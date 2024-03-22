@@ -11,6 +11,9 @@ spring:
       max-parts: -1
       file-storage-directory: classpath:static/upload
 
+  profiles:
+    active: local
+
 logging:
   level:
     mapper:

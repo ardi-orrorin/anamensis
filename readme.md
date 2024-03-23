@@ -6,9 +6,9 @@
 
 ### Client
 - Language : Typescript
-- PakageManager : NPM
-- build : TurboPack
-- Framwork : NEXTJS
+- PackageManager : NPM
+- Build : TurboPack
+- Framework : NEXTJS
 - Libraries
   - Date : momentJs
   - fetchAPI : axios
@@ -20,7 +20,7 @@
 
 ### Server
 - Language : Java 17
-- PagageManager & Build : Gradle
+- PackageManager & Build : Gradle
 - Framwork : Springboot
 - Libraries
   - Webflux

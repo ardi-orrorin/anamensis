@@ -1,4 +1,4 @@
-# Project Anamensis
+# Project Anamensis(업데이트 중...)
 
 ## Introduce
 
@@ -21,7 +21,7 @@
 ### Server
 - Language : Java 17
 - PackageManager & Build : Gradle
-- Framwork : Springboot
+- Framework : Springboot
 - Libraries
   - Webflux
   - SpringSecurity
@@ -41,5 +41,5 @@
 
 
 ## ERD --> [Link](https://www.erdcloud.com/d/kaLkfNKiwKcPe85k4)
-
+![](./resource/erd.jpg)
 

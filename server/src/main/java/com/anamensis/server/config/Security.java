@@ -9,6 +9,8 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
@@ -19,21 +21,16 @@ public class Security {
 
     @Bean
     public SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http) {
-        http.authorizeExchange((authorize) -> authorize
-                .pathMatchers("/**").permitAll()
-//                .pathMatchers("/resources/**", "/signup", "/about").permitAll()
-//                .pathMatchers("/admin/**").hasRole("ADMIN")
-		);
-
-
-        http.formLogin(ServerHttpSecurity.FormLoginSpec::disable);
-        http.csrf(ServerHttpSecurity.CsrfSpec::disable);
-
-        http.httpBasic(Customizer.withDefaults());
-
-        http.cors(cors -> cors.configurationSource(this::corsConfiguration));
-
-        return http.build();
+        return http
+                .authorizeExchange((authorize) -> authorize
+                        .pathMatchers("/**").permitAll()
+                        .anyExchange().authenticated()
+                )
+                .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
+                .httpBasic(Customizer.withDefaults())
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .cors(cors -> cors.configurationSource(this::corsConfiguration))
+                .build();
     }
 
 //    @Bean
@@ -42,10 +39,9 @@ public class Security {
 //    }
 
     private CorsConfiguration corsConfiguration(ServerWebExchange exchange){
-
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedOrigins(List.of("*"));
-        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
+        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         return corsConfiguration;

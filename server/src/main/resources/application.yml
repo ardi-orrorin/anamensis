@@ -24,6 +24,6 @@ logging:
       mybatis: debug
 
 jwt:
-  grant-type: bearer
+  grant-type: Authorization
 
 

@@ -33,5 +33,6 @@ public class UserService implements ReactiveUserDetailsService {
     public Mono<UserDetails> findByUsername(String username) {
         return Mono.justOrEmpty(userMapper.findUserByUserId(username))
                 .map(user -> new UserDto(user.userId(), user.pwd(), List.of()));
+
     }
 }

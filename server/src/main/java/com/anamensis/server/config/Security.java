@@ -9,8 +9,6 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
@@ -32,11 +30,6 @@ public class Security {
                 .cors(cors -> cors.configurationSource(this::corsConfiguration))
                 .build();
     }
-
-//    @Bean
-//    public MapReactiveUserDetailsService userDetailsService() {
-//        return new MapReactiveUserDetailsService();
-//    }
 
     private CorsConfiguration corsConfiguration(ServerWebExchange exchange){
         CorsConfiguration corsConfiguration = new CorsConfiguration();

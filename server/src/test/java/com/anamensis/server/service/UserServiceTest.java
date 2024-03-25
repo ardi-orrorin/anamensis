@@ -1,9 +1,12 @@
 package com.anamensis.server.service;
 
+import com.anamensis.server.entity.User;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import reactor.core.publisher.Mono;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,17 +16,28 @@ class UserServiceTest {
     @SpyBean
     private UserService userService;
 
+    @SpyBean
+    private BCryptPasswordEncoder encoder;
+
 
     private Logger log = org.slf4j.LoggerFactory.getLogger(UserServiceTest.class);
 
 
     @Test
     void findUserByUserIdAndPwd() {
-        log.info(userService.findUserByUserIdAndPwd("admin", "admin"));
+        userService.findUserByUserId("admin", "admin")
+                .log();
 
     }
 
     @Test
     void findByUsername() {
+    }
+
+    @Test
+    void save() {
+        String encodePwd = encoder.encode("admin3");
+        User user = new User(0, "admin3", encodePwd, "admin", "test@test1.com","010-1111-1112", null, null, true);
+        userService.saveUser(Mono.just(user));
     }
 }

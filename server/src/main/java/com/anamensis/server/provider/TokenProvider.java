@@ -5,6 +5,7 @@ import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,37 +23,26 @@ import java.time.Instant;
 @Slf4j
 public class TokenProvider {
 
-    @Autowired
-    @Lazy
-    private UserService userService;
-
-    @Value("${jwt.grant-type}")
-    private String GRANT_TYPE;
-
     private final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
+    private final long EXP = 30 * 60 * 1000L;
+
+
     public String generateToken(String userId) {
-        Instant now = Instant.now().plusSeconds(1 * 60 * 60);
         return Jwts.builder()
-                .setSubject(userId)
-                .setExpiration(Timestamp.from(now))
-                .signWith(SECRET_KEY)
-                .compact();
+            .setSubject(userId)
+            .setExpiration(new Timestamp(Instant.now().toEpochMilli() + EXP))
+            .signWith(SECRET_KEY)
+            .compact();
     }
 
     public String getUserId(String token) {
         JwtParser jwts =  Jwts.parserBuilder()
                 .setSigningKey(SECRET_KEY)
                 .build();
-        return jwts.parseClaimsJws(token.substring(7))
+        return jwts.parseClaimsJws(token)
                 .getBody().getSubject();
 
-    }
-
-    public Mono<Authentication> getAuthentication(String token) {
-        log.info("getAuthentication : {}", token);
-        return userService.findByUsername(getUserId(token))
-                .map(userDetails -> new UsernamePasswordAuthenticationToken(userDetails, ""));
     }
 
 }

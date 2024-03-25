@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -66,5 +67,25 @@ class UserControllerTest {
                 .returnResult();
 
         log.info(result.getResponseBody());
+    }
+
+    @Test
+    void signup(){
+        MultiValueMap<String, String> formData = new org.springframework.util.LinkedMultiValueMap<>();
+        formData.add("userId", "admin");
+        formData.add("pwd", "admin");
+        formData.add("name", "admin");
+        formData.add("email", "test@test.com");
+        formData.add("phone", "010-1234-5678");
+
+        EntityExchangeResult<Integer> result =
+        webTestClient.post()
+                .uri("/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(formData)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Integer.class)
+                .returnResult();
     }
 }

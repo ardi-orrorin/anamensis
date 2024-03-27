@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.server.mapper.LoginHistoryMapper">
+    <insert id="save" parameterType="map">
+        INSERT INTO login_history
+               (user_pk, ip, location, device)
+         VALUE (#{user.id}, #{history.ip}, #{history.location}, #{history.device})
+    </insert>
+</mapper>

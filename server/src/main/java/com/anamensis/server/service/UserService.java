@@ -30,7 +30,7 @@ public class UserService implements ReactiveUserDetailsService {
         return Mono.justOrEmpty(userMapper.findUserByUserId(userId))
                 .onErrorMap(e -> new RuntimeException("User not found"))
                 .doOnNext(user -> {
-                    if (!bCryptPasswordEncoder.matches(pwd, user.pwd())) {
+                    if (!bCryptPasswordEncoder.matches(pwd, user.getPwd())) {
                         throw new RuntimeException("Password not matched");
                     }
                 });
@@ -41,8 +41,8 @@ public class UserService implements ReactiveUserDetailsService {
     public Mono<UserDetails> findByUsername(String username) {
         return Mono.justOrEmpty(userMapper.findUserByUserId(username))
                 .map(user -> new UserDto(
-                        user.userId(),
-                        bCryptPasswordEncoder.encode(user.pwd()),
+                        user.getUserId(),
+                        bCryptPasswordEncoder.encode(user.getPwd()),
                         List.of()
                 ));
 
@@ -50,11 +50,7 @@ public class UserService implements ReactiveUserDetailsService {
 
 //    @Transactional
     public Mono<Integer> saveUser(Mono<User> user) {
-        return user.map(u -> new User(
-                        0,        u.userId(),    bCryptPasswordEncoder.encode(u.pwd()),
-                        u.name(),     u.email(),    u.phone(),
-                        u.createAt(), u.updateAt(), true
-                    ))
+        return user.doOnNext(u -> u.setPwd(bCryptPasswordEncoder.encode(u.getPwd())))
                    .map(userMapper::save)
                    .onErrorMap(e -> new DuplicateUserException(e.getMessage(), HttpStatus.BAD_REQUEST));
     }

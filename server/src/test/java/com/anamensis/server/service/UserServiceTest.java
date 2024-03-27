@@ -37,7 +37,14 @@ class UserServiceTest {
     @Test
     void save() {
         String encodePwd = encoder.encode("admin3");
-        User user = new User(0, "admin3", encodePwd, "admin", "test@test1.com","010-1111-1112", null, null, true);
+        User user = User.builder()
+                .userId("admin3")
+                .pwd(encodePwd)
+                .name("admin")
+                .email("test@test1.com")
+                .phone("010-1111-1112")
+                .isUse(true)
+                .build();
         userService.saveUser(Mono.just(user));
     }
 }

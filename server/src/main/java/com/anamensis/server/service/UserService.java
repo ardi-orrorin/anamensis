@@ -26,6 +26,11 @@ public class UserService implements ReactiveUserDetailsService {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    public User findUserByUserId(String userId) {
+        return userMapper.findUserByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
     public Mono<User> findUserByUserId(String userId, String pwd) {
         return Mono.justOrEmpty(userMapper.findUserByUserId(userId))
                 .onErrorMap(e -> new RuntimeException("User not found"))
@@ -48,10 +53,11 @@ public class UserService implements ReactiveUserDetailsService {
 
     }
 
-//    @Transactional
+    @Transactional
     public Mono<Integer> saveUser(Mono<User> user) {
         return user.doOnNext(u -> u.setPwd(bCryptPasswordEncoder.encode(u.getPwd())))
                    .map(userMapper::save)
                    .onErrorMap(e -> new DuplicateUserException(e.getMessage(), HttpStatus.BAD_REQUEST));
     }
+
 }

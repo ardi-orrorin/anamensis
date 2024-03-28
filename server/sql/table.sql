@@ -131,7 +131,7 @@ CREATE TABLE anamensis.board_comment (
 CREATE TABLE anamensis.share_link (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT                        COMMENT 'PK',
     org_link       VARCHAR(255)    NOT NULL                                             COMMENT '원본 링크',
-    share_link     VARCHAR(255)    NOT NULL       UNIQUE                                COMMENT '공유 링크',
+    share_link     VARCHAR(255)    NOT NULL                                             COMMENT '공유 링크',
     create_at      DATETIME        NOT NULL       DEFAULT            CURRENT_TIMESTAMP  COMMENT '생성 일자',
     is_use         TINYINT(1)      NOT NULL       DEFAULT            1                  COMMENT '사용 여부 0:사용안함, 1:사용',
     user_pk        BIGINT          NOT NULL                                             COMMENT '유저 PK',

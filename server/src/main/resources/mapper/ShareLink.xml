@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.server.mapper.ShareLinkMapper">
+    <select id="selectByShareLink" resultType="ShareLink">
+        SELECT *
+          FROM share_link
+         WHERE share_link = #{shareLink}
+           AND is_use = 1
+    </select>
+    <insert id="insert" parameterType="ShareLink">
+        INSERT INTO share_link
+               (org_link, share_link, user_pk)
+        VALUES (#{shareLink.orgLink}, #{shareLink.shareLink}, #{user.id})
+    </insert>
+    <update id="updateUse" parameterType="ShareLink">
+        UPDATE share_link
+           SET is_use = #{isUse}
+         WHERE id = #{id}
+    </update>
+</mapper>

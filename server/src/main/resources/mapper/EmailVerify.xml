@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.server.mapper.EmailVerifyMapper">
+    <select id="selectByEmailAndCode" resultType="EmailVerify">
+        SELECT *
+         FROM email_verify
+        WHERE email = #{email}
+          AND code = #{code}
+          AND is_use = 1
+          AND expire_at > #{expireAt}
+    </select>
+
+    <insert id="insert" parameterType="EmailVerify">
+        INSERT INTO email_verify
+               (email, code, create_at, expire_at)
+        VALUES (#{email}, #{code}, #{createAt}, #{expireAt})
+    </insert>
+
+    <update id="updateIsUse" parameterType="EmailVerify">
+        UPDATE email_verify
+           SET is_use = #{isUse}
+         WHERE email = #{email}
+           AND code = #{code}
+    </update>
+</mapper>

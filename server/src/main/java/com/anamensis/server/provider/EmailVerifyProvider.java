@@ -1,5 +1,6 @@
 package com.anamensis.server.provider;
 
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -9,23 +10,23 @@ import java.util.Random;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class ShareLinkProvider {
+public class EmailVerifyProvider {
+
+    private final String[] KEYS = {"0","1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
     private final Random rdm;
 
-    public String generateShareLink() {
+    public String generateCode() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 15; i++) {
-            sb.append(generateChar());
+        for (int i = 0; i < 6; i++) {
+            sb.append(generateKey());
         }
         return sb.toString();
     }
 
-    private char generateChar() {
-        int c = rdm.nextInt(26) + 65;
+    private String generateKey() {
+        int keyIndex = rdm.nextInt(KEYS.length);
 
-        char result = rdm.nextInt(2) == 0 ? (char) c : (char) (c + 32);
-
-        return result;
+        return KEYS[keyIndex];
     }
 }

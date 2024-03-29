@@ -23,7 +23,8 @@ logging:
     mapper:
       mybatis: debug
 
-jwt:
-  grant-type: Authorization
-
-
+email:
+  host: smtp.gmail.com
+  port: 587
+  username: username
+  password: password

@@ -176,3 +176,20 @@ CREATE TABLE anamensis.board_history (
     INDEX           create_at_idx     (create_at DESC),
     INDEX           change_code_idx   (change_code_pk)
 ) COMMENT '게시글 변경 이력';
+
+
+CREATE TABLE anamensis.email_verify (
+    id              BIGINT            PRIMARY KEY         AUTO_INCREMENT                           COMMENT 'PK',
+    email           VARCHAR(255)      NOT NULL                                                     COMMENT '이메일',
+    code            VARCHAR(255)      NOT NULL                                                     COMMENT '인증 코드',
+    create_at       DATETIME          NOT NULL            DEFAULT               CURRENT_TIMESTAMP  COMMENT '생성일자',
+    expire_at       DATETIME          NOT NULL                                                     COMMENT '만료일자',
+    is_use          TINYINT(1)        NOT NULL            DEFAULT               1                  COMMENT '사용 여부 0:사용안함, 1:사용',
+    INDEX           email_idx         (email),
+    INDEX           code_idx          (code),
+    INDEX           create_at_idx     (create_at),
+    INDEX           expire_at_idx     (expire_at),
+    INDEX           is_use_idx        (is_use)
+) COMMENT '이메일 인증';
+
+

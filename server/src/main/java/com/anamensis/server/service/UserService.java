@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -56,6 +57,7 @@ public class UserService implements ReactiveUserDetailsService {
     @Transactional
     public Mono<Integer> saveUser(Mono<User> user) {
         return user.doOnNext(u -> u.setPwd(bCryptPasswordEncoder.encode(u.getPwd())))
+                   .doOnNext(u -> u.setCreateAt(LocalDateTime.now()))
                    .map(userMapper::save)
                    .onErrorMap(e -> new DuplicateUserException(e.getMessage(), HttpStatus.BAD_REQUEST));
     }

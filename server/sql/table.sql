@@ -1,7 +1,7 @@
-DROP TABLE anamensis.board;
 DROP TABLE anamensis.login_history;
 DROP TABLE anamensis.role;
 DROP TABLE anamensis.user;
+DROP TABLE anamensis.board;
 DROP TABLE anamensis.table_code;
 DROP TABLE anamensis.file;
 DROP TABLE anamensis.board_history;
@@ -11,6 +11,8 @@ DROP TABLE anamensis.share_link;
 DROP TABLE anamensis.point_code;
 DROP TABLE anamensis.point_history;
 DROP TABLE anamensis.category;
+DROP TABLE anamensis.email_verify;
+
 
 CREATE TABLE anamensis.user (
 	id	        BIGINT	      NOT NULL PRIMARY KEY  AUTO_INCREMENT     COMMENT 'PK'          ,
@@ -99,10 +101,10 @@ CREATE TABLE anamensis.board (
      rate         BIGINT          NOT NULL                DEFAULT             0                    COMMENT '좋아요',
      view_count   BIGINT          NOT NULL                DEFAULT             0                    COMMENT '조회수',
      create_at    DATETIME        NOT NULL                                                         COMMENT '생성일자',
-     user_pk      BIGINT          NOT NULL                                                         COMMENT '유저 PK',
+     user_id      VARCHAR(255)    NOT NULL                                                         COMMENT '유저 아이디',
      isAdsense    TINYINT(1)      NOT NULL                DEFAULT             0                    COMMENT '광고 여부 0:안함, 1:광고',
      is_use       TINYINT(1)      NOT NULL                DEFAULT             1                    COMMENT '사용 여부 0:사용안함, 1:사용',
-     FOREIGN KEY  (user_pk)       REFERENCES              anamensis.user(id),
+     FOREIGN KEY  (user_id)       REFERENCES              anamensis.user(user_id),
      FOREIGN KEY  (category_pk)   REFERENCES              anamensis.category(id),
      FULLTEXT     INDEX           title_idx               (title)             WITH PARSER ngram,
      FULLTEXT     INDEX           content_idx             (content)           WITH PARSER ngram,
@@ -116,11 +118,11 @@ CREATE TABLE anamensis.board_comment (
     board_pk       BIGINT          NOT NULL                                                           COMMENT '게시글 PK',
     content        TEXT            NOT NULL                                                           COMMENT '댓글 내용',
     create_at      DATETIME        NOT NULL                                                           COMMENT '생성일자',
-    user_pk        BIGINT          NOT NULL                                                           COMMENT '유저 PK',
+    user_id        VARCHAR(255)    NOT NULL                                                           COMMENT '유저 아이디',
     parent_pk      BIGINT                                                                             COMMENT '댓글 PK',
     is_use         TINYINT(1)      NOT NULL       DEFAULT          1                                  COMMENT '사용 여부 0:사용안함, 1:사용',
     FOREIGN KEY                    (board_pk)     REFERENCES       anamensis.board(id),
-    FOREIGN KEY                    (user_pk)      REFERENCES       anamensis.user(id),
+    FOREIGN KEY                    (user_id)      REFERENCES       anamensis.user(user_id),
     FOREIGN KEY                    (parent_pk)    REFERENCES       anamensis.board_comment(id),
     INDEX          create_at_idx   (create_at),
     INDEX          is_use_idx      (is_use),
@@ -143,9 +145,10 @@ CREATE TABLE anamensis.share_link (
 
 CREATE TABLE anamensis.point_code (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT    COMMENT 'PK',
-    point_name     VARCHAR(255)    NOT NULL                         COMMENT '포인트 적립 이름',
+    name           VARCHAR(255)    NOT NULL                         COMMENT '포인트 적립 이름',
+    value          BIGINT          NOT NULL                         COMMENT '포인트 값',
     is_use         TINYINT(1)      NOT NULL       DEFAULT 1         COMMENT '사용여부 0:사용안함, 1:사용',
-    INDEX          point_name_idx  (point_name),
+    INDEX          point_name_idx  (name),
     INDEX          is_use_idx      (is_use)
 ) COMMENT '포인트 코드';
 
@@ -155,7 +158,6 @@ CREATE TABLE anamensis.point_history (
     table_ref_pk   BIGINT          NOT NULL                                                   COMMENT '참조된 테이블 PK',
     user_pk        BIGINT          NOT NULL                                                   COMMENT '유저 PK',
     point_code_pk  BIGINT          NOT NULL                                                   COMMENT '포인트 코드 PK',
-    point          BIGINT          NOT NULL                                                   COMMENT '포인트',
     create_at      DATETIME        NOT NULL                                                   COMMENT '생성일자',
     FOREIGN KEY    (user_pk)       REFERENCES     anamensis.user(id),
     FOREIGN KEY    (table_code_pk) REFERENCES     anamensis.table_code(id),

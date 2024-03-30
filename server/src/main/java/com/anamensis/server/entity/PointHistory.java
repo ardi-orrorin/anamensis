@@ -13,9 +13,9 @@ import java.time.LocalDateTime;
 @Builder
 public class PointHistory {
     private long id;
-    private long tableCodePk;
-    private long tableRefPk;
+    private String tableName;
+    private long tablePk;
     private long userPk;
     private long pointCodePk;
-    private LocalDateTime createdAt;
+    private LocalDateTime createAt;
 }

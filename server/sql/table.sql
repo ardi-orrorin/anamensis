@@ -48,15 +48,13 @@ CREATE TABLE anamensis.login_history (
     INDEX        device_idx     (device)
 ) COMMENT '로그인 이력';
 
-CREATE TABLE anamensis.table_code (
-    id           BIGINT          PRIMARY KEY  AUTO_INCREMENT    COMMENT 'PK',
-    table_name   VARCHAR(255)    NOT NULL                       COMMENT '테이블 이름',
-    code         INT             NOT NULL                       COMMENT '테이블 코드',
-    is_use       TINYINT(1)      NOT NULL     DEFAULT 1         COMMENT '사용여부 0:사용안함, 1:사용',
-    INDEX        table_name_idx  (table_name),
-    INDEX        code_idx        (code),
-    INDEX        is_use_idx      (is_use)
-) COMMENT '테이블 코드';
+# CREATE TABLE anamensis.table_code (
+#     id           BIGINT          PRIMARY KEY  AUTO_INCREMENT    COMMENT 'PK',
+#     table_name   VARCHAR(255)    NOT NULL                       COMMENT '테이블 이름',
+#     is_use       TINYINT(1)      NOT NULL     DEFAULT 1         COMMENT '사용여부 0:사용안함, 1:사용',
+#     INDEX        table_name_idx  (table_name),
+#     INDEX        is_use_idx      (is_use)
+# ) COMMENT '테이블 코드';
 
 CREATE TABLE anamensis.file (
     id            BIGINT          PRIMARY KEY            AUTO_INCREMENT                                  COMMENT 'PK',
@@ -154,13 +152,13 @@ CREATE TABLE anamensis.point_code (
 
 CREATE TABLE anamensis.point_history (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT                              COMMENT 'PK',
-    table_code_pk  BIGINT          NOT NULL                                                   COMMENT '테이블코드 PK',
-    table_ref_pk   BIGINT          NOT NULL                                                   COMMENT '참조된 테이블 PK',
+    table_name     VARCHAR(255)    NOT NULL                                                   COMMENT '테이블 이름',
+    table_pk       BIGINT          NOT NULL                                                   COMMENT '참조된 테이블 PK',
     user_pk        BIGINT          NOT NULL                                                   COMMENT '유저 PK',
     point_code_pk  BIGINT          NOT NULL                                                   COMMENT '포인트 코드 PK',
     create_at      DATETIME        NOT NULL                                                   COMMENT '생성일자',
     FOREIGN KEY    (user_pk)       REFERENCES     anamensis.user(id),
-    FOREIGN KEY    (table_code_pk) REFERENCES     anamensis.table_code(id),
+#     FOREIGN KEY    (table_code_pk) REFERENCES     anamensis.table_code(id),
     FOREIGN KEY    (point_code_pk) REFERENCES     anamensis.point_code(id),
     INDEX          create_at_idx   (create_at)
 ) COMMENT '포인트 이력';

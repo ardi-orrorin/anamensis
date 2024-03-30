@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.server.mapper.PointHistoryMapper">
+    <select id="selectByPointHistory" resultType="PointHistory">
+        SELECT *
+          FROM point_history
+         WHERE 1 = 1
+        <if test="id != 0">
+           AND id = #{id}
+        </if>
+        <if test="tableName != null and tableName != ''">
+           AND table_name = #{tableName}
+        </if>
+        <if test="tablePk != 0">
+           AND table_pk = #{tablePk}
+        </if>
+        <if test="userPk != 0">
+           AND user_pk = #{userPk}
+        </if>
+        <if test="pointCodePk != 0">
+           AND point_code_pk = #{pointCodePk}
+        </if>
+    </select>
+
+    <insert id="insert" parameterType="PointHistory">
+        INSERT INTO point_history
+               (table_name, table_pk, user_pk, point_code_pk, create_at)
+        VALUES (#{tableName}, #{tablePk}, #{userPk}, #{pointCodePk}, #{createAt})
+    </insert>
+</mapper>

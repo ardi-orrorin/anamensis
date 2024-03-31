@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.server.mapper.FileMapper">
+    <insert id="insert" parameterType="File">
+        INSERT INTO file (
+               table_code_pk, table_ref_pk, org_file_name
+               , file_name, file_path, create_at)
+        VALUES (#{tableCodePk}, #{tableRefPk}, #{orgFileName}
+                , #{fileName}, #{filePath}, #{createAt})
+    </insert>
+
+    <select id="selectByFileName" resultType="File">
+        SELECT *
+          FROM file
+         WHERE file_name = #{fileName}
+           AND is_use = 1
+    </select>
+</mapper>

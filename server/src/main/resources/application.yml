@@ -28,3 +28,6 @@ email:
   port: 587
   username: username
   password: password
+
+file:
+  upload-dir: /Users/username/Downloads/upload

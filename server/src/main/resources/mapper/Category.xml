@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.server.mapper.CategoryMapper">
+    <select id="selectAll" resultType="Category">
+        SELECT *
+          FROM category
+         WHERE is_use = 1
+    </select>
+
+    <select id="selectById">
+        SELECT *
+          FROM category
+         WHERE id = #{id}
+           AND is_use = 1
+    </select>
+
+    <insert id="insert" parameterType="Category">
+        INSERT INTO category (name, parent_pk)
+        VALUES (#{name}, #{parentPK})
+    </insert>
+
+    <update id="update" parameterType="Category">
+        UPDATE category
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+                parent_pk = #{parentPK},
+        </set>
+         WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE
+          FROM category
+         WHERE id = #{id}
+    </delete>
+</mapper>

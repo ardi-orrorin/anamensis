@@ -2,7 +2,8 @@ mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.anamensis.server.entity, com.anamensis.server.resultMap
   configuration:
-      map-underscore-to-camel-case: true
+    map-underscore-to-camel-case: true
+    jdbc-type-for-null: "null"
 
 
 spring:

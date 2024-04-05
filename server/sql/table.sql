@@ -2,7 +2,7 @@ DROP TABLE anamensis.login_history;
 DROP TABLE anamensis.role;
 DROP TABLE anamensis.user;
 DROP TABLE anamensis.board;
-DROP TABLE anamensis.table_code;
+# DROP TABLE anamensis.table_code;
 DROP TABLE anamensis.file;
 DROP TABLE anamensis.board_history;
 DROP TABLE anamensis.change_code;
@@ -12,6 +12,7 @@ DROP TABLE anamensis.point_code;
 DROP TABLE anamensis.point_history;
 DROP TABLE anamensis.category;
 DROP TABLE anamensis.email_verify;
+DROP TABLE anamensis.otp;
 
 
 CREATE TABLE anamensis.user (
@@ -32,6 +33,17 @@ CREATE TABLE anamensis.role (
 	role        VARCHAR(20)	  NOT NULL                                 COMMENT '권한 정보',
 	user_pk     BIGINT	      NOT NULL                                 COMMENT '사용자 PK'
 ) COMMENT '권한 정보';
+
+CREATE TABLE anamensis.otp (
+    id           BIGINT          PRIMARY KEY   AUTO_INCREMENT       COMMENT 'PK',
+    user_pk      BIGINT          NOT NULL                           COMMENT '사용자 PK',
+    hash         VARCHAR(255)    NOT NULL                           COMMENT 'OTP 코드',
+    create_at    DATETIME        NOT NULL                           COMMENT '생성일자',
+    is_use       TINYINT(1)      NOT NULL      DEFAULT 1            COMMENT '사용여부 0:사용안함, 1:사용',
+    FOREIGN KEY  (user_pk)       REFERENCES    anamensis.user(id),
+    INDEX        user_pk_idx     (user_pk),
+    INDEX        is_use_idx      (is_use)
+) COMMENT 'OTP 정보';
 
 CREATE TABLE anamensis.login_history (
 	id           BIGINT	        NOT NULL    PRIMARY KEY AUTO_INCREMENT       COMMENT 'PK',

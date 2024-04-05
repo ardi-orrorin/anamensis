@@ -34,8 +34,8 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-    // https://mvnrepository.com/artifact/io.vertx/vertx-auth-otp
-    implementation 'io.vertx:vertx-auth-otp:4.5.7'
+    // https://mvnrepository.com/artifact/com.warrenstrange/googleauth
+    implementation 'com.warrenstrange:googleauth:1.5.0'
 
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'

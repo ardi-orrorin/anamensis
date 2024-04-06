@@ -31,6 +31,16 @@
         INSERT INTO user (user_id, pwd, name, email, phone)
          VALUE (#{userId}, #{pwd}, #{name}, #{email}, #{phone})
     </insert>
+    <insert id="saveRole" parameterType="Role">
+        INSERT INTO role (user_pk, role)
+         VALUE (#{userPk}, #{role})
+    </insert>
+    <delete id="deleteRole" parameterType="Role">
+        DELETE
+          FROM role
+         WHERE user_pk = #{userPk}
+           AND role    = #{role}
+    </delete>
     
     <resultMap id="userResultMap" type="UserResultMap" autoMapping="true">
         <id property="userPk" column="id"/>

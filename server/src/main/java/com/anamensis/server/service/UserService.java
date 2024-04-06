@@ -3,6 +3,7 @@ package com.anamensis.server.service;
 
 import com.anamensis.server.dto.UserDto;
 import com.anamensis.server.entity.Role;
+import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.entity.User;
 import com.anamensis.server.exception.DuplicateUserException;
 import com.anamensis.server.mapper.UserMapper;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -61,6 +63,31 @@ public class UserService implements ReactiveUserDetailsService {
                    .doOnNext(u -> u.setCreateAt(LocalDateTime.now()))
                    .map(userMapper::save)
                    .onErrorMap(e -> new DuplicateUserException(e.getMessage(), HttpStatus.BAD_REQUEST));
+    }
+
+    @Transactional
+    public Integer saveRole(Tuple2<UserDetails, RoleType> tuple) {
+        return tuple.mapT1(ud -> findUserByUserId(ud.getUsername()))
+                .mapT1(user -> generateRole(user, tuple.getT2()))
+                .mapT1(userMapper::saveRole)
+                .getT1();
+
+    }
+
+    @Transactional
+    public Integer deleteRole(Tuple2<UserDetails, RoleType> tuple) {
+        return tuple.mapT1(ud -> findUserByUserId(ud.getUsername()))
+                .mapT1(user -> generateRole(user, tuple.getT2()))
+                .mapT1(userMapper::deleteRole)
+                .getT1();
+    }
+
+
+    private Role generateRole(User user, RoleType roleType) {
+        Role role = new Role();
+        role.setUserPk(user.getId());
+        role.setRole(roleType);
+        return role;
     }
 
 }

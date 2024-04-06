@@ -4,6 +4,7 @@ import com.anamensis.server.entity.PointHistory;
 import com.anamensis.server.mapper.PointHistoryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class PointHistoryService {
         return pointHistoryMapper.selectByPointHistory(pointHistory);
     }
 
+    @Transactional
     public boolean insert(PointHistory pointHistory) {
         int result = pointHistoryMapper.insert(pointHistory);
 

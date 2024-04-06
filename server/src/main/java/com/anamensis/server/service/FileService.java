@@ -6,6 +6,7 @@ import com.anamensis.server.provider.FileProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -21,6 +22,7 @@ public class FileService {
                 .orElseThrow(() -> new RuntimeException("File not found"));
     }
 
+    @Transactional
     public Mono<Boolean> insert(FilePart filePart, File file) {
         return fileProvider.save(filePart, file)
                 .map(fileMapper::insert)

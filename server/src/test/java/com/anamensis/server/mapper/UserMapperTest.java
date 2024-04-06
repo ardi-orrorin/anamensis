@@ -1,5 +1,6 @@
 package com.anamensis.server.mapper;
 
+import com.anamensis.server.entity.Role;
 import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.entity.User;
 import org.junit.jupiter.api.Test;
@@ -57,5 +58,28 @@ class UserMapperTest {
     @Test
     void enumTest() {
         log.info("{}", RoleType.valueOf("ADMIN"));
+    }
+
+    @Test
+    void saveRole() {
+        User user = userMapper.findUserByUserId("admin").get();
+
+        Role role = new Role();
+        role.setUserPk(user.getId());
+        role.setRole(RoleType.MASTER);
+
+        userMapper.saveRole(role);
+    }
+
+    @Test
+    void deleteRole() {
+
+        User user = userMapper.findUserByUserId("admin").get();
+
+        Role role = new Role();
+        role.setUserPk(user.getId());
+        role.setRole(RoleType.MASTER);
+
+        userMapper.deleteRole(role);
     }
 }

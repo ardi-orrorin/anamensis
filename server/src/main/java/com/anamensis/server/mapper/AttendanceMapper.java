@@ -1,0 +1,17 @@
+package com.anamensis.server.mapper;
+
+import com.anamensis.server.entity.Attendance;
+import org.apache.ibatis.annotations.Mapper;
+
+import java.time.LocalDate;
+import java.util.Optional;
+
+@Mapper
+public interface AttendanceMapper {
+    void init(long userPk, LocalDate lastDate);
+
+    void update(Attendance attendance);
+
+    Optional<Attendance> findByUserPk(long userPk);
+
+}

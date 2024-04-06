@@ -7,6 +7,7 @@ import com.anamensis.server.provider.ShareLinkProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -37,6 +38,7 @@ public class ShareLinkService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 링크가 존재하지 않습니다."));
     }
 
+    @Transactional
     public boolean updateUse(String shareLink, boolean isUse) {
         ShareLink sl = shareLinkMapper.selectByShareLink(shareLink)
                 .orElseThrow(() -> new IllegalArgumentException("해당 링크가 존재하지 않습니다."));

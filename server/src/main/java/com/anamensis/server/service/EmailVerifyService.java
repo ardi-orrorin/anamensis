@@ -5,6 +5,7 @@ import com.anamensis.server.mapper.EmailVerifyMapper;
 import com.anamensis.server.provider.EmailVerifyProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +17,7 @@ public class EmailVerifyService {
 
     private final EmailVerifyProvider emailVerifyProvider;
 
+    @Transactional
     public String insert(EmailVerify emailVerify) {
         String code = emailVerifyProvider.generateCode();
 
@@ -30,6 +32,7 @@ public class EmailVerifyService {
         return code;
     }
 
+    @Transactional
     public boolean updateIsUse(EmailVerify emailVerify) {
         emailVerify.setExpireAt(LocalDateTime.now());
         EmailVerify email = emailVerifyMapper.selectByEmailAndCode(emailVerify)

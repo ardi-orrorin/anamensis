@@ -9,6 +9,7 @@ import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.util.function.Tuple2;
 
 import java.time.LocalDateTime;
@@ -32,6 +33,7 @@ public class OTPService {
         return otpMapper.selectByUserPk(userPk);
     }
 
+    @Transactional
     public String insert(User user) {
         GoogleAuthenticatorKey key = gAuth.createCredentials();
 
@@ -49,6 +51,7 @@ public class OTPService {
         return GoogleAuthenticatorQRGenerator.getOtpAuthURL("Anamensis", user.getUserId(), key);
     }
 
+    @Transactional
     public boolean update(OTP otp) {
         otp.setUse(false);
         int result = otpMapper.update(otp);

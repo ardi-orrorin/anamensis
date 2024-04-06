@@ -22,5 +22,4 @@ public class UserResultMap {
 
     private List<Role> roles;
 
-
 }

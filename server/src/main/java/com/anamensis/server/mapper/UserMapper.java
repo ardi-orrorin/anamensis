@@ -1,6 +1,7 @@
 package com.anamensis.server.mapper;
 
 
+import com.anamensis.server.entity.Role;
 import com.anamensis.server.entity.User;
 import com.anamensis.server.resultMap.UserResultMap;
 import org.apache.ibatis.annotations.Mapper;
@@ -19,4 +20,7 @@ public interface UserMapper {
 
     int save(User user);
 
+    int saveRole(Role role);
+
+    int deleteRole(Role role);
 }

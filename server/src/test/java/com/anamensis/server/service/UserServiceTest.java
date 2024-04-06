@@ -1,12 +1,18 @@
 package com.anamensis.server.service;
 
+import com.anamensis.server.dto.UserDto;
+import com.anamensis.server.entity.Role;
+import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.entity.User;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -51,6 +57,28 @@ class UserServiceTest {
     @Test
     void testFindByUsername() {
         userService.findByUsername("admin")
+                .log()
+                .subscribe();
+    }
+
+    @Test
+    void saveRole() {
+        UserDetails user = new UserDto("admin", "admin", List.of());
+
+        Mono<UserDetails> mono = Mono.just(user);
+        mono.zipWith(Mono.just(RoleType.USER))
+                .map(userService::saveRole)
+                .log()
+                .subscribe();
+    }
+
+    @Test
+    void deleteRole() {
+        UserDetails user = new UserDto("admin", "admin", List.of());
+        Mono<UserDetails> mono = Mono.just(user);
+        Mono<RoleType> roleType = Mono.just(RoleType.USER);
+        mono.zipWith(roleType)
+                .map(userService::deleteRole)
                 .log()
                 .subscribe();
     }

@@ -4,6 +4,7 @@ package com.anamensis.server.controller;
 import com.anamensis.server.entity.LoginHistory;
 import com.anamensis.server.entity.User;
 import com.anamensis.server.provider.TokenProvider;
+import com.anamensis.server.service.AttendanceService;
 import com.anamensis.server.service.LoginHistoryService;
 import com.anamensis.server.service.UserService;
 import io.netty.handler.codec.http.HttpRequest;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.reactive.result.view.RequestContext;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -30,6 +32,7 @@ import java.net.UnknownHostException;
 public class UserController {
 
     private final UserService userService;
+    private final AttendanceService attendanceService;
     private final LoginHistoryService loginHistoryService;
     private final TokenProvider tokenProvider;
 
@@ -42,8 +45,12 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public Mono<Integer> signup(@Valid @RequestBody com.anamensis.server.entity.User user) {
-        return userService.saveUser(Mono.just(user));
+    public Mono<String> signup(@Valid @RequestBody com.anamensis.server.entity.User user) {
+        return userService.saveUser(Mono.just(user))
+                .publishOn(Schedulers.boundedElastic())
+                .doOnNext(u -> attendanceService.init(u.getId()))
+                .map(u -> "success");
+
     }
 
     @GetMapping(value = "/test")

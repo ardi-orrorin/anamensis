@@ -1,5 +1,6 @@
 package com.anamensis.server.dto;
 
+import com.anamensis.server.entity.RoleType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -11,13 +12,15 @@ public record UserDto(
     String username,
     String password,
 
-    List<GrantedAuthority> authorities
+    List<RoleType> authorities
 
 ) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.authorities;
+        return authorities.stream()
+                .map(authority -> (GrantedAuthority) authority::toString)
+                .toList();
     }
 
     @Override

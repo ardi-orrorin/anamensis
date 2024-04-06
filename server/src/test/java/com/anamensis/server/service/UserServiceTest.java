@@ -47,4 +47,11 @@ class UserServiceTest {
                 .build();
         userService.saveUser(Mono.just(user));
     }
+
+    @Test
+    void testFindByUsername() {
+        userService.findByUsername("admin")
+                .log()
+                .subscribe();
+    }
 }

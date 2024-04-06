@@ -2,6 +2,7 @@ package com.anamensis.server.service;
 
 
 import com.anamensis.server.dto.UserDto;
+import com.anamensis.server.entity.Role;
 import com.anamensis.server.entity.User;
 import com.anamensis.server.exception.DuplicateUserException;
 import com.anamensis.server.mapper.UserMapper;
@@ -18,6 +19,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,13 +47,12 @@ public class UserService implements ReactiveUserDetailsService {
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
-        return Mono.justOrEmpty(userMapper.findUserByUserId(username))
+        return Mono.justOrEmpty(userMapper.findUserInfo(username))
                 .map(user -> new UserDto(
-                        user.getUserId(),
-                        bCryptPasswordEncoder.encode(user.getPwd()),
-                        List.of()
+                        user.getUser().getUserId(),
+                        bCryptPasswordEncoder.encode(user.getUser().getPwd()),
+                        user.getRoles().stream().map(Role::getRole).toList()
                 ));
-
     }
 
     @Transactional

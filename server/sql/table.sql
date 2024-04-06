@@ -2,7 +2,7 @@ DROP TABLE anamensis.login_history;
 DROP TABLE anamensis.role;
 DROP TABLE anamensis.user;
 DROP TABLE anamensis.board;
-# DROP TABLE anamensis.table_code;
+DROP TABLE anamensis.table_code;
 DROP TABLE anamensis.file;
 DROP TABLE anamensis.board_history;
 DROP TABLE anamensis.change_code;
@@ -25,13 +25,16 @@ CREATE TABLE anamensis.user (
     point       BIGINT                 DEFAULT      0                  COMMENT '포인트',
 	create_at	DATETIME	  NOT NULL                                 COMMENT '생성일자',
 	update_at	DATETIME          NULL                                 COMMENT '정보 수정 일자',
-	is_use	    TINYINT	      NOT NULL DEFAULT      1	               COMMENT '계정 사용여부 0:사용안함, 1:사용'
+	is_use	    TINYINT	      NOT NULL DEFAULT      1	               COMMENT '계정 사용여부 0:사용안함, 1:사용',
+	INDEX       user_id_idx  (user_id),
+    INDEX       is_use_idx   (is_use)
 ) COMMENT '사용자 정보';
 
 CREATE TABLE anamensis.role (
-	id	        BIGINT	      NOT NULL PRIMARY KEY 	AUTO_INCREMENT     COMMENT 'PK' ,
+# 	id	        BIGINT	      NOT NULL PRIMARY KEY 	AUTO_INCREMENT     COMMENT 'PK' ,
 	role        VARCHAR(20)	  NOT NULL                                 COMMENT '권한 정보',
-	user_pk     BIGINT	      NOT NULL                                 COMMENT '사용자 PK'
+	user_pk     BIGINT	      NOT NULL                                 COMMENT '사용자 PK',
+    PRIMARY KEY (role, user_pk)
 ) COMMENT '권한 정보';
 
 CREATE TABLE anamensis.otp (
@@ -60,13 +63,13 @@ CREATE TABLE anamensis.login_history (
     INDEX        device_idx     (device)
 ) COMMENT '로그인 이력';
 
-# CREATE TABLE anamensis.table_code (
-#     id           BIGINT          PRIMARY KEY  AUTO_INCREMENT    COMMENT 'PK',
-#     table_name   VARCHAR(255)    NOT NULL                       COMMENT '테이블 이름',
-#     is_use       TINYINT(1)      NOT NULL     DEFAULT 1         COMMENT '사용여부 0:사용안함, 1:사용',
-#     INDEX        table_name_idx  (table_name),
-#     INDEX        is_use_idx      (is_use)
-# ) COMMENT '테이블 코드';
+CREATE TABLE anamensis.table_code (
+    id           BIGINT          PRIMARY KEY  AUTO_INCREMENT    COMMENT 'PK',
+    table_name   VARCHAR(255)    NOT NULL                       COMMENT '테이블 이름',
+    is_use       TINYINT(1)      NOT NULL     DEFAULT 1         COMMENT '사용여부 0:사용안함, 1:사용',
+    INDEX        table_name_idx  (table_name),
+    INDEX        is_use_idx      (is_use)
+) COMMENT '테이블 코드';
 
 CREATE TABLE anamensis.file (
     id            BIGINT          PRIMARY KEY            AUTO_INCREMENT                                  COMMENT 'PK',

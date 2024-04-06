@@ -63,6 +63,16 @@ CREATE TABLE anamensis.login_history (
     INDEX        device_idx     (device)
 ) COMMENT '로그인 이력';
 
+CREATE TABLE attendance (
+    user_pk BIGINT NOT NULL PRIMARY KEY,
+    lastDate DATE NOT NULL,
+    days INT NOT NULL DEFAULT 1,
+    is_use TINYINT NOT NULL DEFAULT 1,
+    FOREIGN KEY (user_pk) REFERENCES user(id),
+    INDEX idx_lastDate (lastDate),
+    CHECK ( days >= 1 )
+) COMMENT '출석 정보';
+
 CREATE TABLE anamensis.table_code (
     id           BIGINT          PRIMARY KEY  AUTO_INCREMENT    COMMENT 'PK',
     table_name   VARCHAR(255)    NOT NULL                       COMMENT '테이블 이름',

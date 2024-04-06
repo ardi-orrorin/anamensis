@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.server.mapper.AttendanceMapper">
+    <select id="findByUserPk" resultType="Attendance">
+        SELECT *
+          FROM attendance
+         WHERE user_pk = #{userPk}
+    </select>
+
+    <insert id="init" parameterType="Attendance">
+        INSERT INTO attendance (user_pk, lastDate)
+        VALUES (#{userPk}, #{lastDate})
+    </insert>
+
+    <update id="update" parameterType="Attendance">
+        <selectKey keyProperty="days" resultType="int" order="AFTER">
+            SELECT days
+              FROM attendance
+             WHERE user_pk = #{userPk}
+        </selectKey>
+        UPDATE attendance
+           SET days = if(lastDate = (#{lastDate} - interval 1 DAY), days + 1, 1)
+             , lastDate = #{lastDate}
+         WHERE user_pk = #{userPk}
+    </update>
+
+</mapper>

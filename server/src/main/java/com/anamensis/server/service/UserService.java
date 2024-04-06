@@ -44,7 +44,6 @@ public class UserService implements ReactiveUserDetailsService {
                         throw new RuntimeException("Password not matched");
                     }
                 });
-
     }
 
     @Override
@@ -58,10 +57,10 @@ public class UserService implements ReactiveUserDetailsService {
     }
 
     @Transactional
-    public Mono<Integer> saveUser(Mono<User> user) {
+    public Mono<User> saveUser(Mono<User> user) {
         return user.doOnNext(u -> u.setPwd(bCryptPasswordEncoder.encode(u.getPwd())))
                    .doOnNext(u -> u.setCreateAt(LocalDateTime.now()))
-                   .map(userMapper::save)
+                   .doOnNext(userMapper::save)
                    .onErrorMap(e -> new DuplicateUserException(e.getMessage(), HttpStatus.BAD_REQUEST));
     }
 

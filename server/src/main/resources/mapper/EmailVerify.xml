@@ -7,9 +7,9 @@
     <select id="selectByEmailAndCode" resultType="EmailVerify">
         SELECT *
          FROM email_verify
-        WHERE email = #{email}
-          AND code = #{code}
-          AND is_use = 1
+        WHERE email     = #{email}
+          AND code      = #{code}
+          AND is_use    = 1
           AND expire_at > #{expireAt}
     </select>
 
@@ -22,7 +22,7 @@
     <update id="updateIsUse" parameterType="EmailVerify">
         UPDATE email_verify
            SET is_use = #{isUse}
-         WHERE email = #{email}
-           AND code = #{code}
+         WHERE email  = #{email}
+           AND code   = #{code}
     </update>
 </mapper>

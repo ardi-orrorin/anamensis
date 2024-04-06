@@ -8,7 +8,7 @@
         SELECT *
           FROM share_link
          WHERE share_link = #{shareLink}
-           AND is_use = 1
+           AND is_use     = 1
     </select>
     <insert id="insert" parameterType="ShareLink">
         INSERT INTO share_link
@@ -18,6 +18,6 @@
     <update id="updateUse" parameterType="ShareLink">
         UPDATE share_link
            SET is_use = #{isUse}
-         WHERE id = #{id}
+         WHERE id     = #{id}
     </update>
 </mapper>

@@ -16,6 +16,6 @@
         SELECT *
           FROM file
          WHERE file_name = #{fileName}
-           AND is_use = 1
+           AND is_use    = 1
     </select>
 </mapper>

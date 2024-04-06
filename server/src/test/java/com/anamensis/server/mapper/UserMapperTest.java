@@ -1,5 +1,6 @@
 package com.anamensis.server.mapper;
 
+import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.entity.User;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -48,4 +49,13 @@ class UserMapperTest {
         userMapper.save(user);
     }
 
+    @Test
+    void findUserInfo() {
+        log.info("{}", userMapper.findUserInfo("admin"));
+    }
+
+    @Test
+    void enumTest() {
+        log.info("{}", RoleType.valueOf("ADMIN"));
+    }
 }

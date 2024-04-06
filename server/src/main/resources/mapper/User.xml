@@ -20,8 +20,27 @@
         WHERE user_id = #{userId}
           AND pwd     = #{pwd}
     </select>
+    <select id="findUserInfo" resultMap="userResultMap">
+        SELECT *
+          FROM user a
+          JOIN role b
+            ON a.id      = b.user_pk
+         WHERE a.user_id = #{userId}
+    </select>
     <insert id="save" parameterType="User">
         INSERT INTO user (user_id, pwd, name, email, phone)
          VALUE (#{userId}, #{pwd}, #{name}, #{email}, #{phone})
     </insert>
+    
+    <resultMap id="userResultMap" type="UserResultMap" autoMapping="true">
+        <id property="userPk" column="id"/>
+        <association property="user" resultMap="UserEntity" autoMapping="true" />
+        <collection property="roles" resultMap="RoleEntity" />
+    </resultMap>
+
+    <resultMap id="UserEntity" type="User" autoMapping="true">
+    </resultMap>
+    <resultMap id="RoleEntity" type="Role" autoMapping="true">
+        <result property="role" column="role" typeHandler="RoleTypeHandler"/>
+    </resultMap>
 </mapper>

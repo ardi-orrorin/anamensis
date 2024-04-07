@@ -34,7 +34,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public boolean delete(int id) {
+    public boolean delete(long id) {
         int result = categoryMapper.delete(id);
         return result == 1;
     }

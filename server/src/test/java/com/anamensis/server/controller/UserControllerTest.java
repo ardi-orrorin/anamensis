@@ -1,5 +1,7 @@
 package com.anamensis.server.controller;
 
+import com.anamensis.server.dto.request.UserRequest;
+import com.anamensis.server.dto.response.UserResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -55,37 +57,48 @@ class UserControllerTest {
 //                .value(token -> assertTrue(token.startsWith("Bearer ")));
     }
 
-    @Test
-    void test() {
-        EntityExchangeResult<String> result =
-        webTestClient.get()
-                .uri("/test")
-                .header("Authorization","Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTcxMTI3NDUwMn0.njdXymw5_ObMIdoXX8berWpPPANfJtXeb9_ExcOjeMwEnNV0t_bUGAhrdLfHoujoutH7xxBXoBH7O6_oRAPxNQ")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(String.class)
-                .returnResult();
-
-        log.info(result.getResponseBody());
-    }
+//    @Test
+//    void test() {
+//        EntityExchangeResult<String> result =
+//        webTestClient.get()
+//                .uri("/test")
+//                .header("Authorization","Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTcxMTI3NDUwMn0.njdXymw5_ObMIdoXX8berWpPPANfJtXeb9_ExcOjeMwEnNV0t_bUGAhrdLfHoujoutH7xxBXoBH7O6_oRAPxNQ")
+//                .exchange()
+//                .expectStatus().isOk()
+//                .expectBody(String.class)
+//                .returnResult();
+//
+//        log.info(result.getResponseBody());
+//    }
 
     @Test
     void signup(){
-        MultiValueMap<String, String> formData = new org.springframework.util.LinkedMultiValueMap<>();
-        formData.add("userId", "admin");
-        formData.add("pwd", "admin");
-        formData.add("name", "admin");
-        formData.add("email", "test@test.com");
-        formData.add("phone", "010-1234-5678");
+//        MultiValueMap<String, String> formData = new org.springframework.util.LinkedMultiValueMap<>();
+//        formData.add("userId", "admin2");
+//        formData.add("pwd", "admin");
+//        formData.add("name", "admin11");
+//        formData.add("email", "test1332@test.com");
+//        formData.add("phone", "010-2334-5678");
 
-        EntityExchangeResult<Integer> result =
+        UserRequest.Register register = new UserRequest.Register();
+        register.setUserId("admin2");
+        register.setPwd("admin");
+        register.setName("admin11");
+        register.setEmail("test12332@test.com");
+        register.setPhone("010-2334-5678");
+
+
+        EntityExchangeResult<UserResponse.Status> result =
         webTestClient.post()
                 .uri("/signup")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(formData)
+                .bodyValue(register)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(Integer.class)
+                .expectBody(UserResponse.Status.class)
                 .returnResult();
+
+        log.info(result.getResponseBody().toString());
     }
+
 }

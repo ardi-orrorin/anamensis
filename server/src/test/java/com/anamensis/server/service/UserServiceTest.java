@@ -1,6 +1,7 @@
 package com.anamensis.server.service;
 
 import com.anamensis.server.dto.UserDto;
+import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.entity.Role;
 import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.entity.User;
@@ -43,15 +44,24 @@ class UserServiceTest {
     @Test
     void save() {
         String encodePwd = encoder.encode("admin3");
-        User user = User.builder()
-                .userId("admin3")
-                .pwd(encodePwd)
-                .name("admin")
-                .email("test@test1.com")
-                .phone("010-1111-1112")
-                .isUse(true)
-                .build();
-        userService.saveUser(Mono.just(user));
+//        User user = User.builder()
+//                .userId("admin3")
+//                .pwd(encodePwd)
+//                .name("admin")
+//                .email("test@test1.com")
+//                .phone("010-1111-1112")
+//                .isUse(true)
+//                .build();
+//        userService.saveUser(Mono.just(user));
+
+        UserRequest.Register register = new UserRequest.Register();
+        register.setUserId("admin3");
+        register.setPwd(encodePwd);
+        register.setName("admin");
+        register.setEmail("admin3@test.com");
+        register.setPhone("010-1111-1113");
+
+        userService.saveUser(Mono.just(register));
     }
 
     @Test

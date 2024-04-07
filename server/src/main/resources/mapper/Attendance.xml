@@ -11,7 +11,8 @@
     </select>
 
     <insert id="init" parameterType="Attendance">
-        INSERT INTO attendance (user_pk, lastDate)
+        INSERT INTO attendance
+               (user_pk, lastDate)
         VALUES (#{userPk}, #{lastDate})
     </insert>
 
@@ -22,9 +23,9 @@
              WHERE user_pk = #{userPk}
         </selectKey>
         UPDATE attendance
-           SET days = if(lastDate = (#{lastDate} - interval 1 DAY), days + 1, 1)
+           SET days     = IF(lastDate = (#{lastDate} - INTERVAL 1 DAY), days + 1, 1)
              , lastDate = #{lastDate}
-         WHERE user_pk = #{userPk}
+         WHERE user_pk  = #{userPk}
     </update>
 
 </mapper>

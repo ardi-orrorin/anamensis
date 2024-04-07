@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 
 import java.util.List;
@@ -42,6 +43,7 @@ public class PointHistoryController {
         return pointHistory
                 .zipWith(user)
                 .doOnNext(this::transUserDetailToUserPk)
+                .publishOn(Schedulers.boundedElastic())
                 .map(tuple -> pointHistoryService.insert(tuple.getT1()));
     }
 

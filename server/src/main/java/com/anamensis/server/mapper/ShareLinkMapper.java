@@ -14,6 +14,8 @@ public interface ShareLinkMapper {
 
     Optional<ShareLink> selectByShareLink(String shareLink);
 
+    Optional<ShareLink> selectById(long id);
+
     int updateUse(ShareLink shareLink);
 
 

@@ -4,6 +4,7 @@ import com.anamensis.server.dto.request.ShareLinkRequest;
 import com.anamensis.server.dto.response.ShareLinkResponse;
 import com.anamensis.server.service.ShareLinkService;
 import com.anamensis.server.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,7 +32,7 @@ public class ShareLinkController {
 
     @PostMapping("")
     public Mono<ShareLinkResponse.ShareLink> insert(
-            @RequestBody Mono<ShareLinkRequest.Param> shareLink,
+            @RequestBody @Valid Mono<ShareLinkRequest.Param> shareLink,
             @AuthenticationPrincipal Mono<UserDetails> user
     ) {
 
@@ -46,11 +47,21 @@ public class ShareLinkController {
                 .map(ShareLinkResponse.ShareLink::transToShareLink);
     }
 
-    @PutMapping("{shareLink}")
-    public Mono<Boolean> updateUse(@PathVariable String shareLink,
-                                   @RequestParam boolean isUse
+    @PutMapping("")
+    public Mono<ShareLinkResponse.Use> updateUse(
+            @RequestBody Mono<ShareLinkRequest.Use> shareLink,
+            @AuthenticationPrincipal Mono<UserDetails> user
     ) {
-        return Mono.just(shareLinkService.updateUse(shareLink, isUse));
+        return shareLink.zipWith(user)
+                .publishOn(Schedulers.parallel())
+                .map(tuple ->
+                        tuple.mapT2(u ->
+                            userService.findUserByUserId(u.getUsername())
+                ))
+                .map(shareLinkService::updateUse)
+                .publishOn(Schedulers.parallel())
+                .map(ShareLinkResponse.Use::of);
+
     }
 
 }

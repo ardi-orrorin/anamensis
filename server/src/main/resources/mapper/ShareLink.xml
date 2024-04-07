@@ -10,6 +10,11 @@
          WHERE share_link = #{shareLink}
            AND is_use     = 1
     </select>
+    <select id="selectById" resultType="ShareLink">
+        SELECT *
+          FROM share_link
+         WHERE id = #{id}
+    </select>
     <insert id="insert" parameterType="ShareLink">
         <selectKey keyProperty="id" resultType="int" order="AFTER">
             SELECT LAST_INSERT_ID()
@@ -23,4 +28,5 @@
            SET is_use = #{isUse}
          WHERE id     = #{id}
     </update>
+
 </mapper>

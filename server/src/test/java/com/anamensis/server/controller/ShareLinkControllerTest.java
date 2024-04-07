@@ -11,14 +11,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.test.web.reactive.server.WebTestClientConfigurer;
 import org.springframework.util.MultiValueMap;
 
 import java.util.Objects;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.springSecurity;
-import static org.springframework.web.reactive.function.client.ExchangeFilterFunctions.basicAuthentication;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ShareLinkControllerTest {
@@ -95,5 +90,21 @@ class ShareLinkControllerTest {
 
     @Test
     void updateUse() {
+
+        ShareLinkRequest.Use use = new ShareLinkRequest.Use();
+        use.setId(22);
+        use.setUse(false);
+
+        EntityExchangeResult result =
+        webTestClient.put()
+                .uri("/link")
+                .header("Authorization", "Bearer " + token)
+                .bodyValue(use)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .returnResult();
+
+        log.info("result: {}", result);
     }
 }

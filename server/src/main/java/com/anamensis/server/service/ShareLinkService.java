@@ -19,18 +19,25 @@ public class ShareLinkService {
 
     private final ShareLinkProvider shareLinkProvider;
 
-    public String insert(ShareLink shareLink, User user) {
-
+    public ShareLink insert(String link, User user) {
         String shareLinkStr;
 
         do {
             shareLinkStr = shareLinkProvider.generateShareLink();
-        } while (shareLinkMapper.selectByShareLink(shareLinkStr).isEmpty());
+        } while (shareLinkMapper.selectByShareLink(shareLinkStr).isPresent());
 
-        shareLink.setCreateAt(LocalDateTime.now());
-        shareLinkMapper.insert(shareLink, user);
+        ShareLink shareLink = ShareLink.builder()
+                .orgLink(link)
+                .shareLink(shareLinkStr)
+                .createAt(LocalDateTime.now())
+                .isUse(true)
+                .userPk(user.getId())
+                .build();
 
-        return shareLinkStr;
+        shareLinkMapper.insert(shareLink);
+
+
+        return shareLink;
     }
 
     public ShareLink selectByShareLink(String shareLink) {

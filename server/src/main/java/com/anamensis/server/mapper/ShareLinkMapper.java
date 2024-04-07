@@ -10,10 +10,7 @@ import java.util.Optional;
 @Mapper
 public interface ShareLinkMapper {
 
-    int insert(
-        @Param("shareLink") ShareLink shareLink,
-        @Param("user") User user
-    );
+    int insert(ShareLink shareLink);
 
     Optional<ShareLink> selectByShareLink(String shareLink);
 

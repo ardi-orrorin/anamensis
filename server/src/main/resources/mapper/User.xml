@@ -28,6 +28,9 @@
          WHERE a.user_id = #{userId}
     </select>
     <insert id="save" parameterType="User">
+        <selectKey keyProperty="id" resultType="int" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
         INSERT INTO user (user_id, pwd, name, email, phone)
          VALUE (#{userId}, #{pwd}, #{name}, #{email}, #{phone})
     </insert>

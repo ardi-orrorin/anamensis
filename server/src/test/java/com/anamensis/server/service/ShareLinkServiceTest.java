@@ -18,6 +18,9 @@ class ShareLinkServiceTest {
     private ShareLinkMapper shareLinkMapper;
 
     @SpyBean
+    private ShareLinkService shareLinkService;
+
+    @SpyBean
     private ShareLinkProvider shareLinkProvider;
 
     Logger log = org.slf4j.LoggerFactory.getLogger(ShareLinkServiceTest.class);
@@ -50,9 +53,24 @@ class ShareLinkServiceTest {
             shareLinkStr = shareLinkProvider.generateShareLink();
         } while (shareLinkMapper.selectByShareLink(shareLinkStr).isPresent());
 
-        int result = shareLinkMapper.insert(shareLink, user);
+        int result = shareLinkMapper.insert(shareLink);
 
         log.info("shareLink : " + shareLink.getShareLink());
+    }
+
+    @Test
+    void insertTest() {
+        String link = "/test/test";
+        User user = User.builder()
+                .id(2)
+                .userId("admin")
+                .pwd("admin")
+                .name("admin")
+                .build();
+
+        shareLinkService.insert(link, user);
+
+
     }
 
     @Test

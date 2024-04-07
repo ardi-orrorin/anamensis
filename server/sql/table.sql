@@ -19,7 +19,7 @@ CREATE TABLE anamensis.user (
 	id	        BIGINT	      NOT NULL PRIMARY KEY  AUTO_INCREMENT     COMMENT 'PK'          ,
 	user_id	    VARCHAR(50)	  NOT NULL UNIQUE     	                   COMMENT '계정 아이디',
 	pwd	        VARCHAR(255)  NOT NULL UNIQUE    	                   COMMENT '패스워드',
-    name	    VARCHAR(100)  NOT NULL UNIQUE    	                   COMMENT '이름',
+    name	    VARCHAR(100)  NOT NULL          	                   COMMENT '이름',
 	email	    VARCHAR(255)  NOT NULL UNIQUE    	                   COMMENT '이메일',
     phone  	    VARCHAR(20)	  NOT NULL UNIQUE    	                   COMMENT '핸드폰 번호',
     point       BIGINT                 DEFAULT      0                  COMMENT '포인트',

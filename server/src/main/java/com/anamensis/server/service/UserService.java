@@ -2,12 +2,14 @@ package com.anamensis.server.service;
 
 
 import com.anamensis.server.dto.UserDto;
+import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.entity.Role;
 import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.entity.User;
 import com.anamensis.server.exception.DuplicateUserException;
 import com.anamensis.server.mapper.UserMapper;
 import com.anamensis.server.provider.TokenProvider;
+import com.anamensis.server.resultMap.UserResultMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
@@ -46,6 +48,11 @@ public class UserService implements ReactiveUserDetailsService {
                 });
     }
 
+    public Mono<UserResultMap> findUserInfo(String userId) {
+        return Mono.justOrEmpty(userMapper.findUserInfo(userId))
+                .onErrorMap(e -> new RuntimeException("User not found"));
+    }
+
     @Override
     public Mono<UserDetails> findByUsername(String username) {
         return Mono.justOrEmpty(userMapper.findUserInfo(username))
@@ -57,10 +64,12 @@ public class UserService implements ReactiveUserDetailsService {
     }
 
     @Transactional
-    public Mono<User> saveUser(Mono<User> user) {
-        return user.doOnNext(u -> u.setPwd(bCryptPasswordEncoder.encode(u.getPwd())))
+    public Mono<User> saveUser(Mono<UserRequest.Register> user) {
+        return user.map(UserRequest.Register::transToUser)
+                   .doOnNext(u -> u.setPwd(bCryptPasswordEncoder.encode(u.getPwd())))
                    .doOnNext(u -> u.setCreateAt(LocalDateTime.now()))
                    .doOnNext(userMapper::save)
+                   .doOnNext(u -> userMapper.saveRole(generateRole(u, RoleType.USER)))
                    .onErrorMap(e -> new DuplicateUserException(e.getMessage(), HttpStatus.BAD_REQUEST));
     }
 

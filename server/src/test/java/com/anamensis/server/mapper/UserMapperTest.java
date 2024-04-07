@@ -43,11 +43,12 @@ class UserMapperTest {
                 .userId("admin3")
                 .pwd(encodePwd)
                 .name("admin")
-                .email("test@test1.com")
-                .phone("010-1111-1112")
+                .email("tes1t@test1.com")
+                .phone("010-1221-1112")
                 .isUse(true)
                 .build();
         userMapper.save(user);
+        log.info("{}", user);
     }
 
     @Test

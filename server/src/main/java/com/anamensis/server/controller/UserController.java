@@ -1,6 +1,8 @@
 package com.anamensis.server.controller;
 
 
+import com.anamensis.server.dto.request.UserRequest;
+import com.anamensis.server.dto.response.UserResponse;
 import com.anamensis.server.entity.LoginHistory;
 import com.anamensis.server.entity.User;
 import com.anamensis.server.provider.TokenProvider;
@@ -11,6 +13,7 @@ import io.netty.handler.codec.http.HttpRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,31 +40,27 @@ public class UserController {
     private final TokenProvider tokenProvider;
 
     @PostMapping(value = "/login")
-    public Mono<String> login(Mono<User> user) throws UnknownHostException {
-        return user.flatMap(u -> userService.findUserByUserId(u.username(), u.password()))
+    public Mono<UserResponse.Login> login(Mono<UserRequest.Login> user) throws UnknownHostException {
+        return user.flatMap(u -> userService.findUserByUserId(u.getUsername(), u.getPassword()))
+                   .flatMap(u -> userService.findUserInfo(u.getUserId()))
                    .zipWith(newLoginHistory(InetAddress.getLocalHost()))
-                   .doOnNext(u -> loginHistoryService.save(u.getT2(), u.getT1()))
-                   .map(u -> tokenProvider.generateToken(u.getT1().getUserId()));
+                   .publishOn(Schedulers.boundedElastic())
+                   .doOnNext(u -> loginHistoryService.save(u.getT2(), u.getT1().getUser()))
+                   .map(u -> u.mapT2(host -> tokenProvider.generateToken(u.getT1().getUser().getUserId())))
+                   .map(u -> UserResponse.Login.transToLogin(u.getT1(), u.getT2()));
     }
 
     @PostMapping("/signup")
-    public Mono<String> signup(@Valid @RequestBody com.anamensis.server.entity.User user) {
-        return userService.saveUser(Mono.just(user))
+    public Mono<UserResponse.Status> signup(@Valid @RequestBody Mono<UserRequest.Register> user) {
+        return  userService.saveUser(user)
                 .publishOn(Schedulers.boundedElastic())
+                .log()
                 .doOnNext(u -> attendanceService.init(u.getId()))
-                .map(u -> "success");
+                .map(u -> UserResponse.Status
+                    .transToStatus(HttpStatus.CREATED, "User created")
+                );
 
     }
-
-    @GetMapping(value = "/test")
-    public Mono<String> test(@AuthenticationPrincipal UserDetails user) {
-        return Mono.just("test");
-    }
-
-    private record User(
-        String username,
-        String password
-    ) {}
 
     private Mono<LoginHistory> newLoginHistory(InetAddress ip) {
         LoginHistory loginHistory = LoginHistory.builder()

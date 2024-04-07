@@ -1,13 +1,16 @@
 package com.anamensis.server.service;
 
+import com.anamensis.server.dto.request.ShareLinkRequest;
 import com.anamensis.server.entity.ShareLink;
 import com.anamensis.server.entity.User;
 import com.anamensis.server.mapper.ShareLinkMapper;
 import com.anamensis.server.provider.ShareLinkProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.type.TypeHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.util.function.Tuple2;
 
 import java.time.LocalDateTime;
 
@@ -46,13 +49,13 @@ public class ShareLinkService {
     }
 
     @Transactional
-    public boolean updateUse(String shareLink, boolean isUse) {
-        ShareLink sl = shareLinkMapper.selectByShareLink(shareLink)
+    public ShareLink updateUse(Tuple2<ShareLinkRequest.Use, User> tuple) {
+        ShareLink sl = shareLinkMapper.selectById(tuple.getT1().getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 링크가 존재하지 않습니다."));
-        sl.setUse(isUse);
-        int result = shareLinkMapper.updateUse(sl);
+        sl.setUse(tuple.getT1().isUse());
+        shareLinkMapper.updateUse(sl);
 
-        return result == 1;
+        return sl;
     }
 
 

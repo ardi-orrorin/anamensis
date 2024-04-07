@@ -1,5 +1,6 @@
 package com.anamensis.server.dto.response;
 
+import com.anamensis.server.entity.ShareLink;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,6 +43,22 @@ public class ShareLinkResponse {
                     .createAt(shareLink.getCreateAt())
                     .build();
         }
+    }
+
+    @Getter
+    @Builder
+    @ToString
+    public static class Use {
+        private long id;
+        private boolean isUse;
+
+        public static Use of(com.anamensis.server.entity.ShareLink shareLink) {
+            return Use.builder()
+                    .id(shareLink.getId())
+                    .isUse(shareLink.isUse())
+                    .build();
+        }
+
     }
 
 

@@ -11,9 +11,12 @@
            AND is_use     = 1
     </select>
     <insert id="insert" parameterType="ShareLink">
+        <selectKey keyProperty="id" resultType="int" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
         INSERT INTO share_link
-               (org_link, share_link, user_pk)
-        VALUES (#{shareLink.orgLink}, #{shareLink.shareLink}, #{user.id})
+               (org_link, share_link, create_at, user_pk)
+         VALUE (#{orgLink}, #{shareLink}, #{createAt}, #{userPk})
     </insert>
     <update id="updateUse" parameterType="ShareLink">
         UPDATE share_link

@@ -19,12 +19,6 @@ class ShareLinkMapperTest {
 
     @Test
     void insert() {
-        ShareLink shareLink = ShareLink.builder()
-//                .id(1)
-                .orgLink("orgLink")
-                .shareLink("shareLink")
-                .isUse(true)
-                .build();
         User user = User.builder()
                 .id(2)
                 .userId("admin")
@@ -32,7 +26,14 @@ class ShareLinkMapperTest {
                 .name("admin")
                 .isUse(true)
                 .build();
-        shareLinkMapper.insert(shareLink, user);
+        ShareLink shareLink = ShareLink.builder()
+//                .id(1)
+                .orgLink("orgLink")
+                .shareLink("shareLink")
+                .userPk(user.getId())
+                .isUse(true)
+                .build();
+        shareLinkMapper.insert(shareLink);
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.anamensis.server.service;
 
+import com.anamensis.server.dto.Page;
 import com.anamensis.server.entity.LoginHistory;
 import com.anamensis.server.entity.ShareLink;
 import com.anamensis.server.entity.User;
@@ -10,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.security.core.parameters.P;
+import reactor.core.publisher.Mono;
 
 @SpringBootTest
 class ShareLinkServiceTest {
@@ -92,4 +95,24 @@ class ShareLinkServiceTest {
         shareLinkMapper.updateUse(sl);
     }
 
+    @Test
+    void selectAll() {
+        User user = User.builder()
+                .id(2)
+                .userId("admin")
+                .pwd("admin")
+                .name("admin")
+                .build();
+
+        Page page = new Page();
+        page.setPage(1);
+        page.setLimit(2);
+//        page.setCriteria("id");
+
+
+        Mono.just(user).zipWith(Mono.just(page))
+                .log()
+                .map(shareLinkService::selectAll)
+                .subscribe(sl -> log.info("sl : " + sl));
+    }
 }

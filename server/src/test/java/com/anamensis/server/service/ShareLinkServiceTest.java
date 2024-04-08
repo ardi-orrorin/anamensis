@@ -106,7 +106,7 @@ class ShareLinkServiceTest {
 
         Page page = new Page();
         page.setPage(1);
-        page.setLimit(2);
+        page.setSize(2);
 //        page.setCriteria("id");
 
 

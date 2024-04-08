@@ -62,7 +62,7 @@ class ShareLinkMapperTest {
 
         Page page = new Page();
         page.setPage(1);
-        page.setLimit(10);
+        page.setSize(10);
 //        page.setCriteria("id");
 //        page.setOrder("desc");
 

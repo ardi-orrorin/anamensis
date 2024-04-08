@@ -2,15 +2,19 @@ package com.anamensis.server.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 
 public class Page {
-    @Getter
+
+    private final int DEFAULT_PAGE = 1;
+
+    private final int DEFAULT_SIZE = 15;
+
     @Setter
     private int page;
 
-    @Getter
     @Setter
-    private int limit;
+    private int size;
 
     @Getter
     @Setter
@@ -24,9 +28,17 @@ public class Page {
 
     private boolean endPage;
 
+    public int getPage() {
+        return page == 0 ? DEFAULT_PAGE : page;
+    }
+
+    public int getSize() {
+        return size == 0 ? DEFAULT_SIZE : size;
+    }
+
     public int getOffset() {
         int max = page <= 1 ? 1 : page;
-        return (max - 1) * limit;
+        return (max - 1) * size;
     }
 
     public String getCriteria() {
@@ -38,7 +50,7 @@ public class Page {
     }
 
     public boolean isEndPage() {
-        return total <= page * limit;
+        return total <= page * size;
     }
 
 }

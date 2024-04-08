@@ -33,3 +33,7 @@ email:
 
 file:
   upload-dir: /Users/username/Downloads/upload
+
+pageable:
+  page: 1
+  size: 20

@@ -2,6 +2,7 @@ package com.anamensis.server.config;
 
 import com.anamensis.server.dto.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.BindingContext;
@@ -12,9 +13,16 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class PageArgumentResolver implements HandlerMethodArgumentResolver {
 
+    @Value("${pageable.page}")
+    private String DEFAULT_PAGE;
+
+    @Value("${pageable.size}")
+    private String DEFAULT_SIZE;
+
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType() == Page.class;
+        return parameter.getParameterType().equals(Page.class);
+
     }
 
     @Override
@@ -25,16 +33,17 @@ public class PageArgumentResolver implements HandlerMethodArgumentResolver {
     ) {
         MultiValueMap<String, String> params = exchange.getRequest().getQueryParams();
 
-        log.info("params: {}", params);
-
         String page = params.getFirst("page");
         String size = params.getFirst("size");
+        String criteria = params.getFirst("criteria");
+        String order = params.getFirst("order");
 
         Page query = new Page();
-        query.setPage(Integer.parseInt(page));
-        query.setSize(Integer.parseInt(size));
-        query.setCriteria(params.getFirst("criteria"));
-        query.setOrder(params.getFirst("order"));
+
+        query.setPage(Integer.parseInt(page == null ? DEFAULT_PAGE : page));
+        query.setSize(Integer.parseInt(size == null ? DEFAULT_SIZE : size));
+        query.setCriteria(criteria == null ? "id" : criteria);
+        query.setOrder(order == null ? "desc" : order);
 
         return Mono.just(query);
     }

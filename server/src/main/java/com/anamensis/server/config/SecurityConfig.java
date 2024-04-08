@@ -1,5 +1,6 @@
 package com.anamensis.server.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -21,6 +22,7 @@ import org.springframework.web.reactive.result.method.annotation.ArgumentResolve
 @EnableWebFlux
 @EnableWebFluxSecurity
 public class SecurityConfig implements WebFluxConfigurer {
+
 
     @Bean
     public SecurityWebFilterChain springWebFilterChain(
@@ -60,10 +62,14 @@ public class SecurityConfig implements WebFluxConfigurer {
                 .allowCredentials(true);
     }
 
+    @Bean
+    public PageArgumentResolver pageArgumentResolver() {
+        return new PageArgumentResolver();
+    }
+
     @Override
     public void configureArgumentResolvers(ArgumentResolverConfigurer configurer) {
 
-        configurer.addCustomResolver(new PageArgumentResolver());
-        WebFluxConfigurer.super.configureArgumentResolvers(configurer);
+        configurer.addCustomResolver(pageArgumentResolver());
     }
 }

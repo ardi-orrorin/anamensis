@@ -9,10 +9,9 @@ import org.springframework.web.reactive.result.method.HandlerMethodArgumentResol
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
 @Slf4j
 public class PageArgumentResolver implements HandlerMethodArgumentResolver {
+
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.getParameterType() == Page.class;
@@ -26,12 +25,17 @@ public class PageArgumentResolver implements HandlerMethodArgumentResolver {
     ) {
         MultiValueMap<String, String> params = exchange.getRequest().getQueryParams();
 
-        Page page = new Page();
-        page.setPage(Integer.parseInt(Objects.requireNonNull(params.getFirst("page"))));
-        page.setLimit(Integer.parseInt(Objects.requireNonNull(params.getFirst("limit"))));
-        page.setCriteria(params.getFirst("criteria"));
-        page.setOrder(params.getFirst("order"));
+        log.info("params: {}", params);
 
-        return Mono.just(page);
+        String page = params.getFirst("page");
+        String size = params.getFirst("size");
+
+        Page query = new Page();
+        query.setPage(Integer.parseInt(page));
+        query.setSize(Integer.parseInt(size));
+        query.setCriteria(params.getFirst("criteria"));
+        query.setOrder(params.getFirst("order"));
+
+        return Mono.just(query);
     }
 }

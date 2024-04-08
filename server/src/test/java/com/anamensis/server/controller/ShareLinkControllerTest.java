@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.MultiValueMap;
@@ -16,6 +17,7 @@ import org.springframework.util.MultiValueMap;
 import java.util.Objects;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("local")
 class ShareLinkControllerTest {
 
     @LocalServerPort
@@ -136,9 +138,10 @@ class ShareLinkControllerTest {
                 .uri(uriBuilder -> uriBuilder
                         .path("/link")
                         .queryParam("page", 1)
-                        .queryParam("limit", 2)
-                        .queryParam("criteria", "id")
+                        .queryParam("size", 15)
+                        .queryParam("criteria", "createAt")
                         .queryParam("sort", "asc")
+                        .queryParam("link", "test")
                         .build()
                 )
                 .header("Authorization", "Bearer " + token)

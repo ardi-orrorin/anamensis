@@ -4,15 +4,37 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.anamensis.server.mapper.ShareLinkMapper">
-    <select id="selectByShareLink" resultType="ShareLink">
+    <sql id="tbl_share_link">
         SELECT *
           FROM share_link
+    </sql>
+    <select id="selectCount" resultType="int">
+        SELECT COUNT(*)
+          FROM share_link
+         WHERE user_pk = #{id}
+    </select>
+    <select id="selectAll" parameterType="Map" resultType="ShareLink">
+        <include refid="tbl_share_link" />
+         WHERE user_pk = #{user.id}
+         ORDER BY
+         <choose>
+            <when test="page.criteria == 'createAt' and (page.order == 'asc' or page.order == '')">create_at</when>
+            <when test="page.criteria == 'createAt' and page.order == 'desc'">create_at DESC</when>
+            <when test="page.criteria == 'isUse' and (page.order == 'asc' or page.order == '' or page.order == null)">is_use</when>
+            <when test="page.criteria == 'isUse' and page.order == 'desc'">is_use DESC</when>
+            <when test="page.criteria == 'id' and (page.order == 'asc' or page.order == '' or page.order == null)">id</when>
+            <when test="page.criteria == 'id' and page.order == 'desc'">id DESC</when>
+            <otherwise>id DESC</otherwise>
+         </choose>
+         LIMIT #{page.offset}, #{page.limit}
+    </select>
+    <select id="selectByShareLink" resultType="ShareLink">
+        <include refid="tbl_share_link" />
          WHERE share_link = #{shareLink}
            AND is_use     = 1
     </select>
     <select id="selectById" resultType="ShareLink">
-        SELECT *
-          FROM share_link
+        <include refid="tbl_share_link" />
          WHERE id = #{id}
     </select>
     <insert id="insert" parameterType="ShareLink">

@@ -1,7 +1,10 @@
 package com.anamensis.server.controller;
 
+import com.anamensis.server.dto.Page;
+import com.anamensis.server.dto.PageResponse;
 import com.anamensis.server.dto.request.ShareLinkRequest;
 import com.anamensis.server.dto.response.ShareLinkResponse;
+import com.anamensis.server.entity.ShareLink;
 import com.anamensis.server.service.ShareLinkService;
 import com.anamensis.server.service.UserService;
 import jakarta.validation.Valid;
@@ -28,6 +31,21 @@ public class ShareLinkController {
     public Mono<ShareLinkResponse.Redirect> redirect(@PathVariable String shareLink) {
         return Mono.just(shareLinkService.selectByShareLink(shareLink))
                 .map(sl -> ShareLinkResponse.Redirect.of(sl.getOrgLink()));
+    }
+
+    @GetMapping("")
+    public Mono<PageResponse<ShareLink>> list(
+            Mono<Page> page,
+            @AuthenticationPrincipal Mono<UserDetails> user
+    ) {
+        return user.map(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
+                   .zipWith(page)
+                   .map(shareLinkService::selectAll)
+                   .map(t -> PageResponse.<ShareLink>builder()
+                           .content(t.getT1())
+                           .page(t.getT2())
+                           .build()
+                   );
     }
 
     @PostMapping("")
@@ -61,7 +79,6 @@ public class ShareLinkController {
                 .map(shareLinkService::updateUse)
                 .publishOn(Schedulers.parallel())
                 .map(ShareLinkResponse.Use::of);
-
     }
 
 }

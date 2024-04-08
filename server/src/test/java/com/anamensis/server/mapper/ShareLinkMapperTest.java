@@ -1,5 +1,6 @@
 package com.anamensis.server.mapper;
 
+import com.anamensis.server.dto.Page;
 import com.anamensis.server.entity.ShareLink;
 import com.anamensis.server.entity.User;
 import org.junit.jupiter.api.Test;
@@ -47,5 +48,36 @@ class ShareLinkMapperTest {
                 .orElseThrow(() -> new IllegalArgumentException("해당 링크가 존재하지 않습니다."));
         sl.setUse(false);
         shareLinkMapper.updateUse(sl);
+    }
+
+    @Test
+    void selectAll() {
+        User user = User.builder()
+                .id(2)
+                .userId("admin")
+                .pwd("admin")
+                .name("admin")
+                .isUse(true)
+                .build();
+
+        Page page = new Page();
+        page.setPage(1);
+        page.setLimit(10);
+//        page.setCriteria("id");
+//        page.setOrder("desc");
+
+        shareLinkMapper.selectAll(user, page).forEach(sl -> log.info("sl : " + sl));
+    }
+
+    @Test
+    void selectCount() {
+        User user = User.builder()
+                .id(2)
+                .userId("admin")
+                .pwd("admin")
+                .name("admin")
+                .isUse(true)
+                .build();
+        log.info("count : " + shareLinkMapper.selectCount(user));
     }
 }

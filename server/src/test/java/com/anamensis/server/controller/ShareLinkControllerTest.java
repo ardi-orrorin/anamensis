@@ -107,4 +107,46 @@ class ShareLinkControllerTest {
 
         log.info("result: {}", result);
     }
+
+    @Test
+    void testPage() {
+        EntityExchangeResult<String> result =
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/link")
+                        .queryParam("page", 4)
+                        .queryParam("limit", 10)
+                        .queryParam("criteria", "id")
+                        .queryParam("sort", "asc")
+                        .queryParam("test", "te2323st")
+                        .build()
+                )
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .returnResult();
+
+        log.info("result: {}", result.getResponseBody());
+    }
+
+    @Test
+    void list() {
+        EntityExchangeResult<String> result =
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/link")
+                        .queryParam("page", 1)
+                        .queryParam("limit", 2)
+                        .queryParam("criteria", "id")
+                        .queryParam("sort", "asc")
+                        .build()
+                )
+                .header("Authorization", "Bearer " + token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .returnResult();
+
+        log.info("result: {}", result.getResponseBody());
+    }
 }

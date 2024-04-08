@@ -1,6 +1,8 @@
 package com.anamensis.server.service;
 
+import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.request.ShareLinkRequest;
+import com.anamensis.server.dto.response.ShareLinkResponse;
 import com.anamensis.server.entity.ShareLink;
 import com.anamensis.server.entity.User;
 import com.anamensis.server.mapper.ShareLinkMapper;
@@ -10,9 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.type.TypeHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 import reactor.util.function.Tuple2;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +25,14 @@ public class ShareLinkService {
     private final ShareLinkMapper shareLinkMapper;
 
     private final ShareLinkProvider shareLinkProvider;
+
+    public Tuple2<List<ShareLink>, Page>  selectAll(Tuple2<User, Page> t) {
+        return t.mapT1(u -> shareLinkMapper.selectAll(u, t.getT2()))
+                .mapT2(p -> {
+                    p.setTotal(shareLinkMapper.selectCount(t.getT1()));
+                    return p;
+                });
+    }
 
     public ShareLink insert(String link, User user) {
         String shareLinkStr;

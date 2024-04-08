@@ -1,5 +1,6 @@
 package com.anamensis.server.controller;
 
+import com.anamensis.server.dto.Device;
 import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.PageResponse;
 import com.anamensis.server.dto.request.ShareLinkRequest;
@@ -35,11 +36,12 @@ public class ShareLinkController {
 
     @GetMapping("")
     public Mono<PageResponse<ShareLink>> list(
-            Mono<Page> page,
+            Page page,
             @AuthenticationPrincipal Mono<UserDetails> user
     ) {
+
         return user.map(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
-                   .zipWith(page)
+                   .zipWith(Mono.just(page))
                    .map(shareLinkService::selectAll)
                    .map(t -> PageResponse.<ShareLink>builder()
                            .content(t.getT1())

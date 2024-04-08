@@ -15,6 +15,7 @@ import org.springframework.security.web.server.authentication.AuthenticationWebF
 import org.springframework.web.reactive.config.CorsRegistry;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
+import org.springframework.web.reactive.result.method.annotation.ArgumentResolverConfigurer;
 
 @Configuration
 @EnableWebFlux
@@ -57,5 +58,12 @@ public class SecurityConfig implements WebFluxConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 .allowedHeaders("Authorization", "Content-Type")
                 .allowCredentials(true);
+    }
+
+    @Override
+    public void configureArgumentResolvers(ArgumentResolverConfigurer configurer) {
+
+        configurer.addCustomResolver(new PageArgumentResolver());
+        WebFluxConfigurer.super.configureArgumentResolvers(configurer);
     }
 }

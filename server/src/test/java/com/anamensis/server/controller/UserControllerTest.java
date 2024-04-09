@@ -62,7 +62,7 @@ class UserControllerTest {
                         .expectStatus().isOk()
                         .expectBody(UserResponse.Login.class)
                         .returnResult();
-        token = result.getResponseBody().getToken();
+        token = result.getResponseBody().getAccessToken();
     }
 
 

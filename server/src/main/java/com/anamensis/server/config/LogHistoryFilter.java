@@ -8,9 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -18,6 +19,7 @@ import org.springframework.web.server.WebFilterChain;
 import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
@@ -26,7 +28,7 @@ import java.time.LocalDateTime;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class UseHistoryFilter implements WebFilter {
+public class LogHistoryFilter implements WebFilter {
 
 
     private final UserService userService;
@@ -35,40 +37,31 @@ public class UseHistoryFilter implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String path = exchange.getRequest().getPath().toString();
-        String method = exchange.getRequest().getMethod().toString();
-
+        HttpMethod method = exchange.getRequest().getMethod();
 
         if(path.equals("/user/login") || path.equals("/user/signup")) {
             return chain.filter(exchange);
         }
 
-        if(method.equals("GET") || method.equals("DELETE")) {
+        if(HttpMethod.GET.equals(method) || HttpMethod.DELETE.equals(method)) {
             return Mono.zip(Mono.just(exchange), exchange.getPrincipal(), exchange.getSession())
                     .doOnNext(t -> logWrite(new byte[0], t.getT1(),(Principal) t.getT2(), t.getT3()))
-                    .map(t -> t.getT1())
+                    .map(Tuple2::getT1)
                     .flatMap(chain::filter);
         }
 
-        if(method.equals("PUT") || method.equals("POST")) {
+        if(HttpMethod.PUT.equals(method) || HttpMethod.POST.equals(method) || HttpMethod.PATCH.equals(method)) {
             Flux<DataBuffer> body = exchange.getRequest().getBody();
 
             return Mono.zip(DataBufferUtils.join(body), exchange.getPrincipal(), exchange.getSession())
                     .map(t -> t.mapT1(this::toBytes))
                     .doOnNext(t -> logWrite(t.getT1(), exchange, (Principal) t.getT2(), t.getT3()))
-                    .map(t -> CompleteFilter(t.getT1(), exchange))
+                    .map(t -> newRequest(t.getT1(), exchange))
                     .flatMap(chain::filter);
         }
 
         return chain.filter(exchange);
     }
-
-    private void finally1 (ServerWebExchange ex) {
-        ex.getPrincipal().subscribe(principal -> {
-            UserDetails userDetails = (UserDetails) principal;
-            log.info("User: {}", userDetails.getUsername());
-        });
-        log.info("Finally");
-    };
 
     private byte[] toBytes (DataBuffer dataBuffer) {
         byte[] bytes = new byte[dataBuffer.readableByteCount()];
@@ -107,7 +100,7 @@ public class UseHistoryFilter implements WebFilter {
         logHistoryService.save(logHistory);
     }
 
-    private ServerWebExchange CompleteFilter(byte[] bytes, ServerWebExchange ex) {
+    private ServerWebExchange newRequest(byte[] bytes, ServerWebExchange ex) {
         ServerHttpRequest request = new ServerHttpRequestDecorator(ex.getRequest()) {
             @Override
             public Flux<DataBuffer> getBody() {

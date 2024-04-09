@@ -16,6 +16,10 @@ spring:
     multipart:
       max-parts: -1
       file-storage-directory: classpath:static/upload
+      max-in-memory-size: 2MB
+  servlet:
+    multipart:
+      max-request-size: 10MB
 
   profiles:
     active: local

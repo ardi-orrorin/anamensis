@@ -4,9 +4,23 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.anamensis.server.mapper.LoginHistoryMapper">
+    <select id="count">
+        SELECT COUNT(*)
+          FROM login_history
+         WHERE user_pk = #{userId}
+    </select>
+
+    <select id="selectAll">
+        SELECT *
+          FROM login_history
+         WHERE user_pk = #{user.id}
+         ORDER BY create_at DESC
+         LIMIT #{page.offset}, #{page.size}
+    </select>
+
     <insert id="save" parameterType="map">
         INSERT INTO login_history
-               (user_pk, ip, location, device)
-         VALUE (#{user.id}, #{history.ip}, #{history.location}, #{history.device})
+               (user_pk, ip, location, device, create_at)
+         VALUE (#{user.id}, #{history.ip}, #{history.location}, #{history.device}, #{history.createAt})
     </insert>
 </mapper>

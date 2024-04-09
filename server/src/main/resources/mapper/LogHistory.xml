@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.server.mapper.LogHistoryMapper">
+    <insert id="save" parameterType="LogHistory">
+        INSERT INTO log_history
+               (user_pk, method, path,
+                query, body, uri, headers,
+                session, local_address, remote_address,
+                create_at)
+        VALUES (#{userPk}, #{method}, #{path},
+                #{query}, #{body}, #{uri}, #{headers},
+                #{session}, #{localAddress}, #{remoteAddress},
+                #{createAt})
+    </insert>
+</mapper>

@@ -1,6 +1,7 @@
 package com.anamensis.server.controller;
 
 import com.anamensis.server.dto.request.ShareLinkRequest;
+import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.dto.response.ShareLinkResponse;
 import com.anamensis.server.dto.response.UserResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -39,14 +41,19 @@ class ShareLinkControllerTest {
     @BeforeEach
     @Order(2)
     void setToken() {
-        MultiValueMap<String, String> formData = new org.springframework.util.LinkedMultiValueMap<>();
-        formData.add("username", "admin");
-        formData.add("password", "admin");
+        UserRequest.Login login = new UserRequest.Login();
+        login.setUsername("admin");
+        login.setPassword("admin");
 
         EntityExchangeResult<UserResponse.Login> result =
                 webTestClient.post()
-                        .uri("/login")
-                        .bodyValue(formData)
+                        .uri("/user/login")
+                        .headers(httpHeaders -> {
+                            httpHeaders.set("Device", "chrome");
+                            httpHeaders.set("Location", "seoul");
+                        })
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(login)
                         .exchange()
                         .expectStatus().isOk()
                         .expectBody(UserResponse.Login.class)
@@ -137,10 +144,10 @@ class ShareLinkControllerTest {
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/link")
-//                        .queryParam("page", 3)
-//                        .queryParam("size", 2)
-//                        .queryParam("criteria", "createAt")
-//                        .queryParam("order", "asc")
+                        .queryParam("page", 3)
+                        .queryParam("size", 2)
+                        .queryParam("criteria", "createAt")
+                        .queryParam("order", "asc")
                         .queryParam("link", "test")
                         .build()
                 )

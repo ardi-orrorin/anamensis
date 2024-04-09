@@ -63,6 +63,32 @@ CREATE TABLE anamensis.login_history (
     INDEX        device_idx     (device)
 ) COMMENT '로그인 이력';
 
+CREATE TABLE log_history (
+     id             BIGINT        AUTO_INCREMENT  PRIMARY KEY,
+     user_pk        BIGINT        NOT NULL,
+     method         VARCHAR(10)   NOT NULL,
+     path           VARCHAR(255)  NOT NULL,
+     query          VARCHAR(500)  NOT NULL,
+     body           JSON,
+     uri            VARCHAR(255)  NOT NULL,
+     headers        VARCHAR(500)  NOT NULL,
+     session        VARCHAR(500)  NOT NULL,
+     local_address  VARCHAR(255)  NOT NULL,
+     remote_address VARCHAR(255)  NOT NULL,
+     create_at      TIMESTAMP     NOT NULL,
+     FOREIGN KEY                                  (user_pk)        REFERENCES user (id),
+     INDEX          idx_user_pk                   (user_pk),
+     INDEX          idx_method                    (method),
+     INDEX          idx_path                      (path),
+     INDEX          idx_query                     (query),
+     INDEX          idx_uri                       (uri),
+     INDEX          idx_create_at                 (create_at),
+     INDEX          idx_remote_address            (remote_address),
+     INDEX          idx_local_address             (local_address),
+     INDEX          idx_headers                   (headers),
+     INDEX          idx_session                   (session)
+) COMMENT 'api 호출 로그 테이블';
+
 CREATE TABLE attendance (
     user_pk BIGINT NOT NULL PRIMARY KEY,
     lastDate DATE NOT NULL,

@@ -1,5 +1,6 @@
 package com.anamensis.server.service;
 
+import com.anamensis.server.dto.Device;
 import com.anamensis.server.entity.LoginHistory;
 import com.anamensis.server.entity.User;
 import org.junit.jupiter.api.Test;
@@ -25,12 +26,17 @@ class LoginHistoryServiceTest {
                 .isUse(true)
                 .build();
 
-        LoginHistory loginHistory = LoginHistory.builder()
-                .ip("111.111.1.1")
-                .device("chrome")
-                .location("seoul")
-                .build();
+//        LoginHistory loginHistory = LoginHistory.builder()
+//                .ip("111.111.1.1")
+//                .device("chrome")
+//                .location("seoul")
+//                .build();
 
-        loginHistoryService.save(loginHistory, user);
+        Device device = new Device();
+        device.setDevice("chrome");
+        device.setIp("1.1.1.1");
+        device.setLocation("seoul");
+
+        loginHistoryService.save(device, user);
     }
 }

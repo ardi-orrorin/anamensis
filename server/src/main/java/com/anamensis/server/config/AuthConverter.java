@@ -1,7 +1,11 @@
 package com.anamensis.server.config;
 
 import com.anamensis.server.provider.TokenProvider;
+import com.anamensis.server.service.LogHistoryService;
 import com.anamensis.server.service.UserService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,14 +27,24 @@ public class AuthConverter implements ServerAuthenticationConverter {
         return Mono.justOrEmpty(exchange)
                 .map(ServerWebExchange::getRequest)
                 .mapNotNull(request -> request.getHeaders().getFirst("Authorization"))
-                .filter(authHeader -> authHeader != null && authHeader.startsWith("Bearer "))
+                .doOnNext(authHeader -> {
+                    if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+                        throw new MalformedJwtException("토큰이 없습니다.");
+                    }
+                })
                 .map(authHeader -> authHeader.substring(7))
-                .flatMap(this::isValidateToken);
+                .flatMap(token -> isValidateToken(token, exchange));
     }
 
 
-    public Mono<Authentication> isValidateToken(String token) {
-        String userId = tokenProvider.getUserId(token);
+    public Mono<Authentication> isValidateToken(String token, ServerWebExchange exchange) {
+        String userId = "";
+        Claims claims = tokenProvider.getClaims(token);
+        if(claims.get("type").equals("refresh")) {
+            exchange.getResponse().getHeaders().add("Access", tokenProvider.generateToken(claims.get("user", String.class), false));
+        }
+        userId = claims.get("user", String.class);
+
         return userService.findByUsername(userId)
                 .onErrorMap(e -> new RuntimeException("유저 정보가 없습니다."))
                 .map(u -> new UsernamePasswordAuthenticationToken(u, token, u.getAuthorities()));

@@ -5,6 +5,7 @@ import com.anamensis.server.service.LogHistoryService;
 import com.anamensis.server.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -32,7 +33,6 @@ import java.time.LocalDateTime;
 @Component
 @RequiredArgsConstructor
 public class LogHistoryFilter implements WebFilter {
-
 
     private final UserService userService;
     private final LogHistoryService logHistoryService;

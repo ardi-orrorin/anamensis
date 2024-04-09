@@ -3,7 +3,9 @@ package com.anamensis.server.dto.request;
 import com.anamensis.server.entity.User;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -12,6 +14,7 @@ public class UserRequest {
 
     @Getter
     @Setter
+    @NoArgsConstructor
     public static class Login {
         private String username;
         private String password;

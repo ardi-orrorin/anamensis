@@ -3,17 +3,17 @@ package com.anamensis.server.controller;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.dto.response.UserResponse;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.MultiValueMap;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -29,31 +29,70 @@ class UserControllerTest {
 
     private WebTestClient webTestClient;
 
+    String token;
+
 
     @BeforeEach
+    @Order(1)
     void setUp() {
-        webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:" + port).build();
+        webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:" + port + "/user").build();
+    }
+
+    @BeforeEach
+    @Order(2)
+    void setupLogin() {
+//        MultiValueMap<String, String> formData = new org.springframework.util.LinkedMultiValueMap<>();
+//        formData.add("username", "admin");
+//        formData.add("password", "admin");
+
+        UserRequest.Login login = new UserRequest.Login();
+        login.setUsername("admin");
+        login.setPassword("admin");
+
+        EntityExchangeResult<UserResponse.Login> result =
+                webTestClient.post()
+                        .uri("/login")
+                        .headers(httpHeaders -> {
+                            httpHeaders.set("Device", "chrome");
+                            httpHeaders.set("Location", "seoul");
+                        })
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(login)
+                        .exchange()
+                        .expectStatus().isOk()
+                        .expectBody(UserResponse.Login.class)
+                        .returnResult();
+        token = result.getResponseBody().getToken();
     }
 
 
     @Test
     void login() {
 
-        MultiValueMap<String, String> formData = new org.springframework.util.LinkedMultiValueMap<>();
-        formData.add("username", "admin");
-        formData.add("password", "admin");
+//        MultiValueMap<String, String> formData = new org.springframework.util.LinkedMultiValueMap<>();
+//        formData.add("username", "admin");
+//        formData.add("password", "admin");
+
+        UserRequest.Login login = new UserRequest.Login();
+        login.setUsername("admin");
+        login.setPassword("admin");
 
         EntityExchangeResult<String> result =
         webTestClient.post()
                 .uri("/login")
-                .bodyValue(formData)
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(httpHeaders -> {
+                    httpHeaders.set("Device", "chrome");
+                    httpHeaders.set("Location", "seoul");
+                })
+                .bodyValue(login)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(String.class)
                 .returnResult();
 
 
-        log.info(result.getResponseBody());
+        log.info(result.toString());
 //                .value(token -> assertTrue(token.startsWith("Bearer ")));
     }
 
@@ -98,7 +137,27 @@ class UserControllerTest {
                 .expectBody(UserResponse.Status.class)
                 .returnResult();
 
+//        log.info(result.toString());
+
         log.info(result.getResponseBody().toString());
     }
 
+    @Test
+    void list() {
+        EntityExchangeResult result =
+        webTestClient.get()
+                .uri(uriBuilder -> {
+                    uriBuilder.path("/histories");
+                    uriBuilder.queryParam("page", 1);
+                    uriBuilder.queryParam("size", 10);
+                    return uriBuilder.build();
+                })
+                .header("Authorization","Bearer " + token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .returnResult();
+
+        log.info("result : {} ", result.getResponseBody());
+    }
 }

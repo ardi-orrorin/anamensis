@@ -23,11 +23,11 @@ public class DeviceResolver implements HandlerMethodArgumentResolver {
             BindingContext bindingContext,
             ServerWebExchange exchange
     ) {
-
-        exchange.getRequest().getHeaders();
-
         Device device = new Device();
-        device.setDevice(exchange.getRequest().getHeaders().toString());
+        device.setDevice(exchange.getRequest().getHeaders().getFirst("Device"));
+        device.setIp(exchange.getRequest().getRemoteAddress().getAddress().getHostAddress());
+        device.setLocation(exchange.getRequest().getHeaders().getFirst("Location"));
+
         return Mono.just(device);
     }
 }

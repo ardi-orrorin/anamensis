@@ -1,5 +1,6 @@
 package com.anamensis.server.controller;
 
+import com.anamensis.server.dto.Token;
 import com.anamensis.server.dto.request.ShareLinkRequest;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.dto.response.ShareLinkResponse;
@@ -26,7 +27,7 @@ class ShareLinkControllerTest {
 
     WebTestClient webTestClient;
 
-    String token;
+    Token token;
 
     @BeforeEach
     @Order(1)
@@ -58,7 +59,10 @@ class ShareLinkControllerTest {
                         .expectBody(UserResponse.Login.class)
                         .returnResult();
 
-        token = Objects.requireNonNull(result.getResponseBody()).getToken();
+        token = Token.builder()
+                .accessToken(Objects.requireNonNull(result.getResponseBody()).getAccessToken())
+                .refreshToken(result.getResponseBody().getRefreshToken())
+                .build();
     }
 
     Logger log = org.slf4j.LoggerFactory.getLogger(ShareLinkControllerTest.class);
@@ -78,15 +82,14 @@ class ShareLinkControllerTest {
 
     @Test
     void insert() {
-
-        log.info("token: {}", token);
         ShareLinkRequest.Param param = new ShareLinkRequest.Param();
         param.setLink("/test/test/test/test");
 
         EntityExchangeResult result =
         webTestClient.post()
                 .uri("/link")
-                .header("Authorization", "Bearer " + token)
+//                .header("Authorization", "Bearer " + token.getRefreshToken())
+                .header("Authorization", "Bearer " + token.getRefreshToken())
                 .bodyValue(param)
                 .exchange()
                 .expectStatus().isOk()

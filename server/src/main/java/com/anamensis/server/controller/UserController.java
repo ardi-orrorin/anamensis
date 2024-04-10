@@ -4,6 +4,7 @@ package com.anamensis.server.controller;
 import com.anamensis.server.dto.Device;
 import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.PageResponse;
+import com.anamensis.server.dto.Token;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.dto.response.LoginHistoryResponse;
 import com.anamensis.server.dto.response.UserResponse;
@@ -44,8 +45,8 @@ public class UserController {
                    .zipWith(Mono.just(device))
                    .publishOn(Schedulers.boundedElastic())
                    .doOnNext(u -> loginHistoryService.save(u.getT2(), u.getT1().getUser()))
-                   .map(u -> u.mapT2(host -> tokenProvider.generateToken(u.getT1().getUser().getUserId())))
-                   .map(u -> UserResponse.Login.transToLogin(u.getT1(), u.getT2()));
+                   .map(t -> t.mapT2(host -> generateToken(t.getT1().getUser().getUserId())))
+                   .map(t -> UserResponse.Login.transToLogin(t.getT1(), t.getT2()));
     }
 
     @PostMapping("signup")
@@ -83,5 +84,13 @@ public class UserController {
                         .content(t.getT1().toList())
                         .build()
                 );
+    }
+
+
+    private Token generateToken(String userId) {
+        return Token.builder()
+                .accessToken(tokenProvider.generateToken(userId, false))
+                .refreshToken(tokenProvider.generateToken(userId, true))
+                .build();
     }
 }

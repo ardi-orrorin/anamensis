@@ -1,5 +1,6 @@
 package com.anamensis.server.dto.response;
 
+import com.anamensis.server.dto.Token;
 import com.anamensis.server.entity.Role;
 import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.resultMap.UserResultMap;
@@ -15,13 +16,15 @@ public class UserResponse {
     @Getter
     @Builder
     public static class Login {
-        private String token;
+        private String accessToken;
+        private String refreshToken;
         private String username;
         private List<RoleType> roles;
 
-        public static Login transToLogin(UserResultMap user, String token) {
+        public static Login transToLogin(UserResultMap user, Token token) {
             return Login.builder()
-                    .token(token)
+                    .accessToken(token.getAccessToken())
+                    .refreshToken(token.getRefreshToken())
                     .username(user.getUser().getName())
                     .roles(user.getRoles().stream().map(Role::getRole).toList())
                     .build();

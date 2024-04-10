@@ -1,48 +1,51 @@
 package com.anamensis.server.provider;
 
-import com.anamensis.server.service.UserService;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import javax.crypto.SecretKey;
 import java.sql.Timestamp;
 import java.time.Instant;
 
 @Component
-@Slf4j
 public class TokenProvider {
 
-    private final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    @Value("${jwt.secret}")
+    private String secret;
 
-    private final long EXP = 30 * 60 * 1000L;
+    private SecretKey SECRET_KEY;
 
+    // 시 * 분 * 초 * 밀리초
+    private final long ACCESS_EXP  =  1 * 30 * 60 * 1000;
+    private final long REFRESH_EXP = 24 * 60 * 60 * 1000;
 
-    public String generateToken(String userId) {
+    public String generateToken(String userId, boolean isRefresh) {
+        SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
+        long exp = isRefresh ? REFRESH_EXP : ACCESS_EXP;
+        String type = isRefresh ? "refresh" : "access";
+        Claims claims = Jwts.claims();
+        claims.put("user", userId);
+        claims.put("type", type);
+
         return Jwts.builder()
-            .setSubject(userId)
-            .setExpiration(new Timestamp(Instant.now().toEpochMilli() + EXP))
+            .setClaims(claims)
+            .setExpiration(
+                new Timestamp(Instant.now().toEpochMilli() + exp)
+            )
             .signWith(SECRET_KEY)
             .compact();
     }
 
-    public String getUserId(String token) {
+    public Claims getClaims(String token){
+        SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
         JwtParser jwts =  Jwts.parserBuilder()
                 .setSigningKey(SECRET_KEY)
                 .build();
         return jwts.parseClaimsJws(token)
-                .getBody().getSubject();
-
+                .getBody();
     }
-
 }

@@ -1,7 +1,5 @@
 package com.anamensis.server.config;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import org.hibernate.validator.constraints.CreditCardNumber;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -18,15 +16,11 @@ import org.springframework.web.reactive.config.CorsRegistry;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.result.method.annotation.ArgumentResolverConfigurer;
-import org.springframework.web.server.session.WebSessionManager;
 
 @Configuration
 @EnableWebFlux
 @EnableWebFluxSecurity
 public class SecurityConfig implements WebFluxConfigurer {
-
-
-
 
     @Bean
     public SecurityWebFilterChain springWebFilterChain(
@@ -46,10 +40,6 @@ public class SecurityConfig implements WebFluxConfigurer {
                         authenticationWebFilter,
                         SecurityWebFiltersOrder.AUTHENTICATION
                 )
-//                .addFilterAfter(
-//                        useHistoryFilter,
-//                        SecurityWebFiltersOrder.SECURITY_CONTEXT_SERVER_WEB_EXCHANGE
-//                )
                 .build();
     }
 

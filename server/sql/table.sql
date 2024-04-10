@@ -248,17 +248,18 @@ CREATE TABLE anamensis.email_verify (
 ) COMMENT '이메일 인증';
 
 CREATE TABLE user_config_smtp (
-    id             BIGINT       AUTO_INCREMENT   PRIMARY KEY ,
-    user_pk        BIGINT       NOT NULL,
-    smtp_server    VARCHAR(255) NOT NULL COMMENT 'SMTP 서버 주소',
-    smtp_port      INT          NOT NULL COMMENT 'SMTP 포트',
-    smtp_username  VARCHAR(255) NOT NULL COMMENT 'SMTP 사용자 아이디',
-    smtp_password  VARCHAR(255) NOT NULL COMMENT 'SMTP 사용자 비밀번호',
-    smtp_from      VARCHAR(255) NOT NULL COMMENT 'SMTP 발신자 주소',
-    smtp_from_name VARCHAR(255) NOT NULL COMMENT 'SMTP 발신자 이름',
-    smtp_ssl       BOOLEAN      NOT NULL COMMENT 'SMTP SSL 사용 여부',
-    FOREIGN KEY    (user_pk)    REFERENCES       user (id),
-    INDEX          idx_user_pk  (user_pk)
+    id             BIGINT        AUTO_INCREMENT    PRIMARY KEY ,
+    user_pk        BIGINT        NOT NULL,
+    host           VARCHAR(255)  NOT NULL                         COMMENT  'SMTP 서버 주소',
+    port           CHAR(6)       NOT NULL                         COMMENT  'SMTP 포트',
+    username       VARCHAR(255)  NOT NULL                         COMMENT  'SMTP 사용자 아이디',
+    password       VARCHAR(255)  NOT NULL                         COMMENT  'SMTP 사용자 비밀번호',
+    from_email     VARCHAR(255)  NOT NULL                         COMMENT  'SMTP 발신자 주소',
+    from_name      VARCHAR(255)  NOT NULL                         COMMENT  'SMTP 발신자 이름',
+    use_ssl        TINYINT(1)    NOT NULL                         COMMENT  'SMTP SSL 사용 여부',
+    is_use         TINYINT(1)    NOT NULL DEFAULT  1              COMMENT  '사용 여부 0:사용안함, 1:사용',
+    FOREIGN KEY    (user_pk)     REFERENCES        user (id),
+    INDEX          idx_user_pk   (user_pk)
 ) COMMENT '사용자 SMTP 설정';
 
 CREATE TABLE smtp_push_history (

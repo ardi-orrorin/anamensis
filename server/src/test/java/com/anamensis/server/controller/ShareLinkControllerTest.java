@@ -89,7 +89,7 @@ class ShareLinkControllerTest {
         webTestClient.post()
                 .uri("/link")
 //                .header("Authorization", "Bearer " + token.getRefreshToken())
-                .header("Authorization", "Bearer" + token.getRefreshToken())
+                .header("Authorization", "Bearer " + token.getRefreshToken())
                 .bodyValue(param)
                 .exchange()
                 .expectStatus().isOk()

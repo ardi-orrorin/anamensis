@@ -13,6 +13,10 @@ DROP TABLE anamensis.point_history;
 DROP TABLE anamensis.category;
 DROP TABLE anamensis.email_verify;
 DROP TABLE anamensis.otp;
+DROP TABLE anamensis.user_config_smtp;
+DROP TABLE anamensis.smtp_push_history;
+DROP TABLE anamensis.attendance;
+
 
 
 CREATE TABLE anamensis.user (
@@ -243,4 +247,30 @@ CREATE TABLE anamensis.email_verify (
     INDEX           is_use_idx        (is_use)
 ) COMMENT '이메일 인증';
 
+CREATE TABLE user_config_smtp (
+    id             BIGINT       AUTO_INCREMENT   PRIMARY KEY ,
+    user_pk        BIGINT       NOT NULL,
+    smtp_server    VARCHAR(255) NOT NULL COMMENT 'SMTP 서버 주소',
+    smtp_port      INT          NOT NULL COMMENT 'SMTP 포트',
+    smtp_username  VARCHAR(255) NOT NULL COMMENT 'SMTP 사용자 아이디',
+    smtp_password  VARCHAR(255) NOT NULL COMMENT 'SMTP 사용자 비밀번호',
+    smtp_from      VARCHAR(255) NOT NULL COMMENT 'SMTP 발신자 주소',
+    smtp_from_name VARCHAR(255) NOT NULL COMMENT 'SMTP 발신자 이름',
+    smtp_ssl       BOOLEAN      NOT NULL COMMENT 'SMTP SSL 사용 여부',
+    FOREIGN KEY    (user_pk)    REFERENCES       user (id),
+    INDEX          idx_user_pk  (user_pk)
+) COMMENT '사용자 SMTP 설정';
 
+CREATE TABLE smtp_push_history (
+    id                  BIGINT                  AUTO_INCREMENT PRIMARY KEY,
+    user_pk             BIGINT                  NOT NULL                           COMMENT '사용자 PK',
+    user_config_smtp_pk BIGINT                  NOT NULL                           COMMENT '사용자 SMTP 설정 PK',
+    subject             VARCHAR(255)            NOT NULL                           COMMENT '제목',
+    content             TEXT                    NOT NULL                           COMMENT '내용',
+    create_at           TIMESTAMP               NOT NULL                           COMMENT '생성일자',
+    FOREIGN KEY         (user_pk)               REFERENCES user (id),
+    FOREIGN KEY         (user_config_smtp_pk)   REFERENCES user_config_smtp (id),
+    INDEX               idx_user_pk             (user_pk),
+    INDEX               idx_user_config_smtp_pk (user_config_smtp_pk),
+    INDEX               idx_create_at           (create_at)
+) COMMENT '사용자 PUSH 설정';

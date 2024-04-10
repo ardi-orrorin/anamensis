@@ -1,10 +1,8 @@
 package com.anamensis.server.config;
 
 import com.anamensis.server.provider.TokenProvider;
-import com.anamensis.server.service.LogHistoryService;
 import com.anamensis.server.service.UserService;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,7 +27,7 @@ public class AuthConverter implements ServerAuthenticationConverter {
                 .mapNotNull(request -> request.getHeaders().getFirst("Authorization"))
                 .doOnNext(authHeader -> {
                     if(authHeader == null || !authHeader.startsWith("Bearer ")) {
-                        throw new MalformedJwtException("토큰이 없습니다.");
+                        throw new MalformedJwtException("잘못된 토큰입니다.");
                     }
                 })
                 .map(authHeader -> authHeader.substring(7))

@@ -11,11 +11,6 @@ import java.util.List;
 @Setter
 @Builder
 public class PageResponse<T> {
-
     private Page page;
-
     private List<T> content;
-
-
-
 }

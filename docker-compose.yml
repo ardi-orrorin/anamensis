@@ -2,6 +2,11 @@ version: '3.7'
 
 services:
   anamensis:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        JAR: server-anamensis-${TAG}
     image: anamensis:${TAG}
     networks:
       - net
@@ -31,3 +36,4 @@ networks:
   net:
     driver: overlay
     attachable: true
+#    external: true

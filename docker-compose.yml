@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  anamensis:
+    image: anamensis:latest
+    networks:
+      - anamensis-net
+    ports:
+      - "18080-18083:8080"
+    deploy:
+      replicas: 4
+
+networks:
+  anamensis-net:
+

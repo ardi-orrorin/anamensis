@@ -15,7 +15,6 @@ java {
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
-//        version version
     }
 }
 

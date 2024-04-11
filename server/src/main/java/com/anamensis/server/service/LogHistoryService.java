@@ -5,6 +5,7 @@ import com.anamensis.server.entity.LogHistory;
 import com.anamensis.server.mapper.LogHistoryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor

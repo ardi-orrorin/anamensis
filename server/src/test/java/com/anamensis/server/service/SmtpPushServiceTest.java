@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 
@@ -65,7 +66,7 @@ class SmtpPushServiceTest {
     @Test
     void saveTest(){
         smtpPushService.send(userConfigSmtp, smtpPush)
+                .subscribeOn(Schedulers.boundedElastic())
                 .subscribe();
     }
-
 }

@@ -67,4 +67,11 @@ public class UserConfigSmtpController {
                 .doOnNext(t -> t.getT2().setUserPk(t.getT1().getId()))
                 .flatMap(t -> userConfigSmtpService.update(t.getT2()));
     }
+
+    @PostMapping("test")
+    public Mono<Boolean> testConnection(UserConfigSmtpRequest.Test test) {
+        return Mono.just(test)
+                .map(UserConfigSmtpRequest.Test::toUserConfigSmtp)
+                .flatMap(userConfigSmtpService::testConnection);
+    }
 }

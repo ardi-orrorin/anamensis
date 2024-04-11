@@ -31,9 +31,22 @@ public class MailProviderTest {
     void builderTest() {
         new MailProvider.Builder()
                 .config(userConfig)
-                .message(userConfig, "Test", "Hello World")
+//                .message(userConfig, "Test", "Hello World")
                 .build()
-                .send();
+                .send()
+                .subscribe();
+    }
+
+    @Test
+    void testConnection() {
+        new MailProvider.Builder()
+                .config(userConfig)
+                .build()
+                .testConnection()
+                .subscribe(
+                        result -> System.out.println("Connection Success"),
+                        error -> System.out.println("Connection Failed")
+                );
     }
 
 

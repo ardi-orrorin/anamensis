@@ -5,9 +5,9 @@ import com.anamensis.server.entity.UserConfigSmtp;
 import com.anamensis.server.mapper.SmtpPushMapper;
 import com.anamensis.server.provider.MailProvider;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 
@@ -30,7 +30,9 @@ public class SmtpPushService {
                             .config(t.getT2())
                             .message(t.getT2(), t.getT1().getSubject(), t.getT1().getContent())
                             .build()
-                            .send();
+                            .send()
+                            .subscribeOn(Schedulers.boundedElastic())
+                            .subscribe();
                 })
                 .map(t -> {
                     smtpPushMapper.save(t.getT1());

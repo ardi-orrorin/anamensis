@@ -42,9 +42,10 @@ public class LogHistoryFilter implements WebFilter {
         String path = exchange.getRequest().getPath().toString();
         HttpMethod method = exchange.getRequest().getMethod();
         String userRegexp = "/user/\\S+";
+        String actuatorRegexp = "/actuator/\\S+";
 
         // /user/histories는 제외한 모든 /user/** 경로에 대해 로그를 남김
-        if(path.matches(userRegexp) && !path.equals("/user/histories")) {
+        if((path.matches(userRegexp) || path.matches(actuatorRegexp)) && !path.equals("/user/histories")) {
             return chain.filter(exchange);
         }
 

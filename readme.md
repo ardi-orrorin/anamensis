@@ -37,7 +37,7 @@
 
 ### CI / CD
 - Github Action
-- Docker(미확정)
+- Docker
 
 
 ## ERD --> [Link](https://www.erdcloud.com/d/kaLkfNKiwKcPe85k4)

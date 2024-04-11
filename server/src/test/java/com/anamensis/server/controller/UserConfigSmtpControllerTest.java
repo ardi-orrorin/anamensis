@@ -149,4 +149,25 @@ class UserConfigSmtpControllerTest {
                 log.info("response: {}", response);
             });
     }
+
+    @Test
+    void testConnection() {
+        UserConfigSmtpRequest.Test smtpRequest = new UserConfigSmtpRequest.Test();
+        smtpRequest.setHost("smtp.gmail.com");
+        smtpRequest.setPort("587");
+        smtpRequest.setUsername("");
+        smtpRequest.setPassword("");
+
+        webTestClient.post()
+                .uri("/user-config-smtp/test")
+                .headers(httpHeaders -> {
+                    httpHeaders.setBearerAuth(token.getAccessToken());
+                })
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(smtpRequest)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(result -> log.info("result = {}", result));
+    }
 }

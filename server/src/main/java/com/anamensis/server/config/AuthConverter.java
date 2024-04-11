@@ -36,12 +36,11 @@ public class AuthConverter implements ServerAuthenticationConverter {
 
 
     public Mono<Authentication> isValidateToken(String token, ServerWebExchange exchange) {
-        String userId = "";
         Claims claims = tokenProvider.getClaims(token);
+        String userId = claims.get("user", String.class);
         if(claims.get("type").equals("refresh")) {
-            exchange.getResponse().getHeaders().add("Access", tokenProvider.generateToken(claims.get("user", String.class), false));
+            exchange.getResponse().getHeaders().add("Access", tokenProvider.generateToken(userId, false));
         }
-        userId = claims.get("user", String.class);
 
         return userService.findByUsername(userId)
                 .onErrorMap(e -> new RuntimeException("유저 정보가 없습니다."))

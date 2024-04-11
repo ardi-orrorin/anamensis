@@ -3,15 +3,18 @@ package com.anamensis.server.service;
 
 import com.anamensis.server.entity.UserConfigSmtp;
 import com.anamensis.server.mapper.UserConfigSmtpMapper;
+import com.anamensis.server.provider.MailProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 @RequiredArgsConstructor
 public class UserConfigSmtpService {
     private final UserConfigSmtpMapper userConfigSmtpMapper;
+
 
     public Flux<UserConfigSmtp> selectByUserPk(long userPk) {
         return Mono.just(userPk)
@@ -45,6 +48,18 @@ public class UserConfigSmtpService {
                 })
                 .onErrorMap(throwable -> new RuntimeException("UserConfigSmtp not update"));
     }
+
+    public Mono<Boolean> testConnection(UserConfigSmtp userConfigSmtp) {
+        return Mono.just(userConfigSmtp)
+                .doOnNext(u -> new MailProvider.Builder()
+                        .config(u)
+                        .build()
+                        .testConnection()
+                )
+                .map(u -> true)
+                .onErrorReturn(false);
+    }
+
 
     public Mono<Boolean> deleteByUserPk(long userPk) {
         userConfigSmtpMapper.deleteByUserPk(userPk);

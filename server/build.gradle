@@ -5,8 +5,9 @@ plugins {
 }
 
 group = 'com.anamensis'
-version = '0.0.1-SNAPSHOT'
+version = 'anamensis-' + project.getProperties().get('version')
 
+println(version)
 java {
     sourceCompatibility = '17'
 }
@@ -14,6 +15,7 @@ java {
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
+//        version version
     }
 }
 
@@ -31,11 +33,11 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.mysql:mysql-connector-j'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-    // https://mvnrepository.com/artifact/com.warrenstrange/googleauth
     implementation 'com.warrenstrange:googleauth:1.5.0'
 
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
@@ -44,8 +46,9 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3'
     testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
+//tasks.named('test') {
+//    useJUnitPlatform()
+//}

@@ -1,5 +1,6 @@
 package com.anamensis.server.mapper;
 
+import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.entity.Role;
 import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.entity.User;
@@ -82,5 +83,14 @@ class UserMapperTest {
         role.setRole(RoleType.MASTER);
 
         userMapper.deleteRole(role);
+    }
+
+    @Test
+    void existsUser() {
+        UserRequest.existsUser existsUser = new UserRequest.existsUser();
+        existsUser.setType("id");
+        existsUser.setValue("admin");
+
+        log.info("{}", userMapper.existsUser(existsUser));
     }
 }

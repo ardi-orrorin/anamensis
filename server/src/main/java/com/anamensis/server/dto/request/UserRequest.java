@@ -54,4 +54,15 @@ public class UserRequest {
         }
     }
 
+    @Getter
+    @Setter
+    public static class existsUser {
+
+        @NotNull(message = "Type is required")
+        private String type;
+
+        @NotNull(message = "Value is required")
+        private String value;
+    }
+
 }

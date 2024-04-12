@@ -59,6 +59,14 @@ public class UserController {
                 );
     }
 
+    @PostMapping("exists")
+    public Mono<UserResponse.Status> exists(@Valid @RequestBody Mono<UserRequest.existsUser> data) {
+        return data.flatMap(userService::existsUser)
+                .map(exists -> UserResponse.Status
+                        .transToStatus(HttpStatus.OK, exists.toString())
+                );
+    }
+
     @GetMapping("histories")
     public Mono<PageResponse<LoginHistoryResponse.LoginHistory>> list(
         Page page,

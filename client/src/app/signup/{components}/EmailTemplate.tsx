@@ -1,18 +1,15 @@
-import {Dispatch, useMemo} from "react";
-import {UserProps} from "@/app/signup/page";
+import {useMemo} from "react";
 
 export type EmailTemplateProps = {
     className? : string;
     id         : string;
     domain     : string;
     order      : number;
-    user       : UserProps;
-    setEmailSelect: Dispatch<React.SetStateAction<boolean>>;
-    setUser    : Dispatch<React.SetStateAction<UserProps>>;
+    emailClickHandler : (value: string) => void;
 }
 
 const EmailTemplate = ({
-    id, className, user, setUser, setEmailSelect
+    id, className, emailClickHandler
 }:EmailTemplateProps) => {
     const emailTemplate = [
         '@gmail.com',
@@ -27,13 +24,7 @@ const EmailTemplate = ({
             return id.split('@')[0]}
         ,[id]) ;
 
-    const emailClickHandler = (value: string) => {
-        setUser({
-            ...user,
-            email: value
-        });
-        setEmailSelect(true);
-    }
+
     return (
         <div className={['w-full duration-300 overflow-y-scroll', className].join(' ')}>
             {

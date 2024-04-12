@@ -77,9 +77,7 @@ export default function Page() {
         // CheckType axios 처리
 
         setCheck({
-            id         : id.length === 0 ? 'uncheck'
-                       : idRegex.test(id) ? 'check'
-                       : 'notCheck',
+            id         : id.length === 0 ? 'uncheck' : check.id,
 
             pwd        : pwd.length === 0 ? 'uncheck'
                        : pwdRegex.test(pwd) ? 'check'
@@ -92,19 +90,14 @@ export default function Page() {
             name       : name.length === 0 ? 'uncheck'
                        : 'check',
 
-            email      : email.length === 0 ? 'uncheck'
-                       : emailRegex.test(email) ? 'check'
-                       : 'notCheck',
+            email      : email.length === 0 ? 'uncheck' : check.email,
 
             emailCheck : emailCheck.length === 0 ? 'uncheck'
                        : 'check',
 
-            phone      : phone.length === 0 ? 'uncheck'
-                       : phoneRegex.test(phone) ? 'check'
-                       : 'notCheck',
+            phone      : phone.length === 0 ? 'uncheck' : check.phone,
         });
     },[user]);
-
 
 
     const setProps = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -127,6 +120,44 @@ export default function Page() {
         if(name === 'email') {
             setEmailSelect(false);
         }
+
+
+        if(name === 'id' || name === 'email' || name === 'phone') {
+            if(name === 'id' && !idRegex.test(value)) {
+                check.id = 'notCheck';
+                return ;
+            }
+            if(name === 'phone' && !phoneRegex.test(value)) {
+                check.phone = 'notCheck';
+                return ;
+            }
+
+            checkHandler({type: name, value})
+                .then((res) => {
+                    console.log(res.data.message)
+                    setCheck({
+                        ...check,
+                        [name]: res.data.message === 'false' ? 'check' : 'notCheck'
+                    });
+                });
+        }
+    }
+
+    const emailClickHandler = (value: string) => {
+        setUser({
+            ...user,
+            email: value
+        });
+
+        setEmailSelect(true);
+
+        checkHandler({type: 'email', value})
+            .then((res) => {
+                setCheck({
+                    ...check,
+                    email: res.data.message === 'false' ? 'check' : 'notCheck'
+                });
+            });
     }
 
     const inputCheck = (checkType: CheckType) => {
@@ -138,7 +169,12 @@ export default function Page() {
 
     const allCheck = useMemo(() => {
         const {id, pwd, pwdCheck, name, email, phone} = check;
-        return id && pwd && pwdCheck && name && email && phone;
+        return id === 'check' &&
+               pwd === 'check' &&
+               pwdCheck === 'check' &&
+               name === 'check' &&
+               email === 'check' &&
+               phone === 'check';
     },[check]);
 
     const submitHandler = async () => {
@@ -158,9 +194,7 @@ export default function Page() {
 
     const checkHandler = async (data: ExistProps) => {
         return await postExistFetch(data)
-            .then((res) => {
-                return res.data.message === 'true'
-            });
+
     }
 
     return (
@@ -214,9 +248,7 @@ export default function Page() {
                                    id={user.email}
                                    domain={''}
                                    order={0}
-                                   user={user}
-                                   setUser={setUser}
-                                   setEmailSelect={setEmailSelect}
+                                   emailClickHandler={emailClickHandler}
                     />
                     <Row className={[emailRegex.test(user.email)? 'max-h-52' : 'max-h-0', 'duration-500'].join(' ')}
                          name={'emailCheck'}
@@ -242,7 +274,7 @@ export default function Page() {
                             ? <FontAwesomeIcon width={12} className={'animate-spin'} icon={faSpinner} />
                             : '회원가입'
                         }
-                    </button>
+                        </button>
                     </div>
                 </div>
             </div>

@@ -10,14 +10,12 @@ export const postFetch = async (data: UserProps) => {
 }
 
 export const postExistFetch = async (data: ExistProps) : Promise<AxiosResponse<UserResponseStatus>>   => {
-    return await axios.post(process.env.NEXT_PUBLIC_SERVER + '/user/exist', data, {
+    return await axios.post(process.env.NEXT_PUBLIC_SERVER + '/user/exists', data, {
         headers: {
             'Content-Type': 'application/json'
         }
     })
 }
-
-
 
 interface UserResponseStatus {
     status: string;

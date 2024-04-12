@@ -66,6 +66,10 @@ public class UserService implements ReactiveUserDetailsService {
                 ));
     }
 
+    public Mono<Boolean> existsUser(UserRequest.existsUser existsUser) {
+        return Mono.just(userMapper.existsUser(existsUser));
+    }
+
     @Transactional
     public Mono<User> saveUser(Mono<UserRequest.Register> user) {
         return user.map(UserRequest.Register::transToUser)

@@ -1,6 +1,7 @@
 package com.anamensis.server.mapper;
 
 
+import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.entity.Role;
 import com.anamensis.server.entity.User;
 import com.anamensis.server.resultMap.UserResultMap;
@@ -17,6 +18,8 @@ public interface UserMapper {
     Optional<User> findUserByUserId(String userId);
 
     Optional<UserResultMap> findUserInfo(String userId);
+
+    boolean existsUser(UserRequest.existsUser existsUser);
 
     int save(User user);
 

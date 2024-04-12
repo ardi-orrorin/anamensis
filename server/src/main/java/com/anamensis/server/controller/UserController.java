@@ -57,7 +57,6 @@ public class UserController {
                 .map(u -> UserResponse.Status
                     .transToStatus(HttpStatus.CREATED, "User created")
                 );
-
     }
 
     @GetMapping("histories")

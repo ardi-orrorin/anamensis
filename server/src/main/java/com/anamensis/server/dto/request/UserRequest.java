@@ -24,7 +24,7 @@ public class UserRequest {
     @Setter
     public static class Register {
         @NotNull(message = "User ID is required")
-        private String userId;
+        private String id;
 
         @NotNull(message = "Password is required")
         private String pwd;
@@ -42,7 +42,7 @@ public class UserRequest {
 
         public static User transToUser(Register reg) {
             return User.builder()
-                    .userId(reg.getUserId())
+                    .userId(reg.getId())
                     .pwd(reg.getPwd())
                     .name(reg.getName())
                     .email(reg.getEmail())

@@ -1,8 +1,11 @@
 'use client'
 
-import React, {useCallback, useMemo, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 import Row from "@/app/signup/{component}/Row";
 import EmailTemplate from "@/app/signup/{component}/EmailTemplate";
+import axios from "axios";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 
 export interface UserProps {
     id            : string;
@@ -24,9 +27,12 @@ export type CheckProps = {
     [key: string] : CheckType;
 }
 
-export type CheckType = null | boolean;
+export type CheckType = 'check' | 'uncheck' | 'notCheck';
 
 export default function Page() {
+
+    const [loading, setLoading] = useState<boolean>(false);
+
     const [user, setUser] = useState<UserProps>({
         id       : '',
         pwd      : '',
@@ -37,45 +43,89 @@ export default function Page() {
     });
 
     const [check, setCheck] = useState<CheckProps>({
-        id       : null,
-        pwd      : null,
-        pwdCheck : null,
-        name     : null,
-        email    : null,
-        phone    : null,
+        id       : 'uncheck',
+        pwd      : 'uncheck',
+        pwdCheck : 'uncheck',
+        name     : 'uncheck',
+        email    : 'uncheck',
+        phone    : 'uncheck',
     });
 
     const [emailSelect, setEmailSelect] = useState<boolean>(false);
 
+    useEffect(() => {
+        if(user.pwdCheck.length > 0 && user.pwd.length < 8) {
+            setUser({
+                ...user,
+                pwdCheck: ''
+            });
+            setCheck({
+                ...check,
+                pwdCheck: 'uncheck'
+            });
+        }
+        if(user.pwdCheck.length === 0) return ;
+
+        if(user.pwdCheck === user.pwd) {
+            setCheck({
+                ...check,
+                pwdCheck: 'check'
+            });
+        } else {
+            setCheck({
+                ...check,
+                pwdCheck: 'notCheck'
+            });
+        }
+    },[user.pwdCheck, user.pwd]);
+
     const setProps = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
+
         setUser({
             ...user,
             [name]: value
         });
+
+        if(name === 'pwdCheck') return ;
+
+        if(value.length > 0) {
+            setCheck({
+                ...check,
+                [name]: 'check'
+            });
+        } else {
+            setCheck({
+                ...check,
+                [name]: 'uncheck'
+            });
+        }
+
         if(name === 'email' && emailSelect) {
             setEmailSelect(false);
         }
     }
 
-    const inputCheck = useCallback((eleId: null | boolean) => {
-        return eleId === null ? ''
-             : eleId ? 'text-blue-500'
-             : eleId ? 'text-red-500'
-             : '';
-    },[check]);
+    const inputCheck = (checkType: CheckType) => {
+        console.log(checkType)
+        return checkType === 'uncheck' ? ''
+            : checkType === 'check' ? 'text-blue-500'
+            : checkType === 'notCheck' ? 'text-red-500'
+            : '';
+    };
 
     const allCheck = useMemo(() => {
         const {id, pwd, pwdCheck, name, email, phone} = check;
         return id && pwd && pwdCheck && name && email && phone;
     },[check]);
 
-    const checkRetryPassword = useMemo(() => {
-        if(user.pwd.length > 0 && user.pwdCheck.length > 0) {
-            return user.pwd === user.pwdCheck;
-        }
-        return false;
-    },[user.pwd, user.pwdCheck]);
+    const submitHandler = async () => {
+        await setLoading(true);
+        await postFetch(user)
+            .finally(() => {
+                setLoading(false);
+            });
+    }
 
     return (
         <main className={'flex flex-col min-h-screen justify-center items-center'}>
@@ -101,12 +151,14 @@ export default function Page() {
                          setProps={setProps}
                          inputCheck={inputCheck}
                     />
-                    <Row name={'pwdCheck'}
+                    <Row className={[user.pwd.length >= 8 ? 'max-h-52' : 'max-h-0', 'duration-500'].join(' ')}
+                         name={'pwdCheck'}
                          value={user}
                          check={check}
                          placeholder={'비밀번호를 재입력 입력하세요.'}
                          setProps={setProps}
                          inputCheck={inputCheck}
+
                     />
                     <Row name={'name'}
                          value={user}
@@ -140,10 +192,31 @@ export default function Page() {
                     <div>
                         <button className={['w-full rounded duration-300 text-xs text-white p-2', allCheck && 'hover:bg-blue-600', allCheck ? 'bg-blue-300' : 'bg-gray-400'].join(' ')}
                                 disabled={!allCheck}
-                        >회원 가입</button>
+                                onClick={submitHandler}
+                        >{
+                            loading
+                            ? <FontAwesomeIcon width={12} className={'animate-spin'} icon={faSpinner} />
+                            : '회원가입'
+                        }
+                    </button>
                     </div>
                 </div>
             </div>
         </main>
     )
 }
+const postFetch = async (data: UserProps) => {
+
+    return await axios.post(process.env.NEXT_PUBLIC_SERVER + '/user/signup', data, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(res => {
+            console.log(res);
+        })
+        .catch(err => {
+            console.error(err);
+        });
+}
+

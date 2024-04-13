@@ -3,10 +3,9 @@
 import React, {useEffect, useMemo, useState} from "react";
 import Row from "@/app/signup/{components}/Row";
 import EmailTemplate from "@/app/signup/{components}/EmailTemplate";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {postExistFetch, postFetch} from "@/app/signup/{services}/fetch";
 import {useRouter} from "next/navigation";
+import LoadingSpinner from "@/app/{common}/LoadingSpinner";
 
 export interface UserProps {
     id            : string;
@@ -73,8 +72,6 @@ export default function Page() {
 
     useEffect(() => {
         const {id, pwd, pwdCheck, name, email, emailCheck, phone} = user;
-
-        // CheckType axios 처리
 
         setCheck({
             id         : id.length === 0 ? 'uncheck' : check.id,
@@ -175,6 +172,7 @@ export default function Page() {
                name === 'check' &&
                email === 'check' &&
                phone === 'check';
+
     },[check]);
 
     const submitHandler = async () => {
@@ -185,7 +183,6 @@ export default function Page() {
                     alert('회원가입이 완료되었습니다.');
                     router.push('/');
                 }
-
             })
             .finally(() => {
                 setLoading(false);
@@ -271,7 +268,7 @@ export default function Page() {
                                 onClick={submitHandler}
                         >{
                             loading
-                            ? <FontAwesomeIcon width={12} className={'animate-spin'} icon={faSpinner} />
+                            ? <LoadingSpinner size={15} />
                             : '회원가입'
                         }
                         </button>

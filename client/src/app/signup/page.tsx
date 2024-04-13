@@ -1,11 +1,11 @@
 'use client'
 
 import React, {useEffect, useMemo, useState} from "react";
-import Row from "@/app/signup/{components}/Row";
-import EmailTemplate from "@/app/signup/{components}/EmailTemplate";
-import {postExistFetch, postFetch} from "@/app/signup/{services}/fetch";
+import Row from "@/app/signup/Row";
+import EmailTemplate from "@/app/signup/EmailTemplate";
+import {postExistFetch, postFetch} from "@/app/signup/fetch";
 import {useRouter} from "next/navigation";
-import LoadingSpinner from "@/app/{common}/LoadingSpinner";
+import LoadingSpinner from "@/app/LoadingSpinner";
 
 export interface UserProps {
     id            : string;
@@ -48,7 +48,6 @@ export default function Page() {
 
     const [emailSelect, setEmailSelect] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
-
 
     const [user, setUser] = useState<UserProps>({
         id         : '',

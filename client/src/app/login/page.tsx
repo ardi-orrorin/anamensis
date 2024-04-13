@@ -2,11 +2,11 @@
 
 import {useEffect, useMemo, useState} from "react";
 import Link from "next/link";
-import LoadingSpinner from "@/app/{common}/LoadingSpinner";
-import fetchPost, {getGeoLocation, UserInfo} from "@/app/login/{serivces}/fetch";
-import axios, {AxiosResponse} from "axios";
+import LoadingSpinner from "@/app/LoadingSpinner";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faExclamation} from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
+import {useRouter} from "next/navigation";
 
 export interface Login {
     username : string;
@@ -19,7 +19,33 @@ export interface ErrorResponse {
     use: boolean
 }
 
+export interface UserInfo {
+    accessToken: string;
+    refreshToken: string;
+    roles: RoleType[];
+}
+
+enum RoleType {
+    ADMIN  =  'ADMIN',
+    USER   =  'USER',
+    GUEST  =  'GUEST',
+    MASTER =  'MASTER'
+}
+
+export interface GeoLocation {
+    countryCode: string;
+    countryName: string;
+    state: string;
+    city: string;
+    ipv4: string;
+    latitude: number;
+    longitude: number;
+}
+
 export default function Page() {
+
+    const router = useRouter();
+
     const [user, setUser] = useState<Login>({
         username  : '',
         password  : ''
@@ -41,10 +67,6 @@ export default function Page() {
             });
         }
     },[user.username]);
-
-    useEffect(() => {
-        test();
-    },[]);
 
     const setProps = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
@@ -72,24 +94,18 @@ export default function Page() {
     }, [user]);
 
 
-    const test = async () => {
-        await getGeoLocation();
-    }
-
     const goLogin = async () => {
         setLoading(true);
-        await fetchPost(user)
-            .then(res => {
-                console.log(res)
+        await axios.post('./login/api', user)
+            .then((res) => {
+                res.status === 200 && router.push('/');
             })
-            .catch(err => {
-                if(err.response.status === 500) {
-                    setError({
-                        status: err.response.status,
-                        message: err.response.data.message,
-                        use: true
-                    });
-                }
+            .catch((err)  => {
+                setError({
+                    status: err.response.data.status,
+                    message: err.response.data.message,
+                    use: err.response.data.use
+                });
             })
             .finally(() => {
                 setLoading(false);
@@ -98,7 +114,7 @@ export default function Page() {
 
     return (
         <main className={'flex flex-col min-h-screen justify-center items-center'}>
-          <div className={"flex flex-col gap-4 border border-solid b border-blue-300 rounded w-1/2 pb-5"}>
+          <div className={"flex flex-col gap-4 border border-solid b border-blue-300 sm:w-4/5 md:w-1/2 xl:w-1/3 w-full rounded pb-5"}>
               <div className={'flex flex-col gap-1 bg-blue-300 py-4'}>
                   <h1 className={'flex justify-center font-bold text-white text-xl'}
                   >Anamensis</h1>
@@ -126,7 +142,7 @@ export default function Page() {
                       <span className={'text-xs text-red-500 my-2 px-2'}
                       >
                         <FontAwesomeIcon height={12} icon={faExclamation} />
-                        &nbsp; 걔정 또는 비밀번호가 잘못되었습니다.
+                        &nbsp; {error.message}
                       </span>
                   </div>
                   <div>
@@ -145,7 +161,6 @@ export default function Page() {
               <div className={'flex justify-between px-3'}>
                   <a href={'#'}
                      className={'flex justify-center text-xs text-blue-500'}
-                     onClick={test}
                   >아이디 찾기</a>
                   <Link href={'/signup'}
                         className={'flex justify-center text-xs text-blue-500'}

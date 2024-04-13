@@ -38,15 +38,15 @@ class UserControllerTest {
         webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:" + port + "/user").build();
     }
 
-    @BeforeEach
-    @Order(2)
+//    @BeforeEach
+//    @Order(2)
     void setupLogin() {
 //        MultiValueMap<String, String> formData = new org.springframework.util.LinkedMultiValueMap<>();
 //        formData.add("username", "admin");
 //        formData.add("password", "admin");
 
         UserRequest.Login login = new UserRequest.Login();
-        login.setUsername("admin");
+        login.setUsername("admin1");
         login.setPassword("admin");
 
         EntityExchangeResult<UserResponse.Login> result =
@@ -74,7 +74,7 @@ class UserControllerTest {
 //        formData.add("password", "admin");
 
         UserRequest.Login login = new UserRequest.Login();
-        login.setUsername("admin");
+        login.setUsername("admin1");
         login.setPassword("admin");
 
         EntityExchangeResult<String> result =

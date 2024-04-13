@@ -43,6 +43,7 @@ public class UserService implements ReactiveUserDetailsService {
 
     public Mono<User> findUserByUserId(String userId, String pwd) {
         return Mono.justOrEmpty(userMapper.findUserByUserId(userId))
+                .switchIfEmpty(Mono.error(new RuntimeException("User not found")))
                 .onErrorMap(e -> new RuntimeException("User not found"))
                 .doOnNext(user -> {
                     if (!bCryptPasswordEncoder.matches(pwd, user.getPwd())) {

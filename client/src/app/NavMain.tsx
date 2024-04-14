@@ -2,6 +2,8 @@ import Link from "next/link";
 import {cookies} from "next/headers";
 import axios from "axios";
 import {useRouter} from "next/navigation";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faBars} from "@fortawesome/free-solid-svg-icons";
 
 
 type NavItemProps = {
@@ -17,16 +19,10 @@ const NavMain = () => {
 
     const menuItems : NavItemProps[] = [
         {
-            name: 'Home',
-            url: '/',
-            loginRequired: false
-
-        },
-        {
-            name: 'Public',
+            name: 'Menu',
             url: '/public',
             loginRequired: false
-        }
+        },
     ];
 
     const rightMenuItems : NavItemProps[] = [
@@ -48,12 +44,18 @@ const NavMain = () => {
         }
     ];
 
-
-
     return (
-        <nav className={'w-full flex justify-between bg-blue-600 text-white px-3'}>
-            <div>
-                <ul className={'flex'}>
+        <nav className={'w-full flex justify-between bg-blue-500 text-white px-3'}>
+            <div className={'w-1/3 duration-300'}>
+                <ul className={'flex md:hidden h-full w-4 duration-300'}>
+                    <button className={'w-full'}>
+                        <span>
+                            <FontAwesomeIcon icon={faBars} />
+                        </span>
+                    </button>
+                </ul>
+                <ul className={'hidden md:flex duration-300'}>
+
                     {
                         menuItems.map((item, index) => {
                             return <NavItem key={index} {...item} />
@@ -61,8 +63,13 @@ const NavMain = () => {
                     }
                 </ul>
             </div>
-            <div>
-                <ul className={'flex'}>
+            <div className={'w-1/3'}>
+                <Link className={'flex justify-center p-3'}
+                      href={'/'}
+                >ANAMENSIS</Link>
+            </div>
+            <div className={'w-1/3'}>
+                <ul className={'hidden md:flex md:flex-row-reverse '}>
                     {
                         rightMenuItems.map((item, index) => {
                             if(!item.loginRequired === isLogged) {
@@ -80,7 +87,7 @@ const NavMain = () => {
 const NavItem = ({name, url}: NavItemProps) => {
     return (
         <li className={'p-3'}>
-            <Link href={url}>{name}</Link>
+            <Link className={'flex'} href={url}>{name}</Link>
         </li>
     );
 }

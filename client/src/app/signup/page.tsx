@@ -48,6 +48,7 @@ export default function Page() {
 
     const [emailSelect, setEmailSelect] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
+    const [timer, setTimer] = useState<number>(-1);
 
     const [user, setUser] = useState<UserProps>({
         id         : '',
@@ -115,6 +116,7 @@ export default function Page() {
 
         if(name === 'email') {
             setEmailSelect(false);
+            setTimer(-1);
         }
 
 
@@ -130,7 +132,6 @@ export default function Page() {
 
             checkHandler({type: name, value})
                 .then((res) => {
-                    console.log(res.data.message)
                     setCheck({
                         ...check,
                         [name]: res.data.message === 'false' ? 'check' : 'notCheck'
@@ -190,15 +191,32 @@ export default function Page() {
 
     const checkHandler = async (data: ExistProps) => {
         return await postExistFetch(data)
-
     }
+
+    const checkTimer = () => {
+        let time = 60;
+        setTimer(time);
+        const interval = setInterval(() => {
+            if(time === 0) {
+                clearInterval(interval);
+            }
+            time--;
+            setTimer(time);
+        }, 1000);
+    }
+
+    const transToTimerMinuteAndSecond = () => {
+        const minute = Math.floor(timer / 60);
+        const second = timer % 60;
+        return `${minute}분 ${second}초`;
+    };
 
     return (
         <main className={'flex flex-col min-h-screen justify-center items-center'}>
             <div className={"flex flex-col gap-4 border border-solid b border-blue-300 sm:w-4/5 md:w-1/2 xl:w-1/3 w-full rounded pb-5"}>
                 <div className={'flex flex-col gap-1 bg-blue-300 py-4'}>
-                    <h1 className={'flex justify-center font-bold text-white text-xl'}
-                    >Anamensis</h1>
+                    {/*<h1 className={'flex justify-center font-bold text-white text-xl'}*/}
+                    {/*>Anamensis</h1>*/}
                     <h3 className={'flex justify-center font-bold text-white text-base'}
                     >Signup</h3>
                 </div>
@@ -239,6 +257,7 @@ export default function Page() {
                          placeholder={'이메일을 입력하세요.'}
                          setProps={setProps}
                          inputCheck={inputCheck}
+                         disabled={timer >= 0}
                     />
                     <EmailTemplate className={user.email.length > 0 && !emailSelect ? 'max-h-52' : 'max-h-0'}
                                    id={user.email}
@@ -246,14 +265,22 @@ export default function Page() {
                                    order={0}
                                    emailClickHandler={emailClickHandler}
                     />
-                    <Row className={[emailRegex.test(user.email)? 'max-h-52' : 'max-h-0', 'duration-500'].join(' ')}
-                         name={'emailCheck'}
-                         value={user}
-                         check={check}
-                         placeholder={'6자리 인증번호 입력하세요.'}
-                         setProps={setProps}
-                         inputCheck={inputCheck}
-                    />
+                    <div className={'flex'}>
+                        <Row className={[emailRegex.test(user.email)? 'max-h-52' : 'max-h-0', 'w-full duration-500'].join(' ')}
+                             name={'emailCheck'}
+                             value={user}
+                             check={check}
+                             placeholder={'6자리 인증번호 입력하세요.'}
+                             setProps={setProps}
+                             inputCheck={inputCheck}
+                        />
+                        <button className={[emailRegex.test(user.email)? 'max-h-52  my-3 ms-2' : 'max-h-0', timer >= 0 ? 'bg-gray-400' : 'bg-blue-300' , 'duration-500','w-1/4 rounded text-xs text-white'].join(' ')}
+                                disabled={timer >= 0}
+                                onClick={checkTimer}
+                        >
+                            {timer >= 0 ? transToTimerMinuteAndSecond() : '인증번호 받기'}
+                        </button>
+                    </div>
                     <Row name={'phone'}
                          value={user}
                          check={check}

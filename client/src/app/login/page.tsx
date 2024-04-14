@@ -60,7 +60,7 @@ export default function Page() {
     });
 
     useEffect(() => {
-        if(user.username.length < 5) {
+        if(user.username.length < 4) {
             setUser({
                 ...user,
                 password: ''
@@ -116,8 +116,8 @@ export default function Page() {
         <main className={'flex flex-col min-h-screen justify-center items-center'}>
           <div className={"flex flex-col gap-4 border border-solid b border-blue-300 sm:w-4/5 md:w-1/2 xl:w-1/3 w-full rounded pb-5"}>
               <div className={'flex flex-col gap-1 bg-blue-300 py-4'}>
-                  <h1 className={'flex justify-center font-bold text-white text-xl'}
-                  >Anamensis</h1>
+                  {/*<h1 className={'flex justify-center font-bold text-white text-xl'}*/}
+                  {/*>Anamensis</h1>*/}
                   <h3 className={'flex justify-center font-bold text-white text-base'}
                   >LOGIN</h3>
               </div>

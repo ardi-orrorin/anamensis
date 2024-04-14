@@ -11,6 +11,7 @@ export type RowProps = {
     placeholder : string;
     setProps    : (e: React.ChangeEvent<HTMLInputElement>) => void;
     inputCheck  : (eleId: CheckType) => string;
+    disabled?   : boolean;
 }
 
 const Row = (props:RowProps) => {
@@ -22,6 +23,7 @@ const Row = (props:RowProps) => {
                 name={props.name}
                 onChange={props.setProps}
                 value={props.value[props.name]}
+                disabled={props.disabled}
             />
             {
                 props.check[props.name] !== 'uncheck' &&

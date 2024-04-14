@@ -47,7 +47,7 @@ const NavMain = () => {
     ];
 
     return (
-        <nav className={'w-full flex justify-between bg-blue-500 text-white px-3'}>
+        <nav className={'w-full flex justify-between items-center bg-blue-500 text-white h-12'}>
             <div className={'w-1/3 duration-300'}>
                 <ul className={'flex md:hidden h-full w-4 duration-300'}>
                     <button className={'w-full'}>

@@ -43,7 +43,23 @@ export default async function Page(page: InferGetServerSidePropsType<typeof getS
 
     return (
         <div>
-            <table>
+            <div className={'flex justify-between h-10'}>
+                <div>
+
+                </div>
+                <div>
+                    <select className={'w-32 border border-solid border-gray-300 rounded-md text-sm px-3 py-1'}
+                            defaultValue={searchParams.size} >
+                        <option value={10}>10</option>
+                        <option value={20}>20</option>
+                        <option value={30}>30</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                        <option value={200}>200</option>
+                    </select>
+                </div>
+            </div>
+            <table className={'w-full'}>
                 <colgroup>
                     <col style={{width: '10%'}}/>
                     <col style={{width: '55%'}}/>
@@ -60,13 +76,13 @@ export default async function Page(page: InferGetServerSidePropsType<typeof getS
                </thead>
                <tbody className={'text-sm'}>
                {
-                   data.content.map((history) => {
+                   data.content.map((history, index) => {
                        return (
-                           <tr key={history.id} className={'border-b border-gray-200 border-solid'}>
-                               <td className={'py-4 ps-2'}>{history.ip}</td>
-                               <td className={'ps-2'}>{history.device}</td>
-                               <td className={'ps-2'}>{history.location}</td>
-                               <td className={'text-center'}>{history.createAt}</td>
+                           <tr key={history.id} className={['border-b border-gray-200 border-solid', index % 2 === 1 ? 'bg-blue-50': ''].join(' ')}>
+                               <td className={'py-4 ps-3'}>{history.ip}</td>
+                               <td className={'ps-3'}>{history.device}</td>
+                               <td className={'ps-3'}>{history.location}</td>
+                               <td className={'ps-3'}>{history.createAt}</td>
                            </tr>
                        )
                    })

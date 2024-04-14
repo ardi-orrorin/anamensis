@@ -2,7 +2,8 @@ import {NextRequest, NextResponse} from "next/server";
 import {cookies} from "next/headers";
 
 export async function middleware(req: NextRequest) {
-    const isLogged = cookies().get('accessToken') !== undefined && cookies().get('refreshToken') !== undefined;
+    // const isLogged = cookies().get('accessToken') !== undefined && cookies().get('refreshToken') !== undefined;
+    const isLogged = cookies().get('accessToken') !== undefined;
     const url = req.nextUrl.clone();
 
     if (!isLogged) {

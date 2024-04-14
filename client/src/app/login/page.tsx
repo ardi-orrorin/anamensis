@@ -6,7 +6,6 @@ import LoadingSpinner from "@/app/LoadingSpinner";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faExclamation} from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
-import {useRouter} from "next/navigation";
 
 export interface Login {
     username : string;
@@ -43,8 +42,6 @@ export interface GeoLocation {
 }
 
 export default function Page() {
-
-    const router = useRouter();
 
     const [user, setUser] = useState<Login>({
         username  : '',
@@ -111,7 +108,6 @@ export default function Page() {
                 setLoading(false);
             });
     }
-
     return (
         <main className={'flex flex-col min-h-screen justify-center items-center'}>
           <div className={"flex flex-col gap-4 border border-solid b border-blue-300 sm:w-4/5 md:w-1/2 xl:w-1/3 w-full rounded pb-5"}>

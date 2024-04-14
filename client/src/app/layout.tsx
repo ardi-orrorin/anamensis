@@ -1,6 +1,5 @@
 import "./init.css"
 import {Metadata} from "next";
-import Link from "next/link";
 import NavMain from "@/app/NavMain";
 
 export const metadata : Metadata = {

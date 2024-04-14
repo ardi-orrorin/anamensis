@@ -1,13 +1,10 @@
 import Link from "next/link";
 import {cookies} from "next/headers";
-import axios from "axios";
-import {useRouter} from "next/navigation";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faBars} from "@fortawesome/free-solid-svg-icons";
-
+import {faBars, faRightFromBracket, faUser} from "@fortawesome/free-solid-svg-icons";
 
 type NavItemProps = {
-    name: string,
+    name: string | JSX.Element,
     url: string
     loginRequired?: boolean
     onClick?: () => void
@@ -38,10 +35,15 @@ const NavMain = () => {
             loginRequired: false
         },
         {
-            name: 'Logout',
+            name: <FontAwesomeIcon className={'w-4'} icon={faRightFromBracket} />,
             url: '/logout',
             loginRequired: true,
-        }
+        },
+        {
+            name: <FontAwesomeIcon className={'w-4'} icon={faUser} />,
+            url: '/user',
+            loginRequired: true
+        },
     ];
 
     return (
@@ -87,7 +89,7 @@ const NavMain = () => {
 const NavItem = ({name, url}: NavItemProps) => {
     return (
         <li className={'p-3'}>
-            <Link className={'flex'} href={url}>{name}</Link>
+            <Link className={'flex'} href={url} >{name}</Link>
         </li>
     );
 }

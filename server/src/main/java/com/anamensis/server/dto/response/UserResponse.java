@@ -16,8 +16,15 @@ public class UserResponse {
     @Getter
     @Builder
     public static class Login {
+
         private String accessToken;
+
+        private long accessTokenExpiresIn;
+
         private String refreshToken;
+
+        private long refreshTokenExpiresIn;
+
         private String username;
         private List<RoleType> roles;
 
@@ -25,6 +32,8 @@ public class UserResponse {
             return Login.builder()
                     .accessToken(token.getAccessToken())
                     .refreshToken(token.getRefreshToken())
+                    .accessTokenExpiresIn(token.getAccessTokenExpiresIn())
+                    .refreshTokenExpiresIn(token.getRefreshTokenExpiresIn())
                     .username(user.getUser().getName())
                     .roles(user.getRoles().stream().map(Role::getRole).toList())
                     .build();

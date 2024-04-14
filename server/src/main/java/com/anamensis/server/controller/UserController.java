@@ -98,6 +98,8 @@ public class UserController {
         return Token.builder()
                 .accessToken(tokenProvider.generateToken(userId, false))
                 .refreshToken(tokenProvider.generateToken(userId, true))
+                .accessTokenExpiresIn(tokenProvider.ACCESS_EXP)
+                .refreshTokenExpiresIn(tokenProvider.REFRESH_EXP)
                 .build();
     }
 }

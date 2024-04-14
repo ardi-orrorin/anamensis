@@ -20,8 +20,8 @@ public class TokenProvider {
     private SecretKey SECRET_KEY;
 
     // 시 * 분 * 초 * 밀리초
-    private final long ACCESS_EXP  =  1 * 30 * 60 * 1000;
-    private final long REFRESH_EXP = 24 * 60 * 60 * 1000;
+    public final long ACCESS_EXP  =  1 * 30 * 60 * 1000;
+    public final long REFRESH_EXP = 24 * 60 * 60 * 1000;
 
     public String generateToken(String userId, boolean isRefresh) {
         SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());

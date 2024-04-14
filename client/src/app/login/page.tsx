@@ -112,6 +112,13 @@ export default function Page() {
             });
     }
 
+    const test = async () => {
+        await axios.get('./login/api')
+            .then((res) => {
+                console.log(res.data);
+            });
+    }
+
     return (
         <main className={'flex flex-col min-h-screen justify-center items-center'}>
           <div className={"flex flex-col gap-4 border border-solid b border-blue-300 sm:w-4/5 md:w-1/2 xl:w-1/3 w-full rounded pb-5"}>
@@ -161,6 +168,7 @@ export default function Page() {
               <div className={'flex justify-between px-3'}>
                   <a href={'#'}
                      className={'flex justify-center text-xs text-blue-500'}
+                     onClick={test}
                   >아이디 찾기</a>
                   <Link href={'/signup'}
                         className={'flex justify-center text-xs text-blue-500'}

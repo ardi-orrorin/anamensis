@@ -1,6 +1,7 @@
 import {NextRequest, NextResponse} from "next/server";
 import axios from "axios";
 import {ErrorResponse} from "@/app/login/page";
+import {ResponseCookie} from "next/dist/compiled/@edge-runtime/cookies";
 
 export async function POST(req: NextRequest) {
     const {username, password} = await req.json();
@@ -18,21 +19,42 @@ export async function POST(req: NextRequest) {
                 longitude: res.data.longitude
             };
         });
-    return await axios.post(url, {username, password}, {
-        headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': req.headers.get('User-Agent') || '',
-            'Location': `${geoLocation.countryName}-${geoLocation.state}-${geoLocation.city}`
-        }
-    }).then((res) => {
-        return new NextResponse(JSON.stringify(res.data), {
+
+    try {
+        const res = await axios.post(url, {username, password}, {
+            headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': req.headers.get('User-Agent') || '',
+                'Location': `${geoLocation.countryName}-${geoLocation.state}-${geoLocation.city}`
+            }
+        })
+
+        const next = new NextResponse(JSON.stringify(res.data), {
             status: 200,
             headers: {
                 'Content-Type': 'application/json',
-                'set-cookie': `${res.data.refreshToken}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=604800`
             }
         });
-    }).catch((err) => {
+
+        const cookieInit: Partial<ResponseCookie> = {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+        }
+
+        next.cookies.set('accessToken', res.data.accessToken, {
+            ...cookieInit,
+            maxAge: res.data.accessTokenExpiresIn / 1000
+        });
+
+        next.cookies.set('refreshToken', res.data.refreshToken, {
+            ...cookieInit,
+            maxAge: res.data.refreshTokenExpiresIn / 1000
+        });
+
+        return next;
+
+    } catch (err: any) {
         const errResponse: ErrorResponse = {
             status: err.response.status,
             message: err.response.data.message,
@@ -40,9 +62,11 @@ export async function POST(req: NextRequest) {
         }
 
         return new NextResponse(JSON.stringify(errResponse), {
-            status: 500,
+            status: err.response.status,
+            headers: {
+                'Content-Type': 'application/json',
+            }
         });
-    }).finally(() => {
-        return NextResponse.error();
-    });
+
+    }
 }

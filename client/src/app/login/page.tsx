@@ -98,7 +98,7 @@ export default function Page() {
         setLoading(true);
         await axios.post('./login/api', user)
             .then((res) => {
-                res.status === 200 && router.push('/');
+                res.status === 200 && window.location.replace('/');
             })
             .catch((err)  => {
                 setError({
@@ -109,13 +109,6 @@ export default function Page() {
             })
             .finally(() => {
                 setLoading(false);
-            });
-    }
-
-    const test = async () => {
-        await axios.get('./login/api')
-            .then((res) => {
-                console.log(res.data);
             });
     }
 
@@ -168,7 +161,6 @@ export default function Page() {
               <div className={'flex justify-between px-3'}>
                   <a href={'#'}
                      className={'flex justify-center text-xs text-blue-500'}
-                     onClick={test}
                   >아이디 찾기</a>
                   <Link href={'/signup'}
                         className={'flex justify-center text-xs text-blue-500'}

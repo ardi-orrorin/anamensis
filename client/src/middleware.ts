@@ -7,16 +7,17 @@ export async function middleware(req: NextRequest) {
 
     if (!isLogged) {
         url.pathname = '/';
+        url.search = '';
         return NextResponse.redirect(url)
     }
 
     return NextResponse.next();
 }
 
-
 export const config = {
     matcher: [
         '/public/:path*',
         '/logout/:path*',
+        '/user/:path*',
     ]
 }

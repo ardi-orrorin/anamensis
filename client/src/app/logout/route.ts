@@ -12,7 +12,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
         url: url.toString()
     });
 
-
     next.cookies.set('accessToken', '', {
         maxAge: 0
     });

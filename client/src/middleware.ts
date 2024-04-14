@@ -1,15 +1,17 @@
 import {NextRequest, NextResponse} from "next/server";
 import axios from "axios";
+import {cookies} from "next/headers";
 
 export async function middleware(req: NextRequest) {
+    const isLogged = cookies().get('accessToken') !== undefined && cookies().get('refreshToken') !== undefined;
+    const url = req.nextUrl.clone();
     if(req.nextUrl.pathname === '/public') {
-        const url = req.nextUrl.clone();
         url.pathname = '/login';
         return NextResponse.redirect(url);
     }
 
     if(req.nextUrl.pathname === '/logout') {
-        const url = req.nextUrl.clone();
+        if(isLogged) return ;
         url.pathname = '/';
         return NextResponse.redirect(url)
     }

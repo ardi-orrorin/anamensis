@@ -5,7 +5,7 @@ import Row from "@/app/signup/Row";
 import EmailTemplate from "@/app/signup/EmailTemplate";
 import {postExistFetch, postFetch} from "@/app/signup/fetch";
 import {useRouter} from "next/navigation";
-import LoadingSpinner from "@/app/LoadingSpinner";
+import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 
 export interface UserProps {
     id            : string;

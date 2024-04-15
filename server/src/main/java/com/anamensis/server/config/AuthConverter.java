@@ -5,6 +5,7 @@ import com.anamensis.server.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
@@ -39,7 +40,14 @@ public class AuthConverter implements ServerAuthenticationConverter {
         Claims claims = tokenProvider.getClaims(token);
         String userId = claims.get("user", String.class);
         if(claims.get("type").equals("refresh")) {
-            exchange.getResponse().getHeaders().add("Access", tokenProvider.generateToken(userId, false));
+            ResponseCookie cookie = ResponseCookie.from("accessToken", tokenProvider.generateToken(userId, true))
+                    .sameSite("None")
+                    .secure(true)
+                    .path("/")
+                    .maxAge(tokenProvider.ACCESS_EXP / 1000)
+                    .build();
+
+            exchange.getResponse().addCookie(cookie);
         }
 
         return userService.findByUsername(userId)

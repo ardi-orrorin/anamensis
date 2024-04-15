@@ -93,6 +93,11 @@ public class UserController {
                 );
     }
 
+    @GetMapping("refresh")
+    public Mono<Boolean> refresh(
+    ) {
+        return Mono.just(true);
+    }
 
     private Token generateToken(String userId) {
         return Token.builder()

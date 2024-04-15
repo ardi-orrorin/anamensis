@@ -38,11 +38,11 @@ class UserControllerTest {
         webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:" + port + "/user").build();
     }
 
-//    @BeforeEach
-//    @Order(2)
+    @BeforeEach
+    @Order(2)
     void setupLogin() {
 //        MultiValueMap<String, String> formData = new org.springframework.util.LinkedMultiValueMap<>();
-//        formData.add("username", "admin");
+//        formData.add("username", "admin1");
 //        formData.add("password", "admin");
 
         UserRequest.Login login = new UserRequest.Login();

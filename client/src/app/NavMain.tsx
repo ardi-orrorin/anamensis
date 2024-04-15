@@ -11,8 +11,7 @@ type NavItemProps = {
 }
 const NavMain = () => {
 
-    const isLogged = cookies().get('accessToken') !== undefined
-        || cookies().get('refreshToken') !== undefined
+    const isLogged = cookies().get('accessToken') !== undefined;
 
     const menuItems : NavItemProps[] = [
         {
@@ -49,15 +48,12 @@ const NavMain = () => {
     return (
         <nav className={'w-full flex justify-between items-center bg-blue-500 text-white h-12'}>
             <div className={'w-1/3 duration-300'}>
-                <ul className={'flex md:hidden h-full w-4 duration-300'}>
-                    <button className={'w-full'}>
-                        <span>
-                            <FontAwesomeIcon icon={faBars} />
-                        </span>
+                <ul className={'flex md:hidden h-full ms-4 w-4 duration-300'}>
+                    <button className={'w-5'}>
+                        <FontAwesomeIcon icon={faBars} />
                     </button>
                 </ul>
                 <ul className={'hidden md:flex duration-300'}>
-
                     {
                         menuItems.map((item, index) => {
                             return <NavItem key={index} {...item} />

@@ -13,6 +13,7 @@ export default function Layout({children}: {children: React.ReactNode}) {
 
     const menuItems = [
         {name: '로그인기록', href:'/user/history'},
+        {name: 'SMTP 설정', href:'/user/smtp'},
     ]
     return (
         <main className={'flex items-start'}>

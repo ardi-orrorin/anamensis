@@ -1,6 +1,6 @@
 import axios, {AxiosResponse} from "axios";
 import {cookies} from "next/headers";
-import {InferGetServerSidePropsType} from "next";
+import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import {getServerSideProps} from "next/dist/build/templates/pages";
 import {PageI} from "@/app/{commons}/types/commons";
 import PageNavigator from "@/app/{commons}/PageNavigator";
@@ -18,7 +18,7 @@ interface LoginHistoriesI {
     createAt: string;
 }
 
-export default async function Page(page: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default async function Page(page: InferGetServerSidePropsType<GetServerSideProps>) {
     const {searchParams} = page;
 
     const url = process.env.NEXT_PUBLIC_SERVER + `/user/histories`;
@@ -87,11 +87,11 @@ export default async function Page(page: InferGetServerSidePropsType<typeof getS
                    data.content.map((history, index) => {
                        return (
                            <tr key={history.id} className={['border-b border-gray-200 border-solid', index % 2 === 1 ? 'bg-blue-50': ''].join(' ')}>
-                               <td className={'ps-3'}>{ maxIndex - index }</td>
-                               <td className={'py-4 ps-3'}>{ history.ip }</td>
-                               <td className={'ps-3'}>{ history.device }</td>
-                               <td className={'ps-3'}>{ history.location }</td>
-                               <td className={'ps-3'}>{ history.createAt }</td>
+                               <td className={'px-3'}>{ maxIndex - index }</td>
+                               <td className={'py-4 px-3'}>{ history.ip }</td>
+                               <td className={'px-3'}>{ history.device }</td>
+                               <td className={'px-3'}>{ history.location }</td>
+                               <td className={'px-3'}>{ history.createAt }</td>
                            </tr>
                        )
                    })

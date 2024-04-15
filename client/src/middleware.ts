@@ -15,7 +15,8 @@ export async function middleware(req: NextRequest) {
         const ssl = process.env.NEXT_PUBLIC_SSL === 'TRUE';
 
         const next = NextResponse.next();
-        next.headers.set('Set-Cookie', `accessToken=${result.accessToken}; Expires=${result.Expires}; Path=/; samSite=strict; HttpOnly${ssl && '; secure'};`);
+        // console.log(result.accessToken)
+        next.headers.set('Set-Cookie', result + '; Secure; SameSite=Strict; HttpOnly');
         return next;
     }
 
@@ -28,7 +29,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
 }
 
-const generateRefreshToken = async (refreshToken: RequestCookie): Promise<AccessCookieI> => {
+const generateRefreshToken = async (refreshToken: RequestCookie): Promise<string> => {
     const refresh = await fetch(process.env.NEXT_PUBLIC_SERVER + '/user/refresh', {
         headers: {
             'Content-Type': 'application/json',
@@ -42,25 +43,25 @@ const generateRefreshToken = async (refreshToken: RequestCookie): Promise<Access
             return cookie;
         }
     });
+    console.log(accessToken);
 
     // @ts-ignore
-    const token: AccessCookieI = accessToken!.split(';')?.map((cookie: string) => {
-        const [key, value] = cookie.split('=');
-        return {[key] : value};
-    }).reduce((acc, curr) => {
-        return {...acc, ...curr};
-    });
+    // const token: AccessCookieI = accessToken!.split(';')?.map((cookie: string) => {
+    //     const [key, value] = cookie.split('=');
+    //     return {[key] : value};
+    // }).reduce((acc, curr) => {
+    //     return {...acc, ...curr};
+    // });
+    // return token;
 
-    return token;
+    return accessToken;
 }
 
-export interface AccessCookieI {
-    accessToken: string;
-    Expires: string;
-    secure: boolean | undefined;
-    Path: string;
-    path: string;
-}
+// export interface AccessCookieI {
+//     accessToken: string;
+//     'Max-Age': string;
+//     secure: boolean | undefined;
+// }
 
 
 export const config = {

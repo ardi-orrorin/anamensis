@@ -1,6 +1,7 @@
 import "./init.css"
 import {Metadata} from "next";
 import NavMain from "@/app/NavMain";
+import {cookies} from "next/headers";
 
 export const metadata : Metadata = {
   title: 'Anamensis',
@@ -14,7 +15,7 @@ export default function RootLayout({
   return (
 	<html lang="ko">
         <body>
-            <NavMain />
+            <NavMain cookie={cookies} />
             <div>
                 {children}
             </div>

@@ -55,7 +55,7 @@ class UserServiceTest {
 //        userService.saveUser(Mono.just(user));
 
         UserRequest.Register register = new UserRequest.Register();
-        register.setUserId("admin3");
+        register.setId("admin3");
         register.setPwd(encodePwd);
         register.setName("admin");
         register.setEmail("admin3@test.com");
@@ -89,6 +89,16 @@ class UserServiceTest {
         Mono<RoleType> roleType = Mono.just(RoleType.USER);
         mono.zipWith(roleType)
                 .map(userService::deleteRole)
+                .log()
+                .subscribe();
+    }
+
+    @Test
+    void existsUser() {
+        UserRequest.existsUser existsUser = new UserRequest.existsUser();
+        existsUser.setType("email");
+        existsUser.setValue("test@icloud.com");
+        userService.existsUser(existsUser)
                 .log()
                 .subscribe();
     }

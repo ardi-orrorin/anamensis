@@ -27,6 +27,24 @@
             ON a.id      = b.user_pk
          WHERE a.user_id = #{userId}
     </select>
+    <select id="existsUser" resultType="boolean">
+        SELECT EXISTS(
+               SELECT *
+                 FROM user
+                WHERE 1 = 1
+                 <choose>
+                    <when test="type != null and type == 'id' and value != null and value != ''">
+                        AND user_id = #{value}
+                    </when>
+                    <when test="type != null and type == 'email' and value != null and value != ''">
+                        AND email   = #{value}
+                    </when>
+                    <when test="type != null and type == 'phone' and value != null and value != ''">
+                        AND phone   = #{value}
+                    </when>
+                 </choose>
+             )
+    </select>
     <insert id="save" parameterType="User">
         <selectKey keyProperty="id" resultType="int" order="AFTER">
             SELECT LAST_INSERT_ID()

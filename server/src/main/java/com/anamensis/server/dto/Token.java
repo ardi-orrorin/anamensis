@@ -7,6 +7,11 @@ import lombok.Getter;
 @Builder
 public class Token {
     private String accessToken;
+
+    private long accessTokenExpiresIn;
+
     private String refreshToken;
+
+    private long refreshTokenExpiresIn;
 
 }

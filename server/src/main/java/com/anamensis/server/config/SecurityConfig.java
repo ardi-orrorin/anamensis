@@ -56,7 +56,7 @@ public class SecurityConfig implements WebFluxConfigurer {
         registry.addMapping("/**")
                 .allowedOriginPatterns("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
-                .allowedHeaders("Authorization", "Content-Type")
+                .allowedHeaders("Authorization", "Content-Type", "Device", "Location")
                 .allowCredentials(true);
     }
     @Override

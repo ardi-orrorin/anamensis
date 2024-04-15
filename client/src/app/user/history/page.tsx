@@ -1,0 +1,107 @@
+import axios, {AxiosResponse} from "axios";
+import {cookies} from "next/headers";
+import {GetServerSideProps, InferGetServerSidePropsType} from "next";
+import {getServerSideProps} from "next/dist/build/templates/pages";
+import {PageI} from "@/app/{commons}/types/commons";
+import PageNavigator from "@/app/{commons}/PageNavigator";
+
+interface PageLoginHistoriesI {
+    page: PageI;
+    content: LoginHistoriesI[];
+}
+
+interface LoginHistoriesI {
+    id: string;
+    ip: string;
+    device: string;
+    location: string;
+    createAt: string;
+}
+
+export default async function Page(page: InferGetServerSidePropsType<GetServerSideProps>) {
+    const {searchParams} = page;
+
+    const url = process.env.NEXT_PUBLIC_SERVER + `/user/histories`;
+
+    const data: PageLoginHistoriesI = await axios.get(url,{
+        params: {...searchParams},
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${cookies().get('accessToken')?.value}`
+    }})
+    .then((res: AxiosResponse) => {
+        return res.data;
+    });
+
+    const maxIndex = data.page.total - ((data.page.page - 1) * data.page.size);
+
+    return (
+        <div>
+            <div className={'flex justify-between h-10'}
+            >
+                <div />
+                <form className={'flex gap-3'}
+                      method={'get'}
+                >
+                    <div>
+                        <select className={'w-32 border border-solid border-gray-300 rounded-md text-sm px-3 py-1'}
+                                defaultValue={searchParams.size}
+                                name={'size'}
+                        >
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={30}>30</option>
+                            <option value={50}>50</option>
+                            <option value={100}>100</option>
+                            <option value={200}>200</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button className={'w-20 border border-solid border-gray-300 rounded-md text-sm px-3 py-1'}
+                                type={'submit'}
+                        >
+                            조회
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <table className={'w-full'}>
+                <colgroup>
+                    <col style={{width: '5%'}}/>
+                    <col style={{width: '10%'}}/>
+                    <col style={{width: '50%'}}/>
+                    <col style={{width: '20%'}}/>
+                    <col style={{width: '15%'}}/>
+                </colgroup>
+               <thead className={'bg-blue-300 text-white h-8 align-middle'}>
+                 <tr className={'text-sm border-x border-white border-solid'}>
+                  <th className={'border-x border-white border-solid'}>#</th>
+                  <th className={'border-x border-white border-solid'}>IP</th>
+                  <th className={'border-x border-white border-solid'}>Device</th>
+                  <th className={'border-x border-white border-solid'}>Location</th>
+                  <th className={'border-x border-white border-solid'}>Create At</th>
+                 </tr>
+               </thead>
+               <tbody className={'text-sm'}>
+               {
+                   data.content.map((history, index) => {
+                       return (
+                           <tr key={history.id} className={['border-b border-gray-200 border-solid', index % 2 === 1 ? 'bg-blue-50': ''].join(' ')}>
+                               <td className={'px-3'}>{ maxIndex - index }</td>
+                               <td className={'py-4 px-3'}>{ history.ip }</td>
+                               <td className={'px-3'}>{ history.device }</td>
+                               <td className={'px-3'}>{ history.location }</td>
+                               <td className={'px-3'}>{ history.createAt }</td>
+                           </tr>
+                       )
+                   })
+               }
+               </tbody>
+            </table>
+            <PageNavigator {...data.page} />
+        </div>
+    )
+}
+
+
+

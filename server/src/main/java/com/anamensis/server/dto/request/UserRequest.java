@@ -24,7 +24,7 @@ public class UserRequest {
     @Setter
     public static class Register {
         @NotNull(message = "User ID is required")
-        private String userId;
+        private String id;
 
         @NotNull(message = "Password is required")
         private String pwd;
@@ -42,7 +42,7 @@ public class UserRequest {
 
         public static User transToUser(Register reg) {
             return User.builder()
-                    .userId(reg.getUserId())
+                    .userId(reg.getId())
                     .pwd(reg.getPwd())
                     .name(reg.getName())
                     .email(reg.getEmail())
@@ -52,6 +52,17 @@ public class UserRequest {
                     .isUse(true)
                     .build();
         }
+    }
+
+    @Getter
+    @Setter
+    public static class existsUser {
+
+        @NotNull(message = "Type is required")
+        private String type;
+
+        @NotNull(message = "Value is required")
+        private String value;
     }
 
 }

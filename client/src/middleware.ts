@@ -3,28 +3,23 @@ import {cookies} from "next/headers";
 import {RequestCookie} from "next/dist/compiled/@edge-runtime/cookies";
 
 export async function middleware(req: NextRequest) {
-    const isLogged = cookies().get('accessToken');
+    const accessToken = cookies().get('accessToken');
 
     const url = req.nextUrl.clone();
 
     const refreshToken = cookies().get('refreshToken');
 
 
-    if(!isLogged && refreshToken) {
+    if(!accessToken && refreshToken) {
         const result = await generateRefreshToken(refreshToken);
+        const ssl = process.env.NEXT_PUBLIC_SSL === 'TRUE';
 
         const next = NextResponse.next();
-        next.cookies.set('accessToken', result.accessToken, {
-            secure: result.secure,
-            path: result.Path,
-            maxAge: new Date(result.Expires).getMinutes()
-        });
-
+        next.headers.set('Set-Cookie', `accessToken=${result.accessToken}; Expires=${result.Expires}; Path=/; samSite=strict; HttpOnly${ssl && '; secure'};`);
         return next;
-
     }
 
-    if (!isLogged) {
+    if (!accessToken) {
         url.pathname = '/';
         url.search = '';
         return NextResponse.redirect(url)
@@ -56,7 +51,6 @@ const generateRefreshToken = async (refreshToken: RequestCookie): Promise<Access
         return {...acc, ...curr};
     });
 
-    // @ts-ignore
     return token;
 }
 

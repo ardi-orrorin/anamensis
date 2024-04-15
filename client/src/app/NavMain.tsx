@@ -1,7 +1,7 @@
 import Link from "next/link";
-import {cookies} from "next/headers";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBars, faRightFromBracket, faUser} from "@fortawesome/free-solid-svg-icons";
+import {ReadonlyRequestCookies} from "next/dist/server/web/spec-extension/adapters/request-cookies";
 
 type NavItemProps = {
     name: string | JSX.Element,
@@ -9,9 +9,8 @@ type NavItemProps = {
     loginRequired?: boolean
     onClick?: () => void
 }
-const NavMain = () => {
-
-    const isLogged = cookies().get('accessToken') !== undefined;
+const NavMain = ({cookie} : {cookie: () => ReadonlyRequestCookies}) => {
+    const isLogged = cookie().get('accessToken') !== undefined;
 
     const menuItems : NavItemProps[] = [
         {

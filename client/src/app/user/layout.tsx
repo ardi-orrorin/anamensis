@@ -15,7 +15,7 @@ export default function Layout({children}: {children: React.ReactNode}) {
     ]
     return (
         <main className={'flex items-start'}>
-            <nav className={['min-h-screen bg-blue-400 py-2 duration-300', isOpen ? 'translate-x-0 shadow-outset-lg w-52 ' : 'translate-x-[-1000px] w-0'].join(' ')}>
+            <nav className={['min-h-screen bg-blue-400 py-2 duration-300', isOpen ? 'translate-x-0 shadow-outset-lg w-[300px]' : 'translate-x-[-1000px] w-0'].join(' ')}>
                 <div className={'flex justify-between px-4'}>
                     <div></div>
                     <div>

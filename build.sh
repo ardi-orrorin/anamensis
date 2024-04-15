@@ -1,6 +1,6 @@
 clear
 
-ehoc proejct build start....
+echo proejct build start....
 echo
 
 version=$1

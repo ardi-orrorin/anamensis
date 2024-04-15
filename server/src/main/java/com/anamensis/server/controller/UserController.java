@@ -57,7 +57,14 @@ public class UserController {
                 .map(u -> UserResponse.Status
                     .transToStatus(HttpStatus.CREATED, "User created")
                 );
+    }
 
+    @PostMapping("exists")
+    public Mono<UserResponse.Status> exists(@Valid @RequestBody Mono<UserRequest.existsUser> data) {
+        return data.flatMap(userService::existsUser)
+                .map(exists -> UserResponse.Status
+                        .transToStatus(HttpStatus.OK, exists.toString())
+                );
     }
 
     @GetMapping("histories")
@@ -86,11 +93,18 @@ public class UserController {
                 );
     }
 
+    @GetMapping("refresh")
+    public Mono<Boolean> refresh(
+    ) {
+        return Mono.just(true);
+    }
 
     private Token generateToken(String userId) {
         return Token.builder()
                 .accessToken(tokenProvider.generateToken(userId, false))
                 .refreshToken(tokenProvider.generateToken(userId, true))
+                .accessTokenExpiresIn(tokenProvider.ACCESS_EXP)
+                .refreshTokenExpiresIn(tokenProvider.REFRESH_EXP)
                 .build();
     }
 }

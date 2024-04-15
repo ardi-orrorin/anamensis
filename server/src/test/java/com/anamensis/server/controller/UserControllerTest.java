@@ -42,11 +42,11 @@ class UserControllerTest {
     @Order(2)
     void setupLogin() {
 //        MultiValueMap<String, String> formData = new org.springframework.util.LinkedMultiValueMap<>();
-//        formData.add("username", "admin");
+//        formData.add("username", "admin1");
 //        formData.add("password", "admin");
 
         UserRequest.Login login = new UserRequest.Login();
-        login.setUsername("admin");
+        login.setUsername("admin1");
         login.setPassword("admin");
 
         EntityExchangeResult<UserResponse.Login> result =
@@ -74,7 +74,7 @@ class UserControllerTest {
 //        formData.add("password", "admin");
 
         UserRequest.Login login = new UserRequest.Login();
-        login.setUsername("admin");
+        login.setUsername("admin1");
         login.setPassword("admin");
 
         EntityExchangeResult<String> result =
@@ -120,7 +120,7 @@ class UserControllerTest {
 //        formData.add("phone", "010-2334-5678");
 
         UserRequest.Register register = new UserRequest.Register();
-        register.setUserId("admin2");
+        register.setId("admin2");
         register.setPwd("admin");
         register.setName("admin11");
         register.setEmail("test12332@test.com");
@@ -159,5 +159,24 @@ class UserControllerTest {
                 .returnResult();
 
         log.info("result : {} ", result.getResponseBody());
+    }
+
+    @Test
+    void exists() {
+        UserRequest.existsUser existsUser = new UserRequest.existsUser();
+        existsUser.setType("id");
+        existsUser.setValue("admin");
+
+        EntityExchangeResult<String> result =
+        webTestClient.post()
+                .uri("/exists")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(existsUser)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .returnResult();
+
+        log.info(result.getResponseBody().toString());
     }
 }

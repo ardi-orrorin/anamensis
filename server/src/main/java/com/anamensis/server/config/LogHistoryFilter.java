@@ -62,6 +62,7 @@ public class LogHistoryFilter implements WebFilter {
         if(HttpMethod.GET.equals(method) || HttpMethod.DELETE.equals(method)) {
             return Mono.zip(Mono.just(exchange), exchange.getPrincipal(), exchange.getSession())
                     .doOnNext(t -> logWrite(new byte[0], t.getT1(),(Principal) t.getT2(), t.getT3()))
+                    .publishOn(Schedulers.boundedElastic())
                     .map(Tuple2::getT1)
                     .flatMap(chain::filter);
         }
@@ -72,15 +73,9 @@ public class LogHistoryFilter implements WebFilter {
             Flux<DataBuffer> body = exchange.getRequest().getBody();
 
             return Mono.zip(DataBufferUtils.join(body), exchange.getPrincipal(), exchange.getSession())
-                    .map(t -> t.mapT1(this::toBytes))
-                    .publishOn(Schedulers.parallel())
-                    .doOnNext(t ->
-                        Mono.fromRunnable(() ->
-                                logWrite(t.getT1(), exchange, (Principal) t.getT2(), t.getT3())
-                            )
-                            .subscribeOn(Schedulers.boundedElastic())
-                            .subscribe()
-                    )
+                    .map(t -> t.mapT1(this::toBytes)) // DataBuffer -> byte[]
+                    .doOnNext(t -> logWrite(t.getT1(), exchange, (Principal) t.getT2(), t.getT3()))
+                    .publishOn(Schedulers.boundedElastic())
                     .map(t -> newRequest(t.getT1(), exchange))
                     // DataBuffer에서 기록을 위해 byte[]로 변환하여 이벤트를 사용 했으므로,
                     // 다시 byte[]를 DataBuffer로 변환하여 다음 필터를 진행하도록 함
@@ -124,7 +119,10 @@ public class LogHistoryFilter implements WebFilter {
                 .createAt(LocalDateTime.now())
                 .build();
 
-        logHistoryService.save(logHistory);
+        Mono.just(logHistory)
+                .subscribeOn(Schedulers.boundedElastic())
+                .doOnNext(logHistoryService::save)
+                .subscribe();
     }
 
     private ServerWebExchange newRequest(byte[] bytes, ServerWebExchange ex) {

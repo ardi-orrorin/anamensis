@@ -1,10 +1,10 @@
 'use client';
 
 import UserInfoWindow from "@/app/user/info/{components}/UserInfoWindow";
-import {useEffect, useMemo, useState} from "react";
-import {sort} from "next/dist/build/webpack/loaders/css-loader/src/utils";
+import {useMemo, useState} from "react";
 import {faWindowRestore} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faWindowMinimize} from "@fortawesome/free-solid-svg-icons/faWindowMinimize";
 
 export type OpenType = {
     win1: boolean,
@@ -47,15 +47,16 @@ export default function Page() {
         },
     ]
 
-    const openAll = () => {
+    const windowToggle = (set: boolean) => {
         setOpen({
-            win1: true,
-            win2: true,
-            win3: true,
-            win4: true,
-            win5: true,
+            win1: set,
+            win2: set,
+            win3: set,
+            win4: set,
+            win5: set,
         })
     }
+
 
     const sortEle = useMemo(() => {
          return ele.sort((a, b) => a.id - b.id)
@@ -71,11 +72,13 @@ export default function Page() {
                     ))
                 }
                 {
-                    Object.keys(open).length === sortEle.filter((e)=> !e.open).length &&
-                    <button className={'w-[120px] h-10 bg-blue-400 text-white'} onClick={openAll}>
-                      <FontAwesomeIcon icon={faWindowRestore} />
-                      &nbsp;<span>Open All</span>
-                    </button>
+                    0 < sortEle.filter((e)=> !e.open).length
+                    ? <button className={'w-[50px] h-10 bg-blue-400 text-white rounded'} onClick={()=> windowToggle(true)}>
+                          <FontAwesomeIcon icon={faWindowRestore} />
+                      </button>
+                    : <button className={'w-[50px] h-10 bg-blue-400 text-white rounded'} onClick={()=> windowToggle(false)}>
+                          <FontAwesomeIcon icon={faWindowMinimize} />
+                      </button>
                 }
             </div>
             <div className={'flex  gap-4 flex-wrap duration-300'}>

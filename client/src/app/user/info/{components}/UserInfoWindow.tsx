@@ -20,10 +20,10 @@ const UserInfoWindow = ({
 
     return (
         <div className={['flex flex-col duration-300',
-                            open[openKey] ? 'w-[500px] h-80 border border-solid border-blue-300 shadow-blue-100 shadow-md rounded' : 'w-[100px] h-10 border-gray-400'
+                            open[openKey] ? 'w-[500px] h-80 border border-solid border-blue-300 shadow-blue-100 shadow-md rounded' : 'w-[100px] h-10 border-gray-400  rounded'
                         ].join(' ')}
         >
-            <div className={['flex justify-between w-full h-10 p-3 text-white', open[openKey] ? 'bg-blue-300' : 'bg-gray-400'].join(' ')}>
+            <div className={['flex justify-between w-full h-10 p-3 text-white', open[openKey] ? 'bg-blue-300' : 'bg-gray-400  rounded'].join(' ')}>
                 <button onClick={sethandler}>
                     {title}
                 </button>

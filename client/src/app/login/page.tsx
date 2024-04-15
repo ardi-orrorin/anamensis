@@ -19,19 +19,6 @@ export interface ErrorResponse {
     use: boolean
 }
 
-export interface UserInfo {
-    accessToken: string;
-    refreshToken: string;
-    roles: RoleType[];
-}
-
-enum RoleType {
-    ADMIN  =  'ADMIN',
-    USER   =  'USER',
-    GUEST  =  'GUEST',
-    MASTER =  'MASTER'
-}
-
 export interface GeoLocation {
     countryCode: string;
     countryName: string;

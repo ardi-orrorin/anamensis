@@ -3,8 +3,9 @@
 import Link from "next/link";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
-import {useState} from "react";
+import React, {useState} from "react";
 import {faBars} from "@fortawesome/free-solid-svg-icons";
+
 
 export default function Layout({children}: {children: React.ReactNode}) {
 
@@ -15,7 +16,7 @@ export default function Layout({children}: {children: React.ReactNode}) {
     ]
     return (
         <main className={'flex items-start'}>
-            <nav className={['min-h-screen bg-blue-400 py-2 duration-300', isOpen ? 'translate-x-0 shadow-outset-lg w-[300px]' : 'translate-x-[-1000px] w-0'].join(' ')}>
+            <nav className={['min-h-svh bg-blue-400 py-2 duration-300', isOpen ? 'translate-x-0 shadow-outset-lg w-[300px]' : 'translate-x-[-1000px] w-0'].join(' ')}>
                 <div className={'flex justify-between px-4'}>
                     <div></div>
                     <div>

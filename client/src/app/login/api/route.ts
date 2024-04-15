@@ -44,8 +44,7 @@ export async function POST(req: NextRequest) {
 
         next.cookies.set('accessToken', res.data.accessToken, {
             ...cookieInit,
-            // maxAge: res.data.accessTokenExpiresIn / 1000
-            maxAge: 60
+            maxAge: res.data.accessTokenExpiresIn / 1000
         });
 
         next.cookies.set('refreshToken', res.data.refreshToken, {

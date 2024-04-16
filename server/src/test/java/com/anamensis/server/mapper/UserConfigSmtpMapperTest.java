@@ -74,4 +74,19 @@ class UserConfigSmtpMapperTest {
     void updateDefaultInit() {
         userConfigSmtpMapper.updateDefaultInit(2);
     }
+
+    @Test
+    void disabled() {
+        userConfigSmtpMapper.disabled(12, 2);
+    }
+
+    @Test
+    void selectFirstId() {
+        log.info("{}", userConfigSmtpMapper.selectFirstId(2));
+    }
+
+    @Test
+    void isDefault() {
+        log.info("{}", userConfigSmtpMapper.isDefault(2, 12));
+    }
 }

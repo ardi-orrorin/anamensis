@@ -76,4 +76,15 @@ class UserConfigSmtpServiceTest {
     @Test
     void deleteById() {
     }
+
+    @Test
+    void disabled() {
+        userConfigSmtpService.disabled(12, 2)
+                .subscribe();
+    }
+
+    @Test
+    void initDefault() {
+//        userConfigSmtpService.initDefault(2);
+    }
 }

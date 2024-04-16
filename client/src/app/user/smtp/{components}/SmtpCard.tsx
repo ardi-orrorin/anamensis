@@ -1,6 +1,8 @@
+'use client';
+
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
-
+import axios from "axios";
 
 export interface SmtpCardProps {
     id: number;
@@ -14,6 +16,13 @@ export interface SmtpCardProps {
     isUse: boolean;
 }
 const SmtpCard = (smtpCardProps: SmtpCardProps) => {
+
+    const disabledHandler = async () => {
+        await axios.get('./smtp/disabled/' + smtpCardProps.id).then(res => {
+            window.location.reload()
+        });
+    }
+
     return (
         <div>
             <div className={'w-full flex flex-col justify-start min-h-36 border-solid border border-blue-300 text-sm text-blue-700 rounded p-3 hover:bg-blue-400 hover:text-white duration-500'}>
@@ -35,7 +44,7 @@ const SmtpCard = (smtpCardProps: SmtpCardProps) => {
                             </button>
                         }
                     </div>
-                    <button>
+                    <button onClick={disabledHandler}>
                         <FontAwesomeIcon icon={faXmark} width={12} className={'text-blue-700'} />
                     </button>
                 </div>

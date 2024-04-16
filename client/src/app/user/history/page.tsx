@@ -1,14 +1,8 @@
 import axios, {AxiosResponse} from "axios";
-import {cookies} from "next/headers";
 import {GetServerSideProps, InferGetServerSidePropsType} from "next";
-import {getServerSideProps} from "next/dist/build/templates/pages";
-import {PageI} from "@/app/{commons}/types/commons";
 import PageNavigator from "@/app/{commons}/PageNavigator";
-
-interface PageLoginHistoriesI {
-    page: PageI;
-    content: LoginHistoriesI[];
-}
+import {PageResponse} from "@/app/{commons}/types/commons";
+import {cookies} from "next/headers";
 
 interface LoginHistoriesI {
     id: string;
@@ -20,18 +14,7 @@ interface LoginHistoriesI {
 
 export default async function Page(page: InferGetServerSidePropsType<GetServerSideProps>) {
     const {searchParams} = page;
-
-    const url = process.env.NEXT_PUBLIC_SERVER + `/user/histories`;
-
-    const data: PageLoginHistoriesI = await axios.get(url,{
-        params: {...searchParams},
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${cookies().get('accessToken')?.value}`
-    }})
-    .then((res: AxiosResponse) => {
-        return res.data;
-    });
+    const data = await getData(searchParams);
 
     const maxIndex = data.page.total - ((data.page.page - 1) * data.page.size);
 
@@ -103,5 +86,15 @@ export default async function Page(page: InferGetServerSidePropsType<GetServerSi
     )
 }
 
+const getData = async (req: URLSearchParams) => {
+    const url = process.env.NEXT_PUBLIC_SERVER + '/user/histories';
+    const token = cookies().get('accessToken') || cookies().get('refreshToken')
 
-
+    return axios.get(url, {
+        params: {...req},
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token?.value}`
+        }})
+    .then((res: AxiosResponse<PageResponse<LoginHistoriesI>>) => res.data);
+}

@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.util.MultiValueMap;
 
 import java.util.Objects;
 
@@ -43,7 +44,7 @@ class UserConfigSmtpControllerTest {
     @Order(2)
     void setToken() {
         UserRequest.Login login = new UserRequest.Login();
-        login.setUsername("admin");
+        login.setUsername("admin1");
         login.setPassword("admin");
 
         EntityExchangeResult<UserResponse.Login> result =
@@ -155,8 +156,9 @@ class UserConfigSmtpControllerTest {
         UserConfigSmtpRequest.Test smtpRequest = new UserConfigSmtpRequest.Test();
         smtpRequest.setHost("smtp.gmail.com");
         smtpRequest.setPort("587");
-        smtpRequest.setUsername("");
-        smtpRequest.setPassword("");
+        smtpRequest.setUsername("yoosc89@gmail.com");
+        smtpRequest.setPassword("rhsmuwnaawrczgcz");
+        smtpRequest.setUseSSL(true);
 
         webTestClient.post()
                 .uri("/user-config-smtp/test")
@@ -169,5 +171,20 @@ class UserConfigSmtpControllerTest {
                 .expectStatus().isOk()
                 .expectBody()
                 .consumeWith(result -> log.info("result = {}", result));
+    }
+
+    @Test
+    void disabled() {
+        webTestClient.get()
+                .uri("/user-config-smtp/disabled/12")
+                .headers(httpHeaders -> {
+                    httpHeaders.setBearerAuth(token.getAccessToken());
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(response -> {
+                    log.info("response: {}", response);
+                });
     }
 }

@@ -38,15 +38,15 @@ public class MailProviderTest {
     }
 
     @Test
-    void testConnection() {
+    void testConnection() throws MessagingException {
         new MailProvider.Builder()
                 .config(userConfig)
                 .build()
-                .testConnection()
-                .subscribe(
-                        result -> System.out.println("Connection Success"),
-                        error -> System.out.println("Connection Failed")
-                );
+                .testConnection();
+//                .subscribe(
+//                        result -> System.out.println("Connection Success"),
+//                        error -> System.out.println("Connection Failed")
+//                );
     }
 
 

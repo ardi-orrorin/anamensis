@@ -1,4 +1,4 @@
-import {NextRequest, NextResponse} from "next/server";
+import {NextRequest, NextResponse, userAgent} from "next/server";
 import {cookies} from "next/headers";
 import {RequestCookie} from "next/dist/compiled/@edge-runtime/cookies";
 
@@ -9,14 +9,12 @@ export async function middleware(req: NextRequest) {
 
     const refreshToken = cookies().get('refreshToken');
 
-
     if(!accessToken && refreshToken) {
-        const result = await generateRefreshToken(refreshToken);
+        const result = await generateRefreshToken(refreshToken, req.headers.get('User-Agent') || '');
         const ssl = process.env.NEXT_PUBLIC_SSL === 'TRUE';
 
         const next = NextResponse.next();
-        // console.log(result.accessToken)
-        next.headers.set('Set-Cookie', result + '; Secure; SameSite=Strict; HttpOnly');
+        next.headers.set('Set-Cookie', result + '; Secure; SameSite=Strict; path=/; HttpOnly');
         return next;
     }
 
@@ -29,10 +27,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
 }
 
-const generateRefreshToken = async (refreshToken: RequestCookie): Promise<string> => {
+const generateRefreshToken = async (refreshToken: RequestCookie, userAgent: string): Promise<string> => {
     const refresh = await fetch(process.env.NEXT_PUBLIC_SERVER + '/user/refresh', {
         headers: {
             'Content-Type': 'application/json',
+            'User-Agent': userAgent,
             'Authorization': `Bearer ${refreshToken.value}`
         }
     });
@@ -43,26 +42,10 @@ const generateRefreshToken = async (refreshToken: RequestCookie): Promise<string
             return cookie;
         }
     });
-    console.log(accessToken);
 
     // @ts-ignore
-    // const token: AccessCookieI = accessToken!.split(';')?.map((cookie: string) => {
-    //     const [key, value] = cookie.split('=');
-    //     return {[key] : value};
-    // }).reduce((acc, curr) => {
-    //     return {...acc, ...curr};
-    // });
-    // return token;
-
     return accessToken;
 }
-
-// export interface AccessCookieI {
-//     accessToken: string;
-//     'Max-Age': string;
-//     secure: boolean | undefined;
-// }
-
 
 export const config = {
     matcher: [

@@ -29,4 +29,6 @@ public class UserConfigSmtp {
     private Boolean useSSL;
 
     private Boolean isUse;
+
+    private Boolean isDefault;
 }

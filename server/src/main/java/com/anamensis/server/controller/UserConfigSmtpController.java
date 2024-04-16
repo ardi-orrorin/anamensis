@@ -7,6 +7,7 @@ import com.anamensis.server.entity.UserConfigSmtp;
 import com.anamensis.server.service.UserConfigSmtpService;
 import com.anamensis.server.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -68,8 +69,18 @@ public class UserConfigSmtpController {
                 .flatMap(t -> userConfigSmtpService.update(t.getT2()));
     }
 
+    @GetMapping("/disabled/{id}")
+    public Mono<Boolean> disabled(
+            @PathVariable long id,
+            @AuthenticationPrincipal Mono<UserDetails> user
+    ) {
+        return user.map(u -> userService.findUserByUserId(u.getUsername()))
+                   .flatMap(u -> userConfigSmtpService.disabled(id, u.getId()));
+    }
+
+
     @PostMapping("test")
-    public Mono<Boolean> testConnection(UserConfigSmtpRequest.Test test) {
+    public Mono<Boolean> testConnection(@RequestBody UserConfigSmtpRequest.Test test) {
         return Mono.just(test)
                 .map(UserConfigSmtpRequest.Test::toUserConfigSmtp)
                 .flatMap(userConfigSmtpService::testConnection);

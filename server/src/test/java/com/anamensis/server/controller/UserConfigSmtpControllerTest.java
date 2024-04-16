@@ -43,7 +43,7 @@ class UserConfigSmtpControllerTest {
     @Order(2)
     void setToken() {
         UserRequest.Login login = new UserRequest.Login();
-        login.setUsername("admin");
+        login.setUsername("admin1");
         login.setPassword("admin");
 
         EntityExchangeResult<UserResponse.Login> result =
@@ -155,8 +155,9 @@ class UserConfigSmtpControllerTest {
         UserConfigSmtpRequest.Test smtpRequest = new UserConfigSmtpRequest.Test();
         smtpRequest.setHost("smtp.gmail.com");
         smtpRequest.setPort("587");
-        smtpRequest.setUsername("");
-        smtpRequest.setPassword("");
+        smtpRequest.setUsername("yoosc89@gmail.com");
+        smtpRequest.setPassword("rhsmuwnaawrczgcz");
+        smtpRequest.setUseSSL(true);
 
         webTestClient.post()
                 .uri("/user-config-smtp/test")

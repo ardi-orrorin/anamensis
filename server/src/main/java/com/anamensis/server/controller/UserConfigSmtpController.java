@@ -69,7 +69,7 @@ public class UserConfigSmtpController {
     }
 
     @PostMapping("test")
-    public Mono<Boolean> testConnection(UserConfigSmtpRequest.Test test) {
+    public Mono<Boolean> testConnection(@RequestBody UserConfigSmtpRequest.Test test) {
         return Mono.just(test)
                 .map(UserConfigSmtpRequest.Test::toUserConfigSmtp)
                 .flatMap(userConfigSmtpService::testConnection);

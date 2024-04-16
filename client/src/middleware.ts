@@ -15,8 +15,7 @@ export async function middleware(req: NextRequest) {
         const ssl = process.env.NEXT_PUBLIC_SSL === 'TRUE';
 
         const next = NextResponse.next();
-        // console.log(result.accessToken)
-        next.headers.set('Set-Cookie', result + '; Secure; SameSite=Strict; HttpOnly');
+        next.headers.set('Set-Cookie', result + '; Secure; SameSite=Strict; path=/; HttpOnly');
         return next;
     }
 
@@ -43,26 +42,10 @@ const generateRefreshToken = async (refreshToken: RequestCookie): Promise<string
             return cookie;
         }
     });
-    console.log(accessToken);
 
     // @ts-ignore
-    // const token: AccessCookieI = accessToken!.split(';')?.map((cookie: string) => {
-    //     const [key, value] = cookie.split('=');
-    //     return {[key] : value};
-    // }).reduce((acc, curr) => {
-    //     return {...acc, ...curr};
-    // });
-    // return token;
-
     return accessToken;
 }
-
-// export interface AccessCookieI {
-//     accessToken: string;
-//     'Max-Age': string;
-//     secure: boolean | undefined;
-// }
-
 
 export const config = {
     matcher: [

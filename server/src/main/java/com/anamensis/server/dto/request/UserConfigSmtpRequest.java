@@ -31,6 +31,8 @@ public class UserConfigSmtpRequest {
 
         private boolean useSSL;
 
+        private boolean isDefault;
+
         public static com.anamensis.server.entity.UserConfigSmtp fromEntity(UserConfigSmtp entity, User user) {
             com.anamensis.server.entity.UserConfigSmtp dto = new com.anamensis.server.entity.UserConfigSmtp();
             dto.setUserPk(user.getId());
@@ -42,6 +44,7 @@ public class UserConfigSmtpRequest {
             dto.setFromName(entity.getFromName());
             dto.setUseSSL(entity.isUseSSL());
             dto.setIsUse(true);
+            dto.setIsDefault(entity.isDefault());
             return dto;
         }
     }

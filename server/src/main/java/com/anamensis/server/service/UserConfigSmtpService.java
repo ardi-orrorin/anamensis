@@ -33,6 +33,11 @@ public class UserConfigSmtpService {
 
     public Mono<UserConfigSmtp> save(UserConfigSmtp userConfigSmtp) {
         return Mono.just(userConfigSmtp)
+                .doOnNext(u -> {
+                    if (u.getIsDefault()) {
+                        userConfigSmtpMapper.updateDefaultInit(u.getUserPk());
+                    }
+                })
                 .doOnNext(userConfigSmtpMapper::save)
                 .onErrorMap(throwable -> new RuntimeException("UserConfigSmtp not save"));
     }

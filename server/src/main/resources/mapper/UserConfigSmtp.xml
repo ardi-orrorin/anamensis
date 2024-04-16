@@ -64,6 +64,12 @@
          WHERE id = #{id}
            AND user_pk = #{userPk}
     </update>
+    <update id="updateDefaultInit" parameterType="UserConfigSmtp">
+        UPDATE user_config_smtp
+           SET is_default = 0
+         WHERE user_pk = #{userPk}
+    </update>
+
     <delete id="deleteById">
         DELETE
           FROM user_config_smtp

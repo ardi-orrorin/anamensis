@@ -69,4 +69,9 @@ class UserConfigSmtpMapperTest {
     void deleteById() {
         userConfigSmtpMapper.deleteById(1);
     }
+
+    @Test
+    void updateDefaultInit() {
+        userConfigSmtpMapper.updateDefaultInit(2);
+    }
 }

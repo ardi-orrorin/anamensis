@@ -17,6 +17,8 @@ public interface UserConfigSmtpMapper {
 
     int update(UserConfigSmtp userConfigSmtp);
 
+    int updateDefaultInit(long userPk);
+
     void deleteByUserPk(long userPk);
 
     void deleteById(long id);

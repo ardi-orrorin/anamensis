@@ -10,37 +10,33 @@ export interface SmtpCardProps {
     fromEmail: string;
     fromName: string;
     useSSL: boolean;
+    isDefault: boolean;
     isUse: boolean;
 }
-const SmtpCard = () => {
-    const smtpCardProps: SmtpCardProps = {
-        id: 1,
-        host: 'smtp.gmail.com',
-        port: 587,
-        username: 'test@gmadf',
-        fromEmail: 'sdfsdfs@df',
-        fromName: 'sdfsdf',
-        useSSL: true,
-        isUse: true,
-    }
-
+const SmtpCard = (smtpCardProps: SmtpCardProps) => {
     return (
         <div>
-            <button className={'w-full flex flex-col justify-start min-h-36 border-solid border border-blue-300 text-sm text-blue-700 rounded p-3 hover:bg-blue-400 hover:text-white duration-500'}>
+            <div className={'w-full flex flex-col justify-start min-h-36 border-solid border border-blue-300 text-sm text-blue-700 rounded p-3 hover:bg-blue-400 hover:text-white duration-500'}>
                 <div className={'w-full flex justify-between'}>
-                    <span className={'text-start'}>
+                    <span className={'text-start w-1/2'}>
                         {smtpCardProps.host}
                     </span>
-                    <div className={'flex gap-3'}>
-                        <button className={'bg-blue-300 w-20 h-5 text-sm text-white rounded'} disabled={true}>
-                            DEFAULT
-                        </button>
-                        <button className={'bg-blue-300 w-20 h-5 text-sm text-white rounded'} disabled={true}>
-                            SSL
-                        </button>
+                    <div className={'flex w-full gap-3'}>
+                        {
+                            smtpCardProps.isDefault &&
+                            <button className={'bg-blue-300 w-20 h-5 text-sm text-white rounded'} disabled={true}>
+                              DEFAULT
+                            </button>
+                        }
+                        {
+                            smtpCardProps.useSSL &&
+                            <button className={'bg-blue-300 w-20 h-5 text-sm text-white rounded'} disabled={true}>
+                              SSL
+                            </button>
+                        }
                     </div>
                     <button>
-                        <FontAwesomeIcon icon={faXmark} className={'text-blue-700'} />
+                        <FontAwesomeIcon icon={faXmark} width={12} className={'text-blue-700'} />
                     </button>
                 </div>
                 <table className={'w-full text-sm mt-4'}>
@@ -67,7 +63,7 @@ const SmtpCard = () => {
                         </tr>
                     </tbody>
                 </table>
-            </button>
+            </div>
         </div>
     );
 }

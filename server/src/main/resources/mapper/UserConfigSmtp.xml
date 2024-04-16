@@ -25,10 +25,10 @@
         INSERT INTO user_config_smtp
                (user_pk, host, port,
                 username, password, from_email,
-                from_name, use_ssl)
+                from_name, use_ssl, is_default)
         VALUES (#{userPk}, #{host}, #{port},
                 #{username}, #{password}, #{fromEmail},
-                #{fromName}, #{useSSL})
+                #{fromName}, #{useSSL}, #{isDefault})
     </insert>
     <update id="update" parameterType="UserConfigSmtp">
         UPDATE user_config_smtp
@@ -55,7 +55,10 @@
                 use_ssl = #{useSSL},
             </if>
             <if test="isUse != null">
-                is_use = #{isUse}
+                is_use = #{isUse},
+            </if>
+            <if test="isDefault != null">
+                is_default = #{isDefault}
             </if>
         </set>
          WHERE id = #{id}

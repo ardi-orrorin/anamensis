@@ -29,6 +29,7 @@ class UserConfigSmtpMapperTest {
         userConfigSmtp.setFromEmail("fromEmail");
         userConfigSmtp.setFromName("fromName");
         userConfigSmtp.setUseSSL(true);
+        userConfigSmtp.setIsDefault(true);
     }
 
     @Test
@@ -49,10 +50,13 @@ class UserConfigSmtpMapperTest {
     @Test
     void update() {
         UserConfigSmtp stmp = new UserConfigSmtp();
-        stmp.setId(1);
+        stmp.setId(12);
         stmp.setHost("smtp.gmail.com11");
         stmp.setPort("02323");
         stmp.setIsUse(false);
+        stmp.setIsDefault(true);
+        stmp.setUserPk(2);
+        log.info("{}", stmp);
         userConfigSmtpMapper.update(stmp);
     }
 

@@ -20,11 +20,8 @@ public class MailProvider {
         });
     }
 
-    public Mono<Boolean> testConnection() {
-        return Mono.fromCallable(() -> {
-            mailSenderImpl.testConnection();
-            return true;
-        });
+    public void testConnection() throws MessagingException {
+        mailSenderImpl.testConnection();
     }
 
     private MailProvider(Builder builder) {

@@ -4,6 +4,7 @@ package com.anamensis.server.service;
 import com.anamensis.server.entity.UserConfigSmtp;
 import com.anamensis.server.mapper.UserConfigSmtpMapper;
 import com.anamensis.server.provider.MailProvider;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -51,11 +52,17 @@ public class UserConfigSmtpService {
 
     public Mono<Boolean> testConnection(UserConfigSmtp userConfigSmtp) {
         return Mono.just(userConfigSmtp)
-                .doOnNext(u -> new MailProvider.Builder()
-                        .config(u)
-                        .build()
-                        .testConnection()
-                )
+                .doOnNext(u -> {
+                    try {
+                        new MailProvider.Builder()
+                                .config(u)
+                                .build()
+                                .testConnection();
+                    } catch (MessagingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .log()
                 .map(u -> true)
                 .onErrorReturn(false);
     }
@@ -70,7 +77,4 @@ public class UserConfigSmtpService {
         userConfigSmtpMapper.deleteById(id);
         return Mono.just(true);
     }
-
-
-
 }

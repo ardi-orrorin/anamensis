@@ -15,6 +15,9 @@ export default function Layout({children}: {children: React.ReactNode}) {
         {name: '로그인기록', href:'/user/history'},
         {name: 'SMTP 설정', href:'/user/smtp'},
     ]
+
+
+
     return (
         <main className={'flex items-start'}>
             <nav className={['min-h-svh bg-blue-400 py-2 duration-300', isOpen ? 'translate-x-0 shadow-outset-lg w-[300px]' : 'translate-x-[-1000px] w-0'].join(' ')}>

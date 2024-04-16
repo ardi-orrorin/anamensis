@@ -33,7 +33,7 @@ const SmtpCard = () => {
                     </span>
                     <div className={'flex gap-3'}>
                         <button className={'bg-blue-300 w-20 h-5 text-sm text-white rounded'} disabled={true}>
-                            USE
+                            DEFAULT
                         </button>
                         <button className={'bg-blue-300 w-20 h-5 text-sm text-white rounded'} disabled={true}>
                             SSL

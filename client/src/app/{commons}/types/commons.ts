@@ -1,3 +1,8 @@
+export interface PageResponse<T> {
+    page: PageI;
+    content: T[];
+}
+
 export interface PageI {
     page: number;
     size: number;

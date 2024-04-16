@@ -18,6 +18,26 @@
          WHERE id = #{id}
            AND is_use = 1
     </select>
+
+    <select id="isDefault" resultType="boolean">
+        SELECT EXISTS(
+               SELECT id
+                 FROM user_config_smtp
+                WHERE user_pk    = #{userPk}
+                  AND id         = #{id}
+                  AND is_use     = 1
+                  AND is_default = 1
+        );
+    </select>
+
+    <select id="selectFirstId" resultType="UserConfigSmtp">
+      <include refid="tbl_user_config_smtp"/>
+         WHERE user_pk = #{userPk}
+           AND is_use = 1
+         ORDER BY ID
+         LIMIT 1
+    </select>
+
     <insert id="save" parameterType="UserConfigSmtp">
         <selectKey keyProperty="id" resultType="Int" order="AFTER">
             SELECT LAST_INSERT_ID()
@@ -25,10 +45,10 @@
         INSERT INTO user_config_smtp
                (user_pk, host, port,
                 username, password, from_email,
-                from_name, use_ssl)
+                from_name, use_ssl, is_default)
         VALUES (#{userPk}, #{host}, #{port},
                 #{username}, #{password}, #{fromEmail},
-                #{fromName}, #{useSSL})
+                #{fromName}, #{useSSL}, #{isDefault})
     </insert>
     <update id="update" parameterType="UserConfigSmtp">
         UPDATE user_config_smtp
@@ -55,12 +75,29 @@
                 use_ssl = #{useSSL},
             </if>
             <if test="isUse != null">
-                is_use = #{isUse}
+                is_use = #{isUse},
+            </if>
+            <if test="isDefault != null">
+                is_default = #{isDefault}
             </if>
         </set>
          WHERE id = #{id}
            AND user_pk = #{userPk}
     </update>
+
+    <update id="updateDefaultInit" parameterType="UserConfigSmtp">
+        UPDATE user_config_smtp
+           SET is_default = 0
+         WHERE user_pk = #{userPk}
+    </update>
+
+    <update id="disabled" parameterType="UserConfigSmtp">
+        UPDATE user_config_smtp
+           SET is_use   = 0
+         WHERE id       = #{id}
+           AND user_pk  = #{userPk}
+    </update>
+
     <delete id="deleteById">
         DELETE
           FROM user_config_smtp

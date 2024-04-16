@@ -1,0 +1,80 @@
+'use client';
+
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
+import axios from "axios";
+
+export interface SmtpCardProps {
+    id: number;
+    host: string;
+    port: number;
+    username: string;
+    fromEmail: string;
+    fromName: string;
+    useSSL: boolean;
+    isDefault: boolean;
+    isUse: boolean;
+}
+const SmtpCard = (smtpCardProps: SmtpCardProps) => {
+
+    const disabledHandler = async () => {
+        await axios.get('./smtp/disabled/' + smtpCardProps.id).then(res => {
+            window.location.reload()
+        });
+    }
+
+    return (
+        <div>
+            <div className={'w-full flex flex-col justify-start min-h-36 border-solid border border-blue-300 text-sm text-blue-700 rounded p-3 hover:bg-blue-400 hover:text-white duration-500'}>
+                <div className={'w-full flex justify-between'}>
+                    <span className={'text-start w-1/2'}>
+                        {smtpCardProps.host}
+                    </span>
+                    <div className={'flex w-full gap-3'}>
+                        {
+                            smtpCardProps.isDefault &&
+                            <button className={'bg-blue-300 w-20 h-5 text-sm text-white rounded'} disabled={true}>
+                              DEFAULT
+                            </button>
+                        }
+                        {
+                            smtpCardProps.useSSL &&
+                            <button className={'bg-blue-300 w-20 h-5 text-sm text-white rounded'} disabled={true}>
+                              SSL
+                            </button>
+                        }
+                    </div>
+                    <button onClick={disabledHandler}>
+                        <FontAwesomeIcon icon={faXmark} width={12} className={'text-blue-700'} />
+                    </button>
+                </div>
+                <table className={'w-full text-sm mt-4'}>
+                    <colgroup>
+                        <col className={'w-2/6'} />
+                        <col className={'w-4/6'} />
+                    </colgroup>
+                    <tbody>
+                        <tr>
+                            <td className={'text-start'}>PORT</td>
+                            <td className={'text-start'}>{smtpCardProps.port}</td>
+                        </tr>
+                        <tr>
+                            <td className={'text-start'}>ACCOUNT</td>
+                            <td className={'text-start'}>{smtpCardProps.username}</td>
+                        </tr>
+                        <tr>
+                            <td className={'text-start'}>FROM EMAIL</td>
+                            <td className={'text-start'}>{smtpCardProps.fromEmail}</td>
+                        </tr>
+                        <tr>
+                            <td className={'text-start'}>FROM NAME</td>
+                            <td className={'text-start'}>{smtpCardProps.fromName}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+}
+
+export default SmtpCard;

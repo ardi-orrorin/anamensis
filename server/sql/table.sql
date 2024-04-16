@@ -258,6 +258,7 @@ CREATE TABLE user_config_smtp (
     from_name      VARCHAR(255)  NOT NULL                         COMMENT  'SMTP 발신자 이름',
     use_ssl        TINYINT(1)    NOT NULL                         COMMENT  'SMTP SSL 사용 여부',
     is_use         TINYINT(1)    NOT NULL DEFAULT  1              COMMENT  '사용 여부 0:사용안함, 1:사용',
+    is_default     TINYINT(1)    NOT NULL DEFAULT  0              COMMENT  '기본 설정 여부 0:기본설정아님, 1:기본설정',
     FOREIGN KEY    (user_pk)     REFERENCES        user (id),
     INDEX          idx_user_pk   (user_pk)
 ) COMMENT '사용자 SMTP 설정';

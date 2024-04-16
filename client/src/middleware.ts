@@ -1,4 +1,4 @@
-import {NextRequest, NextResponse} from "next/server";
+import {NextRequest, NextResponse, userAgent} from "next/server";
 import {cookies} from "next/headers";
 import {RequestCookie} from "next/dist/compiled/@edge-runtime/cookies";
 
@@ -9,9 +9,8 @@ export async function middleware(req: NextRequest) {
 
     const refreshToken = cookies().get('refreshToken');
 
-
     if(!accessToken && refreshToken) {
-        const result = await generateRefreshToken(refreshToken);
+        const result = await generateRefreshToken(refreshToken, req.headers.get('User-Agent') || '');
         const ssl = process.env.NEXT_PUBLIC_SSL === 'TRUE';
 
         const next = NextResponse.next();
@@ -28,10 +27,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
 }
 
-const generateRefreshToken = async (refreshToken: RequestCookie): Promise<string> => {
+const generateRefreshToken = async (refreshToken: RequestCookie, userAgent: string): Promise<string> => {
     const refresh = await fetch(process.env.NEXT_PUBLIC_SERVER + '/user/refresh', {
         headers: {
             'Content-Type': 'application/json',
+            'User-Agent': userAgent,
             'Authorization': `Bearer ${refreshToken.value}`
         }
     });

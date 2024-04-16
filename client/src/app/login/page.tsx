@@ -83,7 +83,11 @@ export default function Page() {
 
     const goLogin = async () => {
         setLoading(true);
-        await axios.post('./login/api', user)
+        await axios.post('./login/api', user, {
+            headers: {
+                'User-Agent': navigator.userAgent,
+            }
+        })
             .then((res) => {
                 res.status === 200 && window.location.replace('/');
         })

@@ -30,6 +30,7 @@ class UserConfigSmtpServiceTest {
         userConfigSmtp.setFromEmail("fromEmail");
         userConfigSmtp.setFromName("fromName");
         userConfigSmtp.setUseSSL(true);
+        userConfigSmtp.setIsDefault(true);
     }
 
     @Test

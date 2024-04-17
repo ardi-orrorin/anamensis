@@ -29,11 +29,11 @@ const OTPFooter = ({cur} : {cur: OTPStepEnum}) => {
         router.push(`?step=${next}`);
     }
 
-
-
     const btnStyle = 'h-9 bg-blue-400 hover:bg-blue-600 text-white font-bold py-2 px-5';
+
+
     return (
-        <div className={'flex justify-between'}>
+        <div className={'w-full flex justify-between'}>
             <button className={btnStyle}
                     onClick={prevStep}
             >

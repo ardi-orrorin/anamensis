@@ -13,11 +13,11 @@ export default async function Layout({
     const data: PageResponse<SmtpCardProps> = await getData();
 
     return (
-        <main className={'flex w-full gap-5'}>
-            <div className={'w-1/2'}>
+        <main className={'flex flex-col lg:flex-row w-full gap-5 duration-500'}>
+            <div className={'w-full lg:w-1/2'}>
                 {children}
             </div>
-            <div className={'w-1/2 flex flex-col gap-3'}>
+            <div className={'w-full lg:w-1/2 flex flex-col gap-3'}>
                 {
                     data.content
                         .sort((a, b) =>  b.id - a.id)

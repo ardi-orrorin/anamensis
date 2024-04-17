@@ -3,15 +3,19 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import React, {Dispatch, SetStateAction, useEffect} from "react";
 import {OpenType} from "@/app/user/page";
 
+
+type UserInfoWindowProps = {
+    title: string,
+    children: React.ReactNode,
+    open: OpenType,
+    setOpen: Dispatch<SetStateAction<OpenType>>,
+    openKey: string
+}
+
 const UserInfoWindow = ({
     title, children, open, setOpen, openKey
-}:{
-    title:string, children: React.ReactNode, openKey: string,  open:OpenType, setOpen:Dispatch<SetStateAction<OpenType>>
-}) => {
-    console.log(openKey)
-
+}: UserInfoWindowProps) => {
     const sethandler = () => {
-        console.log(open[openKey])
         setOpen({
             ...open,
             [openKey]: !open[openKey]

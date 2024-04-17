@@ -3,26 +3,27 @@ import {cookies} from "next/headers";
 import {RequestCookie} from "next/dist/compiled/@edge-runtime/cookies";
 
 export async function middleware(req: NextRequest) {
+
     const accessToken = cookies().get('accessToken');
 
     const url = req.nextUrl.clone();
 
     const refreshToken = cookies().get('refreshToken');
 
-    if(!accessToken && refreshToken) {
-        const result = await generateRefreshToken(refreshToken, req.headers.get('User-Agent') || '');
-        const ssl = process.env.NEXT_PUBLIC_SSL === 'TRUE';
-
-        const next = NextResponse.next();
-        next.headers.set('Set-Cookie', result + '; Secure; SameSite=Strict; path=/; HttpOnly');
-        return next;
-    }
-
-    if (!accessToken) {
-        url.pathname = '/';
-        url.search = '';
-        return NextResponse.redirect(url)
-    }
+    // if(!accessToken && refreshToken) {
+    //     const result = await generateRefreshToken(refreshToken, req.headers.get('User-Agent') || '');
+    //     const ssl = process.env.NEXT_PUBLIC_SSL === 'TRUE';
+    //
+    //     const next = NextResponse.next();
+    //     next.headers.set('Set-Cookie', result + '; Secure; SameSite=Strict; path=/; HttpOnly');
+    //     return next;
+    // }
+    //
+    // if (!accessToken) {
+    //     url.pathname = '/';
+    //     url.search = '';
+    //     return NextResponse.redirect(url)
+    // }
 
     return NextResponse.next();
 }

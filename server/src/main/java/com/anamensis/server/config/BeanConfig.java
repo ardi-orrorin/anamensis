@@ -1,7 +1,6 @@
 package com.anamensis.server.config;
 
 import com.warrenstrange.googleauth.GoogleAuthenticator;
-import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,5 +24,4 @@ public class BeanConfig {
     public GoogleAuthenticator googleAuthenticator() {
         return new GoogleAuthenticator();
     }
-
 }

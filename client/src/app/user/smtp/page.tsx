@@ -1,8 +1,9 @@
 'use client';
 
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import axios from "axios";
+import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import {useRouter} from "next/navigation";
 
 
@@ -32,11 +33,56 @@ export interface SmtpTestProps {
     message: string;
 }
 
-export default function Page() {
+interface SmtpPropsI {
+    searchParams: URLQuery;
+}
+
+interface URLQuery extends URLSearchParams {
+    // @ts-ignore
+    [key: string]: string;
+}
+
+const getServerSideProps: GetServerSideProps<SmtpPropsI> = async (context) => {
+    const searchParams = new URLSearchParams(context.query as any) as URLQuery;
+    return {
+        props: {
+            searchParams,
+        }
+    }
+}
+
+export default function Page(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    const {searchParams} = props;
+
+    const router = useRouter();
+
     const [hasTest, setHasTest] = useState<boolean>(false)
     const [smtp, setSmtp] = useState<SmtpProps>({} as SmtpProps);
     const [loading, setLoading] = useState<boolean>(false);
     const [testResult, setTestResult] = useState<SmtpTestProps>({} as SmtpTestProps);
+
+    useEffect(() => {
+        if(searchParams?.id) {
+            axios.get('./smtp/api/', {
+                params: {
+                    id: searchParams?.id
+                }
+            })
+            .then(res => {
+                const data = res.data as SmtpProps;
+                setSmtp({
+                    id: data.id,
+                    host: data.host,
+                    port: data.port,
+                    username: data.username,
+                    password: data.password,
+                    fromEmail: data.fromEmail,
+                    fromName: data.fromName,
+                    options: data.options
+                })
+            })
+        }
+    },[props.searchParams]);
 
     const setSmtpHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         if(hasTest) setHasTest(false);
@@ -100,6 +146,14 @@ export default function Page() {
         .finally(() => {
             setLoading(false);
         });
+    }
+
+    const modify = () => {
+
+    }
+
+    const init = () => {
+        window.location.search = '';
     }
 
     const inputStyle = 'w-full outline-0 focus:bg-blue-50 p-2 text-sm rounded duration-500';
@@ -190,12 +244,28 @@ export default function Page() {
                 </button>
             }
             {
-                hasTest && testResult.result &&
+                hasTest && testResult.result && !searchParams?.id &&
                 <button className={btnStyle}
                       onClick={save}
                       disabled={loading}
                 >저장
                 </button>
+            }
+            {
+                hasTest && testResult.result && searchParams?.id &&
+                <button className={btnStyle}
+                        onClick={modify}
+                        disabled={loading}
+                >수정
+                </button>
+            }
+            {
+                searchParams?.id &&
+                <button className={btnStyle}
+                        onClick={init}
+                        disabled={loading}
+                >변경 취소</button>
+
             }
         </div>
     )

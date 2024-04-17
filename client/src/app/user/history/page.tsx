@@ -12,8 +12,21 @@ interface LoginHistoriesI {
     createAt: string;
 }
 
-export default async function Page(page: InferGetServerSidePropsType<GetServerSideProps>) {
-    const {searchParams} = page;
+interface GetProps {
+    searchParams: URLSearchParams;
+}
+
+const getServerSideProps: GetServerSideProps<GetProps> = async (context) => {
+    const searchParams = new URLSearchParams(context.query as any);
+    return {
+        props: {
+            searchParams,
+        }
+    }
+}
+
+export default async function Page(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    const {searchParams} = props;
     const data = await getData(searchParams);
 
     const maxIndex = data.page.total - ((data.page.page - 1) * data.page.size);
@@ -70,11 +83,11 @@ export default async function Page(page: InferGetServerSidePropsType<GetServerSi
                    data.content.map((history, index) => {
                        return (
                            <tr key={history.id} className={['border-b border-gray-200 border-solid', index % 2 === 1 ? 'bg-blue-50': ''].join(' ')}>
-                               <td className={'px-3'}>{ maxIndex - index }</td>
+                               <td className={'py-2 px-3'}>{ maxIndex - index }</td>
                                <td className={'py-4 px-3'}>{ history.ip }</td>
-                               <td className={'px-3'}>{ history.device }</td>
-                               <td className={'px-3'}>{ history.location }</td>
-                               <td className={'px-3'}>{ history.createAt }</td>
+                               <td className={'py-2 px-3'}>{ history.device }</td>
+                               <td className={'py-2 px-3'}>{ history.location }</td>
+                               <td className={'py-2 px-3'}>{ history.createAt }</td>
                            </tr>
                        )
                    })

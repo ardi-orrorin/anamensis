@@ -29,18 +29,18 @@ export default function Layout({children}: {children: React.ReactNode}) {
                         </button>
                     </div>
                 </div>
-                <ul className={''}>
-                    <div className={'text text-white px-3 mb-4'}>
+                <ul className={'w-full'}>
+                    <li className={'text text-white px-3 mb-4'}>
                         <Link href={'/user'}
                         >User</Link>
-                    </div>
+                    </li>
                     {
                         menuItems.map((item, index) => {
                             return (
                                 <li key={index}
-                                    className={'p-3'}
+                                    className={'p-3 w-full'}
                                 >
-                                    <Link className={'text text-white'}
+                                    <Link className={'text text-white w-full'}
                                           href={item.href}
                                     >{item.name}
                                     </Link>

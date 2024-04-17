@@ -3,11 +3,13 @@ import {SmtpI} from "@/app/user/smtp/page";
 import {cookies} from "next/headers";
 import axios from "axios";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+
+    const id = req.nextUrl.searchParams.get('id');
 
     const token = cookies().get('accessToken') || cookies().get('refreshToken')
 
-    const url = process.env.NEXT_PUBLIC_SERVER + '/user-config-smtp';
+    const url = `${process.env.NEXT_PUBLIC_SERVER}/user-config-smtp${id ? `/${id}` : ''}`;
 
     const result: SmtpI = await axios.get(url, {
             headers: {

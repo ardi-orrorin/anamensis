@@ -6,11 +6,12 @@ export interface OTPContextI {
 }
 
 export interface OTPProps {
-    existOtp    : boolean;
-    otpQRLink   : string;
-    callApiReq  : boolean;
-    verifyCode  : string;
-    verifyState : 'success' | 'fail' | undefined;
+    existOtp        : boolean;
+    otpQRLink       : string;
+    isViewOtpQRCode : boolean;
+    callApiReq      : boolean;
+    verifyCode      : string;
+    verifyState     : 'success' | 'fail' | undefined;
 }
 
 const OTPProvider = createContext<OTPContextI>({} as OTPContextI);

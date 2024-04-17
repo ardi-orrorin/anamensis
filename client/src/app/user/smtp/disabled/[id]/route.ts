@@ -1,11 +1,10 @@
-import {NextResponse} from "next/server";
+import {NextRequest, NextResponse} from "next/server";
 import axios from "axios";
-import {NextApiRequest} from "next";
 import {cookies} from "next/headers";
 
 export async function GET(
-    req: NextApiRequest,
-    {params}: {params: {id: string}}
+    req: NextRequest,
+    {params}: {params: {id: string}},
 ){
     const url = process.env.NEXT_PUBLIC_SERVER + '/user-config-smtp/disabled/' + params.id;
 

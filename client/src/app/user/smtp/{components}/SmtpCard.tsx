@@ -3,6 +3,7 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import axios from "axios";
+import Link from "next/link";
 
 export interface SmtpCardProps {
     id: number;
@@ -18,13 +19,14 @@ export interface SmtpCardProps {
 const SmtpCard = (smtpCardProps: SmtpCardProps) => {
 
     const disabledHandler = async () => {
+        if(!confirm('정말로 삭제하시겠습니까?')) return;
         await axios.get('./smtp/disabled/' + smtpCardProps.id).then(res => {
             window.location.reload()
         });
     }
 
     return (
-        <div>
+        <Link href={'?id=' + smtpCardProps.id}>
             <div className={'w-full flex flex-col justify-start min-h-36 border-solid border border-blue-300 text-sm text-blue-700 rounded p-3 hover:bg-blue-400 hover:text-white duration-500'}>
                 <div className={'w-full flex justify-between'}>
                     <span className={'text-start w-1/2'}>
@@ -73,7 +75,7 @@ const SmtpCard = (smtpCardProps: SmtpCardProps) => {
                     </tbody>
                 </table>
             </div>
-        </div>
+        </Link>
     );
 }
 

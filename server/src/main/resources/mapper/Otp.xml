@@ -26,6 +26,15 @@
          WHERE hash = #{hash}
     </select>
 
+    <select id="existByUserPk" parameterType="long">
+        SELECT EXISTS (
+               SELECT id
+                 FROM otp
+                WHERE user_pk = #{userPk}
+                  AND is_use  = 1
+        )
+    </select>
+
     <insert id="insert" parameterType="OTP">
         INSERT INTO otp (user_pk, hash, create_at)
         VALUES (#{userPk}, #{hash}, #{createAt})
@@ -36,4 +45,11 @@
            SET is_use = #{isUse}
          WHERE hash   = #{hash}
     </update>
+
+    <update id="disableOTP" parameterType="long">
+        UPDATE otp
+           SET is_use = 0
+         WHERE user_pk = #{userPk}
+    </update>
+
 </mapper>

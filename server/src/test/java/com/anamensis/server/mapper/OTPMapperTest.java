@@ -34,4 +34,13 @@ class OTPMapperTest {
     }
 
 
+    @Test
+    void disableOTP() {
+        otpMapper.disableOTP(2);
+    }
+
+    @Test
+    void existByUserPk() {
+        log.info("{}", otpMapper.existByUserPk(2));
+    }
 }

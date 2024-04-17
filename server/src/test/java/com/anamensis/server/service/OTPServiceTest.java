@@ -83,4 +83,9 @@ class OTPServiceTest {
     void verify(Tuple2<OTP, Integer> tuple) {
         gAuth.authorize(tuple.getT1().getHash(), tuple.getT2());
     }
+
+    @Test
+    void disableOTP() {
+        otpService.disableOTP(2);
+    }
 }

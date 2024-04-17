@@ -15,4 +15,9 @@ public interface OTPMapper {
     int insert(OTP otp);
 
     int update(OTP otp);
+
+    void disableOTP(long userPk);
+
+    boolean existByUserPk(long userPk);
+
 }

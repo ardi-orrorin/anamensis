@@ -58,6 +58,17 @@ public class OTPService {
         return result == 1;
     }
 
+
+    @Transactional
+    public boolean disableOTP(long userPk) {
+        otpMapper.disableOTP(userPk);
+        return true;
+    }
+
+    public boolean existByUserPk(long userPk) {
+        return otpMapper.existByUserPk(userPk);
+    }
+
     public boolean verify(Tuple2<OTP, Integer> tuple) {
         return gAuth.authorize(tuple.getT1().getHash(), tuple.getT2());
     }

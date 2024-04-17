@@ -6,11 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,7 +18,7 @@ public class OTPController {
     private final OTPService otpService;
     private final UserService userService;
 
-    @PostMapping("")
+    @GetMapping("")
     public Mono<String> generate(@AuthenticationPrincipal Mono<UserDetails> user){
         return user
                 .map(u -> userService.findUserByUserId(u.getUsername()))
@@ -33,6 +31,12 @@ public class OTPController {
                 .map(otpService::insert);
     }
 
+    @GetMapping("/exist")
+    public Mono<Boolean> exist(@AuthenticationPrincipal Mono<UserDetails> user){
+        return user.map(u -> userService.findUserByUserId(u.getUsername()))
+                .map(u -> otpService.existByUserPk(u.getId()));
+    }
+
     @PostMapping("/verify")
     public Mono<String> verify(
             @AuthenticationPrincipal Mono<UserDetails> user,
@@ -43,6 +47,15 @@ public class OTPController {
                     tuple.mapT1(u -> otpService.selectByUserId(u.getUsername()))
                 )
                 .map(otpService::verify)
+                .map(result -> result ? "success" : "fail");
+    }
+
+    @PutMapping("/disable")
+    public Mono<String> disable(@AuthenticationPrincipal Mono<UserDetails> user){
+        return user
+                .map(u -> userService.findUserByUserId(u.getUsername()))
+                .publishOn(Schedulers.boundedElastic())
+                .map(u -> otpService.disableOTP(u.getId()))
                 .map(result -> result ? "success" : "fail");
     }
 

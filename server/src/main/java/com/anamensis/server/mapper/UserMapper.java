@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 @Mapper
 public interface UserMapper {
@@ -18,6 +19,8 @@ public interface UserMapper {
     Optional<User> findUserByUserId(String userId);
 
     Optional<UserResultMap> findUserInfo(String userId);
+
+    int editAuth(long id, boolean isAuth);
 
     boolean existsUser(UserRequest.existsUser existsUser);
 

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
 import java.time.LocalDateTime;
@@ -60,17 +61,20 @@ public class OTPService {
 
 
     @Transactional
-    public boolean disableOTP(long userPk) {
+    public Mono<Tuple2<Long, Boolean>> disableOTP(long userPk) {
         otpMapper.disableOTP(userPk);
-        return true;
+
+        return Mono.zip(Mono.just(userPk), Mono.just(true));
     }
 
     public boolean existByUserPk(long userPk) {
         return otpMapper.existByUserPk(userPk);
     }
 
-    public boolean verify(Tuple2<OTP, Integer> tuple) {
-        return gAuth.authorize(tuple.getT1().getHash(), tuple.getT2());
+    @Transactional
+    public Tuple2<OTP, Boolean> verify(Tuple2<OTP, Integer> tuple) {
+        return tuple.mapT2(otp ->
+                gAuth.authorize(tuple.getT1().getHash(), tuple.getT2()));
     }
 
 }

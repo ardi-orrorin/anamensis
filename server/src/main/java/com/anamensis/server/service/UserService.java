@@ -8,24 +8,19 @@ import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.entity.User;
 import com.anamensis.server.exception.DuplicateUserException;
 import com.anamensis.server.mapper.UserMapper;
-import com.anamensis.server.provider.TokenProvider;
 import com.anamensis.server.resultMap.UserResultMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
-import reactor.util.Logger;
 import reactor.util.function.Tuple2;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -69,6 +64,11 @@ public class UserService implements ReactiveUserDetailsService {
 
     public Mono<Boolean> existsUser(UserRequest.existsUser existsUser) {
         return Mono.just(userMapper.existsUser(existsUser));
+    }
+
+    public Mono<Boolean> editAuth(long id, boolean isAuth) {
+        return Mono.just(userMapper.editAuth(id, isAuth))
+                .map(i -> i > 0);
     }
 
     @Transactional

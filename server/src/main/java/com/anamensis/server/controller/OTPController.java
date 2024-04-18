@@ -47,7 +47,8 @@ public class OTPController {
                     tuple.mapT1(u -> otpService.selectByUserId(u.getUsername()))
                 )
                 .map(otpService::verify)
-                .map(result -> result ? "success" : "fail");
+                .flatMap(t -> userService.editAuth(t.getT1().getUserPk(), true))
+                .map(t -> t ? "success" : "fail");
     }
 
     @PutMapping("/disable")
@@ -55,8 +56,9 @@ public class OTPController {
         return user
                 .map(u -> userService.findUserByUserId(u.getUsername()))
                 .publishOn(Schedulers.boundedElastic())
-                .map(u -> otpService.disableOTP(u.getId()))
-                .map(result -> result ? "success" : "fail");
+                .flatMap(u -> otpService.disableOTP(u.getId()))
+                .flatMap(t -> userService.editAuth(t.getT1(), false))
+                .map(b -> b ? "success" : "fail");
     }
 
 }

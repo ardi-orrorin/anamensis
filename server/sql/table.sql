@@ -18,7 +18,6 @@ DROP TABLE anamensis.smtp_push_history;
 DROP TABLE anamensis.attendance;
 
 
-
 CREATE TABLE anamensis.user (
 	id	        BIGINT	      NOT NULL PRIMARY KEY  AUTO_INCREMENT     COMMENT 'PK'          ,
 	user_id	    VARCHAR(50)	  NOT NULL UNIQUE     	                   COMMENT '계정 아이디',
@@ -30,6 +29,7 @@ CREATE TABLE anamensis.user (
 	create_at	DATETIME	  NOT NULL                                 COMMENT '생성일자',
 	update_at	DATETIME          NULL                                 COMMENT '정보 수정 일자',
 	is_use	    TINYINT	      NOT NULL DEFAULT      1	               COMMENT '계정 사용여부 0:사용안함, 1:사용',
+	s_auth      TINYINT       NOT NULL DEFAULT      0                  COMMENT '2차 인증 사용어부 0:사용안함, 1:사용',
 	INDEX       user_id_idx  (user_id),
     INDEX       is_use_idx   (is_use)
 ) COMMENT '사용자 정보';
@@ -247,7 +247,7 @@ CREATE TABLE anamensis.email_verify (
     INDEX           is_use_idx        (is_use)
 ) COMMENT '이메일 인증';
 
-CREATE TABLE user_config_smtp (
+CREATE TABLE anamensis.user_config_smtp (
     id             BIGINT        AUTO_INCREMENT    PRIMARY KEY ,
     user_pk        BIGINT        NOT NULL,
     host           VARCHAR(255)  NOT NULL                         COMMENT  'SMTP 서버 주소',
@@ -263,7 +263,7 @@ CREATE TABLE user_config_smtp (
     INDEX          idx_user_pk   (user_pk)
 ) COMMENT '사용자 SMTP 설정';
 
-CREATE TABLE smtp_push_history (
+CREATE TABLE anamensis.smtp_push_history (
     id                  BIGINT                  AUTO_INCREMENT PRIMARY KEY,
     user_pk             BIGINT                  NOT NULL                           COMMENT '사용자 PK',
     user_config_smtp_pk BIGINT                  NOT NULL                           COMMENT '사용자 SMTP 설정 PK',

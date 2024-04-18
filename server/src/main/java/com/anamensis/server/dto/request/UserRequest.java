@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 
 public class UserRequest {
@@ -18,6 +19,10 @@ public class UserRequest {
     public static class Login {
         private String username;
         private String password;
+
+        private Boolean verify;
+        private String authType;
+        private Integer code;
     }
 
     @Getter
@@ -64,5 +69,4 @@ public class UserRequest {
         @NotNull(message = "Value is required")
         private String value;
     }
-
 }

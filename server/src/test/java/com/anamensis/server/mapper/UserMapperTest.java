@@ -93,4 +93,9 @@ class UserMapperTest {
 
         log.info("{}", userMapper.existsUser(existsUser));
     }
+
+    @Test
+    void editAuth() {
+        userMapper.editAuth(2, true);
+    }
 }

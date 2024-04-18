@@ -102,4 +102,11 @@ class UserServiceTest {
                 .log()
                 .subscribe();
     }
+
+    @Test
+    void editAuth() {
+        userService.editAuth(2, true)
+                .log()
+                .subscribe();
+    }
 }

@@ -56,6 +56,11 @@
         INSERT INTO role (user_pk, role)
          VALUE (#{userPk}, #{role})
     </insert>
+    <update id="editAuth" parameterType="map">
+        UPDATE user
+           SET s_auth = ${isAuth}
+         WHERE id     = #{id}
+    </update>
     <delete id="deleteRole" parameterType="Role">
         DELETE
           FROM role

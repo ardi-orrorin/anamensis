@@ -37,4 +37,6 @@ public class User{
     private LocalDateTime updateAt;
 
     private boolean isUse;
+
+    private Boolean sAuth;
 }

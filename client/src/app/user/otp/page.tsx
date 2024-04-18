@@ -25,8 +25,6 @@ export default function Page() {
             });
     }, [step])
 
-
-
     return (
         <div className={'flex flex-col gap-10 items-center justify-center'}>
             <OTPProvider.Provider value={{otp, setOtp}}>

@@ -1,6 +1,6 @@
 package com.anamensis.server.provider;
 
-import com.anamensis.server.dto.AuthType;
+import com.anamensis.server.entity.AuthType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;

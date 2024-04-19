@@ -1,15 +1,16 @@
 package com.anamensis.server.mapper;
 
 
+import com.anamensis.server.entity.AuthType;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.entity.Role;
 import com.anamensis.server.entity.User;
 import com.anamensis.server.resultMap.UserResultMap;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 @Mapper
 public interface UserMapper {
@@ -20,7 +21,10 @@ public interface UserMapper {
 
     Optional<UserResultMap> findUserInfo(String userId);
 
-    int editAuth(long id, boolean isAuth);
+    int editAuth(
+            @Param("id") long id,
+            @Param("isAuth") boolean isAuth,
+            @Param("authType") AuthType authType);
 
     boolean existsUser(UserRequest.existsUser existsUser);
 

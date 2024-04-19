@@ -43,6 +43,4 @@ public class LoginHistoryService {
         int save = loginHistoryMapper.save(loginHistory, user);
         if(save != 1) throw new RuntimeException("LoginHistory save failed");
     }
-
-
 }

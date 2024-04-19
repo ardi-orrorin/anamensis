@@ -1,6 +1,7 @@
 package com.anamensis.server.service;
 
 
+import com.anamensis.server.entity.AuthType;
 import com.anamensis.server.dto.UserDto;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.entity.Role;
@@ -66,8 +67,8 @@ public class UserService implements ReactiveUserDetailsService {
         return Mono.just(userMapper.existsUser(existsUser));
     }
 
-    public Mono<Boolean> editAuth(long id, boolean isAuth) {
-        return Mono.just(userMapper.editAuth(id, isAuth))
+    public Mono<Boolean> editAuth(long id, boolean isAuth, AuthType authType) {
+        return Mono.just(userMapper.editAuth(id, isAuth, authType))
                 .map(i -> i > 0);
     }
 

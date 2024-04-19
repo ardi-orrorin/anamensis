@@ -58,7 +58,8 @@
     </insert>
     <update id="editAuth" parameterType="map">
         UPDATE user
-           SET s_auth = ${isAuth}
+           SET s_auth = #{isAuth},
+               s_auth_type = #{authType}
          WHERE id     = #{id}
     </update>
     <delete id="deleteRole" parameterType="Role">
@@ -75,8 +76,10 @@
     </resultMap>
 
     <resultMap id="UserEntity" type="User" autoMapping="true">
+        <result property="sAuthType" column="s_auth_type" typeHandler="AuthTypeHandler"/>
     </resultMap>
     <resultMap id="RoleEntity" type="Role" autoMapping="true">
         <result property="role" column="role" typeHandler="RoleTypeHandler"/>
     </resultMap>
+
 </mapper>

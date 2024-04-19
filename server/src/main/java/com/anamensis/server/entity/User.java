@@ -1,13 +1,10 @@
 package com.anamensis.server.entity;
 
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
@@ -39,4 +36,6 @@ public class User{
     private boolean isUse;
 
     private Boolean sAuth;
+
+    private AuthType sAuthType;
 }

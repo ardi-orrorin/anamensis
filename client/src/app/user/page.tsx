@@ -27,23 +27,23 @@ export default function Page() {
     const ele = [
         {
             id: 1, open: open.win1,
-            component: <UserInfoWindow openKey={'win1'} title={'제목1'} open={open} setOpen={setOpen}>test</UserInfoWindow>
+            component: <UserInfoWindow key={'win1'} openKey={'win1'} title={'제목1'} open={open} setOpen={setOpen}>test</UserInfoWindow>
         },
         {
             id: 2, open: open.win2,
-            component: <UserInfoWindow openKey={'win2'} title={'제목2'} open={open} setOpen={setOpen}>test</UserInfoWindow>
+            component: <UserInfoWindow key={'win2'} openKey={'win2'} title={'제목2'} open={open} setOpen={setOpen}>test</UserInfoWindow>
         },
         {
             id: 3, open: open.win3,
-            component: <UserInfoWindow openKey={'win3'} title={'제목3'} open={open} setOpen={setOpen}>test</UserInfoWindow>
+            component: <UserInfoWindow key={'win3'} openKey={'win3'} title={'제목3'} open={open} setOpen={setOpen}>test</UserInfoWindow>
         },
         {
             id: 4, open: open.win4,
-            component: <UserInfoWindow openKey={'win4'} title={'제목4'} open={open} setOpen={setOpen}>test</UserInfoWindow>
+            component: <UserInfoWindow key={'win4'} openKey={'win4'} title={'제목4'} open={open} setOpen={setOpen}>test</UserInfoWindow>
         },
         {
             id: 5, open: open.win5,
-            component: <UserInfoWindow openKey={'win5'} title={'제목5'} open={open} setOpen={setOpen}>test</UserInfoWindow>
+            component: <UserInfoWindow key={'win5'} openKey={'win5'} title={'제목5'} open={open} setOpen={setOpen}>test</UserInfoWindow>
         },
     ]
 

@@ -32,21 +32,19 @@ class EmailVerifyMapperTest {
 
     @BeforeEach
     void setUp() {
-        emailVerify = EmailVerify.builder()
-                .email("test@test.com")
-                .code(emailVerifyProvider.generateCode())
-                .expireAt(LocalDateTime.now().plusMinutes(10))
-                .build();
+        emailVerify = new EmailVerify();
+        emailVerify.setEmail("test@test.com");
+        emailVerify.setCode(emailVerifyProvider.generateCode());
+        emailVerify.setExpireAt(LocalDateTime.now().plusMinutes(10));
     }
 
     @Test
     void selectByEmailAndCode() {
 
-        EmailVerify join = EmailVerify.builder()
-                .email("test@test.com")
-                .code("463130")
-                .expireAt(LocalDateTime.now())
-                .build();
+        EmailVerify join = new EmailVerify();
+        join.setEmail("test@test.com");
+        join.setCode("463130");
+        join.setExpireAt(LocalDateTime.now());
 
         EmailVerify result = emailVerifyMapper.selectByEmailAndCode(join)
                 .orElseThrow(() -> new RuntimeException("not found"));
@@ -60,11 +58,10 @@ class EmailVerifyMapperTest {
 
     @Test
     void updateIsUse() {
-        EmailVerify join = EmailVerify.builder()
-                .email("test@test.com")
-                .code("409604")
-                .expireAt(LocalDateTime.now())
-                .build();
+        EmailVerify join = new EmailVerify();
+        join.setEmail("yoosc89@gmail.com");
+        join.setCode("775009");
+        join.setExpireAt(LocalDateTime.now());
 
         EmailVerify e1 = emailVerifyMapper.selectByEmailAndCode(join)
                 .orElseThrow(() -> new RuntimeException("not found"));;
@@ -76,19 +73,17 @@ class EmailVerifyMapperTest {
 
     @Test
     void insertTest() {
-        EmailVerify email1 = EmailVerify.builder()
-                .email("test@test.com")
-                .build();
+        EmailVerify email1 = new EmailVerify();
+        email1.setEmail("test@test.com");
 
         log.info("code: {}", emailVerifyService.insert(email1));
     }
 
     @Test
     void updateIsUseTest() {
-        EmailVerify email1 = EmailVerify.builder()
-                .email("test@test.com")
-                .code("787522")
-                .build();
+        EmailVerify email1 = new EmailVerify();
+        email1.setEmail("test@test.com");
+        email1.setCode("787522");
 
         log.info("result: {}", emailVerifyService.updateIsUse(email1));
 

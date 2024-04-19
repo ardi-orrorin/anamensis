@@ -6,6 +6,7 @@ import EmailTemplate from "@/app/signup/EmailTemplate";
 import {postExistFetch, postFetch} from "@/app/signup/fetch";
 import {useRouter} from "next/navigation";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
+import axios from "axios";
 
 export interface UserProps {
     id            : string;
@@ -57,7 +58,7 @@ export default function Page() {
         name       : '',
         email      : '',
         emailCheck : '',
-        phone      : ''
+        phone      : '',
     });
 
     const [check, setCheck] = useState<CheckProps>({
@@ -90,7 +91,7 @@ export default function Page() {
             email      : email.length === 0 ? 'uncheck' : check.email,
 
             emailCheck : emailCheck.length === 0 ? 'uncheck'
-                       : 'check',
+                       : check.emailCheck,
 
             phone      : phone.length === 0 ? 'uncheck' : check.phone,
         });
@@ -172,7 +173,6 @@ export default function Page() {
                name === 'check' &&
                email === 'check' &&
                phone === 'check';
-
     },[check]);
 
     const submitHandler = async () => {
@@ -193,8 +193,39 @@ export default function Page() {
         return await postExistFetch(data)
     }
 
+    const sendVerifyCode = async () => {
+        await axios.post('./signup/api/code', {email: user.email}, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then((res) => {
+            if(res.status === 200) {
+                alert('인증번호가 전송되었습니다.');
+            }
+            checkTimer();
+        });
+    }
+
+    const verifyCode = async () => {
+        await axios.post('./signup/api/verify', {email: user.email, code: user.emailCheck}, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then((res) => {
+            if(res.status === 200) {
+
+                alert('인증이 완료되었습니다.');
+
+                setCheck({
+                    ...check,
+                    emailCheck: 'check'
+                });
+            }
+        });
+    }
+
     const checkTimer = () => {
-        let time = 60;
+        let time = 10 * 60; // unit : second
         setTimer(time);
         const interval = setInterval(() => {
             if(time === 0) {
@@ -280,9 +311,17 @@ export default function Page() {
                              inputCheck={inputCheck}
                              description={'이메일로 전송된 6자리 인증번호를 입력하세요.'}
                         />
+                        {
+                            timer >= 0 && emailRegex.test(user.email) && user.emailCheck.length === 6 &&
+                            <button className={'w-1/4 my-3 ms-2 rounded text-xs text-white bg-blue-300'}
+                                    onClick={verifyCode}
+                            >
+                              인증하기
+                            </button>
+                        }
                         <button className={[emailRegex.test(user.email)? 'max-h-52  my-3 ms-2' : 'max-h-0', timer >= 0 ? 'bg-gray-400' : 'bg-blue-300' , 'duration-500','w-1/4 rounded text-xs text-white'].join(' ')}
                                 disabled={timer >= 0}
-                                onClick={checkTimer}
+                                onClick={sendVerifyCode}
                         >
                             {timer >= 0 ? transToTimerMinuteAndSecond() : '인증번호 받기'}
                         </button>

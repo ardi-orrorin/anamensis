@@ -2,11 +2,14 @@ package com.anamensis.server.service;
 
 import com.anamensis.server.entity.EmailVerify;
 import com.anamensis.server.mapper.EmailVerifyMapper;
+import com.anamensis.server.provider.AwsSesMailProvider;
 import com.anamensis.server.provider.EmailVerifyProvider;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.OutputStream;
 import java.time.LocalDateTime;
 
 @Service
@@ -16,6 +19,8 @@ public class EmailVerifyService {
     private final EmailVerifyMapper emailVerifyMapper;
 
     private final EmailVerifyProvider emailVerifyProvider;
+
+    private final AwsSesMailProvider awsSesMailProvider;
 
     @Transactional
     public String insert(EmailVerify emailVerify) {
@@ -29,12 +34,21 @@ public class EmailVerifyService {
 
         if(result == 0) throw new RuntimeException("insert failed");
 
+        try {
+            awsSesMailProvider.verifyEmail(code, emailVerify.getEmail());
+        } catch (Exception e) {
+            throw new RuntimeException("send email failed");
+        }
+
         return code;
     }
 
     @Transactional
     public boolean updateIsUse(EmailVerify emailVerify) {
         emailVerify.setExpireAt(LocalDateTime.now());
+
+        System.out.println(emailVerify);
+
         EmailVerify email = emailVerifyMapper.selectByEmailAndCode(emailVerify)
                 .orElseThrow(() -> new RuntimeException("not found"));;
 

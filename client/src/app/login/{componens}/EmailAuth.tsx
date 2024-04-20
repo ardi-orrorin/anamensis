@@ -39,7 +39,7 @@ const EmailAuth = () => {
 
     const verify = async () => {
         setLoading(true);
-        await axios.post('/login/verify/api', user, {
+        await axios.post('/api/login/verify', user, {
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -83,7 +83,6 @@ const EmailAuth = () => {
                     >{
                         loading ?
                             <LoadingSpinner size={12}/> :
-                            //
                             `인증 ${transMinSec(timer)}`
                     }
                     </button>

@@ -12,7 +12,7 @@ import reactor.core.scheduler.Schedulers;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/otp")
+@RequestMapping("api/otp")
 public class OTPController {
 
     private final OTPService otpService;

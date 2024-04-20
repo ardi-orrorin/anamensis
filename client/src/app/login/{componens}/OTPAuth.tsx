@@ -36,7 +36,7 @@ const OTPAuth = () => {
 
     const verify = async () => {
         setLoading(true);
-        await axios.post('/login/verify/api', user, {
+        await axios.post('/api/login/verify', user, {
             headers: {
                 'Content-Type': 'application/json'
             }

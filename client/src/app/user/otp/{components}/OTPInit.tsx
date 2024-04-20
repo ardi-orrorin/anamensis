@@ -3,7 +3,7 @@ import axios from "axios";
 const OTPInit = () => {
 
     const onInit = async () => {
-        await axios.put('./otp/api')
+        await axios.put('/api/user/otp')
             .then(res => {
                 alert('OTP 삭제 완료');
                 window.location.reload();

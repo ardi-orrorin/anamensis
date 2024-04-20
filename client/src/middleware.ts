@@ -29,7 +29,7 @@ export async function middleware(req: NextRequest) {
 }
 
 const generateRefreshToken = async (refreshToken: RequestCookie, userAgent: string): Promise<string> => {
-    const refresh = await fetch(process.env.NEXT_PUBLIC_SERVER + '/user/refresh', {
+    const refresh = await fetch(process.env.NEXT_PUBLIC_SERVER + '/api/user/refresh', {
         headers: {
             'Content-Type': 'application/json',
             'User-Agent': userAgent,
@@ -51,7 +51,7 @@ const generateRefreshToken = async (refreshToken: RequestCookie, userAgent: stri
 export const config = {
     matcher: [
         '/public/:path*',
-        '/logout/:path*',
+        '/api/logout/:path*',
         '/user/:path*',
     ]
 }

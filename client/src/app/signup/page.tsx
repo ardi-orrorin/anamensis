@@ -3,7 +3,6 @@
 import React, {useEffect, useMemo, useState} from "react";
 import Row from "@/app/signup/Row";
 import EmailTemplate from "@/app/signup/EmailTemplate";
-import {postExistFetch, postFetch} from "@/app/signup/fetch";
 import {useRouter} from "next/navigation";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import axios from "axios";
@@ -177,7 +176,11 @@ export default function Page() {
 
     const submitHandler = async () => {
         await setLoading(true);
-        await postFetch(user)
+        await axios.post('/api/signup', user, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
             .then((res) => {
                 if(res.request.status === 200) {
                     alert('회원가입이 완료되었습니다.');
@@ -190,11 +193,15 @@ export default function Page() {
     }
 
     const checkHandler = async (data: ExistProps) => {
-        return await postExistFetch(data)
+        return await axios.post('/api/signup/exists', data, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
     }
 
     const sendVerifyCode = async () => {
-        await axios.post('./signup/api/code', {email: user.email}, {
+        await axios.post('/api/signup/code', {email: user.email}, {
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -207,7 +214,7 @@ export default function Page() {
     }
 
     const verifyCode = async () => {
-        await axios.post('./signup/api/verify', {email: user.email, code: user.emailCheck}, {
+        await axios.post('/api/signup/verify', {email: user.email, code: user.emailCheck}, {
             headers: {
                 'Content-Type': 'application/json'
             }

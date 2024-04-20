@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user-config-smtp")
+@RequestMapping("api/user-config-smtp")
 public class UserConfigSmtpController {
 
     private final UserConfigSmtpService userConfigSmtpService;

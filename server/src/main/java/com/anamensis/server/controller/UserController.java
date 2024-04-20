@@ -27,10 +27,9 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 
-@Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("user")
+@RequestMapping("api/user")
 public class UserController {
 
     private final UserService userService;
@@ -40,6 +39,7 @@ public class UserController {
     private final EmailVerifyService emailVerifyService;
     private final TokenProvider tokenProvider;
 
+    @PublicAPI
     @PostMapping("login")
     public Mono<UserResponse.Auth> login(
             @RequestBody UserRequest.Login user
@@ -61,6 +61,7 @@ public class UserController {
                    );
     }
 
+    @PublicAPI
     @PostMapping("verify")
     public Mono<UserResponse.Login> verify(
             @RequestBody UserRequest.Login user,
@@ -77,7 +78,7 @@ public class UserController {
     }
 
 
-
+    @PublicAPI
     @PostMapping("signup")
     public Mono<UserResponse.Status> signup(
             @Valid @RequestBody
@@ -91,6 +92,7 @@ public class UserController {
                 );
     }
 
+    @PublicAPI
     @PostMapping("exists")
     public Mono<UserResponse.Status> exists(@Valid @RequestBody Mono<UserRequest.existsUser> data) {
         return data.flatMap(userService::existsUser)
@@ -146,7 +148,6 @@ public class UserController {
             @RequestBody UserRequest.SAuth auth,
             @AuthenticationPrincipal Mono<UserDetails> userDetails
     ) {
-        log.info("auth: {}", auth);
         return userDetails
                 .map(u -> userService.findUserByUserId(u.getUsername()))
                 .map(u -> userService.editAuth(u.getId(), auth.isSauth(), AuthType.fromString(auth.getSauthType())))

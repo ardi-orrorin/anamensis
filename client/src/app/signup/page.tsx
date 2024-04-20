@@ -194,7 +194,7 @@ export default function Page() {
     }
 
     const sendVerifyCode = async () => {
-        await axios.post('./signup/api/code', {email: user.email}, {
+        await axios.post('/api/signup/code', {email: user.email}, {
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -207,7 +207,7 @@ export default function Page() {
     }
 
     const verifyCode = async () => {
-        await axios.post('./signup/api/verify', {email: user.email, code: user.emailCheck}, {
+        await axios.post('/api/signup/verify', {email: user.email, code: user.emailCheck}, {
             headers: {
                 'Content-Type': 'application/json'
             }

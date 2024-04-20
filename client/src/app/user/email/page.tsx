@@ -29,7 +29,7 @@ export default function Page() {
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
-        axios.get('./email/api')
+        axios.get('/api/user/email')
             .then(res => {
                 setUserInfo(res.data);
             });
@@ -51,7 +51,7 @@ export default function Page() {
     const updateSAuth = async (data: AuthPropsI) => {
         setLoading(true);
 
-        await axios.put('./email/api', data)
+        await axios.put('/api/user/email', data)
             .then(res => {
                 setUserInfo(res.data);
             }).catch(err => {

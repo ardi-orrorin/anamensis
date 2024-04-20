@@ -20,8 +20,8 @@ const SmtpCard = (smtpCardProps: SmtpCardProps) => {
 
     const disabledHandler = async () => {
         if(!confirm('정말로 삭제하시겠습니까?')) return;
-        await axios.get('./smtp/disabled/' + smtpCardProps.id).then(res => {
-            window.location.reload()
+        await axios.get('/api/user/smtp/disabled/' + smtpCardProps.id).then(res => {
+            window.location.replace('/user/smtp');
         });
     }
 

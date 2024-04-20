@@ -20,7 +20,7 @@ const OTPGenerate = () => {
         });
 
 
-        await axios.get('./otp/api')
+        await axios.get('/api/user/otp')
             .then((res) => {
                 setOtp({
                     ...otp,

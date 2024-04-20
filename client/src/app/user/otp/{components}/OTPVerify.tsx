@@ -17,7 +17,7 @@ const OTPVerify = () => {
 
     const onVerify = async () => {
         setLoading(true);
-        await axios.post('./otp/api', {otp: otp.verifyCode})
+        await axios.post('/api/user/otp', {otp: otp.verifyCode})
             .then(res => {
                 setOtp({
                     ...otp,

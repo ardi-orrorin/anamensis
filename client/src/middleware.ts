@@ -51,7 +51,7 @@ const generateRefreshToken = async (refreshToken: RequestCookie, userAgent: stri
 export const config = {
     matcher: [
         '/public/:path*',
-        '/logout/:path*',
+        '/api/logout/:path*',
         '/user/:path*',
     ]
 }

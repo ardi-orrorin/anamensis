@@ -10,7 +10,7 @@ const NoneAuth = () => {
     const {user} = useContext(LoginProvider);
 
     useEffect(() => {
-        axios.post('/login/verify/api', user, {
+        axios.post('/api/login/verify', user, {
             headers: {
                 'Content-Type': 'application/json'
             }

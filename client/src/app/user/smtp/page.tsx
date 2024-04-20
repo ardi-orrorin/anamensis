@@ -63,7 +63,7 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
 
     useEffect(() => {
         if(searchParams?.id) {
-            axios.get('./smtp/api/', {
+            axios.get('/api/user/smtp', {
                 params: {
                     id: searchParams?.id
                 }
@@ -106,7 +106,7 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
     const testSmtp = async () => {
         const data = transformSmtp(smtp);
         setLoading(true);
-        await axios.post('./smtp/test/api', data ,{
+        await axios.post('/api/user/smtp/test', data ,{
             headers: {
                 'Content-Type': 'application/json',
             }
@@ -125,7 +125,7 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
     const save = () => {
         setLoading(true);
         const data = transformSmtp(smtp);
-        axios.post('./smtp/api', data, {
+        axios.post('/api/user/smtp', data, {
             headers: {
                 'Content-Type': 'application/json',
             }

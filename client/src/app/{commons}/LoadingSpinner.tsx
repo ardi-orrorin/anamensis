@@ -5,7 +5,7 @@ import React from "react";
 const LoadingSpinner = ({size}:{size : number}) => {
     return (
         <>
-            <FontAwesomeIcon width={size} className={'animate-spin'} icon={faSpinner} />
+            <FontAwesomeIcon width={size} className={`animate-spin h-[${size}px]`} icon={faSpinner} />
         </>
     );
 }

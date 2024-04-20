@@ -32,7 +32,7 @@ const Login = () => {
 
     const goLogin = async () => {
         setLoading(true);
-        await axios.post('./login/api', user, {
+        await axios.post('/api/login', user, {
             headers: {
                 'Content-Type': 'application/json',
             }}

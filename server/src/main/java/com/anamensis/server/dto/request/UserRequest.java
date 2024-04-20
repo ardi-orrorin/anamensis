@@ -81,4 +81,15 @@ public class UserRequest {
         @NotNull(message = "Value is required")
         private String value;
     }
+
+    @Getter
+    @Setter
+    public static class SAuth {
+
+        @NotNull(message = "SAuth is required")
+        private boolean sauth;
+
+        @NotNull(message = "SAuthType is required")
+        private String sauthType;
+    }
 }

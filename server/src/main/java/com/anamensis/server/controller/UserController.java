@@ -71,6 +71,8 @@ public class UserController {
         } else if(AuthType.EMAIL.equals(user.getAuthType())) {
             return emailLogin(user, device);
         }
+
+        // BUG: notAuth log가 두번 생김
         return notAuth(user, device);
     }
 
@@ -137,6 +139,20 @@ public class UserController {
         return userDetails
                 .map(user -> userService.findUserByUserId(user.getUsername()))
                 .map(UserResponse.MyPage::transToMyPage);
+    }
+
+    @PutMapping("s-auth")
+    public Mono<UserResponse.Status> sAuth(
+            @RequestBody UserRequest.SAuth auth,
+            @AuthenticationPrincipal Mono<UserDetails> userDetails
+    ) {
+        log.info("auth: {}", auth);
+        return userDetails
+                .map(u -> userService.findUserByUserId(u.getUsername()))
+                .map(u -> userService.editAuth(u.getId(), auth.isSauth(), AuthType.fromString(auth.getSauthType())))
+                .publishOn(Schedulers.boundedElastic())
+                .map(u -> UserResponse.Status.transToStatus(HttpStatus.OK, "Success"));
+
     }
 
     private Mono<UserResponse.Login> notAuth(

@@ -11,4 +11,8 @@ public enum AuthType {
         return this.name().equals(authStr.toUpperCase());
     }
 
+    public static AuthType fromString(String authStr) {
+        return AuthType.valueOf(authStr.toUpperCase());
+    }
+
 }

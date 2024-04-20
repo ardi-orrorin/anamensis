@@ -1,18 +1,16 @@
 package com.anamensis.server.dto.response;
 
-import com.anamensis.server.dto.AuthType;
+import com.anamensis.server.entity.AuthType;
 import com.anamensis.server.dto.Token;
 import com.anamensis.server.entity.Role;
 import com.anamensis.server.entity.RoleType;
+import com.anamensis.server.entity.User;
 import com.anamensis.server.resultMap.UserResultMap;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class UserResponse {
@@ -52,6 +50,42 @@ public class UserResponse {
 
         private boolean verity;
 
+    }
+
+    @Getter
+    @Setter
+    public static class MyPage {
+        private String userId;
+        private String email;
+        private String phone;
+        private String name;
+        private long point;
+        private Boolean sAuth;
+        private AuthType sAuthType;
+
+        public static MyPage transToMyPage(UserResultMap user) {
+            MyPage my = new MyPage();
+            my.setUserId(user.getUser().getUserId());
+            my.setEmail(user.getUser().getEmail());
+            my.setName(user.getUser().getName());
+            my.setPhone(user.getUser().getPhone());
+            my.setPoint(user.getUser().getPoint());
+            my.setSAuth(user.getUser().getSAuth());
+            my.setSAuthType(user.getUser().getSAuthType());
+            return my;
+        }
+
+        public static MyPage transToMyPage(User user) {
+            MyPage my = new MyPage();
+            my.setUserId(user.getUserId());
+            my.setEmail(user.getEmail());
+            my.setName(user.getName());
+            my.setPhone(user.getPhone());
+            my.setPoint(user.getPoint());
+            my.setSAuth(user.getSAuth());
+            my.setSAuthType(user.getSAuthType());
+            return my;
+        }
     }
 
 

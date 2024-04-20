@@ -25,6 +25,8 @@ import reactor.util.function.Tuple2;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -43,10 +45,13 @@ public class LogHistoryFilter implements WebFilter {
         String path = exchange.getRequest().getPath().toString();
         HttpMethod method = exchange.getRequest().getMethod();
         String userRegexp = "/user/\\S+";
+        String verifyRegexp = "/verify/\\S+";
         String actuatorRegexp = "/actuator/\\S+";
 
+        List<String> skips = Arrays.asList("/user/histories", "/user/info", "/user/s-auth");
+
         // /user/histories는 제외한 모든 /user/** 경로에 대해 로그를 남김
-        if((path.matches(userRegexp) || path.matches(actuatorRegexp)) && !path.equals("/user/histories")) {
+        if((path.matches(verifyRegexp) ||path.matches(userRegexp) || path.matches(actuatorRegexp)) && !skips.contains(path)) {
             return chain.filter(exchange);
         }
 

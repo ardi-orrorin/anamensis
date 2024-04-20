@@ -5,13 +5,12 @@ import com.anamensis.server.dto.*;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.dto.response.LoginHistoryResponse;
 import com.anamensis.server.dto.response.UserResponse;
+import com.anamensis.server.entity.AuthType;
+import com.anamensis.server.entity.EmailVerify;
 import com.anamensis.server.entity.OTP;
 import com.anamensis.server.entity.User;
 import com.anamensis.server.provider.TokenProvider;
-import com.anamensis.server.service.AttendanceService;
-import com.anamensis.server.service.LoginHistoryService;
-import com.anamensis.server.service.OTPService;
-import com.anamensis.server.service.UserService;
+import com.anamensis.server.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +23,7 @@ import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 
@@ -37,6 +37,7 @@ public class UserController {
     private final OTPService otpService;
     private final AttendanceService attendanceService;
     private final LoginHistoryService loginHistoryService;
+    private final EmailVerifyService emailVerifyService;
     private final TokenProvider tokenProvider;
 
     @PostMapping("login")
@@ -45,8 +46,16 @@ public class UserController {
     ) {
         return Mono.just(user)
                    .flatMap(u -> userService.findUserByUserId(u.getUsername(), u.getPassword()))
+                   .publishOn(Schedulers.boundedElastic())
+                   .doOnNext(u -> {
+                       if(AuthType.EMAIL.equals(u.getSAuthType())) {
+                           EmailVerify emailVerify = new EmailVerify();
+                           emailVerify.setEmail(u.getEmail());
+                           emailVerifyService.insert(emailVerify);
+                       }
+                   })
                    .map(u -> UserResponse.Auth.builder()
-                           .authType(u.getSAuth() ? AuthType.OTP : AuthType.NONE)
+                           .authType(u.getSAuthType())
                            .verity(u.getSAuth())
                            .build()
                    );
@@ -57,19 +66,23 @@ public class UserController {
             @RequestBody UserRequest.Login user,
             Device device
     ) {
-
-        log.info("verify user: {}", user);
-
-        // todo: auth type 에 따른 분기 처리는 추후에 추가
-        if(user.getAuthType().equals(AuthType.OTP.name())) {
+        if(AuthType.OTP.equals(user.getAuthType())) {
             return otpLogin(user, device);
+        } else if(AuthType.EMAIL.equals(user.getAuthType())) {
+            return emailLogin(user, device);
         }
 
+        // BUG: notAuth log가 두번 생김
         return notAuth(user, device);
     }
 
+
+
     @PostMapping("signup")
-    public Mono<UserResponse.Status> signup(@Valid @RequestBody Mono<UserRequest.Register> user) {
+    public Mono<UserResponse.Status> signup(
+            @Valid @RequestBody
+            Mono<UserRequest.Register> user
+    ) {
         return  userService.saveUser(user)
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(u -> attendanceService.init(u.getId()))
@@ -116,6 +129,29 @@ public class UserController {
     public Mono<Boolean> refresh(
     ) {
         return Mono.just(true);
+    }
+
+
+    @GetMapping("info")
+    public Mono<UserResponse.MyPage> info(
+            @AuthenticationPrincipal Mono<UserDetails> userDetails
+    ) {
+        return userDetails
+                .map(user -> userService.findUserByUserId(user.getUsername()))
+                .map(UserResponse.MyPage::transToMyPage);
+    }
+
+    @PutMapping("s-auth")
+    public Mono<UserResponse.Status> sAuth(
+            @RequestBody UserRequest.SAuth auth,
+            @AuthenticationPrincipal Mono<UserDetails> userDetails
+    ) {
+        log.info("auth: {}", auth);
+        return userDetails
+                .map(u -> userService.findUserByUserId(u.getUsername()))
+                .map(u -> userService.editAuth(u.getId(), auth.isSauth(), AuthType.fromString(auth.getSauthType())))
+                .publishOn(Schedulers.boundedElastic())
+                .map(u -> UserResponse.Status.transToStatus(HttpStatus.OK, "Success"));
 
     }
 
@@ -132,8 +168,31 @@ public class UserController {
                 .map(t -> UserResponse.Login.transToLogin(t.getT1(), t.getT2()));
     }
 
-    private Mono<UserResponse.Login> otpLogin(UserRequest.Login user,
-                                              Device device
+    private Mono<UserResponse.Login> emailLogin(
+            UserRequest.Login user,
+            Device device
+    ) {
+        return Mono.just(user)
+                .doOnNext(u -> userService.findUserByUserId(u.getUsername()))
+                .flatMap(u -> userService.findUserInfo(u.getUsername()))
+                .publishOn(Schedulers.boundedElastic())
+                .doOnNext(u -> {
+                    EmailVerify emailVerify = new EmailVerify();
+                    emailVerify.setEmail(u.getUser().getEmail());
+                    emailVerify.setCode(String.valueOf(user.getCode()));
+                    emailVerify.setExpireAt(LocalDateTime.now());
+
+                    emailVerifyService.updateIsUse(emailVerify);
+                })
+                .doOnNext(u -> loginHistoryService.save(device, u.getUser()))
+                .publishOn(Schedulers.boundedElastic())
+                .map(u -> Tuples.of(u, generateToken(u.getUser().getUserId())))
+                .map(t -> UserResponse.Login.transToLogin(t.getT1(), t.getT2()));
+    }
+
+    private Mono<UserResponse.Login> otpLogin(
+            UserRequest.Login user,
+            Device device
     ) {
         return Mono.just(user)
                 .map(u -> userService.findUserByUserId(u.getUsername()))

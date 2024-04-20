@@ -1,8 +1,9 @@
 package com.anamensis.server.typeHandler;
 
-import com.anamensis.server.entity.Role;
 import com.anamensis.server.entity.RoleType;
-import org.apache.ibatis.type.*;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.MappedTypes;
+import org.apache.ibatis.type.TypeHandler;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;

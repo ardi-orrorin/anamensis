@@ -1,10 +1,9 @@
 package com.anamensis.server.service;
 
+import com.anamensis.server.entity.AuthType;
 import com.anamensis.server.dto.UserDto;
 import com.anamensis.server.dto.request.UserRequest;
-import com.anamensis.server.entity.Role;
 import com.anamensis.server.entity.RoleType;
-import com.anamensis.server.entity.User;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,8 +13,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class UserServiceTest {
@@ -105,7 +102,7 @@ class UserServiceTest {
 
     @Test
     void editAuth() {
-        userService.editAuth(2, true)
+        userService.editAuth(2, false, AuthType.NONE)
                 .log()
                 .subscribe();
     }

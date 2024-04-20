@@ -4,7 +4,8 @@ import React, {useState} from "react";
 import LoginProvider, {LoginI} from "@/app/login/{services}/LoginProvider";
 import Login from "@/app/login/{componens}/Login";
 import NoneAuth from "@/app/login/{componens}/NoneAuth";
-import Auth from "@/app/login/{componens}/Auth";
+import OTPAuth from "@/app/login/{componens}/OTPAuth";
+import EmailAuth from "@/app/login/{componens}/EmailAuth";
 
 
 export interface LoginAuth {
@@ -54,7 +55,11 @@ export default function page() {
                 }
                 {
                     user.verify && user.authType === AuthType.OTP &&
-                    <Auth />
+                    <OTPAuth />
+                }
+                {
+                    user.verify && user.authType === AuthType.EMAIL &&
+                    <EmailAuth />
                 }
             </LoginProvider.Provider>
         </main>

@@ -26,24 +26,22 @@ class EmailVerifyServiceTest {
 
     @Test
     void insert() {
-        EmailVerify emailVerify = EmailVerify.builder()
-                .email("test@test.com")
-                .code(emailVerifyProvider.generateCode())
-                .createAt(LocalDateTime.now())
-                .expireAt(LocalDateTime.now().plusMinutes(10))
-                .build();
+        EmailVerify emailVerify = new EmailVerify();
+        emailVerify.setEmail("test@test.com");
+        emailVerify.setCode(emailVerifyProvider.generateCode());
+        emailVerify.setCreateAt(LocalDateTime.now());
+        emailVerify.setExpireAt(LocalDateTime.now().plusMinutes(10));
 
         emailVerifyMapper.insert(emailVerify);
     }
 
     @Test
     void selectByEmailAndCode() {
-        EmailVerify emailVerify = EmailVerify.builder()
-                .email("test@test.com")
-                .code("982964")
-                .expireAt(LocalDateTime.now())
-                .build();
+        EmailVerify emailVerify = new EmailVerify();
 
+        emailVerify.setEmail("test@test.com");
+        emailVerify.setCode("982964");
+        emailVerify.setExpireAt(LocalDateTime.now());
 
         EmailVerify r =  emailVerifyMapper.selectByEmailAndCode(emailVerify)
                 .orElseThrow(() -> new RuntimeException("not found"));

@@ -1,5 +1,6 @@
 package com.anamensis.server.mapper;
 
+import com.anamensis.server.entity.AuthType;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.entity.Role;
 import com.anamensis.server.entity.RoleType;
@@ -32,8 +33,7 @@ class UserMapperTest {
 
     @Test
     void findUserByUserId() {
-        log.info("{}", userMapper.findUserByUserId("admin"));
-//        userMapper.findUserByUserId("admin");
+        log.info("{}", userMapper.findUserByUserId("admin1"));
     }
 
     @Test
@@ -96,6 +96,6 @@ class UserMapperTest {
 
     @Test
     void editAuth() {
-        userMapper.editAuth(2, true);
+        userMapper.editAuth(2, false, AuthType.NONE);
     }
 }

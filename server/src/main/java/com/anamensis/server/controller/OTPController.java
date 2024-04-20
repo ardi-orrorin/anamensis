@@ -1,11 +1,11 @@
 package com.anamensis.server.controller;
 
+import com.anamensis.server.entity.AuthType;
 import com.anamensis.server.service.OTPService;
 import com.anamensis.server.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -47,7 +47,7 @@ public class OTPController {
                     tuple.mapT1(u -> otpService.selectByUserId(u.getUsername()))
                 )
                 .map(otpService::verify)
-                .flatMap(t -> userService.editAuth(t.getT1().getUserPk(), true))
+                .flatMap(t -> userService.editAuth(t.getT1().getUserPk(), true, AuthType.OTP))
                 .map(t -> t ? "success" : "fail");
     }
 
@@ -57,7 +57,7 @@ public class OTPController {
                 .map(u -> userService.findUserByUserId(u.getUsername()))
                 .publishOn(Schedulers.boundedElastic())
                 .flatMap(u -> otpService.disableOTP(u.getId()))
-                .flatMap(t -> userService.editAuth(t.getT1(), false))
+                .flatMap(t -> userService.editAuth(t.getT1(), false, AuthType.NONE))
                 .map(b -> b ? "success" : "fail");
     }
 

@@ -61,6 +61,18 @@ public class UserRequest {
 
     @Getter
     @Setter
+    public static class EmailVerify {
+        @NotNull(message = "Email is required")
+        private String email;
+
+//        @NotNull(message = "Code is required")
+        private String code;
+    }
+
+
+
+    @Getter
+    @Setter
     public static class existsUser {
 
         @NotNull(message = "Type is required")
@@ -68,5 +80,16 @@ public class UserRequest {
 
         @NotNull(message = "Value is required")
         private String value;
+    }
+
+    @Getter
+    @Setter
+    public static class SAuth {
+
+        @NotNull(message = "SAuth is required")
+        private boolean sauth;
+
+        @NotNull(message = "SAuthType is required")
+        private String sauthType;
     }
 }

@@ -53,3 +53,10 @@ pageable:
 ## 예제
 jwt:
   secret: c2R2c2RsdmlqZHM7dmlqYTsnb3NkaWpmYW85d2V1cndhZWxrbnZtbC54Y252bGl6dXhjaHZwOHN2OGloamFzO2RsdmtuYW1zO2RsaWZqYW9zZGZ1OTA4OXUyMzA0Mmpsa25tLnZseGNudnppaHNkbztmaHNvZGZhZGZhZmJ2enhjYnp2YnpkZmJmZA
+
+aws:
+  ses:
+    access-key: access-key
+    secret-key: secret-key
+    region: us-west-2
+    from: from@email.com

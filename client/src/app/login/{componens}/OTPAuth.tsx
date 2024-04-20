@@ -2,9 +2,8 @@ import {useContext, useEffect, useState} from "react";
 import LoginProvider, {LoginProviderI} from "@/app/login/{services}/LoginProvider";
 import axios from "axios";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import {Simulate} from "react-dom/test-utils";
 
-const Auth = () => {
+const OTPAuth = () => {
     const { user, setUser } = useContext<LoginProviderI>(LoginProvider);
     const [loading, setLoading] = useState<boolean>(false);
     const [timer, setTimer] = useState<number>(300);
@@ -90,4 +89,4 @@ const Auth = () => {
     )
 }
 
-export default Auth;
+export default OTPAuth;

@@ -1,7 +1,7 @@
-import {NextRequest, NextResponse} from "next/server";
+import {NextResponse} from "next/server";
 
-export async function GET(req: NextRequest, res: NextResponse) {
-    const next = new NextResponse(null, {
+export async function GET() {
+    const next = new NextResponse( null, {
         status: 302,
     });
 

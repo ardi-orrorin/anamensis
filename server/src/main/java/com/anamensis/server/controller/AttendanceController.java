@@ -13,7 +13,7 @@ import reactor.core.scheduler.Schedulers;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/attendance")
+@RequestMapping("api/attendance")
 public class AttendanceController {
 
     private final AttendanceService attendanceService;

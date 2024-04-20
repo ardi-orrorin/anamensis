@@ -16,7 +16,7 @@ export default function Page() {
     const [otp, setOtp] = useState<OTPProps>({} as OTPProps);
 
     useEffect(() => {
-        axios.get('./otp/exist')
+        axios.get('/api/user/otp/exist')
             .then(res => {
                 setOtp({
                     ...otp,

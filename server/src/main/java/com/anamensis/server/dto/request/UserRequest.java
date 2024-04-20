@@ -38,7 +38,7 @@ public class UserRequest {
         private String name;
 
         @NotNull(message = "Email is required")
-        @Pattern(regexp = "^[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$", message = "Invalid email")
+        @Pattern(regexp = "^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$", message = "Invalid email")
         private String email;
 
         @NotNull(message = "Phone number is required")

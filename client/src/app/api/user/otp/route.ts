@@ -3,7 +3,7 @@ import {cookies} from "next/headers";
 import {NextRequest} from "next/server";
 
 export async function GET() {
-    const url = process.env.NEXT_PUBLIC_SERVER + '/otp';
+    const url = process.env.NEXT_PUBLIC_SERVER + '/api/otp';
     const token = cookies().get('accessToken') || cookies().get('refreshToken');
     console.log(token)
     const res = await axios.get(url,{
@@ -23,7 +23,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
     const {otp} = await req.json();
 
-    const url = process.env.NEXT_PUBLIC_SERVER + '/otp/verify';
+    const url = process.env.NEXT_PUBLIC_SERVER + '/api/otp/verify';
 
     const token = cookies().get('accessToken') || cookies().get('refreshToken');
 
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
 
     console.log('sdfs')
-    const url = process.env.NEXT_PUBLIC_SERVER + '/otp/disable';
+    const url = process.env.NEXT_PUBLIC_SERVER + '/api/otp/disable';
     const token = cookies().get('accessToken') || cookies().get('refreshToken');
 
     const res = await axios.put(url, {}, {

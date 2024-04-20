@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
 
     const token = cookies().get('accessToken') || cookies().get('refreshToken')
 
-    const url = `${process.env.NEXT_PUBLIC_SERVER}/user-config-smtp${id ? `/${id}` : ''}`;
+    const url = `${process.env.NEXT_PUBLIC_SERVER}/api/user-config-smtp${id ? `/${id}` : ''}`;
 
     const result: SmtpI = await axios.get(url, {
             headers: {

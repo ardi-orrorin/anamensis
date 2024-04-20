@@ -20,7 +20,7 @@ import reactor.util.function.Tuples;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/link")
+@RequestMapping("api/link")
 @Slf4j
 public class ShareLinkController {
 

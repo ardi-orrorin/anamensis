@@ -3,7 +3,7 @@ import axios from "axios";
 
 export async function POST(req: NextRequest) {
     const { email, code } = await req.json();
-    const url = process.env.NEXT_PUBLIC_SERVER + '/verify/verifyCode';
+    const url = process.env.NEXT_PUBLIC_SERVER + '/public/api/verify/verifyCode';
 
     try {
         const res = await axios.post(url, {email, code}, {

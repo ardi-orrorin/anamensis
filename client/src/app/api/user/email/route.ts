@@ -4,7 +4,7 @@ import {AuthPropsI, UserInfoI} from "@/app/user/email/page";
 import {NextRequest, NextResponse} from "next/server";
 
 export async function GET(){
-    const url = process.env.NEXT_PUBLIC_SERVER + '/user/info';
+    const url = process.env.NEXT_PUBLIC_SERVER + '/api/user/info';
     const token = cookies().get('accessToken') || cookies().get('refreshToken');
 
     const result = await axios.get(url, {
@@ -26,7 +26,7 @@ export async function GET(){
 export async function PUT(req: NextRequest) {
     const {sauth, sauthType} = await req.json() as AuthPropsI;
 
-    const url = process.env.NEXT_PUBLIC_SERVER + '/user/s-auth';
+    const url = process.env.NEXT_PUBLIC_SERVER + '/api/user/s-auth';
 
     const token = cookies().get('accessToken') || cookies().get('refreshToken');
 

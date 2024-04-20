@@ -48,7 +48,7 @@ public class LogHistoryFilter implements WebFilter {
         String verifyRegexp = "/verify/\\S+";
         String actuatorRegexp = "/actuator/\\S+";
 
-        List<String> skips = Arrays.asList("/user/histories", "/user/info");
+        List<String> skips = Arrays.asList("/user/histories", "/user/info", "/user/s-auth");
 
         // /user/histories는 제외한 모든 /user/** 경로에 대해 로그를 남김
         if((path.matches(verifyRegexp) ||path.matches(userRegexp) || path.matches(actuatorRegexp)) && !skips.contains(path)) {

@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @RestController
-@RequestMapping("/points")
+@RequestMapping("api/points")
 @RequiredArgsConstructor
 public class PointController {
 

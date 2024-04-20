@@ -36,7 +36,7 @@ const getData = async (): Promise<PageResponse<SmtpCardProps>> => {
 
     const token = cookies().get('accessToken') || cookies().get('refreshToken')
 
-    const url = process.env.NEXT_PUBLIC_SERVER + '/user-config-smtp';
+    const url = process.env.NEXT_PUBLIC_SERVER + '/api/user-config-smtp';
 
     return await axios.get(url, {
         headers: {

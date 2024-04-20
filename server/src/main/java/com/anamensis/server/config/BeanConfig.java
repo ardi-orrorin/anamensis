@@ -4,6 +4,7 @@ import com.warrenstrange.googleauth.GoogleAuthenticator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.Random;
 
@@ -24,4 +25,5 @@ public class BeanConfig {
     public GoogleAuthenticator googleAuthenticator() {
         return new GoogleAuthenticator();
     }
+
 }

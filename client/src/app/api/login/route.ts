@@ -3,7 +3,7 @@ import axios from "axios";
 
 export async function POST(req: NextRequest) {
     const {username, password} = await req.json();
-    const url = process.env.NEXT_PUBLIC_SERVER + '/user/login';
+    const url = process.env.NEXT_PUBLIC_SERVER + '/public/api/user/login';
 
     const res = await axios.post(url, {username, password}, {
         headers: {

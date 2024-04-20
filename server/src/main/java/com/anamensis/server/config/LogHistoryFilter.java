@@ -44,14 +44,11 @@ public class LogHistoryFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String path = exchange.getRequest().getPath().toString();
         HttpMethod method = exchange.getRequest().getMethod();
-        String userRegexp = "/user/\\S+";
-        String verifyRegexp = "/verify/\\S+";
         String actuatorRegexp = "/actuator/\\S+";
-
-        List<String> skips = Arrays.asList("/user/histories", "/user/info", "/user/s-auth");
+        String publicRegexp = "/public/\\S+";
 
         // /user/histories는 제외한 모든 /user/** 경로에 대해 로그를 남김
-        if((path.matches(verifyRegexp) || path.matches(userRegexp) || path.matches(actuatorRegexp)) && !skips.contains(path)) {
+        if((path.matches(publicRegexp) || path.matches(actuatorRegexp))) {
             return chain.filter(exchange);
         }
 

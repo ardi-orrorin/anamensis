@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/smtp-push")
+@RequestMapping("api/smtp-push")
 @RequiredArgsConstructor
 public class SmtpPushController {
     private final SmtpPushService smtpPushService;

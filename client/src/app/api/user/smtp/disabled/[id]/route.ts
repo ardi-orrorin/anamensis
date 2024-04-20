@@ -6,7 +6,7 @@ export async function GET(
     req: NextRequest,
     {params}: {params: {id: string}},
 ){
-    const url = process.env.NEXT_PUBLIC_SERVER + '/user-config-smtp/disabled/' + params.id;
+    const url = process.env.NEXT_PUBLIC_SERVER + '/api/user-config-smtp/disabled/' + params.id;
 
     const token = cookies().get('accessToken') || cookies().get('refreshToken');
 

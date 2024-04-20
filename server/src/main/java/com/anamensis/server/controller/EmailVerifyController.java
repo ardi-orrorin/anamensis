@@ -12,17 +12,20 @@ import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("verify")
+@RequestMapping("api/verify")
 @Slf4j
 public class  EmailVerifyController {
 
     private final EmailVerifyService emailVerifyService;
 
+
+    @PublicAPI
     @PostMapping("email")
     public Mono<String> verify(@RequestBody Mono<EmailVerify> email) {
         return email.map(emailVerifyService::insert);
     }
 
+    @PublicAPI
     @PostMapping("verifyCode")
     public Mono<Boolean> verifyCode(@RequestBody Mono<EmailVerify> email) {
         return email.map(emailVerifyService::updateIsUse);

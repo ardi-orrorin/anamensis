@@ -6,7 +6,7 @@ import {LoginI} from "@/app/login/{services}/LoginProvider";
 
 export async function POST(req: NextRequest) {
     const user = await req.json() as LoginI;
-    const url = process.env.NEXT_PUBLIC_SERVER + '/user/verify';
+    const url = process.env.NEXT_PUBLIC_SERVER + '/public/api/user/verify';
 
     const geoLocation = await axios.get('https://geolocation-db.com/json')
         .then((res) => {

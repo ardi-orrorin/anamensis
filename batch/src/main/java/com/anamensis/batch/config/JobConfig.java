@@ -15,18 +15,38 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class JobConfig {
 
     @Bean
-    public Job job(JobRepository jobRepository, Step step1) {
+    public Job job1(JobRepository jobRepository, Step step1) {
         return new JobBuilder("job1", jobRepository)
                 .start(step1)
                 .incrementer(new RunIdIncrementer())
                 .build();
     }
 
+
     @Bean
     public Step step1(JobRepository jobRepository, PlatformTransactionManager tm) {
         return new StepBuilder("step1", jobRepository)
                 .tasklet((con, chunk) -> {
-                    System.out.println("Hello World");
+                    System.out.println("Hello World 11111111111111");
+                    return RepeatStatus.FINISHED;
+                },tm)
+                .allowStartIfComplete(true)
+                .build();
+    }
+
+    @Bean
+    public Job job2(JobRepository jobRepository, Step step2) {
+        return new JobBuilder("job2", jobRepository)
+                .start(step2)
+                .incrementer(new RunIdIncrementer())
+                .build();
+    }
+
+    @Bean
+    public Step step2(JobRepository jobRepository, PlatformTransactionManager tm) {
+        return new StepBuilder("step2", jobRepository)
+                .tasklet((con, chunk) -> {
+                    System.out.println("Hello World 22222222222222222");
                     return RepeatStatus.FINISHED;
                 },tm)
                 .allowStartIfComplete(true)

@@ -7,7 +7,6 @@ plugins {
 group = 'com.anamensis'
 version = 'anamensis-' + project.getProperties().get('version')
 
-println(version)
 java {
     sourceCompatibility = '17'
 }

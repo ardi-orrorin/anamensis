@@ -30,6 +30,7 @@ CREATE TABLE anamensis.user (
 	update_at	DATETIME          NULL                                 COMMENT '정보 수정 일자',
 	is_use	    TINYINT	      NOT NULL DEFAULT      1	               COMMENT '계정 사용여부 0:사용안함, 1:사용',
 	s_auth      TINYINT       NOT NULL DEFAULT      0                  COMMENT '2차 인증 사용어부 0:사용안함, 1:사용',
+    s_auth_type VARCHAR(10)   NOT NULL DEFAULT      'NONE'             COMMENT '2차 인증 타입',
 	INDEX       user_id_idx  (user_id),
     INDEX       is_use_idx   (is_use)
 ) COMMENT '사용자 정보';
@@ -73,9 +74,9 @@ CREATE TABLE log_history (
      method         VARCHAR(10)   NOT NULL,
      path           VARCHAR(255)  NOT NULL,
      query          VARCHAR(500)  NOT NULL,
-     body           JSON,
+     body           TEXT,
      uri            VARCHAR(255)  NOT NULL,
-     headers        VARCHAR(500)  NOT NULL,
+     headers        TEXT          NOT NULL,
      session        VARCHAR(500)  NOT NULL,
      local_address  VARCHAR(255)  NOT NULL,
      remote_address VARCHAR(255)  NOT NULL,
@@ -89,7 +90,6 @@ CREATE TABLE log_history (
      INDEX          idx_create_at                 (create_at),
      INDEX          idx_remote_address            (remote_address),
      INDEX          idx_local_address             (local_address),
-     INDEX          idx_headers                   (headers),
      INDEX          idx_session                   (session)
 ) COMMENT 'api 호출 로그 테이블';
 

@@ -30,13 +30,6 @@ spring:
     redis:
       flush-mode: on_save
       namespace: spring
-  batch:
-    jdbc:
-      initialize-schema: always
-    job:
-      enabled: false
-  quartz:
-#    startup-delay: 10s
 
 logging:
   level:

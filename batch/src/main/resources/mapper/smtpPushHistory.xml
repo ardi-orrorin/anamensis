@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.batch.mapper.SmtpPushHistoryMapper">
+
+    <insert id="save" parameterType="SmtpPushHistory">
+        INSERT INTO smtp_push_history
+               (user_pk, user_config_smtp_pk, subject, content, create_at, status, message)
+        VALUES (#{userPk}, #{userConfigSmtpPk}, #{subject}, #{content}, #{createAt}, #{status}, #{message})
+    </insert>
+</mapper>

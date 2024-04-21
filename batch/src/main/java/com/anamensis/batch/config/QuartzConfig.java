@@ -26,8 +26,8 @@ public class QuartzConfig {
     @Bean
     public Trigger jobTrigger1() {
         SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule()
-                .withIntervalInSeconds(5)
-                .repeatForever();
+//                .withIntervalInSeconds(60)
+                .withRepeatCount(0);
 
         return TriggerBuilder.newTrigger()
                 .forJob(jobDetail())
@@ -36,18 +36,18 @@ public class QuartzConfig {
                 .build();
     }
 
-    @Bean
-    public Trigger jobTrigger2() {
-        SimpleScheduleBuilder scheduleBuilder2 = SimpleScheduleBuilder.simpleSchedule()
-                .withIntervalInSeconds(3)
-                .repeatForever();
-
-        return TriggerBuilder.newTrigger()
-                .forJob(jobDetail2())
-                .withIdentity("jobTrigger2")
-                .withSchedule(scheduleBuilder2)
-                .build();
-    }
-
+//    @Bean
+//    public Trigger jobTrigger2() {
+//        SimpleScheduleBuilder scheduleBuilder2 = SimpleScheduleBuilder.simpleSchedule()
+//                .withIntervalInSeconds(3)
+//                .repeatForever();
+//
+//        return TriggerBuilder.newTrigger()
+//                .forJob(jobDetail2())
+//                .withIdentity("jobTrigger2")
+//                .withSchedule(scheduleBuilder2)
+//                .build();
+//    }
+//
 
 }

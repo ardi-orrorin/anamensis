@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     const data = await req.json() as SmtpI;
     const token = cookies().get('accessToken') || cookies().get('refreshToken')
 
-    const url = process.env.NEXT_PUBLIC_SERVER + '/user-config-smtp';
+    const url = process.env.NEXT_PUBLIC_SERVER + '/api/user-config-smtp';
 
     const result: SmtpI  = await axios.post(url, data, {
         headers: {

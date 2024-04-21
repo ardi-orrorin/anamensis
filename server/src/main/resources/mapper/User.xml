@@ -49,8 +49,8 @@
         <selectKey keyProperty="id" resultType="int" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
-        INSERT INTO user (user_id, pwd, name, email, phone)
-         VALUE (#{userId}, #{pwd}, #{name}, #{email}, #{phone})
+        INSERT INTO user (user_id, pwd, name, email, phone, create_at)
+         VALUE (#{userId}, #{pwd}, #{name}, #{email}, #{phone}, #{createAt})
     </insert>
     <insert id="saveRole" parameterType="Role">
         INSERT INTO role (user_pk, role)

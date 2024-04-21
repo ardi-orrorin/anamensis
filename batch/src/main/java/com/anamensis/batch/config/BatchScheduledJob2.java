@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 @Configuration
-public class BatchScheduledJob extends QuartzJobBean {
+public class BatchScheduledJob2 extends QuartzJobBean {
 
     @Autowired
     private JobExplorer jobExplorer;
@@ -31,14 +31,14 @@ public class BatchScheduledJob extends QuartzJobBean {
         JobParameters jobParameters = null;
         try {
             jobParameters = new JobParametersBuilder(this.jobExplorer)
-                    .getNextJobParameters(jobRegistry.getJob("job1"))
+                    .getNextJobParameters(jobRegistry.getJob("job2"))
                     .toJobParameters();
         } catch (NoSuchJobException e) {
             throw new RuntimeException(e);
         }
 
         try {
-            this.jobLauncher.run(jobRegistry.getJob("job1"), jobParameters);
+            this.jobLauncher.run(jobRegistry.getJob("job2"), jobParameters);
         } catch (Exception e) {
             e.printStackTrace();
         }

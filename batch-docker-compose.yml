@@ -1,19 +1,18 @@
 version: '3.8'
 
 services:
-  anamensis:
+  batch-anamensis:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Batch-Dockerfile
       args:
-        JAR: server-anamensis-${TAG}
-    image: anamensis:${TAG}
+        JAR: batch-anamensis-${TAG}
+    image: batch-anamensis:${TAG}
     networks:
       - net
     ports:
       - "${PORT}:8080"
     deploy:
-      replicas: 2
       update_config:
         parallelism: 1
         failure_action: rollback

@@ -1,5 +1,6 @@
 package com.anamensis.batch.config;
 
+import lombok.SneakyThrows;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.batch.core.Job;
@@ -25,22 +26,24 @@ public class BatchScheduledJob extends QuartzJobBean {
     @Autowired
     private JobRegistry jobRegistry;
 
+    @SneakyThrows
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 
-        JobParameters jobParameters = null;
+
+        Job job = null;
         try {
-            jobParameters = new JobParametersBuilder(this.jobExplorer)
-                    .getNextJobParameters(jobRegistry.getJob("job1"))
-                    .toJobParameters();
+            job = jobRegistry.getJob("mail-test-job");
         } catch (NoSuchJobException e) {
             throw new RuntimeException(e);
         }
 
-        try {
-            this.jobLauncher.run(jobRegistry.getJob("job1"), jobParameters);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        JobParameters jobParameters = new JobParametersBuilder(this.jobExplorer)
+                    .getNextJobParameters(job)
+                    .toJobParameters();
+
+        this.jobLauncher.run(job, jobParameters);
+
     }
 }

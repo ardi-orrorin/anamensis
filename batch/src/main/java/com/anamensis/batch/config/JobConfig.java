@@ -6,27 +6,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.batch.MyBatisCursorItemReader;
-import org.mybatis.spring.batch.MyBatisPagingItemReader;
 import org.mybatis.spring.batch.builder.MyBatisCursorItemReaderBuilder;
-import org.mybatis.spring.batch.builder.MyBatisPagingItemReaderBuilder;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.boot.actuate.endpoint.web.annotation.WebEndpoint;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
+import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
-
-import javax.sql.DataSource;
-import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -40,16 +32,18 @@ public class JobConfig {
         return new JobBuilder("mail-test-job", jobRepository)
                 .start(mailTestStep1)
                 .incrementer(new RunIdIncrementer())
+
                 .build();
     }
 
 
     @Bean
     public Step mailTestStep1(JobRepository jobRepository, PlatformTransactionManager tm) throws Exception {
-        return new StepBuilder("", jobRepository)
-                .<UserConfigSmtp, UserConfigSmtp>chunk(8, tm)
+        return new StepBuilder("mail-test-step", jobRepository)
+                .<UserConfigSmtp, UserConfigSmtp>chunk(10, tm)
                 .reader(myBatisCursorItemReader())
                 .writer(itemWriter())
+//                .taskExecutor(new SimpleAsyncTaskExecutor())
                 .allowStartIfComplete(true)
                 .build();
     }
@@ -65,15 +59,18 @@ public class JobConfig {
     @Bean
     public ItemWriter<UserConfigSmtp> itemWriter() {
         return items -> {
-            for (UserConfigSmtp smtp : items) {
-                new MailProvider.Builder()
-                        .config(smtp)
-                        .message(smtp, "Hello World", "Hello World")
-                        .build()
-                        .send()
-                        .onErrorMap(throwable -> new RuntimeException("Error"))
-                        .subscribe();
-            }
+            Flux.fromIterable(items)
+                    .parallel()
+                    .runOn(Schedulers.parallel())
+                    .flatMap(smtp ->
+                        new MailProvider.Builder()
+                                .config(smtp)
+                                .message(smtp, "Hello World", "Hello World")
+                                .build()
+                                .send()
+                                .subscribeOn(Schedulers.parallel())
+                    )
+                    .subscribe();
         };
     }
 

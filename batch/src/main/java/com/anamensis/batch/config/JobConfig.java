@@ -2,6 +2,7 @@ package com.anamensis.batch.config;
 
 import com.anamensis.batch.entity.UserConfigSmtp;
 import com.anamensis.batch.provider.MailProvider;
+import com.anamensis.batch.service.SmtpPushHistoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -13,12 +14,16 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.integration.async.AsyncItemWriter;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.retry.Retry;
+
+import java.time.Duration;
 
 @Configuration
 @RequiredArgsConstructor
@@ -27,23 +32,23 @@ public class JobConfig {
 
     private final SqlSessionFactory sqlSessionFactory;
 
+    private final MailItemWriter mailItemWriter;
+
+
     @Bean
     public Job mailTestJob(JobRepository jobRepository, Step mailTestStep1) {
         return new JobBuilder("mail-test-job", jobRepository)
                 .start(mailTestStep1)
                 .incrementer(new RunIdIncrementer())
-
                 .build();
     }
-
 
     @Bean
     public Step mailTestStep1(JobRepository jobRepository, PlatformTransactionManager tm) throws Exception {
         return new StepBuilder("mail-test-step", jobRepository)
-                .<UserConfigSmtp, UserConfigSmtp>chunk(10, tm)
+                .<UserConfigSmtp, UserConfigSmtp>chunk(100, tm)
                 .reader(myBatisCursorItemReader())
-                .writer(itemWriter())
-//                .taskExecutor(new SimpleAsyncTaskExecutor())
+                .writer(mailItemWriter)
                 .allowStartIfComplete(true)
                 .build();
     }
@@ -54,24 +59,6 @@ public class JobConfig {
                 .sqlSessionFactory(sqlSessionFactory)
                 .queryId("com.anamensis.batch.mapper.UserConfigSmtpMapper.findAll")
                 .build();
-    }
-
-    @Bean
-    public ItemWriter<UserConfigSmtp> itemWriter() {
-        return items -> {
-            Flux.fromIterable(items)
-                    .parallel()
-                    .runOn(Schedulers.parallel())
-                    .flatMap(smtp ->
-                        new MailProvider.Builder()
-                                .config(smtp)
-                                .message(smtp, "Hello World", "Hello World")
-                                .build()
-                                .send()
-                                .subscribeOn(Schedulers.parallel())
-                    )
-                    .subscribe();
-        };
     }
 
     @Bean
@@ -92,4 +79,5 @@ public class JobConfig {
 //                .allowStartIfComplete(true)
 //                .build();
 //    }
+
 }

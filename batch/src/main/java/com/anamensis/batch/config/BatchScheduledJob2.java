@@ -33,6 +33,7 @@ public class BatchScheduledJob2 extends QuartzJobBean {
             jobParameters = new JobParametersBuilder(this.jobExplorer)
                     .getNextJobParameters(jobRegistry.getJob("job2"))
                     .toJobParameters();
+
         } catch (NoSuchJobException e) {
             throw new RuntimeException(e);
         }

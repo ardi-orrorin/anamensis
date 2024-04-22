@@ -276,3 +276,38 @@ CREATE TABLE anamensis.smtp_push_history (
     INDEX               idx_user_config_smtp_pk (user_config_smtp_pk),
     INDEX               idx_create_at           (create_at)
 ) COMMENT '사용자 PUSH 설정';
+
+CREATE TABLE anamensis.web_sys (
+    code        CHAR(4)      NOT NULL PRIMARY KEY COMMENT '시스템 코드',
+    name        VARCHAR(100) NOT NULL             COMMENT '이름',
+    description TEXT                              COMMENT '시스템 설명',
+    permission  varchar(10)  NOT NULL              COMMENT '접근 권한',
+    INDEX idx_web_sys_access_permission (permission),
+    INDEX idx_web_sys_name              (name),
+    INDEX idx_web_sys_code              (code)
+) COMMENT '시스템 정보';
+
+CREATE TABLE anamensis.system_message (
+    id          INT          PRIMARY KEY           AUTO_INCREMENT,
+    web_sys_pk  CHAR(4)      NOT NULL              COMMENT '시스템 코드',
+    subject     VARCHAR(255) NOT NULL              COMMENT '제목',
+    content     TEXT                               COMMENT '내용',
+    create_at   TIMESTAMP    NOT NULL              COMMENT '생성일',
+    update_at   TIMESTAMP    NOT NULL              COMMENT '수정일',
+    is_use      TINYINT(1)   NOT NULL DEFAULT 1    COMMENT '사용여부',
+    extra1      TEXT                               COMMENT '추가1',
+    extra2      TEXT                               COMMENT '추가2',
+    extra3      TEXT                               COMMENT '추가3',
+    extra4      TEXT                               COMMENT '추가4',
+    extra5      TEXT                               COMMENT '추가5',
+    FOREIGN KEY (web_sys_pk)   REFERENCES web_sys(code),
+    INDEX       web_sys_pk_idx (web_sys_pk),
+    INDEX       is_use_idx     (is_use),
+    INDEX       create_at_idx  (create_at),
+    INDEX       update_at_idx  (update_at),
+    INDEX       id_idx         (id),
+    INDEX       subject_idx    (subject)
+) COMMENT '시스템 메시지';
+
+
+

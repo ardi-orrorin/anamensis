@@ -29,6 +29,8 @@ class SmtpPushControllerTest {
 
     Logger log = org.slf4j.LoggerFactory.getLogger(SmtpPushControllerTest.class);
 
+
+
     @BeforeEach
     @Order(1)
     void setUp() {
@@ -42,7 +44,7 @@ class SmtpPushControllerTest {
     @Order(2)
     void setToken() {
         UserRequest.Login login = new UserRequest.Login();
-        login.setUsername("admin");
+        login.setUsername("admin1");
         login.setPassword("admin");
 
         EntityExchangeResult<UserResponse.Login> result =

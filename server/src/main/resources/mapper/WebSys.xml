@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.server.mapper.WebSysMapper">
+    <select id="findAll" resultType="WebSys">
+        SELECT *
+          FROM web_sys
+    </select>
+
+    <select id="findByCode" resultType="WebSys">
+        SELECT *
+          FROM web_sys
+         WHERE code = #{code}
+    </select>
+
+    <select id="findByPermission">
+        SELECT *
+          FROM web_sys
+         WHERE permission = #{permission}
+    </select>
+
+    <insert id="save" parameterType="WebSys">
+        INSERT INTO web_sys (code, name, description, permission)
+        VALUES (#{code}, #{name}, #{description},  #{permission})
+    </insert>
+
+    <insert id="saveAll">
+        INSERT INTO web_sys (code, name, description, permission)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.code}, #{item.name}, #{item.description}, #{item.permission})
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="WebSys">
+        UPDATE web_sys
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="description != null and description != ''">
+                description = #{description},
+            </if>
+            <if test="permission != null">
+                permission = #{permission},
+            </if>
+        </set>
+         WHERE code = #{code}
+    </update>
+
+    <delete id="deleteByCode" parameterType="String">
+        DELETE
+          FROM web_sys
+         WHERE code = #{code}
+    </delete>
+</mapper>

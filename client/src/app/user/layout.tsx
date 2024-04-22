@@ -5,6 +5,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import React, {useState} from "react";
 import {faAddressCard, faBars, faClockRotateLeft, faEnvelope, faKey} from "@fortawesome/free-solid-svg-icons";
+import {faGear} from "@fortawesome/free-solid-svg-icons/faGear";
 
 
 export default function Layout({children}: {children: React.ReactNode}) {
@@ -14,9 +15,10 @@ export default function Layout({children}: {children: React.ReactNode}) {
 
     const menuItems = [
         {name: '로그인기록', href:'/user/history', iconComponent: <FontAwesomeIcon icon={faClockRotateLeft} width={iconSize} />},
-        {name: 'SMTP 설정', href:'/user/smtp', iconComponent: <FontAwesomeIcon icon={faEnvelope} width={iconSize} />},
-        {name: 'OTP 설정', href:'/user/otp', iconComponent: <FontAwesomeIcon icon={faKey} width={iconSize} />},
-        {name: 'EMAIL 인증 설정', href:'/user/email', iconComponent: <FontAwesomeIcon icon={faEnvelope} width={iconSize} />},
+        {name: 'SMTP', href:'/user/smtp', iconComponent: <FontAwesomeIcon icon={faEnvelope} width={iconSize} />},
+        {name: 'OTP', href:'/user/otp', iconComponent: <FontAwesomeIcon icon={faKey} width={iconSize} />},
+        {name: 'EMAIL', href:'/user/email', iconComponent: <FontAwesomeIcon icon={faEnvelope} width={iconSize} />},
+        {name: 'SYSTEM', href:'/user/system', iconComponent: <FontAwesomeIcon icon={faGear} width={iconSize} />},
     ]
     
     return (

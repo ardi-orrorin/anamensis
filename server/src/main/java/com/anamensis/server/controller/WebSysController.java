@@ -11,7 +11,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/admin/web-sys")
+@RequestMapping("admin/api/web-sys")
 public class WebSysController {
 
     private final WebSysService webSysService;
@@ -27,8 +27,8 @@ public class WebSysController {
     }
 
     @PostMapping("")
-    public Mono<Void> save(@RequestBody WebSys webSys) {
-        return webSysService.save(webSys);
+    public Mono<Void> save(@RequestBody WebSysRequest.WebSysReq webSys) {
+        return webSysService.save(webSys.toEntity());
     }
 
     @PostMapping("list")

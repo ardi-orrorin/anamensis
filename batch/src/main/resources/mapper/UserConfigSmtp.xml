@@ -12,4 +12,17 @@
         <include refid="tbl_user_config_smtp"/>
         WHERE is_use = 1
     </select>
+    <select id="findByIds" resultType="UserConfigSmtp">
+        <include refid="tbl_user_config_smtp"/>
+        WHERE is_use = 1
+          AND id IN
+        <foreach collection="ids" item="id"  open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+<!--    <select id="findByIds" resultType="UserConfigSmtp">-->
+<!--        <include refid="tbl_user_config_smtp"/>-->
+<!--        WHERE is_use = 1-->
+<!--        AND id IN (#{ids})-->
+<!--    </select>-->
 </mapper>

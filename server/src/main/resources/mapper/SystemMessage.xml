@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.server.mapper.SystemMessageMapper">
+    <select id="findById" parameterType="Integer">
+        SELECT *
+          FROM system_message
+         WHERE id = #{id}
+    </select>
+
+    <select id="findByWebSysPk" parameterType="String">
+        SELECT *
+          FROM system_message
+         WHERE web_sys_pk = #{webSysPk}
+    </select>
+
+    <insert id="save" parameterType="SystemMessage">
+        INSERT INTO system_message
+               (web_sys_pk, subject, content,
+                create_at, update_at,
+                extra1, extra2, extra3,
+                extra4, extra5)
+        VALUES (#{webSysPk}, #{subject}, #{content},
+                #{createAt}, #{updateAt},
+                #{extra1}, #{extra2}, #{extra3},
+                #{extra4}, #{extra5})
+    </insert>
+
+    <insert id="update" parameterType="SystemMessage">
+        UPDATE system_message
+        <set>
+            <if test="subject != null and subject != ''">
+                subject = #{subject},
+            </if>
+            <if test="content != null and content != ''">
+                content = #{content},
+            </if>
+            <if test="updateAt != null">
+                update_at = #{updateAt},
+            </if>
+            <if test="extra1 != null and extra1 != ''">
+                extra1 = #{extra1},
+            </if>
+            <if test="extra2 != null and extra2 != ''">
+                extra2 = #{extra2},
+            </if>
+            <if test="extra3 != null and extra3 != ''">
+                extra3 = #{extra3},
+            </if>
+            <if test="extra4 != null and extra4 != ''">
+                extra4 = #{extra4},
+            </if>
+            <if test="extra5 != null and extra5 != ''">
+                extra5 = #{extra5},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </insert>
+
+    <update id="updateIsUse" parameterType="Map">
+        UPDATE system_message
+           SET is_use = #{isUse}
+         WHERE id     = #{id}
+    </update>
+    
+    <delete id="delete" parameterType="Integer">
+        DELETE
+          FROM system_message
+         WHERE id = #{id}
+    </delete>
+</mapper>

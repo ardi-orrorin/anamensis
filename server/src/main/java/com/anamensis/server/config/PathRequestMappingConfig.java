@@ -1,5 +1,6 @@
 package com.anamensis.server.config;
 
+import com.anamensis.server.controller.AdminAPI;
 import com.anamensis.server.controller.PublicAPI;
 import org.springframework.web.reactive.result.method.RequestMappingInfo;
 import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
@@ -19,6 +20,13 @@ public class PathRequestMappingConfig extends RequestMappingHandlerMapping {
                     .build()
                     .combine(requestMappingInfo);
         }
+
+        if(requestMappingInfo != null && method.getAnnotation(AdminAPI.class) != null) {
+            return RequestMappingInfo.paths("admin")
+                    .build()
+                    .combine(requestMappingInfo);
+        }
+
 
         return requestMappingInfo;
     }

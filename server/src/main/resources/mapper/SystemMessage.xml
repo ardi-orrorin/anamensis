@@ -61,8 +61,9 @@
 
     <update id="updateIsUse" parameterType="Map">
         UPDATE system_message
-           SET is_use = #{isUse}
-         WHERE id     = #{id}
+           SET is_use    = #{isUse},
+               update_at = #{updateAt}
+         WHERE id        = #{id}
     </update>
     
     <delete id="delete" parameterType="Integer">

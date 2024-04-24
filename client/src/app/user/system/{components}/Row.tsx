@@ -1,14 +1,19 @@
-import {Dispatch, SetStateAction, useState} from "react";
+import {Dispatch, SetStateAction, useContext, useState} from "react";
 import axios from "axios";
 import {RoleType, WebSysI} from "@/app/user/system/page";
+import ModalProvider, {ModalContextType} from "@/app/user/{services}/modalProvider";
+import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
+import Message from "@/app/user/system/{components}/message";
 
 const Row = ({
-                 props, setData
-             } : {
+    props, setData
+} : {
     props: WebSysI, setData: Dispatch<SetStateAction<WebSysI[]>>
 }) => {
 
     const [webSys, setWebSys] = useState<WebSysI>(props);
+
+    const {modal, setModal} = useContext<ModalContextType>(ModalProvider);
 
     const onSaveHandler = async () => {
         await axios.put('/api/user/system', webSys)
@@ -49,6 +54,17 @@ const Row = ({
         setWebSys({
             ...webSys,
             [e.target.name]: e.target.value
+        });
+    }
+
+    const onMessageHandler = () => {
+        bodyScrollToggle();
+        setModal({
+            id: webSys.code,
+            route: '메시지',
+            isOpen: true,
+            params: {},
+            component: <Message />
         });
     }
 
@@ -114,6 +130,12 @@ const Row = ({
                       <button className={'bg-blue-300 rounded px-4 h-7 text-white hover:bg-blue-600 duration-500'}
                               onClick={onEditHandler}
                       >Edit</button>
+                    }
+                    {
+                        !webSys.edit &&
+                        <button className={'bg-green-300 rounded px-4 h-7 text-white hover:bg-green-600 duration-500'}
+                                onClick={onMessageHandler}
+                        >메시지</button>
                     }
                 </div>
             </td>

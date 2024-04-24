@@ -4,6 +4,7 @@ import com.anamensis.server.entity.SystemMessage;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,7 +21,8 @@ public interface SystemMessageMapper {
 
     void updateIsUse(
             @Param("id") int id,
-            @Param("isUse") boolean isUse
+            @Param("isUse") boolean isUse,
+            @Param("updateAt") LocalDateTime updateAt
     );
 
     void delete(int id);

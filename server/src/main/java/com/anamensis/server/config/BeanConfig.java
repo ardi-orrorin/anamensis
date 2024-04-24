@@ -4,7 +4,6 @@ import com.warrenstrange.googleauth.GoogleAuthenticator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.Random;
 
@@ -15,6 +14,7 @@ public class BeanConfig {
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 
     @Bean
     public Random random() {

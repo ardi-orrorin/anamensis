@@ -1,6 +1,8 @@
 import "./init.css"
 import {Metadata} from "next";
 import NavMain from "@/app/NavMain";
+import {ErrorBoundary} from "next/dist/client/components/error-boundary";
+import Error from "@/app/error";
 
 export const metadata : Metadata = {
   title: 'Anamensis',
@@ -16,7 +18,9 @@ export default function RootLayout({
         <body>
             <NavMain />
             <div>
-                {children}
+                <ErrorBoundary errorComponent={Error}>
+                    {children}
+                </ErrorBoundary>
             </div>
         </body>
 	</html>

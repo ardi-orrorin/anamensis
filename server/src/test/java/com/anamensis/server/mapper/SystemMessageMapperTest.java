@@ -63,12 +63,11 @@ class SystemMessageMapperTest {
         systemMessage.setExtra1("extra1 update");
 
         systemMessageMapper.update(systemMessage);
-
     }
 
     @Test
     void updateIsUse() {
-        systemMessageMapper.updateIsUse(1, false);
+        systemMessageMapper.updateIsUse(1, false, LocalDateTime.now());
     }
 
     @Test

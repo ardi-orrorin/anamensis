@@ -1,17 +1,21 @@
 package com.anamensis.batch.provider;
 
 import com.anamensis.batch.entity.UserConfigSmtp;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import jakarta.mail.MessagingException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMailMessage;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.util.Properties;
 
 public class MailProvider {
 
     JavaMailSenderImpl mailSenderImpl;
-    MimeMailMessage mimeMailMessage;
+    MimeMessageHelper mimeMailMessage;
 
     public Mono<Void> send() {
         return Mono.fromRunnable(() -> {
@@ -30,7 +34,7 @@ public class MailProvider {
 
     public static class Builder {
         JavaMailSenderImpl mailSenderImpl = new JavaMailSenderImpl();
-        MimeMailMessage mimeMailMessage = new MimeMailMessage(mailSenderImpl.createMimeMessage());
+        MimeMessageHelper mimeMailMessage = new MimeMessageHelper(mailSenderImpl.createMimeMessage());
 
         public Builder config(UserConfigSmtp userConfigSmtp) {
             this.mailSenderImpl.setHost(userConfigSmtp.getHost());
@@ -43,6 +47,7 @@ public class MailProvider {
             properties.put("mail.smtp.auth", "true");
             properties.put("mail.smtp.starttls.enable", "true");
 
+
             if (userConfigSmtp.getUseSSL()) {
                 properties.put("mail.smtp.ssl.trust", "*");
             }
@@ -51,11 +56,26 @@ public class MailProvider {
             return this;
         }
 
-        public Builder message(UserConfigSmtp userConfigSmtp, String subject, String content) {
-            this.mimeMailMessage.setTo(userConfigSmtp.getFromEmail());
-            this.mimeMailMessage.setFrom(userConfigSmtp.getFromEmail());
-            this.mimeMailMessage.setSubject(subject);
-            this.mimeMailMessage.setText(content);
+        public Builder message(UserConfigSmtp userConfigSmtp, String subject, String content, String model) {
+
+
+            try {
+                String body = "";
+
+                if(model != null && !model.isEmpty()){
+                    Template template = new Template("mail", content, null);
+                    body = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
+                } else {
+                    body = content;
+                }
+
+                this.mimeMailMessage.setTo(userConfigSmtp.getFromEmail());
+                this.mimeMailMessage.setFrom(userConfigSmtp.getFromEmail());
+                this.mimeMailMessage.setSubject(subject);
+                this.mimeMailMessage.setText(body, true);
+            } catch (MessagingException | IOException | TemplateException e) {
+                throw new RuntimeException(e);
+            }
             return this;
         }
 

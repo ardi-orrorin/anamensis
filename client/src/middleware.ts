@@ -1,4 +1,4 @@
-import {NextRequest, NextResponse, userAgent} from "next/server";
+import {NextRequest, NextResponse} from "next/server";
 import {cookies} from "next/headers";
 import {RequestCookie} from "next/dist/compiled/@edge-runtime/cookies";
 
@@ -16,6 +16,7 @@ export async function middleware(req: NextRequest) {
 
         const next = NextResponse.next();
         next.headers.set('Set-Cookie', result + '; Secure; SameSite=Strict; path=/; HttpOnly');
+        next.headers.set('Set-Cookie', result + '; SameSite=NONE; path=/;');
         return next;
     }
 

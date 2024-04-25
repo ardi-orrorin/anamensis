@@ -61,6 +61,7 @@ public class SecurityConfig implements WebFluxConfigurer {
                 .allowedHeaders("Authorization", "Content-Type", "Device", "Location")
                 .allowCredentials(true);
     }
+
     @Override
     public void configureArgumentResolvers(ArgumentResolverConfigurer configurer) {
         configurer.addCustomResolver(pageArgumentResolver());

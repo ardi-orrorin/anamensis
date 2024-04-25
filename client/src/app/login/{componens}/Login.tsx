@@ -37,23 +37,23 @@ const Login = () => {
                 'Content-Type': 'application/json',
             }}
         )
-            .then((res: AxiosResponse<LoginAuth>) => {
-                setUser({
-                    ...user,
-                    verify: res.data.verity,
-                    authType: res.data.authType
-                });
-            })
-            .catch((err)  => {
-                setError({
-                    status: err.response.data.status,
-                    message: err.response.data.message,
-                    use: err.response.data.use
-                });
-            })
-            .finally(() => {
-                setLoading(false);
+        .then((res: AxiosResponse<LoginAuth>) => {
+            setUser({
+                ...user,
+                verify: res.data.verity,
+                authType: res.data.authType
             });
+        })
+        .catch((err)  => {
+            setError({
+                status: err.response.data.status,
+                message: err.response.data.message,
+                use: err.response.data.use
+            });
+        })
+        .finally(() => {
+            setLoading(false);
+        });
     }
 
 

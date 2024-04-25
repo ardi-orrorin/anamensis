@@ -1,5 +1,5 @@
 import {createContext, Dispatch, SetStateAction} from "react";
-import {AuthType} from "@/app/login/page";
+import {AuthType} from "@/app/login/{services}/types";
 
 
 export interface LoginI {

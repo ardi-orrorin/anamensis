@@ -1,56 +1,57 @@
 import {NextRequest, NextResponse} from "next/server";
 import axios from "axios";
-import {ErrorResponse} from "@/app/login/page";
-import {ResponseCookie} from "next/dist/compiled/@edge-runtime/cookies";
 import {LoginI} from "@/app/login/{services}/LoginProvider";
+import {ResponseCookie} from "next/dist/compiled/@edge-runtime/cookies";
+import {ErrorResponse} from "@/app/login/page";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest){
     const user = await req.json() as LoginI;
     const url = process.env.NEXT_PUBLIC_SERVER + '/public/api/user/verify';
 
-    const geoLocation = await axios.get('https://geolocation-db.com/json')
-        .then((res) => {
-            return {
-                countryCode: res.data.country_code,
-                countryName: res.data.country_name,
-                state: res.data.state,
-                city: res.data.city,
-                ipv4: res.data.IPv4,
-                latitude: res.data.latitude,
-                longitude: res.data.longitude
-            };
-        });
+    // const geoLocation = await axios.get('https://geolocation-db.com/json')
+    //     .then((res) => {
+    //         return {
+    //             countryCode: res.data.country_code,
+    //             countryName: res.data.country_name,
+    //             state: res.data.state,
+    //             city: res.data.city,
+    //             ipv4: res.data.IPv4,
+    //             latitude: res.data.latitude,
+    //             longitude: res.data.longitude
+    //         };
+    //     });
 
     try {
-        const res = await axios.post(url, user, {
+        const resData = await axios.post(url, user, {
             headers: {
                 'Content-Type': 'application/json',
                 'User-Agent': req.headers.get('User-Agent') || '',
-                'Location': `${geoLocation.countryName}-${geoLocation.state}-${geoLocation.city}`
-            }
+                'Location': `select`
+                // 'Location': `${geoLocation.countryName}-${geoLocation.state}-${geoLocation.city}`
+            },
+            withCredentials: true
         })
-
-        const next = new NextResponse(JSON.stringify(res.data), {
+        const next = new NextResponse(JSON.stringify(resData.data), {
             status: 200,
             headers: {
                 'Content-Type': 'application/json',
-            }
+            },
         });
 
         const cookieInit: Partial<ResponseCookie> = {
             httpOnly: true,
             secure: true,
-            sameSite: 'none',
+            sameSite: 'strict',
         }
 
-        next.cookies.set('accessToken', res.data.accessToken, {
+        next.cookies.set('accessToken', resData.data.accessToken, {
             ...cookieInit,
-            maxAge: res.data.accessTokenExpiresIn / 1000
+            maxAge: resData.data.accessTokenExpiresIn / 1000
         });
 
-        next.cookies.set('refreshToken', res.data.refreshToken, {
+        next.cookies.set('refreshToken', resData.data.refreshToken, {
             ...cookieInit,
-            maxAge: res.data.refreshTokenExpiresIn / 1000
+            maxAge: resData.data.refreshTokenExpiresIn / 1000
         });
 
         return next;
@@ -68,6 +69,5 @@ export async function POST(req: NextRequest) {
                 'Content-Type': 'application/json',
             }
         });
-
     }
 }

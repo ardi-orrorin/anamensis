@@ -1,22 +1,18 @@
 import React, {useContext, useEffect} from "react";
 import LoginProvider from "@/app/login/{services}/LoginProvider";
-import axios from "axios";
-import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {useRouter} from "next/navigation";
+import axios from "axios";
 
-const NoneAuth = () => {
 
+const NoneAuth = ({}) => {
     const {user} = useContext(LoginProvider);
-
     useEffect(() => {
         axios.post('/api/login/verify', user, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            // withCredentials: true,
         }).then(res => {
-            console.log(res)
-            window.location.replace('/user');
+            location.replace('/user');
         })
     },[]);
 

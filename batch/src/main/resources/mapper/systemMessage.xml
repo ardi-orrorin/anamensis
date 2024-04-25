@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.batch.mapper.SystemMessageMapper">
+    <select id="findByWebSysPk" resultType="SystemMessage">
+        SELECT *
+          FROM system_message
+         WHERE web_sys_pk = #{webSysPk}
+           AND is_use = 1
+    </select>
+</mapper>

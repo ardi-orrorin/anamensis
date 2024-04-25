@@ -16,13 +16,6 @@ export interface WebSysI {
     edit: boolean;
 }
 
-export enum RoleType {
-    ADMIN = 'ADMIN',
-    USER = 'USER',
-    MASTER = 'MASTER',
-    GUEST = 'GUEST'
-}
-
 export default function Page(){
 
     const [data, setData] = useState<WebSysI[]>([]);

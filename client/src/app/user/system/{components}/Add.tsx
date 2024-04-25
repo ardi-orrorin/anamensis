@@ -1,6 +1,7 @@
 import {Dispatch, SetStateAction, useState} from "react";
 import axios from "axios";
-import {RoleType, WebSysI} from "@/app/user/system/page";
+import {WebSysI} from "@/app/user/system/page";
+import {RoleType} from "@/app/user/system/{services}/types";
 
 const Add = ({
     setAdd, data

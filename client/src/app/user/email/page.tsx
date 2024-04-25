@@ -1,10 +1,10 @@
 'use client';
 
 import axios from "axios";
-import {AuthType} from "@/app/login/page";
 import React, {useEffect, useMemo, useState} from "react";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {AuthType} from "@/app/login/{services}/types";
 
 export interface UserInfoI {
     userId: string;

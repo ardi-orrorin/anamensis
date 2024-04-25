@@ -1,8 +1,10 @@
 package com.anamensis.batch.config;
 
+import com.anamensis.batch.entity.SystemMessage;
 import com.anamensis.batch.entity.UserConfigSmtp;
 import com.anamensis.batch.provider.MailProvider;
 import com.anamensis.batch.service.SmtpPushHistoryService;
+import com.anamensis.batch.service.SystemMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;
@@ -21,17 +23,23 @@ public class MailItemWriter implements ItemWriter<UserConfigSmtp> {
 
     private final SmtpPushHistoryService smtpPushHistoryService;
 
+    private final SystemMessageService smService;
+
     @Override
     public void write(Chunk<? extends UserConfigSmtp> items) throws Exception {
-        String subject = "Hello World subject";
-        String content = "Hello World body";
+
+        SystemMessage sm  = smService.findByWebSysPk("015");
+        String subject = sm.getSubject();
+        String content = sm.getContent();
+        log.info("subject: {}", items);
+
         Flux.fromIterable(items)
                 .parallel()
                 .runOn(Schedulers.boundedElastic())
                 .doOnNext(item -> {
                     new MailProvider.Builder()
                         .config(item)
-                        .message(item,subject, content)
+                        .message(item,subject, content, null)
                         .build()
                         .send()
                         .retryWhen(Retry.fixedDelay(10, Duration.ofMinutes(1)))

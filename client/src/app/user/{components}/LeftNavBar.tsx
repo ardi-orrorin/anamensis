@@ -19,6 +19,7 @@ const LeftNavBar = ({
     const menuItems = [
         {name: '로그인기록', href:'/user/history', iconComponent: <FontAwesomeIcon icon={faClockRotateLeft} width={iconSize} />},
         {name: 'SMTP', href:'/user/smtp', iconComponent: <FontAwesomeIcon icon={faEnvelope} width={iconSize} />},
+        {name: 'SMTP 발송 내역', href:'/user/smtp-history', iconComponent: <FontAwesomeIcon icon={faEnvelope} width={iconSize} />},
         {name: 'OTP', href:'/user/otp', iconComponent: <FontAwesomeIcon icon={faKey} width={iconSize} />},
         {name: 'EMAIL', href:'/user/email', iconComponent: <FontAwesomeIcon icon={faEnvelope} width={iconSize} />},
         {name: 'SYSTEM', href:'/user/system', iconComponent: <FontAwesomeIcon icon={faGear} width={iconSize} />},

@@ -1,5 +1,6 @@
 package com.anamensis.server.mapper;
 
+import com.anamensis.server.dto.Page;
 import com.anamensis.server.entity.SmtpPush;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -32,7 +33,10 @@ class SmtpPushHistoryMapperTest {
 
     @Test
     void findByUserPk() {
-        spHistoryMapper.findByUserPk(1).forEach(smtpPushHistory ->
+        Page page = new Page();
+        page.setPage(1);
+        page.setSize(10);
+        spHistoryMapper.findByUserPk(1, page).forEach(smtpPushHistory ->
                 log.info(smtpPushHistory.toString())
         );
 

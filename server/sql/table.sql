@@ -269,6 +269,8 @@ CREATE TABLE anamensis.smtp_push_history (
     user_config_smtp_pk BIGINT                  NOT NULL                           COMMENT '사용자 SMTP 설정 PK',
     subject             VARCHAR(255)            NOT NULL                           COMMENT '제목',
     content             TEXT                    NOT NULL                           COMMENT '내용',
+    status              VARCHAR(20)             NOT NULL                           COMMENT '상태',
+    message             VARCHAR(255)            NOT NULL                           COMMENT '메시지',
     create_at           TIMESTAMP               NOT NULL                           COMMENT '생성일자',
     FOREIGN KEY         (user_pk)               REFERENCES user (id),
     FOREIGN KEY         (user_config_smtp_pk)   REFERENCES user_config_smtp (id),

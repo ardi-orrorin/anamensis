@@ -9,10 +9,11 @@
           FROM smtp_push_history
          WHERE user_pk = #{userPk}
          ORDER BY create_at DESC
+         LIMIT #{page.offset}, #{page.size}
     </select>
     <select id="countByUserPk" resultType="long">
-        SELECT COUNT(*)
-          FROM smtp_push_history
+        SELECT SUM(count)
+          FROM smtp_push_history_count
          WHERE user_pk = #{userPk}
     </select>
     <select id="findById" resultType="SmtpPushHistory">
@@ -20,5 +21,4 @@
           FROM smtp_push_history
          WHERE id = #{id}
     </select>
-
 </mapper>

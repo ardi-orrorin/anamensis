@@ -22,7 +22,6 @@ public class PageArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.getParameterType().equals(Page.class);
-
     }
 
     @Override

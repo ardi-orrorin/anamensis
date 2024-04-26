@@ -1,7 +1,9 @@
 package com.anamensis.server.mapper;
 
+import com.anamensis.server.dto.Page;
 import com.anamensis.server.entity.SmtpPush;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 
@@ -12,6 +14,11 @@ class SmtpPushHistoryMapperTest {
 
     @SpyBean
     SmtpPushMapper smtpPushHistoryMapper;
+
+    @SpyBean
+    SmtpPushHistoryMapper spHistoryMapper;
+
+    Logger log = org.slf4j.LoggerFactory.getLogger(SmtpPushHistoryMapperTest.class);
 
     @Test
     void insert() {
@@ -24,4 +31,24 @@ class SmtpPushHistoryMapperTest {
         smtpPushHistoryMapper.save(smtpPushHistory);
     }
 
+    @Test
+    void findByUserPk() {
+        Page page = new Page();
+        page.setPage(1);
+        page.setSize(10);
+        spHistoryMapper.findByUserPk(1, page).forEach(smtpPushHistory ->
+                log.info(smtpPushHistory.toString())
+        );
+
+    }
+
+    @Test
+    void findById() {
+        log.info(spHistoryMapper.findById(357).orElseThrow().toString());
+    }
+
+    @Test
+    void countByUserPk() {
+        log.info(String.valueOf(spHistoryMapper.countByUserPk(1)));
+    }
 }

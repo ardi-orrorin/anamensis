@@ -29,6 +29,7 @@ public class BatchScheduledJob2 extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 
         JobParameters jobParameters = null;
+
         try {
             jobParameters = new JobParametersBuilder(this.jobExplorer)
                     .getNextJobParameters(jobRegistry.getJob("job2"))

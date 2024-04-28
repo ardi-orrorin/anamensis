@@ -46,7 +46,7 @@ public class SecurityConfig implements WebFluxConfigurer {
 
     private AuthorizeExchangeSpec authorizeExchange(AuthorizeExchangeSpec exchange) {
         return exchange
-                .pathMatchers("/public/**").permitAll()
+                .pathMatchers("/public/**", "/actuator/**").permitAll()
                 .pathMatchers("/api/**").hasAuthority("USER")
                 .pathMatchers("/admin/**").hasAuthority("ADMIN")
                 .anyExchange().authenticated();

@@ -1,7 +1,7 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import Link from "next/link";
-import {faAddressCard, faClockRotateLeft, faEnvelope, faKey} from "@fortawesome/free-solid-svg-icons";
+import {faAddressCard, faCheckToSlot, faClockRotateLeft, faEnvelope, faKey} from "@fortawesome/free-solid-svg-icons";
 import React, {useState} from "react";
 import {ModalI} from "@/app/user/{services}/modalProvider";
 import {faGear} from "@fortawesome/free-solid-svg-icons/faGear";
@@ -15,8 +15,8 @@ const LeftNavBar = ({
 }) => {
 
     const iconSize = 16;
-
     const menuItems = [
+        {name: '출석체크', href:'/user/attend', iconComponent: <FontAwesomeIcon icon={faCheckToSlot} width={iconSize} />},
         {name: '로그인기록', href:'/user/history', iconComponent: <FontAwesomeIcon icon={faClockRotateLeft} width={iconSize} />},
         {name: 'SMTP', href:'/user/smtp', iconComponent: <FontAwesomeIcon icon={faEnvelope} width={iconSize} />},
         {name: 'SMTP 발송 내역', href:'/user/smtp-history', iconComponent: <FontAwesomeIcon icon={faEnvelope} width={iconSize} />},

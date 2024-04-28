@@ -28,10 +28,8 @@ class AttendanceServiceTest {
 
     @Test
     void update() {
-
-        String result = attendanceService.update(2);
-
-        log.info("attendance: {}", result);
-
+        attendanceService.update(1)
+                .log().subscribe();
     }
+
 }

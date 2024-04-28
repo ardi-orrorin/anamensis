@@ -28,7 +28,7 @@ echo
 
 echo 'docker latest build start....'
 
-docker build --build-arg='JAR='${batch_file_name} -t batch-anamensis:latest  .
+docker build --build-arg='JAR='${batch_file_name} -t batch-anamensis:latest -f Batch-Dockerfile .
 
 echo 'docker latest build success....'
 

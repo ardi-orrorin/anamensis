@@ -18,6 +18,7 @@ public class AttendanceService {
 
     @Transactional
     public Mono<Attendance> findByUserPk(long userPk) {
+
         Optional<Attendance> attendance = attendanceMapper.findByUserPk(userPk);
 
         if(attendance.isEmpty()) {
@@ -25,11 +26,7 @@ public class AttendanceService {
             attendance = attendanceMapper.findByUserPk(userPk);
         }
 
-        return Mono.justOrEmpty(attendance)
-                   .switchIfEmpty(Mono.error(
-                           new RuntimeException("Not found userPk: " + userPk)
-                       )
-                   );
+        return Mono.justOrEmpty(attendance);
     }
 
     @Transactional
@@ -41,21 +38,23 @@ public class AttendanceService {
     @Transactional
     public Mono<Attendance> update(long userPk) {
         return Mono.just(userPk)
-                   .map(attendanceMapper::findByUserPk)
-                   .map(Optional::get)
-                   .doOnNext(attendance -> {
-                       if (attendance.getLastDate().isEqual(LocalDate.now())) {
-                           throw new RuntimeException("오늘은 이미 출석 했습니다.");
-                       }
-
-                       if (attendance.getLastDate().plusDays(1).isEqual(LocalDate.now())) {
-                           attendance.setDays(attendance.getDays() + 1);
-                       } else {
-                           attendance.setDays(1);
-                       }
-
-                       attendance.setLastDate(LocalDate.now());
-                   })
+                   .flatMap(this::findByUserPk)
+                   .doOnNext(this::updateAttendance)
                    .doOnNext(attendanceMapper::update);
+    }
+
+
+    private void updateAttendance(Attendance attendance) {
+        if (attendance.getLastDate().isEqual(LocalDate.now())) {
+            throw new RuntimeException("오늘은 이미 출석 했습니다.");
+        }
+
+        if (attendance.getLastDate().plusDays(1).isEqual(LocalDate.now())) {
+            attendance.setDays(attendance.getDays() + 1);
+        } else {
+            attendance.setDays(1);
+        }
+
+        attendance.setLastDate(LocalDate.now());
     }
 }

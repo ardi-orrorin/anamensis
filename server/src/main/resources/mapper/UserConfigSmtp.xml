@@ -20,7 +20,7 @@
     </select>
 
     <select id="isDefault" resultType="boolean">
-        SELECT EXISTS(
+        SELECT EXISTS (
                SELECT id
                  FROM user_config_smtp
                 WHERE user_pk    = #{userPk}

@@ -63,6 +63,10 @@ public class UserService implements ReactiveUserDetailsService {
                 ));
     }
 
+    public void updatePoint(long userPk, int point) {
+        userMapper.updatePoint(userPk, point);
+    }
+
     public Mono<Boolean> existsUser(UserRequest.existsUser existsUser) {
         return Mono.just(userMapper.existsUser(existsUser));
     }

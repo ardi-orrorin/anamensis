@@ -98,4 +98,9 @@ class UserMapperTest {
     void editAuth() {
         userMapper.editAuth(2, false, AuthType.NONE);
     }
+
+    @Test
+    void updatePoint() {
+        userMapper.updatePoint(1, 100);
+    }
 }

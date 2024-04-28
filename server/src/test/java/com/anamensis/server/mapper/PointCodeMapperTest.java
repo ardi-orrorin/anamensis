@@ -53,4 +53,11 @@ class PointCodeMapperTest {
 
 
     }
+
+    @Test
+    void findByName() {
+        PointCode pointCode = pointCodeMapper.findByName("attend-1").orElseThrow();
+        log.info("{}", pointCode);
+    }
+
 }

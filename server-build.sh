@@ -28,7 +28,7 @@ echo
 
 echo 'docker latest build start....'
 
-docker build --build-arg='JAR='${server_file_name} -t server-anamensis:latest  .
+docker build --build-arg='JAR='${server_file_name} -t server-anamensis:latest -f server.Dockerfile  .
 
 echo 'docker latest build success....'
 

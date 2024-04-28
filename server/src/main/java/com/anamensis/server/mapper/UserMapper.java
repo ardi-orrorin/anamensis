@@ -26,6 +26,11 @@ public interface UserMapper {
             @Param("isAuth") boolean isAuth,
             @Param("authType") AuthType authType);
 
+    void updatePoint(
+            @Param("id") long id,
+            @Param("point") int point
+    );
+
     boolean existsUser(UserRequest.existsUser existsUser);
 
     int save(User user);

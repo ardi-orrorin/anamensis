@@ -49,8 +49,10 @@
         <selectKey keyProperty="id" resultType="int" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
-        INSERT INTO user (user_id, pwd, name, email, phone, create_at)
-         VALUE (#{userId}, #{pwd}, #{name}, #{email}, #{phone}, #{createAt})
+        INSERT INTO user (user_id, pwd, name,
+                          email, phone, create_at)
+         VALUE (#{userId}, #{pwd}, #{name},
+                #{email}, #{phone}, #{createAt})
     </insert>
     <insert id="saveRole" parameterType="Role">
         INSERT INTO role (user_pk, role)
@@ -62,6 +64,13 @@
                s_auth_type = #{authType}
          WHERE id     = #{id}
     </update>
+
+    <update id="updatePoint" parameterType="Map">
+        UPDATE user
+           SET point = point + #{point}
+         WHERE id = #{id}
+    </update>
+
     <delete id="deleteRole" parameterType="Role">
         DELETE
           FROM role

@@ -44,13 +44,14 @@ public class AttendanceController {
                 .map(t -> "출석체크 완료");
     }
 
-    @GetMapping("")
-    public Mono<Attendance> findByUserPk(@AuthenticationPrincipal Mono<UserDetails> user) {
-        return user
-                .map(u -> userService.findUserByUserId(u.getUsername()))
-                .publishOn(Schedulers.boundedElastic())
-                .flatMap(u -> attendanceService.findByUserPk(u.getId()));
-    }
+//    @GetMapping("")
+//    public Mono<Attendance> findByUserPk(@AuthenticationPrincipal Mono<UserDetails> user) {
+//        return user
+//                .map(u -> userService.findUserByUserId(u.getUsername()))
+//                .publishOn(Schedulers.boundedElastic())
+//                .flatMap(u -> attendanceService.findByUserPk(u.getId()));
+//    }
+
 
     private Mono<Tuple2<Attendance, PointCode>> getPointByAttendance(Attendance attendance) {
         String name = "attend-" + (

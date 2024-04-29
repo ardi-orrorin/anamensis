@@ -2,15 +2,20 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faExclamation} from "@fortawesome/free-solid-svg-icons";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import Link from "next/link";
-import {useContext, useEffect, useMemo, useState} from "react";
+import {useContext, useEffect, useMemo, useRef, useState} from "react";
 import axios, {AxiosResponse} from "axios";
 import {ErrorResponse, LoginAuth} from "@/app/login/page";
 import LoginProvider from "@/app/login/{services}/LoginProvider";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const Login = () => {
 
-    const {user, setUser} = useContext(LoginProvider);
+    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+    const privateKey = process.env.NEXT_PUBLIC_RECAPTCHA_PRIVATE_KEY;
+    const [isRecaptcha, setIsReCaptcha] = useState<boolean>(false);
+    const recaptchaRef = useRef<ReCAPTCHA>(null);
 
+    const {user, setUser} = useContext(LoginProvider);
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
@@ -29,6 +34,7 @@ const Login = () => {
     const isNext = useMemo(() => {
         return user.username.length > 5 && user.password.length > 4;
     }, [user]);
+
 
     const goLogin = async () => {
         setLoading(true);
@@ -64,7 +70,6 @@ const Login = () => {
     });
 
 
-
     const setProps = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
 
@@ -80,6 +85,25 @@ const Login = () => {
                 use: false
             });
         }
+
+        if(!recaptchaRef.current) return;
+
+        setIsReCaptcha(false);
+        recaptchaRef.current.reset();
+    }
+
+    const onChangeReCaptchaHandler = async (value: string | null) => {
+        if (!value) return;
+
+        const url = '/api/login/google';
+        const data = {
+            secret: privateKey,
+            response: value || ""
+        };
+
+        await axios.post(url, data).then((res) => {
+            setIsReCaptcha(res.data.success);
+        })
     }
 
     return (
@@ -116,10 +140,19 @@ const Login = () => {
                           &nbsp; {error.message}
                       </span>
                 </div>
+
+                {
+                    idCheck && isNext &&
+                    <ReCAPTCHA ref={recaptchaRef}
+                               sitekey={siteKey || ""}
+                               onChange={onChangeReCaptchaHandler}
+                               className={'w-full flex justify-center py-2'}
+                    />
+                }
                 <div>
                     <button
-                        className={['w-full rounded  duration-300 text-xs text-white my-2 p-2', isNext ? 'bg-blue-300 hover:bg-blue-600' : 'bg-gray-400 hover:bg-gray-700'].join(' ')}
-                        disabled={!isNext || loading}
+                        className={['w-full rounded  duration-300 text-xs text-white my-2 p-2', isNext && isRecaptcha ? 'bg-blue-300 hover:bg-blue-600' : 'bg-gray-400 hover:bg-gray-700'].join(' ')}
+                        disabled={!isNext || loading || !isRecaptcha}
                         onSubmit={goLogin}
                         onClick={goLogin}
                     >{

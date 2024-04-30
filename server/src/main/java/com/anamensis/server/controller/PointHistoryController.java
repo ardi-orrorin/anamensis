@@ -32,7 +32,7 @@ public class PointHistoryController {
         return pointHistory
                 .zipWith(user)
                 .doOnNext(this::transUserDetailToUserPk)
-                .map(tuple -> pointHistoryService.selectByPointHistory(tuple.getT1()));
+                .flatMap(tuple -> pointHistoryService.selectByPointHistory(tuple.getT1()));
     }
 
     @PostMapping("")
@@ -44,14 +44,12 @@ public class PointHistoryController {
                 .zipWith(user)
                 .doOnNext(this::transUserDetailToUserPk)
                 .publishOn(Schedulers.boundedElastic())
-                .map(tuple -> pointHistoryService.insert(tuple.getT1()));
+                .flatMap(tuple -> pointHistoryService.insert(tuple.getT1()));
     }
 
-    private void transUserDetailToUserPk(Tuple2<PointHistory, UserDetails> tuple) {
-        long userPk = userService.findUserByUserId(
-                tuple.getT2().getUsername()
-        ).getId();
-
-        tuple.getT1().setUserPk(userPk);
+    private Mono<Void> transUserDetailToUserPk(Tuple2<PointHistory, UserDetails> tuple) {
+        return userService.findUserByUserId(tuple.getT2().getUsername())
+                .doOnNext(u -> tuple.getT1().setUserPk(u.getId()))
+                .then();
     }
 }

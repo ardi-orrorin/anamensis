@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 import java.io.OutputStream;
 import java.time.LocalDateTime;
@@ -23,7 +24,7 @@ public class EmailVerifyService {
     private final AwsSesMailProvider awsSesMailProvider;
 
     @Transactional
-    public String insert(EmailVerify emailVerify) {
+    public Mono<String> insert(EmailVerify emailVerify) {
         String code = emailVerifyProvider.generateCode();
 
         emailVerify.setCode(code);
@@ -40,11 +41,11 @@ public class EmailVerifyService {
             throw new RuntimeException("send email failed");
         }
 
-        return code;
+        return Mono.just(code);
     }
 
     @Transactional
-    public boolean updateIsUse(EmailVerify emailVerify) {
+    public Mono<Boolean> updateIsUse(EmailVerify emailVerify) {
         emailVerify.setExpireAt(LocalDateTime.now());
 
         System.out.println(emailVerify);
@@ -56,7 +57,7 @@ public class EmailVerifyService {
 
         int result = emailVerifyMapper.updateIsUse(email);
 
-        return result == 1;
+        return Mono.just(result == 1);
     }
 
 }

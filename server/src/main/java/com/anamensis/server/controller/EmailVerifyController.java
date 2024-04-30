@@ -22,13 +22,14 @@ public class  EmailVerifyController {
     @PublicAPI
     @PostMapping("email")
     public Mono<String> verify(@RequestBody Mono<EmailVerify> email) {
-        return email.map(emailVerifyService::insert);
+
+        return email.flatMap(emailVerifyService::insert);
     }
 
     @PublicAPI
     @PostMapping("verifyCode")
     public Mono<Boolean> verifyCode(@RequestBody Mono<EmailVerify> email) {
-        return email.map(emailVerifyService::updateIsUse);
+        return email.flatMap(emailVerifyService::updateIsUse);
     }
 
 

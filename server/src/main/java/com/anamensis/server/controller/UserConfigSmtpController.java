@@ -27,7 +27,7 @@ public class UserConfigSmtpController {
             @AuthenticationPrincipal Mono<UserDetails> user
     ) {
         return user
-                .map(u -> userService.findUserByUserId(u.getUsername()))
+                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
                 .map(u -> userConfigSmtpService.selectByUserPk(u.getId()))
                 .flatMap(Flux::collectList)
                 .map(r -> PageResponse.<UserConfigSmtp>builder()
@@ -51,7 +51,7 @@ public class UserConfigSmtpController {
             @AuthenticationPrincipal Mono<UserDetails> user
     ) {
         return user
-                .map(u -> userService.findUserByUserId(u.getUsername()))
+                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
                 .zipWith(userConfigSmtp)
                 .map(t -> UserConfigSmtpRequest.UserConfigSmtp.fromEntity(t.getT2(), t.getT1()))
                 .flatMap(userConfigSmtpService::save);
@@ -63,7 +63,7 @@ public class UserConfigSmtpController {
             @AuthenticationPrincipal Mono<UserDetails> user
     ) {
         return user
-                .map(u -> userService.findUserByUserId(u.getUsername()))
+                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
                 .zipWith(userConfigSmtp)
                 .doOnNext(t -> t.getT2().setUserPk(t.getT1().getId()))
                 .flatMap(t -> userConfigSmtpService.update(t.getT2()));
@@ -74,7 +74,7 @@ public class UserConfigSmtpController {
             @PathVariable long id,
             @AuthenticationPrincipal Mono<UserDetails> user
     ) {
-        return user.map(u -> userService.findUserByUserId(u.getUsername()))
+        return user.flatMap(u -> userService.findUserByUserId(u.getUsername()))
                    .flatMap(u -> userConfigSmtpService.disabled(id, u.getId()));
     }
 

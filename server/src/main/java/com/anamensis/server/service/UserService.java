@@ -19,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 
 import java.time.LocalDateTime;
@@ -32,9 +33,9 @@ public class UserService implements ReactiveUserDetailsService {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public User findUserByUserId(String userId) {
-        return userMapper.findUserByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public Mono<User> findUserByUserId(String userId) {
+        return Mono.justOrEmpty(userMapper.findUserByUserId(userId))
+                .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
     }
 
     public Mono<User> findUserByUserId(String userId, String pwd) {
@@ -63,8 +64,9 @@ public class UserService implements ReactiveUserDetailsService {
                 ));
     }
 
-    public void updatePoint(long userPk, int point) {
+    public Mono<Void> updatePoint(long userPk, int point) {
         userMapper.updatePoint(userPk, point);
+        return Mono.empty();
     }
 
     public Mono<Boolean> existsUser(UserRequest.existsUser existsUser) {
@@ -82,33 +84,38 @@ public class UserService implements ReactiveUserDetailsService {
                    .doOnNext(u -> u.setPwd(bCryptPasswordEncoder.encode(u.getPwd())))
                    .doOnNext(u -> u.setCreateAt(LocalDateTime.now()))
                    .doOnNext(userMapper::save)
-                   .doOnNext(u -> userMapper.saveRole(generateRole(u, RoleType.USER)))
+                   .publishOn(Schedulers.boundedElastic())
+                   .doOnNext(u -> generateRole(u, RoleType.USER)
+                           .doOnNext(userMapper::saveRole)
+                           .subscribe()
+                   )
                    .onErrorMap(e -> new DuplicateUserException(e.getMessage(), HttpStatus.BAD_REQUEST));
     }
 
     @Transactional
-    public Integer saveRole(Tuple2<UserDetails, RoleType> tuple) {
+    public Mono<Integer> saveRole(Tuple2<UserDetails, RoleType> tuple) {
         return tuple.mapT1(ud -> findUserByUserId(ud.getUsername()))
-                .mapT1(user -> generateRole(user, tuple.getT2()))
-                .mapT1(userMapper::saveRole)
+                .mapT1(user -> user.flatMap(u -> generateRole(u, tuple.getT2()))
+                )
+                .mapT1(user -> user.map(userMapper::saveRole))
                 .getT1();
 
     }
 
     @Transactional
-    public Integer deleteRole(Tuple2<UserDetails, RoleType> tuple) {
+    public Mono<Integer> deleteRole(Tuple2<UserDetails, RoleType> tuple) {
         return tuple.mapT1(ud -> findUserByUserId(ud.getUsername()))
-                .mapT1(user -> generateRole(user, tuple.getT2()))
-                .mapT1(userMapper::deleteRole)
+                .mapT1(user -> user.flatMap(u -> generateRole(u, tuple.getT2())))
+                .mapT1(user -> user.map(userMapper::deleteRole))
                 .getT1();
     }
 
 
-    private Role generateRole(User user, RoleType roleType) {
+    private Mono<Role> generateRole(User user, RoleType roleType) {
         Role role = new Role();
         role.setUserPk(user.getId());
         role.setRole(roleType);
-        return role;
+        return Mono.just(role);
     }
 
 }

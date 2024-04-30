@@ -40,7 +40,7 @@ public class ShareLinkController {
             @AuthenticationPrincipal Mono<UserDetails> user
     ) {
 
-        return user.map(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
+        return user.flatMap(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
                    .zipWith(Mono.just(page))
                    .map(shareLinkService::selectAll)
                    .map(t -> PageResponse.<ShareLink>builder()
@@ -58,10 +58,10 @@ public class ShareLinkController {
 
         return Mono.zip(shareLink, user)
                 .publishOn(Schedulers.parallel())
-                .map(tuple -> Tuples.of(
-                        tuple.getT1(),
+                .flatMap(tuple ->
                         userService.findUserByUserId(tuple.getT2().getUsername())
-                ))
+                                .map(u -> Tuples.of(tuple.getT1(), u))
+                )
                 .map(tuple -> shareLinkService.insert(tuple.getT1().getLink(), tuple.getT2()))
                 .publishOn(Schedulers.parallel())
                 .map(ShareLinkResponse.ShareLink::transToShareLink);
@@ -74,10 +74,10 @@ public class ShareLinkController {
     ) {
         return shareLink.zipWith(user)
                 .publishOn(Schedulers.parallel())
-                .map(tuple ->
-                        tuple.mapT2(u ->
-                            userService.findUserByUserId(u.getUsername())
-                ))
+                .flatMap(tuple ->
+                    userService.findUserByUserId(tuple.getT2().getUsername())
+                               .map(u -> Tuples.of(tuple.getT1(), u))
+                )
                 .map(shareLinkService::updateUse)
                 .publishOn(Schedulers.parallel())
                 .map(ShareLinkResponse.Use::of);

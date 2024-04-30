@@ -8,6 +8,8 @@ import com.anamensis.server.provider.FilePathProvider;
 import com.anamensis.server.provider.FileProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,8 +60,6 @@ public class FileService {
 
     public Mono<String> saveProfile(User user, FilePart filePart) {
 
-        log.info("user: {}", user);
-
         String ext = filePart.filename().substring(filePart.filename().lastIndexOf(".")+1);
 
         FilePathDto filepath = filePathProvider.changePath(
@@ -68,7 +68,6 @@ public class FileService {
                 200,200, ext
         );
 
-        java.io.File file = new java.io.File(filePart.filename());
         File fileEntity = File.builder()
                 .fileName(filepath.file())
                 .filePath(filepath.path())
@@ -78,20 +77,21 @@ public class FileService {
                 .createAt(LocalDateTime.now())
                 .build();
 
-        return filePart.transferTo(file)
-                .then(Mono.defer(() -> saveS3(filePart, file, filepath.path()))
-                .then(Mono.just(fileMapper.insert(fileEntity))))
+
+        return DataBufferUtils.join(filePart.content())
+                .flatMap(b -> saveS3(filePart, b, filepath.path()))
+                .then(Mono.fromCallable(() -> fileMapper.insert(fileEntity)))
                 .then(Mono.just(filepath.path()));
     }
 
-    private Mono<Void> saveS3(FilePart filePart, java.io.File file, String path) {
+    private Mono<Void> saveS3(FilePart filePart, DataBuffer data, String path) {
         PutObjectRequest req = PutObjectRequest.builder()
                 .bucket("anamensis")
                 .key(path.substring(1))
                 .contentType(filePart.headers().getContentType().getType())
                 .build();
 
-        s3Client.putObject(req, RequestBody.fromFile(file));
+        s3Client.putObject(req, RequestBody.fromInputStream(data.asInputStream(), data.readableByteCount()));
 
         return Mono.empty();
     }

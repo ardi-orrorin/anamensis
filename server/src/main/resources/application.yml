@@ -18,6 +18,7 @@ spring:
   servlet:
     multipart:
       max-request-size: 10MB
+
   profiles:
     active: local
   data:
@@ -31,10 +32,20 @@ spring:
       flush-mode: on_save
       namespace: spring
 
+  cloud:
+    aws:
+      credentials:
+        access-key: access-key
+        secret-key: scret-key
+      s3:
+        enabled: true
+        region: ap-northeast-2
+
 logging:
   level:
     mapper:
       mybatis: debug
+
 email:
   host: smtp.gmail.com
   port: 587

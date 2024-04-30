@@ -22,6 +22,9 @@ repositories {
 }
 
 dependencies {
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.1.0'
+
+
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     implementation 'org.springframework.boot:spring-boot-starter-security'

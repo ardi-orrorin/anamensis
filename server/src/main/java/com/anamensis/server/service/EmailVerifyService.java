@@ -5,12 +5,10 @@ import com.anamensis.server.mapper.EmailVerifyMapper;
 import com.anamensis.server.provider.AwsSesMailProvider;
 import com.anamensis.server.provider.EmailVerifyProvider;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
-import java.io.OutputStream;
 import java.time.LocalDateTime;
 
 @Service
@@ -36,12 +34,11 @@ public class EmailVerifyService {
         if(result == 0) throw new RuntimeException("insert failed");
 
         try {
-            awsSesMailProvider.verifyEmail(code, emailVerify.getEmail());
+            return awsSesMailProvider.verifyEmail(code, emailVerify.getEmail())
+                    .then(Mono.defer(() -> Mono.just(code)));
         } catch (Exception e) {
-            throw new RuntimeException("send email failed");
+            throw new RuntimeException(e.getMessage());
         }
-
-        return Mono.just(code);
     }
 
     @Transactional

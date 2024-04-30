@@ -22,16 +22,20 @@ public class AttendanceService {
         Optional<Attendance> attendance = attendanceMapper.findByUserPk(userPk);
 
         if(attendance.isEmpty()) {
-            this.init(userPk);
-            attendance = attendanceMapper.findByUserPk(userPk);
+            return this.init(userPk)
+                    .then(Mono.defer(() ->
+                            Mono.justOrEmpty(attendanceMapper.findByUserPk(userPk))
+                        )
+                    );
         }
 
         return Mono.justOrEmpty(attendance);
     }
 
     @Transactional
-    public void init(long userPk) {
+    public Mono<Void> init(long userPk) {
         attendanceMapper.init(userPk, LocalDate.now());
+        return Mono.empty();
     }
 
 
@@ -44,7 +48,7 @@ public class AttendanceService {
     }
 
 
-    private void updateAttendance(Attendance attendance) {
+    private Mono<Void> updateAttendance(Attendance attendance) {
         if (attendance.getLastDate().isEqual(LocalDate.now())) {
             throw new RuntimeException("오늘은 이미 출석 했습니다.");
         }
@@ -56,5 +60,6 @@ public class AttendanceService {
         }
 
         attendance.setLastDate(LocalDate.now());
+        return Mono.empty();
     }
 }

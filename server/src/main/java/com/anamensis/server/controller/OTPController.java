@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.function.Tuples;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,20 +22,22 @@ public class OTPController {
     @GetMapping("")
     public Mono<String> generate(@AuthenticationPrincipal Mono<UserDetails> user){
         return user
-                .map(u -> userService.findUserByUserId(u.getUsername()))
+                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext(u -> {
+                    //check otp already exist
                     otpService.selectByUserPk(u.getId())
-                            .ifPresent((otp)-> {
-                                throw new RuntimeException("already exist");
-                            });
+                            .doOnSuccess(otp -> {
+                                new RuntimeException("already exist");
+                            }).subscribe();
                 })
-                .map(otpService::insert);
+                .flatMap(otpService::insert);
     }
 
     @GetMapping("/exist")
     public Mono<Boolean> exist(@AuthenticationPrincipal Mono<UserDetails> user){
-        return user.map(u -> userService.findUserByUserId(u.getUsername()))
-                .map(u -> otpService.existByUserPk(u.getId()));
+        return user.flatMap(u -> userService.findUserByUserId(u.getUsername()))
+                .flatMap(u -> otpService.existByUserPk(u.getId()));
     }
 
     @PostMapping("/verify")
@@ -43,10 +46,11 @@ public class OTPController {
             @RequestBody Mono<Integer> code
     ){
         return user.zipWith(code)
-                .map(tuple ->
-                    tuple.mapT1(u -> otpService.selectByUserId(u.getUsername()))
+                .flatMap(tuple ->
+                    otpService.selectByUserId(tuple.getT1().getUsername())
+                            .map(t -> Tuples.of(t, tuple.getT2()))
                 )
-                .map(otpService::verify)
+                .flatMap(otpService::verify)
                 .flatMap(t -> userService.editAuth(t.getT1().getUserPk(), true, AuthType.OTP))
                 .map(t -> t ? "success" : "fail");
     }
@@ -54,7 +58,7 @@ public class OTPController {
     @PutMapping("/disable")
     public Mono<String> disable(@AuthenticationPrincipal Mono<UserDetails> user){
         return user
-                .map(u -> userService.findUserByUserId(u.getUsername()))
+                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
                 .publishOn(Schedulers.boundedElastic())
                 .flatMap(u -> otpService.disableOTP(u.getId()))
                 .flatMap(t -> userService.editAuth(t.getT1(), false, AuthType.NONE))

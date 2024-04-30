@@ -17,12 +17,12 @@ public class PointController {
 
     @GetMapping("")
     public Mono<List<PointCode>> selectAll() {
-        return Mono.just(pointService.selectAll());
+        return pointService.selectAll();
     }
 
     @GetMapping("/search")
     public Mono<List<PointCode>> selectByIdOrName(Mono<PointCode> pointCode) {
-        return pointCode.map(pointService::selectByIdOrName);
+        return pointCode.flatMap(pointService::selectByIdOrName);
     }
 
     @PostMapping("")

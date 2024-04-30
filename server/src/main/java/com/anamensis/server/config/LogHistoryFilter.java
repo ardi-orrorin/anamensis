@@ -94,7 +94,7 @@ public class LogHistoryFilter implements WebFilter {
         return bytes;
     }
 
-    private void logWrite(byte[] bytes, ServerWebExchange ex, Principal principal, WebSession session) {
+    private Mono<Void> logWrite(byte[] bytes, ServerWebExchange ex, Principal principal, WebSession session) {
         String path = ex.getRequest().getPath().toString();
         String body = new String(bytes, StandardCharsets.UTF_8);
         String header = ex.getRequest().getHeaders().toString();
@@ -105,26 +105,26 @@ public class LogHistoryFilter implements WebFilter {
         String URI = ex.getRequest().getURI().toString();
         String user = principal.getName();
         String sessionId = session.getId();
-        long userPK = userService.findUserByUserId(user).getId();
 
-        LogHistory logHistory = LogHistory.builder()
-                .userPk(userPK)
-                .method(method)
-                .path(path)
-                .uri(URI)
-                .body(body)
-                .query(query)
-                .localAddress(localAddr)
-                .headers(header)
-                .remoteAddress(remoteAddr)
-                .session(sessionId)
-                .createAt(LocalDateTime.now())
-                .build();
-
-        Mono.just(logHistory)
+        return userService.findUserByUserId(user)
+                .map(u ->
+                    LogHistory.builder()
+                            .userPk(u.getId())
+                            .method(method)
+                            .path(path)
+                            .uri(URI)
+                            .body(body)
+                            .query(query)
+                            .localAddress(localAddr)
+                            .headers(header)
+                            .remoteAddress(remoteAddr)
+                            .session(sessionId)
+                            .createAt(LocalDateTime.now())
+                            .build()
+                )
                 .subscribeOn(Schedulers.boundedElastic())
                 .doOnNext(logHistoryService::save)
-                .subscribe();
+                .then();
     }
 
     private ServerWebExchange newRequest(byte[] bytes, ServerWebExchange ex) {

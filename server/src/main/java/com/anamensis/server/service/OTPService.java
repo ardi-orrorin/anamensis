@@ -24,18 +24,17 @@ public class OTPService {
 
     private final GoogleAuthenticator gAuth;
 
-    public OTP selectByUserId(String userId) {
-        return otpMapper.selectByUserId(userId).orElseThrow(() ->
-                new RuntimeException("not found")
-        );
+    public Mono<OTP> selectByUserId(String userId) {
+        return Mono.justOrEmpty(otpMapper.selectByUserId(userId))
+                   .switchIfEmpty(Mono.error(new RuntimeException("not found")));
     }
 
-    public Optional<OTP> selectByUserPk(long userPk) {
-        return otpMapper.selectByUserPk(userPk);
+    public Mono<OTP> selectByUserPk(long userPk) {
+        return Mono.justOrEmpty(otpMapper.selectByUserPk(userPk));
     }
 
     @Transactional
-    public String insert(User user) {
+    public Mono<String> insert(User user) {
         GoogleAuthenticatorKey key = gAuth.createCredentials();
 
         OTP otp = new OTP();
@@ -49,14 +48,16 @@ public class OTPService {
             throw new RuntimeException("insert fail");
         }
 
-        return GoogleAuthenticatorQRGenerator.getOtpAuthURL("Anamensis", user.getUserId(), key);
+        String url = GoogleAuthenticatorQRGenerator.getOtpAuthURL("Anamensis", user.getUserId(), key);
+
+        return Mono.just(url);
     }
 
     @Transactional
-    public boolean update(OTP otp) {
+    public Mono<Boolean> update(OTP otp) {
         otp.setUse(false);
         int result = otpMapper.update(otp);
-        return result == 1;
+        return Mono.just(result == 1);
     }
 
 
@@ -67,14 +68,14 @@ public class OTPService {
         return Mono.zip(Mono.just(userPk), Mono.just(true));
     }
 
-    public boolean existByUserPk(long userPk) {
-        return otpMapper.existByUserPk(userPk);
+    public Mono<Boolean> existByUserPk(long userPk) {
+        return Mono.just(otpMapper.existByUserPk(userPk));
     }
 
     @Transactional
-    public Tuple2<OTP, Boolean> verify(Tuple2<OTP, Integer> tuple) {
-        return tuple.mapT2(otp ->
-                gAuth.authorize(tuple.getT1().getHash(), tuple.getT2()));
+    public Mono<Tuple2<OTP, Boolean>> verify(Tuple2<OTP, Integer> tuple) {
+        return Mono.just(tuple.mapT2(otp ->
+                gAuth.authorize(tuple.getT1().getHash(), tuple.getT2())));
     }
 
 }

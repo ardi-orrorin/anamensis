@@ -15,12 +15,12 @@ public class PointService {
 
     private final PointCodeMapper pointCodeMapper;
 
-    public List<PointCode> selectAll() {
-        return pointCodeMapper.selectAll();
+    public Mono<List<PointCode>> selectAll() {
+        return Mono.just(pointCodeMapper.selectAll());
     }
 
-    public List<PointCode> selectByIdOrName(PointCode pointCode) {
-        return pointCodeMapper.selectByIdOrName(pointCode);
+    public Mono<List<PointCode>> selectByIdOrName(PointCode pointCode) {
+        return Mono.just(pointCodeMapper.selectByIdOrName(pointCode));
     }
 
     public Mono<PointCode> findByName(String name) {

@@ -5,6 +5,7 @@ import com.anamensis.server.mapper.PointHistoryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -14,17 +15,17 @@ public class PointHistoryService {
 
     private final PointHistoryMapper pointHistoryMapper;
 
-    public List<PointHistory> selectByPointHistory(PointHistory pointHistory) {
-        return pointHistoryMapper.selectByPointHistory(pointHistory);
+    public Mono<List<PointHistory>> selectByPointHistory(PointHistory pointHistory) {
+        return Mono.just(pointHistoryMapper.selectByPointHistory(pointHistory));
     }
 
     @Transactional
-    public boolean insert(PointHistory pointHistory) {
+    public Mono<Boolean> insert(PointHistory pointHistory) {
         int result = pointHistoryMapper.insert(pointHistory);
 
         if (result != 1 ) throw new RuntimeException("insert 실패");
 
-        return true;
+        return Mono.just(true);
     }
 
 }

@@ -1,7 +1,10 @@
 package com.anamensis.server.controller;
 
 
-import com.anamensis.server.dto.*;
+import com.anamensis.server.dto.Device;
+import com.anamensis.server.dto.Page;
+import com.anamensis.server.dto.PageResponse;
+import com.anamensis.server.dto.Token;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.dto.response.LoginHistoryResponse;
 import com.anamensis.server.dto.response.UserResponse;
@@ -13,7 +16,6 @@ import com.anamensis.server.provider.TokenProvider;
 import com.anamensis.server.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,7 +26,6 @@ import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 
 @RequiredArgsConstructor
@@ -51,7 +52,8 @@ public class UserController {
                        if(AuthType.EMAIL.equals(u.getSAuthType())) {
                            EmailVerify emailVerify = new EmailVerify();
                            emailVerify.setEmail(u.getEmail());
-                           emailVerifyService.insert(emailVerify);
+                           emailVerifyService.insert(emailVerify)
+                                   .subscribe();
                        }
                    })
                    .map(u -> UserResponse.Auth.builder()
@@ -84,7 +86,7 @@ public class UserController {
             @Valid @RequestBody
             Mono<UserRequest.Register> user
     ) {
-        return  userService.saveUser(user)
+        return userService.saveUser(user)
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(u -> attendanceService.init(u.getId()))
                 .map(u -> UserResponse.Status
@@ -107,23 +109,23 @@ public class UserController {
         @AuthenticationPrincipal Mono<UserDetails> userDetails
     ) {
         return userDetails
-                .map(user -> userService.findUserByUserId(user.getUsername()))
+                .flatMap(user -> userService.findUserByUserId(user.getUsername()))
                 .zipWith(Mono.just(page))
                 .map(t -> t.mapT2(p -> {
-                    p.setTotal(loginHistoryService.count(t.getT1().getId()));
+                    loginHistoryService.count(t.getT1().getId())
+                            .doOnNext(p::setTotal)
+                            .subscribe();
                     return p;
                 }))
-                .map(t -> t.mapT1(user -> loginHistoryService.selectAll(user, t.getT2())))
                 .publishOn(Schedulers.boundedElastic())
-                .map(t -> t.mapT1(his ->
-                        his.stream().map(LoginHistoryResponse.LoginHistory::from)
-                    )
-                )
+                .map(t -> Tuples.of(loginHistoryService.selectAll(t.getT1(), t.getT2()), t.getT2()))
+                .map(t -> t.mapT1(t1 -> t1.map(LoginHistoryResponse.LoginHistory::from).collectList()))
                 .publishOn(Schedulers.boundedElastic())
-                .map(t -> PageResponse.<LoginHistoryResponse.LoginHistory>builder()
+                .flatMap(t -> t.getT1().map(t1 ->
+                        PageResponse.<LoginHistoryResponse.LoginHistory>builder()
                         .page(t.getT2())
-                        .content(t.getT1().toList())
-                        .build()
+                        .content(t1)
+                        .build())
                 );
     }
 
@@ -139,8 +141,8 @@ public class UserController {
             @AuthenticationPrincipal Mono<UserDetails> userDetails
     ) {
         return userDetails
-                .map(user -> userService.findUserByUserId(user.getUsername()))
-                .map(UserResponse.MyPage::transToMyPage);
+                .flatMap(user -> userService.findUserByUserId(user.getUsername()))
+                .flatMap(u -> Mono.just(UserResponse.MyPage.transToMyPage(u)));
     }
 
     @PutMapping("s-auth")
@@ -149,10 +151,9 @@ public class UserController {
             @AuthenticationPrincipal Mono<UserDetails> userDetails
     ) {
         return userDetails
-                .map(u -> userService.findUserByUserId(u.getUsername()))
-                .map(u -> userService.editAuth(u.getId(), auth.isSauth(), AuthType.fromString(auth.getSauthType())))
-                .publishOn(Schedulers.boundedElastic())
-                .map(u -> UserResponse.Status.transToStatus(HttpStatus.OK, "Success"));
+                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
+                .flatMap(u -> userService.editAuth(u.getId(), auth.isSauth(), AuthType.fromString(auth.getSauthType())))
+                .flatMap($ -> Mono.just(UserResponse.Status.transToStatus(HttpStatus.OK, "Success")));
 
     }
 
@@ -161,10 +162,10 @@ public class UserController {
             Device device
     ){
         return Mono.just(user)
-                .map(u -> userService.findUserByUserId(u.getUsername()))
+                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
                 .flatMap(u -> userService.findUserInfo(u.getUserId()))
                 .publishOn(Schedulers.boundedElastic())
-                .doOnNext(u -> loginHistoryService.save(device, u.getUser()))
+                .doOnNext(u -> loginHistoryService.save(device, u.getUser()).subscribe())
                 .map(u -> Tuples.of(u, generateToken(u.getUser().getUserId())))
                 .map(t -> UserResponse.Login.transToLogin(t.getT1(), t.getT2()));
     }
@@ -174,7 +175,6 @@ public class UserController {
             Device device
     ) {
         return Mono.just(user)
-                .doOnNext(u -> userService.findUserByUserId(u.getUsername()))
                 .flatMap(u -> userService.findUserInfo(u.getUsername()))
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(u -> {
@@ -183,9 +183,10 @@ public class UserController {
                     emailVerify.setCode(String.valueOf(user.getCode()));
                     emailVerify.setExpireAt(LocalDateTime.now());
 
-                    emailVerifyService.updateIsUse(emailVerify);
+                    emailVerifyService.updateIsUse(emailVerify)
+                            .subscribe();
                 })
-                .doOnNext(u -> loginHistoryService.save(device, u.getUser()))
+                .doOnNext(u -> loginHistoryService.save(device, u.getUser()).subscribe())
                 .publishOn(Schedulers.boundedElastic())
                 .map(u -> Tuples.of(u, generateToken(u.getUser().getUserId())))
                 .map(t -> UserResponse.Login.transToLogin(t.getT1(), t.getT2()));
@@ -196,17 +197,25 @@ public class UserController {
             Device device
     ) {
         return Mono.just(user)
-                .map(u -> userService.findUserByUserId(u.getUsername()))
-                .flatMap(u -> transToTuple2(u, otpService.selectByUserPk(u.getId())))
+                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
+                .flatMap(u ->
+                    otpService.selectByUserPk(u.getId())
+                                    .flatMap(otp -> transToTuple2(u, otp))
+                )
+                .publishOn(Schedulers.boundedElastic())
                 .map(t -> t.mapT2(m2 -> Tuples.of(m2, user.getCode())))
                 .map(t -> t.mapT2(otpService::verify))
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext(t -> {
-                    if(!t.getT2().getT2()) {
-                        throw new RuntimeException("OTP 인증에 실패하였습니다.");
-                    }
+                    // todo: 다시 체크
+                    t.getT2().doOnNext(u -> {
+                        if(!u.getT2()) {
+                            throw new RuntimeException("OTP 인증에 실패하였습니다.");
+                        }
+                    }).subscribe();
                 })
                 .publishOn(Schedulers.boundedElastic())
-                .doOnNext(u -> loginHistoryService.save(device, u.getT1()))
+                .doOnNext(u -> loginHistoryService.save(device, u.getT1()).subscribe())
                 .map(t -> t.mapT2(m2 -> generateToken(t.getT1().getUserId())))
                 .map(t -> t.mapT1(m1 -> userService.findUserInfo(m1.getUserId())))
                 .publishOn(Schedulers.boundedElastic())
@@ -217,9 +226,8 @@ public class UserController {
     }
 
 
-    private Mono<Tuple2<User, OTP>> transToTuple2(User user, Optional<OTP> otp) {
-        OTP otp1 = otp.orElseThrow(() -> new RuntimeException("OTP 정보가 없습니다."));
-        return Mono.zip(Mono.just(user), Mono.just(otp1));
+    private Mono<Tuple2<User, OTP>> transToTuple2(User user, OTP otp) {
+        return Mono.zip(Mono.just(user), Mono.just(otp));
     }
 
     private Token generateToken(String userId) {

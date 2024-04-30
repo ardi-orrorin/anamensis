@@ -34,13 +34,15 @@ public class AttendanceController {
             @AuthenticationPrincipal Mono<UserDetails> user
     ) {
         return user
-                .map(u -> userService.findUserByUserId(u.getUsername()))
+                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
                 .flatMap(u -> attendanceService.update(u.getId()))
                 .flatMap(this::getPointByAttendance)
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext(t -> userService.updatePoint(
                         t.getT1().getUserPk(),
                         (int) t.getT2().getValue()
-                ))
+                    ).subscribe()
+                )
                 .map(t -> "출석체크 완료");
     }
 

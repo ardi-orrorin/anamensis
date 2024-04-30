@@ -18,10 +18,7 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -60,7 +57,7 @@ public class FileService {
 
     public Mono<String> saveProfile(User user, FilePart filePart) {
 
-        String ext = filePart.filename().substring(filePart.filename().lastIndexOf(".")+1);
+        String ext = filePart.filename().substring(filePart.filename().lastIndexOf(".") + 1);
 
         FilePathDto filepath = filePathProvider.changePath(
                 FilePathProvider.RootType.PROFILE,
@@ -76,7 +73,6 @@ public class FileService {
                 .tableRefPk(user.getId())
                 .createAt(LocalDateTime.now())
                 .build();
-
 
         return DataBufferUtils.join(filePart.content())
                 .flatMap(b -> saveS3(filePart, b, filepath.path()))
@@ -95,7 +91,6 @@ public class FileService {
 
         return Mono.empty();
     }
-
 }
 
 

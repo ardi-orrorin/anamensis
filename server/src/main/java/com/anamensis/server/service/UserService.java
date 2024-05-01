@@ -103,6 +103,12 @@ public class UserService implements ReactiveUserDetailsService {
     }
 
     @Transactional
+    public Mono<Boolean> updateUser(User user) {
+        return Mono.just(userMapper.update(user))
+                .map(i -> i == 1);
+    }
+
+    @Transactional
     public Mono<Integer> deleteRole(Tuple2<UserDetails, RoleType> tuple) {
         return tuple.mapT1(ud -> findUserByUserId(ud.getUsername()))
                 .mapT1(user -> user.flatMap(u -> generateRole(u, tuple.getT2())))

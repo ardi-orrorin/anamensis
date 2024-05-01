@@ -18,4 +18,27 @@
          WHERE file_name = #{fileName}
            AND is_use    = 1
     </select>
+
+    <select id="findByTableNameAndTableRefPk" resultType="File">
+        SELECT f.id,
+               f.table_code_pk,
+               f.table_ref_pk,
+               f.org_file_name,
+               f.file_name,
+               f.file_path,
+               f.create_at,
+               f.is_use
+          FROM file f
+          JOIN table_code tc
+            ON f.table_code_pk = tc.id
+         WHERE tc.table_name   = #{tableName}
+           AND f.table_ref_pk  = #{tableRefPk}
+           AND f.is_use        = 1
+    </select>
+
+    <update id="updateIsUseById" parameterType="Map">
+        UPDATE file
+           SET is_use = #{isUse}
+         WHERE id     = #{id}
+    </update>
 </mapper>

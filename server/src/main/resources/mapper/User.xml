@@ -71,6 +71,14 @@
          WHERE id = #{id}
     </update>
 
+    <update id="update" parameterType="User">
+        UPDATE user
+           SET name  = #{name},
+               email = #{email},
+               phone = #{phone}
+         WHERE id    = #{id}
+    </update>
+
     <delete id="deleteRole" parameterType="Role">
         DELETE
           FROM role

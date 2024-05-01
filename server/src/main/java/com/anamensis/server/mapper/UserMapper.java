@@ -38,4 +38,6 @@ public interface UserMapper {
     int saveRole(Role role);
 
     int deleteRole(Role role);
+
+    int update(User user);
 }

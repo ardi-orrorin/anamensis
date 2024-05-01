@@ -87,9 +87,6 @@ public class UserResponse {
             return my;
         }
     }
-
-
-
     @Getter
     public static class Status {
         private final HttpStatus status;

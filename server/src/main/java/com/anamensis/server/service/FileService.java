@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -44,8 +45,8 @@ public class FileService {
                 .onErrorMap(RuntimeException::new);
     }
 
-    public Mono<File> findByTableNameAndTableRefPk(String tableName, long tableRefPk) {
-        return Mono.justOrEmpty(fileMapper.findByTableNameAndTableRefPk(tableName, tableRefPk));
+    public Mono<Optional<File>> findByTableNameAndTableRefPk(String tableName, long tableRefPk) {
+        return Mono.just(fileMapper.findByTableNameAndTableRefPk(tableName, tableRefPk));
     }
 
 
@@ -80,12 +81,12 @@ public class FileService {
                 .createAt(LocalDateTime.now())
                 .build();
 
-        return this.findByTableNameAndTableRefPk("user", user.getId())
+        return Mono.just(fileMapper.findByTableNameAndTableRefPk("user", user.getId()))
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(file -> {
-                    if(file != null) { // 이미 파일이 있는 경우 삭제
-                        fileMapper.updateIsUseById(file.getId(), 0);
-                        awsS3Provider.deleteS3(file.getFilePath())
+                    if(file.isPresent()) { // 이미 파일이 있는 경우 삭제
+                        fileMapper.updateIsUseById(file.get().getId(), 0);
+                        awsS3Provider.deleteS3(file.get().getFilePath())
                                 .subscribe();
                     }
                 })

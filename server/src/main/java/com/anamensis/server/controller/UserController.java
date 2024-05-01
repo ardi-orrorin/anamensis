@@ -141,8 +141,7 @@ public class UserController {
         return userDetails
                 .flatMap(user -> userService.findUserByUserId(user.getUsername()))
                 .flatMap(user -> fileService.findByTableNameAndTableRefPk("user", user.getId()))
-                .switchIfEmpty(Mono.just(File.builder().filePath("").build()))
-                .map(File::getFilePath);
+                .map(file -> file.map(File::getFilePath).orElseGet(()->""));
     }
 
 

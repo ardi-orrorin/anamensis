@@ -36,7 +36,7 @@ class OTPServiceTest {
 
     @Test
     void insert() {
-        User user = userService.findUserByUserId("admin");
+        User user = userService.findUserByUserId("admin").block();
 //        otpService.insert(user.getId());
 
 

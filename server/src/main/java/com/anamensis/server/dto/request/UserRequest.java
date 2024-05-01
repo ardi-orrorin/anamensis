@@ -92,4 +92,20 @@ public class UserRequest {
         @NotNull(message = "SAuthType is required")
         private String sauthType;
     }
+
+    @Getter
+    @Setter
+    public static class Profile {
+
+        @NotNull(message = "Name is required")
+        private String name;
+
+        @NotNull(message = "Email is required")
+        @Pattern(regexp = "^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$", message = "Invalid email")
+        private String email;
+
+        @NotNull(message = "Phone number is required")
+        @Pattern(regexp = "^01(?:0|1|[6-9])-(?:\\d{3}|\\d{4})-\\d{4}$", message = "Invalid phone number")
+        private String phone;
+    }
 }

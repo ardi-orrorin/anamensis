@@ -37,4 +37,9 @@ class FileMapperTest {
         fileMapper.selectByFileName(fileName).orElseThrow(() ->
                 new RuntimeException("File not found"));
     }
+
+    @Test
+    void updateIsUseById() {
+        fileMapper.updateIsUseById(29, 1);
+    }
 }

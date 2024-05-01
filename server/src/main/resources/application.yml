@@ -66,4 +66,4 @@ jwt:
 
 aws:
   ses:
-    from: ardi.orrorin@gmail.com
+    from: test@tets.com

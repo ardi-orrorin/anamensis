@@ -113,7 +113,7 @@ CREATE TABLE anamensis.table_code (
 
 CREATE TABLE anamensis.file (
     id            BIGINT          PRIMARY KEY            AUTO_INCREMENT                                  COMMENT 'PK',
-    table_code_pk INT             NOT NULL                                                               COMMENT '테이블 코드 PK',
+    table_code_pk BIGINT          NOT NULL                                                               COMMENT '테이블 코드 PK',
     table_ref_pk  BIGINT          NOT NULL                                                               COMMENT '참고 테이블 Pk',
     org_file_name VARCHAR(255)    NOT NULL                                                               COMMENT '원본 파일 이름',
     file_name     VARCHAR(255)    NOT NULL                                                               COMMENT '변경 파일 이름',
@@ -312,4 +312,9 @@ CREATE TABLE anamensis.system_message (
 ) COMMENT '시스템 메시지';
 
 
-
+CREATE TABLE anamensis.smtp_push_history_count (
+    user_pk              INT NOT NULL,
+    user_config_smtp_pk  INT NOT NULL,
+    count                INT NOT NULL DEFAULT 0,
+    PRIMARY KEY          (user_pk, user_config_smtp_pk)
+) COMMENT 'smtp_push_history 카운트'

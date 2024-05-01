@@ -28,10 +28,9 @@ public class MailItemWriter implements ItemWriter<UserConfigSmtp> {
     @Override
     public void write(Chunk<? extends UserConfigSmtp> items) throws Exception {
 
-        SystemMessage sm  = smService.findByWebSysPk("015");
+        SystemMessage sm  = smService.findByWebSysPk("001");
         String subject = sm.getSubject();
         String content = sm.getContent();
-        log.info("subject: {}", items);
 
         Flux.fromIterable(items)
                 .parallel()

@@ -12,10 +12,13 @@ import org.springframework.security.config.web.server.ServerHttpSecurity.FormLog
 import org.springframework.security.config.web.server.ServerHttpSecurity.HttpBasicSpec;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
-import org.springframework.web.reactive.config.CorsRegistry;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.result.method.annotation.ArgumentResolverConfigurer;
+
+import java.util.List;
 
 @Configuration
 @EnableWebFlux
@@ -36,6 +39,9 @@ public class SecurityConfig implements WebFluxConfigurer {
                 .formLogin(FormLoginSpec::disable)
                 .httpBasic(HttpBasicSpec::disable)
                 .csrf(CsrfSpec::disable)
+                .cors(corsSpec -> {
+                    corsSpec.configurationSource(corsConfigurationSource());
+                })
                 .addFilterAfter(
                         authenticationWebFilter,
                         SecurityWebFiltersOrder.AUTHENTICATION
@@ -53,14 +59,20 @@ public class SecurityConfig implements WebFluxConfigurer {
     }
 
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOriginPatterns("*")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
-                .allowedHeaders("Authorization", "Content-Type", "Device", "Location")
-                .allowCredentials(true);
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        return (request) -> {
+            CorsConfiguration corsConfiguration = new CorsConfiguration();
+            corsConfiguration.setAllowedOrigins(List.of("http://192.168.0.49:3000"));
+            corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+            corsConfiguration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Device", "Location"));
+            corsConfiguration.setAllowCredentials(true);
+            corsConfiguration.setMaxAge(3600L);
+            return corsConfiguration;
+        };
     }
+
 
     @Override
     public void configureArgumentResolvers(ArgumentResolverConfigurer configurer) {

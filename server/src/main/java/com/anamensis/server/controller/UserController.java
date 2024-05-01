@@ -141,8 +141,7 @@ public class UserController {
         return userDetails
                 .flatMap(user -> userService.findUserByUserId(user.getUsername()))
                 .flatMap(user -> fileService.findByTableNameAndTableRefPk("user", user.getId()))
-                .log()
-                .switchIfEmpty(Mono.error(new RuntimeException("Profile image not found")))
+                .switchIfEmpty(Mono.just(File.builder().filePath("").build()))
                 .map(File::getFilePath);
     }
 

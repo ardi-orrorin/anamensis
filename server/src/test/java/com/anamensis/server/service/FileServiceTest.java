@@ -35,4 +35,10 @@ class FileServiceTest {
         }
         return true;
     }
+
+    @Test
+    void findByTableNameAndTableRefPk() {
+        fileService.findByTableNameAndTableRefPk("user", 1)
+                .log().subscribe();
+    }
 }

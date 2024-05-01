@@ -8,13 +8,11 @@ import com.anamensis.server.dto.Token;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.dto.response.LoginHistoryResponse;
 import com.anamensis.server.dto.response.UserResponse;
-import com.anamensis.server.entity.AuthType;
-import com.anamensis.server.entity.EmailVerify;
-import com.anamensis.server.entity.OTP;
-import com.anamensis.server.entity.User;
+import com.anamensis.server.entity.*;
 import com.anamensis.server.provider.TokenProvider;
 import com.anamensis.server.service.*;
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,6 +37,7 @@ public class UserController {
     private final LoginHistoryService loginHistoryService;
     private final EmailVerifyService emailVerifyService;
     private final TokenProvider tokenProvider;
+    private final FileService fileService;
 
     @PublicAPI
     @PostMapping("login")
@@ -135,6 +134,18 @@ public class UserController {
         return Mono.just(true);
     }
 
+    @GetMapping("profile-img")
+    public Mono<String> profileImg(
+            @AuthenticationPrincipal Mono<UserDetails> userDetails
+    ) {
+        return userDetails
+                .flatMap(user -> userService.findUserByUserId(user.getUsername()))
+                .flatMap(user -> fileService.findByTableNameAndTableRefPk("user", user.getId()))
+                .log()
+                .switchIfEmpty(Mono.error(new RuntimeException("Profile image not found")))
+                .map(File::getFilePath);
+    }
+
 
     @GetMapping("info")
     public Mono<UserResponse.MyPage> info(
@@ -143,6 +154,22 @@ public class UserController {
         return userDetails
                 .flatMap(user -> userService.findUserByUserId(user.getUsername()))
                 .flatMap(u -> Mono.just(UserResponse.MyPage.transToMyPage(u)));
+    }
+
+    @PutMapping("info")
+    public Mono<UserResponse.Status> update(
+            @AuthenticationPrincipal Mono<UserDetails> userDetails,
+            @Valid @RequestBody UserRequest.Profile profile
+    ) {
+        return userDetails.flatMap(u -> userService.findUserByUserId(u.getUsername()))
+                .doOnNext(user -> {
+                    user.setName(profile.getName());
+                    user.setEmail(profile.getEmail());
+                    user.setPhone(profile.getPhone());
+                    user.setUpdateAt(LocalDateTime.now());
+                })
+                .flatMap(userService::updateUser)
+                .map($ -> UserResponse.Status.transToStatus(HttpStatus.OK, "Success"));
     }
 
     @PutMapping("s-auth")

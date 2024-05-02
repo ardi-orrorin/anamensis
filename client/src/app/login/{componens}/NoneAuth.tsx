@@ -10,7 +10,6 @@ const NoneAuth = ({}) => {
     const {user} = useContext(LoginProvider);
     useEffect(() => {
         axios.post('/api/login/verify', user, {
-            // withCredentials: true,
         }).then(res => {
             location.replace('/user');
         })

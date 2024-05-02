@@ -2,6 +2,7 @@ package com.anamensis.server.controller;
 
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.dto.response.UserResponse;
+import com.anamensis.server.entity.AuthType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -35,11 +36,11 @@ class UserControllerTest {
     @BeforeEach
     @Order(1)
     void setUp() {
-        webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:" + port + "/user").build();
+        webTestClient = WebTestClient.bindToServer().baseUrl("http://localhost:" + port).build();
     }
 
-    @BeforeEach
-    @Order(2)
+//    @BeforeEach
+//    @Order(2)
     void setupLogin() {
 //        MultiValueMap<String, String> formData = new org.springframework.util.LinkedMultiValueMap<>();
 //        formData.add("username", "admin1");
@@ -75,7 +76,7 @@ class UserControllerTest {
 
         UserRequest.Login login = new UserRequest.Login();
         login.setUsername("admin1");
-        login.setPassword("admin");
+        login.setPassword("adminAdmin1");
 
         EntityExchangeResult<String> result =
         webTestClient.post()
@@ -178,5 +179,31 @@ class UserControllerTest {
                 .returnResult();
 
         log.info(result.getResponseBody().toString());
+    }
+
+    @Test
+    void verify() {
+        UserRequest.Login login = new UserRequest.Login();
+        login.setUsername("admin1");
+        login.setPassword("adminAdmin1");
+        login.setVerify(false);
+        login.setAuthType(AuthType.NONE.name());
+
+        EntityExchangeResult<String> result =
+                webTestClient.post()
+                        .uri("/public/api/user/verify")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .headers(httpHeaders -> {
+                            httpHeaders.set("Device", "chrome");
+                            httpHeaders.set("Location", "seoul");
+                        })
+                        .bodyValue(login)
+                        .exchange()
+                        .expectStatus().isOk()
+                        .expectBody(String.class)
+                        .returnResult();
+
+
+        log.info(result.toString());
     }
 }

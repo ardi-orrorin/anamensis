@@ -1,9 +1,9 @@
 'use client';
 import {useEffect, useMemo, useState} from "react";
-import axios from "axios";
+import axios, {AxiosResponse} from "axios";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import PageNavigator from "@/app/{commons}/PageNavigator";
-import {PageI} from "@/app/{commons}/types/commons";
+import {PageI, PageResponse} from "@/app/{commons}/types/commons";
 import {useRouter, useSearchParams} from "next/navigation";
 import Row from "@/app/user/smtp-history/{components}/Row";
 
@@ -31,7 +31,7 @@ export default function Page() {
                 size: search.get('size') || 10,
             }
         })
-            .then((res) => {
+            .then((res: AxiosResponse<PageResponse<SmtpHistoryI>>) => {
                 setPage(res.data.page);
                 setSmtpHistory(res.data.content);
             })
@@ -89,6 +89,14 @@ export default function Page() {
                             />
                         )
                     })
+                }
+                {
+                    smtpHistory.length === 0 &&
+                    <tr>
+                      <td className={'text-center py-5'}
+                          colSpan={5}
+                      >조회할 내용이 없습니다.</td>
+                    </tr>
                 }
                 </tbody>
             </table>

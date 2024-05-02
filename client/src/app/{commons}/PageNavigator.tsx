@@ -3,6 +3,7 @@ import Link from "next/link";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faAnglesLeft} from "@fortawesome/free-solid-svg-icons/faAnglesLeft";
 import {faAnglesRight} from "@fortawesome/free-solid-svg-icons";
+import {redirect} from "next/navigation";
 
 const PageNavigator = ({
     page, size, total
@@ -15,6 +16,12 @@ const PageNavigator = ({
     const curEndPage = Math.min(lastPage, page + 3);
 
     const pages = Array.from({length: curEndPage - startPAge + 1}, (_, i) => startPAge + i);
+
+    if(total !== 0 && lastPage < page) {
+        redirect(`?page=${lastPage}&size=${size}`);
+    } else if(total !== 0 && page < 1) {
+        redirect(`?page=1&size=${size}`);
+    }
 
     return (
         <div className={'w-full flex justify-center gap-x-2 mt-6'}>
@@ -39,7 +46,7 @@ const PageNavigator = ({
                 })
             }
             {
-                page !== lastPage &&
+                page !== lastPage && lastPage !== 0 && total !== 0 &&
                   <Link className={['border border-solid border-gray-300 rounded-md text-sm px-4 py-2'].join(' ')}
                         href={`?page=${lastPage}&size=${size}`}
                   >

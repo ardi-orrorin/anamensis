@@ -29,7 +29,7 @@ export default function Page() {
     useEffect(() => {
         axios.get('/api/user/info/profile-img')
             .then((res) => {
-                if(res.data.length === 0 ) return ;
+                if(res.data.length === 0) return ;
                 setImg(process.env.NEXT_PUBLIC_CDN_SERVER + res.data)
             })
     },[]);

@@ -28,7 +28,6 @@ const getServerSideProps: GetServerSideProps<GetProps> = async (context) => {
 export default async function Page(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const {searchParams} = props;
     const data = await getData(searchParams);
-
     const maxIndex = data.page.total - ((data.page.page - 1) * data.page.size);
 
     return (
@@ -94,7 +93,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                }
                </tbody>
             </table>
-            <PageNavigator {...data.page} />
+            <PageNavigator {...data!.page} />
         </div>
     )
 }
@@ -109,5 +108,7 @@ const getData = async (req: URLSearchParams) => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token?.value}`
         }})
-    .then((res: AxiosResponse<PageResponse<LoginHistoriesI>>) => res.data);
+    .then((res: AxiosResponse<PageResponse<LoginHistoriesI>>) => {
+        return res.data;
+    });
 }

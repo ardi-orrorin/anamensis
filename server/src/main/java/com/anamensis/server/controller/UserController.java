@@ -12,7 +12,6 @@ import com.anamensis.server.entity.*;
 import com.anamensis.server.provider.TokenProvider;
 import com.anamensis.server.service.*;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -73,8 +72,6 @@ public class UserController {
         } else if(AuthType.EMAIL.equals(user.getAuthType())) {
             return emailLogin(user, device);
         }
-
-        // BUG: notAuth log가 두번 생김
         return notAuth(user, device);
     }
 

@@ -8,7 +8,7 @@
         SELECT id, subject, create_at, status, message
           FROM smtp_push_history
          WHERE user_pk = #{userPk}
-         ORDER BY create_at DESC
+         ORDER BY id DESC
          LIMIT #{page.offset}, #{page.size}
     </select>
     <select id="countByUserPk" resultType="Long">

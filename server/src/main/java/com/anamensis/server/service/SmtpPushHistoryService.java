@@ -24,6 +24,7 @@ public class SmtpPushHistoryService {
 
     public Flux<SmtpPushHistoryResponse.ListSmtpPushHistory> findByUserPk(long userPk, Page page) {
         return Flux.fromIterable(smtpPushHistoryMapper.findByUserPk(userPk, page))
+                .publishOn(Schedulers.parallel())
                 .map(SmtpPushHistoryResponse.ListSmtpPushHistory::fromResultMap);
     }
 

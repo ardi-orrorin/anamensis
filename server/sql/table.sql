@@ -68,7 +68,7 @@ CREATE TABLE anamensis.login_history (
     INDEX        device_idx     (device)
 ) COMMENT '로그인 이력';
 
-CREATE TABLE log_history (
+CREATE TABLE anamensis.log_history (
      id             BIGINT        AUTO_INCREMENT  PRIMARY KEY,
      user_pk        BIGINT        NOT NULL,
      method         VARCHAR(10)   NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE log_history (
      INDEX          idx_session                   (session)
 ) COMMENT 'api 호출 로그 테이블';
 
-CREATE TABLE attendance (
+CREATE TABLE anamensis.attendance (
     user_pk BIGINT NOT NULL PRIMARY KEY,
     lastDate DATE NOT NULL,
     days INT NOT NULL DEFAULT 1,

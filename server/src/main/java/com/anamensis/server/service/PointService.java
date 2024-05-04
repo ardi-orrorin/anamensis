@@ -3,6 +3,7 @@ package com.anamensis.server.service;
 import com.anamensis.server.entity.PointCode;
 import com.anamensis.server.mapper.PointCodeMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -12,6 +13,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PointService {
+
+    @Value("${db.setting.user.attendance_point_code_prefix}")
+    private String ATTENDANCE_POINT_CODE_PREFIX;
 
     private final PointCodeMapper pointCodeMapper;
 
@@ -23,8 +27,8 @@ public class PointService {
         return Mono.just(pointCodeMapper.selectByIdOrName(pointCode));
     }
 
-    public Mono<PointCode> findByName(String name) {
-        return Mono.justOrEmpty(pointCodeMapper.findByName(name))
+    public Mono<PointCode> findByName(String seq) {
+        return Mono.justOrEmpty(pointCodeMapper.findByName(ATTENDANCE_POINT_CODE_PREFIX + seq))
                 .switchIfEmpty(Mono.error(new RuntimeException("not found")));
     }
 

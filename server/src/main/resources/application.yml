@@ -10,14 +10,7 @@ spring:
     url: jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Seoul
     username: user
     password: password
-  webflux:
-    multipart:
-      max-parts: -1
-      file-storage-directory: classpath:static/upload
-      max-in-memory-size: 2MB
-  servlet:
-    multipart:
-      max-request-size: 10MB
+
 
   profiles:
     active: local
@@ -67,3 +60,8 @@ jwt:
 aws:
   ses:
     from: test@tets.com
+
+db:
+  setting:
+    user:
+      attendance_point_code_prefix: attend-

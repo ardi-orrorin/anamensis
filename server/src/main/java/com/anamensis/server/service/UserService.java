@@ -1,17 +1,17 @@
 package com.anamensis.server.service;
 
 
-import com.anamensis.server.entity.AuthType;
+import com.anamensis.server.entity.*;
 import com.anamensis.server.dto.UserDto;
 import com.anamensis.server.dto.request.UserRequest;
-import com.anamensis.server.entity.Role;
-import com.anamensis.server.entity.RoleType;
-import com.anamensis.server.entity.User;
 import com.anamensis.server.exception.DuplicateUserException;
+import com.anamensis.server.mapper.PointCodeMapper;
 import com.anamensis.server.mapper.UserMapper;
 import com.anamensis.server.resultMap.UserResultMap;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,7 +29,11 @@ import java.time.LocalDateTime;
 @Slf4j
 public class UserService implements ReactiveUserDetailsService {
 
+    @Value("${db.setting.user.attendance_point_code_prefix}")
+    private String ATTENDANCE_POINT_CODE_PREFIX;
+
     private final UserMapper userMapper;
+    private final PointCodeMapper pointCodeMapper;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -83,6 +87,11 @@ public class UserService implements ReactiveUserDetailsService {
         return user.map(UserRequest.Register::transToUser)
                    .doOnNext(u -> u.setPwd(bCryptPasswordEncoder.encode(u.getPwd())))
                    .doOnNext(u -> u.setCreateAt(LocalDateTime.now()))
+                   .doOnNext(u -> {
+                       PointCode pointCode = pointCodeMapper.findByName(ATTENDANCE_POINT_CODE_PREFIX + "1")
+                               .orElseThrow(() -> new RuntimeException("PointCode not found"));
+                      u.setPoint(pointCode.getValue());
+                   })
                    .doOnNext(userMapper::save)
                    .publishOn(Schedulers.boundedElastic())
                    .doOnNext(u -> generateRole(u, RoleType.USER)

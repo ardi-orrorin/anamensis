@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
@@ -25,10 +26,12 @@ public class MailItemWriter implements ItemWriter<UserConfigSmtp> {
 
     private final SystemMessageService smService;
 
+    @Value("${db.setting.default.web_sys_pk}")
+    private String DEFAULT_WEB_SYS_PK;
+
     @Override
     public void write(Chunk<? extends UserConfigSmtp> items) throws Exception {
-
-        SystemMessage sm  = smService.findByWebSysPk("001");
+        SystemMessage sm  = smService.findByWebSysPk(DEFAULT_WEB_SYS_PK);
         String subject = sm.getSubject();
         String content = sm.getContent();
 

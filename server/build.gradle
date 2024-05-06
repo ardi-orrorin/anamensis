@@ -23,19 +23,14 @@ repositories {
 
 dependencies {
     implementation 'net.coobird:thumbnailator:0.4.20'
-
+    implementation 'com.warrenstrange:googleauth:1.5.0'
 
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.1.0'
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-ses:3.1.1'
 
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-
-//    implementation 'com.amazonaws:aws-java-sdk-ses:1.12.701'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
-
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -44,16 +39,13 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-    implementation 'com.maxmind.geoip2:geoip2:4.2.0'
-
-    implementation 'com.warrenstrange:googleauth:1.5.0'
-
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
 
     runtimeOnly 'com.mysql:mysql-connector-j'
     compileOnly 'org.projectlombok:lombok'
 
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'

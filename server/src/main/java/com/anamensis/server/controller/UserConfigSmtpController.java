@@ -26,15 +26,14 @@ public class UserConfigSmtpController {
     public Mono<PageResponse<UserConfigSmtp>> list(
             @AuthenticationPrincipal Mono<UserDetails> user
     ) {
-        return user
-                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
-                .map(u -> userConfigSmtpService.selectByUserPk(u.getId()))
-                .flatMap(Flux::collectList)
-                .map(r -> PageResponse.<UserConfigSmtp>builder()
-                            .page(new Page())
-                            .content(r)
-                            .build()
-                );
+        return user.flatMap(u -> userService.findUserByUserId(u.getUsername()))
+                   .map(u -> userConfigSmtpService.selectByUserPk(u.getId()))
+                   .flatMap(Flux::collectList)
+                   .map(r -> PageResponse.<UserConfigSmtp>builder()
+                               .page(new Page())
+                               .content(r)
+                               .build()
+                   );
     }
 
     @GetMapping("{id}")
@@ -50,11 +49,10 @@ public class UserConfigSmtpController {
             @RequestBody Mono<UserConfigSmtpRequest.UserConfigSmtp> userConfigSmtp,
             @AuthenticationPrincipal Mono<UserDetails> user
     ) {
-        return user
-                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
-                .zipWith(userConfigSmtp)
-                .map(t -> UserConfigSmtpRequest.UserConfigSmtp.fromEntity(t.getT2(), t.getT1()))
-                .flatMap(userConfigSmtpService::save);
+        return user.flatMap(u -> userService.findUserByUserId(u.getUsername()))
+                   .zipWith(userConfigSmtp)
+                   .map(t -> UserConfigSmtpRequest.UserConfigSmtp.fromEntity(t.getT2(), t.getT1()))
+                   .flatMap(userConfigSmtpService::save);
     }
 
     @PutMapping("")
@@ -62,11 +60,10 @@ public class UserConfigSmtpController {
             @RequestBody Mono<UserConfigSmtp> userConfigSmtp,
             @AuthenticationPrincipal Mono<UserDetails> user
     ) {
-        return user
-                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
-                .zipWith(userConfigSmtp)
-                .doOnNext(t -> t.getT2().setUserPk(t.getT1().getId()))
-                .flatMap(t -> userConfigSmtpService.update(t.getT2()));
+        return user.flatMap(u -> userService.findUserByUserId(u.getUsername()))
+                   .zipWith(userConfigSmtp)
+                   .doOnNext(t -> t.getT2().setUserPk(t.getT1().getId()))
+                   .flatMap(t -> userConfigSmtpService.update(t.getT2()));
     }
 
     @GetMapping("/disabled/{id}")
@@ -82,7 +79,7 @@ public class UserConfigSmtpController {
     @PostMapping("test")
     public Mono<Boolean> testConnection(@RequestBody UserConfigSmtpRequest.Test test) {
         return Mono.just(test)
-                .map(UserConfigSmtpRequest.Test::toUserConfigSmtp)
-                .flatMap(userConfigSmtpService::testConnection);
+                   .map(UserConfigSmtpRequest.Test::toUserConfigSmtp)
+                   .flatMap(userConfigSmtpService::testConnection);
     }
 }

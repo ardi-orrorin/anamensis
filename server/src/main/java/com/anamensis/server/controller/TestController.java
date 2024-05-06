@@ -2,10 +2,8 @@ package com.anamensis.server.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.codec.multipart.PartEvent;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
@@ -25,10 +23,10 @@ public class TestController {
         String message
     ) {}
 
+
     @PublicAPI
     @GetMapping(value = "{id}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<HashRecord> test(@PathVariable String id) {
-
         return list.asFlux()
                 .publishOn(Schedulers.boundedElastic())
                 .onBackpressureBuffer()

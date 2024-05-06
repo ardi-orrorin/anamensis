@@ -35,7 +35,6 @@ public class AuthConverter implements ServerAuthenticationConverter {
                 .flatMap(token -> isValidateToken(token, exchange));
     }
 
-
     public Mono<Authentication> isValidateToken(String token, ServerWebExchange exchange) {
         Claims claims = tokenProvider.getClaims(token);
         String userId = claims.get("user", String.class);

@@ -1,6 +1,5 @@
 package com.anamensis.server.controller;
 
-import com.anamensis.server.dto.Device;
 import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.PageResponse;
 import com.anamensis.server.dto.request.ShareLinkRequest;
@@ -39,15 +38,15 @@ public class ShareLinkController {
             Page page,
             @AuthenticationPrincipal Mono<UserDetails> user
     ) {
-
-        return user.flatMap(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
-                   .zipWith(Mono.just(page))
-                   .map(shareLinkService::selectAll)
-                   .map(t -> PageResponse.<ShareLink>builder()
-                           .content(t.getT1())
-                           .page(t.getT2())
-                           .build()
-                   );
+        return user
+                .flatMap(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
+                .zipWith(Mono.just(page))
+                .map(shareLinkService::selectAll)
+                .map(t -> PageResponse.<ShareLink>builder()
+                        .content(t.getT1())
+                        .page(t.getT2())
+                        .build()
+                );
     }
 
     @PostMapping("")
@@ -72,7 +71,8 @@ public class ShareLinkController {
             @RequestBody Mono<ShareLinkRequest.Use> shareLink,
             @AuthenticationPrincipal Mono<UserDetails> user
     ) {
-        return shareLink.zipWith(user)
+        return shareLink
+                .zipWith(user)
                 .publishOn(Schedulers.parallel())
                 .flatMap(tuple ->
                     userService.findUserByUserId(tuple.getT2().getUsername())

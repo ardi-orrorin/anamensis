@@ -18,7 +18,7 @@
   - 미정
 
 ### Server-Common Info
-- Language : Java 17
+- Language : Java 21
 - PackageManager & Build : Gradle
 - Framework : Springboot
 - Libraries

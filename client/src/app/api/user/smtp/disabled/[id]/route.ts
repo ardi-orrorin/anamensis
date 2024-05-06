@@ -8,7 +8,7 @@ export async function GET(
 ){
     const url = process.env.NEXT_PUBLIC_SERVER + '/api/user-config-smtp/disabled/' + params.id;
 
-    const token = cookies().get('accessToken') || cookies().get('refreshToken');
+    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
 
     const result = await axios.get(url, {
         headers: {

@@ -40,16 +40,17 @@ export async function POST(req: NextRequest){
 
         const cookieInit: Partial<ResponseCookie> = {
             httpOnly: true,
-            secure: true,
-            sameSite: 'strict',
+            secure: false,
+            sameSite: 'lax',
+            path: '/'
         }
 
-        next.cookies.set('accessToken', resData.data.accessToken, {
+        next.cookies.set('next.access.token', resData.data.accessToken, {
             ...cookieInit,
             maxAge: resData.data.accessTokenExpiresIn / 1000
         });
 
-        next.cookies.set('refreshToken', resData.data.refreshToken, {
+        next.cookies.set('next.refresh.token', resData.data.refreshToken, {
             ...cookieInit,
             maxAge: resData.data.refreshTokenExpiresIn / 1000
         });

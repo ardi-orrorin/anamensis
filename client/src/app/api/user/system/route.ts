@@ -6,7 +6,7 @@ import {WebSysI} from "@/app/user/system/page";
 export async function GET() {
     const url = process.env.NEXT_PUBLIC_SERVER + '/admin/api/web-sys';
 
-    const token = cookies().get('accessToken') || cookies().get('refreshToken');
+    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
 
     const res:AxiosResponse<WebSysI[]> = await axios.get(url, {
         headers: {
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     const url = process.env.NEXT_PUBLIC_SERVER + '/admin/api/web-sys';
 
-    const token = cookies().get('accessToken') || cookies().get('refreshToken');
+    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
 
     const res = await axios.post(url, data, {
         headers: {
@@ -45,7 +45,7 @@ export async function PUT(req: NextRequest) {
 
     const url = process.env.NEXT_PUBLIC_SERVER + '/admin/api/web-sys';
 
-    const token = cookies().get('accessToken') || cookies().get('refreshToken');
+    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
 
     const res = await axios.put(url, data, {
         headers: {

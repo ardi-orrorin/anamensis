@@ -9,7 +9,7 @@ export async function GET(req: NextRequest): Promise<NextResponse<PageResponse<S
     const search = new URLSearchParams(req.nextUrl.search);
 
     const url = process.env.NEXT_PUBLIC_SERVER + '/api/smtp-push-history';
-    const token = cookies().get('accessToken') || cookies().get('refreshToken');
+    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
 
     const result = await axios.get(url, {
         params: {

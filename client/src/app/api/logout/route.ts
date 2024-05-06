@@ -5,11 +5,11 @@ export async function GET() {
         status: 302,
     });
 
-    next.cookies.set('accessToken', '', {
+    next.cookies.set('next.access.token', '', {
         maxAge: 0
     });
 
-    next.cookies.set('refreshToken', '', {
+    next.cookies.set('next.refresh.token', '', {
         maxAge: 0
     });
 

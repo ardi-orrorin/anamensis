@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
 
     const id = req.nextUrl.searchParams.get('id');
 
-    const token = cookies().get('accessToken') || cookies().get('refreshToken')
+    const token = cookies().get('access.token') || cookies().get('refresh.token');
 
     const url = `${process.env.NEXT_PUBLIC_SERVER}/api/user-config-smtp${id ? `/${id}` : ''}`;
 
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
 
     const data = await req.json() as SmtpI;
-    const token = cookies().get('accessToken') || cookies().get('refreshToken')
+    const token = cookies().get('next.access.token') || cookies().get('next.wrefresh.token');
 
     const url = process.env.NEXT_PUBLIC_SERVER + '/api/user-config-smtp';
 

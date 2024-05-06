@@ -6,7 +6,7 @@ import {UserInfoI} from "@/app/user/email/page";
 export async function POST(req: NextRequest) {
     const data = await req.formData();
 
-    const token = cookies().get('accessToken') || cookies().get('refreshToken');
+    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
     const url = process.env.NEXT_PUBLIC_SERVER + '/api/files/profile';
     const result = await axios.post(url, data, {
         headers: {
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-    const token = cookies().get('accessToken') || cookies().get('refreshToken');
+    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
     const url = process.env.NEXT_PUBLIC_SERVER + '/api/user/profile-img';
 
     const result = await axios.get(url, {

@@ -4,19 +4,19 @@ import {RequestCookie} from "next/dist/compiled/@edge-runtime/cookies";
 
 export async function middleware(req: NextRequest) {
 
-    const accessToken = cookies().get('accessToken');
+    const accessToken = cookies().get('next.access.token');
 
     const url = req.nextUrl.clone();
 
-    const refreshToken = cookies().get('refreshToken');
+    const refreshToken = cookies().get('next.refresh.token');
 
     if(!accessToken && refreshToken) {
         const result = await generateRefreshToken(refreshToken, req.headers.get('User-Agent') || '');
         const ssl = process.env.NEXT_PUBLIC_SSL === 'TRUE';
 
         const next = NextResponse.next();
-        next.headers.set('Set-Cookie', result + '; Secure; SameSite=Strict; path=/; HttpOnly');
-        next.headers.set('Set-Cookie', result + '; SameSite=NONE; path=/;');
+        next.headers.set('Set-Cookie', result + '; Secure; SameSite=lax; path=/;');
+        next.headers.set('Set-Cookie', result + '; SameSite=lax; path=/;');
         return next;
     }
 

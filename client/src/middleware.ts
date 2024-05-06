@@ -15,8 +15,9 @@ export async function middleware(req: NextRequest) {
         const ssl = process.env.NEXT_PUBLIC_SSL === 'TRUE';
 
         const next = NextResponse.next();
-        next.headers.set('Set-Cookie', result + '; Secure; SameSite=lax; path=/;');
-        next.headers.set('Set-Cookie', result + '; SameSite=lax; path=/;');
+
+        next.headers.set('Set-Cookie', result + '; SameSite=lax; path=/; httponly;');
+        next.headers.set('Set-Cookie', result + '; SameSite=lax; path=/; httponly;');
         return next;
     }
 

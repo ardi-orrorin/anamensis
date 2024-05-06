@@ -54,7 +54,8 @@ const Login = () => {
             setError({
                 status: err.response.data.status,
                 message: err.response.data.message,
-                use: err.response.data.use
+                // use: err.response.data.use
+                use: true
             });
         })
         .finally(() => {
@@ -134,21 +135,25 @@ const Login = () => {
                     />
                 </div>
                 <div className={['flex duration-500', error.use ? 'max-h-52' : 'max-h-0'].join(' ')}>
-                      <span className={'text-xs text-red-500 my-2 px-2'}
-                      >
+                  {
+                    error.use &&
+                    <span className={'text-xs text-red-500 my-2 px-2'}
+                    >
                         <FontAwesomeIcon height={12} icon={faExclamation}/>
-                          &nbsp; {error.message}
-                      </span>
+                        &nbsp; {error.message}
+                    </span>
+                  }
                 </div>
-
-                {
-                    idCheck && isNext &&
-                    <ReCAPTCHA ref={recaptchaRef}
-                               sitekey={siteKey || ""}
-                               onChange={onChangeReCaptchaHandler}
-                               className={'w-full flex justify-center py-2'}
-                    />
-                }
+                <div className={''}>
+                    {
+                        idCheck && isNext &&
+                        <ReCAPTCHA ref={recaptchaRef}
+                                   sitekey={siteKey || ""}
+                                   onChange={onChangeReCaptchaHandler}
+                                   className={'w-full flex justify-center py-2'}
+                        />
+                    }
+                </div>
                 <div>
                     <button
                         className={['w-full rounded  duration-300 text-xs text-white my-2 p-2', isNext && isRecaptcha ? 'bg-blue-300 hover:bg-blue-600' : 'bg-gray-400 hover:bg-gray-700'].join(' ')}

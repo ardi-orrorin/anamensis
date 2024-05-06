@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
     const url = process.env.NEXT_PUBLIC_SERVER + '/admin/api/sys-message';
 
-    const token = cookies().get('accessToken') || cookies().get('refreshToken');
+    const token = cookies().get('access.token') || cookies().get('refresh.token');
 
     const res:AxiosResponse<SysMessageI> = await axios.get(url, {
         params: {
@@ -56,7 +56,7 @@ export async function PUT(req: NextRequest) {
 
     const url = process.env.NEXT_PUBLIC_SERVER + '/admin/api/sys-message';
 
-    const token = cookies().get('accessToken') || cookies().get('refreshToken');
+    const token = cookies().get('access.token') || cookies().get('refresh.token');
 
     const res:AxiosResponse<SysMessageI> = await axios.put(url, body, {
         headers: {
@@ -80,7 +80,7 @@ export async function DELETE(req: NextRequest) {
 
     const url = process.env.NEXT_PUBLIC_SERVER + '/admin/api/sys-message';
 
-    const token = cookies().get('accessToken') || cookies().get('refreshToken');
+    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
 
     const res:AxiosResponse<SysMessageI> = await axios.delete(url,{
         params: {

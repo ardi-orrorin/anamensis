@@ -5,7 +5,7 @@ import {NextRequest, NextResponse} from "next/server";
 
 export async function GET(){
     const url = process.env.NEXT_PUBLIC_SERVER + '/api/user/info';
-    const token = cookies().get('accessToken') || cookies().get('refreshToken');
+    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
 
     const result = await axios.get(url, {
         headers: {
@@ -28,7 +28,7 @@ export async function PUT(req: NextRequest) {
 
     const url = process.env.NEXT_PUBLIC_SERVER + '/api/user/s-auth';
 
-    const token = cookies().get('accessToken') || cookies().get('refreshToken');
+    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
 
     const result = await axios.put(url, {sauth, sauthType}, {
         headers: {

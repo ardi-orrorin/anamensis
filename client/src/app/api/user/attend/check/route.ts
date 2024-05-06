@@ -5,7 +5,7 @@ import {NextResponse} from "next/server";
 export async function GET() {
     const url = process.env.NEXT_PUBLIC_SERVER + '/api/attendance/check';
 
-    const token = cookies().get('accessToken') || cookies().get('refreshToken');
+    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
 
     const result: string = await axios.get(url, {
             headers: {

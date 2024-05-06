@@ -6,13 +6,13 @@ import {cookies} from "next/headers";
 type NavItemProps = {
     name: string | JSX.Element,
     url: string
-    loginRequired?: boolean
+    loginRequired?: boolean,
     onClick?: () => void
 }
 
 const NavMain = async () => {
 
-    const isLogged = cookies().get('accessToken') !== undefined;
+    const isLogged = cookies().get('next.access.token') !== undefined;
 
     const menuItems : NavItemProps[] = [
         {
@@ -26,23 +26,23 @@ const NavMain = async () => {
         {
             name: 'Sign Up',
             url: '/signup',
-            loginRequired: false
-
+            loginRequired: false,
         },
         {
             name: 'Login',
             url: '/login',
-            loginRequired: false
+            loginRequired: false,
         },
         {
             name: <FontAwesomeIcon className={'w-4'} icon={faRightFromBracket} />,
             url: '/api/logout',
             loginRequired: true,
+
         },
         {
             name: <FontAwesomeIcon className={'w-4'} icon={faUser} />,
             url: '/user',
-            loginRequired: true
+            loginRequired: true,
         },
     ];
 
@@ -86,7 +86,7 @@ const NavMain = async () => {
 const NavItem = ({name, url}: NavItemProps) => {
     return (
         <li className={'p-3'}>
-            <Link className={'flex'} href={url} >{name}</Link>
+            <Link className={'flex'} href={url} prefetch={false}>{name}</Link>
         </li>
     );
 }

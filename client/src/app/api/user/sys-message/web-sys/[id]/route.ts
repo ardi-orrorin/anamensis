@@ -7,7 +7,7 @@ export async function GET(req: NextRequest,{params}: {params: {id: string}}) {
     const {id} = params;
     const url = process.env.NEXT_PUBLIC_SERVER + '/admin/api/sys-message/web-sys/'+id;
 
-    const token = cookies().get('accessToken') || cookies().get('refreshToken');
+    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
 
     const res:AxiosResponse<SysMessageI[]> = await axios.get(url, {
         headers: {

@@ -5,14 +5,14 @@ import {SmtpI} from "@/app/user/smtp/page";
 
 export async function POST(req: NextRequest) {
     const data = await req.json() as SmtpI;
-    const accessToken = cookies().get('accessToken') || cookies().get('refreshToken')
+    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
 
     const url = process.env.NEXT_PUBLIC_SERVER + '/api/user-config-smtp/test';
 
     const result = await axios.post(url, data, {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken?.value}`
+            'Authorization': `Bearer ${token?.value}`
         }
     }).then(res => {
         return res.data;

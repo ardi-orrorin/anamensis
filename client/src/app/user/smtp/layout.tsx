@@ -34,7 +34,7 @@ export default async function Layout({
 
 const getData = async (): Promise<PageResponse<SmtpCardProps>> => {
 
-    const token = cookies().get('accessToken') || cookies().get('refreshToken')
+    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token')
 
     const url = process.env.NEXT_PUBLIC_SERVER + '/api/user-config-smtp';
 

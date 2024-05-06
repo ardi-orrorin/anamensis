@@ -100,7 +100,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
 
 const getData = async (req: URLSearchParams) => {
     const url = process.env.NEXT_PUBLIC_SERVER + '/api/user/histories';
-    const token = cookies().get('accessToken') || cookies().get('refreshToken')
+    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
 
     return axios.get(url, {
         params: {...req},

@@ -41,8 +41,6 @@ export async function PUT(req: NextRequest) {
 
     const data = await req.json() as WebSysI;
 
-    console.log(data)
-
     const url = process.env.NEXT_PUBLIC_SERVER + '/admin/api/web-sys';
 
     const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');

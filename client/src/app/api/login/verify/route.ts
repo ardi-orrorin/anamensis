@@ -8,26 +8,26 @@ export async function POST(req: NextRequest){
     const user = await req.json() as LoginI;
     const url = process.env.NEXT_PUBLIC_SERVER + '/public/api/user/verify';
 
-    // const geoLocation = await axios.get('https://geolocation-db.com/json')
-    //     .then((res) => {
-    //         return {
-    //             countryCode: res.data.country_code,
-    //             countryName: res.data.country_name,
-    //             state: res.data.state,
-    //             city: res.data.city,
-    //             ipv4: res.data.IPv4,
-    //             latitude: res.data.latitude,
-    //             longitude: res.data.longitude
-    //         };
-    //     });
+    const geoLocation = await axios.get('https://geolocation-db.com/json')
+        .then((res) => {
+            return {
+                countryCode: res.data.country_code,
+                countryName: res.data.country_name,
+                state: res.data.state,
+                city: res.data.city,
+                ipv4: res.data.IPv4,
+                latitude: res.data.latitude,
+                longitude: res.data.longitude
+            };
+        });
 
     try {
         const resData = await axios.post(url, user, {
             headers: {
                 'Content-Type': 'application/json',
                 'User-Agent': req.headers.get('User-Agent') || '',
-                'Location': `select`
-                // 'Location': `${geoLocation.countryName}-${geoLocation.state}-${geoLocation.city}`
+                // 'Location': `select`
+                'Location': `${geoLocation.countryName}-${geoLocation.state}-${geoLocation.city}`
             },
             withCredentials: true
         })

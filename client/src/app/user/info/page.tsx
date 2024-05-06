@@ -38,6 +38,7 @@ export default function Page() {
         if(!e.target.files) return;
 
         const formdata = new FormData();
+
         formdata.append('file', e.target.files[0]);
 
         setLoading({
@@ -47,7 +48,6 @@ export default function Page() {
 
         await axios.post('/api/user/info/profile-img', formdata)
             .then((res) => {
-
                 setImg(process.env.NEXT_PUBLIC_CDN_SERVER + res.data)
             }).finally(() => {
                 setLoading({
@@ -65,7 +65,7 @@ export default function Page() {
         })
         await axios.put('/api/user/info', profile)
             .then((res) => {
-            //
+                alert('수정되었습니다.')
             }).finally(() => {
                 setLoading({
                     ...loading,

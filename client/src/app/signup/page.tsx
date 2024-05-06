@@ -6,6 +6,9 @@ import EmailTemplate from "@/app/signup/EmailTemplate";
 import {useRouter} from "next/navigation";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import axios from "axios";
+import {
+    pickFontFileForFallbackGeneration
+} from "next/dist/compiled/@next/font/dist/local/pick-font-file-for-fallback-generation";
 
 export interface UserProps {
     id            : string;
@@ -27,6 +30,16 @@ export type CheckProps = {
     emailCheck    : CheckType;
     phone         : CheckType;
     [key: string] : CheckType;
+}
+export type DescriptionProps = {
+    id            : string;
+    pwd           : string;
+    pwdCheck      : string;
+    name          : string;
+    email         : string;
+    emailCheck    : string;
+    phone         : string;
+    [key: string] : string;
 }
 
 export type ExistProps = {
@@ -68,6 +81,16 @@ export default function Page() {
         email      : 'uncheck',
         emailCheck : 'uncheck',
         phone      : 'uncheck',
+    });
+
+    const [description, setDescription] = useState<DescriptionProps>({
+        id         : '아이디는 5자리 이상 20자리 이하로 입력하세요.',
+        pwd        : '비밀번호는 8자리 이상이어야 합니다. 영 대소문자 + 숫자를 포함해야 합니다.',
+        pwdCheck   : '비밀번호를 다시 입력하세요.',
+        name       : '이름을 입력하세요.',
+        email      : '이메일을 입력하세요.',
+        emailCheck : '이메일로 전송된 6자리 인증번호를 입력하세요.',
+        phone      : '휴대폰 번호를 입력하세요. ex) 010-1234-5678',
     });
 
     useEffect(() => {
@@ -119,7 +142,6 @@ export default function Page() {
             setTimer(-1);
         }
 
-
         if(name === 'id' || name === 'email' || name === 'phone') {
             if(name === 'id' && !idRegex.test(value)) {
                 check.id = 'notCheck';
@@ -129,6 +151,10 @@ export default function Page() {
                 check.phone = 'notCheck';
                 return ;
             }
+            if(name === 'email' && !emailRegex.test(value)) {
+                check.email = 'notCheck';
+                return ;
+            }
 
             checkHandler({type: name, value})
                 .then((res) => {
@@ -136,6 +162,18 @@ export default function Page() {
                         ...check,
                         [name]: res.data.message === 'false' ? 'check' : 'notCheck'
                     });
+                    if(name === 'id') {
+                        setDescription({
+                            ...description,
+                            id: res.data.message === 'false' ? '사용 가능한 아이디입니다.' : '이미 사용중인 아이디입니다.'
+                        });
+                    }
+                    if(name === 'email') {
+                        setDescription({
+                            ...description,
+                            email: res.data.message === 'false' ? '사용 가능한 이메일입니다.' : '이미 사용중인 이메일입니다.'
+                        });
+                    }
                 });
         }
     }
@@ -153,6 +191,10 @@ export default function Page() {
                 setCheck({
                     ...check,
                     email: res.data.message === 'false' ? 'check' : 'notCheck'
+                });
+                setDescription({
+                    ...description,
+                    email: res.data.message === 'false' ? '사용 가능한 이메일입니다.' : '이미 사용중인 이메일입니다.'
                 });
             });
     }
@@ -265,7 +307,7 @@ export default function Page() {
                          placeholder={'아이디를 입력하세요.'}
                          setProps={setProps}
                          inputCheck={inputCheck}
-                         description={'아이디는 5자리 이상 20자리 이하로 입력하세요.'}
+                         description={description.id}
                     />
                     <Row name={'pwd'}
                          value={user}
@@ -273,7 +315,7 @@ export default function Page() {
                          placeholder={'영소대문자 + 숫자 포함하여 8자리 이상의 비밀번호 입력하세요.'}
                          setProps={setProps}
                          inputCheck={inputCheck}
-                         description={'비밀번호는 8자리 이상이어야 합니다. 영 대소문자 + 숫자를 포함해야 합니다.'}
+                         description={description.pwd}
                     />
                     <Row className={[user.pwd.length >= 8 ? 'max-h-52' : 'max-h-0', 'duration-500'].join(' ')}
                          name={'pwdCheck'}
@@ -282,7 +324,7 @@ export default function Page() {
                          placeholder={'비밀번호를 재입력 입력하세요.'}
                          setProps={setProps}
                          inputCheck={inputCheck}
-                         description={'비밀번호를 다시 입력하세요.'}
+                         description={description.pwdCheck}
 
                     />
                     <Row name={'name'}
@@ -291,7 +333,7 @@ export default function Page() {
                          placeholder={'이름을 입력하세요.'}
                          setProps={setProps}
                          inputCheck={inputCheck}
-                         description={'이름을 입력하세요.'}
+                         description={description.name}
                     />
                     <Row name={'email'}
                          value={user}
@@ -300,7 +342,7 @@ export default function Page() {
                          setProps={setProps}
                          inputCheck={inputCheck}
                          disabled={timer >= 0}
-                         description={'이메일을 입력하세요.'}
+                         description={description.email}
                     />
                     <EmailTemplate className={user.email.length > 0 && !emailSelect ? 'max-h-52' : 'max-h-0'}
                                    id={user.email}
@@ -316,7 +358,7 @@ export default function Page() {
                              placeholder={'6자리 인증번호 입력하세요.'}
                              setProps={setProps}
                              inputCheck={inputCheck}
-                             description={'이메일로 전송된 6자리 인증번호를 입력하세요.'}
+                             description={description.emailCheck}
                         />
                         {
                             timer >= 0 && emailRegex.test(user.email) && user.emailCheck.length === 6 &&
@@ -326,8 +368,12 @@ export default function Page() {
                               인증하기
                             </button>
                         }
-                        <button className={[emailRegex.test(user.email)? 'max-h-52  my-3 ms-2' : 'max-h-0', timer >= 0 ? 'bg-gray-400' : 'bg-blue-300' , 'duration-500','w-1/4 rounded text-xs text-white'].join(' ')}
-                                disabled={timer >= 0}
+                        <button className={[
+                                    emailRegex.test(user.email)? 'max-h-52  my-3 ms-2' : 'max-h-0',
+                                    (timer >= 0 || check.email !== 'check') ? 'bg-gray-400' : 'bg-blue-300',
+                                    'duration-500','w-1/4 rounded text-xs text-white'
+                                ].join(' ')}
+                                disabled={timer >= 0 || check.email !== 'check'}
                                 onClick={sendVerifyCode}
                         >
                             {timer >= 0 ? transToTimerMinuteAndSecond() : '인증번호 받기'}
@@ -339,7 +385,7 @@ export default function Page() {
                          placeholder={'휴대폰 번호를 입력하세요. ex) 010-1234-5678'}
                          setProps={setProps}
                          inputCheck={inputCheck}
-                         description={'휴대폰 번호를 입력하세요. ex) 010-1234-5678'}
+                         description={description.phone}
                     />
                     <div>
                         <button className={['w-full rounded duration-300 text-xs text-white p-2', allCheck && 'hover:bg-blue-600', allCheck ? 'bg-blue-300' : 'bg-gray-400'].join(' ')}

@@ -18,7 +18,6 @@ public class  EmailVerifyController {
 
     private final EmailVerifyService emailVerifyService;
 
-
     @PublicAPI
     @PostMapping("email")
     public Mono<String> verify(@RequestBody Mono<EmailVerify> email) {

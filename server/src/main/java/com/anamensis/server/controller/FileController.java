@@ -21,7 +21,6 @@ public class FileController {
 
     private final UserService userService;
 
-
     @PostMapping("")
     public Mono<Boolean> upload(
             @RequestBody File file,
@@ -42,7 +41,6 @@ public class FileController {
         @AuthenticationPrincipal Mono<UserDetails> userDetails
     ) {
         return userDetails
-                .log()
                 .flatMap(u -> userService.findUserByUserId(u.getUsername()))
                 .flatMap(user -> fileService.saveProfile(user, filePart));
     }

@@ -11,7 +11,10 @@ public class PathRequestMappingConfig extends RequestMappingHandlerMapping {
 
     @Override
     protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
-        if(method.getAnnotation(PublicAPI.class) == null) return super.getMappingForMethod(method, handlerType);
+        boolean skip = method.getAnnotation(PublicAPI.class) == null
+                    || method.getAnnotation(AdminAPI.class)  == null;
+
+        if(skip) return super.getMappingForMethod(method, handlerType);
 
         RequestMappingInfo requestMappingInfo = super.getMappingForMethod(method, handlerType);
 
@@ -26,7 +29,6 @@ public class PathRequestMappingConfig extends RequestMappingHandlerMapping {
                     .build()
                     .combine(requestMappingInfo);
         }
-
 
         return requestMappingInfo;
     }

@@ -32,8 +32,8 @@ class WebSysMapperTest {
 //            () -> new RuntimeException("Not found")
 //        );
 
-        WebSys sd = webSysMapper.findByCode("010").orElseThrow(
-                () -> new RuntimeException("Not found")
+        WebSys sd = webSysMapper.findByCode("010").orElseThrow(() ->
+                new RuntimeException("Not found")
         );
 
         log.info(sd.toString());

@@ -52,6 +52,9 @@ export const googleOption: NextAuthOptions = {
     ],
     callbacks: {
         async signIn({account, email, user, profile, credentials}) {
+
+            console.log('signIn', account, email, user, profile, credentials)
+
             const data = user as UserType;
 
             cookies().set('next.access.token', data.accessToken, {
@@ -68,6 +71,7 @@ export const googleOption: NextAuthOptions = {
                 sameSite: 'lax',
                 maxAge: data.refreshTokenExpiresIn / 1000
             });
+
             return true
         },
         async redirect({url, baseUrl}) {

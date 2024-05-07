@@ -54,6 +54,7 @@ public class UserService implements ReactiveUserDetailsService {
     }
 
     public Mono<UserResultMap> findUserInfo(String userId) {
+        log.info("findUserInfo: {}", userId);
         return Mono.justOrEmpty(userMapper.findUserInfo(userId))
                 .onErrorMap(e -> new RuntimeException("User not found"));
     }

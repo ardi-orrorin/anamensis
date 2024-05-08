@@ -3,7 +3,6 @@ import {Metadata} from "next";
 import NavMain from "@/app/NavMain";
 import {ErrorBoundary} from "next/dist/client/components/error-boundary";
 import Error from "@/app/error";
-import {SessionProvider} from "next-auth/react";
 
 export const metadata : Metadata = {
   title: 'Anamensis',

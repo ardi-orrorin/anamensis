@@ -6,7 +6,6 @@ import LeftNavBar from "@/app/user/{components}/LeftNavBar";
 import Contents from "@/app/user/{components}/Contents";
 import ModalBackground from "@/app/user/{components}/Modal";
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
-import {SessionProvider, useSession} from "next-auth/react";
 
 
 export default function Layout({children}: {children: React.ReactNode}) {

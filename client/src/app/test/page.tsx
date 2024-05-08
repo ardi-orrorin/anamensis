@@ -10,6 +10,7 @@ type FileProps = {
     prevEnd: number
     file: File
 }
+// input stream 용 테스트 컴포넌트
 export default function Page(){
 
     const [eventList, setEventList] = useState<string[]>([]);

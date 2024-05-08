@@ -162,11 +162,13 @@ const Message = () => {
             })
     }
 
+    const textareaStyle = `resize-none outline-0 text-sm p-2 rounded h-12 overflow-y-hidden focus:bg-blue-100 focus:h-52 focus:overflow-y-auto duration-500`
+
     return (
         <div className={'absolute z-20 w-full min-h-screen flex justify-center items-center duration-1000'}
              onClick={modalClose}
         >
-            <div className={['absolute z-10 lg:w-2/3 lg:h-[800px] w-full h-screen bg-white flex flex-col rounded drop-shadow-2xl p-5 overflow-y-auto duration-500'].join(' ')}
+            <div className={['absolute z-10 lg:w-2/3 lg:h-[800px] w-full h-screen bg-white flex flex-col rounded drop-shadow-2xl p-10 overflow-y-auto duration-500'].join(' ')}
                 onClick={stopPropagation}
             >
                 <header className={'flex w-full py-3 justify-between items-center'}>
@@ -194,7 +196,7 @@ const Message = () => {
                             <span>
                                 내용
                             </span>
-                            <textarea className={'outline-0 text-sm p-2 rounded h-12 overflow-y-hidden focus:bg-blue-100 focus:h-52 focus:overflow-y-auto duration-500'}
+                            <textarea className={textareaStyle}
                                       placeholder={'메시지 내용을 입력하세요'}
                                       name={'content'}
                                       value={message.content}
@@ -205,7 +207,7 @@ const Message = () => {
                             <span>
                                 추가1
                             </span>
-                            <textarea className={'outline-0 text-sm p-2 rounded h-12 overflow-y-hidden focus:bg-blue-100 focus:h-52 focus:overflow-y-auto duration-500'}
+                            <textarea className={textareaStyle}
                                       placeholder={'메시지 내용을 입력하세요'}
                                       name={'extra1'}
                                       value={message.extra1}
@@ -216,7 +218,7 @@ const Message = () => {
                             <span>
                                 추가2
                             </span>
-                            <textarea className={'outline-0 text-sm p-2 rounded h-12 overflow-y-hidden focus:bg-blue-100 focus:h-52 focus:overflow-y-auto duration-500'}
+                            <textarea className={textareaStyle}
                                       placeholder={'메시지 내용을 입력하세요'}
                                       name={'extra2'}
                                       value={message.extra2}
@@ -227,35 +229,36 @@ const Message = () => {
                             <span>
                                 추가3
                             </span>
-                            <textarea className={'outline-0 text-sm p-2 rounded h-12 overflow-y-hidden focus:bg-blue-100 focus:h-52 focus:overflow-y-auto duration-500'}
+                            <textarea className={textareaStyle}
                                       placeholder={'메시지 내용을 입력하세요'}
                                       name={'extra3'}
                                       value={message.extra3}
                                       onChange={onChangeHandler}
+
                             />
                         </div>
-                        <div className={'flex flex-col gap-2'}>
-                            <span>
-                                추가4
-                            </span>
-                            <textarea className={'outline-0 text-sm p-2 rounded h-12 overflow-y-hidden focus:bg-blue-100 focus:h-52 focus:overflow-y-auto duration-500'}
-                                      placeholder={'메시지 내용을 입력하세요'}
-                                      name={'extra4'}
-                                      value={message.extra4}
-                                      onChange={onChangeHandler}
-                            />
-                        </div>
-                        <div className={'flex flex-col gap-2'}>
-                            <span>
-                                추가5
-                            </span>
-                            <textarea className={'outline-0 text-sm p-2 rounded h-12 overflow-y-hidden focus:bg-blue-100 focus:h-52 focus:overflow-y-auto duration-500'}
-                                      placeholder={'메시지 내용을 입력하세요'}
-                                      name={'extra5'}
-                                      value={message.extra5}
-                                      onChange={onChangeHandler}
-                            />
-                        </div>
+                        {/*<div className={'flex flex-col gap-2'}>*/}
+                        {/*    <span>*/}
+                        {/*        추가4*/}
+                        {/*    </span>*/}
+                        {/*    <textarea className={'outline-0 text-sm p-2 rounded h-12 overflow-y-hidden focus:bg-blue-100 focus:h-52 focus:overflow-y-auto duration-500'}*/}
+                        {/*              placeholder={'메시지 내용을 입력하세요'}*/}
+                        {/*              name={'extra4'}*/}
+                        {/*              value={message.extra4}*/}
+                        {/*              onChange={onChangeHandler}*/}
+                        {/*    />*/}
+                        {/*</div>*/}
+                        {/*<div className={'flex flex-col gap-2'}>*/}
+                        {/*    <span>*/}
+                        {/*        추가5*/}
+                        {/*    </span>*/}
+                        {/*    <textarea className={'outline-0 text-sm p-2 rounded h-12 overflow-y-hidden focus:bg-blue-100 focus:h-52 focus:overflow-y-auto duration-500'}*/}
+                        {/*              placeholder={'메시지 내용을 입력하세요'}*/}
+                        {/*              name={'extra5'}*/}
+                        {/*              value={message.extra5}*/}
+                        {/*              onChange={onChangeHandler}*/}
+                        {/*    />*/}
+                        {/*</div>*/}
                         <div className={'flex gap-3 duration-300'}>
                             {
                                 init &&

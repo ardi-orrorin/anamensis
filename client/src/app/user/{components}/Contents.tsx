@@ -12,6 +12,8 @@ const Contents = ({
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     children: React.ReactNode
 }) => {
+
+
     return (
         <section className={'w-full flex flex-col justify-center border-s border-solid border-gray-200 p-4'}>
             <div className={'w-full flex items-start h-12'}>
@@ -20,12 +22,12 @@ const Contents = ({
                         <FontAwesomeIcon icon={faBars} />
                     </button>
                 </div>
-                <div className={'w-1/3 flex justify-center text-lg'}>
-                    <h1>로그인기록</h1>
-                </div>
-                <div className={'w-1/3 flex justify-end'}>
-                    경로
-                </div>
+                {/*<div className={'w-1/3 flex justify-center text-lg'}>*/}
+                    {/*<h1>로그인</h1>*/}
+                {/*</div>*/}
+                {/*<div className={'w-1/3 flex justify-end'}>*/}
+                    {/*경로*/}
+                {/*</div>*/}
             </div>
             <div>
                 <Suspense fallback={<GlobalLoadingSpinner />}>

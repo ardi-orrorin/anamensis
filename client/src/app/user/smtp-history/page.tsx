@@ -1,11 +1,10 @@
-'use client';
-import {useEffect, useMemo, useState} from "react";
 import axios, {AxiosResponse} from "axios";
-import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import PageNavigator from "@/app/{commons}/PageNavigator";
-import {PageI, PageResponse} from "@/app/{commons}/types/commons";
-import {useRouter, useSearchParams} from "next/navigation";
+import {PageResponse} from "@/app/{commons}/types/commons";
 import Row from "@/app/user/smtp-history/{components}/Row";
+import {GetServerSideProps, InferGetServerSidePropsType} from "next";
+import {GetProps} from "@/app/user/history/page";
+import {cookies} from "next/headers";
 
 export interface SmtpHistoryI {
     id: number;
@@ -15,49 +14,48 @@ export interface SmtpHistoryI {
     createAt: string;
 }
 
-export default function Page() {
-    const search = useSearchParams();
-    const router = useRouter();
 
-    const [smtpHistory, setSmtpHistory] = useState<SmtpHistoryI[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [page, setPage] = useState<PageI>({} as PageI);
+const getServerSideProps: GetServerSideProps<GetProps> = async (context) => {
+    const searchParams = new URLSearchParams(context.query as any);
+    return {
+        props: {
+            searchParams,
+        }
+    }
+}
 
-    useEffect(() => {
-        setLoading(true);
-        axios.get('/api/user/smtp-history', {
-            params: {
-                page: search.get('page') || 1,
-                size: search.get('size') || 10,
-            }
-        })
-            .then((res: AxiosResponse<PageResponse<SmtpHistoryI>>) => {
-                setPage(res.data.page);
-                setSmtpHistory(res.data.content);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    },[search]);
-
-    const onChangeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const searchParams = new URLSearchParams(search);
-        searchParams.set('size', e.target.value);
-        searchParams.set('page', '1');
-        router.push(`?${searchParams}`);
-    };
+export default async function Page(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    const {searchParams} = props;
+    const {page,content} = await getData(searchParams);
 
     return (
         <div className={'flex flex-col gap-3'}>
             <div className={'flex justify-between'}>
                 <div></div>
-                <div className={'flex justify-end'}>
-                    <select value={search.get('size') || 10} onChange={onChangeHandler}>
-                        <option value={'10'}>10</option>
-                        <option value={'30'}>30</option>
-                        <option value={'100'}>100</option>
-                    </select>
-                </div>
+                <form className={'flex gap-3'}
+                      method={'get'}
+                >
+                    <div>
+                        <select className={'w-32 border border-solid border-gray-300 rounded-md text-sm px-3 py-1'}
+                                defaultValue={searchParams.size}
+                                name={'size'}
+                        >
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={30}>30</option>
+                            <option value={50}>50</option>
+                            <option value={100}>100</option>
+                            <option value={200}>200</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button className={'w-20 border border-solid border-gray-300 rounded-md text-sm px-3 py-1'}
+                                type={'submit'}
+                        >
+                            조회
+                        </button>
+                    </div>
+                </form>
             </div>
             <table className={'w-full'}>
                 <colgroup>
@@ -78,9 +76,7 @@ export default function Page() {
                 </thead>
                 <tbody className={''}>
                 {
-                    loading
-                    ? <LoadingSpinner size={20} />
-                    : smtpHistory.map((item, index) => {
+                    content.map((item, index) => {
                         return (
                             <Row key={index}
                                  index={index}
@@ -91,7 +87,7 @@ export default function Page() {
                     })
                 }
                 {
-                    smtpHistory.length === 0 &&
+                    content.length === 0 &&
                     <tr>
                       <td className={'text-center py-5'}
                           colSpan={5}
@@ -105,3 +101,19 @@ export default function Page() {
     );
 }
 
+
+const getData = async (req: URLSearchParams): Promise<PageResponse<SmtpHistoryI>> => {
+    const url = process.env.NEXT_PUBLIC_SERVER + '/api/smtp-push-history';
+    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
+
+    const result = await axios.get(url, {
+        params: {...req},
+        headers: {
+            'Authorization': 'Bearer ' + token?.value,
+        }
+    }).then((res: AxiosResponse<PageResponse<SmtpHistoryI>>) => {
+        return res.data;
+    });
+
+    return result;
+}

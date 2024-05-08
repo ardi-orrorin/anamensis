@@ -12,7 +12,7 @@ interface LoginHistoriesI {
     createAt: string;
 }
 
-interface GetProps {
+export interface GetProps {
     searchParams: URLSearchParams;
 }
 

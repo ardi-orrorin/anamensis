@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
 
     const id = req.nextUrl.searchParams.get('id');
 
-    const token = cookies().get('access.token') || cookies().get('refresh.token');
+    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
 
     const url = `${process.env.NEXT_PUBLIC_SERVER}/api/user-config-smtp${id ? `/${id}` : ''}`;
 

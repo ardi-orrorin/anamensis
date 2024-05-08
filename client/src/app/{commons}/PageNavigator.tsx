@@ -17,6 +17,9 @@ const PageNavigator = ({
 
     const pages = Array.from({length: curEndPage - startPAge + 1}, (_, i) => startPAge + i);
 
+    const skipNextPage = page + 5 > lastPage ? lastPage : page + 5;
+    const skipPrevPage = page - 5 < 1 ? 1 : page - 5;
+
     if(total !== 0 && lastPage < page) {
         redirect(`?page=${lastPage}&size=${size}`);
     } else if(total !== 0 && page < 1) {
@@ -28,7 +31,7 @@ const PageNavigator = ({
             {
                 page !== 1 &&
                   <Link className={['border border-solid border-gray-300 rounded-md text-sm px-4 py-2'].join(' ')}
-                        href={`?page=1&size=${size}`}
+                        href={`?page=${skipPrevPage}&size=${size}`}
                   >
                     <FontAwesomeIcon icon={faAnglesLeft} />
                   </Link>
@@ -39,6 +42,7 @@ const PageNavigator = ({
                         <Link className={['border border-solid border-gray-300 rounded-md text-sm px-4 py-2', page === item ? 'bg-blue-500 text-white' : ''].join(' ')}
                               href={`?page=${item}&size=${size}`}
                               key={`navi-${index}`}
+                              prefetch={true}
                         >
                             {item}
                         </Link>
@@ -48,7 +52,7 @@ const PageNavigator = ({
             {
                 page !== lastPage && lastPage !== 0 && total !== 0 &&
                   <Link className={['border border-solid border-gray-300 rounded-md text-sm px-4 py-2'].join(' ')}
-                        href={`?page=${lastPage}&size=${size}`}
+                        href={`?page=${skipNextPage}&size=${size}`}
                   >
                     <FontAwesomeIcon icon={faAnglesRight} />
                   </Link>

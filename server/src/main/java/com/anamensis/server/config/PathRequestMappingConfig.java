@@ -2,14 +2,13 @@ package com.anamensis.server.config;
 
 import com.anamensis.server.controller.AdminAPI;
 import com.anamensis.server.controller.PublicAPI;
-import com.anamensis.server.dto.request.UserRequest;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.result.method.RequestMappingInfo;
 import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
 
 import java.lang.reflect.Method;
 
-@Slf4j
+@Component
 public class PathRequestMappingConfig extends RequestMappingHandlerMapping {
 
     @Override

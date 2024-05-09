@@ -5,12 +5,25 @@ echo
 
 version=$1
 port=$2
+config=$3
 batch_file_name='batch-anamensis-'${version}''
 
 
 if((!version))
 then
     echo 'version is required'
+    exit 1
+fi
+
+if((!port))
+then
+    echo 'port is required'
+    exit 1
+fi
+
+if((!config))
+then
+    echo 'config is required'
     exit 1
 fi
 
@@ -37,7 +50,7 @@ echo
 
 echo 'batch-docker-compose build start....'
 
-TAG=${version} docker-compose -f batch-docker-compose.yml build
+TAG=${version} CONFIG_FILE=${config} docker-compose -f batch-docker-compose.yml build
 
 echo 'batch-docker-compose build success....'
 
@@ -47,7 +60,7 @@ echo
 
 echo 'docker stack deploy start....'
 
-TAG=${version} PORT=${port} docker stack deploy -c batch-docker-compose.yml batch-anamensis
+TAG=${version} PORT=${port} CONFIG_FILE=${config} docker stack deploy -c batch-docker-compose.yml batch-anamensis
 
 echo 'docker stack deploy success....'
 

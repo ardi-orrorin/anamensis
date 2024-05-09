@@ -31,7 +31,15 @@ services:
       retries: 3
       start_period: 10s
     restart: on-failure
+    secrets:
+      - source: batch-anamensis-secret-config
+        target: /application-prod.yml
 
 networks:
   net:
     driver: overlay
+
+secrets:
+  batch-anamensis-secret-config:
+    file: ${CONFIG_FILE}
+    external: true

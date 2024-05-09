@@ -29,7 +29,8 @@ public class AttendanceService {
                     );
         }
 
-        return Mono.justOrEmpty(attendance);
+        return Mono.justOrEmpty(attendance)
+                .switchIfEmpty(Mono.error(new RuntimeException("출석 정보를 찾을 수 없습니다.")));
     }
 
     @Transactional

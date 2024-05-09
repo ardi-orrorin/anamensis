@@ -10,12 +10,14 @@ import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("local")
 class AttendanceControllerTest {
 
     @LocalServerPort
@@ -79,5 +81,20 @@ class AttendanceControllerTest {
                 })
                 .isEqualTo("출석체크 완료");
 
+    }
+
+    @Test
+    void info() {
+        webTestClient.get()
+                .uri("/api/attendance")
+                .headers(httpHeaders -> {
+                    httpHeaders.setBearerAuth(token.getAccessToken());
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .consumeWith(response -> {
+                    log.info("Response: {}", response);
+                });
     }
 }

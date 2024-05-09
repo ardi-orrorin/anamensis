@@ -15,7 +15,7 @@ const LeftNavBar = ({
 
     const iconSize = 16;
     const menuItems = [
-        {name: '출석체크', href:'/user/attend', iconComponent: <FontAwesomeIcon icon={faCheckToSlot} width={iconSize} />},
+        // {name: '출석체크', href:'/user/attend', iconComponent: <FontAwesomeIcon icon={faCheckToSlot} width={iconSize} />},
         {name: '유저 정보', href:'/user/info', iconComponent: <FontAwesomeIcon icon={faCheckToSlot} width={iconSize} />},
         {name: '로그인기록', href:'/user/history', iconComponent: <FontAwesomeIcon icon={faClockRotateLeft} width={iconSize} />},
         {name: 'SMTP', href:'/user/smtp', iconComponent: <FontAwesomeIcon icon={faEnvelope} width={iconSize} />},

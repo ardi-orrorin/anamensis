@@ -5,16 +5,16 @@ import {AuthType} from "@/app/login/{services}/types";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {useRouter} from "next/navigation";
 
-export default function Page() {
+export default function AttendInfo() {
 
     const router = useRouter();
 
-    const [user, setUser] = useState<UserInfoI>({} as UserInfoI);
+    const [user, setUser] = useState<AttendInfoI>({} as AttendInfoI);
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(()=> {
-        axios.get("/api/user/info")
-            .then((res: AxiosResponse<UserInfoI>) => {
+        axios.get("/api/user/attend")
+            .then((res: AxiosResponse<AttendInfoI>) => {
                 setUser(res.data);
             })
     },[loading]);
@@ -31,7 +31,7 @@ export default function Page() {
             })
     }
     return (
-        <div className={'flex flex-col gap-3'}>
+        <div className={'w-full flex flex-col gap-5'}>
             <div>
                 <label>아이디 : </label>
                 <span>{user.userId}</span>
@@ -41,27 +41,19 @@ export default function Page() {
                 <span>{user.email}</span>
             </div>
             <div>
-                <label>연락처 : </label>
-                <span>{user.phone}</span>
-            </div>
-            <div>
-                <label>이름 : </label>
-                <span>{user.name}</span>
-            </div>
-            <div>
                 <label>점수 : </label>
                 <span>{user.point}</span>
             </div>
             <div>
-                <label>인증 방식 : </label>
-                <span>{user.sauthType}</span>
+                <label>마지막 출석일 : </label>
+                <span>{user.lastDate}</span>
             </div>
             <div>
-                <label>2차 인증 사용여부 : </label>
-                <span>{user.sauth ? 'O' : 'X'}</span>
+                <label>연속 출석 횟수 : </label>
+                <span>{user.days}회</span>
             </div>
             <div>
-                <button className={'w-full bg-blue-500 text-white p-2 rounded'}
+                <button className={'w-full bg-blue-300 text-white p-2 rounded hover:bg-blue-700 duration-500'}
                         onClick={attend}
                 >
                     {
@@ -75,12 +67,10 @@ export default function Page() {
     )
 }
 
-export interface UserInfoI {
-    userId: string
-    email: string
-    phone: string
-    name: string
-    point: number
-    sauthType: AuthType
-    sauth: boolean
+export interface AttendInfoI {
+    userId   : string;
+    email    : string;
+    point    : number;
+    lastDate : string;
+    days     : number;
 }

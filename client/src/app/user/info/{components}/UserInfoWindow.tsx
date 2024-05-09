@@ -36,7 +36,7 @@ const UserInfoWindow = ({
                 </button>
             </div>
             <div className={['duration-300', open[openKey] ? 'h-80 max-h-80' : 'max-h-0 h-0'].join(' ')}>
-                <div className={[open[openKey] ? 'flex flex-col py-3 px-2' : 'hidden', 'duration-500'].join(' ')}>
+                <div className={[open[openKey] ? 'h-full w-full flex flex-col p-4 items-center justify-center ' : 'hidden', 'duration-500'].join(' ')}>
                     {children}
                 </div>
             </div>

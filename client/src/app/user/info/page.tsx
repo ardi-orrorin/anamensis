@@ -1,9 +1,10 @@
 'use client'
-import {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Image from "next/image";
 import axios from "axios";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import {UserInfoI} from "@/app/user/attend/page";
+import {UserInfoI} from "@/app/user/email/page";
+
 
 type loadingType = {
     profile : boolean,
@@ -22,6 +23,7 @@ export default function Page() {
     useEffect(() => {
         axios.get('/api/user/info')
             .then((res) => {
+                console.log(res.data)
                 setProfile(res.data)
             })
     },[])
@@ -135,7 +137,7 @@ export default function Page() {
             </div>
             <div className={'flex flex-col gap-3 w-full sm:w-2/3 md:w-[400px] duration-500'}>
                 <div className={'flex gap-3'}>
-                    <span className={'flex items-center w-20'}>이름</span>
+                    <span className={'flex items-center w-36'}>이름</span>
                     <input className={'w-full px-3 py-2 outline-0 focus:bg-blue-50 duration-300 text-sm'}
                            name={'name'}
                            value={profile.name}
@@ -143,7 +145,7 @@ export default function Page() {
                     />
                 </div>
                 <div className={'flex gap-3'}>
-                    <span className={'flex items-center w-20'}>이메일</span>
+                    <span className={'flex items-center w-36'}>이메일</span>
                     <input className={'w-full px-3 py-2 outline-0 focus:bg-blue-50 duration-300 text-sm'}
                            name={'email'}
                            value={profile.email}
@@ -151,12 +153,39 @@ export default function Page() {
                     />
                 </div>
                 <div className={'flex gap-3'}>
-                    <span className={'flex items-center w-20'}>연락처</span>
+                    <span className={'flex items-center w-36'}>연락처</span>
                     <input className={'w-full px-3 py-2 outline-0 focus:bg-blue-50 duration-300 text-sm'}
                            name={'phone'}
                            value={profile.phone}
                            onChange={onChange}
                     />
+                </div>
+                <div className={'flex gap-3'}>
+                    <span className={'flex items-center w-36'}>포인트</span>
+                    <span className={'w-full px-3 py-2 outline-0 hover:bg-blue-50 duration-300 text-sm'}
+                    >{profile.point}
+                    </span>
+                </div>
+                <div className={'flex gap-3'}>
+                    <span className={'flex items-center w-36'}>2차 인증 사용</span>
+                    <span className="w-full px-3 py-2 inline-flex items-center cursor-pointer">
+                        <input type="checkbox" className={"sr-only peer hidden"} checked={profile.sauth} disabled/>
+                        <div className="relative w-11 h-6 ray-200 peer-focus:outline-none peer-focus:ring-4
+                                        peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-300
+                                        peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
+                                        peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px]
+                                        after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5
+                                        after:transition-all dark:border-gray-400 peer-checked:bg-blue-300"></div>
+                        <span className="ms-3 text-sm fontclassNameum text-blue-700 items-center">
+                            {profile.sauth ? '사용 중' : '사용 안함'}
+                        </span>
+                    </span>
+                </div>
+                <div className={'flex gap-3'}>
+                    <span className={'flex items-center w-36'}>2차 인증 방법</span>
+                    <span className={'w-full px-3 py-2 outline-0 hover:bg-blue-50 duration-300 text-sm'}
+                    >{profile.sauthType}
+                    </span>
                 </div>
                 <div>
                     <button className={'w-full rounded bg-blue-300 text-white py-2'}

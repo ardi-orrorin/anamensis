@@ -8,6 +8,7 @@
         SELECT *
           FROM attendance
          WHERE user_pk = #{userPk}
+           AND is_use  = 1
     </select>
 
     <insert id="init" parameterType="Attendance">

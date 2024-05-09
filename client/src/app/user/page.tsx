@@ -5,6 +5,7 @@ import {useMemo, useState} from "react";
 import {faWindowRestore} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faWindowMinimize} from "@fortawesome/free-solid-svg-icons/faWindowMinimize";
+import AttendInfo from "@/app/user/{components}/AttendInfo";
 
 export type OpenType = {
     win1: boolean,
@@ -27,7 +28,7 @@ export default function Page() {
     const ele = [
         {
             id: 1, open: open.win1,
-            component: <UserInfoWindow key={'win1'} openKey={'win1'} title={'제목1'} open={open} setOpen={setOpen}>test</UserInfoWindow>
+            component: <UserInfoWindow key={'win1'} openKey={'win1'} title={'출석체크'} open={open} setOpen={setOpen}><AttendInfo/></UserInfoWindow>
         },
         {
             id: 2, open: open.win2,

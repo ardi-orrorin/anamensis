@@ -1,5 +1,6 @@
 package com.anamensis.server.controller;
 
+import com.anamensis.server.dto.response.AttendResponse;
 import com.anamensis.server.entity.Attendance;
 import com.anamensis.server.entity.PointCode;
 import com.anamensis.server.service.AttendanceService;
@@ -26,6 +27,22 @@ public class AttendanceController {
     private final PointService pointService;
 
     private final UserService userService;
+
+
+    @GetMapping("")
+    public Mono<AttendResponse.AttendInfo> info(
+        @AuthenticationPrincipal Mono<UserDetails> user
+    ) {
+        return user
+                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
+                .flatMap(u -> attendanceService.findByUserPk(u.getId())
+                                .map(attend -> Tuples.of(u, attend))
+                )
+                .flatMap(t ->
+                    Mono.just(AttendResponse.AttendInfo.mergeUserAndAttendance(t.getT1(), t.getT2()))
+                );
+    }
+
 
     @GetMapping("check")
     public Mono<String> update(

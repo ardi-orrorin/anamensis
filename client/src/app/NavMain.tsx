@@ -20,6 +20,11 @@ const NavMain = async () => {
             url: '/public',
             loginRequired: false
         },
+        {
+            name: 'Board',
+            url: '/board',
+            loginRequired: false
+        },
     ];
 
     const rightMenuItems : NavItemProps[] = [

@@ -33,8 +33,6 @@ class WebSysControllerTest {
     Logger log = org.slf4j.LoggerFactory.getLogger(WebSysControllerTest.class);
 
 
-    Token token;
-
     @BeforeEach
     @Order(1)
     void setUp() {
@@ -42,7 +40,7 @@ class WebSysControllerTest {
                 .baseUrl("http://localhost:" + port)
                 .build();
     }
-
+    Token token;
 
     @BeforeEach
     @Order(2)

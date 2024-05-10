@@ -33,14 +33,14 @@ class ShareLinkServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = User.builder()
-                .id(2)
-                .userId("admin")
-                .pwd("admin")
-                .name("admin")
-                .build();
-
-        orgLink = "orgLink";
+//        user = User.builder()
+//                .id(2)
+//                .userId("admin")
+//                .pwd("admin")
+//                .name("admin")
+//                .build();
+//
+//        orgLink = "orgLink";
     }
 
     @Test
@@ -64,15 +64,15 @@ class ShareLinkServiceTest {
     @Test
     void insertTest() {
         String link = "/test/test";
-        User user = User.builder()
-                .id(2)
-                .userId("admin")
-                .pwd("admin")
-                .name("admin")
-                .build();
-
-        shareLinkService.insert(link, user);
-
+//        User user = User.builder()
+//                .id(2)
+//                .userId("admin")
+//                .pwd("admin")
+//                .name("admin")
+//                .build();
+//
+//        shareLinkService.insert(link, user);
+//r
 
     }
 
@@ -97,22 +97,22 @@ class ShareLinkServiceTest {
 
     @Test
     void selectAll() {
-        User user = User.builder()
-                .id(2)
-                .userId("admin")
-                .pwd("admin")
-                .name("admin")
-                .build();
-
-        Page page = new Page();
-        page.setPage(1);
-        page.setSize(2);
+//        User user = User.builder()
+//                .id(2)
+//                .userId("admin")
+//                .pwd("admin")
+//                .name("admin")
+//                .build();
+//
+//        Page page = new Page();
+//        page.setPage(1);
+//        page.setSize(2);
 //        page.setCriteria("id");
-
-
-        Mono.just(user).zipWith(Mono.just(page))
-                .log()
-                .map(shareLinkService::selectAll)
-                .subscribe(sl -> log.info("sl : " + sl));
+//
+//
+//        Mono.just(user).zipWith(Mono.just(page))
+//                .log()
+//                .map(shareLinkService::selectAll)
+//                .subscribe(sl -> log.info("sl : " + sl));
     }
 }

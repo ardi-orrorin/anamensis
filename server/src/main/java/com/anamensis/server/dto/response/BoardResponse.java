@@ -1,0 +1,68 @@
+package com.anamensis.server.dto.response;
+
+
+import com.anamensis.server.resultMap.BoardResultMap;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+
+public class BoardResponse {
+
+    @Getter
+    @Builder
+    @ToString
+    public static class List {
+
+        private long id;
+
+        private String title;
+
+        private String writer;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime createdAt;
+
+        private boolean isAdsense;
+
+        public static List from(BoardResultMap.Board board) {
+            return List.builder()
+                    .id(board.getId())
+                    .title(board.getBoard().getTitle())
+                    .writer(board.getUser().getName())
+                    .createdAt(board.getBoard().getCreateAt())
+                    .isAdsense(board.getBoard().isAdsense())
+                    .build();
+        }
+    }
+
+    @Getter
+    @Builder
+    @ToString
+    public static class Content {
+
+        private long id;
+
+        private String title;
+
+        private Map<String, Object> content;
+
+        private String writer;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime createdAt;
+
+        public static Content from(BoardResultMap.Board board) {
+            return Content.builder()
+                    .id(board.getId())
+                    .title(board.getBoard().getTitle())
+                    .content(board.getBoard().getContent())
+                    .writer(board.getUser().getName())
+                    .createdAt(board.getBoard().getCreateAt())
+                    .build();
+        }
+    }
+}

@@ -8,6 +8,8 @@ import org.springframework.web.reactive.result.method.HandlerMethodArgumentResol
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 @Slf4j
 public class DeviceResolver implements HandlerMethodArgumentResolver {
     @Override
@@ -25,7 +27,7 @@ public class DeviceResolver implements HandlerMethodArgumentResolver {
     ) {
         Device device = new Device();
         device.setDevice(exchange.getRequest().getHeaders().getFirst("User-Agent"));
-        device.setIp(exchange.getRequest().getRemoteAddress().getAddress().getHostAddress());
+        device.setIp(Objects.requireNonNull(exchange.getRequest().getRemoteAddress()).getAddress().getHostAddress());
         device.setLocation(exchange.getRequest().getHeaders().getFirst("Location"));
 
         return Mono.just(device);

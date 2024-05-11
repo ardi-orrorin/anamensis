@@ -43,8 +43,16 @@ public class BoardService {
     }
 
     @Transactional
+    public Mono<Boolean> viewUpdateByPk(long boardPk) {
+        return Mono.just(boardMapper.viewUpdateByPk(boardPk) == 1);
+    }
+
+    @Transactional
     public Mono<Boolean> disableByPk(long boardPk, long userPk) {
         return Mono.just(boardMapper.disableByPk(boardPk, userPk) == 1);
     }
 
+    public Mono<Boolean> updateByPk(Board board) {
+        return Mono.just(boardMapper.updateByPk(board) == 1);
+    }
 }

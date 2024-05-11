@@ -163,4 +163,20 @@ class BoardServiceTest {
                 .doOnNext(Assertions::assertFalse)
                 .subscribe();
     }
+
+    @Test
+    @DisplayName("게시글 조회수 증가")
+    void viewUpdateByPk() {
+            boardService.viewUpdateByPk(30)
+                .doOnNext(Assertions::assertTrue)
+                .subscribe();
+    }
+
+    @Test
+    @DisplayName("게시글 조회수 증가 실패")
+    void viewUpdateByPkError() {
+            boardService.viewUpdateByPk(0)
+                .doOnNext(Assertions::assertFalse)
+                .subscribe();
+    }
 }

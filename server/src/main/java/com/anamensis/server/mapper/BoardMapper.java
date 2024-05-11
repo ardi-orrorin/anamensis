@@ -23,4 +23,8 @@ public interface BoardMapper {
     long count(Board board);
 
     int disableByPk(long boardPk, long userPk);
+
+    int viewUpdateByPk(long boardPk);
+
+    int updateByPk(Board board);
 }

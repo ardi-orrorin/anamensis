@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @RestController
 @RequestMapping("api/boards")
@@ -45,7 +46,11 @@ public class BoardController {
     public Mono<BoardResponse.Content> findByPk(
             @PathVariable(name = "id") long boardPk
     ) {
-        return boardService.findByPk(boardPk);
+        return boardService.findByPk(boardPk)
+                .publishOn(Schedulers.boundedElastic())
+                .doOnNext(b -> boardService.viewUpdateByPk(boardPk)
+                    .subscribe()
+                );
     }
 
     @PostMapping("")
@@ -59,6 +64,32 @@ public class BoardController {
                 .flatMap(u -> boardService.save(board));
     }
 
+    @PutMapping("/{id}")
+    public Mono<StatusResponse> updateByPk(
+        @PathVariable(name = "id") long boardPk,
+        @RequestBody Board board,
+        @AuthenticationPrincipal Mono<UserDetails> user
+    ) {
+        return user
+                .flatMap(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
+                .doOnNext(u -> {
+                    board.setUserPk(u.getId());
+                    board.setId(boardPk);
+                })
+                .flatMap(u -> boardService.updateByPk(board))
+                .map(result -> {
+                    StatusResponse.StatusResponseBuilder sb = StatusResponse.builder();
+                    if (result) {
+                        sb.status(StatusType.SUCCESS)
+                          .message("게시글이 수정 되었습니다.");
+                    } else {
+                        sb.status(StatusType.FAIL)
+                          .message("게시글 수정에 실패하였습니다.");
+                    }
+                    return sb.build();
+                });
+    }
+
 
     @DeleteMapping("/{id}")
     public Mono<StatusResponse> disableByPk(
@@ -69,17 +100,15 @@ public class BoardController {
                 .flatMap(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
                 .flatMap(u -> boardService.disableByPk(boardPk, u.getId()))
                 .map(result -> {
+                    StatusResponse.StatusResponseBuilder sb = StatusResponse.builder();
                     if (result) {
-                        return StatusResponse.builder()
-                                .status(StatusType.SUCCESS)
-                                .message("게시글이 삭제 되었습니다.")
-                                .build();
+                        sb.status(StatusType.SUCCESS)
+                          .message("게시글이 삭제 되었습니다.");
                     } else {
-                        return StatusResponse.builder()
-                                .status(StatusType.FAIL)
-                                .message("게시글 삭제에 실패하였습니다.")
-                                .build();
+                        sb.status(StatusType.FAIL)
+                          .message("게시글 삭제에 실패하였습니다.");
                     }
+                    return sb.build();
                 });
     }
 

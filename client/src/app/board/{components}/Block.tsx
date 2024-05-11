@@ -15,7 +15,7 @@ type BlockProps = {
     isView: boolean;
     openMenu: boolean;
     openMenuToggle: () => void;
-    onChangeHandler: (e: ChangeEvent<HTMLInputElement>) => void;
+    onChangeHandler: (e: ChangeEvent<HtmlElements>) => void;
     onKeyUpHandler: (e: React.KeyboardEvent<HtmlElements>) => void;
     onKeyDownHandler: (e: React.KeyboardEvent<HtmlElements>) => void;
     onClickAddHandler: () => void;
@@ -24,7 +24,7 @@ type BlockProps = {
     blockRef: MutableRefObject<HTMLElement[] | null[]>;
 }
 
-type HtmlElements = HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | HTMLDataElement | HTMLDataListElement;
+export type HtmlElements = HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | HTMLDataElement;
 
 export default function Block({
     seq,
@@ -76,7 +76,7 @@ export default function Block({
                 {
                     // todo: 블록 타입 추가
                     !isView &&
-                    <input className={`w-full h-full outline-0 px-3 bg-gray-50 focus:bg-blue-50 hover:bg-blue-50 duration-500`}
+                    <input className={`w-full h-full break-words outline-0 px-3 bg-gray-50 focus:bg-blue-50 hover:bg-blue-50 duration-500`}
                            style={{color: color, backgroundColor: bg, fontSize: size}}
                            value={value}
                            onChange={onChangeHandler}

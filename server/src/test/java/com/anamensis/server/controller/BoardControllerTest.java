@@ -76,8 +76,8 @@ class BoardControllerTest {
                 .build();
     }
 
-    @Test
     @DisplayName("게시판 목록 조회")
+    @RepeatedTest(100)
     void findAll() {
         webTestClient.get()
                 .uri("/public/api/boards")
@@ -104,11 +104,11 @@ class BoardControllerTest {
                 });
     }
 
-    @Test
     @DisplayName("게시판 상세 조회 성공")
+    @RepeatedTest(1000)
     void findByPkSuccess() {
         webTestClient.get()
-                .uri("/public/api/boards/7")
+                .uri("/public/api/boards/30")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -117,8 +117,8 @@ class BoardControllerTest {
                     assertNotNull(response.getResponseBody());
                 });
     }
-    @Test
     @DisplayName("게시판 상세 조회 실패")
+    @RepeatedTest(10)
     void findByPkFail() {
         webTestClient.get()
                 .uri("/public/api/boards/0")

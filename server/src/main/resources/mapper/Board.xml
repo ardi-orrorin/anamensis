@@ -50,12 +50,35 @@
          WHERE b.id     = #{boardPk}
            AND b.is_use = 1
     </select>
+    <update id="updateByPk" parameterType="Board">
+        UPDATE board
+        <set>
+            <if test="categoryPk > 0">
+                category_pk = #{categoryPk},
+            </if>
+            <if test="title != null and title != ''">
+                title       = #{title},
+            </if>
+            <if test="content != null">
+                content     = #{content, typeHandler=JsonTypeHandler},
+            </if>
+        </set>
+         WHERE id           = #{id}
+           AND is_use       = 1
+           AND user_pk      = #{userPk}
+    </update>
     <update id="disableByPk" parameterType="Map">
         UPDATE board
            SET is_use  = 0
          WHERE id      = #{boardPk}
            AND is_use  = 1
            AND user_pk = #{userPk}
+    </update>
+    <update id="viewUpdateByPk" parameterType="Long">
+        UPDATE board
+           SET view_count = view_count + 1
+         WHERE id         = #{boardPk}
+           AND is_use     = 1
     </update>
     <resultMap id="BoardResultMapBoard" type="com.anamensis.server.resultMap.BoardResultMap$Board">
         <id property="id" column="id"/>

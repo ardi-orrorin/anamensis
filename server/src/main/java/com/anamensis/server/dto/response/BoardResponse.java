@@ -23,6 +23,8 @@ public class BoardResponse {
 
         private String writer;
 
+        private long viewCount;
+
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime createdAt;
 
@@ -32,6 +34,7 @@ public class BoardResponse {
             return List.builder()
                     .id(board.getId())
                     .title(board.getBoard().getTitle())
+                    .viewCount(board.getBoard().getViewCount())
                     .writer(board.getUser().getName())
                     .createdAt(board.getBoard().getCreateAt())
                     .isAdsense(board.getBoard().isAdsense())
@@ -48,6 +51,8 @@ public class BoardResponse {
 
         private String title;
 
+        private long categoryPk;
+
         private Map<String, Object> content;
 
         private String writer;
@@ -59,6 +64,7 @@ public class BoardResponse {
             return Content.builder()
                     .id(board.getId())
                     .title(board.getBoard().getTitle())
+                    .categoryPk(board.getBoard().getCategoryPk())
                     .content(board.getBoard().getContent())
                     .writer(board.getUser().getName())
                     .createdAt(board.getBoard().getCreateAt())

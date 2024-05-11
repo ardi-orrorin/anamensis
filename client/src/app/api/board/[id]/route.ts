@@ -25,7 +25,6 @@ export async function GET(req: NextRequest) {
 
 export async function PUT(req:NextRequest) {
     const data: BoardI = await req.json();
-    console.log(data)
 
     const id = req.nextUrl.pathname.split('/')[req.nextUrl.pathname.split('/').length - 1];
 

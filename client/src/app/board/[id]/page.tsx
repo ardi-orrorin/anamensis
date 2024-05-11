@@ -36,7 +36,6 @@ type OpenMenuProps = {
 }
 
 export default function Page({params}: {params : {id: string}}) {
-    const router = useRouter();
     const [data, setData] = useState<BoardI>({} as BoardI);
     const [loading, setLoading] = useState<boolean>(false);
     const [isView, setIsView] = useState<boolean>(true);
@@ -51,7 +50,7 @@ export default function Page({params}: {params : {id: string}}) {
     useEffect(() => {
         if(!isNewBoard) return ;
         const list = [addBlock(0, true)];
-        setData({...data, content: {list: list}, categoryPk: 2});
+        setData({...data, content: {list: list}, categoryPk: 2, title: '', writer: ''});
         setIsView(false);
     },[params.id]);
 
@@ -81,10 +80,22 @@ export default function Page({params}: {params : {id: string}}) {
         return block;
     },[]);
 
-    const submitHandler = useCallback(async (isSave: boolean) => {
+    const validation = useCallback(() => {
+        const title = data.title !== '';
+        const content = data.content.list.filter(item => item.value !== '').length > 0;
+        return title && content;
+    },[data]);
+
+    if(loading) return <GlobalLoadingSpinner />;
+
+    const submitHandler = async (isSave: boolean) => {
+        if(!validation()) {
+            alert('내용을 입력해주세요');
+            return ;
+        }
         setLoading(true);
+        let result = null;
         try {
-            let result = null;
             if(isSave) {
                 result = await axios.post('/api/board/new', data, {
                     headers: {
@@ -101,22 +112,29 @@ export default function Page({params}: {params : {id: string}}) {
         } catch (e) {
             console.log(e);
         } finally {
-            setLoading(false);
-        }
-    },[]);
+            if(isSave) {
+                location.href = '/board/' + result?.data?.id;
+            } else {
+                location.reload();
+            }
 
-    const deleteHandler = useCallback(async () => {
+        }
+    };
+
+    const deleteHandler = async () => {
         setLoading(true);
         try {
             await axios.delete('/api/board/' + params.id);
         } catch (e) {
             console.log(e);
         } finally {
-            router.push('/board');
+            location.href = '/board';
         }
-    },[]);
+    };
 
-    if(loading) return <GlobalLoadingSpinner />;
+
+
+
 
     const addBlockHandler = (seq: number) => {
         const list = data?.content?.list;
@@ -265,18 +283,8 @@ export default function Page({params}: {params : {id: string}}) {
 
                         </div>
                     }
-                    {
-                        isNewBoard &&
-                        <div className={'w-36 flex gap-1 justify-end'}>
-                          <button className={'rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
-                                  onClick={()=>submitHandler(true)}
-                          >
-                            작성
-                          </button>
-                        </div>
-                    }
                 </div>
-                <div className={'min-h-80 flex flex-col gap-3'}>
+                <div className={'min-h-36 flex flex-col gap-3'}>
                     {
                         data && data.content && data.content.list && data.content.list.length > 0 &&
                         data.content.list.map((item, index) =>
@@ -302,6 +310,16 @@ export default function Page({params}: {params : {id: string}}) {
                     }
                 </div>
                 <div>
+                    {
+                      isNewBoard &&
+                      <div className={'flex gap-1 justify-end'}>
+                        <button className={'w-full rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                                onClick={()=>submitHandler(true)}
+                        >
+                          작성
+                        </button>
+                      </div>
+                    }
                 </div>
             </div>
         </div>

@@ -28,7 +28,6 @@ public class AttendanceController {
 
     private final UserService userService;
 
-
     @GetMapping("")
     public Mono<AttendResponse.AttendInfo> info(
         @AuthenticationPrincipal Mono<UserDetails> user

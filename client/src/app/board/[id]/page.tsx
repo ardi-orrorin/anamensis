@@ -1,11 +1,10 @@
 'use client';
 
 import axios, {AxiosResponse} from "axios";
-import Block, {HtmlElements} from "@/app/board/{components}/Block";
+import Block from "@/app/board/{components}/Block";
 import {ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
-import {router} from "next/client";
-import {useRouter} from "next/navigation";
+import {HtmlElements} from "@/app/{components}/block/type/Types";
 
 export interface BoardI {
     id: string;
@@ -73,7 +72,7 @@ export default function Page({params}: {params : {id: string}}) {
     },[data?.content?.list.length]);
 
     const addBlock = useCallback((seq: number, init: boolean) => {
-        const block = {seq: 0, value: '', bg: '', code: '', color: '', size: '', text: '' };
+        const block = {seq: 0, value: '', bg: '', code: '00005', color: '', size: '', text: '' };
         if(!init) {
             block.seq = seq + 0.1;
         }
@@ -89,6 +88,7 @@ export default function Page({params}: {params : {id: string}}) {
     if(loading) return <GlobalLoadingSpinner />;
 
     const submitHandler = async (isSave: boolean) => {
+        console.log(data)
         if(!validation()) {
             alert('내용을 입력해주세요');
             return ;
@@ -110,7 +110,7 @@ export default function Page({params}: {params : {id: string}}) {
                 });
             }
         } catch (e) {
-            console.log(e);
+            alert('저장에 실패했습니다.');
         } finally {
             if(isSave) {
                 location.href = '/board/' + result?.data?.id;
@@ -131,10 +131,6 @@ export default function Page({params}: {params : {id: string}}) {
             location.href = '/board';
         }
     };
-
-
-
-
 
     const addBlockHandler = (seq: number) => {
         const list = data?.content?.list;
@@ -172,9 +168,22 @@ export default function Page({params}: {params : {id: string}}) {
         setIsView(!isView);
     }
 
-    const openMenuToggle  = (seq: number) => {
+    const openMenuToggle  = (seq: number, code: string) => {
+        console.log('openMenuToggle', openMenu.open, seq, code)
         if(openMenu.open && openMenu.seq === seq) {
             setOpenMenu({open: false, seq: 0});
+            if(code && code !== '') {
+
+                const list = data?.content?.list;
+                if (!list) return ;
+                const newList = list.map((item, index) => {
+                    if (item.seq === seq) {
+                        item.code = code;
+                    }
+                    return item;
+                });
+                setData({...data, content: {list: newList}});
+            }
             return ;
         }
         setOpenMenu({open: true, seq: seq});
@@ -284,7 +293,7 @@ export default function Page({params}: {params : {id: string}}) {
                         </div>
                     }
                 </div>
-                <div className={'min-h-36 flex flex-col gap-3'}>
+                <div className={'flex flex-col'}>
                     {
                         data && data.content && data.content.list && data.content.list.length > 0 &&
                         data.content.list.map((item, index) =>
@@ -297,12 +306,12 @@ export default function Page({params}: {params : {id: string}}) {
                                    color={item.color}
                                    isView={isView}
                                    openMenu={openMenu.open && Number(openMenu.seq) === Number(item.seq)}
-                                   openMenuToggle={() => {openMenuToggle(item.seq)}}
+                                   openMenuToggle={({label, code}) => {openMenuToggle(item.seq, code)}}
                                    onChangeHandler={e => {onChangeHandler(e, item.seq)}}
                                    onKeyDownHandler={e=> {onKeyDownHandler(e, item.seq)}}
                                    onKeyUpHandler={e=> {onKeyUpHandler(e, item.seq)}}
                                    setValue={e=>{}}
-                                   onClickAddHandler={()=> {addBlockHandler(item.seq)}}
+                                   onClickAddHandler={()=> addBlockHandler(item.seq)}
                                    size={item.size}
                                    text={item.text}
                             />

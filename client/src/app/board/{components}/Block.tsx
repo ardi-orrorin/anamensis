@@ -3,28 +3,8 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
 import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
-import {ChangeEvent, Dispatch, LegacyRef, MutableRefObject, SetStateAction, useEffect} from "react";
-
-type BlockProps = {
-    seq: number;
-    code: string;
-    color: string;
-    bg : string;
-    text: string;
-    size: string;
-    isView: boolean;
-    openMenu: boolean;
-    openMenuToggle: () => void;
-    onChangeHandler: (e: ChangeEvent<HtmlElements>) => void;
-    onKeyUpHandler: (e: React.KeyboardEvent<HtmlElements>) => void;
-    onKeyDownHandler: (e: React.KeyboardEvent<HtmlElements>) => void;
-    onClickAddHandler: () => void;
-    value: string;
-    setValue: Dispatch<SetStateAction<string>>;
-    blockRef: MutableRefObject<HTMLElement[] | null[]>;
-}
-
-export type HtmlElements = HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | HTMLDataElement;
+import {blockList} from "@/app/{components}/block/list";
+import {BlockProps, MenuParams} from "@/app/{components}/block/type/Types";
 
 export default function Block({
     seq,
@@ -42,20 +22,39 @@ export default function Block({
     onClickAddHandler,
     value,
     setValue,
-      blockRef
+    blockRef
 }: BlockProps) {
     const menuItems = [
-        {label: 'Text'},
-        {label: '1Text'},
-        {label: '2Text'},
-        {label: '3Text'},
-        {label: '4Text'},
-        {label: '5Text'},
-        {label: '6Text'},
+        {label: '큰 제목', code: '00001'},
+        {label: '작은 제목', code: '00002'},
+        {label: '큰 본문', code: '00003'},
+        {label: '보통 본문', code: '00004'},
+        {label: '작은 본문', code: '00005'},
     ];
 
+    const component = blockList.find(b=>
+        b.code === code
+    )?.component({
+        // bg,
+        // color,
+        // size,
+        // text,
+        code,
+        isView,
+        blockRef: blockRef,
+        seq: seq,
+        value: value,
+        setValue: setValue,
+        openMenu: false,
+        onKeyUpHandler: onKeyUpHandler,
+        onKeyDownHandler: onKeyDownHandler,
+        onChangeHandler: onChangeHandler,
+        onClickAddHandler: onClickAddHandler,
+        openMenuToggle: openMenuToggle
+    })
+
     return (
-        <div className={'h-8 flex relative'}>
+        <div className={'flex relative'}>
             {
                 !isView &&
                 <button className={'w-8 h-full flex justify-center items-center text-gray-600 hover:text-gray-950'}
@@ -67,32 +66,15 @@ export default function Block({
             {
                 !isView &&
                 <button className={'w-8 h-full flex justify-center items-center text-gray-600 hover:text-gray-950'}
-                        onClick={openMenuToggle}
+                        onClick={()=> openMenuToggle({label: '', code: ''})}
                 >
                   <FontAwesomeIcon icon={faEllipsisVertical} height={20} />
                 </button>
             }
             <div className={`w-full h-full flex items-center rounded`}>
-                {
-                    // todo: 블록 타입 추가
-                    !isView &&
-                    <input className={`w-full h-full break-words outline-0 px-3 bg-gray-50 focus:bg-blue-50 hover:bg-blue-50 duration-500`}
-                           style={{color: color, backgroundColor: bg, fontSize: size}}
-                           value={value}
-                           onChange={onChangeHandler}
-                           onKeyDown={onKeyDownHandler}
-                           onKeyUp={onKeyUpHandler}
-                           ref={el => blockRef.current[seq] = el}
-                    >
-                    </input>
-                }
-                {
-                    isView &&
-                    <span className={'w-full h-full flex items-center'}
-                      style={{color: color, backgroundColor: bg, fontSize: size}}
-                    >{value}</span>
-                }
+                { component }
             </div>
+
             {
                 openMenu &&
                 <div className={'absolute top-8 left-3 bg-blue-100 z-10 w-32 max-h-36 duration-500 overflow-y-scroll rounded'}>
@@ -102,7 +84,8 @@ export default function Block({
                                 return (
                                     <MenuItem key={index}
                                               label={item.label}
-                                              onClick={openMenuToggle}
+                                              code={item.code}
+                                              onClick={({label, code}) => openMenuToggle({label, code})}
                                     />
                                 )
                             })
@@ -117,14 +100,16 @@ export default function Block({
 const MenuItem = ({
     label,
     onClick,
+    code
 } : {
     label: string,
-    onClick: (e: React.MouseEvent<HTMLButtonElement>) => void
+    code: string,
+    onClick: ({label, code}:MenuParams) => void
 }) => {
     return (
         <li className={'w-full'}>
-            <button className={'w-full ps-3 h-8 text-left'}
-                    onClick={onClick}
+            <button className={'w-full ps-3 h-8 text-left text-sm'}
+                    onClick={()=> onClick({label, code})}
             >
                 {label}
             </button>

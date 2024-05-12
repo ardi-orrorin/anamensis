@@ -1,10 +1,18 @@
 import InputBlock from "@/app/{components}/block/input/InputBlock";
 import {BlockProps} from "@/app/{components}/block/type/Types";
 
-export const blockList = [
+export type BlockType = {
+    code: string,
+    tag: string,
+    label: string,
+    component: (props: BlockProps) => JSX.Element
+}
+
+export const blockTypeList: BlockType[] = [
     {
         code: '00001',
         tag: 'h1',
+        label: 'Heading 1',
         component: (props: BlockProps) => InputBlock(props, {
             fontSize: '2.4rem',
             fontWeight: '700',
@@ -15,6 +23,7 @@ export const blockList = [
     {
         code: '00002',
         tag: 'h2',
+        label: 'Heading 2',
         component: (props: BlockProps) => InputBlock(props, {
             fontSize: '1.8rem',
             fontWeight: '600',
@@ -25,6 +34,7 @@ export const blockList = [
     {
         code: '00003',
         tag: 'h3',
+        label: 'Heading 3',
         component: (props: BlockProps) => InputBlock(props, {
             fontSize: '1.4rem',
             fontWeight: '500',
@@ -35,6 +45,7 @@ export const blockList = [
     {
         code: '00004',
         tag: 'h4',
+        label: 'Heading 4',
         component: (props: BlockProps) => InputBlock(props, {
             fontSize: '1.2rem',
             padding: '0.5rem 0.5rem',
@@ -44,6 +55,7 @@ export const blockList = [
     {
         code: '00005',
         tag: 'h5',
+        label: 'Heading 5',
         component: (props: BlockProps) => InputBlock(props, {
             fontSize: '1rem',
             padding: '0.5rem 0.5rem',

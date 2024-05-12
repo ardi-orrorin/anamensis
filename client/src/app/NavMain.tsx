@@ -16,11 +16,6 @@ const NavMain = async () => {
 
     const menuItems : NavItemProps[] = [
         {
-            name: 'Menu',
-            url: '/public',
-            loginRequired: false
-        },
-        {
             name: 'Board',
             url: '/board',
             loginRequired: false

@@ -12,11 +12,11 @@ export type BlockProps = {
     value              : string;
     setValue           : Dispatch<SetStateAction<string>>;
     blockRef           : MutableRefObject<HTMLElement[] | null[]>;
-    openMenuToggle     : ({label, code}: MenuParams) => void;
-    onChangeHandler    : (e: ChangeEvent<HtmlElements>) => void;
-    onKeyUpHandler     : (e: React.KeyboardEvent<HtmlElements>) => void;
-    onKeyDownHandler   : (e: React.KeyboardEvent<HtmlElements>) => void;
-    onClickAddHandler  : () => void;
+    openMenuToggle?    : ({label, code}: MenuParams) => void;
+    onChangeHandler?   : (e: ChangeEvent<HtmlElements>) => void;
+    onKeyUpHandler?    : (e: React.KeyboardEvent<HtmlElements>) => void;
+    onKeyDownHandler?  : (e: React.KeyboardEvent<HtmlElements>) => void;
+    onClickAddHandler? : () => void;
 }
 
 export type MenuParams = {

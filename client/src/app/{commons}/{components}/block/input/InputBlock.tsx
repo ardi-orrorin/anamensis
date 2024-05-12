@@ -1,6 +1,6 @@
-import {BlockProps} from "@/app/{components}/block/type/Types";
+import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
 import React, {CSSProperties} from "react";
-import InputBase from "@/app/{components}/block/input/InputBase";
+import InputBase from "@/app/{commons}/{components}/block/input/InputBase";
 
 export default function InputBlock (props: BlockProps, customStyle: CSSProperties) {
 

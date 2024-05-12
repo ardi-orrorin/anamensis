@@ -1,4 +1,4 @@
-import {BlockProps} from "@/app/{components}/block/type/Types";
+import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
 import React, {CSSProperties, DetailedHTMLProps, InputHTMLAttributes} from "react";
 
 export default function InputBase({

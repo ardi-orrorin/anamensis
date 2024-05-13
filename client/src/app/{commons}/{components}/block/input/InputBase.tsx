@@ -9,8 +9,10 @@ export default function InputBase({
 }){
 
     const {
-        onKeyUpHandler,
+        onKeyUpHandler, onFocusHandler,
         onKeyDownHandler, onChangeHandler,
+        onBlurHandler, onBlurCaptureHandler,
+        onMouseEnterHandler,
         value, isView,
         size, color, bg,
         blockRef, seq
@@ -33,11 +35,15 @@ export default function InputBase({
     };
 
     const props: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> = {
+        value,
         ref: el => blockRef.current[seq] = el,
         onKeyUp: onKeyUpHandler,
         onKeyDown: onKeyDownHandler,
         onChange: onChangeHandler,
-        value,
+        onFocus: onFocusHandler,
+        onMouseEnter: onMouseEnterHandler,
+        onBlur: onBlurHandler,
+        onBlurCapture: onBlurCaptureHandler,
     }
 
     return (

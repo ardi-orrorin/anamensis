@@ -1,7 +1,7 @@
 import {NextRequest, NextResponse} from "next/server";
 import axios, {AxiosResponse} from "axios";
-import {BoardI} from "@/app/board/[id]/page";
 import {cookies} from "next/headers";
+import {BoardI} from "@/app/board/{services}/types";
 
 export async function GET(req: NextRequest) {
     const id = req.nextUrl.pathname.split('/')[req.nextUrl.pathname.split('/').length - 1];

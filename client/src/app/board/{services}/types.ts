@@ -1,3 +1,5 @@
+import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
+
 export interface BoardI {
     id          : string;
     categoryPk  : number;
@@ -24,4 +26,11 @@ export interface BlockI {
 export type OpenMenuProps = {
     open  : boolean;
     seq   : number;
+}
+
+export type SubTextMenuType = {
+    icon  : IconDefinition;
+    label : string;
+    code  : string;
+    value : string;
 }

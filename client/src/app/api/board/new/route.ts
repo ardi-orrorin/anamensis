@@ -1,7 +1,7 @@
 import {NextRequest} from "next/server";
-import {BoardI} from "@/app/board/[id]/page";
 import {cookies} from "next/headers";
 import axios from "axios";
+import {BoardI} from "@/app/board/{services}/types";
 
 export async function POST(req: NextRequest){
     const data: BoardI = await req.json();

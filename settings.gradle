@@ -2,3 +2,4 @@ rootProject.name = 'anamnesis'
 
 includeBuild('server')
 includeBuild('batch')
+includeBuild('config')

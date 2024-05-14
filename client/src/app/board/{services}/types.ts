@@ -1,4 +1,5 @@
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
+import {CSSProperties} from "react";
 
 export interface BoardI {
     id          : string;
@@ -14,14 +15,15 @@ export interface BoardContentI {
 }
 
 export interface BlockI {
-    seq    : number;
-    value  : string;
-    bg     : string;
-    code   : string;
-    color  : string;
-    size   : string;
-    text   : string;
+    seq        : number;
+    value      : string;
+    textStyle? : TextStylesType;
+    code       : string;
 }
+
+export type TextStylesType = {
+    [key: string] : any;
+} & CSSProperties
 
 export type OpenMenuProps = {
     open  : boolean;

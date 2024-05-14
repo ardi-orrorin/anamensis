@@ -14,6 +14,7 @@ import BoardProvider from "@/app/board/{services}/BoardProvider";
 export default function Block(props: BlockProps) {
     const {
         seq,
+        textStyle,
         onClickAddHandler,
     } = props;
 
@@ -47,8 +48,19 @@ export default function Block(props: BlockProps) {
         setBoard({...board, data: {...board.data, content: {list: newList}}});
     }
 
-    const onClickSubTextMenu = (e: React.MouseEvent<HTMLButtonElement>, code: string) => {
-        console.log(e, code, seq);
+    const onClickSubTextMenu = ({type, value}:{type: string, value: string}) => {
+        const newList = board.data?.content?.list.map((item, index) => {
+            if (item.seq === seq) {
+                if(type === '') {
+                    item.textStyle = {};
+                    return item;
+                } else {
+                    item.textStyle = {...item.textStyle, [type]: value};
+                }
+            }
+            return item;
+        });
+        setBoard({...board, data: {...board.data, content: {list: newList}}});
     }
 
     return (
@@ -74,8 +86,9 @@ export default function Block(props: BlockProps) {
                     !board.isView
                     && blockService.blockMenu === 'openTextMenu'
                     && blockService.seq === seq
-                    && <div className={'absolute -top-8 left-0 md:left-1/3 bg-gray-100 z-20 w-auto max-h-52 duration-500 rounded'}>
-                    <SubTextMenu onClick={onClickSubTextMenu} />
+                    && textStyle
+                    && <div className={'absolute -top-8 left-0 md:left-1/4 bg-gray-100 z-20 w-auto max-h-52 duration-500 rounded'}>
+                    <SubTextMenu textStyle={textStyle} onClick={onClickSubTextMenu} />
                   </div>
                 }
                 {

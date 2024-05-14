@@ -14,7 +14,7 @@ export default function InputBase({
         onBlurHandler, onBlurCaptureHandler,
         onMouseEnterHandler,
         value, isView,
-        size, color, bg,
+        textStyle,
         blockRef, seq
     } = data;
 
@@ -24,14 +24,17 @@ export default function InputBase({
     }
 
     const customStyle: CSSProperties = {
-        outline: 'none',
-        border: 'none',
-        width: '100%',
-        fontSize: (size && size !== '') ? size : style.fontSize,
-        color: (color && color !== '') ? color : style.color,
-        fontWeight: style.fontWeight,
-        padding: style.padding,
-        letterSpacing: style.letterSpacing,
+        outline         : 'none',
+        border          : 'none',
+        width           : '100%',
+        wordBreak       : 'break-all',
+        fontSize        : textStyle?.fontSize   ? textStyle.fontSize   : style.fontSize,
+        color           : textStyle?.color      ? textStyle.color      : style.color,
+        fontWeight      : textStyle?.fontWeight ? textStyle.fontWeight : style.fontWeight,
+        fontStyle       : textStyle?.fontStyle  ? textStyle.fontStyle  : style.fontStyle,
+        padding         : style.padding,
+        letterSpacing   : style.letterSpacing,
+
     };
 
     const props: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> = {
@@ -47,11 +50,11 @@ export default function InputBase({
     }
 
     return (
-        <div style={{display: 'flex', width: '100%', padding: '0.5rem'}}>
+        <div style={{display: 'flex', width: '100%', padding: '0.1rem 0.5rem'}}>
             {
                 isView
-                ? <span style={{...customStyle, backgroundColor: bg || defaultBg.span}} {...props}>{value}</span>
-                : <input style={{...customStyle, backgroundColor: bg || defaultBg.input}} {...props}/>
+                ? <p style={{...customStyle, backgroundColor: textStyle?.backgroundColor || defaultBg.span}} {...props}>{value}</p>
+                : <input style={{...customStyle, backgroundColor: textStyle?.backgroundColor || defaultBg.input}} {...props}/>
             }
         </div>
     )

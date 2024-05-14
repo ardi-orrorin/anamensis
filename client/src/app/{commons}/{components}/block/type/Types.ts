@@ -1,12 +1,10 @@
 import {ChangeEvent, MutableRefObject} from "react";
+import {TextStylesType} from "@/app/board/{services}/types";
 
 export type BlockProps = {
     seq                     : number;
-    color?                  : string;
     code                    : string;
-    bg?                     : string;
-    text?                   : string;
-    size?                   : string;
+    textStyle?              : TextStylesType;
     isView?                 : boolean;
     openMenu?               : boolean;
     value                   : string;

@@ -9,12 +9,16 @@ import {BoardI, OpenMenuProps} from "@/app/board/{services}/types";
 import {blockTypeList} from "@/app/{commons}/{components}/block/list";
 import BlockProvider, {BlockService} from "@/app/board/{services}/BlockProvider";
 import BoardProvider, {BoardService} from "@/app/board/{services}/BoardProvider";
+import {faDownLeftAndUpRightToCenter, faUpRightAndDownLeftFromCenter} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 export default function Page({params}: {params : {id: string}}) {
 
     const [board, setBoard] = useState<BoardService>({} as BoardService);
 
     const [loading, setLoading] = useState<boolean>(false);
+
+    const [fullScreen, setFullScreen] = useState<boolean>(false);
 
     const [blockService, setBlockService] = useState<BlockService>({} as BlockService);
 
@@ -23,7 +27,7 @@ export default function Page({params}: {params : {id: string}}) {
     const isNewBoard = useMemo(() => !params.id || params.id === 'new',[params.id]);
 
     const defaultBlock = useMemo(()=>(
-        {seq: 0, value: '', bg: '', code: '00005', color: '', size: '', text: ''}
+        {seq: 0, value: '', code: '00005', textStyle: {}}
     ),[]);
     const shortList = useMemo(()=> (
         blockTypeList.map(item => ({ command: item.command, code: item.code}))
@@ -227,7 +231,7 @@ export default function Page({params}: {params : {id: string}}) {
     return (
         <BoardProvider.Provider value={{board, setBoard}}>
             <div className={'p-5 flex justify-center'}>
-                <div className={'w-full lg:w-2/3 xl:w-1/2 flex flex-col gap-6 duration-500'}>
+                <div className={`w-full flex flex-col gap-6 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-1/2'}`}>
                     <div className={'flex justify-between gap-2 h-auto border-b-2 border-solid border-blue-200 py-3'}>
                         <div className={'font-bold flex items-center w-full'}>
                             {
@@ -250,30 +254,40 @@ export default function Page({params}: {params : {id: string}}) {
                             <div className={'w-auto flex gap-1 justify-end'}>
                               {
                                   !board.isView &&
-                                  <button className={'w-16 rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                                  <button className={'w-16 rounded h-full border-2 border-blue-200 text-blue-400 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
                                           onClick={()=>submitHandler(false)}
                                   >저장
                                   </button>
                               }
-                              <button className={'w-16 rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                              <button className={'w-16 rounded h-full border-2 border-blue-200 text-blue-400 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
                                       onClick={editClickHandler}
                               >{board.isView ? '수정' : '취소'}
                               </button>
                               {
                                   !board.isView &&
-                                  <button className={'w-16 rounded h-full border-2 border-red-200 hover:bg-red-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                                  <button className={'w-16 rounded h-full border-2 border-red-200 text-red-400 hover:bg-red-200 hover:text-white py-1 px-3 text-sm duration-300'}
                                           onClick={deleteHandler}
                                   >삭제
                                   </button>
                               }
                               {
                                   board.isView &&
-                                  <button className={'w-16 rounded border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                                  <button className={'w-16 rounded border-2 border-blue-200 text-blue-400 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
                                   >공유
                                   </button>
                               }
                             </div>
                         }
+                        <div>
+                            <button className={'w-14 rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                                    onClick={()=> setFullScreen(!fullScreen)}>
+                                {
+                                    fullScreen
+                                    ? <FontAwesomeIcon icon={faDownLeftAndUpRightToCenter} className={'text-blue-400'} />
+                                    : <FontAwesomeIcon icon={faUpRightAndDownLeftFromCenter} className={'text-blue-400'} />
+                                }
+                            </button>
+                        </div>
                     </div>
                     <BlockProvider.Provider value={{blockService, setBlockService}}>
                         <div className={'flex flex-col'}>
@@ -287,11 +301,8 @@ export default function Page({params}: {params : {id: string}}) {
                                            blockRef={blockRef}
                                            seq={item.seq}
                                            value={item.value}
-                                           bg={item.bg}
+                                           textStyle={item.textStyle}
                                            code={item.code}
-                                           color={item.color}
-                                           size={item.size}
-                                           text={item.text}
                                            // setValue={e=>{}}
                                            onChangeHandler={e => {onChangeHandler(e, item.seq)}}
                                            onKeyDownHandler={e=> {onKeyDownHandler(e, item.seq)}}

@@ -48,15 +48,12 @@ export default function Block(props: BlockProps) {
         setBoard({...board, data: {...board.data, content: {list: newList}}});
     }
 
-    const onClickSubTextMenu = ({type, value}:{type: string, value: string}) => {
+    const onClickSubTextMenu = (type: string, value: string) => {
         const newList = board.data?.content?.list.map((item, index) => {
             if (item.seq === seq) {
-                if(type === '') {
-                    item.textStyle = {};
-                    return item;
-                } else {
-                    item.textStyle = {...item.textStyle, [type]: value};
-                }
+                item.textStyle = type === ''
+                ? {}
+                : {...item.textStyle, [type]: value};
             }
             return item;
         });
@@ -88,16 +85,17 @@ export default function Block(props: BlockProps) {
                     && blockService.seq === seq
                     && textStyle
                     && <div className={'absolute -top-8 left-0 md:left-1/4 bg-gray-100 z-20 w-auto max-h-52 duration-500 rounded'}>
-                    <SubTextMenu textStyle={textStyle} onClick={onClickSubTextMenu} />
-                  </div>
+                        <SubTextMenu textStyle={textStyle}
+                                     onClick={onClickSubTextMenu}
+                        />
+                    </div>
                 }
                 {
-                    blockTypeList.find(b=> b.code === props.code)
-                        ?.component({
-                            ...props,
-                            isView: board.isView,
-                            onMouseEnterHandler,
-                        })
+                    blockTypeList.find(b=> b.code === props.code)?.component({
+                        ...props,
+                        isView: board.isView,
+                        onMouseEnterHandler,
+                    })
                 }
             </div>
             {

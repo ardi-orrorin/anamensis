@@ -2,10 +2,10 @@
 
 import axios, {AxiosResponse} from "axios";
 import Block from "@/app/board/{components}/Block";
-import {ChangeEvent, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
+import {ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 import {HtmlElements} from "@/app/{commons}/{components}/block/type/Types";
-import {BoardI, OpenMenuProps} from "@/app/board/{services}/types";
+import {BoardI} from "@/app/board/{services}/types";
 import {blockTypeList} from "@/app/{commons}/{components}/block/list";
 import BlockProvider, {BlockService} from "@/app/board/{services}/BlockProvider";
 import BoardProvider, {BoardService} from "@/app/board/{services}/BoardProvider";

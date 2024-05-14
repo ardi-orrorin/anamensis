@@ -9,7 +9,7 @@ const SubTextMenu = ({
     onClick,
 }: {
     textStyle : TextStylesType
-    onClick   : ({type, value}:{type: string, value: string}) => void
+    onClick   : (type: string, value: string) => void
 }) => {
 
     const {blockService, setBlockService} = useContext(BlockProvider);
@@ -20,14 +20,13 @@ const SubTextMenu = ({
         setBlockService({...blockService, blockMenu: 'openMenu'})
     }
 
-
     const selectChangeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        onClick({type: e.target.name, value: e.target.value})
+        onClick(e.target.name, e.target.value)
     }
 
     const selectFontStyle = (type: string, value:string) => {
         value = textStyle[type] === value ? '' : value;
-        onClick({type, value})
+        onClick(type, value)
     }
 
     return (
@@ -44,7 +43,7 @@ const SubTextMenu = ({
                     {
                         fontSize.map((size, index) => {
                             return (
-                                <option key={'fontSize'+index}
+                                <option key={'fontSize' + index}
                                         value={size.value ?? ''}
                                 >{size.value}
                                 </option>
@@ -63,8 +62,8 @@ const SubTextMenu = ({
                    {
                        fontColor.map((color, index) => {
                            return (
-                               <option key={'fontColor'+index}
-                                       value={color.value ?? ''}
+                               <option key={'fontColor' + index}
+                                       value={color.value}
                                >{color.value}
                                </option>
                            )
@@ -82,8 +81,8 @@ const SubTextMenu = ({
                     {
                         backgroundColor.map((color, index) => {
                             return (
-                                <option key={'backgroundColor'+index}
-                                        value={color.value ?? ''}
+                                <option key={'backgroundColor' + index}
+                                        value={color.value}
                                 >{color.value}
                                 </option>
                             )
@@ -93,20 +92,21 @@ const SubTextMenu = ({
             </li>
             <li>
                 <button className={buttonStyle + (textStyle.fontStyle === 'Italic' ? 'bg-blue-400 text-white' : 'bg-white')}
-                        onClick={e=> selectFontStyle('fontStyle', 'Italic')}
+                        onClick={() => selectFontStyle('fontStyle', 'Italic')}
                 >
                     <FontAwesomeIcon icon={faItalic} />
                 </button>
             </li>
             <li>
                 <button className={buttonStyle + (textStyle.fontWeight === fontWeight ? 'bg-blue-400 text-white' : 'bg-white')}
-                        onClick={e=> selectFontStyle('fontWeight', fontWeight)}
-                >                    <FontAwesomeIcon icon={faBold} />
+                        onClick={() => selectFontStyle('fontWeight', fontWeight)}
+                >
+                    <FontAwesomeIcon icon={faBold} />
                 </button>
             </li>
             <li>
                 <button className={buttonStyle + (Object.keys(textStyle).length > 0 ? 'bg-blue-400 text-white' : 'bg-white')}
-                        onClick={e=> selectFontStyle('', '')}
+                        onClick={() => selectFontStyle('', '')}
                 >
                     초기화
                 </button>

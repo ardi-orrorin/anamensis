@@ -1,52 +1,7 @@
-mybatis:
-  mapper-locations: classpath:mapper/*.xml
-  type-aliases-package: com.anamensis.server.entity, com.anamensis.server.resultMap, com.anamensis.server.typeHandler
-  configuration:
-    map-underscore-to-camel-case: true
-    jdbc-type-for-null: "null"
-
 spring:
-  session:
-    redis:
-      flush-mode: on_save
-      namespace: spring
-
-  cloud:
-    aws:
-      credentials:
-        access-key: access-key
-        secret-key: scret-key
-      s3:
-        enabled: true
-        region: ap-northeast-2
-
-logging:
-  level:
-    mapper:
-      mybatis: trace
-
-email:
-  host: smtp.gmail.com
-  port: 587
-  username: username
-  password: password
-
-file:
-  upload-dir: /Users/username/Downloads/upload
-
-pageable:
-  page: 1
-  size: 20
-
-## 예제
-jwt:
-  secret: c2R2c2RsdmlqZHM7dmlqYTsnb3NkaWpmYW85d2V1cndhZWxrbnZtbC54Y252bGl6dXhjaHZwOHN2OGloamFzO2RsdmtuYW1zO2RsaWZqYW9zZGZ1OTA4OXUyMzA0Mmpsa25tLnZseGNudnppaHNkbztmaHNvZGZhZGZhZmJ2enhjYnp2YnpkZmJmZA
-
-aws:
-  ses:
-    from: test@tets.com
-
-db:
-  setting:
-    user:
-      attendance_point_code_prefix: attend-
+  application:
+    name: anamensisServer, anamensisAws, anamensisMysql, anamensisSecurity
+  profiles:
+    active: dev
+  config:
+    import: optional:configserver:http://localhost:8077

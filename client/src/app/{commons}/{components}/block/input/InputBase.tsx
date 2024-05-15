@@ -20,7 +20,7 @@ export default function InputBase({
 
     const defaultBg = {
         input: 'rgba(230,230,230,0.2)',
-        span: ''
+        p: ''
     }
 
     const customStyle: CSSProperties = {
@@ -39,7 +39,7 @@ export default function InputBase({
 
     const props: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> = {
         value,
-        ref: el => blockRef.current[seq] = el,
+        ref: el => blockRef!.current[seq] = el,
         onKeyUp: onKeyUpHandler,
         onKeyDown: onKeyDownHandler,
         onChange: onChangeHandler,
@@ -53,7 +53,7 @@ export default function InputBase({
         <div style={{display: 'flex', width: '100%', padding: '0.1rem 0.5rem'}}>
             {
                 isView
-                ? <p style={{...customStyle, backgroundColor: textStyle?.backgroundColor || defaultBg.span}} {...props}>{value}</p>
+                ? <p style={{...customStyle, backgroundColor: textStyle?.backgroundColor || defaultBg.p}} {...props}>{value}</p>
                 : <input style={{...customStyle, backgroundColor: textStyle?.backgroundColor || defaultBg.input}} {...props}/>
             }
         </div>

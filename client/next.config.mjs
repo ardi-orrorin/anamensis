@@ -9,9 +9,10 @@ const nextConfig = {
       {
         protocol : 'https',
         hostname : process.env.NEXT_PUBLIC_CDN_SERVER_HOST,
-      }
+      },
     ],
     formats : ['image/avif'],
+
   },
 };
 

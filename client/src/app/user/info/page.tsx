@@ -50,6 +50,7 @@ export default function Page() {
 
         await axios.post('/api/user/info/profile-img', formdata)
             .then((res) => {
+                console.log(res.data)
                 setImg(process.env.NEXT_PUBLIC_CDN_SERVER + res.data)
             }).finally(() => {
                 setLoading({

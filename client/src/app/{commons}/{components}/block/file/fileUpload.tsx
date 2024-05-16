@@ -37,7 +37,13 @@ export default function FileUpload (props: FileUploadProps) {
         if(!e.target.files || e.target.files.length === 0) return ;
 
         const formData = new FormData();
+        const fileContent = {
+            tableCodePk: 2
+        }
+
+        const blob = new Blob([JSON.stringify(fileContent)], {type: 'application/json'})
         formData.append('file', e.target.files[0]);
+        formData.append('fileContent', blob);
         setLoading(true);
 
         await axios.post('/api/file', formData, {
@@ -46,12 +52,10 @@ export default function FileUpload (props: FileUploadProps) {
             }
         }).then((res) => {
             console.log('res', res);
-            onUploadFileUrl('sdfs');
+            // onUploadFileUrl('sdfs');
         })
         .finally(() => {
-            setTimeout(() => {
-                setLoading(false);
-            },2000);
+            setLoading(false);
         });
     }
 

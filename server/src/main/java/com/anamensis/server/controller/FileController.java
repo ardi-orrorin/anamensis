@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/files")
 @RequiredArgsConstructor
@@ -21,12 +23,12 @@ public class FileController {
 
     private final UserService userService;
 
-    @PostMapping("")
-    public Mono<Boolean> upload(
-            @RequestBody File file,
-            @RequestPart("file") FilePart filePart
+    @PostMapping("content")
+    public Mono<List<File>> upload(
+            @RequestPart("file") FilePart filePart,
+            @RequestPart("fileContent") File fileContent
     ) {
-        return fileService.insert(filePart, file);
+        return fileService.insert(filePart, fileContent);
     }
 
     @GetMapping("/{fileName}")

@@ -1,5 +1,6 @@
 package com.anamensis.server.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +25,9 @@ public class File {
 
     private String filePath;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createAt;
 
     private boolean isUse;
+
 }

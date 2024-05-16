@@ -4,6 +4,7 @@ import com.anamensis.server.entity.File;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 @Mapper
@@ -12,7 +13,7 @@ public interface FileMapper {
 
     Optional<File> selectByFileName(String fileName);
 
-    Optional<File> findByTableNameAndTableRefPk(
+    List<File> findByTableNameAndTableRefPk(
             @Param("tableName") String tableName,
             @Param("tableRefPk") long tableRefPk
     );

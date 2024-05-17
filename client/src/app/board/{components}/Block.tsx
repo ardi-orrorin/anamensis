@@ -4,25 +4,39 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
 import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
 import {blockTypeList} from "@/app/{commons}/{components}/block/list";
-import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
+import {BlockProps, HtmlElements} from "@/app/{commons}/{components}/block/type/Types";
 import React, {useContext} from "react";
 import SubTextMenu from "@/app/board/{components}/SubTextMenu";
 import MenuItem from "@/app/board/{components}/MenuItem";
-import BlockProvider from "@/app/board/{services}/BlockProvider";
+import BlockProvider, {BlockMenu, BlockService} from "@/app/board/{services}/BlockProvider";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
+import SubObjectMenu from "@/app/board/{components}/SubObjectMenu";
 
 export default function Block(props: BlockProps) {
     const {
         seq,
         textStyle,
         onClickAddHandler,
+        onClickDeleteHandler,
+        value,
     } = props;
 
     const {board, setBoard} = useContext(BoardProvider);
     const {blockService, setBlockService} = useContext(BlockProvider);
 
-    const onMouseEnterHandler = () => {
-        setBlockService({...blockService, blockMenu: 'openTextMenu', seq})
+    const onMouseEnterHandler = (e: React.MouseEvent<HTMLInputElement | HTMLImageElement> ) => {
+        let blockMenu: BlockMenu = '';
+        if(e.target instanceof HTMLImageElement) {
+            blockMenu = 'openObjectMenu';
+        } else if(e.target instanceof HTMLInputElement) {
+            blockMenu = 'openTextMenu';
+        }
+
+        setBlockService({...blockService, blockMenu: blockMenu, seq})
+    }
+
+    const onMouseLeaveHandler = (e: React.MouseEvent<HTMLImageElement | HTMLInputElement> ) => {
+        setBlockService({blockMenu: '', seq: 0});
     }
 
     const openMenuToggle  = () => {
@@ -60,6 +74,37 @@ export default function Block(props: BlockProps) {
         setBoard({...board, data: {...board.data, content: {list: newList}}});
     }
 
+    const onClickObjectMenu = (type: string) => {
+        // delete, detailView
+        // todo: delete, detailView 구현
+        if(type === 'delete') {
+            if(!onClickDeleteHandler) return;
+            onClickDeleteHandler(seq);
+
+            return ;
+        }
+        if(type === 'detailView') {
+            const url = process.env.NEXT_PUBLIC_CDN_SERVER + value;
+            window.open(url, '_blank');
+            return ;
+
+        }
+
+    }
+
+    const onChangeValueHandler = (value: string) => {
+        const newList = board.data?.content?.list.map((item, index) => {
+            if (item.seq === seq) {
+                item.value = value;
+            }
+            return item;
+        });
+
+        setBoard({...board, data: {...board.data, content: {list: newList}}});
+    }
+
+
+
     return (
         <div className={'flex relative'}>
             {
@@ -84,9 +129,18 @@ export default function Block(props: BlockProps) {
                     && blockService.blockMenu === 'openTextMenu'
                     && blockService.seq === seq
                     && textStyle
-                    && <div className={'absolute -top-8 left-0 md:left-1/4 bg-gray-100 z-20 w-auto max-h-52 duration-500 rounded'}>
+                    && <div className={'absolute -top-8 left-0 md:left-1/4 bg-gray-100 z-20 w-auto max-h-52 duration-500 rounded  shadow-md'}>
                         <SubTextMenu textStyle={textStyle}
                                      onClick={onClickSubTextMenu}
+                        />
+                    </div>
+                }
+                {
+                    blockService.blockMenu === 'openObjectMenu'
+                    && blockService.seq === seq
+                    && <div className={'absolute bottom-[50%] left-[30%] bg-gray-100 z-10 max-h-80 duration-500 rounded shadow-md'}>
+                        <SubObjectMenu onClick={onClickObjectMenu}
+                                       isView={board.isView}
                         />
                     </div>
                 }
@@ -95,6 +149,8 @@ export default function Block(props: BlockProps) {
                         ...props,
                         isView: board.isView,
                         onMouseEnterHandler,
+                        onMouseLeaveHandler,
+                        onChangeValueHandler,
                     })
                 }
             </div>

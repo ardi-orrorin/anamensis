@@ -9,6 +9,7 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -24,10 +25,11 @@ public class FileController {
     private final UserService userService;
 
     @PostMapping("content")
-    public Mono<List<File>> upload(
+    public Mono<File> upload(
             @RequestPart("file") FilePart filePart,
             @RequestPart("fileContent") File fileContent
     ) {
+
         return fileService.insert(filePart, fileContent);
     }
 
@@ -45,5 +47,13 @@ public class FileController {
         return userDetails
                 .flatMap(u -> userService.findUserByUserId(u.getUsername()))
                 .flatMap(user -> fileService.saveProfile(user, filePart));
+    }
+
+    @PatchMapping("content")
+    public Mono<Void> deleteContent(
+            @RequestBody Flux<File> files
+    ) {
+        return files.flatMap(fileService::deleteFile)
+                .then();
     }
 }

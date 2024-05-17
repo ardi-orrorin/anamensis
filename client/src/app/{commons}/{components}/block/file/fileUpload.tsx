@@ -1,31 +1,30 @@
 'use client';
 
-import {CSSProperties, useRef, useState} from "react";
+import {CSSProperties, useContext, useRef, useState} from "react";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import axios from "axios";
 import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
+import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 
 
 export type FileUploadProps = {
     onUploadFileUrl: (url: string) => void;
+    isImage?: boolean;
 } & BlockProps;
 
 export default function FileUpload (props: FileUploadProps) {
-    const {onUploadFileUrl} = props;
+    const {onUploadFileUrl, isImage} = props;
 
     const useFileInputRef = useRef<HTMLInputElement>(null);
 
     const [loading, setLoading] = useState<boolean>(false);
+    const {setTempFiles} = useContext(TempFileProvider);
 
     const customStyle: CSSProperties = {
         width            : '100%',
         height           : '4rem',
         outline          : 'none',
-        border           : '1px solid',
-        borderRadius     : '0.4rem',
-        borderColor      : 'rgba(100, 100, 100, 1)',
-        color            : 'rgba(100, 100, 100, 1)',
-        backgroundColor  : 'rgba(250,250,250, 1)',
+        backgroundColor  : 'rgba(250,250,250, 0.3)',
     }
 
     const onClick = () => {
@@ -51,8 +50,14 @@ export default function FileUpload (props: FileUploadProps) {
                 'Content-Type': 'multipart/form-data'
             }
         }).then((res) => {
-            console.log('res', res);
-            // onUploadFileUrl('sdfs');
+            if(!res.data) return ;
+            setTempFiles(prevState => [
+                ...prevState,
+                {...res.data}
+            ]);
+
+            const url = res.data.filePath + res.data.fileName;
+            onUploadFileUrl(url);
         })
         .finally(() => {
             setLoading(false);
@@ -77,6 +82,7 @@ export default function FileUpload (props: FileUploadProps) {
                    onChange={onChangeFileHandler}
                    hidden={true}
                    multiple={false}
+                   accept={ isImage ? 'image/*' : '*/*'}
             />
         </>
     )

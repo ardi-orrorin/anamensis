@@ -25,7 +25,6 @@ public class File {
 
     private String filePath;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createAt;
 
     private boolean isUse;

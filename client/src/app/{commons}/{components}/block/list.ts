@@ -1,7 +1,8 @@
 import InputBlock from "@/app/{commons}/{components}/block/input/InputBlock";
 import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
-import {faHeading} from "@fortawesome/free-solid-svg-icons";
+import {faFile, faHeading, faImage} from "@fortawesome/free-solid-svg-icons";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
+import FileBlock from "@/app/{commons}/{components}/block/file/fileBlock";
 
 export type BlockType = {
     code       : string;
@@ -84,5 +85,23 @@ export const blockTypeList: BlockComponentType[] = [
             padding: '0.5rem 0.5rem',
             letterSpacing: '0.03rem',
         })
+    },
+    {
+        code: '00011',
+        tag: 'image',
+        command: '/img',
+        label: 'Image',
+        icon: faImage,
+        comment: '이미지',
+        component: (props: BlockProps) => FileBlock(props)
+    },
+    {
+        code: '00011',
+        tag: 'fileUpload',
+        command: '/file',
+        label: 'fileUplaod',
+        icon: faFile,
+        comment: '파일 업로드',
+        component: (props: BlockProps) => FileBlock(props)
     },
 ]

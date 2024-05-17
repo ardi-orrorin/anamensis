@@ -9,15 +9,19 @@ export type BlockProps = {
     openMenu?               : boolean;
     value                   : string;
     blockRef?                : MutableRefObject<HTMLElement[] | null[]>;
+    onChangeValueHandler?   : (value: string) => void;
     onChangeHandler?        : (e: ChangeEvent<HtmlElements>) => void;
     onKeyUpHandler?         : (e: React.KeyboardEvent<HtmlElements>) => void;
     onKeyDownHandler?       : (e: React.KeyboardEvent<HtmlElements>) => void;
     onFocusHandler?         : (e: React.FocusEvent<HtmlElements>) => void;
-    onMouseEnterHandler?    : (e: React.MouseEvent<HtmlElements>) => void;
+    onMouseEnterHandler?    : (e: React.MouseEvent<HTMLImageElement | HTMLInputElement>) => void;
+    onMouseLeaveHandler?    : (e: React.MouseEvent<HTMLImageElement | HTMLInputElement>) => void;
     onBlurHandler?          : (e: React.FocusEvent<HtmlElements>) => void;
     onBlurCaptureHandler?   : (e: React.FocusEvent<HtmlElements>) => void;
     onClickAddHandler?      : () => void;
     onClickSubTextMenu?     : (e: React.MouseEvent<HTMLButtonElement>, code: string) => void;
+    onClickDeleteHandler?   : (seq: number) => void;
 }
 
 export type HtmlElements = HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | HTMLDataElement;
+

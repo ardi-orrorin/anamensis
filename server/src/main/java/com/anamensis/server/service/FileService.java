@@ -43,51 +43,66 @@ public class FileService {
     }
 
     @Transactional
-    public Mono<List<File>> insert(FilePart filePart, File fileContent) {
+    public Mono<File> insert(FilePart filePart, File fileContent) {
         return fileProvider.save(filePart, fileContent)
-                .flatMapMany(file -> saveBoardImg(filePart, file))
+                .flatMap(file -> saveBoardImg(filePart, file))
                 .doOnNext(t -> fileMapper.insert(t.getT1()))
                 .publishOn(Schedulers.boundedElastic())
-                .doOnNext(t -> {
+                .flatMap(t -> {
+                    if(!"image".equalsIgnoreCase(filePart.headers().getContentType().getType())) {
+                           return Mono.just(t) ;
+                    }
                     if (t.getT2().width() == 0 || t.getT2().height() == 0) {
-                        awsS3Provider.saveOri(filePart, t.getT2().path(), t.getT2().file())
-                                .subscribe();
+                        return awsS3Provider.saveOri(filePart, t.getT2().path(), t.getT2().file())
+                                .thenReturn(t);
                     } else {
-                        awsS3Provider.saveThumbnail(filePart, t.getT2().path(), t.getT2().file(), t.getT2().width(), t.getT2().height())
-                                .subscribe();
+                        return awsS3Provider.saveThumbnail(filePart, t.getT2().path(), t.getT2().file(), t.getT2().width(), t.getT2().height())
+                                .thenReturn(t);
                     }
                 })
                 .map(Tuple2::getT1)
-                .collectList()
                 .onErrorMap(RuntimeException::new);
     }
 
-    public Flux<Tuple2<File, FilePathDto>> saveBoardImg(FilePart filePart, File fileContent) {
+    public Mono<Tuple2<File, FilePathDto>> saveBoardImg(FilePart filePart, File fileContent) {
         int profileWidth = 700;
         int profileHeight = 700;
 
         String ext = filePart.filename().substring(filePart.filename().lastIndexOf(".") + 1);
 
-        List<FilePathDto> filepath = filePathProvider.changeContentPath(
-                String.valueOf(fileContent.getTableCodePk()),
-                String.valueOf(fileContent.getTableRefPk()),
-                profileWidth, profileHeight, ext
-        );
+//        List<FilePathDto> filepath = filePathProvider.changeContentPath(
+//                profileWidth, profileHeight, ext
+//        );
 
-        return Flux.fromIterable(filepath)
-            .map(file -> {
-                File newFile = File.builder()
-                    .tableCodePk(fileContent.getTableCodePk())
-                    .tableRefPk(fileContent.getTableRefPk())
-                    .fileName(file.file())
-                    .filePath(file.path())
-                    .orgFileName(filePart.filename())
-                    .createAt(LocalDateTime.now())
-                    .isUse(true)
-                    .build();
-                return Tuples.of(newFile, file);
-            });
+        FilePathDto filepath = filePathProvider.changeContentPath(profileWidth, profileHeight, ext);
 
+
+        return Mono.just(filepath)
+                .map(file -> {
+                    File newFile = File.builder()
+                            .tableCodePk(fileContent.getTableCodePk())
+                            .tableRefPk(fileContent.getTableRefPk())
+                            .fileName(file.file())
+                            .filePath(file.path())
+                            .orgFileName(filePart.filename())
+                            .createAt(LocalDateTime.now())
+                            .isUse(true)
+                            .build();
+                    return Tuples.of(newFile, file);
+                });
+//        return Flux.fromIterable(filepath)
+//            .map(file -> {
+//                File newFile = File.builder()
+//                    .tableCodePk(fileContent.getTableCodePk())
+//                    .tableRefPk(fileContent.getTableRefPk())
+//                    .fileName(file.file())
+//                    .filePath(file.path())
+//                    .orgFileName(filePart.filename())
+//                    .createAt(LocalDateTime.now())
+//                    .isUse(true)
+//                    .build();
+//                return Tuples.of(newFile, file);
+//            });
     }
 
     public Mono<List<File>> findByTableNameAndTableRefPk(String tableName, long tableRefPk) {
@@ -137,6 +152,16 @@ public class FileService {
                 .doOnNext($ -> fileMapper.insert(fileEntity))
                 .flatMap(r -> awsS3Provider.saveProfileThumbnail(filePart, filepath.path(), filepath.file(), profileWidth, profileHeight))
                 .then(Mono.defer(() -> Mono.just(filepath.path() + filepath.file())));
+    }
+
+    @Transactional
+    public Mono<Boolean> deleteFile(File file) {
+        return Mono.just(fileMapper.updateIsUseById(file.getId(), 0))
+                .publishOn(Schedulers.boundedElastic())
+                .doOnNext(r -> awsS3Provider.deleteS3(file.getFilePath(), file.getFileName())
+                        .subscribe()
+                )
+                .map(this::response);
     }
 
 }

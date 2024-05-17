@@ -31,7 +31,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
     const {searchParams} = props;
     const data = await getData(searchParams);
     const maxIndex = data.page.total - ((data.page.page - 1) * data.page.size);
-    const isLogin = cookies().get('next.access.token') !== undefined;
+    const isLogin = cookies().get('next.access.token') || cookies().get('next.refresh.token') !== undefined;
 
     return (
         <div className={'p-5'}>

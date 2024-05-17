@@ -1,32 +1,33 @@
 'use client';
 
-import React from "react";
+import React, {useContext} from "react";
 import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
 import FileUpload from "@/app/{commons}/{components}/block/file/fileUpload";
 import FileImage from "@/app/{commons}/{components}/block/file/fileImage";
 import FileFile from "@/app/{commons}/{components}/block/file/fileFile";
+import BoardProvider from "@/app/board/{services}/BoardProvider";
 
 export default function FileBlock (data: BlockProps) {
-    const {seq, value, code} = data;
+    const {seq, value, code,
+        onChangeValueHandler,
+        onMouseEnterHandler,
+        onMouseLeaveHandler,
+    } = data;
 
     const codes = [
-        // {code: '000010', component: FileUpload},
-        {code: '000011', component: FileImage},
-        {code: '000012', component: FileFile},
+        {code: '00011', component: FileImage},
+        {code: '00012', component: FileFile},
     ]
-
-    const onUploadFileUrl = (value: string) => {
-        console.log('onUploadFileUrl', value);
-    }
 
     return (
         <>
             {
-                code === '000010' &&
+                !value &&
                 <FileUpload seq={seq}
                             code={code}
                             value={value}
-                            onUploadFileUrl={onUploadFileUrl}
+                            onUploadFileUrl={onChangeValueHandler!}
+                            isImage={code === '00011'}
                 />
             }
             {
@@ -34,7 +35,11 @@ export default function FileBlock (data: BlockProps) {
                 codes.map((c, i) => {
                     if(c.code === code){
                         const Component = c.component;
-                        return <Component key={i} value={value} />
+                        return <Component key={i}
+                                          value={value}
+                                          onMouseEnterHandler={onMouseEnterHandler!}
+                                          onMouseLeaveHandler={onMouseLeaveHandler!}
+                        />
                     }
                 })
             }

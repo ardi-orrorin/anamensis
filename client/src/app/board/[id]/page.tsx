@@ -2,7 +2,7 @@
 
 import axios, {AxiosResponse} from "axios";
 import Block from "@/app/board/{components}/Block";
-import {ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
+import {ChangeEvent, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 import {HtmlElements} from "@/app/{commons}/{components}/block/type/Types";
 import {BoardI} from "@/app/board/{services}/types";
@@ -11,6 +11,7 @@ import BlockProvider, {BlockService} from "@/app/board/{services}/BlockProvider"
 import BoardProvider, {BoardService} from "@/app/board/{services}/BoardProvider";
 import {faDownLeftAndUpRightToCenter, faUpRightAndDownLeftFromCenter} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import TempFileProvider, {TempFileI} from "@/app/board/{services}/TempFileProvider";
 
 export default function Page({params}: {params : {id: string}}) {
 
@@ -22,7 +23,10 @@ export default function Page({params}: {params : {id: string}}) {
 
     const [blockService, setBlockService] = useState<BlockService>({} as BlockService);
 
+    const [tempFiles, setTempFiles] = useState<TempFileI[]>([]);
+
     const blockRef = useRef<HTMLElement[] | null[]>([]);
+    const pageRef = useRef<HTMLDivElement | null>(null);
 
     const isNewBoard = useMemo(() => !params.id || params.id === 'new',[params.id]);
 
@@ -64,6 +68,18 @@ export default function Page({params}: {params : {id: string}}) {
             });
     },[params.id]);
 
+    // useEffect(() => {
+    //     return () => {
+    //         if(tempFiles.length === 0 && pageRef.current) return ;
+    //         if(pageRef.current !== null) return ;
+    //         axios.patch('/api/file', tempFiles, {
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             }
+    //         });
+    //     }
+    // },[pageRef?.current?.innerHTML]);
+
     useEffect(() => {
         const list = board.data?.content?.list;
         if (!list) return ;
@@ -85,7 +101,7 @@ export default function Page({params}: {params : {id: string}}) {
     },[board.data]);
 
     const onChangeBlockHandler = useCallback((e: ChangeEvent<HtmlElements>, seq: number) => {
-        const block = shortList.find(item => item.command + ' ' === e.target.value);
+        const block = shortList.find(item => item.command + ' ' === e.target?.value);
         if(!block) return false;
         const newList = board.data?.content?.list.map((item, index) => {
             if (item.seq === seq) {
@@ -113,22 +129,34 @@ export default function Page({params}: {params : {id: string}}) {
                     headers: {
                         'Content-Type': 'application/json',
                     }
-                })
+                }).then((res: AxiosResponse<BoardI>) => {
+                    setTempFiles([]);
+                    return res;
+                });
             } else {
                 result = await axios.put('/api/board/' + params.id, board.data, {
                     headers: {
                         'Content-Type': 'application/json',
                     }
+                }).then((res: AxiosResponse<BoardI>) => {
+                    setTempFiles([]);
+                    return res;
                 });
             }
-        } catch (e) {
-            alert('저장에 실패했습니다.');
-        } finally {
+
             if(isSave) {
                 location.href = '/board/' + result?.data?.id;
             } else {
                 location.reload();
             }
+        } catch (e) {
+            alert('저장에 실패했습니다.');
+        } finally {
+            setTimeout(() => {
+                console.log('loading')
+            }, 3000);
+
+            setLoading(false);
         }
     };
 
@@ -169,6 +197,7 @@ export default function Page({params}: {params : {id: string}}) {
 
         list.map((item, index) => {
             if (item.seq === seq) {
+
                 item.value = e.target.value;
             }
             return item;
@@ -179,6 +208,31 @@ export default function Page({params}: {params : {id: string}}) {
 
     const editClickHandler = () => {
         setBoard({...board, isView: !board.isView});
+    }
+
+    const onClickDeleteHandler = (seq: number) => {
+        const list = board.data?.content?.list;
+
+        let newList = board.data?.content?.list.filter(item => item.seq !== seq);
+        if (newList?.length === 0) {
+            newList = [{seq, value: '', code: '00005', textStyle: {}}];
+        }
+
+
+        setBoard({
+            ...board,
+            data: {
+                ...board.data,
+                content: {
+                    list: newList
+                }
+            }
+        });
+
+        if(newList.length === 0) {
+            addBlockHandler(0);
+        }
+
     }
 
     const onChangeTitleHandler = (e: ChangeEvent<HTMLInputElement>) => {
@@ -230,7 +284,8 @@ export default function Page({params}: {params : {id: string}}) {
 
     return (
         <BoardProvider.Provider value={{board, setBoard}}>
-            <div className={'p-5 flex justify-center'}>
+            <TempFileProvider.Provider value={{tempFiles, setTempFiles}}>
+            <div className={'p-5 flex justify-center'} ref={pageRef}>
                 <div className={`w-full flex flex-col gap-6 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-1/2'}`}>
                     <div className={'flex justify-between gap-2 h-auto border-b-2 border-solid border-blue-200 py-3'}>
                         <div className={'font-bold flex items-center w-full'}>
@@ -308,6 +363,7 @@ export default function Page({params}: {params : {id: string}}) {
                                            onKeyDownHandler={e=> {onKeyDownHandler(e, item.seq)}}
                                            onKeyUpHandler={e=> {onKeyUpHandler(e, item.seq)}}
                                            onClickAddHandler={()=> addBlockHandler(item.seq)}
+                                           onClickDeleteHandler={onClickDeleteHandler}
                                     />
                                 )
                             }
@@ -326,6 +382,7 @@ export default function Page({params}: {params : {id: string}}) {
                     </div>
                 </div>
             </div>
+            </TempFileProvider.Provider>
         </BoardProvider.Provider>
     )
 }

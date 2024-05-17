@@ -12,16 +12,18 @@ import java.util.UUID;
 @Component
 public class FilePathProvider {
 
-    public List<FilePathDto> changeContentPath(String tableCodePk, String tableRefPk, int width, int height, String ext) {
-        String path = String.format("/resource/%s/%s/", tableCodePk, tableRefPk);
+    public FilePathDto changeContentPath(int width, int height, String ext) {
+        String path = "/resource/board/";
         String filename = UUID.randomUUID().toString();
         String oriFilename = String.format("%s.%s", filename, ext);
         String thumbFilename = String.format("%s_%sx%s.%s", filename, width, height, ext);
 
-        return List.of(
-                new FilePathDto(path, oriFilename, 0, 0),
-                new FilePathDto(path, thumbFilename, width, height)
-        );
+
+        return new FilePathDto(path, oriFilename, 0, 0);
+//        return List.of(
+//                new FilePathDto(path, oriFilename, 0, 0),
+//                new FilePathDto(path, thumbFilename, width, height)
+//        );
     }
 
 

@@ -12,7 +12,7 @@ type NavItemProps = {
 
 const NavMain = async () => {
 
-    const isLogged = cookies().get('next.access.token') !== undefined;
+    const isLogged = cookies().get('next.access.token') || cookies().get('next.refresh.token') !== undefined;
 
     const menuItems : NavItemProps[] = [
         {

@@ -1,6 +1,6 @@
 import {createContext, Dispatch, SetStateAction} from "react";
 
-type BlockMenu = '' | 'openMenu' | 'openTextMenu';
+export type BlockMenu = '' | 'openMenu' | 'openTextMenu' | 'openObjectMenu';
 
 export interface BlockService {
     blockMenu: BlockMenu;

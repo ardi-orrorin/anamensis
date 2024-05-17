@@ -12,7 +12,6 @@ const nextConfig = {
       },
     ],
     formats : ['image/avif'],
-
   },
 };
 

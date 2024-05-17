@@ -38,6 +38,7 @@ public class AwsS3Provider {
     }
 
     private Mono<Void> saveS3(FilePart filePart, String path, String filename, int width, int height, boolean isCrop) {
+
         PutObjectRequest.Builder reqBuilder = PutObjectRequest.builder()
                 .bucket(bucket)
                 .contentType(filePart.headers().getContentType().toString());
@@ -54,6 +55,8 @@ public class AwsS3Provider {
                         if (width == 0 || height == 0) {
                             data.asInputStream().transferTo(outputStream);
                         } else {
+
+                            // todo: 이미지가 섬네일보다 작을 경우 리사이징하지 않도록 수정
                             Thumbnails.Builder<? extends InputStream> builder = Thumbnails.of(data.asInputStream())
                                     .size(width, height)
                                     .outputQuality(0.4);
@@ -69,12 +72,12 @@ public class AwsS3Provider {
                     }
 
                     s3Client.putObject(req, RequestBody.fromBytes(outputStream.toByteArray()));
-
                     return Mono.empty();
                 });
     }
 
     public Mono<Void> deleteS3(String filePath, String filename) {
+
         s3Client.deleteObject(
                 DeleteObjectRequest.builder()
                         .bucket(bucket)

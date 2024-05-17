@@ -30,7 +30,7 @@ const SubTextMenu = ({
     }
 
     return (
-        <ul className={'flex overflow-hidden rounded text-sm bg-white shadow-md'}
+        <ul className={'flex overflow-hidden rounded text-sm bg-white'}
             onMouseLeave={onMouseLeave}
         >
             <li>

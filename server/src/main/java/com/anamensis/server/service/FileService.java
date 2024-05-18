@@ -1,5 +1,6 @@
 package com.anamensis.server.service;
 
+import com.anamensis.server.dto.FileHashRecord;
 import com.anamensis.server.dto.FilePathDto;
 import com.anamensis.server.entity.File;
 import com.anamensis.server.entity.User;
@@ -9,19 +10,25 @@ import com.anamensis.server.provider.FilePathProvider;
 import com.anamensis.server.provider.FileProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.http.codec.multipart.FilePartEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
 import java.awt.*;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
@@ -36,15 +43,31 @@ public class FileService {
 
     private final AwsS3Provider awsS3Provider;
 
+    @Value("${file.upload-dir}")
+    private String UPLOAD_DIR;
+
+    public Sinks.Many<FileHashRecord> list = Sinks.many().multicast().directAllOrNothing();
 
     public File selectByFileName(String fileName) {
         return fileMapper.selectByFileName(fileName)
                 .orElseThrow(() -> new RuntimeException("File not found"));
     }
 
+    public Mono<List<File>> findByTableNameAndTableRefPk(String tableName, long tableRefPk) {
+        return Mono.just(fileMapper.findByTableNameAndTableRefPk(tableName, tableRefPk));
+    }
+
     @Transactional
-    public Mono<File> insertFile(File file) {
-        return Mono.just(file)
+    public Mono<File> insertFile(FilePartEvent filePartEvent, String hash) {
+        File newFile = File.builder()
+                .fileName(filePartEvent.filename())
+                .filePath(UPLOAD_DIR + hash + "/")
+                .orgFileName(filePartEvent.filename())
+                .tableCodePk(2)
+                .createAt(LocalDateTime.now())
+                .build();
+
+        return Mono.just(newFile)
                 .doOnNext(fileMapper::insert);
     }
 
@@ -110,17 +133,6 @@ public class FileService {
 //            });
     }
 
-    public Mono<List<File>> findByTableNameAndTableRefPk(String tableName, long tableRefPk) {
-        return Mono.just(fileMapper.findByTableNameAndTableRefPk(tableName, tableRefPk));
-    }
-
-    private boolean response(int result) {
-        if (result == 0) {
-            throw new RuntimeException("File insert failed");
-        }
-        return true;
-    }
-
     @Transactional
     public Mono<String> saveProfile(User user, FilePart filePart) {
 
@@ -159,6 +171,7 @@ public class FileService {
                 .then(Mono.defer(() -> Mono.just(filepath.path() + filepath.file())));
     }
 
+
     @Transactional
     public Mono<Boolean> deleteFile(File file) {
         return Mono.just(fileMapper.updateIsUseById(file.getId(), 0))
@@ -167,6 +180,48 @@ public class FileService {
                         .subscribe()
                 )
                 .map(this::response);
+    }
+
+
+    // -----------------------------------------------------------------------------
+
+
+    public Mono<String> getAddr() {
+        String uuid = UUID.randomUUID().toString();
+
+        return Mono.just(new FileHashRecord(uuid, "0"))
+                .doOnNext(list::tryEmitNext)
+                .flatMap(record -> Mono.just(uuid));
+    }
+
+    public Flux<FileHashRecord> pushProgress(String hash) {
+        return list.asFlux()
+                .publishOn(Schedulers.boundedElastic())
+                .onBackpressureBuffer()
+                .filter(record -> record.hash().equals(hash));
+    }
+    public Mono<Void> fileUpload(
+            FilePartEvent filePartEvent,
+            String hash,
+            long length,
+            AtomicInteger progress,
+            AtomicInteger input
+    ) {
+        try {
+            fileProvider.saveFile(filePartEvent, input, hash);
+            fileProvider.pushProgress(input, length, progress, filePartEvent.content().capacity(), hash, list);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return Mono.empty();
+    }
+
+    private boolean response(int result) {
+        if (result == 0) {
+            throw new RuntimeException("File insert failed");
+        }
+        return true;
     }
 
 }

@@ -118,7 +118,7 @@ public class FileController {
                 .doOnNext(part -> {
                     if(part instanceof FilePartEvent filePartEvent) {
                         try {
-                            fileProvider.saveFile(filePartEvent, part, input);
+                            fileProvider.saveFile(filePartEvent, part, input, hash);
                             fileProvider.pushProgress(input, length, progress, filePartEvent.content().capacity(), hash, list);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
@@ -131,7 +131,7 @@ public class FileController {
                     if((part instanceof FilePartEvent filePartEvent)) {
                         File newFile = File.builder()
                                 .fileName(filePartEvent.filename())
-                                .filePath(UPLOAD_DIR)
+                                .filePath(UPLOAD_DIR + hash + "/")
                                 .orgFileName(filePartEvent.filename())
                                 .tableCodePk(2)
                                 .createAt(LocalDateTime.now())

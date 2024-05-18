@@ -1,5 +1,6 @@
 package com.anamensis.server.resultMap;
 
+import com.anamensis.server.entity.File;
 import com.anamensis.server.entity.User;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,5 +15,6 @@ public class BoardResultMap {
         private long id;
         private User user;
         private com.anamensis.server.entity.Board board;
+        private File file;
     }
 }

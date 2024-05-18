@@ -4,6 +4,7 @@ import {PageResponse} from "@/app/{commons}/types/commons";
 import PageNavigator from "@/app/{commons}/PageNavigator";
 import Link from "next/link";
 import {cookies} from "next/headers";
+import Image from "next/image";
 
 
 interface BoardListI {
@@ -11,6 +12,7 @@ interface BoardListI {
     title: string;
     viewCount: number;
     writer: string;
+    profileImage: string;
     createdAt: string;
 }
 
@@ -111,7 +113,15 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                                     </Link>
                                 </td>
                                 <td className={'py-2 px-3'}>{ history.viewCount }</td>
-                                <td className={'py-2 px-3'}>{ history.writer }</td>
+                                <td className={'py-2 px-3 flex gap-2 items-center'}>
+                                    <Image src={ process.env.NEXT_PUBLIC_CDN_SERVER + history.profileImage}
+                                           className={'rounded-full border-2 border-solid border-blue-300'}
+                                           width={40}
+                                           height={40}
+                                           alt={''}
+                                   />
+                                    { history.writer }
+                                </td>
                                 <td className={'py-2 px-3'}>{ history.createdAt }</td>
                             </tr>
                         )

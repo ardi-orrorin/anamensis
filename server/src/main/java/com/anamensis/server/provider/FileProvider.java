@@ -7,7 +7,6 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FilePartEvent;
-import org.springframework.http.codec.multipart.PartEvent;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
@@ -103,5 +102,20 @@ public class FileProvider {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean deleteFile(String hash) {
+        String filepath = UPLOAD_DIR + hash;
+        java.io.File file = new java.io.File(filepath);
+
+        File[] subFiles = file.listFiles();
+
+        if(subFiles != null) {
+            for(File subFile : subFiles) {
+                subFile.delete();
+            }
+        }
+
+        return file.delete();
     }
 }

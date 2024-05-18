@@ -107,13 +107,16 @@ public class FileController {
                                 .subscribe();
                     }
                 })
-                .doOnError(Throwable::printStackTrace)
                 .last()
                 .flatMap(part -> {
                     if((part instanceof FilePartEvent filePartEvent)) {
                         return fileService.insertFile(filePartEvent, hash);
                     }
                     return Mono.empty();
-                });
+                })
+                .onErrorComplete(e->
+                    fileService.deleteFile(hash)
+                );
+
     }
 }

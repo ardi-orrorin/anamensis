@@ -39,19 +39,11 @@ public class FileController {
 
     private final UserService userService;
 
-    private final FileProvider fileProvider;
-
-    @Value("${file.upload-dir}")
-    private String UPLOAD_DIR;
-
-    Sinks.Many<FileHashRecord> list = Sinks.many().multicast().directAllOrNothing();
-
     @PostMapping("content-img")
     public Mono<File> upload(
             @RequestPart("file") FilePart filePart,
             @RequestPart("fileContent") File fileContent
     ) {
-
         return Mono.just(filePart)
                 .doOnNext(part -> {
                     if(!part.headers().getContentType().getType().equalsIgnoreCase("image")){
@@ -87,20 +79,14 @@ public class FileController {
 
     @GetMapping("addr")
     public Mono<String> getAddr() {
-        String uuid = UUID.randomUUID().toString();
-
-        return Mono.just(new FileHashRecord(uuid, "0"))
-                .doOnNext(list::tryEmitNext)
-                .flatMap(record -> Mono.just(uuid));
+        return fileService.getAddr();
     }
 
     @PublicAPI
     @GetMapping(value = "upload/{id}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<FileHashRecord> pushProgress(@PathVariable String id) {
-        return list.asFlux()
-                .publishOn(Schedulers.boundedElastic())
-                .onBackpressureBuffer()
-                .filter(record -> record.hash().equals(id));
+        return fileService.pushProgress(id);
+
     }
 
     @PublicAPI
@@ -117,27 +103,15 @@ public class FileController {
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(part -> {
                     if(part instanceof FilePartEvent filePartEvent) {
-                        try {
-                            fileProvider.saveFile(filePartEvent, part, input, hash);
-                            fileProvider.pushProgress(input, length, progress, filePartEvent.content().capacity(), hash, list);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
+                        fileService.fileUpload(filePartEvent, hash, length, progress, input)
+                                .subscribe();
                     }
                 })
                 .doOnError(Throwable::printStackTrace)
                 .last()
                 .flatMap(part -> {
                     if((part instanceof FilePartEvent filePartEvent)) {
-                        File newFile = File.builder()
-                                .fileName(filePartEvent.filename())
-                                .filePath(UPLOAD_DIR + hash + "/")
-                                .orgFileName(filePartEvent.filename())
-                                .tableCodePk(2)
-                                .createAt(LocalDateTime.now())
-                                .build();
-
-                        return fileService.insertFile(newFile);
+                        return fileService.insertFile(filePartEvent, hash);
                     }
                     return Mono.empty();
                 });

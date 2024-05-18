@@ -84,7 +84,6 @@ public class FileProvider {
 
     public void saveFile(
             FilePartEvent filePartEvent,
-            PartEvent part,
             AtomicInteger input,
             String hash
     ) throws IOException {
@@ -101,7 +100,7 @@ public class FileProvider {
             FileOutputStream outputStream = new FileOutputStream(filepath, true)
         ) {
             outputStream.write(filePartEvent.content().asInputStream().readAllBytes());
-            DataBufferUtils.release(part.content());
+            DataBufferUtils.release(filePartEvent.content());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

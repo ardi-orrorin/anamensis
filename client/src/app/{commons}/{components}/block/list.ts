@@ -96,7 +96,7 @@ export const blockTypeList: BlockComponentType[] = [
         component: (props: BlockProps) => FileBlock(props)
     },
     {
-        code: '00011',
+        code: '00012',
         tag: 'fileUpload',
         command: '/file',
         label: 'fileUplaod',

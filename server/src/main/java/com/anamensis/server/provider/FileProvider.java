@@ -1,17 +1,24 @@
 package com.anamensis.server.provider;
 
+import com.anamensis.server.dto.FileHashRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.http.codec.multipart.FilePartEvent;
+import org.springframework.http.codec.multipart.PartEvent;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @Slf4j
@@ -57,4 +64,44 @@ public class FileProvider {
 
     }
 
+    public void pushProgress (
+            AtomicInteger input,
+            long length,
+            AtomicInteger progress,
+            int capacity,
+            String hash,
+            Sinks.Many<FileHashRecord> list
+    ) {
+        int cur = (int) Math.ceil((double) input.addAndGet(capacity) / (double) length * 100);
+
+        if(progress.get() >= cur) return;
+        progress.set(cur);
+
+        Mono.just(new FileHashRecord(hash,  String.valueOf(cur)))
+                .doOnNext(list::tryEmitNext)
+                .subscribe();
+    }
+
+    public void saveFile(
+            FilePartEvent filePartEvent,
+            PartEvent part,
+            AtomicInteger input
+    ) throws IOException {
+        if (input.get() == 0) {
+            java.io.File save = new java.io.File(UPLOAD_DIR + filePartEvent.filename());
+
+            if (save.exists()) save.delete();
+
+            if (!save.getParentFile().exists()) save.getParentFile().mkdirs();
+        }
+
+        try (
+            FileOutputStream outputStream = new FileOutputStream(UPLOAD_DIR + filePartEvent.filename(), true)
+        ) {
+            outputStream.write(filePartEvent.content().asInputStream().readAllBytes());
+            DataBufferUtils.release(part.content());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

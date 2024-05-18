@@ -43,6 +43,12 @@ public class FileService {
     }
 
     @Transactional
+    public Mono<File> insertFile(File file) {
+        return Mono.just(file)
+                .doOnNext(fileMapper::insert);
+    }
+
+    @Transactional
     public Mono<File> insert(FilePart filePart, File fileContent) {
         return fileProvider.save(filePart, fileContent)
                 .flatMap(file -> saveBoardImg(filePart, file))
@@ -75,7 +81,6 @@ public class FileService {
 //        );
 
         FilePathDto filepath = filePathProvider.changeContentPath(profileWidth, profileHeight, ext);
-
 
         return Mono.just(filepath)
                 .map(file -> {

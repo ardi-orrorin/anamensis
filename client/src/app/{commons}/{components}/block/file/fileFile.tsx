@@ -20,20 +20,22 @@ export default function FileFile({
         width             : '100%',
         height            : '4rem',
         outline           : 'none',
-        border            : '1px solid',
-        borderRadius      : '0.4rem',
         borderColor       : 'rgba(100, 100, 100, 1)',
         color             : 'rgba(100, 100, 100, 1)',
         backgroundColor   : 'rgba(250,250,250, 1)',
     }
 
+    const downloadUrl = process.env.NEXT_PUBLIC_SERVER + value;
+
     return (
         <div style={style}>
             <Link style={downloadStyle}
-                  href={value}
+                  href={downloadUrl}
                   download={true}
             >
-                파일 다운로드 : {value}
+                <p>
+                    {value.split('/').pop()}
+                </p>
             </Link>
         </div>
     )

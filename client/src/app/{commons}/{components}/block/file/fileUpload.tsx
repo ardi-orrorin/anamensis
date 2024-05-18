@@ -6,7 +6,6 @@ import axios from "axios";
 import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 
-
 export type FileUploadProps = {
     onUploadFileUrl: (url: string) => void;
     isImage?: boolean;
@@ -18,6 +17,7 @@ export default function FileUpload (props: FileUploadProps) {
     const useFileInputRef = useRef<HTMLInputElement>(null);
 
     const [loading, setLoading] = useState<boolean>(false);
+    const [progress, setProgress] = useState<number>(0);
     const {setTempFiles} = useContext(TempFileProvider);
 
     const customStyle: CSSProperties = {
@@ -33,6 +33,46 @@ export default function FileUpload (props: FileUploadProps) {
     }
 
     const onChangeFileHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        isImage
+        ? await uploadImage(e)
+        : await uploadFile(e);
+    }
+
+    const uploadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        let eventSource ;
+        try {
+            const hash = await axios.get('/api/file/addr').then((res) => res.data);
+
+            const formData = new FormData();
+            const file = e.target.files && e.target.files[0];
+            formData.append('file', file!);
+            const root = process.env.NEXT_PUBLIC_SERVER + '/public/api/files/upload/';
+
+            setLoading(true);
+
+            eventSource = new EventSource(root + hash);
+            eventSource.onmessage = (e) => {
+                const data: {hash:string, message: string} = JSON.parse(e.data);
+                setProgress(Number(data.message));
+            }
+
+            const result = await axios.post(root + hash, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            eventSource.close();
+
+            onUploadFileUrl(result.data.filePath + result.data.fileName);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            if(eventSource) eventSource.close();
+            setLoading(false);
+        }
+    }
+
+    const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if(!e.target.files || e.target.files.length === 0) return ;
 
         const formData = new FormData();
@@ -45,7 +85,7 @@ export default function FileUpload (props: FileUploadProps) {
         formData.append('fileContent', blob);
         setLoading(true);
 
-        await axios.post('/api/file', formData, {
+        await axios.post('/api/file/img', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -59,9 +99,9 @@ export default function FileUpload (props: FileUploadProps) {
             const url = res.data.filePath + res.data.fileName;
             onUploadFileUrl(url);
         })
-        .finally(() => {
-            setLoading(false);
-        });
+            .finally(() => {
+                setLoading(false);
+            });
     }
 
     return (
@@ -71,9 +111,20 @@ export default function FileUpload (props: FileUploadProps) {
                         onClick={onClick}
                 >
                     {
-                        loading
-                        ? <LoadingSpinner size={40} />
-                        : <p>파일첨부</p>
+                        isImage && loading
+                        && <LoadingSpinner size={40} />
+
+                    }
+                    {
+                        !isImage && loading
+                        && <div>
+                            <p>{progress}%</p>
+                            <p>Uploading... </p>
+                      </div>
+                    }
+                    {
+                        !loading &&
+                        <p>파일첨부</p>
                     }
                 </button>
             </div>

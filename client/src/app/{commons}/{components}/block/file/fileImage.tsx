@@ -1,5 +1,4 @@
 import {CSSProperties} from "react";
-import {HtmlElements} from "@/app/{commons}/{components}/block/type/Types";
 import Image from "next/image";
 
 export default function FileImage({

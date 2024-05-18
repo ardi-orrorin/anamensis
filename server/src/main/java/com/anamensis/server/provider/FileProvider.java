@@ -85,10 +85,12 @@ public class FileProvider {
     public void saveFile(
             FilePartEvent filePartEvent,
             PartEvent part,
-            AtomicInteger input
+            AtomicInteger input,
+            String hash
     ) throws IOException {
+        String filepath = UPLOAD_DIR + hash + "/" + filePartEvent.filename();
         if (input.get() == 0) {
-            java.io.File save = new java.io.File(UPLOAD_DIR + filePartEvent.filename());
+            java.io.File save = new java.io.File(filepath);
 
             if (save.exists()) save.delete();
 
@@ -96,7 +98,7 @@ public class FileProvider {
         }
 
         try (
-            FileOutputStream outputStream = new FileOutputStream(UPLOAD_DIR + filePartEvent.filename(), true)
+            FileOutputStream outputStream = new FileOutputStream(filepath, true)
         ) {
             outputStream.write(filePartEvent.content().asInputStream().readAllBytes());
             DataBufferUtils.release(part.content());

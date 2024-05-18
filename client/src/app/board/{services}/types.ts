@@ -7,6 +7,7 @@ export interface BoardI {
     title       : string;
     content     : BoardContentI;
     writer      : string;
+    profileImage: string;
     createdAt   : string;
 }
 export interface BoardContentI {

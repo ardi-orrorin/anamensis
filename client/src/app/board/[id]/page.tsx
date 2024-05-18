@@ -12,6 +12,7 @@ import BoardProvider, {BoardService} from "@/app/board/{services}/BoardProvider"
 import {faDownLeftAndUpRightToCenter, faUpRightAndDownLeftFromCenter} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import TempFileProvider, {TempFileI} from "@/app/board/{services}/TempFileProvider";
+import Image from "next/image";
 
 export default function Page({params}: {params : {id: string}}) {
 
@@ -286,7 +287,8 @@ export default function Page({params}: {params : {id: string}}) {
         <BoardProvider.Provider value={{board, setBoard}}>
             <TempFileProvider.Provider value={{tempFiles, setTempFiles}}>
             <div className={'p-5 flex justify-center'} ref={pageRef}>
-                <div className={`w-full flex flex-col gap-6 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-1/2'}`}>
+                <div className={`w-full flex flex-col gap-3 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-1/2'}`}>
+
                     <div className={'flex justify-between gap-2 h-auto border-b-2 border-solid border-blue-200 py-3'}>
                         <div className={'font-bold flex items-center w-full'}>
                             {
@@ -343,6 +345,27 @@ export default function Page({params}: {params : {id: string}}) {
                                 }
                             </button>
                         </div>
+                    </div>
+                    <div>
+                        {
+                            !isNewBoard && board.isView &&
+                          <div className={'flex gap-2 justify-between'}>
+                            <p className={'text-sm'}>
+                                {board.data.createdAt}
+                            </p>
+                            <div className={'flex gap-2 items-center'}>
+                              <Image src={process.env.NEXT_PUBLIC_CDN_SERVER + board.data.profileImage}
+                                     className={'rounded-full border-2 border-solid border-blue-300'}
+                                     width={50}
+                                     height={50}
+                                     alt={''}
+                              />
+                              <p className={'font-bold'}
+                              >{board.data.writer}</p>
+                            </div>
+
+                          </div>
+                        }
                     </div>
                     <BlockProvider.Provider value={{blockService, setBlockService}}>
                         <div className={'flex flex-col'}>

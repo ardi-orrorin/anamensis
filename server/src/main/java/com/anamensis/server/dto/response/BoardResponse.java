@@ -23,6 +23,8 @@ public class BoardResponse {
 
         private String writer;
 
+        private String profileImage;
+
         private long viewCount;
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -36,6 +38,7 @@ public class BoardResponse {
                     .title(board.getBoard().getTitle())
                     .viewCount(board.getBoard().getViewCount())
                     .writer(board.getUser().getName())
+                    .profileImage(board.getFile().getFilePath() + board.getFile().getFileName())
                     .createdAt(board.getBoard().getCreateAt())
                     .isAdsense(board.getBoard().isAdsense())
                     .build();
@@ -57,6 +60,8 @@ public class BoardResponse {
 
         private String writer;
 
+        private String profileImage;
+
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime createdAt;
 
@@ -67,6 +72,7 @@ public class BoardResponse {
                     .categoryPk(board.getBoard().getCategoryPk())
                     .content(board.getBoard().getContent())
                     .writer(board.getUser().getName())
+                    .profileImage(board.getFile().getFilePath() + board.getFile().getFileName())
                     .createdAt(board.getBoard().getCreateAt())
                     .build();
         }

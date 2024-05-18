@@ -30,10 +30,18 @@
     <select id="findList" resultMap="BoardResultMapBoard">
         SELECT *,
                u.id as user_pk,
-               b.id as board_pk
+               b.id as board_pk,
+               f.id as file_pk
           FROM board b
-          JOIN user u ON u.id = b.user_pk
+          JOIN user u
+            ON u.id = b.user_pk
+          LEFT OUTER JOIN file f
+            ON f.table_ref_pk = u.id
          WHERE b.is_use = 1
+           AND f.is_use = 1
+           AND f.table_code_pk = (SELECT t.id
+                                    FROM table_code t
+                                   WHERE t.table_name = 'user')
            <if test="board.categoryPk != 0">
                AND b.category_pk = #{board.categoryPk}
            </if>
@@ -46,9 +54,16 @@
     <select id="findByPk" resultMap="BoardResultMapBoard" parameterType="Long">
         SELECT *
           FROM board b
-          JOIN user u ON u.id = b.user_pk
-         WHERE b.id     = #{boardPk}
-           AND b.is_use = 1
+          JOIN user u
+            ON u.id = b.user_pk
+          LEFT OUTER JOIN file f
+            ON f.table_ref_pk = u.id
+         WHERE b.is_use        = 1
+           AND b.id            = #{boardPk}
+           AND f.is_use        = 1
+           AND f.table_code_pk = (SELECT t.id
+                                    FROM table_code t
+                                   WHERE t.table_name = 'user')
     </select>
     <update id="updateByPk" parameterType="Board">
         UPDATE board
@@ -84,6 +99,7 @@
         <id property="id" column="id"/>
         <association property="board" resultMap="BoardEntity" />
         <association property="user" resultMap="UserEntity" />
+        <association property="file" resultMap="FileEntity" />
     </resultMap>
 
     <resultMap id="BoardEntity" type="Board" autoMapping="true">
@@ -92,6 +108,9 @@
     </resultMap>
     <resultMap id="UserEntity" type="User" autoMapping="true">
         <id property="id" column="user_pk"/>
+    </resultMap>
+    <resultMap id="FileEntity" type="File" autoMapping="true">
+        <id property="id" column="file_pk"/>
     </resultMap>
 
     <resultMap id="BoardResultMap" type="Board">

@@ -4,11 +4,11 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
 import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
 import {blockTypeList} from "@/app/{commons}/{components}/block/list";
-import {BlockProps, HtmlElements} from "@/app/{commons}/{components}/block/type/Types";
+import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
 import React, {useContext} from "react";
 import SubTextMenu from "@/app/board/{components}/SubTextMenu";
 import MenuItem from "@/app/board/{components}/MenuItem";
-import BlockProvider, {BlockMenu, BlockService} from "@/app/board/{services}/BlockProvider";
+import BlockProvider, {BlockMenu} from "@/app/board/{services}/BlockProvider";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import SubObjectMenu from "@/app/board/{components}/SubObjectMenu";
 
@@ -75,8 +75,6 @@ export default function Block(props: BlockProps) {
     }
 
     const onClickObjectMenu = (type: string) => {
-        // delete, detailView
-        // todo: delete, detailView 구현
         if(type === 'delete') {
             if(!onClickDeleteHandler) return;
             onClickDeleteHandler(seq);
@@ -138,7 +136,7 @@ export default function Block(props: BlockProps) {
                 {
                     blockService.blockMenu === 'openObjectMenu'
                     && blockService.seq === seq
-                    && <div className={'absolute bottom-[50%] left-[30%] bg-gray-100 z-10 max-h-80 duration-500 rounded shadow-md'}>
+                    && <div className={'absolute bottom-[5%] right-[5%] bg-gray-100 z-10 max-h-80 duration-500 rounded shadow-md'}>
                         <SubObjectMenu onClick={onClickObjectMenu}
                                        isView={board.isView}
                         />

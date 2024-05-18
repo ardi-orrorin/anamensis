@@ -46,7 +46,7 @@ public class FileService {
     @Value("${file.upload-dir}")
     private String UPLOAD_DIR;
 
-    public Sinks.Many<FileHashRecord> list = Sinks.many().multicast().directAllOrNothing();
+    private final Sinks.Many<FileHashRecord> list = Sinks.many().multicast().directAllOrNothing();
 
     public File selectByFileName(String fileName) {
         return fileMapper.selectByFileName(fileName)
@@ -59,13 +59,12 @@ public class FileService {
 
     @Transactional
     public Mono<File> insertFile(FilePartEvent filePartEvent, String hash) {
-        File newFile = File.builder()
-                .fileName(filePartEvent.filename())
-                .filePath(UPLOAD_DIR + hash + "/")
-                .orgFileName(filePartEvent.filename())
-                .tableCodePk(2)
-                .createAt(LocalDateTime.now())
-                .build();
+        File newFile = new File();
+        newFile.setFileName(filePartEvent.filename());
+        newFile.setFilePath(UPLOAD_DIR + hash + "/");
+        newFile.setOrgFileName(filePartEvent.filename());
+        newFile.setTableCodePk(2);
+        newFile.setCreateAt(LocalDateTime.now());
 
         return Mono.just(newFile)
                 .doOnNext(fileMapper::insert);
@@ -107,15 +106,15 @@ public class FileService {
 
         return Mono.just(filepath)
                 .map(file -> {
-                    File newFile = File.builder()
-                            .tableCodePk(fileContent.getTableCodePk())
-                            .tableRefPk(fileContent.getTableRefPk())
-                            .fileName(file.file())
-                            .filePath(file.path())
-                            .orgFileName(filePart.filename())
-                            .createAt(LocalDateTime.now())
-                            .isUse(true)
-                            .build();
+                    File newFile = new File();
+                    newFile.setTableCodePk(fileContent.getTableCodePk());
+                    newFile.setTableRefPk(fileContent.getTableRefPk());
+                    newFile.setFileName(file.file());
+                    newFile.setFilePath(file.path());
+                    newFile.setOrgFileName(filePart.filename());
+                    newFile.setCreateAt(LocalDateTime.now());
+                    newFile.setUse(true);
+
                     return Tuples.of(newFile, file);
                 });
 //        return Flux.fromIterable(filepath)
@@ -147,15 +146,14 @@ public class FileService {
                 profileWidth,profileHeight, ext
         );
 
-        File fileEntity = File.builder()
-                .fileName(filepath.file())
-                .filePath(filepath.path())
-                .orgFileName(filePart.filename())
-                .tableCodePk(1)
-                .tableRefPk(user.getId())
-                .createAt(LocalDateTime.now())
-                .isUse(true)
-                .build();
+        File fileEntity = new File();
+        fileEntity.setFileName(filepath.file());
+        fileEntity.setFilePath(filepath.path());
+        fileEntity.setOrgFileName(filePart.filename());
+        fileEntity.setTableCodePk(1);
+        fileEntity.setTableRefPk(user.getId());
+        fileEntity.setCreateAt(LocalDateTime.now());
+        fileEntity.setUse(true);
 
         return Mono.just(fileMapper.findByTableNameAndTableRefPk("user", user.getId()))
                 .publishOn(Schedulers.boundedElastic())

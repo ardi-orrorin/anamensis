@@ -22,11 +22,9 @@ import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
-import java.awt.*;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -195,7 +193,6 @@ public class FileService {
     public Flux<FileHashRecord> pushProgress(String hash) {
         return list.asFlux()
                 .publishOn(Schedulers.boundedElastic())
-                .onBackpressureBuffer()
                 .filter(record -> record.hash().equals(hash));
     }
     public Mono<Void> fileUpload(
@@ -222,6 +219,9 @@ public class FileService {
         return true;
     }
 
+    public boolean deleteFile(String hash) {
+        return fileProvider.deleteFile(hash);
+    }
 }
 
 

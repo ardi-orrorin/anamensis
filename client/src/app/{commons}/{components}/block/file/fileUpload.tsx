@@ -33,19 +33,24 @@ export default function FileUpload (props: FileUploadProps) {
     }
 
     const onChangeFileHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const formData = new FormData();
+        const file = e.target.files && e.target.files[0];
+
+        if(!file) return ;
+
         isImage
-        ? await uploadImage(e)
-        : await uploadFile(e);
+        ? await uploadImage(e, formData, file)
+        : await uploadFile(e, formData, file);
     }
 
-    const uploadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const uploadFile = async (e: React.ChangeEvent<HTMLInputElement>, formData: FormData, file: File) => {
         let eventSource ;
         try {
-            const hash = await axios.get('/api/file/addr').then((res) => res.data);
+            const hash = await axios.get('/api/file/addr')
+                .then((res) => res.data);
 
-            const formData = new FormData();
-            const file = e.target.files && e.target.files[0];
-            formData.append('file', file!);
+            formData.append('file', file);
+
             const root = process.env.NEXT_PUBLIC_SERVER + '/public/api/files/upload/';
 
             setLoading(true);
@@ -61,6 +66,7 @@ export default function FileUpload (props: FileUploadProps) {
                     'Content-Type': 'multipart/form-data'
                 }
             });
+
             eventSource.close();
 
             onUploadFileUrl(result.data.filePath + result.data.fileName);
@@ -72,17 +78,16 @@ export default function FileUpload (props: FileUploadProps) {
         }
     }
 
-    const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if(!e.target.files || e.target.files.length === 0) return ;
-
-        const formData = new FormData();
+    const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>, formData: FormData, file: File) => {
         const fileContent = {
             tableCodePk: 2
         }
 
         const blob = new Blob([JSON.stringify(fileContent)], {type: 'application/json'})
-        formData.append('file', e.target.files[0]);
+
+        formData.append('file', file);
         formData.append('fileContent', blob);
+
         setLoading(true);
 
         await axios.post('/api/file/img', formData, {
@@ -98,10 +103,9 @@ export default function FileUpload (props: FileUploadProps) {
 
             const url = res.data.filePath + res.data.fileName;
             onUploadFileUrl(url);
-        })
-            .finally(() => {
-                setLoading(false);
-            });
+        }).finally(() => {
+            setLoading(false);
+        });
     }
 
     return (

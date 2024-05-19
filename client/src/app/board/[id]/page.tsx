@@ -368,7 +368,7 @@ export default function Page({params}: {params : {id: string}}) {
                         }
                     </div>
                     <BlockProvider.Provider value={{blockService, setBlockService}}>
-                        <div className={'flex flex-col'}>
+                        <div className={'flex flex-col gap-2'}>
                             {
                                 board.data
                                 && board.data.content

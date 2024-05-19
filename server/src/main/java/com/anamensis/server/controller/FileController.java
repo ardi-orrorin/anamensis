@@ -2,13 +2,11 @@ package com.anamensis.server.controller;
 
 import com.anamensis.server.dto.FileHashRecord;
 import com.anamensis.server.entity.File;
-import com.anamensis.server.provider.FileProvider;
 import com.anamensis.server.service.FileService;
 import com.anamensis.server.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.buffer.DataBufferUtils;
+import org.apache.ibatis.datasource.DataSourceException;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FilePartEvent;
@@ -18,15 +16,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.Sinks;
 import reactor.core.scheduler.Schedulers;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
@@ -114,9 +105,13 @@ public class FileController {
                     }
                     return Mono.empty();
                 })
-                .onErrorComplete(e->
-                    fileService.deleteFile(hash)
-                );
+                .onErrorComplete(e-> {
+                    if(e instanceof DataSourceException) {
+                        // todo: db 파일 저장 실패
+                        log.error("db error", e);
+                    }
+                    return fileService.deleteFile(hash);
+                });
 
     }
 }

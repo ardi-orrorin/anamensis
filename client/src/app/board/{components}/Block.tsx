@@ -53,6 +53,9 @@ export default function Block(props: BlockProps) {
 
         const newList = board.data?.content?.list.map((item, index) => {
             if (item.seq === seq) {
+                if(item.code.slice(0, 3) !== code.slice(0, 3)) {
+                    item.value = '';
+                }
                 item.code = code;
             }
             return item;
@@ -143,12 +146,16 @@ export default function Block(props: BlockProps) {
                     </div>
                 }
                 {
-                    blockTypeList.find(b=> b.code === props.code)?.component({
-                        ...props,
-                        isView: board.isView,
-                        onMouseEnterHandler,
-                        onMouseLeaveHandler,
-                        onChangeValueHandler,
+                    blockTypeList.filter(b=> b.code === props.code)?.map(c => {
+                        'use client'
+                        const Component = c.component;
+                        return <Component key={'block' + seq}
+                                          {...props}
+                                          isView={board.isView}
+                                          onMouseEnterHandler={onMouseEnterHandler}
+                                          onMouseLeaveHandler={onMouseLeaveHandler}
+                                          onChangeValueHandler={onChangeValueHandler}
+                        />
                     })
                 }
             </div>

@@ -1,8 +1,10 @@
+
 import InputBlock from "@/app/{commons}/{components}/block/input/InputBlock";
 import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
-import {faFile, faHeading, faImage} from "@fortawesome/free-solid-svg-icons";
+import {faFile, faHeading, faImage, faLink} from "@fortawesome/free-solid-svg-icons";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import FileBlock from "@/app/{commons}/{components}/block/file/fileBlock";
+import LinkBlock from "@/app/{commons}/{components}/block/input/linkBlock";
 
 export type BlockType = {
     code       : string;
@@ -28,7 +30,7 @@ export const blockTypeList: BlockComponentType[] = [
         component: (props: BlockProps) => InputBlock(props, {
             fontSize: '2.4rem',
             fontWeight: '700',
-            padding: '0.5rem 0.5rem',
+            padding: '0.5rem',
             letterSpacing: '0.03rem',
         }),
     },
@@ -42,7 +44,7 @@ export const blockTypeList: BlockComponentType[] = [
         component: (props: BlockProps) => InputBlock(props, {
             fontSize: '1.8rem',
             fontWeight: '600',
-            padding: '0.5rem 0.5rem',
+            padding: '0.5rem',
             letterSpacing: '0.03rem',
         }),
     },
@@ -54,9 +56,9 @@ export const blockTypeList: BlockComponentType[] = [
         icon: faHeading,
         comment: '세션 본문 제목',
         component: (props: BlockProps) => InputBlock(props, {
-            fontSize: '1.4rem',
+            fontSize: '1.2rem',
             fontWeight: '500',
-            padding: '0.5rem 0.5rem',
+            padding: '0.5rem',
             letterSpacing: '0.03rem',
         })
     },
@@ -68,12 +70,12 @@ export const blockTypeList: BlockComponentType[] = [
         icon: faHeading,
         comment: '세션 본문 내용',
         component: (props: BlockProps) => InputBlock(props, {
-            fontSize: '1.2rem',
-            padding: '0.5rem 0.5rem',
+            fontSize: '1rem',
+            padding: '0.5rem',
             letterSpacing: '0.03rem',
         })
     },
-    {
+        {
         code: '00005',
         tag: 'h5',
         command: '/h5',
@@ -81,13 +83,22 @@ export const blockTypeList: BlockComponentType[] = [
         icon: faHeading,
         comment: '세션 본문 작은 내용',
         component: (props: BlockProps) => InputBlock(props, {
-            fontSize: '1rem',
-            padding: '0.5rem 0.5rem',
+            fontSize: '0.8rem',
+            padding: '0.5rem',
             letterSpacing: '0.03rem',
         })
     },
     {
-        code: '00011',
+        code: '00006',
+        tag: 'link',
+        command: '/link',
+        label: 'Link',
+        icon: faLink,
+        comment: '링크',
+        component: (props: BlockProps) => LinkBlock(props)
+    },
+    {
+        code: '00101',
         tag: 'image',
         command: '/img',
         label: 'Image',
@@ -96,7 +107,7 @@ export const blockTypeList: BlockComponentType[] = [
         component: (props: BlockProps) => FileBlock(props)
     },
     {
-        code: '00012',
+        code: '00102',
         tag: 'fileUpload',
         command: '/file',
         label: 'fileUplaod',

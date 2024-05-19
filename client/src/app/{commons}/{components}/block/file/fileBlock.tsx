@@ -15,8 +15,8 @@ export default function FileBlock (data: BlockProps) {
     } = data;
 
     const codes = [
-        {code: '00011', component: FileImage},
-        {code: '00012', component: FileFile},
+        {code: '00101', component: FileImage},
+        {code: '00102', component: FileFile},
     ]
 
     return (
@@ -27,7 +27,7 @@ export default function FileBlock (data: BlockProps) {
                             code={code}
                             value={value}
                             onUploadFileUrl={onChangeValueHandler!}
-                            isImage={code === '00011'}
+                            isImage={code === '00101'}
                 />
             }
             {

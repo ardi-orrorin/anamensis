@@ -6,11 +6,9 @@ import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
 import {blockTypeList} from "@/app/{commons}/{components}/block/list";
 import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
 import React, {useContext} from "react";
-import SubTextMenu from "@/app/board/{components}/SubTextMenu";
 import MenuItem from "@/app/board/{components}/MenuItem";
 import BlockProvider, {BlockMenu} from "@/app/board/{services}/BlockProvider";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
-import SubObjectMenu from "@/app/board/{components}/SubObjectMenu";
 
 export default function Block(props: BlockProps) {
     const {
@@ -81,16 +79,14 @@ export default function Block(props: BlockProps) {
         if(type === 'delete') {
             if(!onClickDeleteHandler) return;
             onClickDeleteHandler(seq);
-
             return ;
         }
+
         if(type === 'detailView') {
             const url = process.env.NEXT_PUBLIC_CDN_SERVER + value;
             window.open(url, '_blank');
             return ;
-
         }
-
     }
 
     const onChangeValueHandler = (value: string) => {
@@ -103,8 +99,6 @@ export default function Block(props: BlockProps) {
 
         setBoard({...board, data: {...board.data, content: {list: newList}}});
     }
-
-
 
     return (
         <div className={'flex relative'}>
@@ -126,36 +120,29 @@ export default function Block(props: BlockProps) {
             }
             <div className={`relative w-full h-full flex items-center rounded`}>
                 {
-                    !board.isView
-                    && blockService.blockMenu === 'openTextMenu'
-                    && blockService.seq === seq
-                    && textStyle
-                    && <div className={'absolute -top-8 left-0 md:left-1/4 bg-gray-100 z-20 w-auto max-h-52 duration-500 rounded  shadow-md'}>
-                        <SubTextMenu textStyle={textStyle}
-                                     onClick={onClickSubTextMenu}
-                        />
-                    </div>
-                }
-                {
-                    blockService.blockMenu === 'openObjectMenu'
-                    && blockService.seq === seq
-                    && <div className={'absolute bottom-[5%] right-[5%] bg-gray-100 z-10 max-h-80 duration-500 rounded shadow-md'}>
-                        <SubObjectMenu onClick={onClickObjectMenu}
-                                       isView={board.isView}
-                        />
-                    </div>
-                }
-                {
                     blockTypeList.filter(b=> b.code === props.code)?.map(c => {
                         'use client'
                         const Component = c.component;
-                        return <Component key={'block' + seq}
-                                          {...props}
-                                          isView={board.isView}
-                                          onMouseEnterHandler={onMouseEnterHandler}
-                                          onMouseLeaveHandler={onMouseLeaveHandler}
-                                          onChangeValueHandler={onChangeValueHandler}
-                        />
+                        const SubMenuComponent = c.subMenuComponent;
+                        const onClick = c.type === 'text' ? onClickSubTextMenu : onClickObjectMenu;
+                        return <div key={'blockContainer' + seq} className={'flex w-full'}>
+                            {
+                                blockService.seq === seq
+                                && <SubMenuComponent key={'subMenu' + seq}
+                                                     isView={board.isView}
+                                                     value={value}
+                                                     textStyle={textStyle || {}}
+                                                     onClick={onClick}
+                                />
+                            }
+                            <Component key={'block' + seq}
+                                       isView={board.isView}
+                                       onMouseEnterHandler={onMouseEnterHandler}
+                                       onMouseLeaveHandler={onMouseLeaveHandler}
+                                       onChangeValueHandler={onChangeValueHandler}
+                                       {...props}
+                            />
+                        </div>
                     })
                 }
             </div>
@@ -163,9 +150,7 @@ export default function Block(props: BlockProps) {
                 !board.isView
                 && blockService.blockMenu === 'openMenu'
                 && blockService.seq === seq
-                && <div className={'absolute top-10 left-3 bg-gray-100 z-10 w-56 max-h-80 duration-500 overflow-y-scroll rounded shadow-md'}>
-                  <MenuItem onClick={openMenuClick} />
-                </div>
+                && <MenuItem onClick={openMenuClick} />
             }
         </div>
     )

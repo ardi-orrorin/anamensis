@@ -2,18 +2,24 @@ import React, {useContext} from "react";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
 import {faEye, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {TextStylesType} from "@/app/board/{services}/types";
 
 const SubObjectMenu = ({
     onClick,
-    isView
+    isView,
+    value,
 }:{
     isView: boolean;
+    value: string;
     onClick: (type: string, value: string) => void;
 }) => {
 
     const {blockService, setBlockService} = useContext(BlockProvider);
 
+    if(!value) return <></>
+
     return (
+        <div className={'absolute bottom-[5%] right-[5%] bg-gray-100 z-10 max-h-80 duration-500 rounded shadow-md'}>
             <ul className={'flex overflow-hidden rounded text-sm bg-white shadow-md'}
                 onMouseEnter={() => setBlockService({...blockService, blockMenu: 'openObjectMenu'})}
             >
@@ -37,6 +43,7 @@ const SubObjectMenu = ({
                     </button>
                 </li>
             </ul>
+        </div>
     );
 }
 export default SubObjectMenu;

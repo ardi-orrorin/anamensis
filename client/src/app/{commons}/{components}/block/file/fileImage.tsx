@@ -1,15 +1,14 @@
 import {CSSProperties} from "react";
 import Image from "next/image";
 
-export default function FileImage({
-    value,
-    onMouseEnterHandler,
-    onMouseLeaveHandler
-}: {
+export type FileImageProps = {
     value: string;
     onMouseEnterHandler: (e: React.MouseEvent<HTMLImageElement | HTMLInputElement>) => void;
     onMouseLeaveHandler: (e: React.MouseEvent<HTMLImageElement | HTMLInputElement>) => void;
-}){
+}
+
+export default function FileImage(props: FileImageProps){
+    const {value, onMouseEnterHandler, onMouseLeaveHandler} = props;
     const url = process.env.NEXT_PUBLIC_CDN_SERVER + value;
 
     const style: CSSProperties = {
@@ -17,9 +16,7 @@ export default function FileImage({
     }
     const onLoadingComplete = (e: HTMLImageElement ) => {
         const multiple = e.srcset.split(',')[1].split(' ')[1];
-        console.log('2x', multiple)
     }
-
 
     return (
         <div style={style}>

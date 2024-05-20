@@ -1,23 +1,21 @@
 'use client';
 
-import React, {useContext} from "react";
+import React, {ReactNode} from "react";
 import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
 import FileUpload from "@/app/{commons}/{components}/block/file/fileUpload";
-import FileImage from "@/app/{commons}/{components}/block/file/fileImage";
-import FileFile from "@/app/{commons}/{components}/block/file/fileFile";
-import BoardProvider from "@/app/board/{services}/BoardProvider";
+import {FileImageProps} from "@/app/{commons}/{components}/block/file/fileImage";
 
-export default function FileBlock (data: BlockProps) {
+export type FileBlockProps = BlockProps & {
+    Component: (props: FileImageProps) => ReactNode;
+}
+
+export default function FileBlock (data: FileBlockProps) {
     const {seq, value, code,
         onChangeValueHandler,
         onMouseEnterHandler,
         onMouseLeaveHandler,
+        Component
     } = data;
-
-    const codes = [
-        {code: '00101', component: FileImage},
-        {code: '00102', component: FileFile},
-    ]
 
     return (
         <>
@@ -27,21 +25,15 @@ export default function FileBlock (data: BlockProps) {
                             code={code}
                             value={value}
                             onUploadFileUrl={onChangeValueHandler!}
-                            isImage={code === '00101'}
+                            isImage={Component.name === 'FileImage'}
                 />
             }
             {
                 value &&
-                codes.map((c, i) => {
-                    if(c.code === code){
-                        const Component = c.component;
-                        return <Component key={i}
-                                          value={value}
-                                          onMouseEnterHandler={onMouseEnterHandler!}
-                                          onMouseLeaveHandler={onMouseLeaveHandler!}
-                        />
-                    }
-                })
+                <Component value={value}
+                           onMouseEnterHandler={onMouseEnterHandler!}
+                           onMouseLeaveHandler={onMouseLeaveHandler!}
+                />
             }
         </>
     )

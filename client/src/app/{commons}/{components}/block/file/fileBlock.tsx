@@ -1,0 +1,40 @@
+'use client';
+
+import React, {ReactNode} from "react";
+import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
+import FileUpload from "@/app/{commons}/{components}/block/file/fileUpload";
+import {FileImageProps} from "@/app/{commons}/{components}/block/file/fileImage";
+
+export type FileBlockProps = BlockProps & {
+    Component: (props: FileImageProps) => ReactNode;
+}
+
+export default function FileBlock (data: FileBlockProps) {
+    const {seq, value, code,
+        onChangeValueHandler,
+        onMouseEnterHandler,
+        onMouseLeaveHandler,
+        Component
+    } = data;
+
+    return (
+        <>
+            {
+                !value &&
+                <FileUpload seq={seq}
+                            code={code}
+                            value={value}
+                            onUploadFileUrl={onChangeValueHandler!}
+                            isImage={Component.name === 'FileImage'}
+                />
+            }
+            {
+                value &&
+                <Component value={value}
+                           onMouseEnterHandler={onMouseEnterHandler!}
+                           onMouseLeaveHandler={onMouseLeaveHandler!}
+                />
+            }
+        </>
+    )
+}

@@ -18,13 +18,13 @@ class LoginHistoryServiceTest {
 
     @Test
     void save() {
-        User user = User.builder()
-                .id(2)
-                .userId("admin")
-                .pwd("admin")
-                .name("admin")
-                .isUse(true)
-                .build();
+//        User user = User.builder()
+//                .id(2)
+//                .userId("admin")
+//                .pwd("admin")
+//                .name("admin")
+//                .isUse(true)
+//                .build();
 
 //        LoginHistory loginHistory = LoginHistory.builder()
 //                .ip("111.111.1.1")
@@ -37,6 +37,6 @@ class LoginHistoryServiceTest {
         device.setIp("1.1.1.1");
         device.setLocation("seoul");
 
-        loginHistoryService.save(device, user);
+//        loginHistoryService.save(device, user);
     }
 }

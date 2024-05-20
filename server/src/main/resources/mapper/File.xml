@@ -5,11 +5,14 @@
 
 <mapper namespace="com.anamensis.server.mapper.FileMapper">
     <insert id="insert" parameterType="File">
+        <selectKey keyProperty="id" resultType="int" order="AFTER">
+        SELECT LAST_INSERT_ID()
+        </selectKey>
         INSERT INTO file (
                table_code_pk, table_ref_pk, org_file_name
-               , file_name, file_path, create_at)
+               , file_name, file_path, create_at, is_use)
         VALUES (#{tableCodePk}, #{tableRefPk}, #{orgFileName}
-                , #{fileName}, #{filePath}, #{createAt})
+                , #{fileName}, #{filePath}, #{createAt}, #{isUse})
     </insert>
 
     <select id="selectByFileName" resultType="File">

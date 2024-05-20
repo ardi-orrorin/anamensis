@@ -41,7 +41,7 @@ const generateRefreshToken = async (refreshToken: RequestCookie, userAgent: stri
 
     const accessToken = refresh.headers.getSetCookie().find((cookie: string) => {
         const [key, value] = cookie.split(';')[0].split('=');
-        if(key === 'accessToken') {
+        if(key === 'next.access.token') {
             return cookie;
         }
     });
@@ -55,5 +55,6 @@ export const config = {
         '/public/:path*',
         '/api/logout/:path*',
         '/user/:path*',
+        '/board/new/:path*',
     ]
 }

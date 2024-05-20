@@ -1,5 +1,6 @@
 package com.anamensis.server.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@Builder
+//@Builder
 public class File {
     private long id;
 
@@ -27,4 +28,5 @@ public class File {
     private LocalDateTime createAt;
 
     private boolean isUse;
+
 }

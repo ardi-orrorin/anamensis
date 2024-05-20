@@ -20,13 +20,13 @@ class ShareLinkMapperTest {
 
     @Test
     void insert() {
-        User user = User.builder()
-                .id(2)
-                .userId("admin")
-                .pwd("admin")
-                .name("admin")
-                .isUse(true)
-                .build();
+        User user = new User();
+        user.setId(2);
+        user.setUserId("admin");
+        user.setPwd("admin");
+        user.setName("admin");
+        user.setUse(true);
+
         ShareLink shareLink = ShareLink.builder()
 //                .id(1)
                 .orgLink("orgLink")
@@ -52,14 +52,12 @@ class ShareLinkMapperTest {
 
     @Test
     void selectAll() {
-        User user = User.builder()
-                .id(2)
-                .userId("admin")
-                .pwd("admin")
-                .name("admin")
-                .isUse(true)
-                .build();
-
+        User user = new User();
+        user.setId(2);
+        user.setUserId("admin");
+        user.setPwd("admin");
+        user.setName("admin");
+        user.setUse(true);
         Page page = new Page();
         page.setPage(1);
         page.setSize(10);
@@ -71,13 +69,13 @@ class ShareLinkMapperTest {
 
     @Test
     void selectCount() {
-        User user = User.builder()
-                .id(2)
-                .userId("admin")
-                .pwd("admin")
-                .name("admin")
-                .isUse(true)
-                .build();
+        User user = new User();
+        user.setId(2);
+        user.setUserId("admin");
+        user.setPwd("admin");
+        user.setName("admin");
+        user.setUse(true);
+
         log.info("count : " + shareLinkMapper.selectCount(user));
     }
 }

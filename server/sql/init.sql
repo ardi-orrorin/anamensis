@@ -19,3 +19,11 @@ VALUES ('attend-1', 10),
        ('attend-8', 50),
        ('attend-9', 50),
        ('attend-10', 100);
+
+
+INSERT INTO anamensis.table_code
+         (id, table_name, is_use)
+VALUES (1, 'user'  , 1),
+       (2, 'board' , 1),
+       (3, 'board_comment', 1);
+

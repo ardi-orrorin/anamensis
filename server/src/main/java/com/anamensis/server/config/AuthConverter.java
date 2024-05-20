@@ -39,7 +39,7 @@ public class AuthConverter implements ServerAuthenticationConverter {
         Claims claims = tokenProvider.getClaims(token);
         String userId = claims.get("user", String.class);
         if(claims.get("type").equals("refresh")) {
-            ResponseCookie cookie = ResponseCookie.from("accessToken", tokenProvider.generateToken(userId, true))
+            ResponseCookie cookie = ResponseCookie.from("next.access.token", tokenProvider.generateToken(userId, true))
                     .maxAge(tokenProvider.ACCESS_EXP / 1000)
                     .build();
 

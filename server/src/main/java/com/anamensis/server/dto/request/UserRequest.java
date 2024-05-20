@@ -44,16 +44,16 @@ public class UserRequest {
         private String phone;
 
         public static User transToUser(Register reg) {
-            return User.builder()
-                    .userId(reg.getId())
-                    .pwd(reg.getPwd())
-                    .name(reg.getName())
-                    .email(reg.getEmail())
-                    .phone(reg.getPhone())
-                    .createAt(LocalDateTime.now())
-                    .updateAt(LocalDateTime.now())
-                    .isUse(true)
-                    .build();
+            User user = new User();
+            user.setUserId(reg.getId());
+            user.setPwd(reg.getPwd());
+            user.setName(reg.getName());
+            user.setEmail(reg.getEmail());
+            user.setPhone(reg.getPhone());
+            user.setCreateAt(LocalDateTime.now());
+            user.setUpdateAt(LocalDateTime.now());
+            user.setUse(true);
+            return user;
         }
     }
 

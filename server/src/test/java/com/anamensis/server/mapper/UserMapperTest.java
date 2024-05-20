@@ -40,14 +40,13 @@ class UserMapperTest {
     @Transactional
     void save() {
         String encodePwd = encoder.encode("admin3");
-        User user = User.builder()
-                .userId("admin3")
-                .pwd(encodePwd)
-                .name("admin")
-                .email("tes1t@test1.com")
-                .phone("010-1221-1112")
-                .isUse(true)
-                .build();
+        User user = new User();
+        user.setUserId("admin3");
+        user.setPwd(encodePwd);
+        user.setName("admin");
+        user.setEmail("tes1t@test1.com");
+        user.setPhone("010-1221-1112");
+        user.setUse(true);
         userMapper.save(user);
         log.info("{}", user);
     }

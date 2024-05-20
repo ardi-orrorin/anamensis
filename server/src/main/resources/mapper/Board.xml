@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.server.mapper.BoardMapper">
+    <insert id="save" parameterType="Board">
+        <selectKey keyProperty="id" resultType="long" order="AFTER">
+            SELECT last_insert_id()
+        </selectKey>
+        INSERT INTO board
+               (category_pk, title, content,
+                rate, view_count, create_at,
+                user_pk, isAdsense)
+        VALUES (#{categoryPk}, #{title}, #{content, typeHandler=JsonTypeHandler},
+                #{rate}, #{viewCount}, #{createAt},
+                #{userPk}, #{isAdsense})
+    </insert>
+    <select id="count" resultType="long">
+        SELECT COUNT(*)
+          FROM board
+         WHERE is_use = 1
+           <if test="categoryPk != 0">
+               AND category_pk = #{categoryPk}
+           </if>
+           <if test="title != null">
+               AND title LIKE CONCAT('%', #{title}, '%')
+           </if>
+    </select>
+    <select id="findList" resultMap="BoardResultMapBoard">
+        SELECT *,
+               u.id as user_pk,
+               b.id as board_pk,
+               f.id as file_pk
+          FROM board b
+          JOIN user u
+            ON u.id = b.user_pk
+          LEFT OUTER JOIN file f
+            ON f.table_ref_pk = u.id
+         WHERE b.is_use = 1
+           AND f.is_use = 1
+           AND f.table_code_pk = (SELECT t.id
+                                    FROM table_code t
+                                   WHERE t.table_name = 'user')
+           <if test="board.categoryPk != 0">
+               AND b.category_pk = #{board.categoryPk}
+           </if>
+           <if test="board.title != null and board.title != ''">
+               AND b.title LIKE CONCAT('%', #{board.title}, '%')
+           </if>
+         ORDER BY b.id DESC
+         LIMIT #{page.offset}, #{page.size}
+    </select>
+    <select id="findByPk" resultMap="BoardResultMapBoard" parameterType="Long">
+        SELECT *
+          FROM board b
+          JOIN user u
+            ON u.id = b.user_pk
+          LEFT OUTER JOIN file f
+            ON f.table_ref_pk = u.id
+         WHERE b.is_use        = 1
+           AND b.id            = #{boardPk}
+           AND f.is_use        = 1
+           AND f.table_code_pk = (SELECT t.id
+                                    FROM table_code t
+                                   WHERE t.table_name = 'user')
+    </select>
+    <update id="updateByPk" parameterType="Board">
+        UPDATE board
+        <set>
+            <if test="categoryPk > 0">
+                category_pk = #{categoryPk},
+            </if>
+            <if test="title != null and title != ''">
+                title       = #{title},
+            </if>
+            <if test="content != null">
+                content     = #{content, typeHandler=JsonTypeHandler},
+            </if>
+        </set>
+         WHERE id           = #{id}
+           AND is_use       = 1
+           AND user_pk      = #{userPk}
+    </update>
+    <update id="disableByPk" parameterType="Map">
+        UPDATE board
+           SET is_use  = 0
+         WHERE id      = #{boardPk}
+           AND is_use  = 1
+           AND user_pk = #{userPk}
+    </update>
+    <update id="viewUpdateByPk" parameterType="Long">
+        UPDATE board
+           SET view_count = view_count + 1
+         WHERE id         = #{boardPk}
+           AND is_use     = 1
+    </update>
+    <resultMap id="BoardResultMapBoard" type="com.anamensis.server.resultMap.BoardResultMap$Board">
+        <id property="id" column="id"/>
+        <association property="board" resultMap="BoardEntity" />
+        <association property="user" resultMap="UserEntity" />
+        <association property="file" resultMap="FileEntity" />
+    </resultMap>
+
+    <resultMap id="BoardEntity" type="Board" autoMapping="true">
+        <id property="id" column="board_pk"/>
+        <result property="content" column="content" typeHandler="JsonTypeHandler"/>
+    </resultMap>
+    <resultMap id="UserEntity" type="User" autoMapping="true">
+        <id property="id" column="user_pk"/>
+    </resultMap>
+    <resultMap id="FileEntity" type="File" autoMapping="true">
+        <id property="id" column="file_pk"/>
+    </resultMap>
+
+    <resultMap id="BoardResultMap" type="Board">
+        <result property="content" column="content" typeHandler="JsonTypeHandler"/>
+    </resultMap>
+</mapper>

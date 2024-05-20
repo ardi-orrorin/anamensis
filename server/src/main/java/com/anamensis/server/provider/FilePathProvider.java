@@ -6,19 +6,33 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
 
 @Component
 public class FilePathProvider {
 
-    public FilePathDto changePath(RootType root, String userPk, int width, int height, String ext) {
+    public FilePathDto changeContentPath(int width, int height, String ext) {
+        String path = "/resource/board/";
+        String filename = UUID.randomUUID().toString();
+        String oriFilename = String.format("%s.%s", filename, ext);
+        String thumbFilename = String.format("%s_%sx%s.%s", filename, width, height, ext);
+
+
+        return new FilePathDto(path, oriFilename, 0, 0);
+//        return List.of(
+//                new FilePathDto(path, oriFilename, 0, 0),
+//                new FilePathDto(path, thumbFilename, width, height)
+//        );
+    }
+
+
+    public FilePathDto changeUserPath(RootType root, String userPk, int width, int height, String ext) {
         String result = "";
         String filename = String.format("%s_%sx%s.%s",UUID.randomUUID(), width, height, ext);
 
-        String profile = String.format("/user/%s/profile/%s/%s",
-                userPk,
-                LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")),
-                filename
+        String profile = String.format("/user/%s/profile/%s/", userPk,
+                LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
         );
 
         String resource = String.format("/user/%s/resource/%s/%s", userPk, width, height);

@@ -2,11 +2,12 @@
 import {CSSProperties} from "react";
 import Link from "next/link";
 
-export default function FileFile({
-    value
-}: {
-    value: string
-}){
+export type FileFileProps = {
+    value: string;
+}
+
+export default function FileFile(props: FileFileProps){
+    const {value} = props;
     const style: CSSProperties = {
         width   : '100%',
         height  : '4rem',

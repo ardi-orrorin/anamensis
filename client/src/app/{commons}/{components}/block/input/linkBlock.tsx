@@ -3,7 +3,6 @@
 import React, {CSSProperties, useMemo} from "react";
 import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
 import axios from "axios";
-import Image from "next/image";
 
 type OGType = {
     title       : string;
@@ -11,6 +10,7 @@ type OGType = {
     image       : string;
     url         : string;
 }
+
 const LinkBlock = (props: BlockProps) => {
     const {value, onChangeValueHandler, onKeyUpHandler, onKeyDownHandler} = props;
 
@@ -33,18 +33,18 @@ const LinkBlock = (props: BlockProps) => {
         wordBreak       : 'break-all',
         color           : 'blue',
         padding         : '0.5rem',
-        backgroundColor: 'rgba(230,230,230,0.2)',
+        backgroundColor : 'rgba(230,230,230,0.2)',
         letterSpacing   : '0.03rem',
     };
 
     const linkPreviewStyle: CSSProperties = {
-        display: 'flex',
-        flex: '1 1',
-        justifyContent: 'space-between',
-        width: '100%',
-        padding: '1rem',
-        backgroundColor: 'rgba(230,230,230,0.2)',
-        borderRadius: '0.5rem',
+        display         : 'flex',
+        flex            : '1 1',
+        justifyContent  : 'space-between',
+        width           : '100%',
+        padding         : '1rem',
+        backgroundColor : 'rgba(230,230,230,0.2)',
+        borderRadius    : '0.5rem',
     }
 
     const onKeyupChangeHandler = async (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -52,37 +52,33 @@ const LinkBlock = (props: BlockProps) => {
 
         const urlRegex = new RegExp(/(http(s)?:\/\/)([a-z0-9\w]+\.*)+[a-z0-9]{2,4}/gi);
 
-        if(urlRegex.test(value)){
-            await axios.get('/api/link/og', {
+        try {
+            if(!urlRegex.test(value)) return ;
+            const res = await axios.get('/api/link/og', {
                 params: {
                     url: value
                 }
             })
-            .then(res => {
 
-                const htmlDoc = new DOMParser().parseFromString(res.data, 'text/html');
-                const ogTitle = htmlDoc.querySelector('meta[property="og:title"]')?.getAttribute('content');
-                const ogDescription = htmlDoc.querySelector('meta[property="og:description"]')?.getAttribute('content');
-                const ogImage = htmlDoc.querySelector('meta[property="og:image"]')?.getAttribute('content');
+            const htmlDoc = new DOMParser().parseFromString(res.data, 'text/html');
+            const ogTitle = htmlDoc.querySelector('meta[property="og:title"]')?.getAttribute('content');
+            const ogDescription = htmlDoc.querySelector('meta[property="og:description"]')?.getAttribute('content');
+            const ogImage = htmlDoc.querySelector('meta[property="og:image"]')?.getAttribute('content');
 
-                const data = {
-                    title: ogTitle || value.split('/')[2],
-                    description: ogDescription || '',
-                    image: ogImage || 'http://' + process.env.NEXT_PUBLIC_DOMAIN + '/noimage.jpg',
-                    url: value || '/',
-                };
+            const data = {
+                title: ogTitle || value.split('/')[2],
+                description: ogDescription || '',
+                image: ogImage || 'http://' + process.env.NEXT_PUBLIC_DOMAIN + '/noimage.jpg',
+                url: value || '/',
+            };
 
-                if (onChangeValueHandler) {
-                    onChangeValueHandler(JSON.stringify(data));
-                }
-            })
-            .then(() => {
-                onKeyUpHandler && onKeyUpHandler(e);
-            })
-            .catch(err => {
-                alert('링크를 가져오는데 실패했습니다.');
-            })
+            onChangeValueHandler
+            && onChangeValueHandler(JSON.stringify(data));
 
+            onKeyUpHandler
+            && onKeyUpHandler(e);
+        } catch (e) {
+            alert('링크를 가져오는데 실패했습니다.');
         }
     }
 
@@ -95,28 +91,27 @@ const LinkBlock = (props: BlockProps) => {
     return (
         <>
             {
-                !link && !link?.title
+                !link
+                && !link?.title
                 ? <input style={customInputStyle}
-                       value={value as string}
-                       onChange={onChangeHandler}
-                       onKeyUp={onKeyupChangeHandler}
-                       onKeyDown={onKeyDownHandler}
-
+                         value={value as string}
+                         onChange={onChangeHandler}
+                         onKeyUp={onKeyupChangeHandler}
+                         onKeyDown={onKeyDownHandler}
                 />
                 : <a style={linkPreviewStyle}
                      href={(link as OGType).url}
                      target={'_blank'}>
-                    <div style={{display: 'flex', flexDirection: 'column', gap: '1rem', justifyContent: 'space-between', padding:'1rem'}}>
-                        <p style={{fontSize: '1.6rem'}}>{(link as OGType).title}</p>
-                        <p style={{fontSize: '1rem', wordBreak: 'break-all', color: 'gray'}}
+                    <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'space-between', padding:'0.6rem'}}>
+                        <p style={{fontSize: '1.3rem'}}>{(link as OGType).title}</p>
+                        <p style={{fontSize: '0.7rem', wordBreak: 'break-all', color: 'gray'}}
                         >{(link as OGType).description}</p>
                     </div>
-                    <img style={{width: '120px', height:'120px'}}
+                    <img style={{minWidth: '200px', width: '200px', height:'80px', borderRadius: '0.2rem', objectFit: 'cover'}}
                          src={(link as OGType).image} alt=""
                     />
                 </a>
             }
-
         </>
     )
 }

@@ -21,7 +21,7 @@ export default function InputBase({
 
     const defaultBg = {
         input: 'rgba(230,230,230,0.2)',
-        p: ''
+        p    : ''
     }
 
     const customStyle: CSSProperties = {
@@ -29,10 +29,14 @@ export default function InputBase({
         border          : 'none',
         width           : '100%',
         wordBreak       : 'break-all',
-        fontSize        : textStyle?.fontSize   ? textStyle.fontSize   : style.fontSize,
-        color           : textStyle?.color      ? textStyle.color      : style.color,
-        fontWeight      : textStyle?.fontWeight ? textStyle.fontWeight : style.fontWeight,
-        fontStyle       : textStyle?.fontStyle  ? textStyle.fontStyle  : style.fontStyle,
+        wordWrap        : 'break-word',
+        height          : textStyle?.height         ? textStyle.height         : style.height,
+        fontSize        : textStyle?.fontSize       ? textStyle.fontSize       : style.fontSize,
+        color           : textStyle?.color          ? textStyle.color          : style.color,
+        fontWeight      : textStyle?.fontWeight     ? textStyle.fontWeight     : style.fontWeight,
+        fontStyle       : textStyle?.fontStyle      ? textStyle.fontStyle      : style.fontStyle,
+        borderLeft      : textStyle?.borderLeft     ? textStyle.borderLeft     : style.borderLeft,
+        textDecoration  : textStyle?.textDecoration ? textStyle.textDecoration : style.textDecoration,
         padding         : style.padding,
         letterSpacing   : style.letterSpacing,
 
@@ -40,22 +44,27 @@ export default function InputBase({
 
     const props: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> = {
         value,
-        ref: el => blockRef!.current[seq] = el,
-        onKeyUp: onKeyUpHandler,
-        onKeyDown: onKeyDownHandler,
-        onChange: onChangeHandler,
-        onFocus: onFocusHandler,
-        onMouseEnter: onMouseEnterHandler,
-        onBlur: onBlurHandler,
-        onBlurCapture: onBlurCaptureHandler,
+        ref           : el => blockRef!.current[seq] = el,
+        onKeyUp       : onKeyUpHandler,
+        onKeyDown     : onKeyDownHandler,
+        onChange      : onChangeHandler,
+        onFocus       : onFocusHandler,
+        onMouseEnter  : onMouseEnterHandler,
+        onBlur        : onBlurHandler,
+        onBlurCapture : onBlurCaptureHandler,
     }
 
     return (
         <div style={{display: 'flex', width: '100%', padding: '0.1rem 0.5rem'}}>
             {
                 isView
-                ? <p style={{...customStyle, backgroundColor: textStyle?.backgroundColor || defaultBg.p}} {...props}>{value}</p>
-                : <input style={{...customStyle, backgroundColor: textStyle?.backgroundColor || defaultBg.input}} {...props}/>
+                ? <p style={{...customStyle, backgroundColor: textStyle?.backgroundColor || defaultBg.p}}
+                     {...props}
+                >{value}</p>
+                : <input style={{...customStyle, backgroundColor: textStyle?.backgroundColor || defaultBg.input}}
+                         placeholder={'내용을 입력하세요'}
+                         {...props}
+                />
             }
         </div>
     )

@@ -1,45 +1,50 @@
 package com.anamensis.batch.job.dummyfile;
 
-import com.anamensis.batch.entity.File;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.SneakyThrows;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.transaction.PlatformTransactionManager;
 
-@Component
+@Configuration
 @RequiredArgsConstructor
-@Slf4j
-public class DummyFileJob {
+public class DummyFileJob extends QuartzJobBean {
+
+    private final JobExplorer jobExplorer;
+
+    private final JobLauncher jobLauncher;
 
     private final JobRepository jobRepository;
 
     private final PlatformTransactionManager tm;
 
-    private final DummyFileService dummyFileService;
+    private final DummyFileStep dummyFileStep;
 
-    @Bean
-    public Job dummyFileDeleteJob() {
-        return new JobBuilder("dummy-file-delete-job", jobRepository)
-                .start(dummyFileDeleteStep(jobRepository, tm))
+
+    @SneakyThrows
+    @Override
+    protected void executeInternal(JobExecutionContext context) {
+
+        Job job = new JobBuilder("dummy-file-delete-job", jobRepository)
+                .start(dummyFileStep.dummyFileDeleteStep(jobRepository, tm))
                 .incrementer(new RunIdIncrementer())
                 .build();
-    }
 
+        JobParameters jobParameters = new JobParametersBuilder(this.jobExplorer)
+                .getNextJobParameters(job)
+                .toJobParameters();
 
-    private Step dummyFileDeleteStep(JobRepository jobRepository, PlatformTransactionManager tm) {
-        return new StepBuilder("dummy-file-delete-step", jobRepository)
-                .<File, File>chunk(200, tm)
-                .reader(dummyFileService.dummyFileDeleteReader())
-                .processor(dummyFileService::dummyFileDelete)
-                .writer(dummyFileService::dummyFileDeleteWriter)
-                .allowStartIfComplete(true)
-                .build();
+        this.jobLauncher.run(job, jobParameters);
     }
 }

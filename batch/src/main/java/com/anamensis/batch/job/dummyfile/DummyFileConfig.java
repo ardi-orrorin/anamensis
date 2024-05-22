@@ -5,15 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class DummyFileQuartzConfig {
-
-    @Bean
-    public JobDetail dummyFileDeleteJobDetail() {
-        return JobBuilder.newJob(DummyFileQuartzJob.class)
-                .withIdentity("dummy-file-delete-job-detail")
-                .storeDurably()
-                .build();
-    }
+public class DummyFileConfig {
 
     @Bean
     public Trigger DummyFileDeleteJobTrigger() {
@@ -25,4 +17,13 @@ public class DummyFileQuartzConfig {
                 .withSchedule(scheduleBuilder)
                 .build();
     }
+
+    @Bean
+    public JobDetail dummyFileDeleteJobDetail() {
+        return JobBuilder.newJob(DummyFileJob.class)
+                .withIdentity("dummy-file-delete-job-detail")
+                .storeDurably()
+                .build();
+    }
+
 }

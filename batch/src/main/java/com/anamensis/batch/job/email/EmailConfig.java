@@ -5,14 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class EmailQuartzConfig {
-    @Bean
-    public JobDetail emailJobDetail() {
-        return JobBuilder.newJob(EmailQuartzJob.class)
-                .withIdentity("email-send-job-detail")
-                .storeDurably()
-                .build();
-    }
+public class EmailConfig {
 
     @Bean
     public Trigger emailJobTrigger() {
@@ -24,4 +17,14 @@ public class EmailQuartzConfig {
                 .withSchedule(scheduleBuilder)
                 .build();
     }
+
+    @Bean
+    public JobDetail emailJobDetail() {
+        return JobBuilder.newJob(EmailJob.class)
+                .withIdentity("email-send-job-detail")
+                .storeDurably()
+                .build();
+    }
+
+
 }

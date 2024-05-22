@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.batch.mapper.FileMapper">
+    <select id="selectDummyFile" resultType="File">
+        SELECT *
+          FROM file
+         WHERE table_ref_pk = 0
+           AND DATE (create_at) BETWEEN #{from} AND #{to}
+    </select>
+
+    <delete id="deleteDummyFile">
+        DELETE
+          FROM file
+         WHERE id = #{id}
+    </delete>
+</mapper>

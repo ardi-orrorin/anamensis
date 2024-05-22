@@ -42,7 +42,7 @@ public class SchedulerController {
                 .addLocalDateTime("date", java.time.LocalDateTime.now())
                 .toJobParameters();
 
-        Job job = jobRegistry.getJob("email-api-job");
+        Job job = jobRegistry.getJob("email-send-job");
 
         jobLauncher.run(job, jobParameters);
 

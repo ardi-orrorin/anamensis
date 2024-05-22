@@ -10,26 +10,31 @@ import org.mybatis.spring.batch.builder.MyBatisCursorItemReaderBuilder;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.integration.async.AsyncItemProcessor;
 import org.springframework.batch.item.Chunk;
+import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 @Component
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
 public class DummyFileStep {
 
     private final SqlSessionFactory sqlSessionFactory;
 
+    private final VirtualThreadTaskExecutor taskExecutor;
+
     public Step dummyFileDeleteStep(JobRepository jobRepository, PlatformTransactionManager tm) {
         return new StepBuilder("dummy-file-delete-step", jobRepository)
-                .<File, File>chunk(200, tm)
+                .<File, Future<File>>chunk(1, tm)
                 .reader(dummyFileDeleteReader())
-                .processor(this::dummyFileDelete)
+                .processor(this::asyncDummyFileDelete)
                 .writer(this::dummyFileDeleteWriter)
                 .allowStartIfComplete(true)
                 .build();
@@ -51,19 +56,30 @@ public class DummyFileStep {
         return builder.build();
     }
 
-    private void dummyFileDeleteWriter(Chunk<? extends File> items) {
-        new MyBatisBatchItemWriterBuilder<File>()
+    private void dummyFileDeleteWriter(Chunk<? extends Future<File>> items) {
+        new MyBatisBatchItemWriterBuilder<Future<File>>()
                 .sqlSessionFactory(sqlSessionFactory)
                 .statementId("com.anamensis.batch.mapper.FileMapper.deleteDummyFile")
                 .itemToParameterConverter(file -> {
                     Map<String, Object> parameter = new HashMap<>();
-                    parameter.put("id", file.id());
+                    try {
+                        parameter.put("id", file.get().id());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+
                     return parameter;
                 })
                 .build()
                 .write(items);
     }
 
+    private Future<File> asyncDummyFileDelete(File file) throws Exception {
+        AsyncItemProcessor<File, File> asyncItemProcessor = new AsyncItemProcessor<>();
+        asyncItemProcessor.setDelegate(this::dummyFileDelete);
+        asyncItemProcessor.setTaskExecutor(taskExecutor);
+        return asyncItemProcessor.process(file);
+    }
 
     private File dummyFileDelete(File file) {
 
@@ -72,8 +88,8 @@ public class DummyFileStep {
         boolean result = false;
 
         if(fileToDelete.exists()) {
-//            log.info("DummyFileService.dummyFileDeleteProcessor: fileToDelete: {} ", fileToDelete);
             result = fileToDelete.delete();
+            result = fileToDelete.getParentFile().delete();
         }
 
 //        if(result) {

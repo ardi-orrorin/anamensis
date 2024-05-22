@@ -47,11 +47,11 @@ public class FileProvider {
 
         return filePart.transferTo(save)
                 .then(Mono.fromCallable(() -> {
-                        file.setFileName(filename2);
-                        file.setOrgFileName(filename);
-                        file.setCreateAt(LocalDateTime.now());
-                        file.setFilePath(subDir);
-                        return file;
+                    file.setFileName(filename2);
+                    file.setOrgFileName(filename);
+                    file.setCreateAt(LocalDateTime.now());
+                    file.setFilePath(subDir);
+                    return file;
                 }));
     }
 

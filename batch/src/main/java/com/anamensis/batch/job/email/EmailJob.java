@@ -1,5 +1,6 @@
 package com.anamensis.batch.job.email;
 
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.quartz.JobExecutionContext;
 import org.springframework.batch.core.Job;
@@ -10,28 +11,23 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
+@RequiredArgsConstructor
 public class EmailJob extends QuartzJobBean {
 
-    @Autowired
-    private JobExplorer jobExplorer;
+    private final JobExplorer jobExplorer;
 
-    @Autowired
-    private JobLauncher jobLauncher;
+    private final JobLauncher jobLauncher;
 
-    @Autowired
-    private JobRepository jobRepository;
+    private final JobRepository jobRepository;
 
-    @Autowired
-    private PlatformTransactionManager tm;
+    private final PlatformTransactionManager tm;
 
-    @Autowired
-    private EmailStep emailStep;
+    private final EmailStep emailStep;
 
     @SneakyThrows
     @Override

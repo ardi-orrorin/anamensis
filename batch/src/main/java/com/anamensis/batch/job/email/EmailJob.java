@@ -1,45 +1,50 @@
 package com.anamensis.batch.job.email;
 
-import com.anamensis.batch.entity.UserConfigSmtp;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.SneakyThrows;
+import org.quartz.JobExecutionContext;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.transaction.PlatformTransactionManager;
 
-@Component
-@Slf4j
-@RequiredArgsConstructor
-public class EmailJob {
+@Configuration
+public class EmailJob extends QuartzJobBean {
 
-    private final JobRepository jobRepository;
+    @Autowired
+    private JobExplorer jobExplorer;
 
-    private final PlatformTransactionManager tm;
+    @Autowired
+    private JobLauncher jobLauncher;
 
-    private final EmailService emailService;
+    @Autowired
+    private JobRepository jobRepository;
 
-    private final MailItemWriter mailItemWriter;
+    @Autowired
+    private PlatformTransactionManager tm;
 
-    @Bean
-    public Job emailSendJob(){
-        return new JobBuilder("email-send-job", jobRepository)
-                .start(emailSendStep(jobRepository, tm))
+    @Autowired
+    private EmailStep emailStep;
+
+    @SneakyThrows
+    @Override
+    protected void executeInternal(JobExecutionContext context) {
+        Job job = new JobBuilder("email-send-job", jobRepository)
+                .start(emailStep.emailSendStep(jobRepository, tm))
                 .incrementer(new RunIdIncrementer())
-                .build();
-    }
+                .build();;
 
-    private Step emailSendStep(JobRepository jobRepository, PlatformTransactionManager tm) {
-        return new StepBuilder("email-send-step", jobRepository)
-                .<UserConfigSmtp, UserConfigSmtp>chunk(2, tm)
-                .reader(emailService.myBatisCursorItemReader(null))
-                .writer(mailItemWriter)
-                .allowStartIfComplete(true)
-                .build();
+        JobParameters jobParameters = new JobParametersBuilder(this.jobExplorer)
+                    .getNextJobParameters(job)
+                    .toJobParameters();
+
+        this.jobLauncher.run(job, jobParameters);
     }
 }

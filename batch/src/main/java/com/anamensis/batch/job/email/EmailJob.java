@@ -1,21 +1,22 @@
-package com.anamensis.batch.config;
+package com.anamensis.batch.job.email;
 
 import lombok.SneakyThrows;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-public class BatchScheduledJob extends QuartzJobBean {
+public class EmailJob extends QuartzJobBean {
 
     @Autowired
     private JobExplorer jobExplorer;
@@ -24,26 +25,26 @@ public class BatchScheduledJob extends QuartzJobBean {
     private JobLauncher jobLauncher;
 
     @Autowired
-    private JobRegistry jobRegistry;
+    private JobRepository jobRepository;
+
+    @Autowired
+    private PlatformTransactionManager tm;
+
+    @Autowired
+    private EmailStep emailStep;
 
     @SneakyThrows
     @Override
-    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-
-
-        Job job = null;
-        try {
-            job = jobRegistry.getJob("mail-test-job");
-        } catch (NoSuchJobException e) {
-            throw new RuntimeException(e);
-        }
-
+    protected void executeInternal(JobExecutionContext context) {
+        Job job = new JobBuilder("email-send-job", jobRepository)
+                .start(emailStep.emailSendStep(jobRepository, tm))
+                .incrementer(new RunIdIncrementer())
+                .build();;
 
         JobParameters jobParameters = new JobParametersBuilder(this.jobExplorer)
                     .getNextJobParameters(job)
                     .toJobParameters();
 
         this.jobLauncher.run(job, jobParameters);
-
     }
 }

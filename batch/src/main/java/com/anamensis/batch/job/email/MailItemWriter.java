@@ -1,4 +1,4 @@
-package com.anamensis.batch.config;
+package com.anamensis.batch.job.email;
 
 import com.anamensis.batch.entity.SystemMessage;
 import com.anamensis.batch.entity.UserConfigSmtp;

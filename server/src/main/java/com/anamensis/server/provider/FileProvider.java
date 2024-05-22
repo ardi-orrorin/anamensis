@@ -14,8 +14,6 @@ import reactor.core.publisher.Sinks;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.FileStore;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -31,13 +29,6 @@ public class FileProvider {
             FilePart filePart,
             com.anamensis.server.entity.File file
     ) {
-        MediaType mediaType = filePart.headers().getContentType();
-        log.info("mediaType: {}", mediaType.getType());
-
-        // todo: mediaType.getType() image 경우 썸네일 / 오리지널 두개 생성
-
-        // todo: 이외 파일은 그냥 저장
-
         String filename = filePart.filename();
         String ext = filename.substring(filename.lastIndexOf(".") + 1);
         String filename2 = UUID.randomUUID() + "." + ext;

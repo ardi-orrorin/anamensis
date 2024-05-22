@@ -16,14 +16,9 @@ public class FilePathProvider {
         String path = "/resource/board/";
         String filename = UUID.randomUUID().toString();
         String oriFilename = String.format("%s.%s", filename, ext);
-        String thumbFilename = String.format("%s_%sx%s.%s", filename, width, height, ext);
+//        String thumbFilename = String.format("%s_%sx%s.%s", filename, width, height, ext);
 
-
-        return new FilePathDto(path, oriFilename, 0, 0);
-//        return List.of(
-//                new FilePathDto(path, oriFilename, 0, 0),
-//                new FilePathDto(path, thumbFilename, width, height)
-//        );
+        return new FilePathDto(path, oriFilename, width, height);
     }
 
 

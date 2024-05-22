@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -15,6 +16,7 @@ public class BoardResponse {
     @Getter
     @Builder
     @ToString
+    @Slf4j
     public static class List {
 
         private long id;
@@ -33,15 +35,18 @@ public class BoardResponse {
         private boolean isAdsense;
 
         public static List from(BoardResultMap.Board board) {
-            return List.builder()
+            List.ListBuilder builder = List.builder()
                     .id(board.getId())
                     .title(board.getBoard().getTitle())
                     .viewCount(board.getBoard().getViewCount())
                     .writer(board.getUser().getName())
-                    .profileImage(board.getFile().getFilePath() + board.getFile().getFileName())
                     .createdAt(board.getBoard().getCreateAt())
-                    .isAdsense(board.getBoard().isAdsense())
-                    .build();
+                    .isAdsense(board.getBoard().isAdsense());
+
+            if (board.getFile().getFilePath() != null) {
+                builder.profileImage(board.getFile().getFilePath() + board.getFile().getFileName());
+            }
+            return builder.build();
         }
     }
 
@@ -66,15 +71,19 @@ public class BoardResponse {
         private LocalDateTime createdAt;
 
         public static Content from(BoardResultMap.Board board) {
-            return Content.builder()
+            Content.ContentBuilder builder = Content.builder()
                     .id(board.getId())
                     .title(board.getBoard().getTitle())
                     .categoryPk(board.getBoard().getCategoryPk())
                     .content(board.getBoard().getContent())
                     .writer(board.getUser().getName())
-                    .profileImage(board.getFile().getFilePath() + board.getFile().getFileName())
-                    .createdAt(board.getBoard().getCreateAt())
-                    .build();
+                    .createdAt(board.getBoard().getCreateAt());
+
+            if (board.getFile().getFilePath() != null) {
+                builder.profileImage(board.getFile().getFilePath() + board.getFile().getFileName());
+            }
+
+            return builder.build();
         }
     }
 }

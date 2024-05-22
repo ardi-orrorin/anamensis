@@ -1,9 +1,7 @@
-package com.anamensis.batch.config;
+package com.anamensis.batch.job.dummyfile;
 
-import lombok.SneakyThrows;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -15,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 @Configuration
-public class BatchScheduledJob extends QuartzJobBean {
+public class DummyFileQuartzJob extends QuartzJobBean {
 
     @Autowired
     private JobExplorer jobExplorer;
@@ -26,24 +24,24 @@ public class BatchScheduledJob extends QuartzJobBean {
     @Autowired
     private JobRegistry jobRegistry;
 
-    @SneakyThrows
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 
+        JobParameters jobParameters = null;
 
-        Job job = null;
         try {
-            job = jobRegistry.getJob("mail-test-job");
+            jobParameters = new JobParametersBuilder(this.jobExplorer)
+                    .getNextJobParameters(jobRegistry.getJob("dummy-file-delete-job"))
+                    .toJobParameters();
+
         } catch (NoSuchJobException e) {
             throw new RuntimeException(e);
         }
 
-
-        JobParameters jobParameters = new JobParametersBuilder(this.jobExplorer)
-                    .getNextJobParameters(job)
-                    .toJobParameters();
-
-        this.jobLauncher.run(job, jobParameters);
-
+        try {
+            this.jobLauncher.run(jobRegistry.getJob("dummy-file-delete-job"), jobParameters);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

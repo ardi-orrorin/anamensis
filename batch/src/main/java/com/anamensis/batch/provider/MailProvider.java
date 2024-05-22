@@ -57,8 +57,6 @@ public class MailProvider {
         }
 
         public Builder message(UserConfigSmtp userConfigSmtp, String subject, String content, String model) {
-
-
             try {
                 String body = "";
 

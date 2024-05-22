@@ -15,6 +15,7 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FilePartEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.Scannable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
@@ -91,16 +92,9 @@ public class FileService {
     }
 
     public Mono<Tuple2<File, FilePathDto>> saveBoardImg(FilePart filePart, File fileContent) {
-        int profileWidth = 700;
-        int profileHeight = 700;
-
         String ext = filePart.filename().substring(filePart.filename().lastIndexOf(".") + 1);
 
-//        List<FilePathDto> filepath = filePathProvider.changeContentPath(
-//                profileWidth, profileHeight, ext
-//        );
-
-        FilePathDto filepath = filePathProvider.changeContentPath(profileWidth, profileHeight, ext);
+        FilePathDto filepath = filePathProvider.changeContentPath(0, 0, ext);
 
         return Mono.just(filepath)
                 .map(file -> {
@@ -115,19 +109,6 @@ public class FileService {
 
                     return Tuples.of(newFile, file);
                 });
-//        return Flux.fromIterable(filepath)
-//            .map(file -> {
-//                File newFile = File.builder()
-//                    .tableCodePk(fileContent.getTableCodePk())
-//                    .tableRefPk(fileContent.getTableRefPk())
-//                    .fileName(file.file())
-//                    .filePath(file.path())
-//                    .orgFileName(filePart.filename())
-//                    .createAt(LocalDateTime.now())
-//                    .isUse(true)
-//                    .build();
-//                return Tuples.of(newFile, file);
-//            });
     }
 
     @Transactional
@@ -191,9 +172,12 @@ public class FileService {
     }
 
     public Flux<FileHashRecord> pushProgress(String hash) {
-        return list.asFlux()
-                .publishOn(Schedulers.boundedElastic())
-                .filter(record -> record.hash().equals(hash));
+        return list
+                .asFlux()
+                .filterWhen(record -> Mono.just(record.hash().equals(hash)))
+                .publish()
+                .refCount(1)
+                .publishOn(Schedulers.boundedElastic());
     }
     public Mono<Void> fileUpload(
             FilePartEvent filePartEvent,

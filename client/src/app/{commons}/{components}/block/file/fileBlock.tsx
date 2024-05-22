@@ -3,7 +3,7 @@
 import React, {ReactNode} from "react";
 import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
 import FileUpload from "@/app/{commons}/{components}/block/file/fileUpload";
-import {FileImageProps} from "@/app/{commons}/{components}/block/file/fileImage";
+import FileImage, {FileImageProps} from "@/app/{commons}/{components}/block/file/fileImage";
 
 export type FileBlockProps = BlockProps & {
     Component: (props: FileImageProps) => ReactNode;
@@ -25,7 +25,7 @@ export default function FileBlock (data: FileBlockProps) {
                             code={code}
                             value={value}
                             onUploadFileUrl={onChangeValueHandler!}
-                            isImage={Component.name === 'FileImage'}
+                            isImage={Component === FileImage}
                 />
             }
             {

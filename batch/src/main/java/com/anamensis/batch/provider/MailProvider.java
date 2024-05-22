@@ -17,10 +17,8 @@ public class MailProvider {
     JavaMailSenderImpl mailSenderImpl;
     MimeMessageHelper mimeMailMessage;
 
-    public Mono<Void> send() {
-        return Mono.fromRunnable(() -> {
-            mailSenderImpl.send(mimeMailMessage.getMimeMessage());
-        });
+    public void send() {
+        mailSenderImpl.send(mimeMailMessage.getMimeMessage());
     }
 
     public void testConnection() throws MessagingException {

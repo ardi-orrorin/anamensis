@@ -9,11 +9,16 @@ public class EmailConfig {
 
     @Bean
     public Trigger emailJobTrigger() {
-        SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule();
+        SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule()
+                .withIntervalInMinutes(1)
+                .withRepeatCount(10);
+
+//        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 10 22 22 5 ? 2024");
 
         return TriggerBuilder.newTrigger()
                 .forJob(emailJobDetail())
                 .withIdentity("email-send-job-trigger")
+//                .withSchedule(cronScheduleBuilder)
                 .withSchedule(scheduleBuilder)
                 .build();
     }

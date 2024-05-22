@@ -37,11 +37,11 @@
             ON u.id = b.user_pk
           LEFT OUTER JOIN file f
             ON f.table_ref_pk = u.id
-         WHERE b.is_use = 1
-           AND f.is_use = 1
            AND f.table_code_pk = (SELECT t.id
                                     FROM table_code t
                                    WHERE t.table_name = 'user')
+           AND f.is_use = 1
+         WHERE b.is_use = 1
            <if test="board.categoryPk != 0">
                AND b.category_pk = #{board.categoryPk}
            </if>

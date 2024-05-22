@@ -8,12 +8,12 @@ import Image from "next/image";
 
 
 interface BoardListI {
-    id: string;
-    title: string;
-    viewCount: number;
-    writer: string;
-    profileImage: string;
-    createdAt: string;
+    id           : string;
+    title        : string;
+    viewCount    : number;
+    writer       : string;
+    profileImage?: string;
+    createdAt    : string;
 }
 
 export interface GetProps {
@@ -114,12 +114,15 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                                 </td>
                                 <td className={'py-2 px-3'}>{ history.viewCount }</td>
                                 <td className={'py-2 px-3 flex gap-2 items-center'}>
-                                    <Image src={ process.env.NEXT_PUBLIC_CDN_SERVER + history.profileImage}
-                                           className={'rounded-full border-2 border-solid border-blue-300'}
-                                           width={40}
-                                           height={40}
-                                           alt={''}
-                                   />
+                                    {
+                                        history.profileImage &&
+                                        <Image src={ process.env.NEXT_PUBLIC_CDN_SERVER + history.profileImage}
+                                               className={'rounded-full border-2 border-solid border-blue-300'}
+                                               width={40}
+                                               height={40}
+                                               alt={''}
+                                        />
+                                    }
                                     { history.writer }
                                 </td>
                                 <td className={'py-2 px-3'}>{ history.createdAt }</td>
@@ -143,6 +146,7 @@ const getData = async (req: URLSearchParams) => {
             'Content-Type': 'application/json',
         }})
         .then((res: AxiosResponse<PageResponse<BoardListI>>) => {
+            console.log(res.data)
             return res.data;
         });
 }

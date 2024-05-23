@@ -98,6 +98,7 @@ const LinkBlock = (props: BlockProps) => {
                          onChange={onChangeHandler}
                          onKeyUp={onKeyupChangeHandler}
                          onKeyDown={onKeyDownHandler}
+                         placeholder={'링크를 입력해주세요(https, http 포함). https://www.example.com'}
                 />
                 : <a style={linkPreviewStyle}
                      href={(link as OGType).url}

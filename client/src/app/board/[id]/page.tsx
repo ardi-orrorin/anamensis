@@ -381,9 +381,14 @@ export default function Page({params}: {params : {id: string}}) {
                             {
                                 !isNewBoard && board.isView
                                 && <div className={'flex gap-2 justify-between'}>
-                                  <p className={'text-sm'}>
-                                      {board.data.createdAt}
-                                  </p>
+                                  <div className={'text-sm'}>
+                                    <p>
+                                        작성일: {board.data.createdAt}
+                                    </p>
+                                    <p>
+                                        조회수: {board.data.viewCount}
+                                    </p>
+                                  </div>
                                   <div className={'flex gap-2 items-center'}>
                                     <Image src={process.env.NEXT_PUBLIC_CDN_SERVER + board.data.profileImage}
                                            className={'rounded-full border-2 border-solid border-blue-300'}
@@ -440,7 +445,7 @@ export default function Page({params}: {params : {id: string}}) {
                                 && <button className={'px-6 py-3 flex gap-2 justify-center items-center border border-blue-400 text-xl rounded hover:bg-blue-400 hover:text-white duration-300'}
                                            onClick={onChangeRateHandler}
                                 >
-                                    <FontAwesomeIcon icon={faHeart} className={`${rateInfo.status ? 'text-red-600' : ''}`}/>
+                                    <FontAwesomeIcon icon={faHeart} className={`${rateInfo.status ? 'text-blue-600' : ''}`}/>
                                     <span>
                                       { rateInfo?.count || board.data.rate }
                                     </span>

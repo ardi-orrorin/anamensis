@@ -50,5 +50,4 @@ public class RateService {
 
         return Mono.just(redisTemplate.boundSetOps(key).size());
     }
-
 }

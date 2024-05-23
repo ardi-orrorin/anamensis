@@ -186,16 +186,11 @@ class BoardServiceTest {
         long userPk = 1;
         boardService.findByUserPk(userPk)
                 .doOnNext(Assertions::assertNotNull)
-                .doOnNext(b -> {
-                    assertTrue(b.size() <= 5);
-                })
-                .doOnNext(b -> {
-                    b.forEach(board -> {
-                        assertNotNull(board.getCreatedAt());
-                        assertNotNull(board.getTitle());
-                        assertTrue(board.getRate() >= 0);
-                        assertTrue(board.getViewCount() >= 0);
-                    });
+                .doOnNext(board -> {
+                    assertNotNull(board.getCreatedAt());
+                    assertNotNull(board.getTitle());
+                    assertTrue(board.getRate() >= 0);
+                    assertTrue(board.getViewCount() >= 0);
                 })
                 .subscribe();
     }

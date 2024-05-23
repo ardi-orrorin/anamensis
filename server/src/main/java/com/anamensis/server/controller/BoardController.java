@@ -7,8 +7,8 @@ import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.dto.response.StatusResponse;
 import com.anamensis.server.entity.Board;
 import com.anamensis.server.service.BoardService;
+import com.anamensis.server.service.RateService;
 import com.anamensis.server.service.UserService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,8 +22,11 @@ import java.util.List;
 @RequestMapping("api/boards")
 @RequiredArgsConstructor
 public class BoardController {
+
     private final BoardService boardService;
     private final UserService userService;
+    private final RateService rateService;
+
 
     @PublicAPI
     @GetMapping("")
@@ -32,6 +35,10 @@ public class BoardController {
         Board board
     ) {
         return boardService.findAll(page, board)
+                .flatMap(b -> rateService.countRate(b.getId())
+                    .doOnNext(b::setRate)
+                    .map($ -> b)
+                )
             .collectList()
             .flatMap(list ->
                 boardService.count(board)
@@ -50,6 +57,10 @@ public class BoardController {
             @PathVariable(name = "id") long boardPk
     ) {
         return boardService.findByPk(boardPk)
+                .flatMap(b -> rateService.countRate(b.getId())
+                    .doOnNext(b::setRate)
+                    .map($ -> b)
+                )
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(b -> boardService.viewUpdateByPk(boardPk)
                     .subscribe()
@@ -62,7 +73,13 @@ public class BoardController {
     ) {
         return user
                 .flatMap(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
-                .flatMap(u -> boardService.findByUserPk(u.getId()));
+                .flatMapMany(u -> boardService.findByUserPk(u.getId()))
+                .flatMap(b -> rateService.countRate(b.getId())
+                    .doOnNext(b::setRate)
+                    .map($ -> b)
+                )
+                .collectList();
+
     }
 
     @PostMapping("")

@@ -2,7 +2,7 @@
 
 import axios, {AxiosResponse} from "axios";
 import Block from "@/app/board/{components}/Block";
-import {ChangeEvent, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
+import {ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 import {HtmlElements} from "@/app/{commons}/{components}/block/type/Types";
 import {BoardI} from "@/app/board/{services}/types";
@@ -13,10 +13,19 @@ import {faDownLeftAndUpRightToCenter, faUpRightAndDownLeftFromCenter} from "@for
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import TempFileProvider, {TempFileI} from "@/app/board/{services}/TempFileProvider";
 import Image from "next/image";
+import {faHeart} from "@fortawesome/free-solid-svg-icons/faHeart";
+
+export interface RateInfoI {
+    id      : number;
+    count   : number;
+    status  : boolean;
+}
 
 export default function Page({params}: {params : {id: string}}) {
 
     const [board, setBoard] = useState<BoardService>({} as BoardService);
+
+    const [rateInfo, setRateInfo] = useState<RateInfoI>({} as RateInfoI);
 
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -74,6 +83,14 @@ export default function Page({params}: {params : {id: string}}) {
         if (!list) return ;
         blockRef.current[list.length - 1]?.focus();
     },[board.data?.content?.list.length])
+
+    useEffect(() => {
+        if(params.id === 'new') return ;
+        axios.get('/api/board/rate/' + params.id)
+            .then((res: AxiosResponse<RateInfoI>) => {
+                setRateInfo(res.data);
+            });
+    },[params.id]);
 
     const addBlock = useCallback((seq: number, init: boolean) => {
         const block = {...defaultBlock};
@@ -271,6 +288,27 @@ export default function Page({params}: {params : {id: string}}) {
         blockRef.current[seq - 1]?.focus();
     }
 
+    const onChangeRateHandler = () => {
+        if(rateInfo.status) {
+            axios.delete('/api/board/rate/' + params.id)
+                .then((res: AxiosResponse<RateInfoI>) => {
+                    setRateInfo(res.data);
+                })
+                .catch(e => {
+                    console.log(e);
+                });
+        } else {
+            axios.post('/api/board/rate/' + params.id)
+                .then((res: AxiosResponse<RateInfoI>) => {
+                    setRateInfo(res.data);
+                })
+                .catch(e => {
+                    alert('로그인이 필요합니다.');
+                });
+        }
+
+    }
+
     return (
         <BoardProvider.Provider value={{board, setBoard}}>
             <TempFileProvider.Provider value={{tempFiles, setTempFiles}}>
@@ -393,6 +431,20 @@ export default function Page({params}: {params : {id: string}}) {
                                 >작성
                                 </button>
                               </div>
+                            }
+                        </div>
+                        <div className={'flex justify-center'}>
+                            {
+                                !isNewBoard && board.isView
+
+                                && <button className={'px-6 py-3 flex gap-2 justify-center items-center border border-blue-400 text-xl rounded hover:bg-blue-400 hover:text-white duration-300'}
+                                           onClick={onChangeRateHandler}
+                                >
+                                    <FontAwesomeIcon icon={faHeart} className={`${rateInfo.status ? 'text-red-600' : ''}`}/>
+                                    <span>
+                                      { rateInfo?.count || board.data.rate }
+                                    </span>
+                                </button>
                             }
                         </div>
                     </div>

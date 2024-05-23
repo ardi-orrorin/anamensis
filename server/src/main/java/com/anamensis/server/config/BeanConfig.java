@@ -3,11 +3,13 @@ package com.anamensis.server.config;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Random;
 
 @Configuration
+@EnableRedisRepositories(basePackages = "com.anamensis.server.repository")
 public class BeanConfig {
 
     @Bean

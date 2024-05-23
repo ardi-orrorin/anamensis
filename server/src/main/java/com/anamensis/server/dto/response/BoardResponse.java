@@ -5,6 +5,7 @@ import com.anamensis.server.resultMap.BoardResultMap;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,8 +16,7 @@ public class BoardResponse {
 
     @Getter
     @Builder
-    @ToString
-    @Slf4j
+    @Setter
     public static class List {
 
         private long id;
@@ -28,6 +28,8 @@ public class BoardResponse {
         private String profileImage;
 
         private long viewCount;
+
+        private long rate;
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime createdAt;
@@ -52,7 +54,7 @@ public class BoardResponse {
 
     @Getter
     @Builder
-    @ToString
+    @Setter
     public static class Content {
 
         private long id;
@@ -67,6 +69,10 @@ public class BoardResponse {
 
         private String profileImage;
 
+        private long viewCount;
+
+        private long rate;
+
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime createdAt;
 
@@ -77,6 +83,7 @@ public class BoardResponse {
                     .categoryPk(board.getBoard().getCategoryPk())
                     .content(board.getBoard().getContent())
                     .writer(board.getUser().getName())
+                    .viewCount(board.getBoard().getViewCount())
                     .createdAt(board.getBoard().getCreateAt());
 
             if (board.getFile().getFilePath() != null) {
@@ -89,6 +96,7 @@ public class BoardResponse {
 
     @Getter
     @Builder
+    @Setter
     public static class SummaryList {
         private long id;
         private String title;

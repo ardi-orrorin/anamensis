@@ -33,12 +33,12 @@ const BoardSummary = () => {
                     <col style={{width: '15%'}} />
                     <col style={{width: '20%'}} />
                 </colgroup>
-                <thead>
-                    <tr className={'h-10'}>
-                        <th>제목</th>
-                        <th>좋아요</th>
-                        <th>조회수</th>
-                        <th>작성일</th>
+                <thead className={'bg-blue-300 text-white h-8 align-middle'}>
+                    <tr className={'text-sm border-x border-white border-solid'}>
+                        <th className={'border-x border-white border-solid'}>제목</th>
+                        <th className={'border-x border-white border-solid'}>좋아요</th>
+                        <th className={'border-x border-white border-solid'}>조회수</th>
+                        <th className={'border-x border-white border-solid'}>작성일</th>
                     </tr>
                 </thead>
                 <tbody>

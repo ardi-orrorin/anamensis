@@ -9,6 +9,8 @@ export interface BoardI {
     writer      : string;
     profileImage: string;
     createdAt   : string;
+    viewCount   : number;
+    rate        : number;
 }
 export interface BoardContentI {
     list          : BlockI[];

@@ -1,6 +1,5 @@
 spring:
   application:
-    name: server, aws, mysql, security
+    name: server, aws, mysql, security, redis
   config:
     import: optional:configserver:http://localhost:8077
-

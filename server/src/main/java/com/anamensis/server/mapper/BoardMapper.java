@@ -20,6 +20,8 @@ public interface BoardMapper {
 
     Optional<BoardResultMap.Board> findByPk(long boardPk);
 
+    List<BoardResultMap.Board> findByUserPk(long userPk);
+
     long count(Board board);
 
     int disableByPk(long boardPk, long userPk);

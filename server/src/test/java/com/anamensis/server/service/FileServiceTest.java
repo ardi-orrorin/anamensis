@@ -46,11 +46,10 @@ class FileServiceTest {
 
     @Test
     void deleteFile() {
-        File file = File.builder()
-                .id(252)
-                .fileName("a0b583ea-4849-4470-b5ef-7e180c286619.png")
-                .filePath("/resource/board/")
-                .build();
+        File file = new File();
+        file.setId(252);
+        file.setFileName("a0b583ea-4849-4470-b5ef-7e180c286619.png");
+        file.setFilePath("/resource/board/");
 
         fileService.deleteFile(file)
                 .log().subscribe();

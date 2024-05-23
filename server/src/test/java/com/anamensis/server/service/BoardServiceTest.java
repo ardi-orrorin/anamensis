@@ -17,7 +17,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles("local")
+@ActiveProfiles("test")
 class BoardServiceTest {
 
     @SpyBean
@@ -177,6 +177,26 @@ class BoardServiceTest {
     void viewUpdateByPkError() {
             boardService.viewUpdateByPk(0)
                 .doOnNext(Assertions::assertFalse)
+                .subscribe();
+    }
+
+    @Test
+    @DisplayName("사용자별 최근 게시글 조회 최대 5개")
+    void findByUserPk() {
+        long userPk = 1;
+        boardService.findByUserPk(userPk)
+                .doOnNext(Assertions::assertNotNull)
+                .doOnNext(b -> {
+                    assertTrue(b.size() <= 5);
+                })
+                .doOnNext(b -> {
+                    b.forEach(board -> {
+                        assertNotNull(board.getCreatedAt());
+                        assertNotNull(board.getTitle());
+                        assertTrue(board.getRate() >= 0);
+                        assertTrue(board.getViewCount() >= 0);
+                    });
+                })
                 .subscribe();
     }
 }

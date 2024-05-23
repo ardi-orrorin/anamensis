@@ -46,8 +46,6 @@ public class EmailStep {
     public Step emailSendStep(JobRepository jobRepository, PlatformTransactionManager tm) {
         SystemMessage sm = smService.findByWebSysPk(DEFAULT_WEB_SYS_PK);
 
-        log.info("EmailSendStep: {}", sm);
-
         return new StepBuilder("email-send-step", jobRepository)
                 .<UserConfigSmtp, Future<SmtpPushHistory>>chunk(1, tm)
                 .reader(myBatisCursorItemReader(null))

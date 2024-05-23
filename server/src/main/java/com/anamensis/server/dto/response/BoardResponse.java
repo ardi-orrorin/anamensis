@@ -86,4 +86,24 @@ public class BoardResponse {
             return builder.build();
         }
     }
+
+    @Getter
+    @Builder
+    public static class SummaryList {
+        private long id;
+        private String title;
+        private long viewCount;
+        private long rate;
+        private String createdAt;
+
+        public static SummaryList from(BoardResultMap.Board board) {
+            return SummaryList.builder()
+                    .id(board.getId())
+                    .title(board.getBoard().getTitle())
+                    .viewCount(board.getBoard().getViewCount())
+                    .rate(board.getBoard().getRate())
+                    .createdAt(board.getBoard().getCreateAt().toString())
+                    .build();
+        }
+    }
 }

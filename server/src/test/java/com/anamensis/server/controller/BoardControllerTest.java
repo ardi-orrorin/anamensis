@@ -27,7 +27,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("local")
+@ActiveProfiles("test")
 class BoardControllerTest {
 
     Logger log = org.slf4j.LoggerFactory.getLogger(BoardControllerTest.class);
@@ -251,5 +251,22 @@ class BoardControllerTest {
                 log.info("response: {}", response);
                 assertNotNull(response.getResponseBody());
         });
+    }
+
+    @Test
+    void findByUserPk() {
+        webTestClient.get()
+                .uri("/api/boards/summary")
+                .headers(httpHeaders -> {
+                    httpHeaders.setBearerAuth(token.getAccessToken());
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .consumeWith(response -> {
+                    log.info("response: {}", response);
+                    assertNotNull(response.getResponseBody());
+                });
+
     }
 }

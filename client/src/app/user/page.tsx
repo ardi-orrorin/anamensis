@@ -1,11 +1,12 @@
 'use client';
 
-import UserInfoWindow from "@/app/user/info/{components}/UserInfoWindow";
+import UserInfoWindow from "@/app/user/{components}/UserInfoWindow";
 import {useMemo, useState} from "react";
 import {faWindowRestore} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faWindowMinimize} from "@fortawesome/free-solid-svg-icons/faWindowMinimize";
 import AttendInfo from "@/app/user/{components}/AttendInfo";
+import BoardSummary from "@/app/user/{components}/BoardSummary";
 
 export type OpenType = {
     win1: boolean,
@@ -32,7 +33,7 @@ export default function Page() {
         },
         {
             id: 2, open: open.win2,
-            component: <UserInfoWindow key={'win2'} openKey={'win2'} title={'제목2'} open={open} setOpen={setOpen}>test</UserInfoWindow>
+            component: <UserInfoWindow key={'win2'} openKey={'win2'} title={'최근 작성글'} open={open} setOpen={setOpen}><BoardSummary /></UserInfoWindow>
         },
         {
             id: 3, open: open.win3,

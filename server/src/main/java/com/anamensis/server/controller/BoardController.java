@@ -8,12 +8,15 @@ import com.anamensis.server.dto.response.StatusResponse;
 import com.anamensis.server.entity.Board;
 import com.anamensis.server.service.BoardService;
 import com.anamensis.server.service.UserService;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/boards")
@@ -51,6 +54,15 @@ public class BoardController {
                 .doOnNext(b -> boardService.viewUpdateByPk(boardPk)
                     .subscribe()
                 );
+    }
+
+    @GetMapping("summary")
+    public Mono<List<BoardResponse.SummaryList>> findByUserPk(
+        @AuthenticationPrincipal Mono<UserDetails> user
+    ) {
+        return user
+                .flatMap(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
+                .flatMap(u -> boardService.findByUserPk(u.getId()));
     }
 
     @PostMapping("")

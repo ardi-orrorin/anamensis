@@ -19,12 +19,12 @@ class FileMapperTest {
     @Test
     void insert() {
 
-        File file = File.builder()
-                .orgFileName("test.txt")
-                .fileName(UUID.randomUUID() + ".txt")
-                .filePath("/20210801/")
-                .createAt(LocalDateTime.now())
-                .build();
+        File file = new File();
+        file.setOrgFileName("test.txt");
+        file.setFileName(UUID.randomUUID() + ".txt");
+        file.setFilePath("/20210801/");
+        file.setCreateAt(LocalDateTime.now());
+
 
         fileMapper.insert(file);
     }

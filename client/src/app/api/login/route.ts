@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
                 body: err.response.data
             }
         });
+
     return new NextResponse(JSON.stringify(res.body), {
         status: res.status
     });

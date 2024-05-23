@@ -65,6 +65,14 @@
                                     FROM table_code t
                                    WHERE t.table_name = 'user')
     </select>
+    <select id="findByUserPk" resultMap="BoardResultMapBoard">
+        SELECT *
+          FROM board
+         WHERE user_pk = #{userPk}
+           AND is_use  = 1
+         ORDER BY id DESC
+         LIMIT 0, 5
+    </select>
     <update id="updateByPk" parameterType="Board">
         UPDATE board
         <set>
@@ -95,6 +103,7 @@
          WHERE id         = #{boardPk}
            AND is_use     = 1
     </update>
+
     <resultMap id="BoardResultMapBoard" type="com.anamensis.server.resultMap.BoardResultMap$Board">
         <id property="id" column="id"/>
         <association property="board" resultMap="BoardEntity" />

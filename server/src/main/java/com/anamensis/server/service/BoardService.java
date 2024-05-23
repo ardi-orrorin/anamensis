@@ -12,6 +12,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +33,12 @@ public class BoardService {
                 .orElseThrow(() -> new RuntimeException("게시글이 없습니다."));
         return Mono.just(board)
                 .map(BoardResponse.Content::from);
+    }
+
+    public Mono<List<BoardResponse.SummaryList>> findByUserPk(long userPk) {
+        return Flux.fromIterable(boardMapper.findByUserPk(userPk))
+                .map(BoardResponse.SummaryList::from)
+                .collectList();
     }
 
     @Transactional

@@ -22,7 +22,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles("local")
+@ActiveProfiles("test")
 class BoardMapperTest {
 
     @SpyBean
@@ -133,4 +133,31 @@ class BoardMapperTest {
     }
 
 
+    @Test
+    @DisplayName("사용자별 최근 게시글 5개 조회")
+    void findByUserPk() {
+        long userPk = 1;
+
+        assertDoesNotThrow(() -> boardMapper.findByUserPk(userPk));
+
+        boardMapper.findByUserPk(userPk).forEach(board -> {
+            log.info("{}", board);
+            Board test = board.getBoard();
+
+            assertNotNull(test.getId());
+            assertNotNull(test.getUserPk());
+            assertNotNull(test.getViewCount());
+            assertNotNull(test.getContent());
+            assertNotNull(test.getRate());
+            assertNotNull(test.getCreateAt());
+            assertNotNull(test.getCategoryPk());
+
+
+            assertNull(board.getUser().getName());
+            assertNull(board.getUser().getEmail());
+            assertNull(board.getUser().getPwd());
+            assertNull(board.getFile().getFileName());
+            assertNull(board.getFile().getFilePath());
+        });
+    }
 }

@@ -1,22 +1,28 @@
 import {NextRequest, NextResponse} from "next/server";
 import axios, {AxiosResponse} from "axios";
 import {cookies} from "next/headers";
-import {BoardI} from "@/app/board/{services}/types";
+import {RateInfoI} from "@/app/board/[id]/page";
 
 export async function GET(req: NextRequest) {
     const id = req.nextUrl.pathname.split('/')[req.nextUrl.pathname.split('/').length - 1];
+    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
 
-    const url = process.env.NEXT_PUBLIC_SERVER + '/public/api/boards/' + id;
+    if(!token) return new NextResponse(null, {
+        status: 200,
+    });
+
+    const url = process.env.NEXT_PUBLIC_SERVER + '/api/rate/' + id;
 
     const data = await axios.get(url, {
         headers: {
+            'Authorization': 'Bearer ' + token?.value,
             'Content-Type': 'application/json',
         }})
-        .then((res: AxiosResponse<BoardI>) => {
+        .then((res: AxiosResponse<RateInfoI>) => {
             return res.data;
         });
 
-    console.log(data);
+
     return new NextResponse(JSON.stringify(data),{
         status: 200,
         headers: {
@@ -25,24 +31,26 @@ export async function GET(req: NextRequest) {
     });
 }
 
-export async function PUT(req:NextRequest) {
-    const data: BoardI = await req.json();
-
+export async function POST(req: NextRequest) {
     const id = req.nextUrl.pathname.split('/')[req.nextUrl.pathname.split('/').length - 1];
-
-    const url = process.env.NEXT_PUBLIC_SERVER + '/api/boards/' + id;
     const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
 
-    const result = await axios.put(url, data, {
+    if(!token) return new NextResponse(JSON.stringify({message: '로그인이 필요합니다.'}), {
+        status: 401,
+    });
+
+    const url = process.env.NEXT_PUBLIC_SERVER + '/api/rate/' + id;
+
+    const data = await axios.post(url,{}, {
         headers: {
             'Authorization': 'Bearer ' + token?.value,
             'Content-Type': 'application/json',
-        }
-    }).then((res) => {
-        return res.data;
-    });
+        }})
+        .then((res: AxiosResponse<RateInfoI>) => {
+            return res.data;
+        });
 
-    return new NextResponse(JSON.stringify(result), {
+    return new NextResponse(JSON.stringify(data),{
         status: 200,
         headers: {
             'Content-Type': 'application/json',
@@ -53,15 +61,19 @@ export async function PUT(req:NextRequest) {
 export async function DELETE(req:NextRequest) {
     const id = req.nextUrl.pathname.split('/')[req.nextUrl.pathname.split('/').length - 1];
 
-    const url = process.env.NEXT_PUBLIC_SERVER + '/api/boards/' + id;
+    const url = process.env.NEXT_PUBLIC_SERVER + '/api/rate/' + id;
     const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
+
+    if(!token) return new NextResponse(JSON.stringify({message: '로그인이 필요합니다.'}), {
+        status: 401,
+    });
 
     const result = await axios.delete(url, {
         headers: {
             'Authorization': 'Bearer ' + token?.value,
             'Content-Type': 'application/json',
         }
-    }).then((res) => {
+    }).then((res: AxiosResponse<RateInfoI>) => {
         return res.data;
     });
 

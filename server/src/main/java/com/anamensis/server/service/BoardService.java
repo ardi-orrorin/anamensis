@@ -35,10 +35,9 @@ public class BoardService {
                 .map(BoardResponse.Content::from);
     }
 
-    public Mono<List<BoardResponse.SummaryList>> findByUserPk(long userPk) {
+    public Flux<BoardResponse.SummaryList> findByUserPk(long userPk) {
         return Flux.fromIterable(boardMapper.findByUserPk(userPk))
-                .map(BoardResponse.SummaryList::from)
-                .collectList();
+                .map(BoardResponse.SummaryList::from);
     }
 
     @Transactional

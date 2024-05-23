@@ -11,6 +11,7 @@ interface BoardListI {
     id           : string;
     title        : string;
     viewCount    : number;
+    rate         : number;
     writer       : string;
     profileImage?: string;
     createdAt    : string;
@@ -79,20 +80,22 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
             </div>
             <table className={'w-full'}>
                 <colgroup>
-                    <col style={{width: '4%'}}/>
-                    <col style={{width: '60%'}}/>
-                    <col style={{width: '6%'}}/>
+                    <col style={{width: '5%'}}/>
+                    <col style={{width: '55%'}}/>
+                    <col style={{width: '5%'}}/>
+                    <col style={{width: '5%'}}/>
                     <col style={{width: '10%'}}/>
                     <col style={{width: '20%'}}/>
                 </colgroup>
                 <thead className={'bg-blue-300 text-white h-8 align-middle'}>
-                <tr className={'text-sm border-x border-white border-solid'}>
-                    <th className={'border-x border-white border-solid'}>#</th>
-                    <th className={'border-x border-white border-solid'}>제목</th>
-                    <th className={'border-x border-white border-solid'}>View</th>
-                    <th className={'border-x border-white border-solid'}>작성자</th>
-                    <th className={'border-x border-white border-solid'}>작성일자</th>
-                </tr>
+                    <tr className={'text-sm border-x border-white border-solid'}>
+                        <th className={'border-x border-white border-solid'}>#</th>
+                        <th className={'border-x border-white border-solid'}>제목</th>
+                        <th className={'border-x border-white border-solid'}>View</th>
+                        <th className={'border-x border-white border-solid'}>Like</th>
+                        <th className={'border-x border-white border-solid'}>작성자</th>
+                        <th className={'border-x border-white border-solid'}>작성일자</th>
+                    </tr>
                 </thead>
                 <tbody className={'text-sm'}>
                 {
@@ -113,6 +116,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                                     </Link>
                                 </td>
                                 <td className={'py-2 px-3'}>{ history.viewCount }</td>
+                                <td className={'py-2 px-3'}>{ history.rate }</td>
                                 <td className={'py-2 px-3 flex gap-2 items-center'}>
                                     {
                                         history.profileImage &&

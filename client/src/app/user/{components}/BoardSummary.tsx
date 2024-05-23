@@ -45,7 +45,7 @@ const BoardSummary = () => {
                 {
                     data.map((e, i) => (
                         <tr key={e.title}
-                            className={`h-10 ${i % 2 === 0 ? 'bg-blue-50' : 'bg-white'}`}
+                            className={`h-10 ${i % 2 === 1 ? 'bg-blue-50' : 'bg-white'}`}
                         >
                             <td className={'p-2'}>
                                 <Link href={`/board/${e.id}`}>

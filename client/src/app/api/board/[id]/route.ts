@@ -16,7 +16,6 @@ export async function GET(req: NextRequest) {
             return res.data;
         });
 
-    console.log(data);
     return new NextResponse(JSON.stringify(data),{
         status: 200,
         headers: {

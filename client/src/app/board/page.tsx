@@ -6,7 +6,6 @@ import Link from "next/link";
 import {cookies} from "next/headers";
 import Image from "next/image";
 
-
 interface BoardListI {
     id           : string;
     title        : string;
@@ -40,14 +39,13 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
         <div className={'p-5'}>
             <div className={'flex justify-between h-10'}
             >
-
                 <div>
                     {
                         isLogin &&
                         <Link href={'/board/new'}
                               className={'w-auto'}
                         >
-                          <button className={'w-20 border border-solid border-gray-300 rounded-md text-sm px-3 py-1'}>
+                          <button className={'w-20 border border-solid border-blue-300 rounded-md text-sm px-3 py-1'}>
                             글쓰기
                           </button>
                         </Link>
@@ -57,7 +55,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                       method={'get'}
                 >
                     <div>
-                        <select className={'w-32 border border-solid border-gray-300 rounded-md text-sm px-3 py-1'}
+                        <select className={'w-32 border border-solid border-blue-300 rounded-md text-sm px-3 py-1'}
                                 defaultValue={searchParams.size}
                                 name={'size'}
                         >
@@ -70,7 +68,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                         </select>
                     </div>
                     <div>
-                        <button className={'w-20 border border-solid border-gray-300 rounded-md text-sm px-3 py-1'}
+                        <button className={'w-20 border border-solid border-blue-300 rounded-md text-sm px-3 py-1'}
                                 type={'submit'}
                         >
                             조회
@@ -103,7 +101,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                         return (
                             <tr key={'boards' + history.id}
                                 className={[
-                                    'w-full border-b border-gray-200 border-solid',
+                                    'w-full border-b border-blue-200 border-solid',
                                     index % 2 === 1 ? 'bg-blue-50': ''
                                 ].join(' ')}
                             >
@@ -121,9 +119,9 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                                     {
                                         history.profileImage &&
                                         <Image src={ process.env.NEXT_PUBLIC_CDN_SERVER + history.profileImage}
-                                               className={'rounded-full border-2 border-solid border-blue-300'}
-                                               width={40}
-                                               height={40}
+                                               className={'rounded-full border border-solid border-blue-300 bg-cover bg-center'}
+                                               width={20}
+                                               height={20}
                                                alt={''}
                                         />
                                     }
@@ -150,7 +148,6 @@ const getData = async (req: URLSearchParams) => {
             'Content-Type': 'application/json',
         }})
         .then((res: AxiosResponse<PageResponse<BoardListI>>) => {
-            console.log(res.data)
             return res.data;
         });
 }

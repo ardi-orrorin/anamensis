@@ -65,12 +65,26 @@ export default function Page() {
                    .sort((a, b) => (a.open ? -1 : 1) - (b.open ? -1 : 1))
     },[open])
 
+    const onChangeWindow = (key: string) => {
+        setOpen({
+            ...open,
+            [key]: !open[key]
+        });
+    }
+
     return (
         <main className={'flex flex-col gap-3'}>
             <div className={'flex gap-4 flex-wrap duration-300'}>
                 {
-                    sortEle.filter((e)=> !e.open).map((e) => (
-                        {...e.component}
+                    sortEle
+                        .filter((e) => !e.open)
+                        .map((e, i ) => (
+                        <button key={'btn'+i}
+                                className={'w-[100px] h-10 bg-gray-400 text-white rounded'}
+                                onClick={() => onChangeWindow(e.component.props.openKey)}
+                        >
+                            {e.component.props.title}
+                        </button>
                     ))
                 }
                 {
@@ -83,9 +97,10 @@ export default function Page() {
                       </button>
                 }
             </div>
-            <div className={'flex  gap-4 flex-wrap duration-300'}>
+            <div className={'flex gap-4 flex-wrap duration-300'}>
                 {
-                   sortEle.filter((e)=> e.open).map((e) => (
+                   sortEle
+                       .map((e) => (
                         {...e.component}
                    ))
                 }

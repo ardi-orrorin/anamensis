@@ -9,7 +9,8 @@ type UserInfoWindowProps = {
     children: React.ReactNode,
     open: OpenType,
     setOpen: Dispatch<SetStateAction<OpenType>>,
-    openKey: string
+    openKey: string,
+    hidden?: boolean
 }
 
 const UserInfoWindow = ({
@@ -23,8 +24,8 @@ const UserInfoWindow = ({
     }
 
     return (
-        <div className={['flex flex-col duration-300',
-                            open[openKey] ? 'w-[500px] h-80 border border-solid border-blue-300 shadow-blue-100 shadow-md rounded' : 'w-[100px] h-10 border-gray-400  rounded'
+        <div className={['flex flex-col w-[500px] h-80 border border-solid border-blue-300 shadow-blue-100 shadow-md rounded duration-300',
+                        open[openKey] ? '' : 'hidden'
                         ].join(' ')}
         >
             <div className={['flex justify-between w-full h-10 p-3 text-sm text-white', open[openKey] ? 'bg-blue-300' : 'bg-gray-400  rounded'].join(' ')}>

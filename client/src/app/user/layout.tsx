@@ -4,14 +4,14 @@ import React, {useState} from "react";
 import ModalProvider, {ModalI} from "@/app/user/{services}/modalProvider";
 import LeftNavBar from "@/app/user/{components}/LeftNavBar";
 import Contents from "@/app/user/{components}/Contents";
-import ModalBackground from "@/app/user/{components}/Modal";
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
+import ModalBackground from "@/app/user/{components}/ModalBackground";
 
 
 export default function Layout({children}: {children: React.ReactNode}) {
 
     const [isOpen, setIsOpen] = useState<boolean>(true);
-    const [modal, setModal] = useState<ModalI>({}as ModalI);
+    const [modal, setModal] = useState<ModalI>({} as ModalI);
 
     const modalClose = () => {
         bodyScrollToggle();

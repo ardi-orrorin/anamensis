@@ -3,6 +3,7 @@ import {TextStylesType} from "@/app/board/{services}/types";
 
 export type BlockProps = {
     seq                     : number;
+    isCursor?               : boolean;
     code                    : string;
     textStyle?              : TextStylesType;
     isView?                 : boolean;

@@ -9,6 +9,7 @@ type TodoType = {
 }
 const CheckBlock = (props: BlockProps) => {
     const {
+        seq,
         value, isView,
         onChangeValueHandler,
         onKeyUpHandler, onKeyDownHandler
@@ -94,7 +95,7 @@ const CheckBlock = (props: BlockProps) => {
     }
 
     return (
-        <div style={containerStyle}>
+        <div id={`block-${seq}`} style={containerStyle}>
             {
                 !isView
                 ? <input style={{...commonStyle, ...checkBoxStyle}}

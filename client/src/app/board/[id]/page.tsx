@@ -14,6 +14,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import TempFileProvider, {TempFileI} from "@/app/board/{services}/TempFileProvider";
 import Image from "next/image";
 import {faHeart} from "@fortawesome/free-solid-svg-icons/faHeart";
+import {useRouter} from "next/navigation";
 
 export interface RateInfoI {
     id      : number;
@@ -21,7 +22,7 @@ export interface RateInfoI {
     status  : boolean;
 }
 
-export default function Page({params}: {params : {id: string}}) {
+export default function Page({params}: {params : {id: string, hash: string}}) {
 
     const [board, setBoard] = useState<BoardService>({} as BoardService);
 
@@ -40,12 +41,20 @@ export default function Page({params}: {params : {id: string}}) {
 
     const isNewBoard = useMemo(() => !params.id || params.id === 'new',[params.id]);
 
+
     const defaultBlock = useMemo(()=>(
         {seq: 0, value: '', code: '00005', textStyle: {}}
     ),[]);
+
     const shortList = useMemo(()=> (
         blockTypeList.map(item => ({ command: item.command, code: item.code}))
     ), []);
+
+
+    const cursor = useMemo(() => {
+        return window.location.hash;
+    },[window.location.hash]);
+
 
     useEffect(() => {
         if(!isNewBoard) return ;
@@ -409,9 +418,11 @@ export default function Page({params}: {params : {id: string}}) {
                                     && board.data.content
                                     && board.data.content.list
                                     && board.data.content.list.length > 0
-                                    && board.data.content.list.map((item, index) => (
-                                        <Block key={'block' + index}
+                                    && board.data.content.list.map((item, index) => {
+                                       const isCursor = cursor === `#block-${item.seq}`;
+                                       return <Block key={'block' + index}
                                                blockRef={blockRef}
+                                               isCursor={isCursor}
                                                seq={item.seq}
                                                value={item.value}
                                                textStyle={item.textStyle}
@@ -423,7 +434,7 @@ export default function Page({params}: {params : {id: string}}) {
                                                onClickAddHandler={()=> addBlockHandler(item.seq)}
                                                onClickDeleteHandler={onClickDeleteHandler}
                                         />
-                                    ))
+                                    })
                                 }
                             </BlockProvider.Provider>
                         </div>

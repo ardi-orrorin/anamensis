@@ -27,7 +27,6 @@ public class BoardController {
     private final UserService userService;
     private final RateService rateService;
 
-
     @PublicAPI
     @GetMapping("")
     public Mono<PageResponse<BoardResponse.List>> findAll(

@@ -12,7 +12,7 @@ type OGType = {
 }
 
 const LinkBlock = (props: BlockProps) => {
-    const {value, onChangeValueHandler, onKeyUpHandler, onKeyDownHandler} = props;
+    const {seq, value, onChangeValueHandler, onKeyUpHandler, onKeyDownHandler} = props;
 
     const link = useMemo(() => {
         try {
@@ -89,7 +89,9 @@ const LinkBlock = (props: BlockProps) => {
     }
 
     return (
-        <>
+        <div id={`block-${seq}`}
+             className={'p-2 w-full'}
+        >
             {
                 !link
                 && !link?.title
@@ -113,7 +115,7 @@ const LinkBlock = (props: BlockProps) => {
                     />
                 </a>
             }
-        </>
+        </div>
     )
 }
 

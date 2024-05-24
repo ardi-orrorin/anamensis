@@ -9,6 +9,7 @@ import axios from "axios";
 import {
     pickFontFileForFallbackGeneration
 } from "next/dist/compiled/@next/font/dist/local/pick-font-file-for-fallback-generation";
+import apiCall from "@/app/{commons}/func/api";
 
 export interface UserProps {
     id            : string;
@@ -218,35 +219,39 @@ export default function Page() {
 
     const submitHandler = async () => {
         await setLoading(true);
-        await axios.post('/api/signup', user, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then((res) => {
-                if(res.request.status === 200) {
-                    alert('회원가입이 완료되었습니다.');
-                    router.push('/');
-                }
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+
+        await apiCall<any, UserProps>({
+            path: '/api/signup',
+            method: 'POST',
+            body: user,
+            call: 'Proxy'
+        })
+        .then((res) => {
+            if(res.request.status === 200) {
+                alert('회원가입이 완료되었습니다.');
+                router.push('/');
+            }
+        })
+        .finally(() => {
+            setLoading(false);
+        });
     }
 
     const checkHandler = async (data: ExistProps) => {
-        return await axios.post('/api/signup/exists', data, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
+        return await apiCall<any, ExistProps>({
+            path: '/api/signup/exists',
+            method: 'POST',
+            body: data,
+            call: 'Proxy'
+        });
     }
 
     const sendVerifyCode = async () => {
-        await axios.post('/api/signup/code', {email: user.email}, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
+        await apiCall<any, {email: string}>({
+            path: '/api/signup/code',
+            method: 'POST',
+            body: {email: user.email},
+            call: 'Proxy'
         }).then((res) => {
             if(res.status === 200) {
                 alert('인증번호가 전송되었습니다.');
@@ -256,15 +261,15 @@ export default function Page() {
     }
 
     const verifyCode = async () => {
-        await axios.post('/api/signup/verify', {email: user.email, code: user.emailCheck}, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
+
+        await apiCall<any, {email: string, code: string}>({
+            path: '/api/signup/verify',
+            method: 'POST',
+            body: {email: user.email, code: user.emailCheck},
+            call: 'Proxy'
         }).then((res) => {
             if(res.status === 200) {
-
                 alert('인증이 완료되었습니다.');
-
                 setCheck({
                     ...check,
                     emailCheck: 'check'

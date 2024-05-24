@@ -5,6 +5,8 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
+import apiCall from "@/app/{commons}/func/api";
+import api from "@/app/{commons}/func/api";
 
 export interface SysMessageI {
     id: string;
@@ -39,36 +41,40 @@ const Message = () => {
             listLoading: true
         })
 
-        axios.get('/api/user/sys-message/web-sys/' + modal.id)
-            .then(res => {
-                setMessageList(res.data);
-                setLoading({
-                    ...loading,
-                    listLoading: false
-                })
+        apiCall({
+            path: '/api/user/sys-message/web-sys/' + modal.id,
+            method: 'GET',
+            call: 'Proxy'
+        })
+        .then(res => {
+            setMessageList(res.data);
+            setLoading({
+                ...loading,
+                listLoading: false
             })
-            .catch(err => {
-                console.log(err);
-            })
-
+        })
+        .catch(err => {
+            console.log(err);
+        })
     }, [modal.id, messageList.length]);
 
     useEffect(() => {
         if(!message.id) return;
-        axios.get('/api/user/sys-message', {
+        apiCall({
+            path: '/api/user/sys-message',
+            method: 'GET',
+            call: 'Proxy',
             params: {
                 id: message.id
             }
         })
         .then(res => {
-            console.log(res.data)
             setMessage(res.data);
             setEdit(true);
             setInit(false);
         })
         .catch(err => {
             console.log(err);
-
         })
     },[message.id]);
 

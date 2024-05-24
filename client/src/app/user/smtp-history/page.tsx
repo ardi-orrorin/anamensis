@@ -5,6 +5,7 @@ import Row from "@/app/user/smtp-history/{components}/Row";
 import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import {GetProps} from "@/app/user/history/page";
 import {cookies} from "next/headers";
+import apiCall from "@/app/{commons}/func/api";
 
 export interface SmtpHistoryI {
     id: number;
@@ -102,18 +103,14 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
 }
 
 
-const getData = async (req: URLSearchParams): Promise<PageResponse<SmtpHistoryI>> => {
-    const url = process.env.NEXT_PUBLIC_SERVER + '/api/smtp-push-history';
-    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
-
-    const result = await axios.get(url, {
-        params: {...req},
-        headers: {
-            'Authorization': 'Bearer ' + token?.value,
-        }
-    }).then((res: AxiosResponse<PageResponse<SmtpHistoryI>>) => {
+const getData = async (req: URLSearchParams) => {
+    return await apiCall<PageResponse<SmtpHistoryI>, URLSearchParams>({
+        path: '/api/smtp-push-history',
+        method: 'GET',
+        call: 'Server',
+        setAuthorization: true,
+        params: req
+    }).then(res => {
         return res.data;
     });
-
-    return result;
 }

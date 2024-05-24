@@ -4,6 +4,7 @@ import Image from "next/image";
 import axios from "axios";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {UserInfoI} from "@/app/user/email/page";
+import apiCall from "@/app/{commons}/func/api";
 
 
 type loadingType = {
@@ -21,23 +22,27 @@ export default function Page() {
     const [profileEnter, setProfileEnter] = useState<boolean>(false);
 
     useEffect(() => {
-        axios.get('/api/user/info')
-            .then((res) => {
-                console.log(res.data)
-                setProfile(res.data)
-            })
+        apiCall<UserInfoI>({
+            path: '/api/user/info',
+            method: 'GET',
+        })
+        .then((res) => {
+            setProfile(res.data)
+        })
     },[])
 
     useEffect(() => {
-        axios.get('/api/user/info/profile-img')
-            .then((res) => {
-                if(res.data.length === 0) return ;
-                setImg(process.env.NEXT_PUBLIC_CDN_SERVER + res.data)
-            })
+        apiCall({
+            path: '/api/user/info/profile-img',
+            method: 'GET',
+        }).then((res) => {
+            if(res.data.length === 0) return ;
+            setImg(process.env.NEXT_PUBLIC_CDN_SERVER + res.data)
+        })
     },[]);
 
     const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if(!e.target.files) return;
+        if (!e.target.files) return;
 
         const formdata = new FormData();
 
@@ -48,11 +53,16 @@ export default function Page() {
             img: true
         });
 
-        await axios.post('/api/user/info/profile-img', formdata)
+        await apiCall({
+                path: '/api/user/info/profile-img',
+                method: 'POST',
+                body: formdata,
+                contentType: 'multipart/form-data',
+            })
             .then((res) => {
-                console.log(res.data)
                 setImg(process.env.NEXT_PUBLIC_CDN_SERVER + res.data)
-            }).finally(() => {
+            })
+            .finally(() => {
                 setLoading({
                     ...loading,
                     img: false
@@ -60,13 +70,17 @@ export default function Page() {
                 setProfileEnter(false)
             })
     }
-
     const onSubmitHandler = async () => {
         setLoading({
             ...loading,
             profile: true
         })
-        await axios.put('/api/user/info', profile)
+
+        await apiCall({
+                path: '/api/user/info',
+                method: 'PUT',
+                body: profile,
+            })
             .then((res) => {
                 alert('수정되었습니다.')
             }).finally(() => {
@@ -75,6 +89,7 @@ export default function Page() {
                     profile: false
                 });
             });
+
     }
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {

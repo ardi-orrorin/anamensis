@@ -3,6 +3,7 @@ import OTPProvider from "@/app/user/otp/{services}/OTPProvider";
 import axios from "axios";
 import {useRouter} from "next/navigation";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
+import apiCall from "@/app/{commons}/func/api";
 
 const OTPGenerate = () => {
 
@@ -19,20 +20,21 @@ const OTPGenerate = () => {
             callApiReq: false
         });
 
-
-        await axios.get('/api/user/otp')
-            .then((res) => {
-                setOtp({
-                    ...otp,
-                    callApiReq: true,
-                    otpQRLink: res.data
-                });
-
-                router.push('?step=verify');
-            })
-            .finally(() => {
-                setLoading(false);
+        await apiCall({
+            path: '/api/user/otp',
+            method: 'GET'
+        })
+        .then((res) => {
+            setOtp({
+                ...otp,
+                callApiReq: true,
+                otpQRLink: res.data
             });
+            router.push('?step=verify');
+        })
+        .finally(() => {
+            setLoading(false);
+        });
     }
 
     const qrcode = () => {

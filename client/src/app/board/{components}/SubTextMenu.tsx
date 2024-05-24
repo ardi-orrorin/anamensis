@@ -3,7 +3,6 @@ import {faBold, faItalic, faTextSlash} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
 import {TextStylesType} from "@/app/board/{services}/types";
-import {relativizeURL} from "next/dist/shared/lib/router/utils/relativize-url";
 
 const SubTextMenu = ({
     isView,

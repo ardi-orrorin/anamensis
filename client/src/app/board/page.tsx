@@ -1,10 +1,10 @@
 import {GetServerSideProps, InferGetServerSidePropsType} from "next";
-import axios, {AxiosResponse} from "axios";
 import {PageResponse} from "@/app/{commons}/types/commons";
 import PageNavigator from "@/app/{commons}/PageNavigator";
 import Link from "next/link";
 import {cookies} from "next/headers";
 import Image from "next/image";
+import apiCall from "@/app/{commons}/func/api";
 
 interface BoardListI {
     id           : string;
@@ -140,14 +140,13 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
 }
 
 const getData = async (req: URLSearchParams) => {
-    const url = process.env.NEXT_PUBLIC_SERVER + '/public/api/boards';
 
-    return axios.get(url, {
-        params: {...req},
-        headers: {
-            'Content-Type': 'application/json',
-        }})
-        .then((res: AxiosResponse<PageResponse<BoardListI>>) => {
-            return res.data;
-        });
+    return apiCall<PageResponse<BoardListI>, URLSearchParams>({
+        path: '/public/api/boards',
+        method: 'GET',
+        call: 'Server',
+        params: req,
+    }).then(res => {
+        return res.data;
+    });
 }

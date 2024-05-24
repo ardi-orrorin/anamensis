@@ -5,6 +5,7 @@ import React, {useEffect, useMemo, useState} from "react";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {AuthType} from "@/app/login/{services}/types";
+import apiCall from "@/app/{commons}/func/api";
 
 export interface UserInfoI {
     userId: string;
@@ -29,10 +30,12 @@ export default function Page() {
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
-        axios.get('/api/user/email')
-            .then(res => {
-                setUserInfo(res.data);
-            });
+        apiCall<UserInfoI>({
+            path: '/api/user/email',
+            method: 'GET',
+        }).then(res => {
+            setUserInfo(res.data);
+        });
     },[loading]);
 
 
@@ -51,16 +54,18 @@ export default function Page() {
     const updateSAuth = async (data: AuthPropsI) => {
         setLoading(true);
 
-        await axios.put('/api/user/email', data)
-            .then(res => {
-                setUserInfo(res.data);
-            }).catch(err => {
-                console.log(err);
-            }).finally(() => {
-                setLoading(false);
-            });
+        await apiCall<UserInfoI, AuthPropsI>({
+            path: '/api/user/email',
+            method: 'PUT',
+            body: data,
+        }).then(res => {
+            setUserInfo(res.data);
+        }).catch(err => {
+            console.log(err);
+        }).finally(() => {
+            setLoading(false);
+        });
     }
-
     return (
         <div>
             <div className={'flex flex-col gap-5 w-full'}>

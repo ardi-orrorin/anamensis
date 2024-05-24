@@ -5,6 +5,7 @@ import ModalProvider, {ModalContextType} from "@/app/user/{services}/modalProvid
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import Message from "@/app/user/system/{components}/message";
 import {RoleType} from "@/app/user/system/{services}/types";
+import apiCall from "@/app/{commons}/func/api";
 
 const Row = ({
     props, setData
@@ -17,27 +18,33 @@ const Row = ({
     const {modal, setModal} = useContext<ModalContextType>(ModalProvider);
 
     const onSaveHandler = async () => {
-        await axios.put('/api/user/system', webSys)
-            .then(res => {
-                setWebSys({
-                    ...webSys,
-                    edit: false
-                });
 
-                setData(data => {
-                    return data.map(item => {
-                        if(item.code === webSys.code){
-                            return webSys;
-                        }
-                        return item;
-                    });
-                });
-
-                alert('수정 완료');
-            })
-            .catch(err => {
-                console.error(err);
+        await apiCall<WebSysI>({
+            path: '/api/user/system',
+            method: 'PUT',
+            body: webSys,
+            call: 'Proxy'
+        })
+        .then(res => {
+            setWebSys({
+                ...webSys,
+                edit: false
             });
+
+            setData(data => {
+                return data.map(item => {
+                    if(item.code === webSys.code){
+                        return webSys;
+                    }
+                    return item;
+                });
+            });
+
+            alert('수정 완료');
+        })
+        .catch(err => {
+            console.error(err);
+        });
     }
 
     const onEditHandler = () => {
@@ -70,13 +77,18 @@ const Row = ({
     }
 
     const onDeleteHandler = async (code: string) => {
-        await axios.delete('/api/user/system/' + code)
-            .then(res => {
-                setData(data => {
-                    return data.filter(item => item.code !== code);
-                });
-                alert('삭제 완료');
+
+        await apiCall({
+            path: '/api/user/system/' + code,
+            method: 'DELETE',
+            call: 'Proxy'
+        })
+        .then(res => {
+            setData(data => {
+                return data.filter(item => item.code !== code);
             });
+            alert('삭제 완료');
+        });
     }
 
     return (

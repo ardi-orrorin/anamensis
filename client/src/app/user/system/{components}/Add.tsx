@@ -2,6 +2,7 @@ import {Dispatch, SetStateAction, useState} from "react";
 import axios from "axios";
 import {WebSysI} from "@/app/user/system/page";
 import {RoleType} from "@/app/user/system/{services}/types";
+import apiCall from "@/app/{commons}/func/api";
 
 const Add = ({
     setAdd, data
@@ -30,15 +31,20 @@ const Add = ({
     }
 
     const onSaveHandler = async () => {
-        await axios.post('/api/user/system', webSys)
-            .then(res => {
-                setWebSys({permission: RoleType.ADMIN} as WebSysI);
-                alert('추가 완료');
-                setAdd(false);
-            })
-            .catch(err => {
-                console.error(err);
-            });
+        await apiCall<WebSysI>({
+            path: '/api/user/system',
+            method: 'POST',
+            body: webSys,
+            call: 'Proxy'
+        })
+        .then(res => {
+            setWebSys({permission: RoleType.ADMIN} as WebSysI);
+            alert('추가 완료');
+            setAdd(false);
+        })
+        .catch(err => {
+            console.error(err);
+        });
     }
 
     const onCancelHandler = () => {

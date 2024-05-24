@@ -1,43 +1,38 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
-import React, {Dispatch, SetStateAction, useEffect} from "react";
-import {OpenType} from "@/app/user/page";
+import React from "react";
 
 
-type UserInfoWindowProps = {
-    title: string,
-    children: React.ReactNode,
-    open: OpenType,
-    setOpen: Dispatch<SetStateAction<OpenType>>,
-    openKey: string,
-    hidden?: boolean
+export type UserInfoWindowProps = {
+    winKey    : string,
+    title     : string,
+    children? : React.ReactNode,
+    open      : boolean,
+    onClick?  : (key: string, open:boolean) => void,
 }
 
-const UserInfoWindow = ({
-    title, children, open, setOpen, openKey
-}: UserInfoWindowProps) => {
-    const sethandler = () => {
-        setOpen({
-            ...open,
-            [openKey]: !open[openKey]
-        });
-    }
+const UserInfoWindow = (props: UserInfoWindowProps) => {
+
+    const {winKey, title, children, open, onClick} = props;
 
     return (
         <div className={['flex flex-col w-[500px] h-80 border border-solid border-blue-300 shadow-blue-100 shadow-md rounded duration-300',
-                        open[openKey] ? '' : 'hidden'
+                        open ? '' : 'hidden',
                         ].join(' ')}
         >
-            <div className={['flex justify-between w-full h-10 p-3 text-sm text-white', open[openKey] ? 'bg-blue-300' : 'bg-gray-400  rounded'].join(' ')}>
-                <button onClick={sethandler}>
+            <div className={['flex justify-between w-full h-10 p-3 text-sm text-white',
+                            open ? 'bg-blue-300' : 'bg-gray-400  rounded'
+                            ].join(' ')}
+            >
+                <button onClick={()=> onClick!(winKey, false)}>
                     {title}
                 </button>
-                <button onClick={sethandler}>
+                <button onClick={()=>onClick!(winKey, false)}>
                     <FontAwesomeIcon icon={faXmark} />
                 </button>
             </div>
-            <div className={['duration-300', open[openKey] ? 'h-80 max-h-80' : 'max-h-0 h-0'].join(' ')}>
-                <div className={[open[openKey] ? 'h-full w-full flex flex-col p-4 items-center justify-center ' : 'hidden', 'duration-500'].join(' ')}>
+            <div className={['duration-300', open ? 'h-80 max-h-80' : 'max-h-0 h-0'].join(' ')}>
+                <div className={[open ? 'h-full w-full flex flex-col p-4 items-center justify-center ' : 'hidden', 'duration-500'].join(' ')}>
                     {children}
                 </div>
             </div>

@@ -1,94 +1,50 @@
 'use client';
 
-import UserInfoWindow from "@/app/user/{components}/UserInfoWindow";
-import {useMemo, useState} from "react";
+import UserInfoWindow, {UserInfoWindowProps} from "@/app/user/{components}/UserInfoWindow";
+import {useState} from "react";
 import {faWindowRestore} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faWindowMinimize} from "@fortawesome/free-solid-svg-icons/faWindowMinimize";
 import AttendInfo from "@/app/user/{components}/AttendInfo";
 import BoardSummary from "@/app/user/{components}/BoardSummary";
 
-export type OpenType = {
-    win1: boolean,
-    win2: boolean,
-    win3: boolean,
-    win4: boolean,
-    win5: boolean,
-    [key: string]: boolean
-}
 export default function Page() {
 
-    const [open, setOpen] = useState<OpenType>({
-        win1: true,
-        win2: true,
-        win3: true,
-        win4: true,
-        win5: true,
-    });
+    const [windowList, setWindowList] = useState<UserInfoWindowProps[]>([
+        {winKey: 'win1', title: '출석체크', open: true, children: <AttendInfo/>},
+        {winKey: 'win2', title: '최근 작성글', open: true, children: <BoardSummary/>},
+        {winKey: 'win3', title: '제목3', open: true, children: "sdf" },
+        {winKey: 'win4', title: '제목4', open: true, children: "test"},
+    ]);
 
-    const ele = [
-        {
-            id: 1, open: open.win1,
-            component: <UserInfoWindow key={'win1'} openKey={'win1'} title={'출석체크'} open={open} setOpen={setOpen}><AttendInfo/></UserInfoWindow>
-        },
-        {
-            id: 2, open: open.win2,
-            component: <UserInfoWindow key={'win2'} openKey={'win2'} title={'최근 작성글'} open={open} setOpen={setOpen}><BoardSummary /></UserInfoWindow>
-        },
-        {
-            id: 3, open: open.win3,
-            component: <UserInfoWindow key={'win3'} openKey={'win3'} title={'제목3'} open={open} setOpen={setOpen}>test</UserInfoWindow>
-        },
-        {
-            id: 4, open: open.win4,
-            component: <UserInfoWindow key={'win4'} openKey={'win4'} title={'제목4'} open={open} setOpen={setOpen}>test</UserInfoWindow>
-        },
-        {
-            id: 5, open: open.win5,
-            component: <UserInfoWindow key={'win5'} openKey={'win5'} title={'제목5'} open={open} setOpen={setOpen}>test</UserInfoWindow>
-        },
-    ]
-
-    const windowToggle = (set: boolean) => {
-        setOpen({
-            win1: set,
-            win2: set,
-            win3: set,
-            win4: set,
-            win5: set,
-        })
+    const onClickHandler = (winKey: string, open: boolean) => {
+        const list = windowList.map(e =>
+            e.winKey === winKey ? {...e, open} : e
+        );
+        setWindowList(list);
     }
 
-
-    const sortEle = useMemo(() => {
-         return ele.sort((a, b) => a.id - b.id)
-                   .sort((a, b) => (a.open ? -1 : 1) - (b.open ? -1 : 1))
-    },[open])
-
-    const onChangeWindow = (key: string) => {
-        setOpen({
-            ...open,
-            [key]: !open[key]
-        });
+    const windowToggle = (open: boolean) => {
+        setWindowList(windowList.map(e => ({...e, open})));
     }
 
     return (
         <main className={'flex flex-col gap-3'}>
             <div className={'flex gap-4 flex-wrap duration-300'}>
                 {
-                    sortEle
-                        .filter((e) => !e.open)
+                    windowList
+                        .filter(e=> !e.open)
                         .map((e, i ) => (
-                        <button key={'btn'+i}
-                                className={'w-[100px] h-10 bg-gray-400 text-white rounded'}
-                                onClick={() => onChangeWindow(e.component.props.openKey)}
-                        >
-                            {e.component.props.title}
-                        </button>
-                    ))
+                            <button key={'btn'+i}
+                                    className={'w-[100px] h-10 bg-gray-400 text-white rounded'}
+                                    onClick={() => onClickHandler(e.winKey, true)}
+                            >
+                                {e.title}
+                            </button>
+                        ))
                 }
                 {
-                    0 < sortEle.filter((e)=> !e.open).length
+                    windowList.filter(e => !e.open).length > 0
                     ? <button className={'w-[50px] h-10 bg-blue-400 text-white rounded'} onClick={()=> windowToggle(true)}>
                           <FontAwesomeIcon icon={faWindowRestore} />
                       </button>
@@ -99,10 +55,12 @@ export default function Page() {
             </div>
             <div className={'flex gap-4 flex-wrap duration-300'}>
                 {
-                   sortEle
-                       .map((e) => (
-                        {...e.component}
-                   ))
+                    windowList.map((e, i ) => (
+                        <UserInfoWindow key={`window-${i}`}
+                                        onClick={onClickHandler}
+                                        {...e}
+                        />
+                    ))
                 }
             </div>
         </main>

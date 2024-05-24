@@ -7,6 +7,7 @@ export type RowProps = {
     className?  : string;
     name        : string;
     value       : UserProps;
+    type?       : string;
     check       : CheckProps;
     placeholder : string;
     setProps    : (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -21,6 +22,7 @@ const Row = (props:RowProps) => {
     return (
         <div className={['flex relative', props.className].join(' ')}>
             <input className={'w-full border border-none outline-0 focus:bg-blue-100 duration-300 text-xs rounded my-3 p-2'}
+                   type={props?.type ?? 'text'}
                    placeholder={props.placeholder}
                    name={props.name}
                    onChange={props.setProps}

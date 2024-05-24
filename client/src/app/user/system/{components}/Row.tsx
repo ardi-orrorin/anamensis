@@ -69,6 +69,16 @@ const Row = ({
         });
     }
 
+    const onDeleteHandler = async (code: string) => {
+        await axios.delete('/api/user/system/' + code)
+            .then(res => {
+                setData(data => {
+                    return data.filter(item => item.code !== code);
+                });
+                alert('삭제 완료');
+            });
+    }
+
     return (
         <tr className={'h-10 '}>
             <td className={'px-2'}>
@@ -77,60 +87,66 @@ const Row = ({
             <td className={'px-2'}>
                 {
                     webSys.edit
-                        ? <input className={'outline-0 p-2 bg-blue-50 text-blue-700'}
-                                 name={'name'}
-                                 value={webSys.name}
-                                 onChange={onChangeHandler}
-                        />
-                        :<span> {props.name} </span>
+                    ? <input className={'outline-0 p-2 bg-blue-50 text-blue-700'}
+                             name={'name'}
+                             value={webSys.name}
+                             onChange={onChangeHandler}
+                    />
+                    :<span> {props.name} </span>
                 }
             </td>
             <td className={'px-2'}>
                 {
                     webSys.edit
-                        ? <input className={'outline-0 p-2 bg-blue-50 text-blue-700'}
-                                 name={'description'}
-                                 value={webSys.description}
-                                 onChange={onChangeHandler}
-                        />
-                        :<span> {webSys.description} </span>
+                    ? <input className={'outline-0 p-2 bg-blue-50 text-blue-700'}
+                             name={'description'}
+                             value={webSys.description}
+                             onChange={onChangeHandler}
+                    />
+                    :<span> {webSys.description} </span>
                 }
             </td>
             <td className={'px-2'}>
                 {
                     webSys.edit
-                        ? <select className={'outline-0 p-2 bg-blue-50 text-blue-700'}
-                                  name={'permission'}
-                                  value={webSys.permission}
-                                  onChange={onChangeHandler}
-                        >
-                            <option value={RoleType.ADMIN}>{RoleType.ADMIN}</option>
-                            <option value={RoleType.USER}>{RoleType.USER}</option>
-                            <option value={RoleType.MASTER}>{RoleType.MASTER}</option>
-                            <option value={RoleType.GUEST}>{RoleType.GUEST}</option>
-                        </select>
-                        :<span> {props.permission} </span>
+                    ? <select className={'outline-0 p-2 bg-blue-50 text-blue-700'}
+                              name={'permission'}
+                              value={webSys.permission}
+                              onChange={onChangeHandler}
+                    >
+                        <option value={RoleType.ADMIN}>{RoleType.ADMIN}</option>
+                        <option value={RoleType.USER}>{RoleType.USER}</option>
+                        <option value={RoleType.MASTER}>{RoleType.MASTER}</option>
+                        <option value={RoleType.GUEST}>{RoleType.GUEST}</option>
+                    </select>
+                    :<span> {props.permission} </span>
                 }
             </td>
             <td className={'px-2'}>
                 <div className={'flex items-center gap-3 justify-center'}>
                     {
                         webSys.edit &&
-                      <button className={'bg-blue-300 rounded px-4 h-7 text-white hover:bg-blue-600 duration-500'}
-                              onClick={onSaveHandler}
-                      >Save</button>
+                        <button className={'bg-blue-300 rounded px-4 h-7 text-white hover:bg-blue-600 duration-500'}
+                                onClick={onSaveHandler}
+                        >저장</button>
                     }
                     {
                         webSys.edit &&
-                      <button className={'bg-blue-300 rounded px-4 h-7 text-white hover:bg-blue-600 duration-500'}
-                              onClick={onCancelHandler}
-                      >Cancel</button>
+                        <button className={'bg-amber-300 rounded px-4 h-7 text-white hover:bg-amber-600 duration-500'}
+                                onClick={onCancelHandler}
+                        >취소</button>
+                    }
+                    {
+                        webSys.edit &&
+                        <button className={'bg-red-300 rounded px-4 h-7 text-white hover:bg-red-600 duration-500'}
+                                onClick={()=>onDeleteHandler(webSys.code)}
+                        >삭제</button>
                     }
                     {
                         !webSys.edit &&
-                      <button className={'bg-blue-300 rounded px-4 h-7 text-white hover:bg-blue-600 duration-500'}
-                              onClick={onEditHandler}
-                      >Edit</button>
+                        <button className={'bg-blue-300 rounded px-4 h-7 text-white hover:bg-blue-600 duration-500'}
+                                onClick={onEditHandler}
+                        >수정</button>
                     }
                     {
                         !webSys.edit &&

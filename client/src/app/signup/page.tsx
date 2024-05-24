@@ -312,6 +312,7 @@ export default function Page() {
                     <Row name={'pwd'}
                          value={user}
                          check={check}
+                         type={'password'}
                          placeholder={'영소대문자 + 숫자 포함하여 8자리 이상의 비밀번호 입력하세요.'}
                          setProps={setProps}
                          inputCheck={inputCheck}
@@ -321,6 +322,7 @@ export default function Page() {
                          name={'pwdCheck'}
                          value={user}
                          check={check}
+                         type={'password'}
                          placeholder={'비밀번호를 재입력 입력하세요.'}
                          setProps={setProps}
                          inputCheck={inputCheck}

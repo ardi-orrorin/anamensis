@@ -18,7 +18,7 @@ export default function FileBlock (data: FileBlockProps) {
     } = data;
 
     return (
-        <>
+        <div id={`block-${seq}`} className={'w-full'}>
             {
                 !value &&
                 <FileUpload seq={seq}
@@ -35,6 +35,6 @@ export default function FileBlock (data: FileBlockProps) {
                            onMouseLeaveHandler={onMouseLeaveHandler!}
                 />
             }
-        </>
+        </div>
     )
 }

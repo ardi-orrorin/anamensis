@@ -5,14 +5,23 @@ import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
 import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
 import {blockTypeList} from "@/app/{commons}/{components}/block/list";
 import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
-import React, {useContext} from "react";
+import React, {MouseEventHandler, useContext, useEffect, useState} from "react";
 import MenuItem from "@/app/board/{components}/MenuItem";
 import BlockProvider, {BlockMenu} from "@/app/board/{services}/BlockProvider";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 
+
+type CopyProps = {
+    isCopy: boolean;
+    seq: number;
+
+
+}
+
 export default function Block(props: BlockProps) {
     const {
         seq,
+        isCursor,
         textStyle,
         onClickAddHandler,
         onClickDeleteHandler,
@@ -21,6 +30,7 @@ export default function Block(props: BlockProps) {
 
     const {board, setBoard} = useContext(BoardProvider);
     const {blockService, setBlockService} = useContext(BlockProvider);
+    const [isCopy, setIsCopy] = useState<CopyProps>({} as CopyProps);
 
     const onMouseEnterHandler = (e: React.MouseEvent<HTMLInputElement | HTMLImageElement> ) => {
         let blockMenu: BlockMenu = '';
@@ -100,8 +110,38 @@ export default function Block(props: BlockProps) {
         setBoard({...board, data: {...board.data, content: {list: newList}}});
     }
 
+    const shareLinkHandler = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        const bastUrl = window.location.href.split('#')[0];
+
+        const url = bastUrl + `#block-${seq}`;
+        navigator.clipboard.writeText(url);
+
+        setIsCopy({isCopy: true, seq});
+
+        setTimeout(() => {
+            setIsCopy({} as CopyProps);
+        }, 1000);
+
+    }
+
     return (
-        <div className={'flex relative'}>
+        <div className={['flex relative'].join(' ')}
+             onContextMenu={shareLinkHandler}
+        >
+            {
+                board.isView
+                && isCopy.isCopy
+                && <div className={'absolute left-1/2 top-1/2 z-30 text-sm w-52 h-14 flex justify-center items-center bg-white rounded shadow border-l-8 border-solid border-blue-300'}>
+                      {`block-${isCopy.seq}`} 링크가 복사되었습니다.
+                </div>
+            }
+            {
+                isCursor
+                && <div className={'z-10 absolute w-full h-full flex justify-center items-center bg-red-700 border-2 border-dashed border-red-800 opacity-40 bg-opacity-40 rounded'}>
+                    select
+                </div>
+            }
             {
                 !board.isView &&
                 <button className={'w-8 h-full flex justify-center items-center text-gray-600 hover:text-gray-950'}

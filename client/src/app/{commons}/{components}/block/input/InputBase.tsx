@@ -55,7 +55,7 @@ export default function InputBase({
     }
 
     return (
-        <div style={{display: 'flex', width: '100%', padding: '0.1rem 0.5rem'}}>
+        <div id={`block-${seq}`} style={{display: 'flex', width: '100%', padding: '0.1rem 0.5rem'}}>
             {
                 isView
                 ? <p style={{...customStyle, backgroundColor: textStyle?.backgroundColor || defaultBg.p}}

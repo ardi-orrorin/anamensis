@@ -131,6 +131,7 @@ export default function Page() {
 
                 <input ref={inputRef}
                        type={'file'}
+                       accept={'image/*'}
                        onChange={onChangeHandler}
                        multiple={false}
                        hidden={true}
@@ -139,7 +140,7 @@ export default function Page() {
             <div className={'flex flex-col gap-3 w-full sm:w-2/3 md:w-[400px] duration-500'}>
                 <div className={'flex gap-3'}>
                     <span className={'flex items-center w-36'}>이름</span>
-                    <input className={'w-full px-3 py-2 outline-0 focus:bg-blue-50 duration-300 text-sm'}
+                    <input className={'w-full px-3 py-2 outline-0 bg-blue-50 duration-300 text-sm'}
                            name={'name'}
                            value={profile.name}
                            onChange={onChange}
@@ -147,15 +148,16 @@ export default function Page() {
                 </div>
                 <div className={'flex gap-3'}>
                     <span className={'flex items-center w-36'}>이메일</span>
-                    <input className={'w-full px-3 py-2 outline-0 focus:bg-blue-50 duration-300 text-sm'}
+                    <input className={'w-full px-3 py-2 outline-0 focus:bg-blue-50 duration-300 text-sm disabled:bg-white'}
                            name={'email'}
                            value={profile.email}
                            onChange={onChange}
+                           disabled={true}
                     />
                 </div>
                 <div className={'flex gap-3'}>
                     <span className={'flex items-center w-36'}>연락처</span>
-                    <input className={'w-full px-3 py-2 outline-0 focus:bg-blue-50 duration-300 text-sm'}
+                    <input className={'w-full px-3 py-2 outline-0 bg-blue-50 duration-300 text-sm'}
                            name={'phone'}
                            value={profile.phone}
                            onChange={onChange}
@@ -163,7 +165,7 @@ export default function Page() {
                 </div>
                 <div className={'flex gap-3'}>
                     <span className={'flex items-center w-36'}>포인트</span>
-                    <span className={'w-full px-3 py-2 outline-0 hover:bg-blue-50 duration-300 text-sm'}
+                    <span className={'w-full px-3 py-2 outline-0 text-sm'}
                     >{profile.point}
                     </span>
                 </div>
@@ -184,7 +186,7 @@ export default function Page() {
                 </div>
                 <div className={'flex gap-3'}>
                     <span className={'flex items-center w-36'}>2차 인증 방법</span>
-                    <span className={'w-full px-3 py-2 outline-0 hover:bg-blue-50 duration-300 text-sm'}
+                    <span className={'w-full px-3 py-2 outline-0 text-sm'}
                     >{profile.sauthType}
                     </span>
                 </div>

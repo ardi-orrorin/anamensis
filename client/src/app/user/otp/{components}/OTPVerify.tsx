@@ -3,6 +3,7 @@ import {useContext, useState} from "react";
 import axios from "axios";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {useRouter} from "next/navigation";
+import apiCall from "@/app/{commons}/func/api";
 
 const OTPVerify = () => {
 
@@ -17,16 +18,21 @@ const OTPVerify = () => {
 
     const onVerify = async () => {
         setLoading(true);
-        await axios.post('/api/user/otp', {otp: otp.verifyCode})
-            .then(res => {
-                setOtp({
-                    ...otp,
-                    verifyState: res.data
-                });
-            })
-            .finally(() => {
-                setLoading(false);
+
+        await apiCall({
+            path: '/api/user/otp',
+            method: 'POST',
+            body: {otp: otp.verifyCode}
+        })
+        .then(res => {
+            setOtp({
+                ...otp,
+                verifyState: res.data
             });
+        })
+        .finally(() => {
+            setLoading(false);
+        });
     }
 
     return (

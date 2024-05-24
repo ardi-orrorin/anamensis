@@ -7,6 +7,7 @@ import OTPFooter from "@/app/user/otp/{components}/OTPFooter";
 import OTPProvider, {OTPProps} from "@/app/user/otp/{services}/OTPProvider";
 import axios from "axios";
 import OTPMain from "@/app/user/otp/{components}/OTPMain";
+import apiCall from "@/app/{commons}/func/api";
 
 
 export default function Page() {
@@ -16,13 +17,16 @@ export default function Page() {
     const [otp, setOtp] = useState<OTPProps>({} as OTPProps);
 
     useEffect(() => {
-        axios.get('/api/user/otp/exist')
-            .then(res => {
-                setOtp({
-                    ...otp,
-                    existOtp: res.data
-                });
+        apiCall({
+            path: '/api/user/otp/exist',
+            method: 'GET',
+        })
+        .then(res => {
+            setOtp({
+                ...otp,
+                existOtp: res.data
             });
+        });
     }, [step])
 
     return (

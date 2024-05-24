@@ -4,6 +4,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import axios from "axios";
 import Link from "next/link";
+import apiCall from "@/app/{commons}/func/api";
 
 export interface SmtpCardProps {
     id: number;
@@ -20,7 +21,11 @@ const SmtpCard = (smtpCardProps: SmtpCardProps) => {
 
     const disabledHandler = async () => {
         if(!confirm('정말로 삭제하시겠습니까?')) return;
-        await axios.get('/api/user/smtp/disabled/' + smtpCardProps.id).then(res => {
+        await apiCall({
+            path: '/api/user/smtp/disabled/' + smtpCardProps.id,
+            method: 'GET'
+        })
+        .then(res => {
             window.location.replace('/user/smtp');
         });
     }

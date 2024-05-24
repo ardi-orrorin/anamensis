@@ -1,7 +1,9 @@
 import {useContext, useEffect, useState} from "react";
-import LoginProvider, {LoginProviderI} from "@/app/login/{services}/LoginProvider";
+import LoginProvider, {LoginI, LoginProviderI} from "@/app/login/{services}/LoginProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import axios from "axios";
+import api from "@/app/{commons}/func/api";
+import apiCall from "@/app/{commons}/func/api";
 
 const EmailAuth = () => {
 
@@ -39,10 +41,11 @@ const EmailAuth = () => {
 
     const verify = async () => {
         setLoading(true);
-        await axios.post('/api/login/verify', user, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
+        await apiCall<null, LoginI>({
+            path: '/api/login/verify',
+            method: 'POST',
+            body: user,
+            call: 'Proxy'
         }).then(res => {
             window.location.replace('/user');
         }).catch(err => {

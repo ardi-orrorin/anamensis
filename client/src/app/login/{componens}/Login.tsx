@@ -5,8 +5,9 @@ import Link from "next/link";
 import {useContext, useEffect, useMemo, useRef, useState} from "react";
 import axios, {AxiosResponse} from "axios";
 import {ErrorResponse, LoginAuth} from "@/app/login/page";
-import LoginProvider from "@/app/login/{services}/LoginProvider";
+import LoginProvider, {LoginI} from "@/app/login/{services}/LoginProvider";
 import ReCAPTCHA from "react-google-recaptcha";
+import apiCall from "@/app/{commons}/func/api";
 
 const Login = () => {
 
@@ -38,29 +39,51 @@ const Login = () => {
 
     const goLogin = async () => {
         setLoading(true);
-        await axios.post('/api/login', user, {
-            headers: {
-                'Content-Type': 'application/json',
-            }}
-        )
-        .then((res: AxiosResponse<LoginAuth>) => {
+
+        await apiCall<LoginAuth, LoginI>({
+            path: '/api/login',
+            method: 'POST',
+            body: user,
+            call: 'Proxy'
+        }).then(res => {
             setUser({
                 ...user,
                 verify: res.data.verity,
                 authType: res.data.authType
             });
-        })
-        .catch((err)  => {
+        }).catch(err => {
             setError({
                 status: err.response.data.status,
                 message: err.response.data.message,
-                // use: err.response.data.use
                 use: true
             });
-        })
-        .finally(() => {
+        }).finally(() => {
             setLoading(false);
         });
+
+        // await axios.post('/api/login', user, {
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     }}
+        // )
+        // .then((res: AxiosResponse<LoginAuth>) => {
+        //     setUser({
+        //         ...user,
+        //         verify: res.data.verity,
+        //         authType: res.data.authType
+        //     });
+        // })
+        // .catch((err)  => {
+        //     setError({
+        //         status: err.response.data.status,
+        //         message: err.response.data.message,
+        //         // use: err.response.data.use
+        //         use: true
+        //     });
+        // })
+        // .finally(() => {
+        //     setLoading(false);
+        // });
     }
 
 

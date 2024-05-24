@@ -1,8 +1,7 @@
 import SmtpCard, {SmtpCardProps} from "@/app/user/smtp/{components}/SmtpCard";
-import axios from "axios";
 import {PageResponse} from "@/app/{commons}/types/commons";
-import {cookies} from "next/headers";
 import React from "react";
+import apiCall from "@/app/{commons}/func/api";
 
 export default async function Layout({
     children
@@ -33,19 +32,13 @@ export default async function Layout({
 }
 
 const getData = async (): Promise<PageResponse<SmtpCardProps>> => {
-
-    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token')
-
-    const url = process.env.NEXT_PUBLIC_SERVER + '/api/user-config-smtp';
-
-    return await axios.get(url, {
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token?.value}`
-        }
+    return await apiCall<PageResponse<SmtpCardProps>>({
+        path: '/api/user-config-smtp',
+        method: 'GET',
+        call: 'Server',
+        setAuthorization: true
     })
     .then(res => {
         return res.data;
     });
-
 }

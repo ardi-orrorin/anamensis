@@ -1,18 +1,23 @@
 import React, {useContext, useEffect} from "react";
-import LoginProvider from "@/app/login/{services}/LoginProvider";
+import LoginProvider, {LoginI} from "@/app/login/{services}/LoginProvider";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useRouter} from "next/navigation";
 import axios from "axios";
+import apiCall from "@/app/{commons}/func/api";
 
 
 const NoneAuth = ({}) => {
     const {user} = useContext(LoginProvider);
     useEffect(() => {
-        axios.post('/api/login/verify', user, {
+        apiCall<null, LoginI>({
+            path: '/api/login/verify',
+            method: 'POST',
+            body: user,
+            call: 'Proxy'
         }).then(res => {
-            location.replace('/user');
-        })
+            window.location.replace('/user');
+        });
     },[]);
 
     return (

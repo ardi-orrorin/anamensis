@@ -14,7 +14,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import TempFileProvider, {TempFileI} from "@/app/board/{services}/TempFileProvider";
 import Image from "next/image";
 import {faHeart} from "@fortawesome/free-solid-svg-icons/faHeart";
-import {useRouter} from "next/navigation";
+import apiCall from "@/app/{commons}/func/api";
 
 export interface RateInfoI {
     id      : number;
@@ -22,7 +22,7 @@ export interface RateInfoI {
     status  : boolean;
 }
 
-export default function Page({params}: {params : {id: string, hash: string}}) {
+export default function Page({params}: {params : {id: string}}) {
 
     const [board, setBoard] = useState<BoardService>({} as BoardService);
 
@@ -74,17 +74,20 @@ export default function Page({params}: {params : {id: string, hash: string}}) {
     useEffect(() => {
         if(isNewBoard) return ;
         setLoading(true);
-        axios.get('/api/board/' + params.id)
-            .then((res: AxiosResponse<BoardI>) => {
-                setBoard({
-                    ...board,
-                    data: res.data,
-                    isView: true
-                });
-            })
-            .finally(() => {
-                setLoading(false);
+
+        apiCall<BoardI>({
+            path: '/api/board/' + params.id,
+            method: 'GET',
+            call: 'Proxy'
+        }).then(res => {
+            setBoard({
+                ...board,
+                data: res.data,
+                isView: true
             });
+        }).finally(() => {
+            setLoading(false);
+        });
     },[params.id]);
 
     useEffect(() => {
@@ -95,10 +98,13 @@ export default function Page({params}: {params : {id: string, hash: string}}) {
 
     useEffect(() => {
         if(params.id === 'new') return ;
-        axios.get('/api/board/rate/' + params.id)
-            .then((res: AxiosResponse<RateInfoI>) => {
-                setRateInfo(res.data);
-            });
+        apiCall<RateInfoI>({
+            path: '/api/board/rate/' + params.id,
+            method: 'GET',
+            call: 'Proxy'
+        }).then(res => {
+            setRateInfo(res.data);
+        });
     },[params.id]);
 
     const addBlock = useCallback((seq: number, init: boolean) => {
@@ -137,30 +143,20 @@ export default function Page({params}: {params : {id: string, hash: string}}) {
             return ;
         }
         setLoading(true);
-        let result = null;
         try {
-            if(isSave) {
-                result = await axios.post('/api/board/new', board.data, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                }).then((res: AxiosResponse<BoardI>) => {
-                    setTempFiles([]);
-                    return res;
-                });
-            } else {
-                result = await axios.put('/api/board/' + params.id, board.data, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                }).then((res: AxiosResponse<BoardI>) => {
-                    setTempFiles([]);
-                    return res;
-                });
-            }
+            const result = await apiCall<BoardI, BoardI>({
+                path: '/api/board/' + (isSave ? 'new' : params.id),
+                method: isSave ? 'POST': 'PUT',
+                call: 'Proxy',
+                body: board.data
+            })
+            .then(res => {
+                setTempFiles([]);
+                return res.data;
+            });
 
             if(isSave) {
-                location.href = '/board/' + result?.data?.id;
+                location.href = '/board/' + result?.id;
             } else {
                 location.reload();
             }
@@ -178,7 +174,11 @@ export default function Page({params}: {params : {id: string, hash: string}}) {
     const deleteHandler = async () => {
         setLoading(true);
         try {
-            await axios.delete('/api/board/' + params.id);
+            await apiCall({
+                path: '/api/board/' + params.id,
+                method: 'DELETE',
+                call: 'Proxy'
+            })
         } catch (e) {
             console.log(e);
         } finally {
@@ -232,7 +232,6 @@ export default function Page({params}: {params : {id: string, hash: string}}) {
         if (newList?.length === 0) {
             newList = [{seq, value: '', code: '00005', textStyle: {}}];
         }
-
 
         setBoard({
             ...board,
@@ -298,24 +297,17 @@ export default function Page({params}: {params : {id: string, hash: string}}) {
     }
 
     const onChangeRateHandler = () => {
-        if(rateInfo.status) {
-            axios.delete('/api/board/rate/' + params.id)
-                .then((res: AxiosResponse<RateInfoI>) => {
-                    setRateInfo(res.data);
-                })
-                .catch(e => {
-                    console.log(e);
-                });
-        } else {
-            axios.post('/api/board/rate/' + params.id)
-                .then((res: AxiosResponse<RateInfoI>) => {
-                    setRateInfo(res.data);
-                })
-                .catch(e => {
-                    alert('로그인이 필요합니다.');
-                });
-        }
-
+        apiCall<RateInfoI>({
+            path: '/api/board/rate/' + params.id,
+            method: rateInfo.status ? 'DELETE' : 'POST',
+            call: 'Proxy'
+        })
+        .then(res => {
+            setRateInfo(res.data);
+        })
+        .catch(e => {
+            rateInfo.status || alert('로그인이 필요합니다.');
+        });
     }
 
     return (

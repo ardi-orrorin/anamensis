@@ -5,6 +5,7 @@ import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import axios from "axios";
 import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import {useRouter} from "next/navigation";
+import apiCall from "@/app/{commons}/func/api";
 
 
 export interface SmtpProps {
@@ -54,8 +55,6 @@ const getServerSideProps: GetServerSideProps<SmtpPropsI> = async (context) => {
 export default function Page(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const {searchParams} = props;
 
-    const router = useRouter();
-
     const [hasTest, setHasTest] = useState<boolean>(false)
     const [smtp, setSmtp] = useState<SmtpProps>({} as SmtpProps);
     const [loading, setLoading] = useState<boolean>(false);
@@ -63,13 +62,17 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
 
     useEffect(() => {
         if(searchParams?.id) {
-            axios.get('/api/user/smtp', {
+
+            apiCall<SmtpProps>({
+                path: '/api/user/smtp',
+                method: 'GET',
+                call: 'Proxy',
                 params: {
-                    id: searchParams?.id
+                    id: searchParams.id
                 }
             })
             .then(res => {
-                const data = res.data as SmtpProps;
+                const data = res.data;
                 setSmtp({
                     id: data.id,
                     host: data.host,
@@ -106,10 +109,12 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
     const testSmtp = async () => {
         const data = transformSmtp(smtp);
         setLoading(true);
-        await axios.post('/api/user/smtp/test', data ,{
-            headers: {
-                'Content-Type': 'application/json',
-            }
+
+        await apiCall({
+            path: '/api/user/smtp/test',
+            method: 'POST',
+            call: 'Proxy',
+            body: data,
         })
         .then((res) => {
             setHasTest(true);
@@ -125,10 +130,12 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
     const save = () => {
         setLoading(true);
         const data = transformSmtp(smtp);
-        axios.post('/api/user/smtp', data, {
-            headers: {
-                'Content-Type': 'application/json',
-            }
+
+        apiCall<any, SmtpI>({
+            path: '/api/user/smtp',
+            method: 'POST',
+            call: 'Proxy',
+            body: data,
         })
         .then(res => {
             setSmtp({

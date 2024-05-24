@@ -1,8 +1,7 @@
-import axios, {AxiosResponse} from "axios";
 import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import PageNavigator from "@/app/{commons}/PageNavigator";
 import {PageResponse} from "@/app/{commons}/types/commons";
-import {cookies} from "next/headers";
+import apiCall from "@/app/{commons}/func/api";
 
 interface LoginHistoriesI {
     id: string;
@@ -99,16 +98,14 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
 }
 
 const getData = async (req: URLSearchParams) => {
-    const url = process.env.NEXT_PUBLIC_SERVER + '/api/user/histories';
-    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
-
-    return axios.get(url, {
-        params: {...req},
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token?.value}`
-        }})
-    .then((res: AxiosResponse<PageResponse<LoginHistoriesI>>) => {
+    return apiCall<PageResponse<LoginHistoriesI>, any>({
+        path: '/api/user/histories',
+        method: 'GET',
+        params: req,
+        call: 'Server',
+        setAuthorization: true,
+    })
+    .then(res => {
         return res.data;
     });
 }

@@ -6,6 +6,8 @@ import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Add from "@/app/user/system/{components}/Add";
 import Row from "@/app/user/system/{components}/Row";
+import apiCall from "@/app/{commons}/func/api";
+import {createDebounce} from "@/app/{commons}/func/debounce";
 
 
 export interface WebSysI {
@@ -22,13 +24,21 @@ export default function Page(){
     const [add, setAdd] = useState<boolean>(false);
 
     useEffect(() => {
-        axios.get('/api/user/system')
+        const fetch = async () => {
+            await apiCall<WebSysI[]>({
+                path: '/api/user/system',
+                method: 'GET',
+            })
             .then(res => {
                 setData(res.data);
             })
             .catch(err => {
                 console.error(err);
             });
+        }
+
+        const debounce = createDebounce(500);
+        debounce(fetch);
     },[add]);
 
     const addHandler = () => {

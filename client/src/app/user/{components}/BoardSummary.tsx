@@ -3,6 +3,8 @@
 import axios from "axios";
 import {useEffect, useState} from "react";
 import Link from "next/link";
+import apiCall from "@/app/{commons}/func/api";
+import {createDebounce} from "@/app/{commons}/func/debounce";
 
 
 export interface BoardSummaryI {
@@ -18,10 +20,19 @@ const BoardSummary = () => {
     const [data, setData] = useState<BoardSummaryI[]>([]);
 
     useEffect(() => {
-        axios.get('/api/board/summary')
+
+        const fetch = async () => {
+            await apiCall<BoardSummaryI[]>({
+                path: "/api/board/summary",
+                method: "GET",
+            })
             .then((res) => {
                 setData(res.data);
             });
+        }
+        const debounce = createDebounce(500);
+        debounce(fetch);
+
     }, []);
 
     return (
@@ -44,7 +55,7 @@ const BoardSummary = () => {
                 <tbody>
                 {
                     data.map((e, i) => (
-                        <tr key={e.title}
+                        <tr key={`summary-${i}`}
                             className={`h-10 ${i % 2 === 1 ? 'bg-blue-50' : 'bg-white'}`}
                         >
                             <td className={'p-2'}>

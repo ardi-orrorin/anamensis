@@ -6,6 +6,7 @@ import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import Message from "@/app/user/system/{components}/message";
 import {RoleType} from "@/app/user/system/{services}/types";
 import apiCall from "@/app/{commons}/func/api";
+import {createDebounce} from "@/app/{commons}/func/debounce";
 
 const Row = ({
     props, setData
@@ -17,13 +18,13 @@ const Row = ({
 
     const {modal, setModal} = useContext<ModalContextType>(ModalProvider);
 
-    const onSaveHandler = async () => {
+    const debounce = createDebounce(500);
 
+    const onSaveHandler = async () => {
         await apiCall<WebSysI>({
             path: '/api/user/system',
             method: 'PUT',
             body: webSys,
-            call: 'Proxy'
         })
         .then(res => {
             setWebSys({
@@ -81,7 +82,6 @@ const Row = ({
         await apiCall({
             path: '/api/user/system/' + code,
             method: 'DELETE',
-            call: 'Proxy'
         })
         .then(res => {
             setData(data => {
@@ -139,7 +139,7 @@ const Row = ({
                     {
                         webSys.edit &&
                         <button className={'bg-blue-300 rounded px-4 h-7 text-white hover:bg-blue-600 duration-500'}
-                                onClick={onSaveHandler}
+                                onClick={()=>debounce(onSaveHandler)}
                         >저장</button>
                     }
                     {
@@ -151,7 +151,7 @@ const Row = ({
                     {
                         webSys.edit &&
                         <button className={'bg-red-300 rounded px-4 h-7 text-white hover:bg-red-600 duration-500'}
-                                onClick={()=>onDeleteHandler(webSys.code)}
+                                onClick={()=>debounce(()=>onDeleteHandler(webSys.code))}
                         >삭제</button>
                     }
                     {

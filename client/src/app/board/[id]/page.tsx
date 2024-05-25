@@ -1,6 +1,5 @@
 'use client';
 
-import axios, {AxiosResponse} from "axios";
 import Block from "@/app/board/{components}/Block";
 import {ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
@@ -15,6 +14,7 @@ import TempFileProvider, {TempFileI} from "@/app/board/{services}/TempFileProvid
 import Image from "next/image";
 import {faHeart} from "@fortawesome/free-solid-svg-icons/faHeart";
 import apiCall from "@/app/{commons}/func/api";
+import {createDebounce} from "@/app/{commons}/func/debounce";
 
 export interface RateInfoI {
     id      : number;
@@ -23,7 +23,6 @@ export interface RateInfoI {
 }
 
 export default function Page({params}: {params : {id: string}}) {
-
     const [board, setBoard] = useState<BoardService>({} as BoardService);
 
     const [rateInfo, setRateInfo] = useState<RateInfoI>({} as RateInfoI);
@@ -41,6 +40,7 @@ export default function Page({params}: {params : {id: string}}) {
 
     const isNewBoard = useMemo(() => !params.id || params.id === 'new',[params.id]);
 
+    const debounce = createDebounce(300);
 
     const defaultBlock = useMemo(()=>(
         {seq: 0, value: '', code: '00005', textStyle: {}}
@@ -50,11 +50,15 @@ export default function Page({params}: {params : {id: string}}) {
         blockTypeList.map(item => ({ command: item.command, code: item.code}))
     ), []);
 
+    const rateCount = useMemo(() => {
+        return rateInfo?.count !== undefined
+            ? rateInfo.count
+            : board?.data?.rate;
+    },[rateInfo?.count, board.data?.rate]);
 
     const cursor = useMemo(() => {
         return window.location.hash;
     },[window.location.hash]);
-
 
     useEffect(() => {
         if(!isNewBoard) return ;
@@ -73,21 +77,29 @@ export default function Page({params}: {params : {id: string}}) {
 
     useEffect(() => {
         if(isNewBoard) return ;
+
         setLoading(true);
 
-        apiCall<BoardI>({
-            path: '/api/board/' + params.id,
-            method: 'GET',
-            call: 'Proxy'
-        }).then(res => {
-            setBoard({
-                ...board,
-                data: res.data,
-                isView: true
+        const fetch = async () => {
+            await apiCall<BoardI>({
+                path: '/api/board/' + params.id,
+                method: 'GET',
+                call: 'Proxy'
+            })
+            .then(res => {
+                setBoard({
+                    ...board,
+                    data: res.data,
+                    isView: true
+                });
+            }).finally(() => {
+                setLoading(false);
             });
-        }).finally(() => {
-            setLoading(false);
-        });
+        }
+
+        const debounce = createDebounce(300);
+        debounce(fetch);
+
     },[params.id]);
 
     useEffect(() => {
@@ -98,13 +110,18 @@ export default function Page({params}: {params : {id: string}}) {
 
     useEffect(() => {
         if(params.id === 'new') return ;
-        apiCall<RateInfoI>({
-            path: '/api/board/rate/' + params.id,
-            method: 'GET',
-            call: 'Proxy'
-        }).then(res => {
-            setRateInfo(res.data);
-        });
+        const fetch = async () => {
+            await apiCall<RateInfoI>({
+                path: '/api/board/rate/' + params.id,
+                method: 'GET',
+                call: 'Proxy'
+            }).then(res => {
+                setRateInfo(res.data);
+            });
+        }
+
+        const debounce = createDebounce(300);
+        debounce(fetch);
     },[params.id]);
 
     const addBlock = useCallback((seq: number, init: boolean) => {
@@ -151,22 +168,16 @@ export default function Page({params}: {params : {id: string}}) {
                 body: board.data
             })
             .then(res => {
-                setTempFiles([]);
                 return res.data;
             });
 
             if(isSave) {
                 location.href = '/board/' + result?.id;
             } else {
-                location.reload();
+               location.reload();
             }
         } catch (e) {
             alert('저장에 실패했습니다.');
-        } finally {
-            setTimeout(() => {
-                console.log('loading')
-            }, 3000);
-
             setLoading(false);
         }
     };
@@ -296,13 +307,14 @@ export default function Page({params}: {params : {id: string}}) {
         blockRef.current[seq - 1]?.focus();
     }
 
-    const onChangeRateHandler = () => {
-        apiCall<RateInfoI>({
+    const onChangeRateHandler = async () => {
+        return await apiCall<RateInfoI>({
             path: '/api/board/rate/' + params.id,
             method: rateInfo.status ? 'DELETE' : 'POST',
             call: 'Proxy'
         })
         .then(res => {
+            console.log(res)
             setRateInfo(res.data);
         })
         .catch(e => {
@@ -340,7 +352,7 @@ export default function Page({params}: {params : {id: string}}) {
                                   {
                                       !board.isView &&
                                       <button className={'w-16 rounded h-full border-2 border-blue-200 text-blue-400 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
-                                              onClick={()=>submitHandler(false)}
+                                              onClick={()=> debounce(()=> submitHandler(false))}
                                       >저장
                                       </button>
                                   }
@@ -351,7 +363,7 @@ export default function Page({params}: {params : {id: string}}) {
                                   {
                                       !board.isView &&
                                       <button className={'w-16 rounded h-full border-2 border-red-200 text-red-400 hover:bg-red-200 hover:text-white py-1 px-3 text-sm duration-300'}
-                                              onClick={deleteHandler}
+                                              onClick={()=> debounce(()=> deleteHandler())}
                                       >삭제
                                       </button>
                                   }
@@ -435,7 +447,7 @@ export default function Page({params}: {params : {id: string}}) {
                               isNewBoard
                               && <div className={'flex gap-1 justify-end'}>
                                 <button className={'w-full rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
-                                        onClick={()=>submitHandler(true)}
+                                        onClick={()=> debounce(()=>submitHandler(true))}
                                 >작성
                                 </button>
                               </div>
@@ -446,11 +458,11 @@ export default function Page({params}: {params : {id: string}}) {
                                 !isNewBoard && board.isView
 
                                 && <button className={'px-6 py-3 flex gap-2 justify-center items-center border border-blue-400 text-xl rounded hover:bg-blue-400 hover:text-white duration-300'}
-                                           onClick={onChangeRateHandler}
+                                           onClick={()=>debounce(onChangeRateHandler)}
                                 >
                                     <FontAwesomeIcon icon={faHeart} className={`${rateInfo.status ? 'text-blue-600' : ''}`}/>
                                     <span>
-                                      { rateInfo?.count || board.data.rate }
+                                      { rateCount }
                                     </span>
                                 </button>
                             }

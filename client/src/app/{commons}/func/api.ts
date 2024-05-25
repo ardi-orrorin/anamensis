@@ -4,27 +4,29 @@ export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 export type Call = 'Proxy' | 'Server';
 export type ContentType = 'application/json' | 'multipart/form-data' | string;
 
-const apiCall = async <R = any, I = any>({
-    path, method,
-    body, params, call,
-    setAuthorization, contentType, cookie,
-}: {
+export type ApiCallProps = {
     path              : string;
     method            : Method;
-    body?             : I;
-    params?           : I;
+    body?             : any;
+    params?           : any;
     call?             : Call;
     setAuthorization? : boolean;
     contentType?      : ContentType;
     cookie?           : string;
 
-}) => {
-    if(!call) Error('call is required');
+}
+
+const apiCall = async <R = any, I = any>({
+    path, method,
+    body, params, call,
+    setAuthorization, contentType, cookie,
+}: ApiCallProps
+) => {
     if(!path) Error('path is required');
     if(!method) Error('method is required');
 
 
-    const url = (call && call === 'Server' ? process.env.NEXT_PUBLIC_SERVER : '')  + path;
+    const url = ((call && call === 'Server') ? process.env.NEXT_PUBLIC_SERVER : '')  + path;
 
     const headers = new AxiosHeaders();
     if(contentType) {
@@ -57,7 +59,7 @@ const apiCall = async <R = any, I = any>({
     if(method === 'POST' || method === 'PUT') {
         if(!body) Error('path body is required');
         config.data = body;
-    } if(method === 'GET') {
+    } if(method === 'GET' || method === 'DELETE') {
         config.params = params;
     }
 

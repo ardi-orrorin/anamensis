@@ -5,6 +5,7 @@ import axios from "axios";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {UserInfoI} from "@/app/user/email/page";
 import apiCall from "@/app/{commons}/func/api";
+import {createDebounce} from "@/app/{commons}/func/debounce";
 
 
 type loadingType = {
@@ -20,6 +21,8 @@ export default function Page() {
     const [profile, setProfile] = useState<UserInfoI>({} as UserInfoI);
 
     const [profileEnter, setProfileEnter] = useState<boolean>(false);
+
+    const debounce = createDebounce(500);
 
     useEffect(() => {
         apiCall<UserInfoI>({
@@ -53,22 +56,27 @@ export default function Page() {
             img: true
         });
 
-        await apiCall({
+        const fetch = async () => {
+            await apiCall({
                 path: '/api/user/info/profile-img',
                 method: 'POST',
                 body: formdata,
                 contentType: 'multipart/form-data',
             })
-            .then((res) => {
-                setImg(process.env.NEXT_PUBLIC_CDN_SERVER + res.data)
-            })
-            .finally(() => {
-                setLoading({
-                    ...loading,
-                    img: false
-                });
-                setProfileEnter(false)
-            })
+                .then((res) => {
+                    setImg(process.env.NEXT_PUBLIC_CDN_SERVER + res.data)
+                })
+                .finally(() => {
+                    setLoading({
+                        ...loading,
+                        img: false
+                    });
+                    setProfileEnter(false)
+                })
+        }
+
+        debounce(fetch);
+
     }
     const onSubmitHandler = async () => {
         setLoading({
@@ -76,7 +84,8 @@ export default function Page() {
             profile: true
         })
 
-        await apiCall({
+        const fetch = async () => {
+            await apiCall({
                 path: '/api/user/info',
                 method: 'PUT',
                 body: profile,
@@ -89,7 +98,9 @@ export default function Page() {
                     profile: false
                 });
             });
+        }
 
+        debounce(fetch);
     }
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {

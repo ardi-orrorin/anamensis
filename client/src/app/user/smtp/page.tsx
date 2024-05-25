@@ -6,6 +6,7 @@ import axios from "axios";
 import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import {useRouter} from "next/navigation";
 import apiCall from "@/app/{commons}/func/api";
+import {createDebounce} from "@/app/{commons}/func/debounce";
 
 
 export interface SmtpProps {
@@ -60,10 +61,12 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
     const [loading, setLoading] = useState<boolean>(false);
     const [testResult, setTestResult] = useState<SmtpTestProps>({} as SmtpTestProps);
 
-    useEffect(() => {
-        if(searchParams?.id) {
+    const debounce = createDebounce(500);
 
-            apiCall<SmtpProps>({
+    useEffect(() => {
+        if(!searchParams?.id) return;
+        const fetch = async () => {
+            await apiCall<SmtpProps>({
                 path: '/api/user/smtp',
                 method: 'GET',
                 call: 'Proxy',
@@ -73,18 +76,10 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
             })
             .then(res => {
                 const data = res.data;
-                setSmtp({
-                    id: data.id,
-                    host: data.host,
-                    port: data.port,
-                    username: data.username,
-                    password: data.password,
-                    fromEmail: data.fromEmail,
-                    fromName: data.fromName,
-                    options: data.options
-                })
+                setSmtp(data);
             })
         }
+        debounce(fetch);
     },[props.searchParams]);
 
     const setSmtpHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,64 +90,67 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
     const transformSmtp = (smtp: SmtpProps): SmtpI => {
         const options: string[] = Object.keys(smtp);
         return {
-            host: smtp.host,
-            port: smtp.port,
-            username: smtp.username,
-            password: smtp.password,
-            fromEmail: smtp.fromEmail,
-            fromName: smtp.fromName,
+            ...smtp,
             useSSL: options.includes('isSSL') || false,
             isDefault: options.includes('isDefault') || false
         }
     }
 
-    const testSmtp = async () => {
+    const testSmtp = () => {
         const data = transformSmtp(smtp);
         setLoading(true);
 
-        await apiCall({
-            path: '/api/user/smtp/test',
-            method: 'POST',
-            call: 'Proxy',
-            body: data,
-        })
-        .then((res) => {
-            setHasTest(true);
-            setTestResult({
-                result: res.data as boolean,
-                message: res.data ? '연결 성공' : '연결 실패'
+        const fetch = async () => {
+            await apiCall({
+                path: '/api/user/smtp/test',
+                method: 'POST',
+                call: 'Proxy',
+                body: data,
             })
-        }).finally(() => {
-            setLoading(false);
-        });
+            .then((res) => {
+                setHasTest(true);
+                setTestResult({
+                    result: res.data as boolean,
+                    message: res.data ? '연결 성공' : '연결 실패'
+                })
+            }).finally(() => {
+                setLoading(false);
+            });
+        }
+
+        debounce(fetch);
     }
 
     const save = () => {
         setLoading(true);
         const data = transformSmtp(smtp);
 
-        apiCall<any, SmtpI>({
-            path: '/api/user/smtp',
-            method: 'POST',
-            call: 'Proxy',
-            body: data,
-        })
-        .then(res => {
-            setSmtp({
-                host: '',
-                port: '',
-                username: '',
-                password: '',
-                fromEmail: '',
-                fromName: '',
-                options: []
+        const fetch = async () => {
+            await apiCall<any, SmtpI>({
+                path: '/api/user/smtp',
+                method: 'POST',
+                call: 'Proxy',
+                body: data,
             })
-            window.location.reload();
+            .then(res => {
+                setSmtp({
+                    host: '',
+                    port: '',
+                    username: '',
+                    password: '',
+                    fromEmail: '',
+                    fromName: '',
+                    options: []
+                })
+                window.location.reload();
 
-        })
-        .finally(() => {
-            setLoading(false);
-        });
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+        }
+
+        debounce(fetch);
     }
 
     const modify = () => {

@@ -1,9 +1,10 @@
 'use client';
 import axios, {AxiosResponse} from "axios";
 import {useEffect, useState} from "react";
-import {AuthType} from "@/app/login/{services}/types";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {useRouter} from "next/navigation";
+import apiCall from "@/app/{commons}/func/api";
+import {createDebounce} from "@/app/{commons}/func/debounce";
 
 export default function AttendInfo() {
 
@@ -11,25 +12,41 @@ export default function AttendInfo() {
 
     const [user, setUser] = useState<AttendInfoI>({} as AttendInfoI);
     const [loading, setLoading] = useState<boolean>(false);
+    const debounce = createDebounce(500);
 
     useEffect(()=> {
-        axios.get("/api/user/attend")
-            .then((res: AxiosResponse<AttendInfoI>) => {
-                setUser(res.data);
+        const fetch = async () => {
+            await apiCall<AttendInfoI>({
+                path: "/api/user/attend",
+                method: "GET",
             })
+            .then((res) => {
+                setUser(res.data);
+            });
+        }
+        const debounce = createDebounce(500);
+        debounce(fetch);
     },[loading]);
 
-    const attend = async () => {
+    const attend = () => {
         setLoading(true);
-        await axios.get("/api/user/attend/check")
-            .then((res: AxiosResponse<string>) => {
+
+        const fetch = async () => {
+            await apiCall<string>({
+                path: "/api/user/attend/check",
+                method: "GET",
+            })
+            .then((res) => {
                 alert(res.data);
                 router.refresh();
             })
             .finally(() => {
                 setLoading(false);
-            })
+            });
+        }
+        debounce(fetch);
     }
+
     return (
         <div className={'w-full flex flex-col gap-5'}>
             <div>
@@ -55,6 +72,7 @@ export default function AttendInfo() {
             <div>
                 <button className={'w-full bg-blue-300 text-white p-2 rounded hover:bg-blue-700 duration-500'}
                         onClick={attend}
+                        disabled={loading}
                 >
                     {
                         loading

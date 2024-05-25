@@ -82,9 +82,12 @@ export async function DELETE(req: NextRequest) {
 
     const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
 
+    console.log(url);
+    console.log(id);
+
     const res:AxiosResponse<SysMessageI> = await axios.delete(url,{
         params: {
-            id
+            id: id
         },
         headers: {
             'content-type': 'application/json',

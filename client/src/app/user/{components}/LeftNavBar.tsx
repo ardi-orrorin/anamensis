@@ -15,14 +15,13 @@ const LeftNavBar = ({
 
     const iconSize = 16;
     const menuItems = [
-        // {name: '출석체크', href:'/user/attend', iconComponent: <FontAwesomeIcon icon={faCheckToSlot} width={iconSize} />},
-        {name: '유저 정보', href:'/user/info', iconComponent: <FontAwesomeIcon icon={faCheckToSlot} width={iconSize} />},
-        {name: '로그인기록', href:'/user/history', iconComponent: <FontAwesomeIcon icon={faClockRotateLeft} width={iconSize} />},
-        {name: 'SMTP', href:'/user/smtp', iconComponent: <FontAwesomeIcon icon={faEnvelope} width={iconSize} />},
-        {name: 'SMTP 발송 내역', href:'/user/smtp-history', iconComponent: <FontAwesomeIcon icon={faEnvelope} width={iconSize} />},
-        {name: 'OTP', href:'/user/otp', iconComponent: <FontAwesomeIcon icon={faKey} width={iconSize} />},
-        {name: 'EMAIL', href:'/user/email', iconComponent: <FontAwesomeIcon icon={faEnvelope} width={iconSize} />},
-        {name: 'SYSTEM', href:'/user/system', iconComponent: <FontAwesomeIcon icon={faGear} width={iconSize} />},
+        {name: '유저 정보', href:'/user/info', icon: faCheckToSlot},
+        {name: '로그인기록', href:'/user/history', icon: faClockRotateLeft},
+        {name: 'SMTP', href:'/user/smtp', icon: faEnvelope},
+        {name: 'SMTP 발송 내역', href:'/user/smtp-history', icon: faEnvelope},
+        {name: 'OTP', href:'/user/otp', icon:faKey},
+        {name: 'EMAIL', href:'/user/email', icon: faEnvelope},
+        {name: 'SYSTEM', href:'/user/system', icon: faGear},
     ]
 
     return (
@@ -53,9 +52,8 @@ const LeftNavBar = ({
                                       href={item.href}
                                 >
                                     <div className={'w-full p-3 hover:bg-blue-500 duration-300'}>
-                                        {item.iconComponent}
+                                        <FontAwesomeIcon icon={item.icon} width={iconSize} />
                                         <span className={'hidden md:inline'}>&nbsp; {item.name}</span>
-
                                     </div>
                                 </Link>
                             </li>

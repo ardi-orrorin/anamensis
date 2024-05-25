@@ -5,8 +5,9 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import apiCall from "@/app/{commons}/func/api";
+import apiCall, {ApiCallProps} from "@/app/{commons}/func/api";
 import api from "@/app/{commons}/func/api";
+import {createDebounce} from "@/app/{commons}/func/debounce";
 
 export interface SysMessageI {
     id: string;
@@ -35,47 +36,60 @@ const Message = () => {
     const [edit, setEdit] = useState<boolean>(false);
     const [init, setInit] = useState<boolean>(true);
 
+    const debounce = createDebounce(500);
+
     useEffect(() => {
         setLoading({
             ...loading,
             listLoading: true
         })
-
-        apiCall({
-            path: '/api/user/sys-message/web-sys/' + modal.id,
-            method: 'GET',
-            call: 'Proxy'
-        })
-        .then(res => {
-            setMessageList(res.data);
-            setLoading({
-                ...loading,
-                listLoading: false
+        const fetch = async () => {
+            await apiCall({
+                path: '/api/user/sys-message/web-sys/' + modal.id,
+                method: 'GET',
             })
-        })
-        .catch(err => {
-            console.log(err);
-        })
+            .then(res => {
+                setMessageList(res.data);
+                setLoading({
+                    ...loading,
+                    listLoading: false
+                })
+            })
+            .catch(err => {
+                console.log(err);
+            })
+        }
+
+        const debounce = createDebounce(500);
+        debounce(fetch);
+
     }, [modal.id, messageList.length]);
 
     useEffect(() => {
         if(!message.id) return;
-        apiCall({
-            path: '/api/user/sys-message',
-            method: 'GET',
-            call: 'Proxy',
-            params: {
-                id: message.id
-            }
-        })
-        .then(res => {
-            setMessage(res.data);
-            setEdit(true);
-            setInit(false);
-        })
-        .catch(err => {
-            console.log(err);
-        })
+
+        const fetch = async () => {
+           await apiCall({
+                path: '/api/user/sys-message',
+                method: 'GET',
+                call: 'Proxy',
+                params: {
+                    id: message.id
+                }
+            })
+            .then(res => {
+                setMessage(res.data);
+                setEdit(true);
+                setInit(false);
+            })
+            .catch(err => {
+                console.log(err);
+            })
+        }
+
+        const debounce = createDebounce(500);
+        debounce(fetch);
+
     },[message.id]);
 
     const modalClose = () => {
@@ -130,42 +144,38 @@ const Message = () => {
         setEdit(false);
     }
 
-    const createMessage = async () => {
+    const submitMessageHandler = async (addItem: boolean, remove: boolean) => {
 
-        await axios.post('/api/user/sys-message', {...message, webSysPk: modal.id})
-            .then(res => {
-                setMessageList([]);
-                initMessage();
-            })
-            .catch(err => {
-                console.log(err);
-            })
-    }
+        let config: ApiCallProps = {
+            path: '/api/user/sys-message',
+            method: 'POST',
+        }
 
-    const modifyMessage = async () => {
-        await axios.put('/api/user/sys-message', message)
-            .then(res => {
-                setMessageList([]);
-                initMessage();
-            })
-            .catch(err => {
-                console.log(err);
-            })
-    }
-
-    const deleteMessage = async () => {
-        await axios.delete('/api/user/sys-message', {
-            params: {
-                id: message.id
+        if(remove) {
+            config = {
+                ...config,
+                method: 'DELETE',
+                params: {id: message.id}
             }
-        })
-            .then(res => {
-                setMessageList([]);
-                initMessage();
-            })
-            .catch(err => {
-                console.log(err);
-            })
+        } else {
+            config = {...config,
+                method: addItem ? 'POST' : 'PUT',
+                body: addItem ? {...message, webSysPk: modal.id} : message
+            }
+        }
+
+        const fetch = async () => {
+            await apiCall(config)
+                .then(res => {
+                    setMessageList([]);
+                    initMessage();
+                })
+                .catch(err => {
+                    console.log(err);
+                })
+        }
+
+        debounce(fetch);
     }
 
     const textareaStyle = `resize-none outline-0 text-sm p-2 rounded h-12 overflow-y-hidden focus:bg-blue-100 focus:h-52 focus:overflow-y-auto duration-500`
@@ -269,7 +279,7 @@ const Message = () => {
                             {
                                 init &&
                                 <button className={'w-full bg-blue-300 hover:bg-blue-600 text-white p-2 rounded duration-300'}
-                                        onClick={createMessage}
+                                        onClick={()=>submitMessageHandler(true, false)}
                                 >
                                   등록
                                 </button>
@@ -277,7 +287,7 @@ const Message = () => {
                             {
                                 edit && !init &&
                               <button className={'w-full bg-blue-300 hover:bg-blue-600 text-white p-2 rounded duration-300'}
-                                      onClick={modifyMessage}
+                                      onClick={()=>submitMessageHandler(false, false)}
                               >
                                 수정
                               </button>
@@ -285,21 +295,21 @@ const Message = () => {
                             {
                                 edit && !init &&
                               <button className={'w-full bg-red-300 hover:bg-red-600 text-white p-2 rounded duration-300'}
-                                      onClick={deleteMessage}
+                                      onClick={()=>submitMessageHandler(false, true)}
                               >
                                 삭제
                               </button>
                             }
                         </div>
                         {
-                            addMessage &&
-                               <div>
+                            addMessage
+                            && <div>
                                 <button className={'w-full bg-green-300 hover:bg-green-600 text-white p-2 rounded duration-300'}
                                         onClick={initMessage}
                                 >
                                   초기화
                                 </button>
-                               </div>
+                            </div>
                         }
                     </article>
                     <aside className={'w-full md:w-1/2 flex flex-col gap-5 duration-500'}>

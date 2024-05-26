@@ -4,11 +4,13 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
 import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
 import {blockTypeList} from "@/app/{commons}/{components}/block/list";
-import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
+import {BlockProps, HtmlElements, MouseEnterHTMLElements} from "@/app/{commons}/{components}/block/type/Types";
 import React, {useContext, useMemo, useState} from "react";
 import MenuItem from "@/app/board/{components}/MenuItem";
 import BlockProvider, {BlockMenu} from "@/app/board/{services}/BlockProvider";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
+import {BlockI} from "@/app/board/{services}/types";
+import SubObjectMenu from "@/app/board/{components}/SubObjectMenu";
 
 
 type CopyProps = {
@@ -35,19 +37,29 @@ export default function Block(props: BlockProps) {
         return window.location.hash === `#block-${seq}`;
     },[window.location.hash]);
 
+    const onFocusHandler = (e: React.FocusEvent<HtmlElements>) => {
+        const rect = e.target.getBoundingClientRect();
+        const blockMenu: BlockMenu = 'openTextMenu';
+        const positionX = rect.x + 550 > window.innerWidth ? 50 : rect.x + 120;
+        const positionY = rect.y - 45
 
-    const onMouseEnterHandler = (e: React.MouseEvent<HTMLInputElement | HTMLImageElement | HTMLAnchorElement> ) => {
-        const blockMenu: BlockMenu = e.target instanceof HTMLImageElement ? 'openObjectMenu' : 'openTextMenu';
-        const maxScreenX = window.innerWidth - 250;
-        const positionX = e.clientX + 250  > maxScreenX ? maxScreenX - 250 : e.clientX + 10;
-        const positionY = e.clientY - 60 > 0 ? e.clientY - 60 : 0;
-
+        const block: BlockI = {seq, code, value, textStyle};
         setBlockService({
             ...blockService,
-            seq,
+            block,
             blockMenu: blockMenu,
             screenX: positionX,
             screenY: positionY,
+        })
+    }
+
+    const onMouseEnterHandler = (e: React.MouseEvent<MouseEnterHTMLElements> ) => {
+        const blockMenu: BlockMenu = 'openObjectMenu';
+        const block: BlockI = {seq, code, value, textStyle};
+        setBlockService({
+            ...blockService,
+            block,
+            blockMenu: blockMenu,
         })
     }
 
@@ -56,12 +68,16 @@ export default function Block(props: BlockProps) {
     }
 
     const openMenuToggle  = () => {
-        if(blockService.blockMenu !== 'openMenu' || blockService.seq !== seq) {
-            setBlockService({...blockService, blockMenu: 'openMenu', seq});
+        if(blockService.blockMenu !== 'openMenu' || blockService.block.seq !== seq) {
+            setBlockService({...blockService, blockMenu: 'openMenu', block: {seq, code, value, textStyle}});
             return ;
         }
 
-        setBlockService({...blockService, blockMenu: '', seq: 0});
+        setBlockService({...blockService, blockMenu: '', block: {
+                seq: 0,
+                code: '',
+                value: '',
+            }});
     }
 
     const openMenuClick = (code: string) => {
@@ -77,25 +93,20 @@ export default function Block(props: BlockProps) {
             return item;
         });
 
-        setBlockService({...blockService, blockMenu: '', seq: 0});
+        setBlockService({
+            ...blockService,
+            blockMenu: '',
+            block: {
+                seq: 0,
+                code: '',
+                value: '',
+            }});
         setBoard({...board, data: {...board.data, content: {list: newList}}});
 
         setTimeout(() => {
             blockRef?.current[seq]?.focus();
         },100);
 
-    }
-
-    const onClickSubTextMenu = (type: string, value: string) => {
-        const newList = board.data?.content?.list.map((item, index) => {
-            if (item.seq === seq) {
-                item.textStyle = type === ''
-                ? {}
-                : {...item.textStyle, [type]: value};
-            }
-            return item;
-        });
-        setBoard({...board, data: {...board.data, content: {list: newList}}});
     }
 
     const onClickObjectMenu = (type: string) => {
@@ -191,16 +202,14 @@ export default function Block(props: BlockProps) {
                     blockTypeList.filter(b=> b.code === props.code)?.map(c => {
                         'use client'
                         const Component = c.component;
-                        const SubMenuComponent = c.subMenuComponent;
-                        const onClick = c.type === 'text' ? onClickSubTextMenu : onClickObjectMenu;
                         return <div key={'blockContainer' + seq} className={'flex w-full'}>
                             {
-                                blockService.seq === seq
-                                && <SubMenuComponent key={'subMenu' + seq}
-                                                     isView={board.isView}
-                                                     value={value}
-                                                     textStyle={textStyle || {}}
-                                                     onClick={onClick}
+                                blockService?.block?.seq === seq
+                                && c.type === 'object'
+                                && <SubObjectMenu key={'subMenu' + seq}
+                                                  isView={board.isView}
+                                                  value={value}
+                                                  onClick={onClickObjectMenu}
                                 />
                             }
                             <Component key={'block' + seq}
@@ -208,6 +217,7 @@ export default function Block(props: BlockProps) {
                                        onMouseEnterHandler={onMouseEnterHandler}
                                        onMouseLeaveHandler={onMouseLeaveHandler}
                                        onChangeValueHandler={onChangeValueHandler}
+                                       onFocusHandler={onFocusHandler}
                                        {...props}
                             />
                         </div>
@@ -217,7 +227,7 @@ export default function Block(props: BlockProps) {
             {
                 !board.isView
                 && blockService.blockMenu === 'openMenu'
-                && blockService.seq === seq
+                && blockService?.block?.seq === seq
                 && <MenuItem onClick={openMenuClick} />
             }
         </div>

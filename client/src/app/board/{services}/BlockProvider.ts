@@ -1,10 +1,11 @@
 import {createContext, Dispatch, SetStateAction} from "react";
+import {BlockI} from "@/app/board/{services}/types";
 
 export type BlockMenu = '' | 'openMenu' | 'openTextMenu' | 'openObjectMenu';
 
 export interface BlockService {
     blockMenu: BlockMenu;
-    seq: number;
+    block: BlockI;
     screenX: number;
     screenY: number;
 }

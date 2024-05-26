@@ -4,37 +4,46 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
 import {TextStylesType} from "@/app/board/{services}/types";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
+import BoardProvider from "@/app/board/{services}/BoardProvider";
 
 const SubTextMenu = ({
     isView,
-    textStyle,
-    onClick,
-    value,
 }: {
-    value     : string;
     isView    : boolean;
-    textStyle : TextStylesType
-    onClick   : (type: string, value: string) => void
 }) => {
-
-    const {blockService, setBlockService} = useContext(BlockProvider);
-
     if(isView) return <></>
+    const {blockService, setBlockService} = useContext(BlockProvider);
+    const {board, setBoard} = useContext(BoardProvider);
 
+    if(!blockService.block) return <></>
+    const {seq, code, value, textStyle} = blockService.block;
+
+    if(!textStyle) return <></>
     const buttonStyle = 'py-2 px-3 h-full hover:bg-blue-50 hover:text-black duration-300 outline-0 '
 
     const selectChangeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        onClick(e.target.name, e.target.value)
+        onClickSubTextMenu(e.target.name, e.target.value)
     }
 
     const selectFontStyle = (type: string, value:string) => {
         value = textStyle[type] === value ? '' : value;
-        onClick(type, value)
+        onClickSubTextMenu(type, value)
     }
 
+    const onClickSubTextMenu = (type: string, value: string) => {
+        const newList = board.data?.content?.list.map((item, index) => {
+            if (item.seq === seq) {
+                item.textStyle = type === ''
+                    ? {}
+                    : {...item.textStyle, [type]: value};
+            }
+            return item;
+        });
+        setBoard({...board, data: {...board.data, content: {list: newList}}});
+    }
 
     return (
-        <div className={`fixed bg-gray-100 z-20 w-auto max-h-52 duration-500 rounded shadow-md`}
+        <div className={`fixed bg-gray-100 z-20 w-auto max-h-52 duration-200 rounded shadow-md`}
              style={{top: blockService.screenY, left: blockService.screenX}}
         >
             <ul className={'flex overflow-hidden rounded text-sm bg-white'}>
@@ -49,8 +58,8 @@ const SubTextMenu = ({
                             fontSize.map((size, index) => {
                                 return (
                                     <option key={'fontSize' + index}
-                                            value={size.value ?? ''}
-                                    >{size.value}
+                                            value={size ?? ''}
+                                    >{size}
                                     </option>
                                 )
                             })
@@ -68,8 +77,8 @@ const SubTextMenu = ({
                            colorSet.map((color, index) => {
                                return (
                                    <option key={'fontColor' + index}
-                                           value={color.value}
-                                   >{color.value}
+                                           value={color}
+                                   >{color}
                                    </option>
                                )
                            })
@@ -87,8 +96,8 @@ const SubTextMenu = ({
                             colorSet.map((color, index) => {
                                 return (
                                     <option key={'backgroundColor' + index}
-                                            value={color.value}
-                                    >{color.value}
+                                            value={color}
+                                    >{color}
                                     </option>
                                 )
                             })
@@ -126,31 +135,8 @@ const fontStyle = [
     {icon : faTextSlash, style: 'textDecoration', value: 'line-through'},
 ]
 
-const fontSize = [
-    {value: '10px'},
-    {value: '12px'},
-    {value: '14px'},
-    {value: '16px'},
-    {value: '18px'},
-    {value: '20px'},
-    {value: '24px'},
-    {value: '32px'},
-    {value: '40px'},
-    {value: '48px'},
-    {value: '64px'},
-    {value: '80px'},
-    {value: '100px'},
-]
+const fontSize = ['10px','12px','14px','16px','18px','20px','24px','32px','40px','48px','64px','80px','100px'];
 
-const colorSet  = [
-    {value: 'red'},
-    {value: 'blue'},
-    {value: 'green'},
-    {value: 'yellow'},
-    {value: 'orange'},
-    {value: 'purple'},
-    {value: 'black'},
-    {value: 'white'},
-];
+const colorSet  = ['red','blue','green','yellow','orange','purple','black','white'];
 
 export default SubTextMenu;

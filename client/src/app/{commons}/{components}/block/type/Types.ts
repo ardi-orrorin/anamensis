@@ -15,7 +15,7 @@ export type BlockProps = {
     onKeyUpHandler?         : (e: React.KeyboardEvent<HtmlElements>) => void;
     onKeyDownHandler?       : (e: React.KeyboardEvent<HtmlElements>) => void;
     onFocusHandler?         : (e: React.FocusEvent<HtmlElements>) => void;
-    onMouseEnterHandler?    : (e: React.MouseEvent<HTMLImageElement | HTMLInputElement | HTMLAnchorElement>) => void;
+    onMouseEnterHandler?    : (e: React.MouseEvent<MouseEnterHTMLElements>) => void;
     onMouseLeaveHandler?    : (e: React.MouseEvent<HTMLImageElement | HTMLInputElement>) => void;
     onBlurHandler?          : (e: React.FocusEvent<HtmlElements>) => void;
     onBlurCaptureHandler?   : (e: React.FocusEvent<HtmlElements>) => void;
@@ -25,4 +25,5 @@ export type BlockProps = {
 }
 
 export type HtmlElements = HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | HTMLDataElement;
+export type MouseEnterHTMLElements = HTMLImageElement | HTMLInputElement | HTMLAnchorElement | HTMLDivElement
 

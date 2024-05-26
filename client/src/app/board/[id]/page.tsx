@@ -16,6 +16,7 @@ import {faHeart} from "@fortawesome/free-solid-svg-icons/faHeart";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useRouter, useSearchParams} from "next/navigation";
+import SubTextMenu from "@/app/board/{components}/SubTextMenu";
 
 export interface RateInfoI {
     id      : number;
@@ -332,144 +333,147 @@ export default function Page({params}: {params : {id: string}}) {
     return (
         <BoardProvider.Provider value={{board, setBoard}}>
             <TempFileProvider.Provider value={{tempFiles, setTempFiles}}>
-                <div className={'p-5 flex justify-center'} ref={pageRef}>
-                    <div className={`w-full flex flex-col gap-3 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-1/2'}`}>
-                        <div className={'flex justify-between gap-2 h-auto border-b-2 border-solid border-blue-200 py-3'}>
-                            <div className={'font-bold flex items-center w-full'}>
-                                {
-                                    !board.isView
-                                    && board.data
-                                    && <input className={'w-full text-lg px-3 py-2 bg-gray-50 focus:bg-blue-50 hover:bg-blue-50 outline-0 rounded'}
-                                              name={'title'}
-                                              value={board.data?.title}
-                                              onChange={onChangeTitleHandler}
-                                              placeholder={'제목을 입력하세요'}
-                                    />
-                                }
-                                {
-                                    board.isView
-                                    && !isNewBoard
-                                    && <span className={'w-full text-lg px-4 py-1'}
-                                    >{board.data.title}</span>
-                                }
-                            </div>
-                            {
-                                !isNewBoard &&
-                                <div className={'w-auto flex gap-1 justify-end'}>
-                                  {
-                                      !board.isView &&
-                                      <button className={'w-16 rounded h-full border-2 border-blue-200 text-blue-400 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
-                                              onClick={()=> debounce(()=> submitHandler(false))}
-                                      >저장
-                                      </button>
-                                  }
-                                  <button className={'w-16 rounded h-full border-2 border-blue-200 text-blue-400 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
-                                          onClick={editClickHandler}
-                                  >{board.isView ? '수정' : '취소'}
-                                  </button>
-                                  {
-                                      !board.isView &&
-                                      <button className={'w-16 rounded h-full border-2 border-red-200 text-red-400 hover:bg-red-200 hover:text-white py-1 px-3 text-sm duration-300'}
-                                              onClick={()=> debounce(()=> deleteHandler())}
-                                      >삭제
-                                      </button>
-                                  }
-                                  {
-                                      board.isView &&
-                                      <button className={'w-16 rounded border-2 border-blue-200 text-blue-400 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
-                                      >공유
-                                      </button>
-                                  }
-                                </div>
-                            }
-                            <div>
-                                <button className={'w-14 rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
-                                        onClick={()=> setFullScreen(!fullScreen)}>
+                <BlockProvider.Provider value={{blockService, setBlockService}}>
+                    <div className={'p-5 flex justify-center'} ref={pageRef}>
+                        <div className={`w-full flex flex-col gap-3 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-1/2'}`}>
+                            <div className={'flex justify-between gap-2 h-auto border-b-2 border-solid border-blue-200 py-3'}>
+                                <div className={'font-bold flex items-center w-full'}>
                                     {
-                                        fullScreen
-                                        ? <FontAwesomeIcon className={'text-blue-400'}
-                                                           icon={faDownLeftAndUpRightToCenter}
-                                        />
-                                        : <FontAwesomeIcon className={'text-blue-400'}
-                                                           icon={faUpRightAndDownLeftFromCenter}
+                                        !board.isView
+                                        && board.data
+                                        && <input className={'w-full text-lg px-3 py-2 bg-gray-50 focus:bg-blue-50 hover:bg-blue-50 outline-0 rounded'}
+                                                  name={'title'}
+                                                  value={board.data?.title}
+                                                  onChange={onChangeTitleHandler}
+                                                  placeholder={'제목을 입력하세요'}
                                         />
                                     }
-                                </button>
+                                    {
+                                        board.isView
+                                        && !isNewBoard
+                                        && <span className={'w-full text-lg px-4 py-1'}
+                                        >{board.data.title}</span>
+                                    }
+                                </div>
+                                {
+                                    !isNewBoard &&
+                                    <div className={'w-auto flex gap-1 justify-end'}>
+                                      {
+                                          !board.isView &&
+                                          <button className={'w-16 rounded h-full border-2 border-blue-200 text-blue-400 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                                                  onClick={()=> debounce(()=> submitHandler(false))}
+                                          >저장
+                                          </button>
+                                      }
+                                      <button className={'w-16 rounded h-full border-2 border-blue-200 text-blue-400 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                                              onClick={editClickHandler}
+                                      >{board.isView ? '수정' : '취소'}
+                                      </button>
+                                      {
+                                          !board.isView &&
+                                          <button className={'w-16 rounded h-full border-2 border-red-200 text-red-400 hover:bg-red-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                                                  onClick={()=> debounce(()=> deleteHandler())}
+                                          >삭제
+                                          </button>
+                                      }
+                                      {
+                                          board.isView &&
+                                          <button className={'w-16 rounded border-2 border-blue-200 text-blue-400 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                                          >공유
+                                          </button>
+                                      }
+                                    </div>
+                                }
+                                <div>
+                                    <button className={'w-14 rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                                            onClick={()=> setFullScreen(!fullScreen)}>
+                                        {
+                                            fullScreen
+                                            ? <FontAwesomeIcon className={'text-blue-400'}
+                                                               icon={faDownLeftAndUpRightToCenter}
+                                            />
+                                            : <FontAwesomeIcon className={'text-blue-400'}
+                                                               icon={faUpRightAndDownLeftFromCenter}
+                                            />
+                                        }
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                {
+                                    !isNewBoard && board.isView
+                                    && <div className={'flex gap-2 justify-between'}>
+                                      <div className={'text-sm'}>
+                                        <p>
+                                            작성일: {board.data.createdAt}
+                                        </p>
+                                        <p>
+                                            조회수: {board.data.viewCount}
+                                        </p>
+                                      </div>
+                                      <div className={'flex gap-2 items-center'}>
+                                        <Image src={process.env.NEXT_PUBLIC_CDN_SERVER + board.data.profileImage}
+                                               className={'rounded-full border-2 border-solid border-blue-300'}
+                                               width={50}
+                                               height={50}
+                                               alt={''}
+                                        />
+                                        <p className={'font-bold'}
+                                        >{board.data.writer}</p>
+                                      </div>
+                                    </div>
+                                }
+                            </div>
+                            <div className={'flex flex-col gap-2'}>
+
+                                    {
+                                        board.data.content.list.map((item, index) => {
+
+                                           return <Block key={'block' + index}
+                                                   blockRef={blockRef}
+                                                   seq={item.seq}
+                                                   value={item.value}
+                                                   textStyle={item.textStyle}
+                                                   code={item.code}
+                                                   onChangeHandler={e => {onChangeHandler(e, item.seq)}}
+                                                   onKeyDownHandler={e=> {onKeyDownHandler(e, item.seq)}}
+                                                   onKeyUpHandler={e=> {onKeyUpHandler(e, item.seq)}}
+                                                   onClickAddHandler={()=> addBlockHandler(item.seq)}
+                                                   onClickDeleteHandler={onClickDeleteHandler}
+                                            />
+                                        })
+                                    }
+
+                            </div>
+                            <div>
+                                {
+                                  isNewBoard
+                                  && <div className={'flex gap-1 justify-end'}>
+                                    <button className={'w-full rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                                            onClick={()=> debounce(()=>submitHandler(true))}
+                                    >작성
+                                    </button>
+                                  </div>
+                                }
+                            </div>
+                            <div className={'flex justify-center'}>
+                                {
+                                    !isNewBoard && board.isView
+
+                                    && <button className={'px-6 py-3 flex gap-2 justify-center items-center border border-blue-400 text-xl rounded hover:bg-blue-400 hover:text-white duration-300'}
+                                               onClick={()=>debounce(onChangeRateHandler)}
+                                    >
+                                        <FontAwesomeIcon icon={faHeart} className={`${rateInfo.status ? 'text-blue-600' : ''}`}/>
+                                        <span>
+                                          { rateCount }
+                                        </span>
+                                    </button>
+                                }
                             </div>
                         </div>
-                        <div>
-                            {
-                                !isNewBoard && board.isView
-                                && <div className={'flex gap-2 justify-between'}>
-                                  <div className={'text-sm'}>
-                                    <p>
-                                        작성일: {board.data.createdAt}
-                                    </p>
-                                    <p>
-                                        조회수: {board.data.viewCount}
-                                    </p>
-                                  </div>
-                                  <div className={'flex gap-2 items-center'}>
-                                    <Image src={process.env.NEXT_PUBLIC_CDN_SERVER + board.data.profileImage}
-                                           className={'rounded-full border-2 border-solid border-blue-300'}
-                                           width={50}
-                                           height={50}
-                                           alt={''}
-                                    />
-                                    <p className={'font-bold'}
-                                    >{board.data.writer}</p>
-                                  </div>
-                                </div>
-                            }
-                        </div>
-                        <div className={'flex flex-col gap-2'}>
-                            <BlockProvider.Provider value={{blockService, setBlockService}}>
-                                {
-                                    board.data.content.list.map((item, index) => {
-
-                                       return <Block key={'block' + index}
-                                               blockRef={blockRef}
-                                               seq={item.seq}
-                                               value={item.value}
-                                               textStyle={item.textStyle}
-                                               code={item.code}
-                                               onChangeHandler={e => {onChangeHandler(e, item.seq)}}
-                                               onKeyDownHandler={e=> {onKeyDownHandler(e, item.seq)}}
-                                               onKeyUpHandler={e=> {onKeyUpHandler(e, item.seq)}}
-                                               onClickAddHandler={()=> addBlockHandler(item.seq)}
-                                               onClickDeleteHandler={onClickDeleteHandler}
-                                        />
-                                    })
-                                }
-                            </BlockProvider.Provider>
-                        </div>
-                        <div>
-                            {
-                              isNewBoard
-                              && <div className={'flex gap-1 justify-end'}>
-                                <button className={'w-full rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
-                                        onClick={()=> debounce(()=>submitHandler(true))}
-                                >작성
-                                </button>
-                              </div>
-                            }
-                        </div>
-                        <div className={'flex justify-center'}>
-                            {
-                                !isNewBoard && board.isView
-
-                                && <button className={'px-6 py-3 flex gap-2 justify-center items-center border border-blue-400 text-xl rounded hover:bg-blue-400 hover:text-white duration-300'}
-                                           onClick={()=>debounce(onChangeRateHandler)}
-                                >
-                                    <FontAwesomeIcon icon={faHeart} className={`${rateInfo.status ? 'text-blue-600' : ''}`}/>
-                                    <span>
-                                      { rateCount }
-                                    </span>
-                                </button>
-                            }
-                        </div>
+                        <SubTextMenu isView={board.isView} />
                     </div>
-                </div>
+                </BlockProvider.Provider>
             </TempFileProvider.Provider>
         </BoardProvider.Provider>
     )

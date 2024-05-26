@@ -12,7 +12,7 @@ export type FileUploadProps = {
 } & BlockProps;
 
 export default function FileUpload (props: FileUploadProps) {
-    const {onUploadFileUrl, isImage} = props;
+    const {onUploadFileUrl, isImage, onMouseEnterHandler} = props;
 
     const useFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -110,7 +110,9 @@ export default function FileUpload (props: FileUploadProps) {
 
     return (
         <>
-            <div className={'w-full'}>
+            <div className={'w-full'}
+                 onMouseEnter={onMouseEnterHandler}
+            >
                 <button style={customStyle}
                         onClick={onClick}
                 >

@@ -30,7 +30,6 @@ export type SubMenuType = {
 
 export type BlockComponentType = BlockType & {
     component         : (props: BlockProps)  => JSX.Element;
-    subMenuComponent  : (props: SubMenuType) => JSX.Element;
 }
 
 export const blockTypeList: BlockComponentType[] = [
@@ -48,7 +47,6 @@ export const blockTypeList: BlockComponentType[] = [
             padding       : '0.5rem',
             letterSpacing : '0.03rem',
         }),
-        subMenuComponent  : (props: SubMenuType) => SubTextMenu(props),
     },
     {
         code              : '00002',
@@ -64,7 +62,6 @@ export const blockTypeList: BlockComponentType[] = [
             padding       : '0.5rem',
             letterSpacing : '0.03rem',
         }),
-        subMenuComponent  : (props: SubMenuType) => SubTextMenu(props),
     },
     {
         code              : '00003',
@@ -80,7 +77,6 @@ export const blockTypeList: BlockComponentType[] = [
             padding       : '0.5rem',
             letterSpacing : '0.03rem',
         }),
-        subMenuComponent  : (props: SubMenuType) => SubTextMenu(props),
     },
     {
         code              : '00004',
@@ -95,7 +91,6 @@ export const blockTypeList: BlockComponentType[] = [
             padding       : '0.5rem',
             letterSpacing : '0.03rem',
         }),
-        subMenuComponent  : (props: SubMenuType) => SubTextMenu(props),
     },
     {
         code              : '00005',
@@ -110,7 +105,6 @@ export const blockTypeList: BlockComponentType[] = [
             padding       : '0.5rem',
             letterSpacing : '0.03rem',
         }),
-        subMenuComponent  : (props: SubMenuType) => SubTextMenu(props),
     },
     {
         code              : '00006',
@@ -121,7 +115,6 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '링크',
         type              : 'object',
         component         : (props: BlockProps)  => LinkBlock(props),
-        subMenuComponent  : (props: SubMenuType) => SubObjectMenu(props),
     },
     {
         code              : '00007',
@@ -138,7 +131,6 @@ export const blockTypeList: BlockComponentType[] = [
             borderLeft    : '0.8rem solid #BBBBBB',
             height        : 'auto',
         }),
-        subMenuComponent  : (props: SubMenuType) => SubTextMenu(props),
     },
     {
         code              : '00008',
@@ -149,7 +141,6 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '할일',
         type              : 'text',
         component         : (props: BlockProps)  => CheckBlock(props),
-        subMenuComponent  : (props: SubMenuType) => SubTextMenu(props),
     },
     {
         code              : '00101',
@@ -163,7 +154,6 @@ export const blockTypeList: BlockComponentType[] = [
             ...props,
             Component     : FileImage
         }),
-        subMenuComponent  : (props: SubMenuType) => SubObjectMenu(props),
     },
     {
         code              : '00102',
@@ -177,6 +167,5 @@ export const blockTypeList: BlockComponentType[] = [
             ...props,
             Component     : FileFile
         }),
-        subMenuComponent  : (props: SubMenuType) => SubObjectMenu(props),
     },
 ]

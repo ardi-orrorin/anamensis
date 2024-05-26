@@ -16,8 +16,6 @@ const SubObjectMenu = ({
 
     const {blockService, setBlockService} = useContext(BlockProvider);
 
-    // if(!value) return <></>
-
     return (
         <div className={'absolute bottom-[5%] right-[5%] bg-gray-100 z-10 max-h-80 duration-500 rounded shadow-md'}>
             <ul className={'flex overflow-hidden rounded text-sm bg-white shadow-md'}

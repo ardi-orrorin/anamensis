@@ -1,29 +1,32 @@
-import React, {useContext} from "react";
+import React, {MutableRefObject, useContext, useState} from "react";
 import {faBold, faItalic, faTextSlash} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
-import {TextStylesType} from "@/app/board/{services}/types";
-import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
+import MenuColorItem from "@/app/board/{components}/MenuColorItem";
+import MenuFontsizeItem from "@/app/board/{components}/MenuFontsizeItem";
+
+
+export type ToggleEnum = 'fontSize' | 'color' | 'backgroundColor' | 'fontStyle' | '';
 
 const SubTextMenu = ({
     isView,
+    blockRef,
 }: {
     isView    : boolean;
+    blockRef  : MutableRefObject<HTMLElement[] | null[]>;
 }) => {
     if(isView) return <></>
+    const [toggle, setToggle] = useState<ToggleEnum>('');
     const {blockService, setBlockService} = useContext(BlockProvider);
     const {board, setBoard} = useContext(BoardProvider);
 
     if(!blockService.block) return <></>
-    const {seq, code, value, textStyle} = blockService.block;
+    const {seq, code, textStyle} = blockService.block;
 
     if(!textStyle) return <></>
     const buttonStyle = 'py-2 px-3 h-full hover:bg-blue-50 hover:text-black duration-300 outline-0 '
 
-    const selectChangeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        onClickSubTextMenu(e.target.name, e.target.value)
-    }
 
     const selectFontStyle = (type: string, value:string) => {
         value = textStyle[type] === value ? '' : value;
@@ -40,6 +43,18 @@ const SubTextMenu = ({
             return item;
         });
         setBoard({...board, data: {...board.data, content: {list: newList}}});
+        setTimeout(() => {
+            blockRef.current[seq]?.focus();
+        },100);
+
+    }
+
+    const onClickColorHandler = (name: ToggleEnum, value: string) => {
+        onClickSubTextMenu(name, value);
+        setToggle(name ? '' : name)
+        setTimeout(() => {
+            blockRef.current[seq]?.focus();
+        },100);
     }
 
     return (
@@ -48,61 +63,48 @@ const SubTextMenu = ({
         >
             <ul className={'flex overflow-hidden rounded text-sm bg-white'}>
                 <li>
-                    <select className={buttonStyle + (textStyle.fontSize && textStyle.fontSize !== '' ?  'bg-blue-400 text-white' : 'bg-white')}
-                            value={textStyle.fontSize ?? ''}
-                            name={'fontSize'}
-                            onChange={selectChangeHandler}
+                    <button className={[
+                        'min-w-20 tracking-wider',
+                        buttonStyle + (textStyle.fontSize && textStyle.fontStyle !== '' ?  'bg-blue-400 text-white' : 'bg-white'),
+                    ].join(' ')}
+                            onClick={() => setToggle('fontSize')}
                     >
-                        <option value={''}>글자크기</option>
-                        {
-                            fontSize.map((size, index) => {
-                                return (
-                                    <option key={'fontSize' + index}
-                                            value={size ?? ''}
-                                    >{size}
-                                    </option>
-                                )
-                            })
-                        }
-                    </select>
+                        글자크기
+                    </button>
+                    <MenuFontsizeItem toggle={toggle}
+                                      onClick={onClickColorHandler}
+                                      value={board.data.content.list[seq].value}
+                    />
                 </li>
                 <li>
-                   <select className={buttonStyle + (textStyle.color && textStyle.color !== '' ?  'bg-blue-400 text-white' : 'bg-white')}
-                           name={'color'}
-                           value={textStyle.color ?? ''}
-                           onChange={selectChangeHandler}
-                   >
-                       <option value={''}>글자색</option>
-                       {
-                           colorSet.map((color, index) => {
-                               return (
-                                   <option key={'fontColor' + index}
-                                           value={color}
-                                   >{color}
-                                   </option>
-                               )
-                           })
-                       }
-                   </select>
+                    <button className={[
+                                'min-w-20 tracking-wider',
+                                buttonStyle + (textStyle.color && textStyle.color !== '' ?  'bg-blue-400 text-white' : 'bg-white'),
+                            ].join(' ')}
+                            onClick={() => setToggle('color')}
+                    >
+                        글자색
+                    </button>
+                    <MenuColorItem toggle={toggle}
+                                   menuTitle={'글자색'}
+                                   name={'color'}
+                                   onClick={onClickColorHandler}
+                    />
                 </li>
                 <li>
-                    <select className={buttonStyle + (textStyle.backgroundColor && textStyle.backgroundColor !== '' ?  'bg-blue-400 text-white' : 'bg-white')}
-                            name={'backgroundColor'}
-                            value={textStyle.backgroundColor ?? ''}
-                            onChange={selectChangeHandler}
+                    <button className={[
+                            'min-w-20 tracking-wider',
+                            buttonStyle + (textStyle.backgroundColor && textStyle.backgroundColor !== '' ?  'bg-blue-400 text-white' : 'bg-white'),
+                        ].join(' ')}
+                            onClick={() => setToggle('backgroundColor')}
                     >
-                        <option value={''}>배경색</option>
-                        {
-                            colorSet.map((color, index) => {
-                                return (
-                                    <option key={'backgroundColor' + index}
-                                            value={color}
-                                    >{color}
-                                    </option>
-                                )
-                            })
-                        }
-                    </select>
+                        배경색
+                    </button>
+                    <MenuColorItem name={'backgroundColor'}
+                                   menuTitle={'배경색'}
+                                   toggle={toggle}
+                                   onClick={onClickColorHandler}
+                    />
                 </li>
                 {
                     fontStyle.map((style, index) => {
@@ -134,9 +136,5 @@ const fontStyle = [
     {icon : faItalic, style: 'fontStyle', value: 'Italic'},
     {icon : faTextSlash, style: 'textDecoration', value: 'line-through'},
 ]
-
-const fontSize = ['10px','12px','14px','16px','18px','20px','24px','32px','40px','48px','64px','80px','100px'];
-
-const colorSet  = ['red','blue','green','yellow','orange','purple','black','white'];
 
 export default SubTextMenu;

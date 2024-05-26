@@ -9,7 +9,7 @@ export type BlockProps = {
     isView?                 : boolean;
     openMenu?               : boolean;
     value                   : string;
-    blockRef?                : MutableRefObject<HTMLElement[] | null[]>;
+    blockRef?               : MutableRefObject<HTMLElement[] | null[]>;
     onChangeValueHandler?   : (value: string) => void;
     onChangeHandler?        : (e: ChangeEvent<HtmlElements>) => void;
     onKeyUpHandler?         : (e: React.KeyboardEvent<HtmlElements>) => void;

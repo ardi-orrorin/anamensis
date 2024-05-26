@@ -471,7 +471,9 @@ export default function Page({params}: {params : {id: string}}) {
                                 }
                             </div>
                         </div>
-                        <SubTextMenu isView={board.isView} />
+                        <SubTextMenu isView={board.isView}
+                                     blockRef={blockRef}
+                        />
                     </div>
                 </BlockProvider.Provider>
             </TempFileProvider.Provider>

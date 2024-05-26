@@ -5,7 +5,7 @@ import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
 import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
 import {blockTypeList} from "@/app/{commons}/{components}/block/list";
 import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
-import React, {MouseEventHandler, useContext, useEffect, useState} from "react";
+import React, {useContext, useMemo, useState} from "react";
 import MenuItem from "@/app/board/{components}/MenuItem";
 import BlockProvider, {BlockMenu} from "@/app/board/{services}/BlockProvider";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
@@ -14,37 +14,45 @@ import BoardProvider from "@/app/board/{services}/BoardProvider";
 type CopyProps = {
     isCopy: boolean;
     seq: number;
-
-
 }
 
 export default function Block(props: BlockProps) {
     const {
         seq,
-        isCursor,
+        code,
         textStyle,
         onClickAddHandler,
         onClickDeleteHandler,
         value,
+        blockRef,
     } = props;
 
     const {board, setBoard} = useContext(BoardProvider);
     const {blockService, setBlockService} = useContext(BlockProvider);
     const [isCopy, setIsCopy] = useState<CopyProps>({} as CopyProps);
 
-    const onMouseEnterHandler = (e: React.MouseEvent<HTMLInputElement | HTMLImageElement> ) => {
-        let blockMenu: BlockMenu = '';
-        if(e.target instanceof HTMLImageElement) {
-            blockMenu = 'openObjectMenu';
-        } else if(e.target instanceof HTMLInputElement) {
-            blockMenu = 'openTextMenu';
-        }
+    const isCursor = useMemo(() => {
+        return window.location.hash === `#block-${seq}`;
+    },[window.location.hash]);
 
-        setBlockService({...blockService, blockMenu: blockMenu, seq})
+
+    const onMouseEnterHandler = (e: React.MouseEvent<HTMLInputElement | HTMLImageElement | HTMLAnchorElement> ) => {
+        const blockMenu: BlockMenu = e.target instanceof HTMLImageElement ? 'openObjectMenu' : 'openTextMenu';
+        const maxScreenX = window.innerWidth - 250;
+        const positionX = e.clientX + 250  > maxScreenX ? maxScreenX - 250 : e.clientX + 10;
+        const positionY = e.clientY - 60 > 0 ? e.clientY - 60 : 0;
+
+        setBlockService({
+            ...blockService,
+            seq,
+            blockMenu: blockMenu,
+            screenX: positionX,
+            screenY: positionY,
+        })
     }
 
     const onMouseLeaveHandler = (e: React.MouseEvent<HTMLImageElement | HTMLInputElement> ) => {
-        setBlockService({blockMenu: '', seq: 0});
+        // setBlockService({blockMenu: '', seq: 0, screenX: 0, screenY: 0});
     }
 
     const openMenuToggle  = () => {
@@ -71,6 +79,11 @@ export default function Block(props: BlockProps) {
 
         setBlockService({...blockService, blockMenu: '', seq: 0});
         setBoard({...board, data: {...board.data, content: {list: newList}}});
+
+        setTimeout(() => {
+            blockRef?.current[seq]?.focus();
+        },100);
+
     }
 
     const onClickSubTextMenu = (type: string, value: string) => {
@@ -93,7 +106,21 @@ export default function Block(props: BlockProps) {
         }
 
         if(type === 'detailView') {
-            const url = process.env.NEXT_PUBLIC_CDN_SERVER + value;
+            const block =blockTypeList.find(b=> b.code === code);
+
+            let url = '';
+
+            switch (block?.tag) {
+                case 'image':
+                    url = process.env.NEXT_PUBLIC_CDN_SERVER + value;
+                    break;
+                case 'link':
+                    url = JSON.parse(value).url;
+                    break;
+                default:
+                    url = '';
+                    break;
+            }
             window.open(url, '_blank');
             return ;
         }
@@ -110,36 +137,37 @@ export default function Block(props: BlockProps) {
         setBoard({...board, data: {...board.data, content: {list: newList}}});
     }
 
-    const shareLinkHandler = (e: React.MouseEvent<HTMLDivElement>) => {
+    const shareLinkHandler = async (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
+        if(typeof window === 'undefined') return ;
         const bastUrl = window.location.href.split('#')[0];
 
         const url = bastUrl + `#block-${seq}`;
-        navigator.clipboard.writeText(url);
+
+        await navigator.clipboard.writeText(url);
 
         setIsCopy({isCopy: true, seq});
 
         setTimeout(() => {
-            setIsCopy({} as CopyProps);
-        }, 1000);
-
+            setIsCopy({isCopy: false, seq});
+        }, 700);
     }
 
     return (
-        <div className={['flex relative'].join(' ')}
+        <div className={[
+            'flex relative',
+            isCursor && 'bg-red-700 border-2 border-dashed border-red-800 border-opacity-20 bg-opacity-20 rounded',
+        ].join(' ')}
              onContextMenu={shareLinkHandler}
         >
             {
                 board.isView
-                && isCopy.isCopy
-                && <div className={'absolute left-1/2 top-1/2 z-30 text-sm w-52 h-14 flex justify-center items-center bg-white rounded shadow border-l-8 border-solid border-blue-300'}>
+                && <div className={[
+                    'absolute left-1/2 top-1/2 z-30 text-sm w-52 h-14 flex justify-center items-center bg-white rounded shadow border-l-8 border-solid border-blue-300 duration-200',
+                    isCopy.isCopy ? 'opacity-100' : 'opacity-0',
+                ].join(' ')
+                }>
                       {`block-${isCopy.seq}`} 링크가 복사되었습니다.
-                </div>
-            }
-            {
-                isCursor
-                && <div className={'z-10 absolute w-full h-full flex justify-center items-center bg-red-700 border-2 border-dashed border-red-800 opacity-40 bg-opacity-40 rounded'}>
-                    select
                 </div>
             }
             {

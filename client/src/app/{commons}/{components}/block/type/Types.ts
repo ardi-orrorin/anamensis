@@ -3,8 +3,8 @@ import {TextStylesType} from "@/app/board/{services}/types";
 
 export type BlockProps = {
     seq                     : number;
-    isCursor?               : boolean;
     code                    : string;
+    tag?                    : string;
     textStyle?              : TextStylesType;
     isView?                 : boolean;
     openMenu?               : boolean;
@@ -15,7 +15,7 @@ export type BlockProps = {
     onKeyUpHandler?         : (e: React.KeyboardEvent<HtmlElements>) => void;
     onKeyDownHandler?       : (e: React.KeyboardEvent<HtmlElements>) => void;
     onFocusHandler?         : (e: React.FocusEvent<HtmlElements>) => void;
-    onMouseEnterHandler?    : (e: React.MouseEvent<HTMLImageElement | HTMLInputElement>) => void;
+    onMouseEnterHandler?    : (e: React.MouseEvent<HTMLImageElement | HTMLInputElement | HTMLAnchorElement>) => void;
     onMouseLeaveHandler?    : (e: React.MouseEvent<HTMLImageElement | HTMLInputElement>) => void;
     onBlurHandler?          : (e: React.FocusEvent<HtmlElements>) => void;
     onBlurCaptureHandler?   : (e: React.FocusEvent<HtmlElements>) => void;

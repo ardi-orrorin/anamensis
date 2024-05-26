@@ -13,6 +13,9 @@ export default function FileImage(props: FileImageProps){
 
     const style: CSSProperties = {
         width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
     }
     const onLoadingComplete = (e: HTMLImageElement ) => {
         const multiple = e.srcset.split(',')[1].split(' ')[1];

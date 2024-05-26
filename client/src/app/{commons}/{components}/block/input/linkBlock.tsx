@@ -12,7 +12,10 @@ type OGType = {
 }
 
 const LinkBlock = (props: BlockProps) => {
-    const {seq, value, onChangeValueHandler, onKeyUpHandler, onKeyDownHandler} = props;
+    const {seq, value,
+        onChangeValueHandler, onKeyUpHandler,
+        onKeyDownHandler, onMouseEnterHandler
+    } = props;
 
     const link = useMemo(() => {
         try {
@@ -104,7 +107,9 @@ const LinkBlock = (props: BlockProps) => {
                 />
                 : <a style={linkPreviewStyle}
                      href={(link as OGType).url}
-                     target={'_blank'}>
+                     target={'_blank'}
+                     onMouseEnter={onMouseEnterHandler}
+                >
                     <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'space-between', padding:'0.6rem'}}>
                         <p style={{fontSize: '1.3rem'}}>{(link as OGType).title}</p>
                         <p style={{fontSize: '0.7rem', wordBreak: 'break-all', color: 'gray'}}

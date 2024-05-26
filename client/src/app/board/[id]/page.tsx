@@ -15,6 +15,7 @@ import Image from "next/image";
 import {faHeart} from "@fortawesome/free-solid-svg-icons/faHeart";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
+import {useRouter, useSearchParams} from "next/navigation";
 
 export interface RateInfoI {
     id      : number;
@@ -23,6 +24,7 @@ export interface RateInfoI {
 }
 
 export default function Page({params}: {params : {id: string}}) {
+
     const [board, setBoard] = useState<BoardService>({} as BoardService);
 
     const [rateInfo, setRateInfo] = useState<RateInfoI>({} as RateInfoI);
@@ -55,10 +57,6 @@ export default function Page({params}: {params : {id: string}}) {
             ? rateInfo.count
             : board?.data?.rate;
     },[rateInfo?.count, board.data?.rate]);
-
-    const cursor = useMemo(() => {
-        return window.location.hash;
-    },[window.location.hash]);
 
     useEffect(() => {
         if(!isNewBoard) return ;
@@ -149,6 +147,11 @@ export default function Page({params}: {params : {id: string}}) {
             return item;
         });
         setBoard({...board, data: {...board.data, content: {list: newList}}});
+
+        setTimeout(() => {
+            blockRef.current[seq]?.focus();
+        },100);
+
         return true;
     },[board.data]);
 
@@ -322,6 +325,10 @@ export default function Page({params}: {params : {id: string}}) {
         });
     }
 
+    if(!board?.data?.content || board.data?.content?.list?.length === 0) {
+        return <GlobalLoadingSpinner />
+    }
+
     return (
         <BoardProvider.Provider value={{board, setBoard}}>
             <TempFileProvider.Provider value={{tempFiles, setTempFiles}}>
@@ -418,20 +425,14 @@ export default function Page({params}: {params : {id: string}}) {
                         <div className={'flex flex-col gap-2'}>
                             <BlockProvider.Provider value={{blockService, setBlockService}}>
                                 {
-                                    board.data
-                                    && board.data.content
-                                    && board.data.content.list
-                                    && board.data.content.list.length > 0
-                                    && board.data.content.list.map((item, index) => {
-                                       const isCursor = cursor === `#block-${item.seq}`;
+                                    board.data.content.list.map((item, index) => {
+
                                        return <Block key={'block' + index}
                                                blockRef={blockRef}
-                                               isCursor={isCursor}
                                                seq={item.seq}
                                                value={item.value}
                                                textStyle={item.textStyle}
                                                code={item.code}
-                                               // setValue={e=>{}}
                                                onChangeHandler={e => {onChangeHandler(e, item.seq)}}
                                                onKeyDownHandler={e=> {onKeyDownHandler(e, item.seq)}}
                                                onKeyUpHandler={e=> {onKeyUpHandler(e, item.seq)}}

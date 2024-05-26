@@ -5,6 +5,8 @@ export type BlockMenu = '' | 'openMenu' | 'openTextMenu' | 'openObjectMenu';
 export interface BlockService {
     blockMenu: BlockMenu;
     seq: number;
+    screenX: number;
+    screenY: number;
 }
 
 export interface BlockProviderI {

@@ -13,7 +13,7 @@ export default function InputBase({
         onKeyUpHandler, onFocusHandler,
         onKeyDownHandler, onChangeHandler,
         onBlurHandler, onBlurCaptureHandler,
-        onMouseEnterHandler,
+        onMouseEnterHandler, onMouseLeaveHandler,
         value, isView,
         textStyle,
         blockRef, seq
@@ -52,6 +52,7 @@ export default function InputBase({
         onMouseEnter  : onMouseEnterHandler,
         onBlur        : onBlurHandler,
         onBlurCapture : onBlurCaptureHandler,
+        onMouseLeave  : onMouseLeaveHandler,
     }
 
     return (

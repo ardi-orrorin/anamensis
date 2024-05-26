@@ -119,9 +119,9 @@ export const blockTypeList: BlockComponentType[] = [
         label             : 'Link',
         icon              : faLink,
         comment           : '링크',
-        type              : 'text',
+        type              : 'object',
         component         : (props: BlockProps)  => LinkBlock(props),
-        subMenuComponent  : (props: SubMenuType) => SubTextMenu(props),
+        subMenuComponent  : (props: SubMenuType) => SubObjectMenu(props),
     },
     {
         code              : '00007',

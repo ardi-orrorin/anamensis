@@ -3,6 +3,7 @@ import {faBold, faItalic, faTextSlash} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
 import {TextStylesType} from "@/app/board/{services}/types";
+import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 
 const SubTextMenu = ({
     isView,
@@ -22,10 +23,6 @@ const SubTextMenu = ({
 
     const buttonStyle = 'py-2 px-3 h-full hover:bg-blue-50 hover:text-black duration-300 outline-0 '
 
-    const onMouseLeave = () => {
-        setBlockService({...blockService, blockMenu: 'openMenu'})
-    }
-
     const selectChangeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
         onClick(e.target.name, e.target.value)
     }
@@ -35,11 +32,12 @@ const SubTextMenu = ({
         onClick(type, value)
     }
 
+
     return (
-        <div className={'absolute -top-8 left-0 md:left-1/4 bg-gray-100 z-20 w-auto max-h-52 duration-500 rounded shadow-md'}>
-            <ul className={'flex overflow-hidden rounded text-sm bg-white'}
-                onMouseLeave={onMouseLeave}
-            >
+        <div className={`fixed bg-gray-100 z-20 w-auto max-h-52 duration-500 rounded shadow-md`}
+             style={{top: blockService.screenY, left: blockService.screenX}}
+        >
+            <ul className={'flex overflow-hidden rounded text-sm bg-white'}>
                 <li>
                     <select className={buttonStyle + (textStyle.fontSize && textStyle.fontSize !== '' ?  'bg-blue-400 text-white' : 'bg-white')}
                             value={textStyle.fontSize ?? ''}
@@ -111,7 +109,7 @@ const SubTextMenu = ({
                     })
                 }
                 <li>
-                    <button className={buttonStyle + (Object.keys(textStyle).length > 0 ? 'bg-blue-400 text-white' : 'bg-white')}
+                    <button className={['min-w-16',buttonStyle + (Object.keys(textStyle).length > 0 ? 'bg-blue-400 text-white' : 'bg-white')].join(' ')}
                             onClick={() => selectFontStyle('', '')}
                     >
                         초기화

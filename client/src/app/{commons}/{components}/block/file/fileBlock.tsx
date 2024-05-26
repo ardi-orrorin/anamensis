@@ -25,6 +25,7 @@ export default function FileBlock (data: FileBlockProps) {
                             code={code}
                             value={value}
                             onUploadFileUrl={onChangeValueHandler!}
+                            onMouseEnterHandler={onMouseEnterHandler!}
                             isImage={Component === FileImage}
                 />
             }

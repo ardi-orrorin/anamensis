@@ -16,7 +16,7 @@ const SubObjectMenu = ({
 
     const {blockService, setBlockService} = useContext(BlockProvider);
 
-    if(!value) return <></>
+    // if(!value) return <></>
 
     return (
         <div className={'absolute bottom-[5%] right-[5%] bg-gray-100 z-10 max-h-80 duration-500 rounded shadow-md'}>
@@ -34,14 +34,18 @@ const SubObjectMenu = ({
                         </button>
                    </li>
                 }
-                <li>
-                    <button className={'w-10 h-10 bg-white hover:bg-blue-50 duration-300'}
-                            title={'원본 보기'}
-                            onClick={() => onClick('detailView', '')}
-                    >
-                      <FontAwesomeIcon icon={faEye} />
-                    </button>
-                </li>
+                {
+                    value
+                    && <li>
+                        <button className={'w-10 h-10 bg-white hover:bg-blue-50 duration-300'}
+                                title={'원본 보기'}
+                                onClick={() => onClick('detailView', '')}
+                        >
+                          <FontAwesomeIcon icon={faEye} />
+                        </button>
+                   </li>
+                }
+
             </ul>
         </div>
     );

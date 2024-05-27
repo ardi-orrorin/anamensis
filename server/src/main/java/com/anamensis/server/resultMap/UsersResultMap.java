@@ -2,7 +2,7 @@ package com.anamensis.server.resultMap;
 
 
 import com.anamensis.server.entity.Role;
-import com.anamensis.server.entity.User;
+import com.anamensis.server.entity.Users;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,11 +14,11 @@ import java.util.List;
 @Setter
 @ToString
 @NoArgsConstructor
-public class UserResultMap {
+public class UsersResultMap {
 
     private long userPk;
 
-    private User user;
+    private Users users;
 
     private List<Role> roles;
 

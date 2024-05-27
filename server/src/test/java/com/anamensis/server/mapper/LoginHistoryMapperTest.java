@@ -1,17 +1,9 @@
 package com.anamensis.server.mapper;
 
-import com.anamensis.server.dto.Page;
-import com.anamensis.server.entity.LoginHistory;
-import com.anamensis.server.entity.User;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class LoginHistoryMapperTest {

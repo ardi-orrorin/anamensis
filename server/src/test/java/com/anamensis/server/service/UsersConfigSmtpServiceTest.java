@@ -8,12 +8,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import reactor.core.publisher.Mono;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
-class UserConfigSmtpServiceTest {
+class UsersConfigSmtpServiceTest {
 
-    Logger log = org.slf4j.LoggerFactory.getLogger(UserConfigSmtpServiceTest.class);
+    Logger log = org.slf4j.LoggerFactory.getLogger(UsersConfigSmtpServiceTest.class);
 
     @SpyBean
     UserConfigSmtpService userConfigSmtpService;

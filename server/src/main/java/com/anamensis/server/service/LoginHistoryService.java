@@ -4,7 +4,7 @@ package com.anamensis.server.service;
 import com.anamensis.server.dto.Device;
 import com.anamensis.server.dto.Page;
 import com.anamensis.server.entity.LoginHistory;
-import com.anamensis.server.entity.User;
+import com.anamensis.server.entity.Users;
 import com.anamensis.server.mapper.LoginHistoryMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,11 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,12 +26,12 @@ public class LoginHistoryService {
         return Mono.just(loginHistoryMapper.count(userId));
     }
 
-    public Flux<LoginHistory> selectAll(User user, Page page) {
-        return Flux.fromIterable(loginHistoryMapper.selectAll(user, page));
+    public Flux<LoginHistory> selectAll(Users users, Page page) {
+        return Flux.fromIterable(loginHistoryMapper.selectAll(users, page));
     }
 
     @Transactional
-    public Mono<Void> save(Device device, User user) {
+    public Mono<Void> save(Device device, Users users) {
         LoginHistory loginHistory = LoginHistory.builder()
                 .ip(device.getIp())
                 .device(device.getDevice())
@@ -42,7 +39,7 @@ public class LoginHistoryService {
                 .createAt(LocalDateTime.now())
                 .build();
 
-        int save = loginHistoryMapper.save(loginHistory, user);
+        int save = loginHistoryMapper.save(loginHistory, users);
         if(save != 1) throw new RuntimeException("LoginHistory save failed");
         return Mono.empty();
     }

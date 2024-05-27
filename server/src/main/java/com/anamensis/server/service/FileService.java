@@ -3,7 +3,7 @@ package com.anamensis.server.service;
 import com.anamensis.server.dto.FileHashRecord;
 import com.anamensis.server.dto.FilePathDto;
 import com.anamensis.server.entity.File;
-import com.anamensis.server.entity.User;
+import com.anamensis.server.entity.Users;
 import com.anamensis.server.mapper.FileMapper;
 import com.anamensis.server.provider.AwsS3Provider;
 import com.anamensis.server.provider.FilePathProvider;
@@ -15,7 +15,6 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FilePartEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.Scannable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
@@ -112,7 +111,7 @@ public class FileService {
     }
 
     @Transactional
-    public Mono<String> saveProfile(User user, FilePart filePart) {
+    public Mono<String> saveProfile(Users users, FilePart filePart) {
 
         int profileWidth = 150;
         int profileHeight = 150;
@@ -121,7 +120,7 @@ public class FileService {
 
         FilePathDto filepath = filePathProvider.changeUserPath(
                 FilePathProvider.RootType.PROFILE,
-                String.valueOf(user.getId()),
+                String.valueOf(users.getId()),
                 profileWidth,profileHeight, ext
         );
 
@@ -130,11 +129,11 @@ public class FileService {
         fileEntity.setFilePath(filepath.path());
         fileEntity.setOrgFileName(filePart.filename());
         fileEntity.setTableCodePk(1);
-        fileEntity.setTableRefPk(user.getId());
+        fileEntity.setTableRefPk(users.getId());
         fileEntity.setCreateAt(LocalDateTime.now());
         fileEntity.setUse(true);
 
-        return Mono.just(fileMapper.findByTableNameAndTableRefPk("user", user.getId()))
+        return Mono.just(fileMapper.findByTableNameAndTableRefPk("user", users.getId()))
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(file -> {
                     if(!file.isEmpty()) { // 이미 파일이 있는 경우 삭제

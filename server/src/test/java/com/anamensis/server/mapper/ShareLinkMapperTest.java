@@ -2,13 +2,11 @@ package com.anamensis.server.mapper;
 
 import com.anamensis.server.dto.Page;
 import com.anamensis.server.entity.ShareLink;
-import com.anamensis.server.entity.User;
+import com.anamensis.server.entity.Users;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class ShareLinkMapperTest {
@@ -20,18 +18,18 @@ class ShareLinkMapperTest {
 
     @Test
     void insert() {
-        User user = new User();
-        user.setId(2);
-        user.setUserId("admin");
-        user.setPwd("admin");
-        user.setName("admin");
-        user.setUse(true);
+        Users users = new Users();
+        users.setId(2);
+        users.setUserId("admin");
+        users.setPwd("admin");
+        users.setName("admin");
+        users.setUse(true);
 
         ShareLink shareLink = ShareLink.builder()
 //                .id(1)
                 .orgLink("orgLink")
                 .shareLink("shareLink")
-                .userPk(user.getId())
+                .userPk(users.getId())
                 .isUse(true)
                 .build();
         shareLinkMapper.insert(shareLink);
@@ -52,30 +50,30 @@ class ShareLinkMapperTest {
 
     @Test
     void selectAll() {
-        User user = new User();
-        user.setId(2);
-        user.setUserId("admin");
-        user.setPwd("admin");
-        user.setName("admin");
-        user.setUse(true);
+        Users users = new Users();
+        users.setId(2);
+        users.setUserId("admin");
+        users.setPwd("admin");
+        users.setName("admin");
+        users.setUse(true);
         Page page = new Page();
         page.setPage(1);
         page.setSize(10);
 //        page.setCriteria("id");
 //        page.setOrder("desc");
 
-        shareLinkMapper.selectAll(user, page).forEach(sl -> log.info("sl : " + sl));
+        shareLinkMapper.selectAll(users, page).forEach(sl -> log.info("sl : " + sl));
     }
 
     @Test
     void selectCount() {
-        User user = new User();
-        user.setId(2);
-        user.setUserId("admin");
-        user.setPwd("admin");
-        user.setName("admin");
-        user.setUse(true);
+        Users users = new Users();
+        users.setId(2);
+        users.setUserId("admin");
+        users.setPwd("admin");
+        users.setName("admin");
+        users.setUse(true);
 
-        log.info("count : " + shareLinkMapper.selectCount(user));
+        log.info("count : " + shareLinkMapper.selectCount(users));
     }
 }

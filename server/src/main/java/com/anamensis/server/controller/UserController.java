@@ -192,8 +192,8 @@ public class UserController {
                 .flatMap(u -> userService.findUserByUserId(u.getUsername()))
                 .flatMap(u -> userService.findUserInfo(u.getUserId()))
                 .publishOn(Schedulers.boundedElastic())
-                .doOnNext(u -> loginHistoryService.save(device, u.getUser()).subscribe())
-                .map(u -> Tuples.of(u, generateToken(u.getUser().getUserId())))
+                .doOnNext(u -> loginHistoryService.save(device, u.getUsers()).subscribe())
+                .map(u -> Tuples.of(u, generateToken(u.getUsers().getUserId())))
                 .map(t -> UserResponse.Login.transToLogin(t.getT1(), t.getT2()));
     }
 
@@ -206,16 +206,16 @@ public class UserController {
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(u -> {
                     EmailVerify emailVerify = new EmailVerify();
-                    emailVerify.setEmail(u.getUser().getEmail());
+                    emailVerify.setEmail(u.getUsers().getEmail());
                     emailVerify.setCode(String.valueOf(user.getCode()));
                     emailVerify.setExpireAt(LocalDateTime.now());
 
                     emailVerifyService.updateIsUse(emailVerify)
                             .subscribe();
                 })
-                .doOnNext(u -> loginHistoryService.save(device, u.getUser()).subscribe())
+                .doOnNext(u -> loginHistoryService.save(device, u.getUsers()).subscribe())
                 .publishOn(Schedulers.boundedElastic())
-                .map(u -> Tuples.of(u, generateToken(u.getUser().getUserId())))
+                .map(u -> Tuples.of(u, generateToken(u.getUsers().getUserId())))
                 .map(t -> UserResponse.Login.transToLogin(t.getT1(), t.getT2()));
     }
 
@@ -253,8 +253,8 @@ public class UserController {
     }
 
 
-    private Mono<Tuple2<User, OTP>> transToTuple2(User user, OTP otp) {
-        return Mono.zip(Mono.just(user), Mono.just(otp));
+    private Mono<Tuple2<Users, OTP>> transToTuple2(Users users, OTP otp) {
+        return Mono.zip(Mono.just(users), Mono.just(otp));
     }
 
     private Token generateToken(String userId) {

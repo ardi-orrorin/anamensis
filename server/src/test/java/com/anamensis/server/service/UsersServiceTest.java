@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @SpringBootTest
-class UserServiceTest {
+class UsersServiceTest {
 
     @SpyBean
     private UserService userService;
@@ -24,7 +24,7 @@ class UserServiceTest {
     private BCryptPasswordEncoder encoder;
 
 
-    private Logger log = org.slf4j.LoggerFactory.getLogger(UserServiceTest.class);
+    private Logger log = org.slf4j.LoggerFactory.getLogger(UsersServiceTest.class);
 
 
     @Test

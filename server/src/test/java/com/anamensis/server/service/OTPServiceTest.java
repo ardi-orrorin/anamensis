@@ -1,7 +1,7 @@
 package com.anamensis.server.service;
 
 import com.anamensis.server.entity.OTP;
-import com.anamensis.server.entity.User;
+import com.anamensis.server.entity.Users;
 import com.anamensis.server.mapper.OTPMapper;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
@@ -13,9 +13,6 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import reactor.util.function.Tuple2;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class OTPServiceTest {
@@ -36,11 +33,11 @@ class OTPServiceTest {
 
     @Test
     void insert() {
-        User user = userService.findUserByUserId("admin").block();
+        Users users = userService.findUserByUserId("admin").block();
 //        otpService.insert(user.getId());
 
 
-        insertTest(user);
+        insertTest(users);
     }
 
     @Test
@@ -57,12 +54,12 @@ class OTPServiceTest {
     }
 
     @Test
-    void insertTest(User user) {
+    void insertTest(Users users) {
 //        long userPk = 2;
         GoogleAuthenticatorKey key = gAuth.createCredentials();
 
         OTP otp = new OTP();
-        otp.setUserPk(user.getId());
+        otp.setUserPk(users.getId());
         otp.setHash(key.getKey());
         otp.setCreateAt(LocalDateTime.now());
 
@@ -73,7 +70,7 @@ class OTPServiceTest {
         }
 
         GoogleAuthenticatorQRGenerator qrGenerator = new GoogleAuthenticatorQRGenerator();
-        String url = qrGenerator.getOtpAuthURL("Anamensis", user.getUserId() , key);
+        String url = qrGenerator.getOtpAuthURL("Anamensis", users.getUserId() , key);
 
         log.info("url: {}", url);
 

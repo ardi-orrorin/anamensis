@@ -4,8 +4,8 @@ import com.anamensis.server.entity.AuthType;
 import com.anamensis.server.dto.Token;
 import com.anamensis.server.entity.Role;
 import com.anamensis.server.entity.RoleType;
-import com.anamensis.server.entity.User;
-import com.anamensis.server.resultMap.UserResultMap;
+import com.anamensis.server.entity.Users;
+import com.anamensis.server.resultMap.UsersResultMap;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,13 +30,13 @@ public class UserResponse {
         private String username;
         private List<RoleType> roles;
 
-        public static Login transToLogin(UserResultMap user, Token token) {
+        public static Login transToLogin(UsersResultMap user, Token token) {
             return Login.builder()
                     .accessToken(token.getAccessToken())
                     .refreshToken(token.getRefreshToken())
                     .accessTokenExpiresIn(token.getAccessTokenExpiresIn())
                     .refreshTokenExpiresIn(token.getRefreshTokenExpiresIn())
-                    .username(user.getUser().getName())
+                    .username(user.getUsers().getName())
                     .roles(user.getRoles().stream().map(Role::getRole).toList())
                     .build();
         }
@@ -63,27 +63,27 @@ public class UserResponse {
         private Boolean sAuth;
         private AuthType sAuthType;
 
-        public static MyPage transToMyPage(UserResultMap user) {
+        public static MyPage transToMyPage(UsersResultMap user) {
             MyPage my = new MyPage();
-            my.setUserId(user.getUser().getUserId());
-            my.setEmail(user.getUser().getEmail());
-            my.setName(user.getUser().getName());
-            my.setPhone(user.getUser().getPhone());
-            my.setPoint(user.getUser().getPoint());
-            my.setSAuth(user.getUser().getSAuth());
-            my.setSAuthType(user.getUser().getSAuthType());
+            my.setUserId(user.getUsers().getUserId());
+            my.setEmail(user.getUsers().getEmail());
+            my.setName(user.getUsers().getName());
+            my.setPhone(user.getUsers().getPhone());
+            my.setPoint(user.getUsers().getPoint());
+            my.setSAuth(user.getUsers().getSAuth());
+            my.setSAuthType(user.getUsers().getSAuthType());
             return my;
         }
 
-        public static MyPage transToMyPage(User user) {
+        public static MyPage transToMyPage(Users users) {
             MyPage my = new MyPage();
-            my.setUserId(user.getUserId());
-            my.setEmail(user.getEmail());
-            my.setName(user.getName());
-            my.setPhone(user.getPhone());
-            my.setPoint(user.getPoint());
-            my.setSAuth(user.getSAuth());
-            my.setSAuthType(user.getSAuthType());
+            my.setUserId(users.getUserId());
+            my.setEmail(users.getEmail());
+            my.setName(users.getName());
+            my.setPhone(users.getPhone());
+            my.setPoint(users.getPoint());
+            my.setSAuth(users.getSAuth());
+            my.setSAuthType(users.getSAuthType());
             return my;
         }
     }

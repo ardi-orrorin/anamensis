@@ -4,8 +4,8 @@ package com.anamensis.server.mapper;
 import com.anamensis.server.entity.AuthType;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.entity.Role;
-import com.anamensis.server.entity.User;
-import com.anamensis.server.resultMap.UserResultMap;
+import com.anamensis.server.entity.Users;
+import com.anamensis.server.resultMap.UsersResultMap;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Mapper
-public interface UserMapper {
+public interface UsersMapper {
 
-    List<User> findAllUsers();
+    List<Users> findAllUsers();
 
-    Optional<User> findUserByUserId(String userId);
+    Optional<Users> findUserByUserId(String userId);
 
-    Optional<UserResultMap> findUserInfo(String userId);
+    Optional<UsersResultMap> findUserInfo(String userId);
 
     int editAuth(
             @Param("id") long id,
@@ -33,11 +33,11 @@ public interface UserMapper {
 
     boolean existsUser(UserRequest.existsUser existsUser);
 
-    int save(User user);
+    int save(Users users);
 
     int saveRole(Role role);
 
     int deleteRole(Role role);
 
-    int update(User user);
+    int update(Users users);
 }

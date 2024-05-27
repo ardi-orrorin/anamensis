@@ -7,7 +7,7 @@
     <select id="selectByUserId" resultType="OTP">
         SELECT a.*
           FROM otp a
-          JOIN user b
+          JOIN users b
             ON a.user_pk = b.id
          WHERE b.user_id = #{userId}
            AND a.is_use  = 1

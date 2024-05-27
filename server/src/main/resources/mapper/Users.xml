@@ -3,26 +3,26 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.anamensis.server.mapper.UserMapper">
+<mapper namespace="com.anamensis.server.mapper.UsersMapper">
     <sql id="tbl_user">
         SELECT *
-          FROM user
+          FROM users
     </sql>
-    <select id="findAllUsers" resultType="User">
+    <select id="findAllUsers" resultType="Users">
         <include refid="tbl_user"/>
     </select>
-    <select id="findUserByUserId" resultType="User">
+    <select id="findUserByUserId" resultType="Users">
         <include refid="tbl_user"/>
         WHERE user_id = #{userId}
     </select>
-    <select id="findUserByUserIdAndPwd" resultType="User">
+    <select id="findUserByUserIdAndPwd" resultType="Users">
         <include refid="tbl_user"/>
         WHERE user_id = #{userId}
           AND pwd     = #{pwd}
     </select>
-    <select id="findUserInfo" resultMap="userResultMap">
+    <select id="findUserInfo" resultMap="usersResultMap">
         SELECT *
-          FROM user a
+          FROM users a
           JOIN role b
             ON a.id      = b.user_pk
          WHERE a.user_id = #{userId}
@@ -30,7 +30,7 @@
     <select id="existsUser" resultType="boolean">
         SELECT EXISTS(
                SELECT *
-                 FROM user
+                 FROM users
                 WHERE 1 = 1
                  <choose>
                     <when test="type != null and type == 'id' and value != null and value != ''">
@@ -45,34 +45,34 @@
                  </choose>
              )
     </select>
-    <insert id="save" parameterType="User">
+    <insert id="save" parameterType="Users">
         <selectKey keyProperty="id" resultType="int" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
-        INSERT INTO user (user_id, pwd, name,
+        INSERT INTO users (user_id, pwd, name,
                           email, phone, create_at)
-         VALUE (#{userId}, #{pwd}, #{name},
+        VALUES (#{userId}, #{pwd}, #{name},
                 #{email}, #{phone}, #{createAt})
     </insert>
     <insert id="saveRole" parameterType="Role">
         INSERT INTO role (user_pk, role)
-         VALUE (#{userPk}, #{role})
+        VALUES (#{userPk}, #{role})
     </insert>
     <update id="editAuth" parameterType="map">
-        UPDATE user
-           SET s_auth = #{isAuth},
+        UPDATE users
+           SET s_auth      = #{isAuth},
                s_auth_type = #{authType}
-         WHERE id     = #{id}
+         WHERE id          = #{id}
     </update>
 
     <update id="updatePoint" parameterType="Map">
-        UPDATE user
+        UPDATE users
            SET point = point + #{point}
          WHERE id = #{id}
     </update>
 
-    <update id="update" parameterType="User">
-        UPDATE user
+    <update id="update" parameterType="Users">
+        UPDATE users
            SET name  = #{name},
                email = #{email},
                phone = #{phone}
@@ -86,13 +86,13 @@
            AND role    = #{role}
     </delete>
     
-    <resultMap id="userResultMap" type="UserResultMap" autoMapping="true">
+    <resultMap id="usersResultMap" type="UsersResultMap" autoMapping="true">
         <id property="userPk" column="id"/>
-        <association property="user" resultMap="UserEntity" autoMapping="true" />
+        <association property="users" resultMap="UserEntity" autoMapping="true" />
         <collection property="roles" resultMap="RoleEntity" />
     </resultMap>
 
-    <resultMap id="UserEntity" type="User" autoMapping="true">
+    <resultMap id="UserEntity" type="Users" autoMapping="true">
         <result property="sAuthType" column="s_auth_type" typeHandler="AuthTypeHandler"/>
     </resultMap>
     <resultMap id="RoleEntity" type="Role" autoMapping="true">

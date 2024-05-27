@@ -2,19 +2,14 @@ package com.anamensis.server.mapper;
 
 import com.anamensis.server.dto.Page;
 import com.anamensis.server.entity.Board;
-import com.anamensis.server.resultMap.BoardResultMap;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.RepeatedTest;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.event.annotation.BeforeTestMethod;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -153,9 +148,9 @@ class BoardMapperTest {
             assertNotNull(test.getCategoryPk());
 
 
-            assertNull(board.getUser().getName());
-            assertNull(board.getUser().getEmail());
-            assertNull(board.getUser().getPwd());
+            assertNull(board.getUsers().getName());
+            assertNull(board.getUsers().getEmail());
+            assertNull(board.getUsers().getPwd());
             assertNull(board.getFile().getFileName());
             assertNull(board.getFile().getFilePath());
         });

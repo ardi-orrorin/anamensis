@@ -1,11 +1,10 @@
 package com.anamensis.server.dto.request;
 
-import com.anamensis.server.entity.User;
+import com.anamensis.server.entity.Users;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
-import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 
 public class UserRequest {
@@ -43,17 +42,17 @@ public class UserRequest {
         @Pattern(regexp = "^01(?:0|1|[6-9])-(?:\\d{3}|\\d{4})-\\d{4}$", message = "Invalid phone number")
         private String phone;
 
-        public static User transToUser(Register reg) {
-            User user = new User();
-            user.setUserId(reg.getId());
-            user.setPwd(reg.getPwd());
-            user.setName(reg.getName());
-            user.setEmail(reg.getEmail());
-            user.setPhone(reg.getPhone());
-            user.setCreateAt(LocalDateTime.now());
-            user.setUpdateAt(LocalDateTime.now());
-            user.setUse(true);
-            return user;
+        public static Users transToUser(Register reg) {
+            Users users = new Users();
+            users.setUserId(reg.getId());
+            users.setPwd(reg.getPwd());
+            users.setName(reg.getName());
+            users.setEmail(reg.getEmail());
+            users.setPhone(reg.getPhone());
+            users.setCreateAt(LocalDateTime.now());
+            users.setUpdateAt(LocalDateTime.now());
+            users.setUse(true);
+            return users;
         }
     }
 

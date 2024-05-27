@@ -10,18 +10,16 @@ import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.util.MultiValueMap;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("local")
-class UserControllerTest {
+class UsersControllerTest {
 
-    private Logger log = org.slf4j.LoggerFactory.getLogger(UserControllerTest.class);
+    private Logger log = org.slf4j.LoggerFactory.getLogger(UsersControllerTest.class);
 
 
     @LocalServerPort

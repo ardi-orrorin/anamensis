@@ -53,7 +53,7 @@ export default function Page() {
                       </button>
                 }
             </div>
-            <div className={'flex gap-4 flex-wrap duration-300'}>
+            <div className={'h-full flex gap-4 flex-wrap duration-300'}>
                 {
                     windowList.map((e, i ) => (
                         <UserInfoWindow key={`window-${i}`}

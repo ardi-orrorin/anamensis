@@ -1,3 +1,7 @@
+'use client';
+
+
+
 import React, {MutableRefObject, useContext, useState} from "react";
 import {faBold, faItalic, faTextSlash} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -10,13 +14,10 @@ import MenuFontsizeItem from "@/app/board/{components}/MenuFontsizeItem";
 export type ToggleEnum = 'fontSize' | 'color' | 'backgroundColor' | 'fontStyle' | '';
 
 const SubTextMenu = ({
-    isView,
     blockRef,
 }: {
-    isView    : boolean;
     blockRef  : MutableRefObject<HTMLElement[] | null[]>;
 }) => {
-    if(isView) return <></>
     const [toggle, setToggle] = useState<ToggleEnum>('');
     const {blockService, setBlockService} = useContext(BlockProvider);
     const {board, setBoard} = useContext(BoardProvider);
@@ -51,6 +52,7 @@ const SubTextMenu = ({
 
     const onClickColorHandler = (name: ToggleEnum, value: string) => {
         onClickSubTextMenu(name, value);
+
         setToggle(name ? '' : name)
         setTimeout(() => {
             blockRef.current[seq]?.focus();
@@ -67,7 +69,7 @@ const SubTextMenu = ({
                         'min-w-20 tracking-wider',
                         buttonStyle + (textStyle.fontSize && textStyle.fontStyle !== '' ?  'bg-blue-400 text-white' : 'bg-white'),
                     ].join(' ')}
-                            onClick={() => setToggle('fontSize')}
+                            onClick={() => toggle === 'fontSize' ? setToggle('') : setToggle('fontSize')}
                     >
                         글자크기
                     </button>
@@ -81,7 +83,7 @@ const SubTextMenu = ({
                                 'min-w-20 tracking-wider',
                                 buttonStyle + (textStyle.color && textStyle.color !== '' ?  'bg-blue-400 text-white' : 'bg-white'),
                             ].join(' ')}
-                            onClick={() => setToggle('color')}
+                            onClick={() => toggle === 'color' ? setToggle('') : setToggle('color')}
                     >
                         글자색
                     </button>
@@ -96,7 +98,7 @@ const SubTextMenu = ({
                             'min-w-20 tracking-wider',
                             buttonStyle + (textStyle.backgroundColor && textStyle.backgroundColor !== '' ?  'bg-blue-400 text-white' : 'bg-white'),
                         ].join(' ')}
-                            onClick={() => setToggle('backgroundColor')}
+                            onClick={() => toggle === 'backgroundColor' ? setToggle('') :  setToggle('backgroundColor')}
                     >
                         배경색
                     </button>

@@ -3,6 +3,7 @@
 import React, {CSSProperties, useMemo} from "react";
 import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
 import axios from "axios";
+import localFont from "next/dist/compiled/@next/font/dist/local";
 
 type OGType = {
     title       : string;
@@ -12,22 +13,13 @@ type OGType = {
 }
 
 const LinkBlock = (props: BlockProps) => {
-    const {seq, value,
+    const {
+        seq, blockRef,
+        value, extraValue,
         onChangeValueHandler, onKeyUpHandler,
-        onKeyDownHandler, onMouseEnterHandler
+        onKeyDownHandler, onMouseEnterHandler,
+        onFocusHandler, onChangeExtraValueHandler,
     } = props;
-
-    const link = useMemo(() => {
-        try {
-            if(value === '') return null;
-            const ogMeta = JSON.parse(value as string);
-            if(!ogMeta?.title) return null;
-            return ogMeta;
-        } catch (e) {
-            return null;
-        }
-
-    },[value]);
 
     const customInputStyle: CSSProperties = {
         outline         : 'none',
@@ -56,7 +48,8 @@ const LinkBlock = (props: BlockProps) => {
         const urlRegex = new RegExp(/(http(s)?:\/\/)([a-z0-9\w]+\.*)+[a-z0-9]{2,4}/gi);
 
         try {
-            if(!urlRegex.test(value)) return ;
+            if(!urlRegex.test(value)) return alert('링크 형식이 올바르지 않습니다.');
+
             const res = await axios.get('/api/link/og', {
                 params: {
                     url: value
@@ -71,12 +64,11 @@ const LinkBlock = (props: BlockProps) => {
             const data = {
                 title: ogTitle || value.split('/')[2],
                 description: ogDescription || '',
-                image: ogImage || 'http://' + process.env.NEXT_PUBLIC_DOMAIN + '/noimage.jpg',
-                url: value || '/',
+                image: ogImage || '',
             };
 
-            onChangeValueHandler
-            && onChangeValueHandler(JSON.stringify(data));
+            onChangeExtraValueHandler
+            && onChangeExtraValueHandler(data);
 
             onKeyUpHandler
             && onKeyUpHandler(e);
@@ -96,27 +88,30 @@ const LinkBlock = (props: BlockProps) => {
              className={'p-2 w-full'}
         >
             {
-                !link
-                && !link?.title
+                !extraValue || !(extraValue as OGType).title
                 ? <input style={customInputStyle}
-                         value={value as string}
+                         value={value}
+                         placeholder={'링크를 입력해주세요(https, http 포함). https://www.example.com'}
                          onChange={onChangeHandler}
                          onKeyUp={onKeyupChangeHandler}
                          onKeyDown={onKeyDownHandler}
-                         placeholder={'링크를 입력해주세요(https, http 포함). https://www.example.com'}
+                         onFocus={onFocusHandler}
+                         ref={el => blockRef!.current[seq] = el}
                 />
                 : <a style={linkPreviewStyle}
-                     href={(link as OGType).url}
+                     href={value}
                      target={'_blank'}
                      onMouseEnter={onMouseEnterHandler}
                 >
                     <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'space-between', padding:'0.6rem'}}>
-                        <p style={{fontSize: '1.3rem'}}>{(link as OGType).title}</p>
+                        <p style={{fontSize: '1.3rem'}}
+                        >{(extraValue as OGType).title || value.split('/')[2]}
+                        </p>
                         <p style={{fontSize: '0.7rem', wordBreak: 'break-all', color: 'gray'}}
-                        >{(link as OGType).description}</p>
+                        >{(extraValue as OGType).description || '내용 없음'}</p>
                     </div>
                     <img style={{minWidth: '200px', width: '200px', height:'80px', borderRadius: '0.2rem', objectFit: 'cover'}}
-                         src={(link as OGType).image} alt=""
+                         src={(extraValue as OGType).image || 'http://' + process.env.NEXT_PUBLIC_DOMAIN + '/noimage.jpg'} alt=""
                     />
                 </a>
             }

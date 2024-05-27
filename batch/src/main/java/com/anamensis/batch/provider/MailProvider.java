@@ -4,10 +4,10 @@ import com.anamensis.batch.entity.UserConfigSmtp;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import jakarta.mail.MessagingException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -30,6 +30,7 @@ public class MailProvider {
         this.mimeMailMessage = builder.mimeMailMessage;
     }
 
+    @Slf4j
     public static class Builder {
         JavaMailSenderImpl mailSenderImpl = new JavaMailSenderImpl();
         MimeMessageHelper mimeMailMessage = new MimeMessageHelper(mailSenderImpl.createMimeMessage());
@@ -44,7 +45,6 @@ public class MailProvider {
             Properties properties = new Properties();
             properties.put("mail.smtp.auth", "true");
             properties.put("mail.smtp.starttls.enable", "true");
-
 
             if (userConfigSmtp.getUseSSL()) {
                 properties.put("mail.smtp.ssl.trust", "*");
@@ -63,6 +63,7 @@ public class MailProvider {
                     body = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
                 } else {
                     body = content;
+
                 }
 
                 this.mimeMailMessage.setTo(userConfigSmtp.getFromEmail());

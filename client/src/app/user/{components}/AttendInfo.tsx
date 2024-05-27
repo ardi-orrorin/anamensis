@@ -48,7 +48,7 @@ export default function AttendInfo() {
     }
 
     return (
-        <div className={'w-full flex flex-col gap-5'}>
+        <div className={'w-full h-full flex flex-col gap-5 justify-center items-start'}>
             <div>
                 <label>아이디 : </label>
                 <span>{user.userId}</span>
@@ -69,7 +69,7 @@ export default function AttendInfo() {
                 <label>연속 출석 횟수 : </label>
                 <span>{user.days}회</span>
             </div>
-            <div>
+            <div className={'w-full'}>
                 <button className={'w-full bg-blue-300 text-white p-2 rounded hover:bg-blue-700 duration-500'}
                         onClick={attend}
                         disabled={loading}

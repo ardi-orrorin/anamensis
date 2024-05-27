@@ -2,29 +2,22 @@
 
 import React, {CSSProperties, useMemo} from "react";
 import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
+import Block from "@/app/board/{components}/Block";
 
 type TodoType = {
     check : boolean;
-    value   : string;
 }
 const CheckBlock = (props: BlockProps) => {
     const {
-        seq,
-        value, isView,
-        onChangeValueHandler,
-        onKeyUpHandler, onKeyDownHandler
+        seq, blockRef,
+        value, extraValue,
+        isView,
+        onChangeValueHandler, onChangeExtraValueHandler,
+        onKeyUpHandler, onKeyDownHandler,
+        onFocusHandler
     } = props;
 
-    const todo = useMemo(() => {
-        try {
-            if(value === '') return null;
-            const todo: TodoType = JSON.parse(value as string);
-            if(!todo?.check && !todo?.value) return null;
-            return todo;
-        } catch (e) {
-            return null;
-        }
-    },[value]);
+    const checked = useMemo(()=>(extraValue as TodoType)?.check || false,[extraValue])
 
     const containerStyle: CSSProperties = {
         display         : 'flex',
@@ -32,8 +25,9 @@ const CheckBlock = (props: BlockProps) => {
         border          : 'none',
         outline         : 'none',
         wordBreak       : 'break-all',
-        padding         : '0.3rem',
+        padding         : '0.1rem 0.5rem',
         backgroundColor : isView ? '' : 'rgba(230,230,230,0.2)',
+        gap             : '0.5rem',
     }
 
     const commonStyle: CSSProperties = {
@@ -53,7 +47,7 @@ const CheckBlock = (props: BlockProps) => {
         height          : 'auto',
         fontSize        : '0.8rem',
         width           : '2.3rem',
-        color           : todo?.check ? 'blue' : 'red',
+        color           : checked ? 'blue' : 'red',
     }
 
     const pStyle: CSSProperties = {
@@ -62,10 +56,10 @@ const CheckBlock = (props: BlockProps) => {
         padding         : '0 0.5rem',
         border          : '1px black',
         width           : '100%',
-        color           : isView ? todo?.check ? 'blue' : 'red' : 'black',
+        color           : isView ? checked ? 'blue' : 'red' : 'black',
         wordBreak       : 'break-all',
         letterSpacing   : '0.03rem',
-        textDecoration  : todo?.check ? 'line-through' : 'none',
+        textDecoration  : checked ? 'line-through' : 'none',
     };
 
     const inputStyle: CSSProperties = {
@@ -75,23 +69,18 @@ const CheckBlock = (props: BlockProps) => {
         border          : 'none',
         width           : '100%',
         letterSpacing   : '0.03rem',
-        backgroundColor : 'rgba(230,230,230,0.2)',
-        textDecoration  : todo?.check ? 'line-through' : 'none',
+        textDecoration  : checked ? 'line-through' : 'none',
+        backgroundColor : 'rgba(230,230,230,0)',
     };
 
     const onCheckChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = {...todo, check: e.target.checked};
-        if (onChangeValueHandler) {
-            onChangeValueHandler(JSON.stringify(value));
-        }
+        const data:TodoType  = {check : e.target.checked};
+        onChangeExtraValueHandler && onChangeExtraValueHandler(data);
 
     }
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = {...todo, value: e.target.value};
-        if (onChangeValueHandler) {
-            onChangeValueHandler(JSON.stringify(value));
-        }
+        onChangeValueHandler && onChangeValueHandler(e.target.value);
     }
 
     return (
@@ -102,24 +91,28 @@ const CheckBlock = (props: BlockProps) => {
                           type={'checkbox'}
                           name={'check'}
                           value={''}
-                          checked={todo?.check as TodoType['check'] || false}
+                          checked={checked || false}
                           onChange={onCheckChangeHandler}
+
                 />
                 : <p style={{...commonStyle, ...checkBoxViewStyle}}>
-                    {todo?.check ? '완료' : '진행중'}
+                    {checked ? '완료' : '진행중'}
                 </p>
             }
 
             {
                 isView
                 ? <p style={{...commonStyle, ...pStyle}}>
-                    {todo?.value || ''}
+                    {value || ''}
                 </p>
                 : <input style={{...commonStyle, ...inputStyle}}
-                       value={todo?.value as TodoType['value'] || ''}
+                       value={value || ''}
                        onChange={onChangeHandler}
                        onKeyUp={onKeyUpHandler}
                        onKeyDown={onKeyDownHandler}
+                       onFocus={onFocusHandler}
+                       ref={e=> blockRef!.current[seq] = e}
+                       aria-roledescription={'todo'}
                 />
             }
 

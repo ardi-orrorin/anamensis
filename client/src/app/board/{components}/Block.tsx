@@ -7,9 +7,9 @@ import {blockTypeList} from "@/app/{commons}/{components}/block/list";
 import {BlockProps, HtmlElements, MouseEnterHTMLElements} from "@/app/{commons}/{components}/block/type/Types";
 import React, {useContext, useMemo, useState} from "react";
 import MenuItem from "@/app/board/{components}/MenuItem";
-import BlockProvider, {BlockMenu} from "@/app/board/{services}/BlockProvider";
+import BlockProvider, {BlockMenu, BlockService} from "@/app/board/{services}/BlockProvider";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
-import {BlockI} from "@/app/board/{services}/types";
+import {BlockI, ExtraValueI} from "@/app/board/{services}/types";
 import SubObjectMenu from "@/app/board/{components}/SubObjectMenu";
 
 
@@ -20,13 +20,11 @@ type CopyProps = {
 
 export default function Block(props: BlockProps) {
     const {
-        seq,
-        code,
-        textStyle,
+        seq, code,
+        value, extraValue,
+        textStyle, blockRef,
         onClickAddHandler,
         onClickDeleteHandler,
-        value,
-        blockRef,
     } = props;
 
     const {board, setBoard} = useContext(BoardProvider);
@@ -38,6 +36,10 @@ export default function Block(props: BlockProps) {
     },[window.location.hash]);
 
     const onFocusHandler = (e: React.FocusEvent<HtmlElements>) => {
+        if(e.currentTarget.ariaRoleDescription !== 'text') {
+            return setBlockService({} as BlockService);
+        }
+
         const rect = e.target.getBoundingClientRect();
         const blockMenu: BlockMenu = 'openTextMenu';
         const positionX = rect.x + 550 > window.innerWidth ? 50 : rect.x + 120;
@@ -54,6 +56,7 @@ export default function Block(props: BlockProps) {
     }
 
     const onMouseEnterHandler = (e: React.MouseEvent<MouseEnterHTMLElements> ) => {
+
         const blockMenu: BlockMenu = 'openObjectMenu';
         const block: BlockI = {seq, code, value, textStyle};
         setBlockService({
@@ -61,10 +64,6 @@ export default function Block(props: BlockProps) {
             block,
             blockMenu: blockMenu,
         })
-    }
-
-    const onMouseLeaveHandler = (e: React.MouseEvent<HTMLImageElement | HTMLInputElement> ) => {
-        // setBlockService({blockMenu: '', seq: 0, screenX: 0, screenY: 0});
     }
 
     const openMenuToggle  = () => {
@@ -86,7 +85,8 @@ export default function Block(props: BlockProps) {
         const newList = board.data?.content?.list.map((item, index) => {
             if (item.seq === seq) {
                 if(item.code.slice(0, 3) !== code.slice(0, 3)) {
-                    item.value = '';
+                    item.extraValue = {};
+                    item.textStyle = {};
                 }
                 item.code = code;
             }
@@ -141,6 +141,17 @@ export default function Block(props: BlockProps) {
         const newList = board.data?.content?.list.map((item, index) => {
             if (item.seq === seq) {
                 item.value = value;
+            }
+            return item;
+        });
+
+        setBoard({...board, data: {...board.data, content: {list: newList}}});
+    }
+
+    const onChangeExtraValueHandler = (value: ExtraValueI) => {
+        const newList = board.data?.content?.list.map((item, index) => {
+            if (item.seq === seq) {
+                item.extraValue = value;
             }
             return item;
         });
@@ -215,9 +226,9 @@ export default function Block(props: BlockProps) {
                             <Component key={'block' + seq}
                                        isView={board.isView}
                                        onMouseEnterHandler={onMouseEnterHandler}
-                                       onMouseLeaveHandler={onMouseLeaveHandler}
                                        onChangeValueHandler={onChangeValueHandler}
                                        onFocusHandler={onFocusHandler}
+                                       onChangeExtraValueHandler={onChangeExtraValueHandler}
                                        {...props}
                             />
                         </div>

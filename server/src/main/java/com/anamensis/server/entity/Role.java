@@ -8,10 +8,9 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor
 public class Role {
 
     private RoleType role;
 
-    private long userPk;
+    private long memberPk;
 }

@@ -5,9 +5,9 @@ import com.anamensis.server.entity.*;
 import com.anamensis.server.dto.UserDto;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.exception.DuplicateUserException;
+import com.anamensis.server.mapper.MemberMapper;
 import com.anamensis.server.mapper.PointCodeMapper;
-import com.anamensis.server.mapper.UsersMapper;
-import com.anamensis.server.resultMap.UsersResultMap;
+import com.anamensis.server.resultMap.MemberResultMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,18 +31,18 @@ public class UserService implements ReactiveUserDetailsService {
     @Value("${db.setting.user.attendance_point_code_prefix}")
     private String ATTENDANCE_POINT_CODE_PREFIX;
 
-    private final UsersMapper usersMapper;
+    private final MemberMapper memberMapper;
     private final PointCodeMapper pointCodeMapper;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public Mono<Users> findUserByUserId(String userId) {
-        return Mono.justOrEmpty(usersMapper.findUserByUserId(userId))
+    public Mono<Member> findUserByUserId(String userId) {
+        return Mono.justOrEmpty(memberMapper.findMemberByUserId(userId))
                 .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
     }
 
-    public Mono<Users> findUserByUserId(String userId, String pwd) {
-        return Mono.justOrEmpty(usersMapper.findUserByUserId(userId))
+    public Mono<Member> findUserByUserId(String userId, String pwd) {
+        return Mono.justOrEmpty(memberMapper.findMemberByUserId(userId))
                 .switchIfEmpty(Mono.error(new RuntimeException("User not found")))
                 .onErrorMap(e -> new RuntimeException("User not found"))
                 .doOnNext(user -> {
@@ -52,38 +52,38 @@ public class UserService implements ReactiveUserDetailsService {
                 });
     }
 
-    public Mono<UsersResultMap> findUserInfo(String userId) {
+    public Mono<MemberResultMap> findUserInfo(String userId) {
         log.info("findUserInfo: {}", userId);
-        return Mono.justOrEmpty(usersMapper.findUserInfo(userId))
+        return Mono.justOrEmpty(memberMapper.findMemberInfo(userId))
                 .onErrorMap(e -> new RuntimeException("User not found"));
     }
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
-        return Mono.justOrEmpty(usersMapper.findUserInfo(username))
+        return Mono.justOrEmpty(memberMapper.findMemberInfo(username))
                 .map(user -> new UserDto(
-                        user.getUsers().getUserId(),
-                        bCryptPasswordEncoder.encode(user.getUsers().getPwd()),
+                        user.getMember().getUserId(),
+                        bCryptPasswordEncoder.encode(user.getMember().getPwd()),
                         user.getRoles().stream().map(Role::getRole).toList()
                 ));
     }
 
     public Mono<Void> updatePoint(long userPk, int point) {
-        usersMapper.updatePoint(userPk, point);
+        memberMapper.updatePoint(userPk, point);
         return Mono.empty();
     }
 
-    public Mono<Boolean> existsUser(UserRequest.existsUser existsUser) {
-        return Mono.just(usersMapper.existsUser(existsUser));
+    public Mono<Boolean> existsUser(UserRequest.existsMember existsMember) {
+        return Mono.just(memberMapper.existsMember(existsMember));
     }
 
     public Mono<Boolean> editAuth(long id, boolean isAuth, AuthType authType) {
-        return Mono.just(usersMapper.editAuth(id, isAuth, authType))
+        return Mono.just(memberMapper.editAuth(id, isAuth, authType))
                 .map(i -> i > 0);
     }
 
     @Transactional
-    public Mono<Users> saveUser(Mono<UserRequest.Register> user) {
+    public Mono<Member> saveUser(Mono<UserRequest.Register> user) {
         return user.map(UserRequest.Register::transToUser)
                    .doOnNext(u -> u.setPwd(bCryptPasswordEncoder.encode(u.getPwd())))
                    .doOnNext(u -> u.setCreateAt(LocalDateTime.now()))
@@ -92,10 +92,10 @@ public class UserService implements ReactiveUserDetailsService {
                                .orElseThrow(() -> new RuntimeException("PointCode not found"));
                       u.setPoint(pointCode.getValue());
                    })
-                   .doOnNext(usersMapper::save)
+                   .doOnNext(memberMapper::save)
                    .publishOn(Schedulers.boundedElastic())
                    .doOnNext(u -> generateRole(u, RoleType.USER)
-                           .doOnNext(usersMapper::saveRole)
+                           .doOnNext(memberMapper::saveRole)
                            .subscribe()
                    )
                    .onErrorMap(e -> new DuplicateUserException(e.getMessage(), HttpStatus.BAD_REQUEST));
@@ -106,14 +106,14 @@ public class UserService implements ReactiveUserDetailsService {
         return tuple.mapT1(ud -> findUserByUserId(ud.getUsername()))
                 .mapT1(user -> user.flatMap(u -> generateRole(u, tuple.getT2()))
                 )
-                .mapT1(user -> user.map(usersMapper::saveRole))
+                .mapT1(user -> user.map(memberMapper::saveRole))
                 .getT1();
 
     }
 
     @Transactional
-    public Mono<Boolean> updateUser(Users users) {
-        return Mono.just(usersMapper.update(users))
+    public Mono<Boolean> updateUser(Member users) {
+        return Mono.just(memberMapper.update(users))
                 .map(i -> i == 1);
     }
 
@@ -121,14 +121,14 @@ public class UserService implements ReactiveUserDetailsService {
     public Mono<Integer> deleteRole(Tuple2<UserDetails, RoleType> tuple) {
         return tuple.mapT1(ud -> findUserByUserId(ud.getUsername()))
                 .mapT1(user -> user.flatMap(u -> generateRole(u, tuple.getT2())))
-                .mapT1(user -> user.map(usersMapper::deleteRole))
+                .mapT1(user -> user.map(memberMapper::deleteRole))
                 .getT1();
     }
 
 
-    private Mono<Role> generateRole(Users users, RoleType roleType) {
+    private Mono<Role> generateRole(Member users, RoleType roleType) {
         Role role = new Role();
-        role.setUserPk(users.getId());
+        role.setMemberPk(users.getId());
         role.setRole(roleType);
         return Mono.just(role);
     }

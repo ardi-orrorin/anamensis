@@ -3,7 +3,7 @@ package com.anamensis.server.service;
 import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.request.ShareLinkRequest;
 import com.anamensis.server.entity.ShareLink;
-import com.anamensis.server.entity.Users;
+import com.anamensis.server.entity.Member;
 import com.anamensis.server.mapper.ShareLinkMapper;
 import com.anamensis.server.provider.ShareLinkProvider;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class ShareLinkService {
 
     private final ShareLinkProvider shareLinkProvider;
 
-    public Tuple2<List<ShareLink>, Page>  selectAll(Tuple2<Users, Page> t) {
+    public Tuple2<List<ShareLink>, Page>  selectAll(Tuple2<Member, Page> t) {
         return t.mapT1(u -> shareLinkMapper.selectAll(u, t.getT2()))
                 .mapT2(p -> {
                     p.setTotal(shareLinkMapper.selectCount(t.getT1()));
@@ -31,7 +31,7 @@ public class ShareLinkService {
                 });
     }
 
-    public ShareLink insert(String link, Users users) {
+    public ShareLink insert(String link, Member users) {
         String shareLinkStr;
 
         do {
@@ -58,7 +58,7 @@ public class ShareLinkService {
     }
 
     @Transactional
-    public ShareLink updateUse(Tuple2<ShareLinkRequest.Use, Users> tuple) {
+    public ShareLink updateUse(Tuple2<ShareLinkRequest.Use, Member> tuple) {
         ShareLink sl = shareLinkMapper.selectById(tuple.getT1().getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 링크가 존재하지 않습니다."));
         sl.setUse(tuple.getT1().isUse());

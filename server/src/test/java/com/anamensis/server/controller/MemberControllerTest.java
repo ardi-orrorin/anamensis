@@ -17,9 +17,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("local")
-class UsersControllerTest {
+class MemberControllerTest {
 
-    private Logger log = org.slf4j.LoggerFactory.getLogger(UsersControllerTest.class);
+    private Logger log = org.slf4j.LoggerFactory.getLogger(MemberControllerTest.class);
 
 
     @LocalServerPort
@@ -162,15 +162,15 @@ class UsersControllerTest {
 
     @Test
     void exists() {
-        UserRequest.existsUser existsUser = new UserRequest.existsUser();
-        existsUser.setType("id");
-        existsUser.setValue("admin");
+        UserRequest.existsMember existsMember = new UserRequest.existsMember();
+        existsMember.setType("id");
+        existsMember.setValue("admin");
 
         EntityExchangeResult<String> result =
         webTestClient.post()
                 .uri("/exists")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(existsUser)
+                .bodyValue(existsMember)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(String.class)

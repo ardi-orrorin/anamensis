@@ -3,9 +3,9 @@ package com.anamensis.server.mapper;
 
 import com.anamensis.server.entity.AuthType;
 import com.anamensis.server.dto.request.UserRequest;
+import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.Role;
-import com.anamensis.server.entity.Users;
-import com.anamensis.server.resultMap.UsersResultMap;
+import com.anamensis.server.resultMap.MemberResultMap;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Mapper
-public interface UsersMapper {
+public interface MemberMapper {
 
-    List<Users> findAllUsers();
+    List<Member> findAllMember();
 
-    Optional<Users> findUserByUserId(String userId);
+    Optional<Member> findMemberByUserId(String userId);
 
-    Optional<UsersResultMap> findUserInfo(String userId);
+    Optional<MemberResultMap> findMemberInfo(String userId);
 
     int editAuth(
             @Param("id") long id,
@@ -31,13 +31,13 @@ public interface UsersMapper {
             @Param("point") int point
     );
 
-    boolean existsUser(UserRequest.existsUser existsUser);
+    boolean existsMember(UserRequest.existsMember existsMember);
 
-    int save(Users users);
+    int save(Member member);
 
     int saveRole(Role role);
 
     int deleteRole(Role role);
 
-    int update(Users users);
+    int update(Member member);
 }

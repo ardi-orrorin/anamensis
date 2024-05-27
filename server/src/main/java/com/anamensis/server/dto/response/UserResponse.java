@@ -2,10 +2,10 @@ package com.anamensis.server.dto.response;
 
 import com.anamensis.server.entity.AuthType;
 import com.anamensis.server.dto.Token;
+import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.Role;
 import com.anamensis.server.entity.RoleType;
-import com.anamensis.server.entity.Users;
-import com.anamensis.server.resultMap.UsersResultMap;
+import com.anamensis.server.resultMap.MemberResultMap;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,14 +30,14 @@ public class UserResponse {
         private String username;
         private List<RoleType> roles;
 
-        public static Login transToLogin(UsersResultMap user, Token token) {
+        public static Login transToLogin(MemberResultMap member, Token token) {
             return Login.builder()
                     .accessToken(token.getAccessToken())
                     .refreshToken(token.getRefreshToken())
                     .accessTokenExpiresIn(token.getAccessTokenExpiresIn())
                     .refreshTokenExpiresIn(token.getRefreshTokenExpiresIn())
-                    .username(user.getUsers().getName())
-                    .roles(user.getRoles().stream().map(Role::getRole).toList())
+                    .username(member.getMember().getName())
+                    .roles(member.getRoles().stream().map(Role::getRole).toList())
                     .build();
         }
     }
@@ -63,19 +63,19 @@ public class UserResponse {
         private Boolean sAuth;
         private AuthType sAuthType;
 
-        public static MyPage transToMyPage(UsersResultMap user) {
+        public static MyPage transToMyPage(MemberResultMap user) {
             MyPage my = new MyPage();
-            my.setUserId(user.getUsers().getUserId());
-            my.setEmail(user.getUsers().getEmail());
-            my.setName(user.getUsers().getName());
-            my.setPhone(user.getUsers().getPhone());
-            my.setPoint(user.getUsers().getPoint());
-            my.setSAuth(user.getUsers().getSAuth());
-            my.setSAuthType(user.getUsers().getSAuthType());
+            my.setUserId(user.getMember().getUserId());
+            my.setEmail(user.getMember().getEmail());
+            my.setName(user.getMember().getName());
+            my.setPhone(user.getMember().getPhone());
+            my.setPoint(user.getMember().getPoint());
+            my.setSAuth(user.getMember().getSAuth());
+            my.setSAuthType(user.getMember().getSAuthType());
             return my;
         }
 
-        public static MyPage transToMyPage(Users users) {
+        public static MyPage transToMyPage(Member users) {
             MyPage my = new MyPage();
             my.setUserId(users.getUserId());
             my.setEmail(users.getEmail());

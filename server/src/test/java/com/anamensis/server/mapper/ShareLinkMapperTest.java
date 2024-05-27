@@ -1,8 +1,8 @@
 package com.anamensis.server.mapper;
 
 import com.anamensis.server.dto.Page;
+import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.ShareLink;
-import com.anamensis.server.entity.Users;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,7 +18,7 @@ class ShareLinkMapperTest {
 
     @Test
     void insert() {
-        Users users = new Users();
+        Member users = new Member();
         users.setId(2);
         users.setUserId("admin");
         users.setPwd("admin");
@@ -50,7 +50,7 @@ class ShareLinkMapperTest {
 
     @Test
     void selectAll() {
-        Users users = new Users();
+        Member users = new Member();
         users.setId(2);
         users.setUserId("admin");
         users.setPwd("admin");
@@ -67,7 +67,7 @@ class ShareLinkMapperTest {
 
     @Test
     void selectCount() {
-        Users users = new Users();
+        Member users = new Member();
         users.setId(2);
         users.setUserId("admin");
         users.setPwd("admin");

@@ -1,7 +1,7 @@
 package com.anamensis.server.service;
 
+import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.OTP;
-import com.anamensis.server.entity.Users;
 import com.anamensis.server.mapper.OTPMapper;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
@@ -32,7 +32,7 @@ public class OTPService {
     }
 
     @Transactional
-    public Mono<String> insert(Users users) {
+    public Mono<String> insert(Member users) {
         GoogleAuthenticatorKey key = gAuth.createCredentials();
 
         OTP otp = new OTP();

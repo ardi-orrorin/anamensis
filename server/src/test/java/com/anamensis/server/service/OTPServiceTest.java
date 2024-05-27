@@ -1,7 +1,7 @@
 package com.anamensis.server.service;
 
+import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.OTP;
-import com.anamensis.server.entity.Users;
 import com.anamensis.server.mapper.OTPMapper;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
@@ -33,7 +33,7 @@ class OTPServiceTest {
 
     @Test
     void insert() {
-        Users users = userService.findUserByUserId("admin").block();
+        Member users = userService.findUserByUserId("admin").block();
 //        otpService.insert(user.getId());
 
 
@@ -54,7 +54,7 @@ class OTPServiceTest {
     }
 
     @Test
-    void insertTest(Users users) {
+    void insertTest(Member users) {
 //        long userPk = 2;
         GoogleAuthenticatorKey key = gAuth.createCredentials();
 

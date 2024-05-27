@@ -92,7 +92,7 @@ public class UserController {
 
     @PublicAPI
     @PostMapping("exists")
-    public Mono<UserResponse.Status> exists(@Valid @RequestBody Mono<UserRequest.existsUser> data) {
+    public Mono<UserResponse.Status> exists(@Valid @RequestBody Mono<UserRequest.existsMember> data) {
         return data.flatMap(userService::existsUser)
                    .map(exists -> UserResponse.Status
                            .transToStatus(HttpStatus.OK, exists.toString())
@@ -192,8 +192,8 @@ public class UserController {
                 .flatMap(u -> userService.findUserByUserId(u.getUsername()))
                 .flatMap(u -> userService.findUserInfo(u.getUserId()))
                 .publishOn(Schedulers.boundedElastic())
-                .doOnNext(u -> loginHistoryService.save(device, u.getUsers()).subscribe())
-                .map(u -> Tuples.of(u, generateToken(u.getUsers().getUserId())))
+                .doOnNext(u -> loginHistoryService.save(device, u.getMember()).subscribe())
+                .map(u -> Tuples.of(u, generateToken(u.getMember().getUserId())))
                 .map(t -> UserResponse.Login.transToLogin(t.getT1(), t.getT2()));
     }
 
@@ -206,16 +206,16 @@ public class UserController {
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(u -> {
                     EmailVerify emailVerify = new EmailVerify();
-                    emailVerify.setEmail(u.getUsers().getEmail());
+                    emailVerify.setEmail(u.getMember().getEmail());
                     emailVerify.setCode(String.valueOf(user.getCode()));
                     emailVerify.setExpireAt(LocalDateTime.now());
 
                     emailVerifyService.updateIsUse(emailVerify)
                             .subscribe();
                 })
-                .doOnNext(u -> loginHistoryService.save(device, u.getUsers()).subscribe())
+                .doOnNext(u -> loginHistoryService.save(device, u.getMember()).subscribe())
                 .publishOn(Schedulers.boundedElastic())
-                .map(u -> Tuples.of(u, generateToken(u.getUsers().getUserId())))
+                .map(u -> Tuples.of(u, generateToken(u.getMember().getUserId())))
                 .map(t -> UserResponse.Login.transToLogin(t.getT1(), t.getT2()));
     }
 
@@ -253,7 +253,7 @@ public class UserController {
     }
 
 
-    private Mono<Tuple2<Users, OTP>> transToTuple2(Users users, OTP otp) {
+    private Mono<Tuple2<Member, OTP>> transToTuple2(Member users, OTP otp) {
         return Mono.zip(Mono.just(users), Mono.just(otp));
     }
 

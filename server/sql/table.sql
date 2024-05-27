@@ -1,6 +1,6 @@
 DROP TABLE anamensis.login_history;
 DROP TABLE anamensis.role;
-DROP TABLE anamensis.users;
+DROP TABLE anamensis.member;
 DROP TABLE anamensis.board;
 DROP TABLE anamensis.table_code;
 DROP TABLE anamensis.file;
@@ -13,12 +13,12 @@ DROP TABLE anamensis.point_history;
 DROP TABLE anamensis.category;
 DROP TABLE anamensis.email_verify;
 DROP TABLE anamensis.otp;
-DROP TABLE anamensis.users_config_smtp;
+DROP TABLE anamensis.member_config_smtp;
 DROP TABLE anamensis.smtp_push_history;
 DROP TABLE anamensis.attendance;
 
 
-CREATE TABLE anamensis.users (
+CREATE TABLE anamensis.member (
 	id	        BIGINT	      NOT NULL PRIMARY KEY  AUTO_INCREMENT     COMMENT 'PK'          ,
 	user_id	    VARCHAR(50)	  NOT NULL UNIQUE     	                   COMMENT '계정 아이디',
 	pwd	        VARCHAR(255)  NOT NULL UNIQUE    	                   COMMENT '패스워드',
@@ -36,70 +36,70 @@ CREATE TABLE anamensis.users (
 ) COMMENT '사용자 정보';
 
 CREATE TABLE anamensis.role (
-	role        VARCHAR(20)	  NOT NULL                                 COMMENT '권한 정보',
-	user_pk     BIGINT	      NOT NULL                                 COMMENT '사용자 PK',
-    PRIMARY KEY (role, user_pk)
+	role         VARCHAR(20)      NOT NULL                                 COMMENT '권한 정보',
+	member_pk    BIGINT	          NOT NULL                                 COMMENT '사용자 PK',
+    PRIMARY KEY (role, member_pk)
 ) COMMENT '권한 정보';
 
 CREATE TABLE anamensis.otp (
-    id           BIGINT          PRIMARY KEY   AUTO_INCREMENT       COMMENT 'PK',
-    user_pk      BIGINT          NOT NULL                           COMMENT '사용자 PK',
-    hash         VARCHAR(255)    NOT NULL                           COMMENT 'OTP 코드',
-    create_at    DATETIME        NOT NULL                           COMMENT '생성일자',
-    is_use       TINYINT(1)      NOT NULL      DEFAULT 1            COMMENT '사용여부 0:사용안함, 1:사용',
-    FOREIGN KEY  (user_pk)       REFERENCES    anamensis.users(id),
-    INDEX        user_pk_idx     (user_pk),
-    INDEX        is_use_idx      (is_use)
+    id           BIGINT           PRIMARY KEY   AUTO_INCREMENT       COMMENT 'PK',
+    member_pk    BIGINT           NOT NULL                           COMMENT '사용자 PK',
+    hash         VARCHAR(255)     NOT NULL                           COMMENT 'OTP 코드',
+    create_at    DATETIME         NOT NULL                           COMMENT '생성일자',
+    is_use       TINYINT(1)       NOT NULL      DEFAULT 1            COMMENT '사용여부 0:사용안함, 1:사용',
+    FOREIGN KEY  (member_pk)      REFERENCES    anamensis.member(id),
+    INDEX        member_pk_idx    (member_pk),
+    INDEX        is_use_idx       (is_use)
 ) COMMENT 'OTP 정보';
 
 CREATE TABLE anamensis.login_history (
-	id           BIGINT	        NOT NULL    PRIMARY KEY AUTO_INCREMENT       COMMENT 'PK',
-	user_pk	     BIGINT	        NOT NULL                                     COMMENT '사용자 PK',
-	ip    	     VARCHAR(255)	NOT NULL	                                 COMMENT '접속 IP주소',
-	location	 VARCHAR(255)	NOT NULL	                                 COMMENT '접속장소',
-	device	     VARCHAR(255)	NOT NULL	                                 COMMENT '단말기정보',
-	create_at	 datetime	    NOT NULL                                     COMMENT '생성일자',
-    FOREIGN KEY  (user_pk)      REFERENCES  anamensis.users(id),
-    INDEX        user_pk_idx    (user_pk),
-    INDEX        create_at_idx  (create_at),
-    INDEX        ip_idx         (ip),
-    INDEX        location_idx   (location),
-    INDEX        device_idx     (device)
+	id           BIGINT	          NOT NULL    PRIMARY KEY       AUTO_INCREMENT       COMMENT 'PK',
+	member_pk    BIGINT	          NOT NULL                                           COMMENT '사용자 PK',
+    ip    	     VARCHAR(255)	  NOT NULL	                                         COMMENT '접속 IP주소',
+    location	 VARCHAR(255)	  NOT NULL	                                         COMMENT '접속장소',
+    device	     VARCHAR(255)	  NOT NULL	                                         COMMENT '단말기정보',
+    create_at	 datetime	      NOT NULL                                           COMMENT '생성일자',
+    FOREIGN KEY  (member_pk)      REFERENCES  anamensis.member(id),
+    INDEX        member_pk_idx    (member_pk),
+    INDEX        create_at_idx    (create_at),
+    INDEX        ip_idx           (ip),
+    INDEX        location_idx     (location),
+    INDEX        device_idx       (device)
 ) COMMENT '로그인 이력';
 
 CREATE TABLE anamensis.log_history (
-     id             BIGINT        AUTO_INCREMENT  PRIMARY KEY,
-     user_pk        BIGINT        NOT NULL,
-     method         VARCHAR(10)   NOT NULL,
-     path           VARCHAR(255)  NOT NULL,
-     query          VARCHAR(500)  NOT NULL,
-     body           TEXT,
-     uri            VARCHAR(255)  NOT NULL,
-     headers        TEXT          NOT NULL,
-     session        VARCHAR(500)  NOT NULL,
-     local_address  VARCHAR(255)  NOT NULL,
-     remote_address VARCHAR(255)  NOT NULL,
-     create_at      TIMESTAMP     NOT NULL,
-     FOREIGN KEY                                  (user_pk)        REFERENCES users (id),
-     INDEX          idx_user_pk                   (user_pk),
-     INDEX          idx_method                    (method),
-     INDEX          idx_path                      (path),
-     INDEX          idx_query                     (query),
-     INDEX          idx_uri                       (uri),
-     INDEX          idx_create_at                 (create_at),
-     INDEX          idx_remote_address            (remote_address),
-     INDEX          idx_local_address             (local_address),
-     INDEX          idx_session                   (session)
+     id             BIGINT                 AUTO_INCREMENT     PRIMARY KEY,
+     member_pk      BIGINT                 NOT NULL,
+     method         VARCHAR(10)            NOT NULL,
+     path           VARCHAR(255)           NOT NULL,
+     query          VARCHAR(500)           NOT NULL,
+     body           TEXT,                  
+     uri            VARCHAR(255)           NOT NULL,
+     headers        TEXT                   NOT NULL,
+     session        VARCHAR(500)           NOT NULL,
+     local_address  VARCHAR(255)           NOT NULL,
+     remote_address VARCHAR(255)           NOT NULL,
+     create_at      TIMESTAMP              NOT NULL,
+     FOREIGN KEY                           (member_pk)        REFERENCES member (id),
+     INDEX          idx_member_pk          (member_pk),
+     INDEX          idx_method             (method),
+     INDEX          idx_path               (path),
+     INDEX          idx_query              (query),
+     INDEX          idx_uri                (uri),
+     INDEX          idx_create_at          (create_at),
+     INDEX          idx_remote_address     (remote_address),
+     INDEX          idx_local_address      (local_address),
+     INDEX          idx_session            (session)
 ) COMMENT 'api 호출 로그 테이블';
 
 CREATE TABLE anamensis.attendance (
-    user_pk BIGINT NOT NULL PRIMARY KEY,
-    lastDate DATE NOT NULL,
-    days INT NOT NULL DEFAULT 1,
-    is_use TINYINT NOT NULL DEFAULT 1,
-    FOREIGN KEY (user_pk) REFERENCES anamensis.users(id),
-    INDEX idx_lastDate (lastDate),
-    CHECK ( days >= 1 )
+    member_pk    BIGINT          NOT NULL   PRIMARY KEY,
+    lastDate     DATE            NOT NULL,
+    days         INT NOT         NULL       DEFAULT 1,
+    is_use       TINYINT         NOT NULL   DEFAULT 1,
+    FOREIGN KEY  (member_pk)     REFERENCES anamensis.member(id),
+    INDEX        idx_lastDate    (lastDate),
+    CHECK        (days >= 1)
 ) COMMENT '출석 정보';
 
 CREATE TABLE anamensis.table_code (
@@ -111,21 +111,21 @@ CREATE TABLE anamensis.table_code (
 ) COMMENT '테이블 코드';
 
 CREATE TABLE anamensis.file (
-    id            BIGINT          PRIMARY KEY            AUTO_INCREMENT                                  COMMENT 'PK',
-    table_code_pk BIGINT          NOT NULL                                                               COMMENT '테이블 코드 PK',
-    table_ref_pk  BIGINT          NOT NULL                                                               COMMENT '참고 테이블 Pk',
-    org_file_name VARCHAR(255)    NOT NULL                                                               COMMENT '원본 파일 이름',
-    file_name     VARCHAR(255)    NOT NULL                                                               COMMENT '변경 파일 이름',
-    file_path     VARCHAR(255)    NOT NULL                                                               COMMENT '하위 경로',
-    create_at     DATETIME        NOT NULL                                                               COMMENT '생성일자',
-    is_use        TINYINT(1)      NOT NULL               DEFAULT                     1                   COMMENT '사영 여부 0:사용안함, 1:사용',
-    FOREIGN KEY   (table_code_pk) REFERENCES             anamensis.table_code(id),
-    FULLTEXT      INDEX           file_name_idx          (file_name)                 WITH PARSER ngram,
-    FULLTEXT      INDEX           org_file_name_idx      (org_file_name)             WITH PARSER ngram,
-    FULLTEXT      INDEX           org_and_file_name_idx  (file_name, org_file_name)  WITH PARSER ngram,
-                  INDEX           create_at_idx          (create_at),
-                  INDEX           table_code_idx         (table_code_pk),
-                  INDEX           table_ref_pk_idx       (table_ref_pk)
+    id               BIGINT          PRIMARY KEY            AUTO_INCREMENT                                  COMMENT 'PK',
+    table_code_pk    BIGINT          NOT NULL                                                               COMMENT '테이블 코드 PK',
+    table_ref_pk     BIGINT          NOT NULL                                                               COMMENT '참고 테이블 Pk',
+    org_file_name    VARCHAR(255)    NOT NULL                                                               COMMENT '원본 파일 이름',
+    file_name        VARCHAR(255)    NOT NULL                                                               COMMENT '변경 파일 이름',
+    file_path        VARCHAR(255)    NOT NULL                                                               COMMENT '하위 경로',
+    create_at        DATETIME        NOT NULL                                                               COMMENT '생성일자',
+    is_use           TINYINT(1)      NOT NULL               DEFAULT                     1                   COMMENT '사영 여부 0:사용안함, 1:사용',
+    FOREIGN KEY      (table_code_pk) REFERENCES             anamensis.table_code(id),
+    FULLTEXT         INDEX           file_name_idx          (file_name)                 WITH PARSER ngram,
+    FULLTEXT         INDEX           org_file_name_idx      (org_file_name)             WITH PARSER ngram,
+    FULLTEXT         INDEX           org_and_file_name_idx  (file_name, org_file_name)  WITH PARSER ngram,
+                     INDEX           create_at_idx          (create_at),
+                     INDEX           table_code_idx         (table_code_pk),
+                     INDEX           table_ref_pk_idx       (table_ref_pk)
 ) COMMENT '파일 테이블';
 
 CREATE TABLE anamensis.category (
@@ -153,14 +153,14 @@ CREATE TABLE anamensis.board (
      rate         BIGINT          NOT NULL                DEFAULT             0                    COMMENT '좋아요',
      view_count   BIGINT          NOT NULL                DEFAULT             0                    COMMENT '조회수',
      create_at    DATETIME        NOT NULL                                                         COMMENT '생성일자',
-     user_pk      BIGINT(255)    NOT NULL                                                         COMMENT '유저 아이디',
+     member_pk    BIGINT(255)     NOT NULL                                                         COMMENT '유저 아이디',
      isAdsense    TINYINT(1)      NOT NULL                DEFAULT             0                    COMMENT '광고 여부 0:안함, 1:광고',
      is_use       TINYINT(1)      NOT NULL                DEFAULT             1                    COMMENT '사용 여부 0:사용안함, 1:사용',
-     FOREIGN KEY  (user_pk)       REFERENCES              anamensis.users(id),
+     FOREIGN KEY  (member_pk)     REFERENCES              anamensis.member(id),
      FOREIGN KEY  (category_pk)   REFERENCES              anamensis.category(id),
-     FULLTEXT     INDEX           title_idx               (title)             WITH PARSER ngram,
-     FULLTEXT     INDEX           content_idx             (content)           WITH PARSER ngram,
-     FULLTEXT     INDEX           title_and_content_idx   (title, content)    WITH PARSER ngram,
+     FULLTEXT     INDEX           title_idx               (title)                  WITH PARSER ngram,
+     FULLTEXT     INDEX           content_idx             (content)                WITH PARSER ngram,
+     FULLTEXT     INDEX           title_and_content_idx   (title, content)         WITH PARSER ngram,
                   INDEX           is_use_idx              (is_use),
                   INDEX           create_at_idx           (create_at)
 ) COMMENT '게시글';
@@ -174,7 +174,7 @@ CREATE TABLE anamensis.board_comment (
     parent_pk      BIGINT                                                                             COMMENT '댓글 PK',
     is_use         TINYINT(1)      NOT NULL       DEFAULT          1                                  COMMENT '사용 여부 0:사용안함, 1:사용',
     FOREIGN KEY                    (board_pk)     REFERENCES       anamensis.board(id),
-    FOREIGN KEY                    (user_id)      REFERENCES       anamensis.users(user_id),
+    FOREIGN KEY                    (user_id)      REFERENCES       anamensis.member(user_id),
     FOREIGN KEY                    (parent_pk)    REFERENCES       anamensis.board_comment(id),
     INDEX          create_at_idx   (create_at),
     INDEX          is_use_idx      (is_use),
@@ -188,8 +188,8 @@ CREATE TABLE anamensis.share_link (
     share_link     VARCHAR(255)    NOT NULL                                             COMMENT '공유 링크',
     create_at      DATETIME        NOT NULL                                             COMMENT '생성 일자',
     is_use         TINYINT(1)      NOT NULL       DEFAULT            1                  COMMENT '사용 여부 0:사용안함, 1:사용',
-    user_pk        BIGINT          NOT NULL                                             COMMENT '유저 PK',
-    FOREIGN KEY    (user_pk)       REFERENCES     anamensis.users(id),
+    member_pk      BIGINT          NOT NULL                                             COMMENT '유저 PK',
+    FOREIGN KEY    (member_pk)     REFERENCES     anamensis.member(id),
     INDEX          org_link_idx    (org_link),
     INDEX          create_at_idx   (create_at),
     INDEX          is_use_idx      (is_use)
@@ -208,10 +208,10 @@ CREATE TABLE anamensis.point_history (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT                              COMMENT 'PK',
     table_name     VARCHAR(255)    NOT NULL                                                   COMMENT '테이블 이름',
     table_pk       BIGINT          NOT NULL                                                   COMMENT '참조된 테이블 PK',
-    user_pk        BIGINT          NOT NULL                                                   COMMENT '유저 PK',
+    member_pk      BIGINT          NOT NULL                                                   COMMENT '유저 PK',
     point_code_pk  BIGINT          NOT NULL                                                   COMMENT '포인트 코드 PK',
     create_at      DATETIME        NOT NULL                                                   COMMENT '생성일자',
-    FOREIGN KEY    (user_pk)       REFERENCES     anamensis.users(id),
+    FOREIGN KEY    (member_pk)     REFERENCES     anamensis.member(id),
     FOREIGN KEY    (point_code_pk) REFERENCES     anamensis.point_code(id),
     INDEX          create_at_idx   (create_at)
 ) COMMENT '포인트 이력';
@@ -245,62 +245,62 @@ CREATE TABLE anamensis.email_verify (
     INDEX           is_use_idx        (is_use)
 ) COMMENT '이메일 인증';
 
-CREATE TABLE anamensis.users_config_smtp (
-    id             BIGINT        AUTO_INCREMENT    PRIMARY KEY ,
-    user_pk        BIGINT        NOT NULL,
-    host           VARCHAR(255)  NOT NULL                         COMMENT  'SMTP 서버 주소',
-    port           CHAR(6)       NOT NULL                         COMMENT  'SMTP 포트',
-    username       VARCHAR(255)  NOT NULL                         COMMENT  'SMTP 사용자 아이디',
-    password       VARCHAR(255)  NOT NULL                         COMMENT  'SMTP 사용자 비밀번호',
-    from_email     VARCHAR(255)  NOT NULL                         COMMENT  'SMTP 발신자 주소',
-    from_name      VARCHAR(255)  NOT NULL                         COMMENT  'SMTP 발신자 이름',
-    use_ssl        TINYINT(1)    NOT NULL                         COMMENT  'SMTP SSL 사용 여부',
-    is_use         TINYINT(1)    NOT NULL DEFAULT  1              COMMENT  '사용 여부 0:사용안함, 1:사용',
-    is_default     TINYINT(1)    NOT NULL DEFAULT  0              COMMENT  '기본 설정 여부 0:기본설정아님, 1:기본설정',
-    FOREIGN KEY    (user_pk)     REFERENCES        anamensis.users (id),
-    INDEX          idx_user_pk   (user_pk)
+CREATE TABLE anamensis.member_config_smtp (
+    id             BIGINT          AUTO_INCREMENT    PRIMARY KEY ,
+    member_pk      BIGINT          NOT NULL,
+    host           VARCHAR(255)    NOT NULL                         COMMENT  'SMTP 서버 주소',
+    port           CHAR(6)         NOT NULL                         COMMENT  'SMTP 포트',
+    username       VARCHAR(255)    NOT NULL                         COMMENT  'SMTP 사용자 아이디',
+    password       VARCHAR(255)    NOT NULL                         COMMENT  'SMTP 사용자 비밀번호',
+    from_email     VARCHAR(255)    NOT NULL                         COMMENT  'SMTP 발신자 주소',
+    from_name      VARCHAR(255)    NOT NULL                         COMMENT  'SMTP 발신자 이름',
+    use_ssl        TINYINT(1)      NOT NULL                         COMMENT  'SMTP SSL 사용 여부',
+    is_use         TINYINT(1)      NOT NULL          DEFAULT  1     COMMENT  '사용 여부 0:사용안함, 1:사용',
+    is_default     TINYINT(1)      NOT NULL          DEFAULT  0     COMMENT  '기본 설정 여부 0:기본설정아님, 1:기본설정',
+    FOREIGN KEY    (member_pk)     REFERENCES        anamensis.member (id),
+    INDEX          idx_member_pk   (member_pk)
 ) COMMENT '사용자 SMTP 설정';
 
 CREATE TABLE anamensis.smtp_push_history (
-    id                  BIGINT                  AUTO_INCREMENT PRIMARY KEY,
-    user_pk             BIGINT                  NOT NULL                           COMMENT '사용자 PK',
-    user_config_smtp_pk BIGINT                  NOT NULL                           COMMENT '사용자 SMTP 설정 PK',
-    subject             VARCHAR(255)            NOT NULL                           COMMENT '제목',
-    content             TEXT                    NOT NULL                           COMMENT '내용',
-    status              VARCHAR(20)             NOT NULL                           COMMENT '상태',
-    message             VARCHAR(255)            NOT NULL                           COMMENT '메시지',
-    create_at           TIMESTAMP               NOT NULL                           COMMENT '생성일자',
-    FOREIGN KEY         (user_pk)               REFERENCES anamensis.users (id),
-    FOREIGN KEY         (user_config_smtp_pk)   REFERENCES user_config_smtp (id),
-    INDEX               idx_user_pk             (user_pk),
-    INDEX               idx_user_config_smtp_pk (user_config_smtp_pk),
-    INDEX               idx_create_at           (create_at)
+    id                  BIGINT                    AUTO_INCREMENT PRIMARY KEY,
+    member_pk           BIGINT                    NOT NULL                           COMMENT '사용자 PK',
+    user_config_smtp_pk BIGINT                    NOT NULL                           COMMENT '사용자 SMTP 설정 PK',
+    subject             VARCHAR(255)              NOT NULL                           COMMENT '제목',
+    content             TEXT                      NOT NULL                           COMMENT '내용',
+    status              VARCHAR(20)               NOT NULL                           COMMENT '상태',
+    message             VARCHAR(255)              NOT NULL                           COMMENT '메시지',
+    create_at           TIMESTAMP                 NOT NULL                           COMMENT '생성일자',
+    FOREIGN KEY         (member_pk)               REFERENCES anamensis.member (id),
+    FOREIGN KEY         (user_config_smtp_pk)     REFERENCES anamensis.member_config_smtp (id),
+    INDEX               idx_member_pk             (member_pk),
+    INDEX               idx_user_config_smtp_pk   (user_config_smtp_pk),
+    INDEX               idx_create_at             (create_at)
 ) COMMENT '사용자 PUSH 설정';
 
 CREATE TABLE anamensis.web_sys (
     code        CHAR(4)      NOT NULL PRIMARY KEY COMMENT '시스템 코드',
     name        VARCHAR(100) NOT NULL             COMMENT '이름',
     description TEXT                              COMMENT '시스템 설명',
-    permission  varchar(10)  NOT NULL              COMMENT '접근 권한',
-    INDEX idx_web_sys_access_permission (permission),
-    INDEX idx_web_sys_name              (name),
-    INDEX idx_web_sys_code              (code)
+    permission  varchar(10)  NOT NULL             COMMENT '접근 권한',
+    INDEX       idx_web_sys_access_permission     (permission),
+    INDEX       idx_web_sys_name                  (name),
+    INDEX       idx_web_sys_code                  (code)
 ) COMMENT '시스템 정보';
 
 CREATE TABLE anamensis.system_message (
-    id          INT          PRIMARY KEY           AUTO_INCREMENT,
-    web_sys_pk  CHAR(4)      NOT NULL              COMMENT '시스템 코드',
-    subject     VARCHAR(255) NOT NULL              COMMENT '제목',
-    content     TEXT                               COMMENT '내용',
-    create_at   TIMESTAMP    NOT NULL              COMMENT '생성일',
-    update_at   TIMESTAMP    NOT NULL              COMMENT '수정일',
-    is_use      TINYINT(1)   NOT NULL DEFAULT 1    COMMENT '사용여부',
-    extra1      TEXT                               COMMENT '추가1',
-    extra2      TEXT                               COMMENT '추가2',
-    extra3      TEXT                               COMMENT '추가3',
-    extra4      TEXT                               COMMENT '추가4',
-    extra5      TEXT                               COMMENT '추가5',
-    FOREIGN KEY (web_sys_pk)   REFERENCES web_sys(code),
+    id          INT            PRIMARY KEY           AUTO_INCREMENT,
+    web_sys_pk  CHAR(4)        NOT NULL              COMMENT '시스템 코드',
+    subject     VARCHAR(255)   NOT NULL              COMMENT '제목',
+    content     TEXT                                 COMMENT '내용',
+    create_at   TIMESTAMP      NOT NULL              COMMENT '생성일',
+    update_at   TIMESTAMP      NOT NULL              COMMENT '수정일',
+    is_use      TINYINT(1)     NOT NULL DEFAULT 1    COMMENT '사용여부',
+    extra1      TEXT                                 COMMENT '추가1',
+    extra2      TEXT                                 COMMENT '추가2',
+    extra3      TEXT                                 COMMENT '추가3',
+    extra4      TEXT                                 COMMENT '추가4',
+    extra5      TEXT                                 COMMENT '추가5',
+    FOREIGN KEY (web_sys_pk)   REFERENCES anamensis.web_sys(code),
     INDEX       web_sys_pk_idx (web_sys_pk),
     INDEX       is_use_idx     (is_use),
     INDEX       create_at_idx  (create_at),
@@ -311,8 +311,8 @@ CREATE TABLE anamensis.system_message (
 
 
 CREATE TABLE anamensis.smtp_push_history_count (
-    user_pk              INT NOT NULL,
-    user_config_smtp_pk  INT NOT NULL,
-    count                INT NOT NULL DEFAULT 0,
-    PRIMARY KEY          (user_pk, user_config_smtp_pk)
+    member_pk            INT      NOT NULL,
+    user_config_smtp_pk  INT      NOT NULL,
+    count                INT      NOT NULL        DEFAULT      0,
+    PRIMARY KEY          (member_pk, user_config_smtp_pk)
 ) COMMENT 'smtp_push_history 카운트'

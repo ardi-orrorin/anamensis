@@ -1,7 +1,7 @@
 package com.anamensis.server.service;
 
+import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.ShareLink;
-import com.anamensis.server.entity.Users;
 import com.anamensis.server.mapper.ShareLinkMapper;
 import com.anamensis.server.provider.ShareLinkProvider;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +24,7 @@ class ShareLinkServiceTest {
 
     Logger log = org.slf4j.LoggerFactory.getLogger(ShareLinkServiceTest.class);
 
-    Users users;
+    Member users;
     String orgLink;
 
     @BeforeEach

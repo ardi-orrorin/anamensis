@@ -1,7 +1,7 @@
 package com.anamensis.server.dto.response;
 
 import com.anamensis.server.entity.Attendance;
-import com.anamensis.server.entity.Users;
+import com.anamensis.server.entity.Member;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +24,7 @@ public class AttendResponse {
 
         private long point;
 
-        public static AttendInfo mergeUserAndAttendance(Users users, Attendance attendance) {
+        public static AttendInfo mergeUserAndAttendance(Member users, Attendance attendance) {
             return AttendInfo.builder()
                     .userId(users.getUserId())
                     .email(users.getEmail())

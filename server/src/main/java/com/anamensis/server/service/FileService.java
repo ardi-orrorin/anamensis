@@ -3,7 +3,7 @@ package com.anamensis.server.service;
 import com.anamensis.server.dto.FileHashRecord;
 import com.anamensis.server.dto.FilePathDto;
 import com.anamensis.server.entity.File;
-import com.anamensis.server.entity.Users;
+import com.anamensis.server.entity.Member;
 import com.anamensis.server.mapper.FileMapper;
 import com.anamensis.server.provider.AwsS3Provider;
 import com.anamensis.server.provider.FilePathProvider;
@@ -111,7 +111,7 @@ public class FileService {
     }
 
     @Transactional
-    public Mono<String> saveProfile(Users users, FilePart filePart) {
+    public Mono<String> saveProfile(Member users, FilePart filePart) {
 
         int profileWidth = 150;
         int profileHeight = 150;

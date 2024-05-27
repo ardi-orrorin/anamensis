@@ -1,15 +1,12 @@
-import InputBlock from "@/app/{commons}/{components}/block/input/InputBlock";
-import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
+import InputBlock from "@/app/board/{components}/block/input/InputBlock";
+import {BlockProps} from "@/app/board/{components}/block/type/Types";
 import {faFile, faHeading, faImage, faLink, faList, faQuoteLeft} from "@fortawesome/free-solid-svg-icons";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
-import FileBlock from "@/app/{commons}/{components}/block/file/fileBlock";
-import LinkBlock from "@/app/{commons}/{components}/block/input/linkBlock";
-import {TextStylesType} from "@/app/board/{services}/types";
-import SubTextMenu from "@/app/board/{components}/SubTextMenu";
-import SubObjectMenu from "@/app/board/{components}/SubObjectMenu";
-import FileFile from "@/app/{commons}/{components}/block/file/fileFile";
-import FileImage from "@/app/{commons}/{components}/block/file/fileImage";
-import CheckBlock from "@/app/{commons}/{components}/block/input/CheckBlock";
+import FileBlock from "@/app/board/{components}/block/file/fileBlock";
+import LinkBlock from "@/app/board/{components}/block/input/linkBlock";
+import FileFile from "@/app/board/{components}/block/file/fileFile";
+import FileImage from "@/app/board/{components}/block/file/fileImage";
+import CheckBlock from "@/app/board/{components}/block/input/CheckBlock";
 
 export type BlockType = {
     code       : string;
@@ -19,13 +16,6 @@ export type BlockType = {
     label      : string;
     comment    : string;
     type       : 'text' | 'object';
-}
-
-export type SubMenuType = {
-    value     : string;
-    isView    : boolean;
-    textStyle : TextStylesType,
-    onClick   : (type: string, value: string) => void
 }
 
 export type BlockComponentType = BlockType & {
@@ -44,7 +34,6 @@ export const blockTypeList: BlockComponentType[] = [
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '2.4rem',
             fontWeight    : '700',
-            padding       : '0.5rem',
             letterSpacing : '0.03rem',
         }),
     },
@@ -59,7 +48,6 @@ export const blockTypeList: BlockComponentType[] = [
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '1.8rem',
             fontWeight    : '600',
-            padding       : '0.5rem',
             letterSpacing : '0.03rem',
         }),
     },
@@ -74,7 +62,6 @@ export const blockTypeList: BlockComponentType[] = [
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '1.2rem',
             fontWeight    : '500',
-            padding       : '0.5rem',
             letterSpacing : '0.03rem',
         }),
     },
@@ -88,7 +75,6 @@ export const blockTypeList: BlockComponentType[] = [
         type              : 'text',
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '1rem',
-            padding       : '0.5rem',
             letterSpacing : '0.03rem',
         }),
     },
@@ -102,7 +88,6 @@ export const blockTypeList: BlockComponentType[] = [
         type              : 'text',
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '0.8rem',
-            padding       : '0.5rem',
             letterSpacing : '0.03rem',
         }),
     },
@@ -139,7 +124,7 @@ export const blockTypeList: BlockComponentType[] = [
         label             : 'Todo',
         icon              : faList,
         comment           : '할일',
-        type              : 'text',
+        type              : 'object',
         component         : (props: BlockProps)  => CheckBlock(props),
     },
     {

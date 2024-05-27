@@ -1,8 +1,7 @@
 'use client'
 
 import React, {CSSProperties, useMemo} from "react";
-import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
-import Block from "@/app/board/{components}/Block";
+import {BlockProps} from "@/app/board/{components}/block/type/Types";
 
 type TodoType = {
     check : boolean;
@@ -25,7 +24,7 @@ const CheckBlock = (props: BlockProps) => {
         border          : 'none',
         outline         : 'none',
         wordBreak       : 'break-all',
-        padding         : '0.1rem 0.5rem',
+        padding         : '0.5rem',
         backgroundColor : isView ? '' : 'rgba(230,230,230,0.2)',
         gap             : '0.5rem',
     }
@@ -42,7 +41,7 @@ const CheckBlock = (props: BlockProps) => {
 
     const checkBoxViewStyle: CSSProperties = {
         display         : 'flex',
-        justifyContent  : 'center',
+        justifyContent  : 'start',
         alignItems      : 'center',
         height          : 'auto',
         fontSize        : '0.8rem',
@@ -51,11 +50,11 @@ const CheckBlock = (props: BlockProps) => {
     }
 
     const pStyle: CSSProperties = {
-        fontSize        : '1rem',
+        fontSize        : '0.8rem',
         outline         : 'none',
         padding         : '0 0.5rem',
         border          : '1px black',
-        width           : '100%',
+        width           : 'auto',
         color           : isView ? checked ? 'blue' : 'red' : 'black',
         wordBreak       : 'break-all',
         letterSpacing   : '0.03rem',
@@ -63,9 +62,9 @@ const CheckBlock = (props: BlockProps) => {
     };
 
     const inputStyle: CSSProperties = {
-        fontSize        : '1rem',
+        fontSize        : '0.8rem',
         outline         : 'none',
-        padding         : '0.5rem',
+        padding         : 'none',
         border          : 'none',
         width           : '100%',
         letterSpacing   : '0.03rem',
@@ -84,38 +83,38 @@ const CheckBlock = (props: BlockProps) => {
     }
 
     return (
-        <div id={`block-${seq}`} style={containerStyle}>
-            {
-                !isView
-                ? <input style={{...commonStyle, ...checkBoxStyle}}
-                          type={'checkbox'}
-                          name={'check'}
-                          value={''}
-                          checked={checked || false}
-                          onChange={onCheckChangeHandler}
+        <div id={`block-${seq}`} className={'w-full px-2'}>
+            <div style={containerStyle}>
+                {
+                    !isView
+                    ? <input style={{...commonStyle, ...checkBoxStyle}}
+                              type={'checkbox'}
+                              name={'check'}
+                              value={''}
+                              checked={checked || false}
+                              onChange={onCheckChangeHandler}
+                    />
+                    : <p style={{...commonStyle, ...checkBoxViewStyle}}>
+                        {checked ? '완료' : '진행중'}
+                    </p>
+                }
 
-                />
-                : <p style={{...commonStyle, ...checkBoxViewStyle}}>
-                    {checked ? '완료' : '진행중'}
-                </p>
-            }
-
-            {
-                isView
-                ? <p style={{...commonStyle, ...pStyle}}>
-                    {value || ''}
-                </p>
-                : <input style={{...commonStyle, ...inputStyle}}
-                       value={value || ''}
-                       onChange={onChangeHandler}
-                       onKeyUp={onKeyUpHandler}
-                       onKeyDown={onKeyDownHandler}
-                       onFocus={onFocusHandler}
-                       ref={e=> blockRef!.current[seq] = e}
-                       aria-roledescription={'todo'}
-                />
-            }
-
+                {
+                    isView
+                    ? <p style={{...commonStyle, ...pStyle}}>
+                        {value || ''}
+                    </p>
+                    : <input style={{...commonStyle, ...inputStyle}}
+                           value={value || ''}
+                           onChange={onChangeHandler}
+                           onKeyUp={onKeyUpHandler}
+                           onKeyDown={onKeyDownHandler}
+                           onFocus={onFocusHandler}
+                           ref={e=> blockRef!.current[seq] = e}
+                           aria-roledescription={'todo'}
+                    />
+                }
+            </div>
         </div>
     )
 }

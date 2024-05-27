@@ -1,7 +1,7 @@
 'use client'
 
-import React, {CSSProperties, useMemo} from "react";
-import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
+import React, {CSSProperties, useEffect, useMemo} from "react";
+import {BlockProps} from "@/app/board/{components}/block/type/Types";
 import axios from "axios";
 import localFont from "next/dist/compiled/@next/font/dist/local";
 
@@ -16,10 +16,15 @@ const LinkBlock = (props: BlockProps) => {
     const {
         seq, blockRef,
         value, extraValue,
+        isView,
         onChangeValueHandler, onKeyUpHandler,
         onKeyDownHandler, onMouseEnterHandler,
         onFocusHandler, onChangeExtraValueHandler,
     } = props;
+
+    useEffect(() => {
+        if(!value?.includes('https://')) onChangeValueHandler && onChangeValueHandler('https://' + value);
+    },[])
 
     const customInputStyle: CSSProperties = {
         outline         : 'none',
@@ -39,7 +44,6 @@ const LinkBlock = (props: BlockProps) => {
         width           : '100%',
         padding         : '1rem',
         backgroundColor : 'rgba(230,230,230,0.2)',
-        borderRadius    : '0.5rem',
     }
 
     const onKeyupChangeHandler = async (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -85,7 +89,7 @@ const LinkBlock = (props: BlockProps) => {
 
     return (
         <div id={`block-${seq}`}
-             className={'p-2 w-full'}
+             className={['w-full', isView && 'py-2'].join(' ')}
         >
             {
                 !extraValue || !(extraValue as OGType).title

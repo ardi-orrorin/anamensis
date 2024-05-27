@@ -1,9 +1,9 @@
 'use client';
 
 import React, {ReactNode} from "react";
-import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
-import FileUpload from "@/app/{commons}/{components}/block/file/fileUpload";
-import FileImage, {FileImageProps} from "@/app/{commons}/{components}/block/file/fileImage";
+import {BlockProps} from "@/app/board/{components}/block/type/Types";
+import FileUpload from "@/app/board/{components}/block/file/fileUpload";
+import FileImage, {FileImageProps} from "@/app/board/{components}/block/file/fileImage";
 
 export type FileBlockProps = BlockProps & {
     Component: (props: FileImageProps) => ReactNode;

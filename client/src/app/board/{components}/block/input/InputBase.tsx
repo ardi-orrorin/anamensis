@@ -1,5 +1,5 @@
 'use client';
-import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
+import {BlockProps} from "@/app/board/{components}/block/type/Types";
 import React, {CSSProperties, DetailedHTMLProps, InputHTMLAttributes} from "react";
 
 export default function InputBase({
@@ -12,7 +12,7 @@ export default function InputBase({
     const {
         onKeyUpHandler, onFocusHandler,
         onKeyDownHandler, onChangeHandler,
-        onBlurHandler,
+        onBlurHandler, onMouseEnterHandler,
         value, isView,
         textStyle,
         blockRef, seq
@@ -49,16 +49,17 @@ export default function InputBase({
         onChange      : onChangeHandler,
         onFocus       : onFocusHandler,
         onBlur        : onBlurHandler,
+        onMouseEnter  : onMouseEnterHandler,
     }
 
     return (
-        <div id={`block-${seq}`} style={{display: 'flex', width: '100%', padding: '0.1rem 0.5rem'}}>
+        <div id={`block-${seq}`} style={{display: 'flex', width: '100%'}}>
             {
                 isView
                 ? <p style={{...customStyle, backgroundColor: textStyle?.backgroundColor || defaultBg.p}}
                      {...props}
                 >{value}</p>
-                : <input style={{...customStyle, backgroundColor: textStyle?.backgroundColor || defaultBg.input}}
+                : <input style={{...customStyle, backgroundColor: textStyle?.backgroundColor || defaultBg.input, padding: '0.5rem'}}
                          placeholder={'내용을 입력하세요'}
                          aria-roledescription={'text'}
                          {...props}

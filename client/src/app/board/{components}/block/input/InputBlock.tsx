@@ -1,7 +1,7 @@
 'use client';
-import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
+import {BlockProps} from "@/app/board/{components}/block/type/Types";
 import React, {CSSProperties} from "react";
-import InputBase from "@/app/{commons}/{components}/block/input/InputBase";
+import InputBase from "@/app/board/{components}/block/input/InputBase";
 
 export default function InputBlock (props: BlockProps, customStyle: CSSProperties) {
     return (

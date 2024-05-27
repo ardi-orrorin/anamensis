@@ -33,7 +33,7 @@
                b.id as board_pk,
                f.id as file_pk
           FROM board b
-          JOIN users u
+          JOIN member u
             ON u.id = b.user_pk
           LEFT OUTER JOIN file f
             ON f.table_ref_pk = u.id
@@ -54,7 +54,7 @@
     <select id="findByPk" resultMap="BoardResultMapBoard" parameterType="Long">
         SELECT *
           FROM board b
-          JOIN users u
+          JOIN member u
             ON u.id = b.user_pk
           LEFT OUTER JOIN file f
             ON f.table_ref_pk = u.id
@@ -107,7 +107,7 @@
     <resultMap id="BoardResultMapBoard" type="com.anamensis.server.resultMap.BoardResultMap$Board">
         <id property="id" column="id"/>
         <association property="board" resultMap="BoardEntity" />
-        <association property="users" resultMap="UserEntity" />
+        <association property="users" resultMap="MemberEntity" />
         <association property="file" resultMap="FileEntity" />
     </resultMap>
 
@@ -115,7 +115,7 @@
         <id property="id" column="board_pk"/>
         <result property="content" column="content" typeHandler="JsonTypeHandler"/>
     </resultMap>
-    <resultMap id="UserEntity" type="Users" autoMapping="true">
+    <resultMap id="MemberEntity" type="Member" autoMapping="true">
         <id property="id" column="user_pk"/>
     </resultMap>
     <resultMap id="FileEntity" type="File" autoMapping="true">

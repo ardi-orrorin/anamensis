@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @SpringBootTest
-class UsersServiceTest {
+class MemberServiceTest {
 
     @SpyBean
     private UserService userService;
@@ -24,7 +24,7 @@ class UsersServiceTest {
     private BCryptPasswordEncoder encoder;
 
 
-    private Logger log = org.slf4j.LoggerFactory.getLogger(UsersServiceTest.class);
+    private Logger log = org.slf4j.LoggerFactory.getLogger(MemberServiceTest.class);
 
 
     @Test
@@ -92,10 +92,10 @@ class UsersServiceTest {
 
     @Test
     void existsUser() {
-        UserRequest.existsUser existsUser = new UserRequest.existsUser();
-        existsUser.setType("email");
-        existsUser.setValue("test@icloud.com");
-        userService.existsUser(existsUser)
+        UserRequest.existsMember existsMember = new UserRequest.existsMember();
+        existsMember.setType("email");
+        existsMember.setValue("test@icloud.com");
+        userService.existsUser(existsMember)
                 .log()
                 .subscribe();
     }

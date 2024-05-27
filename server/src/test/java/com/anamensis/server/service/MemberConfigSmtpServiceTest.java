@@ -9,9 +9,9 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import reactor.core.publisher.Mono;
 
 @SpringBootTest
-class UsersConfigSmtpServiceTest {
+class MemberConfigSmtpServiceTest {
 
-    Logger log = org.slf4j.LoggerFactory.getLogger(UsersConfigSmtpServiceTest.class);
+    Logger log = org.slf4j.LoggerFactory.getLogger(MemberConfigSmtpServiceTest.class);
 
     @SpyBean
     UserConfigSmtpService userConfigSmtpService;

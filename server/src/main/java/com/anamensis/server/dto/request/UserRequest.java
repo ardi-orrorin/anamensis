@@ -1,6 +1,6 @@
 package com.anamensis.server.dto.request;
 
-import com.anamensis.server.entity.Users;
+import com.anamensis.server.entity.Member;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
@@ -42,8 +42,8 @@ public class UserRequest {
         @Pattern(regexp = "^01(?:0|1|[6-9])-(?:\\d{3}|\\d{4})-\\d{4}$", message = "Invalid phone number")
         private String phone;
 
-        public static Users transToUser(Register reg) {
-            Users users = new Users();
+        public static Member transToUser(Register reg) {
+            Member users = new Member();
             users.setUserId(reg.getId());
             users.setPwd(reg.getPwd());
             users.setName(reg.getName());
@@ -62,7 +62,6 @@ public class UserRequest {
         @NotNull(message = "Email is required")
         private String email;
 
-//        @NotNull(message = "Code is required")
         private String code;
     }
 
@@ -70,7 +69,7 @@ public class UserRequest {
 
     @Getter
     @Setter
-    public static class existsUser {
+    public static class existsMember {
 
         @NotNull(message = "Type is required")
         private String type;

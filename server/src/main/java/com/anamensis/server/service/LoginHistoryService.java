@@ -4,7 +4,7 @@ package com.anamensis.server.service;
 import com.anamensis.server.dto.Device;
 import com.anamensis.server.dto.Page;
 import com.anamensis.server.entity.LoginHistory;
-import com.anamensis.server.entity.Users;
+import com.anamensis.server.entity.Member;
 import com.anamensis.server.mapper.LoginHistoryMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,12 +26,12 @@ public class LoginHistoryService {
         return Mono.just(loginHistoryMapper.count(userId));
     }
 
-    public Flux<LoginHistory> selectAll(Users users, Page page) {
+    public Flux<LoginHistory> selectAll(Member users, Page page) {
         return Flux.fromIterable(loginHistoryMapper.selectAll(users, page));
     }
 
     @Transactional
-    public Mono<Void> save(Device device, Users users) {
+    public Mono<Void> save(Device device, Member users) {
         LoginHistory loginHistory = LoginHistory.builder()
                 .ip(device.getIp())
                 .device(device.getDevice())

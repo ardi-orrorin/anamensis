@@ -3,34 +3,34 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.anamensis.server.mapper.UsersMapper">
-    <sql id="tbl_user">
+<mapper namespace="com.anamensis.server.mapper.MemberMapper">
+    <sql id="tbl_member">
         SELECT *
-          FROM users
+          FROM member
     </sql>
-    <select id="findAllUsers" resultType="Users">
-        <include refid="tbl_user"/>
+    <select id="findAllMember" resultType="Member">
+        <include refid="tbl_member"/>
     </select>
-    <select id="findUserByUserId" resultType="Users">
-        <include refid="tbl_user"/>
+    <select id="findMemberByUserId" resultType="Member">
+        <include refid="tbl_member"/>
         WHERE user_id = #{userId}
     </select>
-    <select id="findUserByUserIdAndPwd" resultType="Users">
-        <include refid="tbl_user"/>
+    <select id="findMemberByUserIdAndPwd" resultType="Member">
+        <include refid="tbl_member"/>
         WHERE user_id = #{userId}
           AND pwd     = #{pwd}
     </select>
-    <select id="findUserInfo" resultMap="usersResultMap">
+    <select id="findMemberInfo" resultMap="memberResultMap">
         SELECT *
-          FROM users a
+          FROM member a
           JOIN role b
-            ON a.id      = b.user_pk
+            ON a.id      = b.member_pk
          WHERE a.user_id = #{userId}
     </select>
-    <select id="existsUser" resultType="boolean">
+    <select id="existsMember" resultType="boolean">
         SELECT EXISTS(
                SELECT *
-                 FROM users
+                 FROM member
                 WHERE 1 = 1
                  <choose>
                     <when test="type != null and type == 'id' and value != null and value != ''">
@@ -45,34 +45,34 @@
                  </choose>
              )
     </select>
-    <insert id="save" parameterType="Users">
+    <insert id="save" parameterType="Member">
         <selectKey keyProperty="id" resultType="int" order="AFTER">
             SELECT LAST_INSERT_ID()
         </selectKey>
-        INSERT INTO users (user_id, pwd, name,
-                          email, phone, create_at)
+        INSERT INTO member (user_id, pwd, name,
+                            email, phone, create_at)
         VALUES (#{userId}, #{pwd}, #{name},
                 #{email}, #{phone}, #{createAt})
     </insert>
     <insert id="saveRole" parameterType="Role">
-        INSERT INTO role (user_pk, role)
-        VALUES (#{userPk}, #{role})
+        INSERT INTO role (member_pk, role)
+        VALUES (#{memberPk}, #{role})
     </insert>
     <update id="editAuth" parameterType="map">
-        UPDATE users
+        UPDATE member
            SET s_auth      = #{isAuth},
                s_auth_type = #{authType}
          WHERE id          = #{id}
     </update>
 
     <update id="updatePoint" parameterType="Map">
-        UPDATE users
+        UPDATE member
            SET point = point + #{point}
-         WHERE id = #{id}
+         WHERE id    = #{id}
     </update>
 
-    <update id="update" parameterType="Users">
-        UPDATE users
+    <update id="update" parameterType="Member">
+        UPDATE member
            SET name  = #{name},
                email = #{email},
                phone = #{phone}
@@ -82,17 +82,17 @@
     <delete id="deleteRole" parameterType="Role">
         DELETE
           FROM role
-         WHERE user_pk = #{userPk}
-           AND role    = #{role}
+         WHERE member_pk = #{memberPk}
+           AND role      = #{role}
     </delete>
     
-    <resultMap id="usersResultMap" type="UsersResultMap" autoMapping="true">
-        <id property="userPk" column="id"/>
-        <association property="users" resultMap="UserEntity" autoMapping="true" />
+    <resultMap id="memberResultMap" type="MemberResultMap" autoMapping="true">
+        <id property="memberPk" column="id"/>
+        <association property="member" resultMap="MemberEntity" autoMapping="true" />
         <collection property="roles" resultMap="RoleEntity" />
     </resultMap>
 
-    <resultMap id="UserEntity" type="Users" autoMapping="true">
+    <resultMap id="MemberEntity" type="Member" autoMapping="true">
         <result property="sAuthType" column="s_auth_type" typeHandler="AuthTypeHandler"/>
     </resultMap>
     <resultMap id="RoleEntity" type="Role" autoMapping="true">

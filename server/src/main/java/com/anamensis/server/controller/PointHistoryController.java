@@ -1,7 +1,6 @@
 package com.anamensis.server.controller;
 
 import com.anamensis.server.entity.PointHistory;
-import com.anamensis.server.entity.User;
 import com.anamensis.server.service.PointHistoryService;
 import com.anamensis.server.service.UserService;
 import lombok.RequiredArgsConstructor;

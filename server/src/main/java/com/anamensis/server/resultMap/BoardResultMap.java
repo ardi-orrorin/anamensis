@@ -1,7 +1,7 @@
 package com.anamensis.server.resultMap;
 
 import com.anamensis.server.entity.File;
-import com.anamensis.server.entity.User;
+import com.anamensis.server.entity.Users;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,7 +13,7 @@ public class BoardResultMap {
     @ToString
     public static class Board {
         private long id;
-        private User user;
+        private Users users;
         private com.anamensis.server.entity.Board board;
         private File file;
     }

@@ -1,7 +1,7 @@
 package com.anamensis.server.dto.response;
 
 import com.anamensis.server.entity.Attendance;
-import com.anamensis.server.entity.User;
+import com.anamensis.server.entity.Users;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,13 +24,13 @@ public class AttendResponse {
 
         private long point;
 
-        public static AttendInfo mergeUserAndAttendance(User user, Attendance attendance) {
+        public static AttendInfo mergeUserAndAttendance(Users users, Attendance attendance) {
             return AttendInfo.builder()
-                    .userId(user.getUserId())
-                    .email(user.getEmail())
+                    .userId(users.getUserId())
+                    .email(users.getEmail())
                     .lastDate(attendance.getLastDate())
                     .days(attendance.getDays())
-                    .point(user.getPoint())
+                    .point(users.getPoint())
                     .build();
         }
     }

@@ -1,6 +1,6 @@
 package com.anamensis.server.dto.request;
 
-import com.anamensis.server.entity.User;
+import com.anamensis.server.entity.Users;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
@@ -33,9 +33,9 @@ public class UserConfigSmtpRequest {
 
         private Boolean isDefault;
 
-        public static com.anamensis.server.entity.UserConfigSmtp fromEntity(UserConfigSmtp entity, User user) {
+        public static com.anamensis.server.entity.UserConfigSmtp fromEntity(UserConfigSmtp entity, Users users) {
             com.anamensis.server.entity.UserConfigSmtp dto = new com.anamensis.server.entity.UserConfigSmtp();
-            dto.setUserPk(user.getId());
+            dto.setUserPk(users.getId());
             dto.setHost(entity.getHost());
             dto.setPort(entity.getPort());
             dto.setUsername(entity.getUsername());

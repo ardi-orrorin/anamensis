@@ -33,13 +33,13 @@
                b.id as board_pk,
                f.id as file_pk
           FROM board b
-          JOIN user u
+          JOIN users u
             ON u.id = b.user_pk
           LEFT OUTER JOIN file f
             ON f.table_ref_pk = u.id
            AND f.table_code_pk = (SELECT t.id
                                     FROM table_code t
-                                   WHERE t.table_name = 'user')
+                                   WHERE t.table_name = 'users')
            AND f.is_use = 1
          WHERE b.is_use = 1
            <if test="board.categoryPk != 0">
@@ -54,7 +54,7 @@
     <select id="findByPk" resultMap="BoardResultMapBoard" parameterType="Long">
         SELECT *
           FROM board b
-          JOIN user u
+          JOIN users u
             ON u.id = b.user_pk
           LEFT OUTER JOIN file f
             ON f.table_ref_pk = u.id
@@ -63,7 +63,7 @@
            AND f.is_use        = 1
            AND f.table_code_pk = (SELECT t.id
                                     FROM table_code t
-                                   WHERE t.table_name = 'user')
+                                   WHERE t.table_name = 'users')
     </select>
     <select id="findByUserPk" resultMap="BoardResultMapBoard">
         SELECT *
@@ -107,7 +107,7 @@
     <resultMap id="BoardResultMapBoard" type="com.anamensis.server.resultMap.BoardResultMap$Board">
         <id property="id" column="id"/>
         <association property="board" resultMap="BoardEntity" />
-        <association property="user" resultMap="UserEntity" />
+        <association property="users" resultMap="UserEntity" />
         <association property="file" resultMap="FileEntity" />
     </resultMap>
 
@@ -115,7 +115,7 @@
         <id property="id" column="board_pk"/>
         <result property="content" column="content" typeHandler="JsonTypeHandler"/>
     </resultMap>
-    <resultMap id="UserEntity" type="User" autoMapping="true">
+    <resultMap id="UserEntity" type="Users" autoMapping="true">
         <id property="id" column="user_pk"/>
     </resultMap>
     <resultMap id="FileEntity" type="File" autoMapping="true">

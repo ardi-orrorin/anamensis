@@ -1,13 +1,9 @@
 package com.anamensis.server.service;
 
 import com.anamensis.server.dto.Device;
-import com.anamensis.server.entity.LoginHistory;
-import com.anamensis.server.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class LoginHistoryServiceTest {

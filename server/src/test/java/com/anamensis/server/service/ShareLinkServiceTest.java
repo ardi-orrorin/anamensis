@@ -1,9 +1,7 @@
 package com.anamensis.server.service;
 
-import com.anamensis.server.dto.Page;
-import com.anamensis.server.entity.LoginHistory;
 import com.anamensis.server.entity.ShareLink;
-import com.anamensis.server.entity.User;
+import com.anamensis.server.entity.Users;
 import com.anamensis.server.mapper.ShareLinkMapper;
 import com.anamensis.server.provider.ShareLinkProvider;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,8 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.security.core.parameters.P;
-import reactor.core.publisher.Mono;
 
 @SpringBootTest
 class ShareLinkServiceTest {
@@ -28,7 +24,7 @@ class ShareLinkServiceTest {
 
     Logger log = org.slf4j.LoggerFactory.getLogger(ShareLinkServiceTest.class);
 
-    User user;
+    Users users;
     String orgLink;
 
     @BeforeEach
@@ -49,7 +45,7 @@ class ShareLinkServiceTest {
         ShareLink shareLink = ShareLink.builder()
                 .orgLink(orgLink)
                 .shareLink(shareLinkProvider.generateShareLink())
-                .userPk(user.getId())
+                .userPk(users.getId())
                 .build();
 
         do {

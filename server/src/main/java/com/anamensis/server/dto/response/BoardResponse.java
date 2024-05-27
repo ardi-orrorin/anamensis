@@ -6,8 +6,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -41,7 +39,7 @@ public class BoardResponse {
                     .id(board.getId())
                     .title(board.getBoard().getTitle())
                     .viewCount(board.getBoard().getViewCount())
-                    .writer(board.getUser().getName())
+                    .writer(board.getUsers().getName())
                     .createdAt(board.getBoard().getCreateAt())
                     .isAdsense(board.getBoard().isAdsense());
 
@@ -82,7 +80,7 @@ public class BoardResponse {
                     .title(board.getBoard().getTitle())
                     .categoryPk(board.getBoard().getCategoryPk())
                     .content(board.getBoard().getContent())
-                    .writer(board.getUser().getName())
+                    .writer(board.getUsers().getName())
                     .viewCount(board.getBoard().getViewCount())
                     .createdAt(board.getBoard().getCreateAt());
 

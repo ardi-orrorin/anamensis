@@ -15,7 +15,7 @@
     </select>
     <select id="selectAll" parameterType="Map" resultType="ShareLink">
         <include refid="tbl_share_link" />
-         WHERE user_pk = #{user.id}
+         WHERE user_pk = #{users.id}
          ORDER BY
          <choose>
             <when test="page.criteria == 'createAt' and (page.order == 'asc' or page.order == '')">create_at</when>

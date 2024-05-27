@@ -1,20 +1,18 @@
 package com.anamensis.server.service;
 
 import com.anamensis.server.entity.OTP;
-import com.anamensis.server.entity.User;
+import com.anamensis.server.entity.Users;
 import com.anamensis.server.mapper.OTPMapper;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,11 +32,11 @@ public class OTPService {
     }
 
     @Transactional
-    public Mono<String> insert(User user) {
+    public Mono<String> insert(Users users) {
         GoogleAuthenticatorKey key = gAuth.createCredentials();
 
         OTP otp = new OTP();
-        otp.setUserPk(user.getId());
+        otp.setUserPk(users.getId());
         otp.setHash(key.getKey());
         otp.setCreateAt(LocalDateTime.now());
 
@@ -48,7 +46,7 @@ public class OTPService {
             throw new RuntimeException("insert fail");
         }
 
-        String url = GoogleAuthenticatorQRGenerator.getOtpAuthURL("Anamensis", user.getUserId(), key);
+        String url = GoogleAuthenticatorQRGenerator.getOtpAuthURL("Anamensis", users.getUserId(), key);
 
         return Mono.just(url);
     }

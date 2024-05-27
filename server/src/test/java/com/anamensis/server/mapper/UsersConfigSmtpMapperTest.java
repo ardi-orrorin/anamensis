@@ -7,12 +7,10 @@ import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
-class UserConfigSmtpMapperTest {
+class UsersConfigSmtpMapperTest {
 
-    Logger log = org.slf4j.LoggerFactory.getLogger(UserConfigSmtpMapperTest.class);
+    Logger log = org.slf4j.LoggerFactory.getLogger(UsersConfigSmtpMapperTest.class);
 
     @SpyBean
     UserConfigSmtpMapper userConfigSmtpMapper;

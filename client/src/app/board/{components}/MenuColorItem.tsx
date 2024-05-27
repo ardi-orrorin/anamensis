@@ -15,7 +15,7 @@ const MenuColorItem = ({
 }: MenuSubItemProps) => {
 
     return (
-        <div className={`absolute flex flex-col justify-left items-center w-20 bg-white duration-300 overflow-y-scroll ${toggle === name ? 'max-h-80' : 'max-h-0'}`}>
+        <div className={`absolute flex flex-col justify-left items-center w-20 bg-white duration-300 overflow-y-scroll shadow ${toggle === name ? 'max-h-80' : 'max-h-0'}`}>
             {
                 colorSet.map((color, index) => {
                     let style = {}

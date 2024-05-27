@@ -3,8 +3,8 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
 import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
-import {blockTypeList} from "@/app/{commons}/{components}/block/list";
-import {BlockProps, HtmlElements, MouseEnterHTMLElements} from "@/app/{commons}/{components}/block/type/Types";
+import {blockTypeList} from "@/app/board/{components}/block/list";
+import {BlockProps, HtmlElements, MouseEnterHTMLElements} from "@/app/board/{components}/block/type/Types";
 import React, {useContext, useMemo, useState} from "react";
 import MenuItem from "@/app/board/{components}/MenuItem";
 import BlockProvider, {BlockMenu, BlockService} from "@/app/board/{services}/BlockProvider";
@@ -21,7 +21,7 @@ type CopyProps = {
 export default function Block(props: BlockProps) {
     const {
         seq, code,
-        value, extraValue,
+        value,
         textStyle, blockRef,
         onClickAddHandler,
         onClickDeleteHandler,
@@ -56,14 +56,19 @@ export default function Block(props: BlockProps) {
     }
 
     const onMouseEnterHandler = (e: React.MouseEvent<MouseEnterHTMLElements> ) => {
-
         const blockMenu: BlockMenu = 'openObjectMenu';
+
         const block: BlockI = {seq, code, value, textStyle};
         setBlockService({
-            ...blockService,
             block,
             blockMenu: blockMenu,
+            screenX: 0,
+            screenY: 0,
         })
+    }
+
+    const onMouseLeaveHandler = (e: React.MouseEvent<HTMLImageElement | HTMLInputElement> ) => {
+        setBlockService({blockMenu: '', block: {} as BlockI, screenX: 0, screenY: 0});
     }
 
     const openMenuToggle  = () => {
@@ -77,36 +82,6 @@ export default function Block(props: BlockProps) {
                 code: '',
                 value: '',
             }});
-    }
-
-    const openMenuClick = (code: string) => {
-        if(!code || code === '') return ;
-
-        const newList = board.data?.content?.list.map((item, index) => {
-            if (item.seq === seq) {
-                if(item.code.slice(0, 3) !== code.slice(0, 3)) {
-                    item.extraValue = {};
-                    item.textStyle = {};
-                }
-                item.code = code;
-            }
-            return item;
-        });
-
-        setBlockService({
-            ...blockService,
-            blockMenu: '',
-            block: {
-                seq: 0,
-                code: '',
-                value: '',
-            }});
-        setBoard({...board, data: {...board.data, content: {list: newList}}});
-
-        setTimeout(() => {
-            blockRef?.current[seq]?.focus();
-        },100);
-
     }
 
     const onClickObjectMenu = (type: string) => {
@@ -226,6 +201,7 @@ export default function Block(props: BlockProps) {
                             <Component key={'block' + seq}
                                        isView={board.isView}
                                        onMouseEnterHandler={onMouseEnterHandler}
+                                       onMouseLeaveHandler={onMouseLeaveHandler}
                                        onChangeValueHandler={onChangeValueHandler}
                                        onFocusHandler={onFocusHandler}
                                        onChangeExtraValueHandler={onChangeExtraValueHandler}
@@ -239,7 +215,9 @@ export default function Block(props: BlockProps) {
                 !board.isView
                 && blockService.blockMenu === 'openMenu'
                 && blockService?.block?.seq === seq
-                && <MenuItem onClick={openMenuClick} />
+                && <MenuItem seq={seq}
+                             blockRef={blockRef!}
+              />
             }
         </div>
     )

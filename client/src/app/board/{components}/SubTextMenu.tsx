@@ -9,9 +9,10 @@ import BlockProvider from "@/app/board/{services}/BlockProvider";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import MenuColorItem from "@/app/board/{components}/MenuColorItem";
 import MenuFontsizeItem from "@/app/board/{components}/MenuFontsizeItem";
+import MenuItem from "@/app/board/{components}/MenuItem";
 
 
-export type ToggleEnum = 'fontSize' | 'color' | 'backgroundColor' | 'fontStyle' | '';
+export type ToggleEnum = 'blockMenu' | 'fontSize' | 'color' | 'backgroundColor' | 'fontStyle' | '';
 
 const SubTextMenu = ({
     blockRef,
@@ -67,6 +68,24 @@ const SubTextMenu = ({
                 <li>
                     <button className={[
                         'min-w-20 tracking-wider',
+                        buttonStyle,
+                    ].join(' ')}
+                            onClick={() => toggle === 'blockMenu' ? setToggle('') : setToggle('blockMenu')}
+                    >
+                        블록타입
+                    </button>
+                    {
+                        !board.isView
+                        && <MenuItem subMenu={true}
+                                     seq={seq}
+                                     toggle={toggle}
+                                     blockRef={blockRef}
+                       />
+                    }
+                </li>
+                <li>
+                    <button className={[
+                        'min-w-20 tracking-wider',
                         buttonStyle + (textStyle.fontSize && textStyle.fontStyle !== '' ?  'bg-blue-400 text-white' : 'bg-white'),
                     ].join(' ')}
                             onClick={() => toggle === 'fontSize' ? setToggle('') : setToggle('fontSize')}
@@ -75,7 +94,7 @@ const SubTextMenu = ({
                     </button>
                     <MenuFontsizeItem toggle={toggle}
                                       onClick={onClickColorHandler}
-                                      value={board.data.content.list[seq].value}
+                                      value={board.data.content.list[seq]?.value ?? ''}
                     />
                 </li>
                 <li>

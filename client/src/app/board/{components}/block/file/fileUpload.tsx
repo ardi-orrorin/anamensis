@@ -3,7 +3,7 @@
 import {CSSProperties, useContext, useRef, useState} from "react";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import axios from "axios";
-import {BlockProps} from "@/app/{commons}/{components}/block/type/Types";
+import {BlockProps} from "@/app/board/{components}/block/type/Types";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 
 export type FileUploadProps = {
@@ -119,7 +119,6 @@ export default function FileUpload (props: FileUploadProps) {
                     {
                         isImage && loading
                         && <LoadingSpinner size={40} />
-
                     }
                     {
                         !isImage && loading

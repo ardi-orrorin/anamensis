@@ -1,5 +1,4 @@
 import {ToggleEnum} from "@/app/board/{components}/SubTextMenu";
-import {number} from "prop-types";
 
 export type MenuSubItemProps = {
     value: string;
@@ -15,7 +14,7 @@ const MenuFontsizeItem = ({
     const fontSize = ['','10px', '12px', '14px', '16px', '18px', '20px', '24px', '32px', '40px', '48px', '64px', '80px', '100px']
 
     return (
-        <div className={`absolute flex flex-col justify-left gap-1 items-start max-w-96 bg-white duration-300 overflow-x-hidden overflow-y-scroll ${toggle === 'fontSize' ? 'max-h-72' : 'max-h-0'}`}>
+        <div className={`absolute flex flex-col justify-left gap-1 items-start max-w-96 bg-white duration-300 overflow-x-hidden overflow-y-scroll shadow ${toggle === 'fontSize' ? 'max-h-72' : 'max-h-0'}`}>
             {
                 fontSize.map((size, index) => {
                     const fontSize = size === '' ? '1rem' : size

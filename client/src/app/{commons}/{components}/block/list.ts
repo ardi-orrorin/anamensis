@@ -108,16 +108,6 @@ export const blockTypeList: BlockComponentType[] = [
     },
     {
         code              : '00006',
-        tag               : 'link',
-        command           : '/link',
-        label             : 'Link',
-        icon              : faLink,
-        comment           : '링크',
-        type              : 'object',
-        component         : (props: BlockProps)  => LinkBlock(props),
-    },
-    {
-        code              : '00007',
         tag               : 'quo',
         command           : '/quo',
         label             : 'Quotation',
@@ -133,7 +123,17 @@ export const blockTypeList: BlockComponentType[] = [
         }),
     },
     {
-        code              : '00008',
+        code              : '00101',
+        tag               : 'link',
+        command           : '/link',
+        label             : 'Link',
+        icon              : faLink,
+        comment           : '링크',
+        type              : 'object',
+        component         : (props: BlockProps)  => LinkBlock(props),
+    },
+    {
+        code              : '00111',
         tag               : 'todo',
         command           : '/todo',
         label             : 'Todo',
@@ -143,7 +143,7 @@ export const blockTypeList: BlockComponentType[] = [
         component         : (props: BlockProps)  => CheckBlock(props),
     },
     {
-        code              : '00101',
+        code              : '00201',
         tag               : 'image',
         command           : '/img',
         label             : 'Image',
@@ -156,7 +156,7 @@ export const blockTypeList: BlockComponentType[] = [
         }),
     },
     {
-        code              : '00102',
+        code              : '00202',
         tag               : 'fileUpload',
         command           : '/file',
         label             : 'fileUplaod',

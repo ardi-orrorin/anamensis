@@ -32,7 +32,7 @@ const UserInfoWindow = (props: UserInfoWindowProps) => {
                 </button>
             </div>
             <div className={['duration-300', open ? 'h-80 max-h-80' : 'max-h-0 h-0'].join(' ')}>
-                <div className={[open ? 'h-full w-full flex flex-col p-4 items-center justify-center ' : 'hidden', 'duration-500'].join(' ')}>
+                <div className={[open ? 'h-full w-full flex flex-col p-4' : 'hidden', 'duration-500'].join(' ')}>
                     {children}
                 </div>
             </div>

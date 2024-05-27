@@ -1,4 +1,5 @@
 import {ToggleEnum} from "@/app/board/{components}/SubTextMenu";
+import {number} from "prop-types";
 
 export type MenuSubItemProps = {
     value: string;
@@ -11,19 +12,25 @@ const MenuFontsizeItem = ({
     toggle,
     onClick
 }: MenuSubItemProps) => {
-    const fontSize = [ 10, 12, 14, 16, 18, 20, 24, 32, 40, 48, 64, 80, 100 ];
+    const fontSize = ['','10px', '12px', '14px', '16px', '18px', '20px', '24px', '32px', '40px', '48px', '64px', '80px', '100px']
 
     return (
-        <div className={`absolute flex flex-col justify-left items-start max-w-96 bg-white duration-300 overflow-x-hidden overflow-y-scroll ${toggle === 'fontSize' ? 'max-h-72' : 'max-h-0'}`}>
+        <div className={`absolute flex flex-col justify-left gap-1 items-start max-w-96 bg-white duration-300 overflow-x-hidden overflow-y-scroll ${toggle === 'fontSize' ? 'max-h-72' : 'max-h-0'}`}>
             {
                 fontSize.map((size, index) => {
+                    const fontSize = size === '' ? '1rem' : size
+                    const minHeight = size === '' ? '1rem' : Number(size.split('px')[0]) + 5 + 'px';
                     return (
                         <button key={'fontSize' + index}
-                                className={'max-w-96 text-left tracking-wider duration-300 hover:bg-blue-200 hover:text-blue-800 truncate'}
-                                onClick={()=> onClick('fontSize', size + 'px')}
-                                style={{fontSize: size + 'px', minHeight: (size + 5) + 'px'}}
+                                className={'w-full max-w-96 text-left tracking-wider duration-300 hover:bg-blue-200 hover:text-blue-800 truncate'}
+                                onClick={()=> onClick('fontSize', size)}
+                                style={{fontSize, minHeight}}
                         >
-                            {value !== '' ? value : size + 'px'}
+                            {
+                                size === '' ? '기본'
+                                    : value !== '' ? value
+                                        : size + 'px'
+                            }
                         </button>
                     )
                 })

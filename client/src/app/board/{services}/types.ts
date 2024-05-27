@@ -18,10 +18,15 @@ export interface BoardContentI {
 }
 
 export interface BlockI {
-    seq        : number;
-    value      : string;
-    textStyle? : TextStylesType;
-    code       : string;
+    seq         : number;
+    value       : string;
+    extraValue? : ExtraValueI | string | number | boolean ;
+    textStyle?  : TextStylesType;
+    code        : string;
+}
+
+export interface ExtraValueI {
+    [key: string] : string | number | boolean | ExtraValueI;
 }
 
 export type TextStylesType = {

@@ -20,9 +20,15 @@ const MenuColorItem = ({
                 colorSet.map((color, index) => {
                     let style = {}
                     if(name === 'color') {
-                            style = {[name]: color.color, backgroundColor: color.dark ? '#FFFFFF' : '#555555'}
+                            style = {
+                                [name]: color.color,
+                                backgroundColor: color.dark ? '#FFFFFF' : '#555555'
+                            }
                     } else {
-                            style = {[name]: color.color, color: color.dark ? '#FFFFFF' : '#555555'}
+                            style = {
+                                [name]: color.color,
+                                color: color.dark ? '#FFFFFF' : '#555555'
+                            }
                     }
                     return (
                         <button key={'fontColor' + index}

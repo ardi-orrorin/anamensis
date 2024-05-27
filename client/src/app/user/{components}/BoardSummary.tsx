@@ -36,7 +36,7 @@ const BoardSummary = () => {
     }, []);
 
     return (
-        <div className={'w-full flex justify-center items-center'}>
+        <div className={'w-full h-max flex justify-center items-start'}>
             <table className={'w-full text-sm'}>
                 <colgroup>
                     <col style={{width: '50%'}} />

@@ -12,8 +12,7 @@ export default function InputBase({
     const {
         onKeyUpHandler, onFocusHandler,
         onKeyDownHandler, onChangeHandler,
-        onBlurHandler, onBlurCaptureHandler,
-        // onMouseEnterHandler, onMouseLeaveHandler,
+        onBlurHandler,
         value, isView,
         textStyle,
         blockRef, seq
@@ -49,10 +48,7 @@ export default function InputBase({
         onKeyDown     : onKeyDownHandler,
         onChange      : onChangeHandler,
         onFocus       : onFocusHandler,
-        // onMouseEnter  : onMouseEnterHandler,
         onBlur        : onBlurHandler,
-        onBlurCapture : onBlurCaptureHandler,
-        // onMouseLeave  : onMouseLeaveHandler,
     }
 
     return (
@@ -64,6 +60,7 @@ export default function InputBase({
                 >{value}</p>
                 : <input style={{...customStyle, backgroundColor: textStyle?.backgroundColor || defaultBg.input}}
                          placeholder={'내용을 입력하세요'}
+                         aria-roledescription={'text'}
                          {...props}
                 />
             }

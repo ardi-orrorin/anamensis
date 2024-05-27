@@ -298,7 +298,13 @@ export default function Page({params}: {params : {id: string}}) {
             setBoard({...board, data: {...board.data, content: {list: newList}}});
         }
 
-        if(currentBlock.value !== '' || seq === 0) return ;
+        if(currentBlock.value !== '') return ;
+        if(seq === 0) {
+            setTimeout(() => {
+                blockRef.current[0]?.focus();
+            },100);
+            return;
+        }
 
         const newList = list.filter(item => item.seq !== seq)
             .sort((a, b) => a.seq - b.seq)
@@ -318,7 +324,6 @@ export default function Page({params}: {params : {id: string}}) {
             call: 'Proxy'
         })
         .then(res => {
-            console.log(res)
             setRateInfo(res.data);
         })
         .catch(e => {
@@ -425,21 +430,17 @@ export default function Page({params}: {params : {id: string}}) {
                                 }
                             </div>
                             <div className={'flex flex-col gap-2'}>
-
                                     {
                                         board.data.content.list.map((item, index) => {
 
                                            return <Block key={'block' + index}
                                                    blockRef={blockRef}
-                                                   seq={item.seq}
-                                                   value={item.value}
-                                                   textStyle={item.textStyle}
-                                                   code={item.code}
                                                    onChangeHandler={e => {onChangeHandler(e, item.seq)}}
                                                    onKeyDownHandler={e=> {onKeyDownHandler(e, item.seq)}}
                                                    onKeyUpHandler={e=> {onKeyUpHandler(e, item.seq)}}
                                                    onClickAddHandler={()=> addBlockHandler(item.seq)}
                                                    onClickDeleteHandler={onClickDeleteHandler}
+                                                   { ...item}
                                             />
                                         })
                                     }
@@ -471,9 +472,10 @@ export default function Page({params}: {params : {id: string}}) {
                                 }
                             </div>
                         </div>
-                        <SubTextMenu isView={board.isView}
-                                     blockRef={blockRef}
-                        />
+                        {
+                            !board.isView
+                            && <SubTextMenu blockRef={blockRef} />
+                        }
                     </div>
                 </BlockProvider.Provider>
             </TempFileProvider.Provider>

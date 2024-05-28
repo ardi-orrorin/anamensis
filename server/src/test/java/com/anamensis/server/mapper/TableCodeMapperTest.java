@@ -4,6 +4,7 @@ import com.anamensis.server.entity.TableCode;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -166,4 +167,21 @@ class TableCodeMapperTest {
         assertFalse(tableCodeMapper.findByIdByTableName(tableCode1.getId(), "").isPresent());
         assertFalse(tableCodeMapper.findByIdByTableName(0, tableCode1.getTableName()).isPresent());
     }
+
+    @Test
+    @Order(5)
+    @DisplayName("save - tableName 255자 제한 테스트")
+    void saveTableName255() {
+        TableCode tableCode1 = new TableCode();
+        tableCode1.setTableName("a".repeat(255));
+
+        assertDoesNotThrow(() -> tableCodeMapper.save(tableCode1));
+
+        tableCode1.setTableName("b".repeat(256));
+        assertThrowsExactly(DataIntegrityViolationException.class, () ->
+                tableCodeMapper.save(tableCode1)
+        );
+    }
+
+
 }

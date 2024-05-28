@@ -1,7 +1,6 @@
 package com.anamensis.server.mapper;
 
 import com.anamensis.server.entity.PointCode;
-import com.anamensis.server.mapper.PointCodeMapper;
 import org.junit.jupiter.api.*;
 import org.mybatis.spring.MyBatisSystemException;
 import org.slf4j.Logger;
@@ -40,21 +39,6 @@ class PointCodeMapperTest {
     @DisplayName("포인트 코드를 추가")
     void insert() {
         PointCode pointCode1 = new PointCode();
-        pointCode1.setName("""
-            255자 제한 테스트
-            slfijsdlifjsdlivjlsdjvlisdjvlsdijvslijdlsivjlsidjvlsijm/xlckmvisjo;dijf;wijer
-            slfijsdlifjsdlivjlsdjvlisdjvlsdijvslijdlsivjlsidjvlsijm/xlckmvisjo;dijf;wijer
-            slfijsdlifjsdlivjlsdjvlisdjvlsdijvslijdlsivjlsidjvlsijm/xlckmvisjo;dijf;wijer
-            slfijsdlifjsdlivjlsdjvlisdjvlsdijvslijdlsivjlsidjvlsijm/xlckmvisjo;dijf;wijer
-            slfijsdlifjsdlivjlsdjvlisdjvlsdijvslijdlsivjlsidjvlsijm/xlckmvisjo;dijf;wijer
-            slfijsdlifjsdlivjlsdjvlisdjvlsdijvslijdlsivjlsidjvlsijm/xlckmvisjo;dijf;wijer
-            slfijsdlifjsdlivjlsdjvlisdjvlsdijvslijdlsivjlsidjvlsijm/xlckmvisjo;dijf;wijer
-            slfijsdlifjsdlivjlsdjvlisdjvlsdijvslijdlsivjlsidjvlsijm/xlckmvisjo;dijf;wijer
-        """);
-
-        assertThrowsExactly(DataIntegrityViolationException.class, () ->
-            pointCodeMapper.insert(pointCode1)
-        );
 
         pointCode1.setName("point-1");
         pointCode1.setPoint(10);
@@ -136,6 +120,24 @@ class PointCodeMapperTest {
             assertEquals(pointCode1.getName(), p.getName());
             assertNotEquals("point-11", pointCode.getName());
         });
-
     }
+
+
+    @Test
+    @Order(5)
+    @DisplayName("save - name 255자 제한 테스트")
+    void name() {
+        pointCode.setName("a".repeat(255));
+        assertDoesNotThrow(() -> {
+            pointCodeMapper.insert(pointCode);
+        });
+
+        pointCode.setName("a".repeat(256));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            pointCodeMapper.insert(pointCode);
+        });
+        pointCode.setName("point-1");
+    }
+
+
 }

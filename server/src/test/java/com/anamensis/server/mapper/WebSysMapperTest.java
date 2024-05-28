@@ -371,4 +371,18 @@ class WebSysMapperTest {
         assertFalse(webSysMapper.findByCode("061").isPresent());
     }
 
+    @Test
+    @Order(8)
+    @DisplayName("save - name 100자 제한 테스트")
+    void name() {
+        webSysbase.setName("a".repeat(100));
+        webSysbase.setCode("1001");
+        assertDoesNotThrow(() -> webSysMapper.save(webSysbase));
+
+        webSysbase.setCode("1002");
+        webSysbase.setName("b".repeat(101));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> webSysMapper.save(webSysbase));
+    }
+
+
 }

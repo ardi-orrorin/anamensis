@@ -112,7 +112,7 @@ public class LogHistoryFilter implements WebFilter {
         return userService.findUserByUserId(user)
                 .map(u ->
                     LogHistory.builder()
-                            .userPk(u.getId())
+                            .memberPk(u.getId())
                             .method(method)
                             .path(path)
                             .uri(URI)

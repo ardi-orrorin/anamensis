@@ -9,11 +9,12 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -33,11 +34,13 @@ class MemberConfigSmtpMapperTest {
     MemberMapper memberMapper;
 
     MemberConfigSmtp userConfigSmtp = new MemberConfigSmtp();
+    MemberConfigSmtp ucsp = new MemberConfigSmtp();
 
     @BeforeAll
     public void setUp() {
         Member member1 = new Member();
         Member member2 = new Member();
+        Member member3 = new Member();
         member1.setUserId("ucsm1");
         member1.setPwd(encoder.encode("ucsm1"));
         member1.setName("ucsm1");
@@ -56,7 +59,6 @@ class MemberConfigSmtpMapperTest {
         member2.setCreateAt(LocalDateTime.now());
         memberMapper.save(member2);
 
-
         memberMapper.findMemberByUserId("ucsm1")
                 .ifPresent(member -> userConfigSmtp.setMemberPk(member.getId()));
         userConfigSmtp.setHost("smtp.test.com");
@@ -69,6 +71,33 @@ class MemberConfigSmtpMapperTest {
         userConfigSmtp.setIsDefault(true);
 
         userConfigSmtpMapper.save(userConfigSmtp);
+
+
+
+        member3.setUserId("ucsm3");
+        member3.setPwd(encoder.encode("ucsm3"));
+        member3.setName("ucsm3");
+        member3.setEmail("ucsm3@gmail.com");
+        member3.setPhone("010-1111-3003");
+        member3.setUse(true);
+        member3.setCreateAt(LocalDateTime.now());
+        memberMapper.save(member3);
+
+        memberMapper.findMemberByUserId("ucsm3")
+                .ifPresent(member -> ucsp.setMemberPk(member.getId()));
+
+        ucsp.setMemberPk(member2.getId());
+        ucsp.setHost("smtp.test.com");
+        ucsp.setPort("576");
+        ucsp.setUsername("username");
+        ucsp.setPassword("password");
+        ucsp.setFromEmail("fromEmail");
+        ucsp.setFromName("fromName");
+        ucsp.setUseSSL(true);
+        ucsp.setIsDefault(true);
+
+        userConfigSmtpMapper.save(ucsp);
+
     }
 
     @Test
@@ -93,7 +122,6 @@ class MemberConfigSmtpMapperTest {
             userConfigSmtp.setUsername("username");
             userConfigSmtpMapper.save(userConfigSmtp);
         });
-
 
         assertThrowsExactly(DataIntegrityViolationException.class, ()-> {
             userConfigSmtp.setPassword("password");
@@ -121,79 +149,125 @@ class MemberConfigSmtpMapperTest {
         });
     }
 
+    @Test
+    @Order(2)
+    @DisplayName("save - host 255자 제한 테스트")
+    void host() {
+        ucsp.setHost("a".repeat(255));
+        assertDoesNotThrow(() -> {
+            userConfigSmtpMapper.save(ucsp);
+        });
 
+        ucsp.setHost("a".repeat(256));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            userConfigSmtpMapper.save(ucsp);
+        });
+
+        ucsp.setHost("smtp.test.com");
+        assertDoesNotThrow(() -> {
+            userConfigSmtpMapper.save(ucsp);
+        });
+    }
 
     @Test
     @Order(2)
-    @DisplayName("저장 무결성 검사")
-    @Disabled("무결성 검사 불필요")
-    void saveIntegrity() {
-        // given
-        MemberConfigSmtp userConfigSmtp = new MemberConfigSmtp();
-        memberMapper.findMemberByUserId("ucsm1")
-                .ifPresent(member -> userConfigSmtp.setMemberPk(member.getId()));
-        userConfigSmtp.setHost("smtp.naver.com");
-        userConfigSmtp.setPort("03939");
-        userConfigSmtp.setUsername("username");
-        userConfigSmtp.setPassword("password");
-        userConfigSmtp.setFromEmail("fromEmail");
-        userConfigSmtp.setFromName("fromName");
-        userConfigSmtp.setUseSSL(true);
-        userConfigSmtp.setIsDefault(true);
+    @DisplayName("save - port 6자 제한 테스트")
+    void port() {
+        ucsp.setPort("a".repeat(6));
+        assertDoesNotThrow(() -> {
+            userConfigSmtpMapper.save(ucsp);
+        });
 
-        userConfigSmtpMapper.save(userConfigSmtp);
+        ucsp.setPort("a".repeat(7));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            userConfigSmtpMapper.save(ucsp);
+        });
 
-        userConfigSmtpMapper.disabled(userConfigSmtp.getId(), userConfigSmtp.getMemberPk());
-
-        // when
-        userConfigSmtpMapper.save(userConfigSmtp);
-//        assertThrowsExactly(DuplicateKeyException.class, ()-> {
-//            userConfigSmtpMapper.save(userConfigSmtp);
-//        });
-//
-//
-//        assertThrowsExactly(DuplicateKeyException.class, ()-> {
-//            userConfigSmtp1.setPort("0939");
-//            userConfigSmtpMapper.save(userConfigSmtp);
-//        });
-//
-//        assertThrowsExactly(DuplicateKeyException.class, ()-> {
-//            userConfigSmtp1.setUsername("username1");
-//            userConfigSmtpMapper.save(userConfigSmtp);
-//        });
-//
-//        assertThrowsExactly(DuplicateKeyException.class, ()-> {
-//            userConfigSmtp1.setPassword("password1");
-//            userConfigSmtpMapper.save(userConfigSmtp);
-//        });
-//
-//        assertThrowsExactly(DuplicateKeyException.class, ()-> {
-//            userConfigSmtp1.setFromEmail("fromEmail1");
-//            userConfigSmtpMapper.save(userConfigSmtp);
-//        });
-//
-//        assertThrowsExactly(DuplicateKeyException.class, ()-> {
-//            userConfigSmtp1.setFromName("fromName1");
-//            userConfigSmtpMapper.save(userConfigSmtp);
-//        });
-//
-//        assertThrowsExactly(DuplicateKeyException.class, ()-> {
-//            userConfigSmtp.setUseSSL(false);
-//            userConfigSmtpMapper.save(userConfigSmtp);
-//        });
-//
-//        assertThrowsExactly(DuplicateKeyException.class, ()-> {
-//            userConfigSmtp1.setIsDefault(false);
-//            userConfigSmtpMapper.save(userConfigSmtp);
-//        });
-
-//        assertDoesNotThrow(()-> {
-//            userConfigSmtp.setIsUse(true);
-//            userConfigSmtpMapper.save(userConfigSmtp);
-//        });
+        ucsp.setPort("576");
+        assertDoesNotThrow(() -> {
+            userConfigSmtpMapper.save(ucsp);
+        });
     }
 
+    @Test
+    @Order(2)
+    @DisplayName("save - username 255자 제한 테스트")
+    void username() {
+        ucsp.setUsername("a".repeat(255));
+        assertDoesNotThrow(() -> {
+            userConfigSmtpMapper.save(ucsp);
+        });
 
+        ucsp.setUsername("a".repeat(256));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            userConfigSmtpMapper.save(ucsp);
+        });
+
+        ucsp.setUsername("username");
+        assertDoesNotThrow(() -> {
+            userConfigSmtpMapper.save(ucsp);
+        });
+    }
+
+    @Test
+    @Order(2)
+    @DisplayName("save - password 255자 제한 테스트")
+    void password() {
+        ucsp.setPassword("a".repeat(255));
+        assertDoesNotThrow(() -> {
+            userConfigSmtpMapper.save(ucsp);
+        });
+
+        ucsp.setPassword("b".repeat(256));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            userConfigSmtpMapper.save(ucsp);
+        });
+
+        ucsp.setPassword("password");
+        assertDoesNotThrow(() -> {
+            userConfigSmtpMapper.save(ucsp);
+        });
+    }
+
+    @Test
+    @Order(2)
+    @DisplayName("save - fromEmail 255자 제한 테스트")
+    void fromEmail() {
+        ucsp.setFromEmail("a".repeat(255));
+        assertDoesNotThrow(() -> {
+            userConfigSmtpMapper.save(ucsp);
+        });
+
+        ucsp.setFromEmail("b".repeat(256));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            userConfigSmtpMapper.save(ucsp);
+        });
+
+        ucsp.setFromEmail("fromEmail");
+        assertDoesNotThrow(() -> {
+            userConfigSmtpMapper.save(ucsp);
+        });
+    }
+
+    @Test
+    @Order(2)
+    @DisplayName("save - fromName 255자 제한 테스트")
+    void fromName() {
+        ucsp.setFromName("a".repeat(255));
+        assertDoesNotThrow(() -> {
+            userConfigSmtpMapper.save(ucsp);
+        });
+
+        ucsp.setFromName("b".repeat(256));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            userConfigSmtpMapper.save(ucsp);
+        });
+
+        ucsp.setFromName("fromName");
+        assertDoesNotThrow(() -> {
+            userConfigSmtpMapper.save(ucsp);
+        });
+    }
 
     @Test
     @Order(3)

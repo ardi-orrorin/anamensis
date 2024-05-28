@@ -6,11 +6,11 @@
 <mapper namespace="com.anamensis.server.mapper.LogHistoryMapper">
     <insert id="save" parameterType="LogHistory">
         INSERT INTO log_history
-               (user_pk, method, path,
+               (member_pk, method, path,
                 query, body, uri, headers,
                 session, local_address, remote_address,
                 create_at)
-        VALUES (#{userPk}, #{method}, #{path},
+        VALUES (#{memberPk}, #{method}, #{path},
                 #{query}, #{body}, #{uri}, #{headers},
                 #{session}, #{localAddress}, #{remoteAddress},
                 #{createAt})

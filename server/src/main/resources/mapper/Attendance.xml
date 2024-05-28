@@ -4,29 +4,29 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.anamensis.server.mapper.AttendanceMapper">
-    <select id="findByUserPk" resultType="Attendance">
+    <select id="findByMemberPk" resultType="Attendance">
         SELECT *
           FROM attendance
-         WHERE user_pk = #{userPk}
+         WHERE member_pk = #{memberPk}
            AND is_use  = 1
     </select>
 
     <insert id="init" parameterType="Attendance">
         INSERT INTO attendance
-               (user_pk, lastDate)
-        VALUES (#{userPk}, #{lastDate})
+               (member_pk, lastDate)
+        VALUES (#{memberPk}, #{lastDate})
     </insert>
 
     <update id="update" parameterType="Attendance">
         <selectKey keyProperty="days" resultType="int" order="AFTER">
             SELECT days
               FROM attendance
-             WHERE user_pk = #{userPk}
+             WHERE member_pk = #{memberPk}
         </selectKey>
         UPDATE attendance
            SET days     = IF(lastDate = (#{lastDate} - INTERVAL 1 DAY), days + 1, 1)
              , lastDate = #{lastDate}
-         WHERE user_pk  = #{userPk}
+         WHERE member_pk  = #{memberPk}
     </update>
 
 </mapper>

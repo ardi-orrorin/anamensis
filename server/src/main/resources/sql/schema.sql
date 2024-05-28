@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS attendance (
 
 CREATE TABLE IF NOT EXISTS table_code (
     id           BIGINT          PRIMARY KEY  AUTO_INCREMENT    COMMENT 'PK',
-    table_name   VARCHAR(255)    NOT NULL                       COMMENT '테이블 이름',
+    table_name   VARCHAR(255)    NOT NULL     UNIQUE            COMMENT '테이블 이름',
     is_use       TINYINT(1)      NOT NULL     DEFAULT 1         COMMENT '사용여부 0:사용안함, 1:사용'
 ) COMMENT '테이블 코드';
 
@@ -78,7 +78,8 @@ CREATE TABLE IF NOT EXISTS file (
     file_path        VARCHAR(255)    NOT NULL                                                               COMMENT '하위 경로',
     create_at        DATETIME        NOT NULL                                                               COMMENT '생성일자',
     is_use           TINYINT(1)      NOT NULL               DEFAULT                     1                   COMMENT '사영 여부 0:사용안함, 1:사용',
-    FOREIGN KEY      (table_code_pk) REFERENCES             table_code(id)
+    FOREIGN KEY      (table_code_pk) REFERENCES             table_code(id),
+    UNIQUE           (file_name, file_path)
 ) COMMENT '파일 테이블';
 
 CREATE TABLE IF NOT EXISTS category (

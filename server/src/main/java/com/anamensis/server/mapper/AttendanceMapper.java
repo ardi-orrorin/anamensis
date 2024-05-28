@@ -8,10 +8,10 @@ import java.util.Optional;
 
 @Mapper
 public interface AttendanceMapper {
-    void init(long userPk, LocalDate lastDate);
+    void init(long memberPk, LocalDate lastDate);
 
     void update(Attendance attendance);
 
-    Optional<Attendance> findByUserPk(long userPk);
+    Optional<Attendance> findByMemberPk(long memberPk);
 
 }

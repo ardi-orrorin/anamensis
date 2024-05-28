@@ -104,7 +104,7 @@ CREATE TABLE anamensis.attendance (
 
 CREATE TABLE anamensis.table_code (
     id           BIGINT          PRIMARY KEY  AUTO_INCREMENT    COMMENT 'PK',
-    table_name   VARCHAR(255)    NOT NULL                       COMMENT '테이블 이름',
+    table_name   VARCHAR(255)    NOT NULL     UNIQUE            COMMENT '테이블 이름',
     is_use       TINYINT(1)      NOT NULL     DEFAULT 1         COMMENT '사용여부 0:사용안함, 1:사용',
     INDEX        table_name_idx  (table_name),
     INDEX        is_use_idx      (is_use)
@@ -119,6 +119,7 @@ CREATE TABLE anamensis.file (
     file_path        VARCHAR(255)    NOT NULL                                                               COMMENT '하위 경로',
     create_at        DATETIME        NOT NULL                                                               COMMENT '생성일자',
     is_use           TINYINT(1)      NOT NULL               DEFAULT                     1                   COMMENT '사영 여부 0:사용안함, 1:사용',
+    UNIQUE           (file_name, file_path),
     FOREIGN KEY      (table_code_pk) REFERENCES             anamensis.table_code(id),
     FULLTEXT         INDEX           file_name_idx          (file_name)                 WITH PARSER ngram,
     FULLTEXT         INDEX           org_file_name_idx      (org_file_name)             WITH PARSER ngram,

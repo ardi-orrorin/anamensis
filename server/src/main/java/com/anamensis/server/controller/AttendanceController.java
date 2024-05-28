@@ -53,8 +53,8 @@ public class AttendanceController {
                 .flatMap(this::getPointByAttendance)
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(t -> userService.updatePoint(
-                        t.getT1().getUserPk(),
-                        (int) t.getT2().getValue()
+                        t.getT1().getMemberPk(),
+                        (int) t.getT2().getPoint()
                     ).subscribe()
                 )
                 .map(t -> "출석체크 완료");
@@ -63,7 +63,7 @@ public class AttendanceController {
     private Mono<Tuple2<Attendance, PointCode>> getPointByAttendance(Attendance attendance) {
         String seq = attendance.getDays() > 10  ? "10" : String.valueOf(attendance.getDays());
 
-        return pointService.findByName(seq)
+        return pointService.selectByIdOrName(seq)
                 .map(point -> Tuples.of(attendance, point));
     }
 }

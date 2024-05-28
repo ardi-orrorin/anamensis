@@ -8,8 +8,8 @@
         <selectKey keyProperty="id" resultType="int" order="AFTER">
         SELECT LAST_INSERT_ID()
         </selectKey>
-        INSERT INTO file (
-               table_code_pk, table_ref_pk, org_file_name
+        INSERT INTO file
+               (table_code_pk, table_ref_pk, org_file_name
                , file_name, file_path, create_at, is_use)
         VALUES (#{tableCodePk}, #{tableRefPk}, #{orgFileName}
                 , #{fileName}, #{filePath}, #{createAt}, #{isUse})
@@ -23,14 +23,7 @@
     </select>
 
     <select id="findByTableNameAndTableRefPk" resultType="File">
-        SELECT f.id,
-               f.table_code_pk,
-               f.table_ref_pk,
-               f.org_file_name,
-               f.file_name,
-               f.file_path,
-               f.create_at,
-               f.is_use
+        SELECT f.*
           FROM file f
           JOIN table_code tc
             ON f.table_code_pk = tc.id

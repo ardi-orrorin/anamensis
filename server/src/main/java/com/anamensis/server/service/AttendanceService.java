@@ -19,12 +19,12 @@ public class AttendanceService {
     @Transactional
     public Mono<Attendance> findByUserPk(long userPk) {
 
-        Optional<Attendance> attendance = attendanceMapper.findByUserPk(userPk);
+        Optional<Attendance> attendance = attendanceMapper.findByMemberPk(userPk);
 
         if(attendance.isEmpty()) {
             return this.init(userPk)
                     .then(Mono.defer(() ->
-                            Mono.justOrEmpty(attendanceMapper.findByUserPk(userPk))
+                            Mono.justOrEmpty(attendanceMapper.findByMemberPk(userPk))
                         )
                     );
         }

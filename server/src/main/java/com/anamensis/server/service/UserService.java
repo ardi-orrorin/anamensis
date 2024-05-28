@@ -88,9 +88,9 @@ public class UserService implements ReactiveUserDetailsService {
                    .doOnNext(u -> u.setPwd(bCryptPasswordEncoder.encode(u.getPwd())))
                    .doOnNext(u -> u.setCreateAt(LocalDateTime.now()))
                    .doOnNext(u -> {
-                       PointCode pointCode = pointCodeMapper.findByName(ATTENDANCE_POINT_CODE_PREFIX + "1")
+                       PointCode pointCode = pointCodeMapper.selectByIdOrName(0,ATTENDANCE_POINT_CODE_PREFIX + "1")
                                .orElseThrow(() -> new RuntimeException("PointCode not found"));
-                      u.setPoint(pointCode.getValue());
+                      u.setPoint(pointCode.getPoint());
                    })
                    .doOnNext(memberMapper::save)
                    .publishOn(Schedulers.boundedElastic())

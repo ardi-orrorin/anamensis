@@ -1,7 +1,7 @@
 package com.anamensis.server.service;
 
 import com.anamensis.server.entity.SmtpPush;
-import com.anamensis.server.entity.UserConfigSmtp;
+import com.anamensis.server.entity.MemberConfigSmtp;
 import com.anamensis.server.mapper.SmtpPushMapper;
 import com.anamensis.server.provider.MailProvider;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +17,11 @@ public class SmtpPushService {
 
     private final SmtpPushMapper smtpPushMapper;
 
-    public Mono<Boolean> send(UserConfigSmtp userConfigSmtp, SmtpPush smtpPush) {
+    public Mono<Boolean> send(MemberConfigSmtp userConfigSmtp, SmtpPush smtpPush) {
         return Mono.just(smtpPush)
                 .doOnNext(smtp -> {
                     smtp.setUserConfigSmtpPk(userConfigSmtp.getId());
-                    smtp.setUserPk(userConfigSmtp.getUserPk());
+                    smtp.setUserPk(userConfigSmtp.getMemberPk());
                     smtp.setCreateAt(LocalDateTime.now());
                 })
                 .zipWith(Mono.just(userConfigSmtp))

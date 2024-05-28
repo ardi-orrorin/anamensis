@@ -8,11 +8,11 @@ import lombok.ToString;
 @Setter
 @Getter
 @ToString
-public class UserConfigSmtp {
+public class MemberConfigSmtp {
 
     private long id;
 
-    private long userPk;
+    private long memberPk;
 
     private String host;
 

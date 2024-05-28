@@ -1,19 +1,17 @@
 package com.anamensis.server.service;
 
 
-import com.anamensis.server.entity.UserConfigSmtp;
-import com.anamensis.server.mapper.UserConfigSmtpMapper;
+import com.anamensis.server.entity.MemberConfigSmtp;
+import com.anamensis.server.mapper.MemberConfigSmtpMapper;
 import com.anamensis.server.provider.MailProvider;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.Optional;
 
@@ -21,19 +19,19 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class UserConfigSmtpService {
-    private final UserConfigSmtpMapper userConfigSmtpMapper;
+    private final MemberConfigSmtpMapper userConfigSmtpMapper;
 
 
     @Transactional(readOnly = true)
-    public Flux<UserConfigSmtp> selectByUserPk(long userPk) {
+    public Flux<MemberConfigSmtp> selectByUserPk(long userPk) {
         return Mono.just(userPk)
-                .map(userConfigSmtpMapper::selectByUserPk)
+                .map(userConfigSmtpMapper::selectByMemberPk)
                 .flatMapMany(Flux::fromIterable)
                 .onErrorMap(throwable -> new RuntimeException("UserConfigSmtp not found"));
     }
 
     @Transactional(readOnly = true)
-    public Mono<UserConfigSmtp> selectById(long id) {
+    public Mono<MemberConfigSmtp> selectById(long id) {
         return Mono.just(id)
                 .map(userConfigSmtpMapper::selectById)
                 .flatMap(optional -> optional.map(Mono::just).orElseThrow())
@@ -41,11 +39,12 @@ public class UserConfigSmtpService {
     }
 
     @Transactional
-    public Mono<UserConfigSmtp> save(UserConfigSmtp userConfigSmtp) {
+    public Mono<MemberConfigSmtp> save(MemberConfigSmtp userConfigSmtp) {
         return Mono.just(userConfigSmtp)
                 .doOnNext(u -> {
                     if (u.getIsDefault()) {
-                        userConfigSmtpMapper.updateDefaultInit(u.getUserPk());
+                        userConfigSmtpMapper
+                                .disabledDefaults(u.getMemberPk());
                     }
                 })
                 .doOnNext(userConfigSmtpMapper::save)
@@ -53,7 +52,7 @@ public class UserConfigSmtpService {
     }
 
     @Transactional
-    public Mono<Boolean> update(UserConfigSmtp userConfigSmtp) {
+    public Mono<Boolean> update(MemberConfigSmtp userConfigSmtp) {
         return Mono.just(userConfigSmtp)
                 .map(userConfigSmtpMapper::update)
                 .<Boolean>handle((r, sink) -> {
@@ -66,7 +65,7 @@ public class UserConfigSmtpService {
                 .onErrorMap(throwable -> new RuntimeException("UserConfigSmtp not update"));
     }
 
-    public Mono<Boolean> testConnection(UserConfigSmtp userConfigSmtp) {
+    public Mono<Boolean> testConnection(MemberConfigSmtp userConfigSmtp) {
         return Mono.just(userConfigSmtp)
                 .doOnNext(u -> {
                     try {
@@ -95,22 +94,12 @@ public class UserConfigSmtpService {
     }
 
 
-    public Mono<Boolean> deleteByUserPk(long userPk) {
-        userConfigSmtpMapper.deleteByUserPk(userPk);
-        return Mono.just(true);
-    }
-
-    public Mono<Boolean> deleteById(long id) {
-        userConfigSmtpMapper.deleteById(id);
-        return Mono.just(true);
-    }
-
     private void initDefault(long userPk) {
-        Optional<UserConfigSmtp> smtp = userConfigSmtpMapper.selectFirstId(userPk);
+        Optional<MemberConfigSmtp> smtp = userConfigSmtpMapper.selectFirstId(userPk);
 
         if(smtp.isEmpty()) return ;
 
-        UserConfigSmtp userConfigSmtp = smtp.get();
+        MemberConfigSmtp userConfigSmtp = smtp.get();
         userConfigSmtp.setIsDefault(true);
         userConfigSmtpMapper.update(userConfigSmtp);
     }

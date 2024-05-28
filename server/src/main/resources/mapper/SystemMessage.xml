@@ -17,6 +17,9 @@
     </select>
 
     <insert id="save" parameterType="SystemMessage">
+        <selectKey keyProperty="id" resultType="Integer" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
         INSERT INTO system_message
                (web_sys_pk, subject, content,
                 create_at, update_at,

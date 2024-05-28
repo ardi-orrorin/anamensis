@@ -1,11 +1,10 @@
 package com.anamensis.server.provider;
 
-import com.anamensis.server.entity.UserConfigSmtp;
+import com.anamensis.server.entity.MemberConfigSmtp;
 import jakarta.mail.MessagingException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMailMessage;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.Properties;
 
@@ -33,7 +32,7 @@ public class MailProvider {
         JavaMailSenderImpl mailSenderImpl = new JavaMailSenderImpl();
         MimeMailMessage mimeMailMessage = new MimeMailMessage(mailSenderImpl.createMimeMessage());
 
-        public Builder config(UserConfigSmtp userConfigSmtp) {
+        public Builder config(MemberConfigSmtp userConfigSmtp) {
             this.mailSenderImpl.setHost(userConfigSmtp.getHost());
             this.mailSenderImpl.setPort(Integer.parseInt(userConfigSmtp.getPort()));
             this.mailSenderImpl.setUsername(userConfigSmtp.getUsername());
@@ -52,7 +51,7 @@ public class MailProvider {
             return this;
         }
 
-        public Builder message(UserConfigSmtp userConfigSmtp, String subject, String content) {
+        public Builder message(MemberConfigSmtp userConfigSmtp, String subject, String content) {
             this.mimeMailMessage.setTo(userConfigSmtp.getFromEmail());
             this.mimeMailMessage.setFrom(userConfigSmtp.getFromEmail());
             this.mimeMailMessage.setSubject(subject);

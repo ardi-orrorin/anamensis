@@ -1,6 +1,5 @@
 package com.anamensis.server.mapper;
 
-import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.entity.SystemMessage;
 import com.anamensis.server.entity.WebSys;
@@ -9,13 +8,14 @@ import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.NoSuchElementException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -255,6 +255,7 @@ class SystemMessageMapperTest {
         assertDoesNotThrow(() -> {
             assertEquals(1, systemMessageMapper.update(updateSystemMessage));
         });
+
         systemMessageMapper.findById(systemMessage.getId()).ifPresent(s -> {
                 assertNotEquals(null, s.getUpdateAt());
                 assertEquals(systemMessage.getUpdateAt(), s.getUpdateAt());
@@ -266,10 +267,9 @@ class SystemMessageMapperTest {
             assertEquals(1, systemMessageMapper.update(updateSystemMessage));
         });
         systemMessageMapper.findById(systemMessage.getId()).ifPresent(s -> {
-                assertNotEquals(systemMessage.getUpdateAt(), s.getUpdateAt());
-                assertEquals(updateSystemMessage.getUpdateAt(), s.getUpdateAt());
-            }
-        );
+            assertNotEquals(systemMessage.getUpdateAt(), s.getUpdateAt());
+            assertEquals(updateSystemMessage.getUpdateAt(), s.getUpdateAt());
+        });
     }
 
     @Test

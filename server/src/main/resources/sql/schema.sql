@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS member (
     email	    VARCHAR(255)  NOT NULL UNIQUE    	                   COMMENT '이메일',
     phone  	    VARCHAR(20)	  NOT NULL UNIQUE    	                   COMMENT '핸드폰 번호',
     point       BIGINT                 DEFAULT      0                  COMMENT '포인트',
-    create_at	DATETIME	  NOT NULL                                 COMMENT '생성일자',
-    update_at	DATETIME          NULL                                 COMMENT '정보 수정 일자',
+    create_at	TIMESTAMP(6)	  NOT NULL                                 COMMENT '생성일자',
+    update_at	TIMESTAMP(6)          NULL                                 COMMENT '정보 수정 일자',
     is_use	    TINYINT	      NOT NULL DEFAULT      1	               COMMENT '계정 사용여부 0:사용안함, 1:사용',
     s_auth      TINYINT       NOT NULL DEFAULT      0                  COMMENT '2차 인증 사용어부 0:사용안함, 1:사용',
     s_auth_type VARCHAR(10)   NOT NULL DEFAULT      'NONE'             COMMENT '2차 인증 타입'
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS otp (
     id           BIGINT           PRIMARY KEY   AUTO_INCREMENT       COMMENT 'PK',
     member_pk    BIGINT           NOT NULL                           COMMENT '사용자 PK',
     hash         VARCHAR(255)     NOT NULL                           COMMENT 'OTP 코드',
-    create_at    DATETIME         NOT NULL                           COMMENT '생성일자',
+    create_at    TIMESTAMP(6)         NOT NULL                           COMMENT '생성일자',
     is_use       TINYINT(1)       NOT NULL      DEFAULT 1            COMMENT '사용여부 0:사용안함, 1:사용',
     FOREIGN KEY  (member_pk)      REFERENCES    member(id),
     UNIQUE       (hash)
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS login_history (
     ip    	     VARCHAR(255)	  NOT NULL	                                 COMMENT '접속 IP주소',
     location	 VARCHAR(255)	  NOT NULL	                                 COMMENT '접속장소',
     device	     VARCHAR(255)	  NOT NULL	                                 COMMENT '단말기정보',
-    create_at	 datetime	      NOT NULL                                     COMMENT '생성일자',
+    create_at	 TIMESTAMP(6)	      NOT NULL                                     COMMENT '생성일자',
     FOREIGN KEY  (member_pk)      REFERENCES  member(id)
 ) COMMENT '로그인 이력';
 
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS log_history (
     session        VARCHAR(500)  NOT NULL,
     local_address  VARCHAR(255)  NOT NULL,
     remote_address VARCHAR(255)  NOT NULL,
-    create_at      TIMESTAMP     NOT NULL,
+    create_at      TIMESTAMP(6)     NOT NULL,
     FOREIGN KEY                                  (member_pk)        REFERENCES member (id)
 ) COMMENT 'api 호출 로그 테이블';
 
@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS file (
     org_file_name    VARCHAR(255)    NOT NULL                                                               COMMENT '원본 파일 이름',
     file_name        VARCHAR(255)    NOT NULL                                                               COMMENT '변경 파일 이름',
     file_path        VARCHAR(255)    NOT NULL                                                               COMMENT '하위 경로',
-    create_at        DATETIME        NOT NULL                                                               COMMENT '생성일자',
+    create_at        TIMESTAMP(6)        NOT NULL                                                               COMMENT '생성일자',
     is_use           TINYINT(1)      NOT NULL               DEFAULT                     1                   COMMENT '사영 여부 0:사용안함, 1:사용',
     FOREIGN KEY      (table_code_pk) REFERENCES             table_code(id),
     UNIQUE           (file_name, file_path)
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS board (
     content      TEXT            NOT NULL                                                         COMMENT '본문',
     rate         BIGINT          NOT NULL                DEFAULT             0                    COMMENT '좋아요',
     view_count   BIGINT          NOT NULL                DEFAULT             0                    COMMENT '조회수',
-    create_at    DATETIME        NOT NULL                                                         COMMENT '생성일자',
+    create_at    TIMESTAMP(6)        NOT NULL                                                         COMMENT '생성일자',
     member_pk    BIGINT(255)     NOT NULL                                                         COMMENT '유저 아이디',
     isAdsense    TINYINT(1)      NOT NULL                DEFAULT             0                    COMMENT '광고 여부 0:안함, 1:광고',
     is_use       TINYINT(1)      NOT NULL                DEFAULT             1                    COMMENT '사용 여부 0:사용안함, 1:사용',
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS board_comment (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT                                      COMMENT 'PK',
     board_pk       BIGINT          NOT NULL                                                           COMMENT '게시글 PK',
     content        TEXT            NOT NULL                                                           COMMENT '댓글 내용',
-    create_at      DATETIME        NOT NULL                                                           COMMENT '생성일자',
+    create_at      TIMESTAMP(6)        NOT NULL                                                           COMMENT '생성일자',
     user_id        VARCHAR(255)    NOT NULL                                                           COMMENT '유저 아이디',
     parent_pk      BIGINT                                                                             COMMENT '댓글 PK',
     is_use         TINYINT(1)      NOT NULL       DEFAULT          1                                  COMMENT '사용 여부 0:사용안함, 1:사용',
@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS share_link (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT                        COMMENT 'PK',
     org_link       VARCHAR(255)    NOT NULL                                             COMMENT '원본 링크',
     share_link     VARCHAR(255)    NOT NULL                                             COMMENT '공유 링크',
-    create_at      DATETIME        NOT NULL                                             COMMENT '생성 일자',
+    create_at      TIMESTAMP(6)        NOT NULL                                             COMMENT '생성 일자',
     is_use         TINYINT(1)      NOT NULL       DEFAULT            1                  COMMENT '사용 여부 0:사용안함, 1:사용',
     member_pk      BIGINT          NOT NULL                                             COMMENT '유저 PK',
     FOREIGN KEY    (member_pk)     REFERENCES     member(id)
@@ -147,7 +147,7 @@ CREATE TABLE IF NOT EXISTS point_history (
     table_pk       BIGINT          NOT NULL                                                   COMMENT '참조된 테이블 PK',
     member_pk      BIGINT          NOT NULL                                                   COMMENT '유저 PK',
     point_code_pk  BIGINT          NOT NULL                                                   COMMENT '포인트 코드 PK',
-    create_at      DATETIME        NOT NULL                                                   COMMENT '생성일자',
+    create_at      TIMESTAMP(6)        NOT NULL                                                   COMMENT '생성일자',
     FOREIGN KEY    (member_pk)     REFERENCES     member(id),
     FOREIGN KEY    (point_code_pk) REFERENCES     point_code(id)
 ) COMMENT '포인트 이력';
@@ -159,7 +159,7 @@ CREATE TABLE IF NOT EXISTS board_history (
     title           VARCHAR(255)      NOT NULL                                                     COMMENT '제목',
     content         TEXT              NOT NULL                                                     COMMENT '본문',
     change_code_pk  BIGINT            NOT NULL                                                     COMMENT '변경코드 PK',
-    create_at       DATETIME          NOT NULL                                                     COMMENT '생성일자',
+    create_at       TIMESTAMP(6)          NOT NULL                                                     COMMENT '생성일자',
     FOREIGN KEY     (board_pk)        REFERENCES          board(id),
     FOREIGN KEY     (change_code_pk)  REFERENCES          change_code(id)
 ) COMMENT '게시글 변경 이력';
@@ -169,8 +169,8 @@ CREATE TABLE IF NOT EXISTS email_verify (
     id              BIGINT            PRIMARY KEY         AUTO_INCREMENT                           COMMENT 'PK',
     email           VARCHAR(255)      NOT NULL                                                     COMMENT '이메일',
     code            VARCHAR(255)      NOT NULL                                                     COMMENT '인증 코드',
-    create_at       DATETIME          NOT NULL                                                     COMMENT '생성일자',
-    expire_at       DATETIME          NOT NULL                                                     COMMENT '만료일자',
+    create_at       TIMESTAMP(6)          NOT NULL                                                     COMMENT '생성일자',
+    expire_at       TIMESTAMP(6)          NOT NULL                                                     COMMENT '만료일자',
     is_use          TINYINT(1)        NOT NULL            DEFAULT               1                  COMMENT '사용 여부 0:사용안함, 1:사용'
 ) COMMENT '이메일 인증';
 
@@ -197,7 +197,7 @@ CREATE TABLE IF NOT EXISTS smtp_push_history (
     content             TEXT                      NOT NULL                           COMMENT '내용',
     status              VARCHAR(20)               NOT NULL                           COMMENT '상태',
     message             VARCHAR(255)              NOT NULL                           COMMENT '메시지',
-    create_at           TIMESTAMP                 NOT NULL                           COMMENT '생성일자',
+    create_at           TIMESTAMP(6)                 NOT NULL                           COMMENT '생성일자',
     FOREIGN KEY         (member_pk)               REFERENCES member (id),
     FOREIGN KEY         (user_config_smtp_pk)     REFERENCES member_config_smtp (id)
 ) COMMENT '사용자 PUSH 설정';
@@ -214,8 +214,8 @@ CREATE TABLE IF NOT EXISTS system_message (
     web_sys_pk  CHAR(4)        NOT NULL              COMMENT '시스템 코드',
     subject     VARCHAR(255)   NOT NULL              COMMENT '제목',
     content     TEXT                                 COMMENT '내용',
-    create_at   TIMESTAMP      NOT NULL              COMMENT '생성일',
-    update_at   TIMESTAMP      NOT NULL              COMMENT '수정일',
+    create_at   TIMESTAMP(6)      NOT NULL              COMMENT '생성일',
+    update_at   TIMESTAMP(6)      NOT NULL              COMMENT '수정일',
     is_use      TINYINT(1)     NOT NULL DEFAULT 1    COMMENT '사용여부',
     extra1      TEXT                                 COMMENT '추가1',
     extra2      TEXT                                 COMMENT '추가2',

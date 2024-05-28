@@ -14,7 +14,7 @@
         SELECT *
           FROM login_history
          WHERE member_pk = #{member.id}
-         ORDER BY create_at DESC
+         ORDER BY id DESC
          LIMIT #{page.offset}, #{page.size}
     </select>
 

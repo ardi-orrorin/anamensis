@@ -1,7 +1,6 @@
 package com.anamensis.server.mapper;
 
 import com.anamensis.server.dto.Page;
-import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.entity.LoginHistory;
 import com.anamensis.server.entity.Member;
 import org.junit.jupiter.api.*;
@@ -11,7 +10,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -37,6 +35,8 @@ class LoginHistoryMapperTest {
     Member member1 = new Member();
     Member member2 = new Member();
 
+    LoginHistory.LoginHistoryBuilder loginHistory = LoginHistory.builder();
+
     @BeforeAll
     public void setUp() {
         member1.setUserId("lhmt1");
@@ -56,6 +56,12 @@ class LoginHistoryMapperTest {
         member2.setUse(true);
         member2.setCreateAt(LocalDateTime.now());
         memberMapper.save(member2);
+
+        loginHistory.ip("127.0.0.1");
+        loginHistory.device("chrome");
+        loginHistory.location("seoul");
+        loginHistory.createAt(LocalDateTime.now());
+        lhMapper.save(loginHistory.build(), member1);
     }
 
     @Test
@@ -82,49 +88,68 @@ class LoginHistoryMapperTest {
         assertDoesNotThrow(() -> {
             lhMapper.save(loginHistory.build(), member1);
         });
-
-        loginHistory.ip("""
-            255자 제한 테스트
-            sdlofjsdlfijsdoivjs[divjsp'dvojksd'povjsd'pojv'spdojvsdlkvjsdlivjsdlivjlsdjvlsij
-            sdlofjsdlfijsdoivjs[divjsp'dvojksd'povjsd'pojv'spdojvsdlkvjsdlivjsdlivjlsdjvlsij
-            sdlofjsdlfijsdoivjs[divjsp'dvojksd'povjsd'pojv'spdojvsdlkvjsdlivjsdlivjlsdjvlsij
-            sdlofjsdlfijsdoivjs[divjsp'dvojksd'povjsd'pojv'spdojvsdlkvjsdlivjsdlivjlsdjvlsij
-            sdlofjsdlfijsdoivjs[divjsp'dvojksd'povjsd'pojv'spdojvsdlkvjsdlivjsdlivjlsdjvlsij
-            sdlofjsdlfijsdoivjs[divjsp'dvojksd'povjsd'pojv'spdojvsdlkvjsdlivjsdlivjlsdjvlsij
-        """);
-        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
-            lhMapper.save(loginHistory.build(), member1);
-        });
-        loginHistory.ip("127.0.0.1");
-
-        loginHistory.device("""
-            255자 제한 테스트
-            sdlofjsdlfijsdoivjs[divjsp'dvojksd'povjsd'pojv'spdojvsdlkvjsdlivjsdlivjlsdjvlsij
-            sdlofjsdlfijsdoivjs[divjsp'dvojksd'povjsd'pojv'spdojvsdlkvjsdlivjsdlivjlsdjvlsij
-            sdlofjsdlfijsdoivjs[divjsp'dvojksd'povjsd'pojv'spdojvsdlkvjsdlivjsdlivjlsdjvlsij
-            sdlofjsdlfijsdoivjs[divjsp'dvojksd'povjsd'pojv'spdojvsdlkvjsdlivjsdlivjlsdjvlsij
-            sdlofjsdlfijsdoivjs[divjsp'dvojksd'povjsd'pojv'spdojvsdlkvjsdlivjsdlivjlsdjvlsij
-            sdlofjsdlfijsdoivjs[divjsp'dvojksd'povjsd'pojv'spdojvsdlkvjsdlivjsdlivjlsdjvlsij
-        """);
-        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
-            lhMapper.save(loginHistory.build(), member1);
-        });
-        loginHistory.device("chrome");
-
-        loginHistory.location("""
-            255자 제한 테스트
-            sdlofjsdlfijsdoivjs[divjsp'dvojksd'povjsd'pojv'spdojvsdlkvjsdlivjsdlivjlsdjvlsij
-            sdlofjsdlfijsdoivjs[divjsp'dvojksd'povjsd'pojv'spdojvsdlkvjsdlivjsdlivjlsdjvlsij
-            sdlofjsdlfijsdoivjs[divjsp'dvojksd'povjsd'pojv'spdojvsdlkvjsdlivjsdlivjlsdjvlsij
-            sdlofjsdlfijsdoivjs[divjsp'dvojksd'povjsd'pojv'spdojvsdlkvjsdlivjsdlivjlsdjvlsij
-            sdlofjsdlfijsdoivjs[divjsp'dvojksd'povjsd'pojv'spdojvsdlkvjsdlivjsdlivjlsdjvlsij
-            sdlofjsdlfijsdoivjs[divjsp'dvojksd'povjsd'pojv'spdojvsdlkvjsdlivjsdlivjlsdjvlsij
-        """);
-        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
-            lhMapper.save(loginHistory.build(), member1);
-        });
-        loginHistory.location("seoul");
     }
+
+    @Test
+    @Order(1)
+    @DisplayName("save - ip 255자 제한 테스트")
+    void ip() {
+        loginHistory.ip("a".repeat(255));
+        assertDoesNotThrow(() -> {
+            lhMapper.save(loginHistory.build(), member1);
+        });
+
+        loginHistory.ip("a".repeat(256));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            lhMapper.save(loginHistory.build(), member1);
+        });
+
+        loginHistory.ip("127.0.0.1");
+        assertDoesNotThrow(() -> {
+            lhMapper.save(loginHistory.build(), member1);
+        });
+    }
+
+    @Test
+    @Order(1)
+    @DisplayName("save - location 255자 제한 테스트")
+    void location() {
+        loginHistory.location("a".repeat(255));
+        assertDoesNotThrow(() -> {
+            lhMapper.save(loginHistory.build(), member1);
+        });
+
+        loginHistory.location("a".repeat(256));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            lhMapper.save(loginHistory.build(), member1);
+        });
+
+        loginHistory.location("seoul");
+        assertDoesNotThrow(() -> {
+            lhMapper.save(loginHistory.build(), member1);
+        });
+    }
+
+    @Test
+    @Order(1)
+    @DisplayName("save - device 255자 제한 테스트")
+    void device() {
+        loginHistory.device("a".repeat(255));
+        assertDoesNotThrow(() -> {
+            lhMapper.save(loginHistory.build(), member1);
+        });
+
+        loginHistory.device("a".repeat(256));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            lhMapper.save(loginHistory.build(), member1);
+        });
+
+        loginHistory.device("chrome");
+        assertDoesNotThrow(() -> {
+            lhMapper.save(loginHistory.build(), member1);
+        });
+    }
+
 
 
     @Test

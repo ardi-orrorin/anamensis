@@ -38,6 +38,7 @@ class MemberMapperTest {
     Logger log = org.slf4j.LoggerFactory.getLogger(MemberMapperTest.class);
     Member member1 = new Member();
     Member member2 = new Member();
+    Member member100 = new Member();
 
     Role role2 = new Role();
 
@@ -69,7 +70,16 @@ class MemberMapperTest {
         role2.setRole(RoleType.USER);
         memberMapper.saveRole(role2);
 
+        member100.setUserId("admin100");
+        member100.setPwd(encoder.encode("admin100"));
+        member100.setName("admin100");
+        member100.setEmail("admin100@gmail.com");
+        member100.setPhone("010-1111-1222");
+        member100.setUse(true);
+        member100.setCreateAt(LocalDateTime.now());
+        memberMapper.save(member100);
     }
+
     @Test
     @DisplayName("모든 유저 조회")
     @Order(1)
@@ -308,4 +318,126 @@ class MemberMapperTest {
         assertDoesNotThrow(() -> memberMapper.updatePoint(member.getId(), -50));
         assertEquals(250, memberMapper.findMemberByUserId("admin1").get().getPoint());
     }
+
+    @Test
+    @Order(10)
+    @DisplayName("userId 50자 제한 테스트")
+    void userId() {
+        member100.setUserId("a".repeat(50));
+        assertDoesNotThrow(() -> {
+            member100.setPwd(encoder.encode("admin101"));
+            member100.setName("admin101");
+            member100.setEmail("admin101@gmail.com");
+            member100.setPhone("010-1111-1223");
+            memberMapper.save(member100);
+        });
+
+        member100.setUserId("a".repeat(51));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            memberMapper.save(member100);
+        });
+
+        member100.setUserId("admin100");
+    }
+
+    @Test
+    @Order(11)
+    @DisplayName("pwd 255자 제한 테스트")
+    void pwd() {
+        member100.setPwd("a".repeat(255));
+        assertDoesNotThrow(() -> {
+            member100.setUserId("admin102");
+            member100.setName("admin102");
+            member100.setEmail("admin102@gmail.com");
+            member100.setPhone("010-1111-1224");
+            memberMapper.save(member100);
+        });
+
+        member100.setPwd("a".repeat(256));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            member100.setUserId("admin103");
+            member100.setName("admin103");
+            member100.setEmail("admin103@gmail.com");
+            member100.setPhone("010-1111-1225");
+            memberMapper.save(member100);
+        });
+
+        member100.setPwd(encoder.encode("admin100"));
+    }
+
+    @Test
+    @Order(12)
+    @DisplayName("name 100자 제한 테스트")
+    void name() {
+        member100.setName("a".repeat(100));
+        assertDoesNotThrow(() -> {
+            member100.setUserId("admin104");
+            member100.setPwd(encoder.encode("admin104"));
+            member100.setEmail("admin104@gmail.com");
+            member100.setPhone("010-1111-1226");
+            memberMapper.save(member100);
+        });
+
+        member100.setName("a".repeat(101));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            member100.setUserId("admin105");
+            member100.setPwd(encoder.encode("admin105"));
+            member100.setEmail("admin105@gmail.com");
+            member100.setPhone("010-1111-1227");
+            memberMapper.save(member100);
+        });
+
+        member100.setName("admin100");
+    }
+
+    @Test
+    @Order(13)
+    @DisplayName("email 255자 제한 테스트")
+    void email() {
+        member100.setEmail("a".repeat(255));
+        assertDoesNotThrow(() -> {
+            member100.setUserId("admin106");
+            member100.setPwd(encoder.encode("admin106"));
+            member100.setName("admin106");
+            member100.setPhone("010-1111-1228");
+            memberMapper.save(member100);
+        });
+
+        member100.setEmail("a".repeat(256));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            member100.setUserId("admin107");
+            member100.setPwd(encoder.encode("admin107"));
+            member100.setName("admin107");
+            member100.setPhone("010-1111-1229");
+            memberMapper.save(member100);
+        });
+
+        member100.setEmail("admin100@gmail.com");
+    }
+
+    @Test
+    @Order(14)
+    @DisplayName("phone 20자 제한 테스트")
+    void phone() {
+        member100.setPhone("a".repeat(20));
+        assertDoesNotThrow(() -> {
+            member100.setUserId("admin108");
+            member100.setPwd(encoder.encode("admin108"));
+            member100.setName("admin108");
+            member100.setEmail("admin108@gmail.com");
+            memberMapper.save(member100);
+        });
+
+        member100.setPhone("a".repeat(21));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            member100.setUserId("admin109");
+            member100.setPwd(encoder.encode("admin109"));
+            member100.setName("admin109");
+            member100.setEmail("admin109@gmail.com");
+            memberMapper.save(member100);
+        });
+
+        member100.setPhone("010-1111-1222");
+    }
+
 }

@@ -2,7 +2,6 @@ package com.anamensis.server.mapper;
 
 import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.OTP;
-import com.anamensis.server.entity.Role;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,10 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.NoSuchElementException;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -165,5 +162,27 @@ class OTPMapperTest {
         assertTrue(otpMapper.disableOTP(member.getId()) > 0);
         assertFalse(otpMapper.existByMemberPk(member.getId()));
     }
+
+    @Test
+    @Order(7)
+    @DisplayName("save - hash 255자 제한 테스트")
+    void hash() {
+        otp.setHash("a".repeat(255));
+        assertDoesNotThrow(() -> {
+            otpMapper.insert(otp);
+        });
+
+        otp.setHash("a".repeat(256));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            otpMapper.insert(otp);
+        });
+
+        otp.setHash("hash10000");
+        assertDoesNotThrow(() -> {
+            otpMapper.insert(otp);
+        });
+    }
+
+
 
 }

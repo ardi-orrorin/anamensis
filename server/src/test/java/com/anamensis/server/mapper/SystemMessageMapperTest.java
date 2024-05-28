@@ -11,7 +11,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -77,22 +76,6 @@ class SystemMessageMapperTest {
         });
         systemMessage.setUpdateAt(LocalDateTime.now());
         assertDoesNotThrow(() -> {
-            systemMessageMapper.save(systemMessage);
-        });
-
-        systemMessage.setSubject("""
-                255자 제한 테스트
-                sldifjslifjlsifjlsifjlsdifjslidjflisjflsifjlsidjflisfjlsifjlsifjlsfjlisjdflsiddf
-                sldifjslifjlsifjlsifjlsdifjslidjflisjflsifjlsidjflisfjlsifjlsifjlsfjlisjdflsiddf
-                sldifjslifjlsifjlsifjlsdifjslidjflisjflsifjlsidjflisfjlsifjlsifjlsfjlisjdflsiddf
-                sldifjslifjlsifjlsifjlsdifjslidjflisjflsifjlsidjflisfjlsifjlsifjlsfjlisjdflsiddf
-                sldifjslifjlsifjlsifjlsdifjslidjflisjflsifjlsidjflisfjlsifjlsifjlsfjlisjdflsiddf
-                sldifjslifjlsifjlsifjlsdifjslidjflisjflsifjlsidjflisfjlsifjlsifjlsfjlisjdflsiddf
-                sldifjslifjlsifjlsifjlsdifjslidjflisjflsifjlsidjflisfjlsifjlsifjlsfjlisjdflsiddf
-                sldifjslifjlsifjlsifjlsdifjslidjflisjflsifjlsidjflisfjlsifjlsifjlsfjlisjdflsiddf
-                sldifjslifjlsifjlsifjlsdifjslidjflisjflsifjlsidjflisfjlsifjlsifjlsfjlisjdflsiddf
-                """);
-        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
             systemMessageMapper.save(systemMessage);
         });
 
@@ -319,8 +302,24 @@ class SystemMessageMapperTest {
         assertTrue(systemMessageMapper.findById(systemMessage.getId()).isPresent());
         assertEquals(1, systemMessageMapper.delete(systemMessage.getId()));
         assertTrue(systemMessageMapper.findById(systemMessage.getId()).isEmpty());
-
-
-
     }
+
+    @Test
+    @Order(7)
+    @DisplayName("save - subject 255자 제한 테스트")
+    void subject() {
+        sm.setSubject("a".repeat(255));
+        assertDoesNotThrow(() -> {
+            systemMessageMapper.save(sm);
+        });
+
+        sm.setSubject("b".repeat(256));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            systemMessageMapper.save(sm);
+        });
+        sm.setSubject("subject");
+    }
+
+
+
 }

@@ -1,7 +1,7 @@
 package com.anamensis.server.mapper;
 
-import com.anamensis.server.entity.*;
-import com.anamensis.server.mapper.FileMapper;
+import com.anamensis.server.entity.File;
+import com.anamensis.server.entity.TableCode;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -10,9 +10,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,11 +28,22 @@ class FileMapperTest {
 
     TableCode tableCode = new TableCode();
 
+    File file = new File();
+
     @BeforeAll
     public void setUp() {
         tableCode.setTableName("file-board");
         tableCode.setUse(true);
         tableCodeMapper.save(tableCode);
+
+        file.setTableCodePk(tableCode.getId());
+        file.setTableRefPk(12);
+        file.setOrgFileName("orgFileName100.txt");
+        file.setFileName("uuidFileName100.txt");
+        file.setFilePath("/20240601/100/");
+        file.setCreateAt(LocalDateTime.now());
+        file.setUse(true);
+        fileMapper.insert(file);
     }
 
     @Test
@@ -69,60 +78,77 @@ class FileMapperTest {
         // fileName + filePath unique 테스트
         file.setTableRefPk(1);
         assertThrowsExactly(DuplicateKeyException.class, () -> fileMapper.insert(file));
-
-        file.setOrgFileName("""
-                255자 제한 테스트
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                """);
-        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
-            fileMapper.insert(file);
-        });
-
-        file.setOrgFileName("orgFileName.txt");
-        file.setFileName("""
-                255자 제한 테스트
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                """);
-        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
-            fileMapper.insert(file);
-        });
-
-        file.setFileName("uuidFileName2.txt");
-        file.setFilePath("""
-                255자 제한 테스트
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                sldifjsdlijvlsidjvlsdijvldsijslifjsldifjsldifjsdlfijslfisdjflisdjflisdjflisdjf
-                """);
-        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
-            fileMapper.insert(file);
-        });
-
-        file.setFilePath("/20240601/");
-        assertDoesNotThrow(() -> fileMapper.insert(file));
     }
+
+    @Test
+    @Order(1)
+    @DisplayName("save - orgFileName 255자 제한 테스트")
+    void orgFileName() {
+        file.setOrgFileName("a".repeat(255));
+        assertDoesNotThrow(() -> {
+            file.setFilePath("/20240601/101"); //  테스트를 위해 unique 무결성 filePath 변경
+            fileMapper.insert(file);
+        });
+
+        file.setOrgFileName("a".repeat(256));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            file.setFilePath("/20240601/102"); //  테스트를 위해 unique 무결성 filePath 변경
+            fileMapper.insert(file);
+        });
+
+        file.setOrgFileName("orgFileName100.txt");
+        assertDoesNotThrow(() -> {
+            file.setFilePath("/20240601/103"); //  테스트를 위해 unique 무결성 filePath 변경
+            fileMapper.insert(file);
+        });
+    }
+
+    @Test
+    @Order(1)
+    @DisplayName("save - filePath 255자 제한 테스트")
+    void filePath() {
+        file.setFilePath("a".repeat(255));
+        assertDoesNotThrow(() -> {
+            file.setFileName("orgFileName101.txt"); //  테스트를 위해 unique 무결성 orgFileName 변경
+            fileMapper.insert(file);
+        });
+
+        file.setFilePath("a".repeat(256));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            file.setFileName("orgFileName102.txt"); //  테스트를 위해 unique 무결성 orgFileName 변경
+            fileMapper.insert(file);
+        });
+
+        file.setFilePath("/20240601/100/");
+        assertDoesNotThrow(() -> {
+            file.setFileName("orgFileName103.txt"); //  테스트를 위해 unique 무결성 orgFileName 변경
+            fileMapper.insert(file);
+        });
+    }
+
+    @Test
+    @Order(1)
+    @DisplayName("save - fileName 255자 제한 테스트")
+    void fileName() {
+        file.setFileName("a".repeat(255));
+        assertDoesNotThrow(() -> {
+            file.setFilePath("/20240601/200/"); //  테스트를 위해 unique 무결성 orgFileName 변경
+            fileMapper.insert(file);
+        });
+
+        file.setFileName("a".repeat(256));
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> {
+            file.setFilePath("/20240601/201/"); //  테스트를 위해 unique 무결성 orgFileName 변경
+            fileMapper.insert(file);
+        });
+
+        file.setFileName("uuidFileName100.txt");
+        assertDoesNotThrow(() -> {
+            file.setFilePath("/20240601/202/"); //  테스트를 위해 unique 무결성 orgFileName 변경
+            fileMapper.insert(file);
+        });
+    }
+
 
     @Test
     @Order(2)

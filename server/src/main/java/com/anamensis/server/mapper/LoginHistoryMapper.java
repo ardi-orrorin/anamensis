@@ -11,15 +11,15 @@ import java.util.List;
 @Mapper
 public interface LoginHistoryMapper {
 
-    int count(long userId);
+    int count(long memberPk);
 
     List<LoginHistory> selectAll(
-            @Param("user") Member users,
+            @Param("member") Member member,
             @Param("page") Page page
     );
 
     int save(
         @Param("history") LoginHistory loginHistory,
-        @Param("user") Member users
+        @Param("member") Member member
     );
 }

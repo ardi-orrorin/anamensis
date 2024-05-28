@@ -28,7 +28,7 @@ public class OTPService {
     }
 
     public Mono<OTP> selectByUserPk(long userPk) {
-        return Mono.justOrEmpty(otpMapper.selectByUserPk(userPk));
+        return Mono.justOrEmpty(otpMapper.selectByMemberPk(userPk));
     }
 
     @Transactional
@@ -36,7 +36,7 @@ public class OTPService {
         GoogleAuthenticatorKey key = gAuth.createCredentials();
 
         OTP otp = new OTP();
-        otp.setUserPk(users.getId());
+        otp.setMemberPk(users.getId());
         otp.setHash(key.getKey());
         otp.setCreateAt(LocalDateTime.now());
 
@@ -54,7 +54,7 @@ public class OTPService {
     @Transactional
     public Mono<Boolean> update(OTP otp) {
         otp.setUse(false);
-        int result = otpMapper.update(otp);
+        int result = otpMapper.updateIsUse(otp);
         return Mono.just(result == 1);
     }
 
@@ -67,7 +67,7 @@ public class OTPService {
     }
 
     public Mono<Boolean> existByUserPk(long userPk) {
-        return Mono.just(otpMapper.existByUserPk(userPk));
+        return Mono.just(otpMapper.existByMemberPk(userPk));
     }
 
     @Transactional

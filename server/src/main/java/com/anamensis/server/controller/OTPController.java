@@ -51,7 +51,7 @@ public class OTPController {
                             .map(t -> Tuples.of(t, tuple.getT2()))
                 )
                 .flatMap(otpService::verify)
-                .flatMap(t -> userService.editAuth(t.getT1().getUserPk(), true, AuthType.OTP))
+                .flatMap(t -> userService.editAuth(t.getT1().getMemberPk(), true, AuthType.OTP))
                 .map(t -> t ? "success" : "fail");
     }
 

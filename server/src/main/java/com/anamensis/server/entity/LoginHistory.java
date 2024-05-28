@@ -16,7 +16,7 @@ public class LoginHistory {
 
     private long id;
 
-    private long userPK;
+    private long memberPk;
 
     private String ip;
 

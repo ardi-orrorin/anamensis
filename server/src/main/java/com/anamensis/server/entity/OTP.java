@@ -16,7 +16,7 @@ public class OTP {
 
     private long id;
 
-    private long userPk;
+    private long memberPk;
 
     private String hash;
 

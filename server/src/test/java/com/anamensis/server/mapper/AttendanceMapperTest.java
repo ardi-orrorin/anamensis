@@ -114,7 +114,6 @@ class AttendanceMapperTest {
         assertDoesNotThrow(() -> {
             attendanceMapper.findByMemberPk(member2.getId()).get();
         });
-
     }
 
     @Test

@@ -20,10 +20,10 @@ public class PointController {
         return pointService.selectAll();
     }
 
-    @GetMapping("/search")
-    public Mono<List<PointCode>> selectByIdOrName(Mono<PointCode> pointCode) {
-        return pointCode.flatMap(pointService::selectByIdOrName);
-    }
+//    @GetMapping("/search")
+//    public Mono<List<PointCode>> selectByIdOrName(Mono<PointCode> pointCode) {
+//        return pointCode.flatMap(pointService::selectByIdOrName);
+//    }
 
     @PostMapping("")
     public Mono<Boolean> insert(@RequestBody Mono<PointCode> pointCode) {

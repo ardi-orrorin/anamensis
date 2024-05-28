@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class File {
     private long id;
 
-    private int tableCodePk;
+    private long tableCodePk;
 
     private long tableRefPk;
 

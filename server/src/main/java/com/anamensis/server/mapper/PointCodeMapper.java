@@ -11,9 +11,7 @@ public interface PointCodeMapper {
 
     List<PointCode> selectAll();
 
-    List<PointCode> selectByIdOrName(PointCode pointCode);
-
-    Optional<PointCode> findByName(String name);
+    Optional<PointCode> selectByIdOrName(long id , String name);
 
     int insert(PointCode pointCode);
 

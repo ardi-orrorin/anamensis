@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.server.mapper.TableCodeMapper">
+    <select id="findByIdByTableName" resultType="TableCode">
+        SELECT *
+          FROM table_code tc
+         WHERE is_use = 1
+       <choose>
+           <when test="tableName != null and tableName != ''">
+               AND tc.table_name = #{tableName}
+           </when>
+           <when test="id != null and id != 0">
+               AND tc.id = #{id}
+           </when>
+       </choose>
+    </select>
+    <insert id="save" parameterType="TableCode">
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO table_code
+               (table_name, is_use)
+        VALUES (#{tableName}, #{isUse})
+    </insert>
+    <update id="update" parameterType="TableCode">
+        UPDATE table_code
+        <set>
+            <if test="tableName != null and tableName != ''">
+                table_name = #{tableName},
+            </if>
+            <if test="isUse != null">
+                is_use = #{isUse}
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteByIdOrTableName">
+        DELETE FROM table_code
+        WHERE 1 = 1
+        <choose>
+            <when test="tableName != null and tableName != ''">
+                AND table_name = #{tableName}
+            </when>
+            <when test="id != null and id != 0">
+                AND id = #{id}
+            </when>
+        </choose>
+    </delete>
+
+
+
+
+</mapper>

@@ -10,14 +10,14 @@ public interface OTPMapper {
 
     Optional<OTP> selectByUserId(String userId);
 
-    Optional<OTP> selectByUserPk(long userPk);
+    Optional<OTP> selectByMemberPk(long memberPk);
 
     int insert(OTP otp);
 
-    int update(OTP otp);
+    int updateIsUse(OTP otp);
 
-    void disableOTP(long userPk);
+    int disableOTP(long memberPk);
 
-    boolean existByUserPk(long userPk);
+    boolean existByMemberPk(long memberPk);
 
 }

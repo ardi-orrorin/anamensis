@@ -5,18 +5,18 @@
 
 <mapper namespace="com.anamensis.server.mapper.OTPMapper">
     <select id="selectByUserId" resultType="OTP">
-        SELECT a.*
-          FROM otp a
-          JOIN users b
-            ON a.user_pk = b.id
-         WHERE b.user_id = #{userId}
-           AND a.is_use  = 1
+        SELECT o.*
+          FROM otp o
+          JOIN member m
+            ON o.member_pk = m.id
+         WHERE m.user_id = #{userId}
+           AND o.is_use  = 1
     </select>
 
-    <select id="selectByUserPk" resultType="OTP">
+    <select id="selectByMemberPk" resultType="OTP">
         SELECT *
           FROM otp
-         WHERE user_pk = #{userPk}
+         WHERE member_pk = #{memberPk}
            AND is_use  = 1
     </select>
 
@@ -26,18 +26,18 @@
          WHERE hash = #{hash}
     </select>
 
-    <select id="existByUserPk" parameterType="long">
+    <select id="existByMemberPk" parameterType="long">
         SELECT EXISTS (
                SELECT id
                  FROM otp
-                WHERE user_pk = #{userPk}
+                WHERE member_pk = #{memberPk}
                   AND is_use  = 1
         )
     </select>
 
     <insert id="insert" parameterType="OTP">
-        INSERT INTO otp (user_pk, hash, create_at)
-        VALUES (#{userPk}, #{hash}, #{createAt})
+        INSERT INTO otp (member_pk, hash, create_at)
+        VALUES (#{memberPk}, #{hash}, #{createAt})
     </insert>
 
     <update id="updateIsUse" parameterType="OTP">
@@ -49,7 +49,7 @@
     <update id="disableOTP" parameterType="long">
         UPDATE otp
            SET is_use = 0
-         WHERE user_pk = #{userPk}
+         WHERE member_pk = #{memberPk}
     </update>
 
 </mapper>

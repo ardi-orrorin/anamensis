@@ -7,20 +7,20 @@
     <select id="count">
         SELECT COUNT(*)
           FROM login_history
-         WHERE user_pk = #{userId}
+         WHERE member_pk = #{memberPk}
     </select>
 
     <select id="selectAll">
         SELECT *
           FROM login_history
-         WHERE user_pk = #{users.id}
+         WHERE member_pk = #{member.id}
          ORDER BY create_at DESC
          LIMIT #{page.offset}, #{page.size}
     </select>
 
     <insert id="save" parameterType="map">
         INSERT INTO login_history
-               (user_pk, ip, location, device, create_at)
-         VALUE (#{users.id}, #{history.ip}, #{history.location}, #{history.device}, #{history.createAt})
+               (member_pk, ip, location, device, create_at)
+        VALUES (#{member.id}, #{history.ip}, #{history.location}, #{history.device}, #{history.createAt})
     </insert>
 </mapper>

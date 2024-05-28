@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS otp (
     hash         VARCHAR(255)     NOT NULL                           COMMENT 'OTP 코드',
     create_at    DATETIME         NOT NULL                           COMMENT '생성일자',
     is_use       TINYINT(1)       NOT NULL      DEFAULT 1            COMMENT '사용여부 0:사용안함, 1:사용',
-    FOREIGN KEY  (member_pk)      REFERENCES    member(id)
+    FOREIGN KEY  (member_pk)      REFERENCES    member(id),
+    UNIQUE       (hash)
 ) COMMENT 'OTP 정보';
 
 CREATE TABLE IF NOT EXISTS login_history (

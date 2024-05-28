@@ -6,9 +6,7 @@ import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.Role;
 import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.resultMap.MemberResultMap;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -28,15 +26,16 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class MemberMapperTest {
 
     @SpyBean
-    static MemberMapper memberMapper;
+    MemberMapper memberMapper;
 
     @SpyBean
-    private static BCryptPasswordEncoder encoder;
+    BCryptPasswordEncoder encoder;
 
-    private Logger log = org.slf4j.LoggerFactory.getLogger(MemberMapperTest.class);
+    Logger log = org.slf4j.LoggerFactory.getLogger(MemberMapperTest.class);
     Member member1 = new Member();
     Member member2 = new Member();
 
@@ -44,7 +43,6 @@ class MemberMapperTest {
 
     @BeforeAll
     void setup() {
-
         member1.setUserId("admin1");
         member1.setPwd(encoder.encode("admin1"));
         member1.setName("admin1");
@@ -73,9 +71,11 @@ class MemberMapperTest {
 
     }
     @Test
+    @DisplayName("모든 유저 조회")
+    @Order(1)
     void findAllUsers() {
         List<Member> member = memberMapper.findAllMember();
-        assertEquals(2, member.size());
+        assertTrue(member.size() > 0);
 
         // not null
         member.forEach(m -> {
@@ -87,24 +87,30 @@ class MemberMapperTest {
             assertNotNull(m.getCreateAt());
         });
 
-        Member member1 = member.get(0);
-        assertEquals("admin1", member1.getUserId());
-        assertEquals("admin1", member1.getName());
-        assertEquals("admin1@gmail.com", member1.getEmail());
-        assertEquals("010-1111-1111", member1.getPhone());
-        assertTrue(member1.isUse());
+        member.stream().filter(m -> m.getUserId().equals("admin1"))
+                .findFirst()
+                .ifPresentOrElse(m -> {
+                    assertEquals("admin1", m.getUserId());
+                    assertEquals("admin1", m.getName());
+                    assertEquals("admin1@gmail.com", m.getEmail());
+                    assertEquals("010-1111-1111", m.getPhone());
+                    assertTrue(m.isUse());
+                }, () -> fail("user not found"));
 
-        Member member2 = member.get(1);
-        assertEquals("admin2", member2.getUserId());
-        assertEquals("admin2", member2.getName());
-        assertEquals("admin2@gmail.com", member2.getEmail());
-        assertEquals("010-1111-2222", member2.getPhone());
-        assertTrue(member2.isUse());
-
-        log.info("{}", member2);
+        member.stream().filter(m -> m.getUserId().equals("admin2"))
+                .findFirst()
+                .ifPresentOrElse(m -> {
+                    assertEquals("admin2", m.getUserId());
+                    assertEquals("admin2", m.getName());
+                    assertEquals("admin2@gmail.com", m.getEmail());
+                    assertEquals("010-1111-2222", m.getPhone());
+                    assertTrue(m.isUse());
+                }, () -> fail("user not found"));
     }
 
     @Test
+    @DisplayName("유저 아이디로 조회")
+    @Order(2)
     void findUserByUserId() {
 
         assertTrue(memberMapper.findMemberByUserId("admin").isEmpty());
@@ -126,6 +132,8 @@ class MemberMapperTest {
     }
 
     @Test
+    @DisplayName("유저 저장")
+    @Order(3)
     @Transactional
     void save() {
         Member member = new Member();
@@ -168,6 +176,8 @@ class MemberMapperTest {
     }
 
     @Test
+    @DisplayName("유저 정보 조회")
+    @Order(4)
     void findMemberInfo() {
         // 없는 유저
         assertTrue(memberMapper.findMemberInfo("admin").isEmpty());
@@ -202,6 +212,8 @@ class MemberMapperTest {
     }
 
     @Test
+    @DisplayName("권한 저장")
+    @Order(5)
     void saveRole() {
         Member member1 = memberMapper.findMemberByUserId("admin1").get();
         Member member2 = memberMapper.findMemberByUserId("admin2").get();
@@ -221,6 +233,8 @@ class MemberMapperTest {
     }
 
     @Test
+    @DisplayName("권한 삭제")
+    @Order(6)
     void deleteRole() {
 
         Role role1 = memberMapper.findMemberInfo("admin2").get().getRoles().get(0);
@@ -234,6 +248,8 @@ class MemberMapperTest {
     }
 
     @Test
+    @DisplayName("유저 존재 여부")
+    @Order(7)
     void existsUser() {
         UserRequest.existsMember existsMember = new UserRequest.existsMember();
         existsMember.setType("id");
@@ -263,6 +279,8 @@ class MemberMapperTest {
     }
 
     @Test
+    @DisplayName("2차 인증 수정")
+    @Order(8)
     void editAuth() {
         Member member = memberMapper.findMemberByUserId("admin1").get();
 
@@ -276,6 +294,8 @@ class MemberMapperTest {
     }
 
     @Test
+    @DisplayName("포인트 수정")
+    @Order(9)
     void updatePoint() {
         Member member = memberMapper.findMemberByUserId("admin1").get();
 

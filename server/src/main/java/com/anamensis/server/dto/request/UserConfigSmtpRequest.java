@@ -1,6 +1,7 @@
 package com.anamensis.server.dto.request;
 
 import com.anamensis.server.entity.Member;
+import com.anamensis.server.entity.MemberConfigSmtp;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
@@ -33,9 +34,9 @@ public class UserConfigSmtpRequest {
 
         private Boolean isDefault;
 
-        public static com.anamensis.server.entity.UserConfigSmtp fromEntity(UserConfigSmtp entity, Member users) {
-            com.anamensis.server.entity.UserConfigSmtp dto = new com.anamensis.server.entity.UserConfigSmtp();
-            dto.setUserPk(users.getId());
+        public static MemberConfigSmtp fromEntity(UserConfigSmtp entity, Member users) {
+            MemberConfigSmtp dto = new MemberConfigSmtp();
+            dto.setMemberPk(users.getId());
             dto.setHost(entity.getHost());
             dto.setPort(entity.getPort());
             dto.setUsername(entity.getUsername());
@@ -68,8 +69,8 @@ public class UserConfigSmtpRequest {
         private boolean useSSL;
 
 
-        public static com.anamensis.server.entity.UserConfigSmtp toUserConfigSmtp(Test test) {
-            com.anamensis.server.entity.UserConfigSmtp userConfigSmtp = new com.anamensis.server.entity.UserConfigSmtp();
+        public static MemberConfigSmtp toUserConfigSmtp(Test test) {
+            MemberConfigSmtp userConfigSmtp = new MemberConfigSmtp();
             userConfigSmtp.setHost(test.getHost());
             userConfigSmtp.setPort(test.getPort());
             userConfigSmtp.setUsername(test.getUsername());

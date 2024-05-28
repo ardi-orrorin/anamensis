@@ -1,5 +1,4 @@
-
-CREATE TABLE member (
+CREATE TABLE IF NOT EXISTS member (
     id	        BIGINT	      NOT NULL PRIMARY KEY  AUTO_INCREMENT     COMMENT 'PK'          ,
     user_id	    VARCHAR(50)	  NOT NULL UNIQUE     	                   COMMENT '계정 아이디',
     pwd	        VARCHAR(255)  NOT NULL UNIQUE    	                   COMMENT '패스워드',
@@ -14,13 +13,13 @@ CREATE TABLE member (
     s_auth_type VARCHAR(10)   NOT NULL DEFAULT      'NONE'             COMMENT '2차 인증 타입'
 ) COMMENT '사용자 정보';
 
-CREATE TABLE role (
+CREATE TABLE IF NOT EXISTS role (
     role         VARCHAR(20)      NOT NULL                                 COMMENT '권한 정보',
     member_pk    BIGINT	          NOT NULL                                 COMMENT '사용자 PK',
     PRIMARY KEY (role, member_pk)
 ) COMMENT '권한 정보';
 
-CREATE TABLE otp (
+CREATE TABLE IF NOT EXISTS otp (
     id           BIGINT           PRIMARY KEY   AUTO_INCREMENT       COMMENT 'PK',
     member_pk    BIGINT           NOT NULL                           COMMENT '사용자 PK',
     hash         VARCHAR(255)     NOT NULL                           COMMENT 'OTP 코드',
@@ -29,7 +28,7 @@ CREATE TABLE otp (
     FOREIGN KEY  (member_pk)      REFERENCES    member(id)
 ) COMMENT 'OTP 정보';
 
-CREATE TABLE login_history (
+CREATE TABLE IF NOT EXISTS login_history (
     id           BIGINT	          NOT NULL    PRIMARY KEY AUTO_INCREMENT       COMMENT 'PK',
     member_pk    BIGINT	          NOT NULL                                     COMMENT '사용자 PK',
     ip    	     VARCHAR(255)	  NOT NULL	                                 COMMENT '접속 IP주소',
@@ -39,7 +38,7 @@ CREATE TABLE login_history (
     FOREIGN KEY  (member_pk)      REFERENCES  member(id)
 ) COMMENT '로그인 이력';
 
-CREATE TABLE log_history (
+CREATE TABLE IF NOT EXISTS log_history (
     id             BIGINT        AUTO_INCREMENT  PRIMARY KEY,
     member_pk      BIGINT        NOT NULL,
     method         VARCHAR(10)   NOT NULL,
@@ -55,7 +54,7 @@ CREATE TABLE log_history (
     FOREIGN KEY                                  (member_pk)        REFERENCES member (id)
 ) COMMENT 'api 호출 로그 테이블';
 
-CREATE TABLE attendance (
+CREATE TABLE IF NOT EXISTS attendance (
     member_pk    BIGINT          NOT NULL   PRIMARY KEY,
     lastDate     DATE            NOT NULL,
     days         INT NOT         NULL       DEFAULT 1,
@@ -64,13 +63,13 @@ CREATE TABLE attendance (
     CHECK        (days >= 1)
 ) COMMENT '출석 정보';
 
-CREATE TABLE table_code (
+CREATE TABLE IF NOT EXISTS table_code (
     id           BIGINT          PRIMARY KEY  AUTO_INCREMENT    COMMENT 'PK',
     table_name   VARCHAR(255)    NOT NULL                       COMMENT '테이블 이름',
     is_use       TINYINT(1)      NOT NULL     DEFAULT 1         COMMENT '사용여부 0:사용안함, 1:사용'
 ) COMMENT '테이블 코드';
 
-CREATE TABLE file (
+CREATE TABLE IF NOT EXISTS file (
     id               BIGINT          PRIMARY KEY            AUTO_INCREMENT                                  COMMENT 'PK',
     table_code_pk    BIGINT          NOT NULL                                                               COMMENT '테이블 코드 PK',
     table_ref_pk     BIGINT          NOT NULL                                                               COMMENT '참고 테이블 Pk',
@@ -82,7 +81,7 @@ CREATE TABLE file (
     FOREIGN KEY      (table_code_pk) REFERENCES             table_code(id)
 ) COMMENT '파일 테이블';
 
-CREATE TABLE category (
+CREATE TABLE IF NOT EXISTS category (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT           COMMENT 'PK',
     name           VARCHAR(255)    NOT NULL                                COMMENT '카테고리 이름',
     parent_pk      BIGINT                                                  COMMENT '카테고리 PK',
@@ -90,12 +89,12 @@ CREATE TABLE category (
     FOREIGN KEY    (parent_pk)     REFERENCES     category(id)
 ) COMMENT '카테고리';
 
-CREATE TABLE change_code(
+CREATE TABLE IF NOT EXISTS change_code(
                                       id           BIGINT           PRIMARY KEY    AUTO_INCREMENT  COMMENT 'PK',
                                       change_name  VARCHAR(255)     NOT NULL                       COMMENT '변경 코드 이름'
 ) COMMENT '변경 코드';
 
-CREATE TABLE board (
+CREATE TABLE IF NOT EXISTS board (
     id           BIGINT          PRIMARY KEY             AUTO_INCREMENT                           COMMENT 'PK',
     category_pk  BIGINT          NOT NULL                                                         COMMENT '카테고리 PK',
     title        VARCHAR(255)    NOT NULL                                                         COMMENT '제목',
@@ -110,7 +109,7 @@ CREATE TABLE board (
     FOREIGN KEY  (category_pk)   REFERENCES              category(id)
 ) COMMENT '게시글';
 
-CREATE TABLE board_comment (
+CREATE TABLE IF NOT EXISTS board_comment (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT                                      COMMENT 'PK',
     board_pk       BIGINT          NOT NULL                                                           COMMENT '게시글 PK',
     content        TEXT            NOT NULL                                                           COMMENT '댓글 내용',
@@ -123,7 +122,7 @@ CREATE TABLE board_comment (
     FOREIGN KEY                    (parent_pk)    REFERENCES       board_comment(id)
 ) COMMENT '게시글 댓글';
 
-CREATE TABLE share_link (
+CREATE TABLE IF NOT EXISTS share_link (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT                        COMMENT 'PK',
     org_link       VARCHAR(255)    NOT NULL                                             COMMENT '원본 링크',
     share_link     VARCHAR(255)    NOT NULL                                             COMMENT '공유 링크',
@@ -133,14 +132,14 @@ CREATE TABLE share_link (
     FOREIGN KEY    (member_pk)     REFERENCES     member(id)
 ) COMMENT '링크 공유';
 
-CREATE TABLE point_code (
+CREATE TABLE IF NOT EXISTS point_code (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT    COMMENT 'PK',
     name           VARCHAR(255)    NOT NULL                         COMMENT '포인트 적립 이름',
     point          BIGINT          NOT NULL                         COMMENT '포인트 값',
     is_use         TINYINT(1)      NOT NULL       DEFAULT 1         COMMENT '사용여부 0:사용안함, 1:사용'
 ) COMMENT '포인트 코드';
 
-CREATE TABLE point_history (
+CREATE TABLE IF NOT EXISTS point_history (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT                              COMMENT 'PK',
     table_name     VARCHAR(255)    NOT NULL                                                   COMMENT '테이블 이름',
     table_pk       BIGINT          NOT NULL                                                   COMMENT '참조된 테이블 PK',
@@ -152,7 +151,7 @@ CREATE TABLE point_history (
 ) COMMENT '포인트 이력';
 
 
-CREATE TABLE board_history (
+CREATE TABLE IF NOT EXISTS board_history (
     id              BIGINT            PRIMARY KEY         AUTO_INCREMENT                           COMMENT 'PK',
     board_pk        BIGINT            NOT NULL                                                     COMMENT '게시글 PK',
     title           VARCHAR(255)      NOT NULL                                                     COMMENT '제목',
@@ -164,7 +163,7 @@ CREATE TABLE board_history (
 ) COMMENT '게시글 변경 이력';
 
 
-CREATE TABLE email_verify (
+CREATE TABLE IF NOT EXISTS email_verify (
     id              BIGINT            PRIMARY KEY         AUTO_INCREMENT                           COMMENT 'PK',
     email           VARCHAR(255)      NOT NULL                                                     COMMENT '이메일',
     code            VARCHAR(255)      NOT NULL                                                     COMMENT '인증 코드',
@@ -173,7 +172,7 @@ CREATE TABLE email_verify (
     is_use          TINYINT(1)        NOT NULL            DEFAULT               1                  COMMENT '사용 여부 0:사용안함, 1:사용'
 ) COMMENT '이메일 인증';
 
-CREATE TABLE member_config_smtp (
+CREATE TABLE IF NOT EXISTS member_config_smtp (
     id             BIGINT          AUTO_INCREMENT    PRIMARY KEY ,
     member_pk      BIGINT          NOT NULL,
     host           VARCHAR(255)    NOT NULL                         COMMENT  'SMTP 서버 주소',
@@ -188,7 +187,7 @@ CREATE TABLE member_config_smtp (
     FOREIGN KEY    (member_pk)     REFERENCES        member (id)
 ) COMMENT '사용자 SMTP 설정';
 
-CREATE TABLE smtp_push_history (
+CREATE TABLE IF NOT EXISTS smtp_push_history (
     id                  BIGINT                    AUTO_INCREMENT PRIMARY KEY,
     member_pk           BIGINT                    NOT NULL                           COMMENT '사용자 PK',
     user_config_smtp_pk BIGINT                    NOT NULL                           COMMENT '사용자 SMTP 설정 PK',
@@ -201,14 +200,14 @@ CREATE TABLE smtp_push_history (
     FOREIGN KEY         (user_config_smtp_pk)     REFERENCES member_config_smtp (id)
 ) COMMENT '사용자 PUSH 설정';
 
-CREATE TABLE web_sys (
+CREATE TABLE IF NOT EXISTS web_sys (
     code        CHAR(4)      NOT NULL PRIMARY KEY COMMENT '시스템 코드',
     name        VARCHAR(100) NOT NULL             COMMENT '이름',
     description TEXT                              COMMENT '시스템 설명',
     permission  varchar(10)  NOT NULL             COMMENT '접근 권한'
 ) COMMENT '시스템 정보';
 
-CREATE TABLE system_message (
+CREATE TABLE IF NOT EXISTS system_message (
     id          INT            PRIMARY KEY           AUTO_INCREMENT,
     web_sys_pk  CHAR(4)        NOT NULL              COMMENT '시스템 코드',
     subject     VARCHAR(255)   NOT NULL              COMMENT '제목',
@@ -225,7 +224,7 @@ CREATE TABLE system_message (
 ) COMMENT '시스템 메시지';
 
 
-CREATE TABLE smtp_push_history_count (
+CREATE TABLE IF NOT EXISTS smtp_push_history_count (
     member_pk            INT NOT NULL,
     user_config_smtp_pk  INT NOT NULL,
     count                INT NOT NULL DEFAULT 0,

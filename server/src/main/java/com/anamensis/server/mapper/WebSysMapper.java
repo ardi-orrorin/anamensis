@@ -23,7 +23,7 @@ public interface WebSysMapper {
 
     void saveAll(List<WebSys> webSysList);
 
-    void update(WebSys webSys);
+    int update(WebSys webSys);
 
-    void deleteByCode(String code);
+    int deleteByCode(String code);
 }

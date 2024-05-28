@@ -3,11 +3,10 @@ package com.anamensis.server.controller;
 import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.PageResponse;
 import com.anamensis.server.dto.request.UserConfigSmtpRequest;
-import com.anamensis.server.entity.UserConfigSmtp;
+import com.anamensis.server.entity.MemberConfigSmtp;
 import com.anamensis.server.service.UserConfigSmtpService;
 import com.anamensis.server.service.UserService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -23,13 +22,13 @@ public class UserConfigSmtpController {
     private final UserService userService;
 
     @GetMapping("")
-    public Mono<PageResponse<UserConfigSmtp>> list(
+    public Mono<PageResponse<MemberConfigSmtp>> list(
             @AuthenticationPrincipal Mono<UserDetails> user
     ) {
         return user.flatMap(u -> userService.findUserByUserId(u.getUsername()))
                    .map(u -> userConfigSmtpService.selectByUserPk(u.getId()))
                    .flatMap(Flux::collectList)
-                   .map(r -> PageResponse.<UserConfigSmtp>builder()
+                   .map(r -> PageResponse.<MemberConfigSmtp>builder()
                                .page(new Page())
                                .content(r)
                                .build()
@@ -37,7 +36,7 @@ public class UserConfigSmtpController {
     }
 
     @GetMapping("{id}")
-    public Mono<UserConfigSmtp> get(
+    public Mono<MemberConfigSmtp> get(
             @PathVariable long id
     ) {
         return Mono.just(id)
@@ -45,7 +44,7 @@ public class UserConfigSmtpController {
     }
 
     @PostMapping("")
-    public Mono<UserConfigSmtp> save(
+    public Mono<MemberConfigSmtp> save(
             @RequestBody Mono<UserConfigSmtpRequest.UserConfigSmtp> userConfigSmtp,
             @AuthenticationPrincipal Mono<UserDetails> user
     ) {
@@ -57,12 +56,12 @@ public class UserConfigSmtpController {
 
     @PutMapping("")
     public Mono<Boolean> update(
-            @RequestBody Mono<UserConfigSmtp> userConfigSmtp,
+            @RequestBody Mono<MemberConfigSmtp> userConfigSmtp,
             @AuthenticationPrincipal Mono<UserDetails> user
     ) {
         return user.flatMap(u -> userService.findUserByUserId(u.getUsername()))
                    .zipWith(userConfigSmtp)
-                   .doOnNext(t -> t.getT2().setUserPk(t.getT1().getId()))
+                   .doOnNext(t -> t.getT2().setMemberPk(t.getT1().getId()))
                    .flatMap(t -> userConfigSmtpService.update(t.getT2()));
     }
 

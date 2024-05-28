@@ -17,14 +17,14 @@ public interface SystemMessageMapper {
 
     void save(SystemMessage systemMessage);
 
-    void update(SystemMessage systemMessage);
+    int update(SystemMessage systemMessage);
 
-    void updateIsUse(
+    int updateIsUse(
             @Param("id") int id,
             @Param("isUse") boolean isUse,
             @Param("updateAt") LocalDateTime updateAt
     );
 
-    void delete(int id);
+    int delete(int id);
 
 }

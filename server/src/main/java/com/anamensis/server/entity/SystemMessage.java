@@ -29,7 +29,6 @@ public class SystemMessage {
     @JsonIgnore
     private LocalDateTime updateAt;
 
-
     private boolean isUse;
 
     @JsonSerialize(nullsUsing = StringNullSerializer.class)

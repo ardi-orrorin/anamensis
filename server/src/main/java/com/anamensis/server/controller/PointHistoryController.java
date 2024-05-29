@@ -23,16 +23,16 @@ public class PointHistoryController {
     private final PointHistoryService pointHistoryService;
     private final UserService userService;
 
-    @GetMapping("")
-    public Mono<List<PointHistory>> getPointHistories(
-            Mono<PointHistory> pointHistory,
-            @AuthenticationPrincipal Mono<UserDetails> user
-    ) {
-        return pointHistory
-                .zipWith(user)
-                .doOnNext(this::transUserDetailToUserPk)
-                .flatMap(tuple -> pointHistoryService.selectByPointHistory(tuple.getT1()));
-    }
+//    @GetMapping("")
+//    public Mono<List<PointHistory>> getPointHistories(
+//            Mono<PointHistory> pointHistory,
+//            @AuthenticationPrincipal Mono<UserDetails> user
+//    ) {
+//        return pointHistory
+//                .zipWith(user)
+//                .doOnNext(this::transUserDetailToUserPk)
+//                .flatMap(tuple -> pointHistoryService.selectByPointHistory(tuple.getT1()));
+//    }
 
     @PostMapping("")
     public Mono<Boolean> postPointHistory(
@@ -48,7 +48,7 @@ public class PointHistoryController {
 
     private Mono<Void> transUserDetailToUserPk(Tuple2<PointHistory, UserDetails> tuple) {
         return userService.findUserByUserId(tuple.getT2().getUsername())
-                .doOnNext(u -> tuple.getT1().setUserPk(u.getId()))
+                .doOnNext(u -> tuple.getT1().setMemberPk(u.getId()))
                 .then();
     }
 }

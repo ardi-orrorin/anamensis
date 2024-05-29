@@ -143,13 +143,14 @@ CREATE TABLE IF NOT EXISTS point_code (
 
 CREATE TABLE IF NOT EXISTS point_history (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT                              COMMENT 'PK',
-    table_name     VARCHAR(255)    NOT NULL                                                   COMMENT '테이블 이름',
-    table_pk       BIGINT          NOT NULL                                                   COMMENT '참조된 테이블 PK',
+    table_code_pk  VARCHAR(255)    NOT NULL                                                   COMMENT '테이블 이름',
+    table_ref_pk   BIGINT          NOT NULL                                                   COMMENT '참조된 테이블 PK',
     member_pk      BIGINT          NOT NULL                                                   COMMENT '유저 PK',
     point_code_pk  BIGINT          NOT NULL                                                   COMMENT '포인트 코드 PK',
     create_at      TIMESTAMP(6)        NOT NULL                                                   COMMENT '생성일자',
     FOREIGN KEY    (member_pk)     REFERENCES     member(id),
-    FOREIGN KEY    (point_code_pk) REFERENCES     point_code(id)
+    FOREIGN KEY    (point_code_pk) REFERENCES     point_code(id),
+    FOREIGN KEY    (table_code_pk) REFERENCES     table_code(id)
 ) COMMENT '포인트 이력';
 
 
@@ -168,7 +169,7 @@ CREATE TABLE IF NOT EXISTS board_history (
 CREATE TABLE IF NOT EXISTS email_verify (
     id              BIGINT            PRIMARY KEY         AUTO_INCREMENT                           COMMENT 'PK',
     email           VARCHAR(255)      NOT NULL                                                     COMMENT '이메일',
-    code            VARCHAR(255)      NOT NULL                                                     COMMENT '인증 코드',
+    code            CHAR(6)           NOT NULL                                                     COMMENT '인증 코드',
     create_at       TIMESTAMP(6)          NOT NULL                                                     COMMENT '생성일자',
     expire_at       TIMESTAMP(6)          NOT NULL                                                     COMMENT '만료일자',
     is_use          TINYINT(1)        NOT NULL            DEFAULT               1                  COMMENT '사용 여부 0:사용안함, 1:사용'

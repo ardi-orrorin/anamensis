@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Transactional
 class MemberMapperTest {
 
     @SpyBean
@@ -439,5 +440,4 @@ class MemberMapperTest {
 
         member100.setPhone("010-1111-1222");
     }
-
 }

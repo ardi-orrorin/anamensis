@@ -19,11 +19,11 @@ public class SmtpPushHistoryService {
     private final SmtpPushHistoryMapper smtpPushHistoryMapper;
 
     public Mono<Long> countByUserPk(long userPk) {
-        return Mono.just(smtpPushHistoryMapper.countByUserPk(userPk));
+        return Mono.just(smtpPushHistoryMapper.countByMemberPk(userPk));
     }
 
     public Flux<SmtpPushHistoryResponse.ListSmtpPushHistory> findByUserPk(long userPk, Page page) {
-        return Flux.fromIterable(smtpPushHistoryMapper.findByUserPk(userPk, page))
+        return Flux.fromIterable(smtpPushHistoryMapper.findByMemberPk(userPk, page))
                 .publishOn(Schedulers.parallel())
                 .map(SmtpPushHistoryResponse.ListSmtpPushHistory::fromResultMap);
     }

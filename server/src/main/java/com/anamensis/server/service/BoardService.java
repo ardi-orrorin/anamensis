@@ -12,7 +12,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +35,7 @@ public class BoardService {
     }
 
     public Flux<BoardResponse.SummaryList> findByUserPk(long userPk) {
-        return Flux.fromIterable(boardMapper.findByUserPk(userPk))
+        return Flux.fromIterable(boardMapper.findByMemberPk(userPk))
                 .map(BoardResponse.SummaryList::from);
     }
 

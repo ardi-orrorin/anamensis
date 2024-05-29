@@ -82,7 +82,8 @@ public class UserController {
             @Valid @RequestBody
             Mono<UserRequest.Register> user
     ) {
-        return userService.saveUser(user)
+
+        return user.flatMap(userService::saveUser)
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(u -> attendanceService.init(u.getId()))
                 .map(u -> UserResponse.Status

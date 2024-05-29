@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -439,5 +440,46 @@ class MemberMapperTest {
         });
 
         member100.setPhone("010-1111-1222");
+    }
+
+    @Test
+    @Order(15)
+    @DisplayName("member 수정 테스트")
+    void update() {
+        Member member = new Member();
+        member.setUserId("d-member-111");
+
+        assertThrowsExactly(BadSqlGrammarException.class, () ->
+            memberMapper.update(member)
+        );
+
+        member.setName("d-member-111");
+        assertEquals(0, memberMapper.update(member));
+
+
+        member.setId(1);
+        assertEquals(1, memberMapper.update(member));
+        memberMapper.findMemberByUserId("d-member-1").ifPresent(m -> {
+            assertEquals("d-member-111", m.getName());
+        });
+
+
+        member.setName(null);
+        member.setEmail("d-member-111@gmail.com");
+        assertEquals(1, memberMapper.update(member));
+        memberMapper.findMemberByUserId("d-member-1").ifPresent(m -> {
+            assertEquals("d-member-111@gmail.com", m.getEmail());
+        });
+
+
+        member.setEmail(null);
+        member.setPhone("010-1111-1234");
+        assertEquals(1, memberMapper.update(member));
+        memberMapper.findMemberByUserId("d-member-1").ifPresent(m -> {
+            assertEquals("010-1111-1234", m.getPhone());
+        });
+
+
+
     }
 }

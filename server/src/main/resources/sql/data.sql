@@ -28,26 +28,34 @@ INSERT INTO member
 , email, phone, point
 , create_at, update_at
 , s_auth, s_auth_type)
-VALUES (1, 'd-member-1', 'd-member-1', 'd-member-1'
+VALUES (1, 'd-member-1', '$2a$10$aV9tKjhmnZhE4gLdtHRw3O2Xa3VWZmOeOuDpbkETFYOl0wYK4haD.', 'd-member-1'
        ,'d-member-1@gmail.com', '010-0000-0001', 0
        , current_timestamp, current_timestamp
        , FALSE, 'NONE')
-     , (2, 'd-member-2', 'd-member-2', 'd-member-2'
+     , (2, 'd-member-2', '$2a$10$AlFLBI5bS6lRsPwOLBYdzuU.PHM5QKUlEOaCkbVoVpoEOMYJ6nXla', 'd-member-2'
        ,'d-member-2@gmail.com', '010-0000-0002', 0
        , current_timestamp, current_timestamp
        , FALSE, 'OTP')
-     , (3, 'd-member-3', 'd-member-3', 'd-member-3'
+     , (3, 'd-member-3', '$2a$10$uDN4NtcVrIq8vemDJ2J.Ye7SM2gIsxLdkojVoQkGvrm6SbDCPxnOe', 'd-member-3'
        ,'d-member-3@gmail.com', '010-0000-0003', 0
        , current_timestamp, current_timestamp
        , FALSE, 'NONE')
-     , (4, 'd-member-4', 'd-member-4', 'd-member-4'
-       ,'d-member-4@gmail.com', '010-0000-0004', 0
+     , (4, 'd-member-4', '$2a$10$VTQ8OrIMPEI5LHou7VK61u3olxdMy0BfBZpLIFue5vOuH2q8AC8RO', 'd-member-4'
+       ,'d-member-4@gmail.com', '010-0000-0004', 100
        , current_timestamp, current_timestamp
        , FALSE, 'EMAIL')
-     , (5, 'd-member-5', 'd-member-5', 'd-member-5'
+     , (5, 'd-member-5', '$2a$10$4GXgtmbOk7QYiR8iI1NO0e2XmWpz7dAaAZHfwygg2ZnqVaQZlLX56', 'd-member-5'
        ,'d-member-5@gmail.com', '010-0000-0005', 0
        , current_timestamp, current_timestamp
        , FALSE, 'EMAIL');
+
+INSERT INTO role (role, member_pk)
+VALUES ('ADMIN', 1)
+     , ('USER', 1)
+     , ('MASTER', 1)
+     , ('USER', 2)
+     , ('ADMIN', 2)
+     , ('GUEST', 3);
 
 
 INSERT INTO table_code

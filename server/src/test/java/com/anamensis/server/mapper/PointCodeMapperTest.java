@@ -140,6 +140,4 @@ class PointCodeMapperTest {
         });
         pointCode.setName("point-1");
     }
-
-
 }

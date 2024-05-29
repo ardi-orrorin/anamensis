@@ -15,9 +15,9 @@ public class PointHistoryService {
 
     private final PointHistoryMapper pointHistoryMapper;
 
-    public Mono<List<PointHistory>> selectByPointHistory(PointHistory pointHistory) {
-        return Mono.just(pointHistoryMapper.selectByPointHistory(pointHistory));
-    }
+//    public Mono<List<PointHistory>> selectByPointHistory(PointHistory pointHistory) {
+//        return Mono.just(pointHistoryMapper.selectByPointHistory(pointHistory));
+//    }
 
     @Transactional
     public Mono<Boolean> insert(PointHistory pointHistory) {

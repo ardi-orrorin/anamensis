@@ -1,14 +1,14 @@
-INSERT INTO anamensis.web_sys
+INSERT INTO web_sys
        (code, name, description, permission)
 VALUES ('001', 'default', '기본값', 'ADMIN');
 
-INSERT INTO anamensis.system_message
-       (web_sys_pk, subject, content, create_at)
-VALUES ('001', '시스템 메시지', '시스템 메시지입니다.', current_timestamp);
+INSERT INTO system_message
+       (web_sys_pk, subject, content, create_at, update_at)
+VALUES ('001', '시스템 메시지', '시스템 메시지입니다.', current_timestamp, current_timestamp);
 
 
-INSERT INTO anamensis.point_code
-       (name, value)
+INSERT INTO point_code
+       (name, point)
 VALUES ('attend-1', 10),
        ('attend-2', 15),
        ('attend-3', 15),
@@ -21,7 +21,7 @@ VALUES ('attend-1', 10),
        ('attend-10', 100);
 
 
-INSERT INTO anamensis.table_code
+INSERT INTO table_code
          (id, table_name, is_use)
 VALUES (1, 'users'  , 1),
        (2, 'board' , 1),

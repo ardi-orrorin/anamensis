@@ -11,10 +11,10 @@ import java.util.Optional;
 
 @Mapper
 public interface SmtpPushHistoryMapper {
-    long countByUserPk(long userPk);
+    long countByMemberPk(long memberPk);
 
-    List<SmtpPushHistoryResultMap.ListSmtpPushHistory> findByUserPk(
-        @Param("userPk") long userPk,
+    List<SmtpPushHistoryResultMap.ListSmtpPushHistory> findByMemberPk(
+        @Param("memberPk") long memberPk,
         @Param("page") Page page
     );
 

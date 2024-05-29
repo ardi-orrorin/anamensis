@@ -13,9 +13,9 @@ public class SmtpPushHistory {
 
     private long id;
 
-    private long userPk;
+    private long memberPk;
 
-    private long userConfigSmtpPk;
+    private long memberConfigSmtpPk;
 
     private String subject;
 

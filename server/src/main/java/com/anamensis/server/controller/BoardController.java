@@ -88,7 +88,7 @@ public class BoardController {
     ) {
         return user
                 .flatMap(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
-                .doOnNext(u -> board.setUserPk(u.getId()))
+                .doOnNext(u -> board.setMemberPk(u.getId()))
                 .flatMap(u -> boardService.save(board));
     }
 
@@ -101,7 +101,7 @@ public class BoardController {
         return user
                 .flatMap(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
                 .doOnNext(u -> {
-                    board.setUserPk(u.getId());
+                    board.setMemberPk(u.getId());
                     board.setId(boardPk);
                 })
                 .flatMap(u -> boardService.updateByPk(board))

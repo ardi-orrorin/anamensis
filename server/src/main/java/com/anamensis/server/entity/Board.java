@@ -13,7 +13,7 @@ import java.util.Map;
 public class Board {
     private long id;
     private long categoryPk;
-    private long userPk;
+    private long memberPk;
     private String title;
     private Map<String, Object> content;
     private long rate;

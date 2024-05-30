@@ -12,6 +12,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PointService {
 
     @Value("${db.setting.user.attendance_point_code_prefix}")
@@ -32,13 +33,14 @@ public class PointService {
                 .switchIfEmpty(Mono.error(new RuntimeException("not found")));
     }
 
-    @Transactional
-    public boolean insert(PointCode pointCode) {
-        int result = pointCodeMapper.insert(pointCode);
+    public Mono<Boolean> insert(PointCode pointCode) {
+        return Mono.just(true)
+                .flatMap(r -> Mono.just(pointCodeMapper.insert(pointCode)))
+                .flatMap(r ->
+                    r == 1 ? Mono.just(true)
+                           : Mono.error(new RuntimeException("insert fail")))
+                .onErrorReturn(false);
 
-        if(result != 1) new RuntimeException("insert fail");
-
-        return true;
     }
 
 

@@ -6,10 +6,13 @@ import com.anamensis.server.entity.SmtpPushHistory;
 import com.anamensis.server.mapper.SmtpPushHistoryMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+
+import java.util.concurrent.Executors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,13 +21,15 @@ public class SmtpPushHistoryService {
 
     private final SmtpPushHistoryMapper smtpPushHistoryMapper;
 
-    public Mono<Long> countByUserPk(long userPk) {
-        return Mono.just(smtpPushHistoryMapper.countByMemberPk(userPk));
+    private final VirtualThreadTaskExecutor virtualThreadTaskExecutor;
+
+    public Mono<Long> countByMemberPk(long memberPk) {
+        return Mono.just(smtpPushHistoryMapper.countByMemberPk(memberPk));
     }
 
-    public Flux<SmtpPushHistoryResponse.ListSmtpPushHistory> findByUserPk(long userPk, Page page) {
-        return Flux.fromIterable(smtpPushHistoryMapper.findByMemberPk(userPk, page))
-                .publishOn(Schedulers.parallel())
+    public Flux<SmtpPushHistoryResponse.ListSmtpPushHistory> findByMemberPk(long memberPk, Page page) {
+        return Flux.fromIterable(smtpPushHistoryMapper.findByMemberPk(memberPk, page))
+                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
                 .map(SmtpPushHistoryResponse.ListSmtpPushHistory::fromResultMap);
     }
 

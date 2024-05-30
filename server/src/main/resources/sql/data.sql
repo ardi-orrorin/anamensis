@@ -154,8 +154,6 @@ VALUES (1, 1, 'smtp.gmail.com'
        , 'username3@gmail.com', 'username3', TRUE
        , TRUE, FALSE);
 
-
-
 INSERT INTO smtp_push_history
             (id, member_pk, member_config_smtp_pk,
              subject, content, status,
@@ -169,7 +167,7 @@ VALUES (1, 1, 1, '테스트 제목1', '테스트 내용1', 'SUCCESS', '메세지
      , (7, 1, 1, '테스트 제목7', '테스트 내용7', 'SUCCESS', '메세지7', current_timestamp)
      , (8, 1, 1, '테스트 제목8', '테스트 내용8', 'SUCCESS', '메세지8', current_timestamp)
      , (9, 1, 1, '테스트 제목9', '테스트 내용9', 'SUCCESS', '메세지9', current_timestamp)
-     , (10, 1, 1, '테스트 제목10', '테스트 내용10', 'SUCCESS', '메세지10', current_timestamp);
+     , (10, 1, 1, '테스트 제목10', '테스트 내용10', 'FAIL', '메세지10', current_timestamp);
 
 INSERT INTO web_sys
        (code, name, description, permission)
@@ -177,5 +175,27 @@ VALUES ('001', '테스트1', '설명1', 'ADMIN')
      , ('002', '테스트2', '설명2', 'USER')
      , ('003', '테스트3', '설명3', 'MASTER')
      , ('004', '테스트4', '설명4', 'ADMIN');
+
+INSERT INTO system_message
+       (id, web_sys_pk, subject,
+        content, create_at, update_at,
+        is_use, extra1, extra2,
+        extra3, extra4, extra5)
+VALUES (1, '001', '제목1'
+       ,'내용1', current_timestamp, current_timestamp
+       ,TRUE, 'extra1', 'extra2'
+       ,'extra3', 'extra4', 'extra5')
+     , (2, '001', '제목2'
+       ,'내용1', current_timestamp, current_timestamp
+       ,TRUE, 'extra1', 'extra2'
+       ,'extra3', 'extra4', 'extra5')
+     , (3, '001', '제목3'
+       ,'내용1', current_timestamp, current_timestamp
+       ,TRUE, 'extra1', 'extra2'
+       ,'extra3', 'extra4', 'extra5')
+     , (4, '002', '제목4'
+       ,'내용1', current_timestamp, current_timestamp
+       ,TRUE, 'extra1', 'extra2'
+       ,'extra3', 'extra4', 'extra5')
 
 

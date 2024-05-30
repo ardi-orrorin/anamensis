@@ -136,7 +136,7 @@ CREATE TABLE IF NOT EXISTS share_link (
 
 CREATE TABLE IF NOT EXISTS point_code (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT    COMMENT 'PK',
-    name           VARCHAR(255)    NOT NULL                         COMMENT '포인트 적립 이름',
+    name           VARCHAR(255)    NOT NULL       UNIQUE                  COMMENT '포인트 적립 이름',
     point          BIGINT          NOT NULL                         COMMENT '포인트 값',
     is_use         TINYINT(1)      NOT NULL       DEFAULT 1         COMMENT '사용여부 0:사용안함, 1:사용'
 ) COMMENT '포인트 코드';

@@ -30,8 +30,8 @@ public class SmtpPushHistoryController {
         return userDetails
                 .flatMap(user -> userService.findUserInfo(user.getUsername()))
                 .flatMap(user ->
-                    Mono.zip(smtpPushHistoryService.countByUserPk(user.getMemberPk()),
-                             smtpPushHistoryService.findByUserPk(user.getMemberPk(), page).collectList()
+                    Mono.zip(smtpPushHistoryService.countByMemberPk(user.getMemberPk()),
+                             smtpPushHistoryService.findByMemberPk(user.getMemberPk(), page).collectList()
                     )
                 ).map(t -> {
                     page.setTotal(t.getT1().intValue());

@@ -19,8 +19,12 @@ public class MailProvider {
         });
     }
 
-    public void testConnection() throws MessagingException {
-        mailSenderImpl.testConnection();
+    public void testConnection() {
+        try {
+            mailSenderImpl.testConnection();
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private MailProvider(Builder builder) {

@@ -17,6 +17,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,12 +39,9 @@ class WebSysMapperTest {
     @SpyBean
     MemberMapper memberMapper;
 
-    WebSys webSysbase = new WebSys();
-
     @BeforeAll
     public void setUp() {
         Member member1 = new Member();
-        Member member2 = new Member();
         member1.setUserId("wsmt1");
         member1.setPwd(encoder.encode("wsmt1"));
         member1.setName("wsmt1");
@@ -52,22 +51,8 @@ class WebSysMapperTest {
         member1.setCreateAt(LocalDateTime.now());
         memberMapper.save(member1);
 
-        member2.setUserId("wsmt2");
-        member2.setPwd(encoder.encode("wsmt2"));
-        member2.setName("wsmt2");
-        member2.setEmail("wsmt2@gmail.com");
-        member2.setPhone("010-1111-4002");
-        member2.setUse(true);
-        member2.setCreateAt(LocalDateTime.now());
-        memberMapper.save(member2);
 
 
-        webSysbase.setCode("002");
-        webSysbase.setName("name");
-        webSysbase.setDescription("description");
-        webSysbase.setPermission(RoleType.ADMIN);
-
-        webSysMapper.save(webSysbase);
     }
 
     @SpyBean
@@ -80,7 +65,7 @@ class WebSysMapperTest {
     @DisplayName("저장")
     void save() {
         WebSys webSys = new WebSys();
-        webSys.setCode("003");
+        webSys.setCode("005");
         assertThrowsExactly(DataIntegrityViolationException.class, () ->
                 webSysMapper.save(webSys)
         );
@@ -105,7 +90,7 @@ class WebSysMapperTest {
                 webSysMapper.save(webSys)
         );
 
-        webSys.setCode("004");
+        webSys.setCode("006");
         assertDoesNotThrow(() -> webSysMapper.save(webSys));
 
         // code 4자 제한
@@ -114,108 +99,49 @@ class WebSysMapperTest {
                 webSysMapper.save(webSys)
         );
 
-        webSys.setCode("005");
-        webSys.setName("""
-                글자 100자 제한, sdfiojsdlfijslifjsdfs
-                fsfsdfdsfsdfsdlfisdjlfsdsdfsdfsdfsdfsdfsdf
-                fsdfsdfsdlfijsdlijvssdfsdfsdfsdfsdfsdfsdfsdfsdf
-                fsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdf
-                sfsflisjdfljdsfsdfsdfsdfsdfsdfsdfdsf
-                fsfsdfdsfsdfsdlfisdjlfsdsdfsdfsdfsdfsdfsdf
-                fsdfsdfsdlfijsdlijvssdfsdfsdfsdfsdfsdfsdfsdfsdf
-                fsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdf
-                sfsflisjdfljdsfsdfsdfsdfsdfsdfsdfdsf
-                """);
+        webSys.setCode("007");
+        webSys.setName("a".repeat(101));
         assertThrowsExactly(DataIntegrityViolationException.class, () ->
                 webSysMapper.save(webSys)
         );
 
-        webSys.setName("name");
+        webSys.setName("a".repeat(100));
         assertDoesNotThrow(() -> webSysMapper.save(webSys));
 
-        webSys.setCode("006");
-        webSys.setDescription("""
-                TEXT 형식으로 글자 제한이 65535자 이다.
-                글자 65535자 제한, sdfiojsdlfijslifjsdfs
-                fsfsdfdsfsdfsdlfisdjlfsdsdfsdfsdfsdfsdfsdfsdf
-                fsdfsdfsdlfijsdlijvssdfsdfsdfsdfsdfsdfsdfsdfsdff
-                sfsdfdsfsdfsdlfisdjlfsdsdfsdfsdfsdfsdfsdfsdf
-                fsdfsdfsdlfijsdlijvssdfsdfsdfsdfsdfsdfsdfsdfsdffsfsd
-                fdsfsdfsdlfisdjlfsdsdfsdfsdfsdfsdfsdfsdf
-                fsdfsdfsdlfijsdlijvssdfsdfsdfsdfsdfsdfsdfsdfsdffsfsd
-                fdsfsdfsdlfisdjlfsdsdfsdfsdfsdfsdfsdfsdf
-                fsdfsdfsdlfijsdlijvssdfsdfsdfsdfsdfsdfsdfsdfsdffsfsd
-                fdsfsdfsdlfisdjlfsdsdfsdfsdfsdfsdfsdfsdf
-                fsdfsdfsdlfijsdlijvssdfsdfsdfsdfsdfsdfsdfsdfsdffsfsd
-                fdsfsdfsdlfisdjlfsdsdfsdfsdfsdfsdfsdfsdf
-                fsdfsdfsdlfijsdlijvssdfsdfsdfsdfsdfsdfsdfsdfsdffsfsd
-                fdsfsdfsdlfisdjlfsdsdfsdfsdfsdfsdfsdfsdf
-                fsdfsdfsdlfijsdlijvssdfsdfsdfsdfsdfsdfsdfsdfsdffsdfs
-                dfsdlfijsdlijvssdfsdfsdfsdfsdfsdfsdfsdfsdffsfsdfdsfs
-                dfsdlfisdjlfsdsdfsdfsdfsdfsdfsdfsdf
-                fsdfsdfsdlfijsdlijvssdfsdfsdfsdfsdfsdfsdfsdfsdffsfsd
-                fdsfsdfsdlfisdjlfsdsdfsdfsdfsdfsdfsdfsdf
-                fsdfsdfsdlfijsdlijvssdfsdfsdfsdfsdfsdfsdfsdfsdffsfsd
-                fdsfsdfsdlfisdjlfsdsdfsdfsdfsdfsdfsdfsdf
-                fsdfsdfsdlfijsdlijvssdfsdfsdfsdfsdfsdfsdfsdfsdffsfsd
-                fdsfsdfsdlfisdjlfsdsdfsdfsdfsdfsdfsdfsdf
-                fsdfsdfsdlfijsdlijvssdfsdfsdfsdfsdfsdfsdfsdfsdffsfsd
-                fdsfsdfsdlfisdjlfsdsdfsdfsdfsdfsdfsdfsdf
-                fsdfsdfsdlfijsdlijvssdfsdfsdfsdfsdfsdfsdfsdfsdffsfsd
-                fdsfsdfsdlfisdjlfsdsdfsdfsdfsdfsdfsdfsdf
-                fsdfsdfsdlfijsdlijvssdfsdfsdfsdfsdfsdfsdfsdfsdf
-                """);
-
-        assertDoesNotThrow(() -> webSysMapper.save(webSys));
+        webSys.setCode("008");
+        webSys.setDescription("a".repeat(65536));
+        assertThrowsExactly(DataIntegrityViolationException.class, () ->
+                webSysMapper.save(webSys)
+        );
     }
 
     @Test
     @Order(2)
     @DisplayName("리스트 저장")
     void saveAll() {
-        List<WebSys> webSysList = new ArrayList<>();
-
-        for (int i = 0; i < 2 ; i++) {
-            WebSys webSys = new WebSys();
-            RoleType randomRole = RoleType.values()[(int) (Math.random() * RoleType.values().length)];
-            webSys.setCode("011");
-            webSys.setName("name" + i);
-            webSys.setDescription("description" + i);
-            webSys.setPermission(randomRole);
-            webSysList.add(webSys);
-        }
+        List<WebSys> list1 = IntStream.range(0, 2).mapToObj(i ->
+            new WebSys() {{
+                setCode("011");
+                setName("name" + i);
+                setDescription("description" + i);
+                setPermission(RoleType.values()[(int) (Math.random() * RoleType.values().length)]);
+            }}
+        ).collect(Collectors.toList());
 
         assertThrowsExactly(DuplicateKeyException.class, () ->
-                webSysMapper.saveAll(webSysList)
+                webSysMapper.saveAll(list1)
         );
 
-        for (int i = 0; i < 2 ; i++) {
-            WebSys webSys = new WebSys();
-            RoleType randomRole = RoleType.values()[(int) (Math.random() * RoleType.values().length)];
-            webSys.setCode("01" + i);
-            webSys.setName("name" + i);
-            webSys.setDescription("description" + i);
-            webSys.setPermission(randomRole);
-            webSysList.add(webSys);
-        }
+        List<WebSys> list2 = IntStream.range(0, 2).mapToObj(i ->
+            new WebSys() {{
+                setCode("01" + i);
+                setName("name" + i);
+                setDescription("description" + i);
+                setPermission(RoleType.values()[(int) (Math.random() * RoleType.values().length)]);
+            }}
+        ).collect(Collectors.toList());
 
-        assertThrowsExactly(DuplicateKeyException.class, () ->
-                webSysMapper.saveAll(webSysList)
-        );
-
-        webSysList.clear();
-
-        for (int i = 0; i < 2 ; i++) {
-            WebSys webSys = new WebSys();
-            RoleType randomRole = RoleType.values()[(int) (Math.random() * RoleType.values().length)];
-            webSys.setCode("01" + i);
-            webSys.setName("name" + i);
-            webSys.setDescription("description" + i);
-            webSys.setPermission(randomRole);
-            webSysList.add(webSys);
-        }
-
-        assertDoesNotThrow(() -> webSysMapper.saveAll(webSysList));
+        assertDoesNotThrow(() -> webSysMapper.saveAll(list2));
     }
 
 
@@ -241,7 +167,6 @@ class WebSysMapperTest {
         assertTrue(list.stream().anyMatch(ws -> ws.getDescription().equals(webSys.getDescription())));
         assertTrue(list.stream().anyMatch(ws -> ws.getPermission().equals(webSys.getPermission())));
 
-        assertTrue(list.stream().anyMatch(ws -> ws.getCode().equals(webSysbase.getCode())));
     }
 
     @Test
@@ -377,8 +302,10 @@ class WebSysMapperTest {
     @Order(8)
     @DisplayName("save - name 100자 제한 테스트")
     void name() {
+        WebSys webSysbase = new WebSys();
         webSysbase.setName("a".repeat(100));
         webSysbase.setCode("1001");
+        webSysbase.setPermission(RoleType.USER);
         assertDoesNotThrow(() -> webSysMapper.save(webSysbase));
 
         webSysbase.setCode("1002");

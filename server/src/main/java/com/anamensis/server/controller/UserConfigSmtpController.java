@@ -4,7 +4,7 @@ import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.PageResponse;
 import com.anamensis.server.dto.request.UserConfigSmtpRequest;
 import com.anamensis.server.entity.MemberConfigSmtp;
-import com.anamensis.server.service.UserConfigSmtpService;
+import com.anamensis.server.service.MemberConfigSmtpService;
 import com.anamensis.server.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping("api/user-config-smtp")
 public class UserConfigSmtpController {
 
-    private final UserConfigSmtpService userConfigSmtpService;
+    private final MemberConfigSmtpService userConfigSmtpService;
     private final UserService userService;
 
     @GetMapping("")

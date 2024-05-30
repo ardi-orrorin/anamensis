@@ -269,19 +269,19 @@ CREATE TABLE member_config_smtp (
 ) COMMENT '사용자 SMTP 설정';
 
 CREATE TABLE smtp_push_history (
-    id                    BIGINT                    AUTO_INCREMENT PRIMARY KEY,
-    member_pk             BIGINT                    NOT NULL                           COMMENT '사용자 PK',
-    member_config_smtp_pk BIGINT                    NOT NULL                           COMMENT '사용자 SMTP 설정 PK',
-    subject               VARCHAR(255)              NOT NULL                           COMMENT '제목',
-    content               TEXT                      NOT NULL                           COMMENT '내용',
-    status                VARCHAR(20)               NOT NULL                           COMMENT '상태',
-    message               VARCHAR(255)              NOT NULL                           COMMENT '메시지',
-    create_at             TIMESTAMP(6)              NOT NULL                           COMMENT '생성일자',
-    FOREIGN KEY           (member_pk)               REFERENCES member (id),
-    FOREIGN KEY           (member_config_smtp_pk)   REFERENCES member_config_smtp (id),
-    INDEX                 idx_member_pk             (member_pk),
-    INDEX                 idx_user_config_smtp_pk   (member_config_smtp_pk),
-    INDEX                 idx_create_at             (create_at)
+    id                    BIGINT                      AUTO_INCREMENT PRIMARY KEY,
+    member_pk             BIGINT                      NOT NULL                           COMMENT '사용자 PK',
+    member_config_smtp_pk BIGINT                      NOT NULL                           COMMENT '사용자 SMTP 설정 PK',
+    subject               VARCHAR(255)                NOT NULL                           COMMENT '제목',
+    content               TEXT                        NOT NULL                           COMMENT '내용',
+    status                VARCHAR(20)                 NOT NULL                           COMMENT '상태',
+    message               VARCHAR(255)                NOT NULL                           COMMENT '메시지',
+    create_at             TIMESTAMP(6)                NOT NULL                           COMMENT '생성일자',
+    FOREIGN KEY           (member_pk)                 REFERENCES member (id),
+    FOREIGN KEY           (member_config_smtp_pk)     REFERENCES member_config_smtp (id),
+    INDEX                 idx_member_pk               (member_pk),
+    INDEX                 idx_member_config_smtp_pk   (member_config_smtp_pk),
+    INDEX                 idx_create_at               (create_at)
 ) COMMENT '사용자 PUSH 설정';
 
 CREATE TABLE web_sys (

@@ -26,9 +26,9 @@ public class UserConfigSmtpRequest {
         @NotNull(message = "password is required")
         private String password;
 
-        private String fromEmail;
+        private String fromEmail = "";
 
-        private String fromName;
+        private String fromName = "";
 
         private Boolean useSSL;
 

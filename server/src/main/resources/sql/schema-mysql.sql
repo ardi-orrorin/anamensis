@@ -1,3 +1,5 @@
+set global max_connections=1000;
+set wait_timeout=60;
 SET foreign_key_checks = 0;
 DROP TABLE IF EXISTS login_history           CASCADE;
 DROP TABLE IF EXISTS log_history             CASCADE;
@@ -136,7 +138,7 @@ CREATE TABLE IF NOT EXISTS file (
 
 CREATE TABLE IF NOT EXISTS category (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT           COMMENT 'PK',
-    name           VARCHAR(255)    NOT NULL                                COMMENT '카테고리 이름',
+    name           VARCHAR(255)    NOT NULL       UNIQUE                         COMMENT '카테고리 이름',
     parent_pk      BIGINT                                                  COMMENT '카테고리 PK',
     is_use         TINYINT(1)      NOT NULL       DEFAULT               1  COMMENT '사용여부 0:사용안함, 1:사용',
     FOREIGN KEY    (parent_pk)     REFERENCES     category(id),
@@ -271,16 +273,16 @@ CREATE TABLE IF NOT EXISTS member_config_smtp (
 CREATE TABLE IF NOT EXISTS smtp_push_history (
     id                  BIGINT                    AUTO_INCREMENT PRIMARY KEY,
     member_pk           BIGINT                    NOT NULL                           COMMENT '사용자 PK',
-    user_config_smtp_pk BIGINT                    NOT NULL                           COMMENT '사용자 SMTP 설정 PK',
+    member_config_smtp_pk BIGINT                    NOT NULL                           COMMENT '사용자 SMTP 설정 PK',
     subject             VARCHAR(255)              NOT NULL                           COMMENT '제목',
     content             TEXT                      NOT NULL                           COMMENT '내용',
     status              VARCHAR(20)               NOT NULL                           COMMENT '상태',
     message             VARCHAR(255)              NOT NULL                           COMMENT '메시지',
     create_at           TIMESTAMP(6)              NOT NULL                           COMMENT '생성일자',
     FOREIGN KEY         (member_pk)               REFERENCES member (id),
-    FOREIGN KEY         (user_config_smtp_pk)     REFERENCES member_config_smtp (id),
+    FOREIGN KEY         (member_config_smtp_pk)     REFERENCES member_config_smtp (id),
     INDEX               idx_member_pk             (member_pk),
-    INDEX               idx_user_config_smtp_pk   (user_config_smtp_pk),
+    INDEX               idx_member_config_smtp_pk   (member_config_smtp_pk),
     INDEX               idx_create_at             (create_at)
 ) COMMENT '사용자 PUSH 설정';
 
@@ -319,7 +321,7 @@ CREATE TABLE IF NOT EXISTS system_message (
 
 CREATE TABLE IF NOT EXISTS smtp_push_history_count (
     member_pk            INT      NOT NULL,
-    user_config_smtp_pk  INT      NOT NULL,
+    member_config_smtp_pk  INT      NOT NULL,
     count                INT      NOT NULL        DEFAULT      0,
-    PRIMARY KEY          (member_pk, user_config_smtp_pk)
+    PRIMARY KEY          (member_pk, member_config_smtp_pk)
 ) COMMENT 'smtp_push_history 카운트';

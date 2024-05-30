@@ -20,7 +20,8 @@ public class WebSysService {
     }
 
     public Mono<WebSys> findByCode(String code) {
-        return Mono.justOrEmpty(webSysMapper.findByCode(code));
+        return Mono.justOrEmpty(webSysMapper.findByCode(code))
+                .switchIfEmpty(Mono.error(new RuntimeException("webSys not found")));
     }
 
     public Mono<List<WebSys>> findByPermission(RoleType permission) {
@@ -28,6 +29,10 @@ public class WebSysService {
     }
 
     public Mono<Void> save(WebSys webSys) {
+        if(webSys.getCode() == null || webSys.getName() == null || webSys.getPermission() == null) {
+            return Mono.error(new IllegalArgumentException("Invalid WebSys"));
+        }
+
         webSysMapper.save(webSys);
         return Mono.empty();
     }

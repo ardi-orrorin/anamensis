@@ -26,7 +26,7 @@ public class OTPController {
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(u -> {
                     //check otp already exist
-                    otpService.selectByUserPk(u.getId())
+                    otpService.selectByMemberPk(u.getId())
                             .doOnSuccess(otp -> {
                                 new RuntimeException("already exist");
                             }).subscribe();
@@ -37,32 +37,33 @@ public class OTPController {
     @GetMapping("/exist")
     public Mono<Boolean> exist(@AuthenticationPrincipal Mono<UserDetails> user){
         return user.flatMap(u -> userService.findUserByUserId(u.getUsername()))
-                .flatMap(u -> otpService.existByUserPk(u.getId()));
+                .flatMap(u -> otpService.existByMemberPk(u.getId()));
     }
 
-    @PostMapping("/verify")
-    public Mono<String> verify(
-            @AuthenticationPrincipal Mono<UserDetails> user,
-            @RequestBody Mono<Integer> code
-    ){
-        return user.zipWith(code)
-                .flatMap(tuple ->
-                    otpService.selectByUserId(tuple.getT1().getUsername())
-                            .map(t -> Tuples.of(t, tuple.getT2()))
-                )
-                .flatMap(otpService::verify)
-                .flatMap(t -> userService.editAuth(t.getT1().getMemberPk(), true, AuthType.OTP))
-                .map(t -> t ? "success" : "fail");
-    }
+//    @PostMapping("/verify")
+//    public Mono<String> verify(
+//            @AuthenticationPrincipal Mono<UserDetails> user,
+//            @RequestBody Mono<Integer> code
+//    ){
+//        return user.zipWith(code)
+//                .flatMap(tuple ->
+//                    otpService.selectByUserId(tuple.getT1().getUsername())
+//                            .map(t -> Tuples.of(t, tuple.getT2()))
+//                )
+//                .flatMap(otpService::verify)
+//                .flatMap(t -> userService.editAuth(t.getT1().getMemberPk(), true, AuthType.OTP))
+//                .map(t -> t ? "success" : "fail");
+//    }
 
-    @PutMapping("/disable")
-    public Mono<String> disable(@AuthenticationPrincipal Mono<UserDetails> user){
-        return user
-                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
-                .publishOn(Schedulers.boundedElastic())
-                .flatMap(u -> otpService.disableOTP(u.getId()))
-                .flatMap(t -> userService.editAuth(t.getT1(), false, AuthType.NONE))
-                .map(b -> b ? "success" : "fail");
-    }
+// todo : 로직 수정 예정
+//    @PutMapping("/disable")
+//    public Mono<String> disable(@AuthenticationPrincipal Mono<UserDetails> user){
+//        return user
+//                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
+//                .publishOn(Schedulers.boundedElastic())
+//                .flatMap(u -> otpService.disableOTP(u.getId()))
+//                .flatMap(t -> userService.editAuth(t.getT1(), false, AuthType.NONE))
+//                .map(b -> b ? "success" : "fail");
+//    }
 
 }

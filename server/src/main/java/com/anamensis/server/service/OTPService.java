@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OTPService {
 
     private final OTPMapper otpMapper;
@@ -27,53 +28,68 @@ public class OTPService {
                    .switchIfEmpty(Mono.error(new RuntimeException("not found")));
     }
 
-    public Mono<OTP> selectByUserPk(long userPk) {
-        return Mono.justOrEmpty(otpMapper.selectByMemberPk(userPk));
+    public Mono<OTP> selectByMemberPk(long memberPk) {
+        return Mono.justOrEmpty(otpMapper.selectByMemberPk(memberPk))
+                   .switchIfEmpty(Mono.error(new RuntimeException("not found")));
+
     }
 
-    @Transactional
-    public Mono<String> insert(Member users) {
+    public Mono<String> insert(Member member) {
+        if(member == null) return Mono.error(new RuntimeException("member is null"));
+        if(member.getId() == 0) return Mono.error(new RuntimeException("member id is null"));
+
         GoogleAuthenticatorKey key = gAuth.createCredentials();
 
         OTP otp = new OTP();
-        otp.setMemberPk(users.getId());
+        otp.setMemberPk(member.getId());
         otp.setHash(key.getKey());
         otp.setCreateAt(LocalDateTime.now());
 
-        int result = otpMapper.insert(otp);
+        String url = GoogleAuthenticatorQRGenerator.getOtpAuthURL("Anamensis", member.getUserId(), key);
 
-        if(result != 1) {
-            throw new RuntimeException("insert fail");
-        }
+        return Mono.just("")
+                .doOnNext(i -> otpMapper.disableOTP(member.getId()))
+                .flatMap(i -> Mono.just(otpMapper.insert(otp)))
+                .flatMap(i ->
+                    i == 1 ? Mono.just(url)
+                           : Mono.error(new RuntimeException("insert fail"))
+                );
 
-        String url = GoogleAuthenticatorQRGenerator.getOtpAuthURL("Anamensis", users.getUserId(), key);
-
-        return Mono.just(url);
     }
 
-    @Transactional
     public Mono<Boolean> update(OTP otp) {
+        if(otp == null) return Mono.error(new RuntimeException("otp is null"));
+        if(otp.getHash() == null) return Mono.error(new RuntimeException("otp hash is null"));
+
+
         otp.setUse(false);
-        int result = otpMapper.updateIsUse(otp);
-        return Mono.just(result == 1);
+
+        return Mono.just(true)
+                .flatMap(i -> Mono.just(otpMapper.updateIsUse(otp)))
+                .flatMap(i ->
+                    i == 1 ? Mono.just(true)
+                           : Mono.error(new RuntimeException("update fail"))
+                )
+                .onErrorReturn(false);
+
+    }
+    public Mono<Boolean> disableOTP(long memberPk) {
+        return Mono.just(true)
+                .flatMap(i -> Mono.just(otpMapper.disableOTP(memberPk)))
+                .flatMap(i ->
+                    i == 1 ? Mono.just(true)
+                           : Mono.error(new RuntimeException("“Failed to disable OPT"))
+                )
+                .onErrorReturn(false);
     }
 
-
-    @Transactional
-    public Mono<Tuple2<Long, Boolean>> disableOTP(long userPk) {
-        otpMapper.disableOTP(userPk);
-
-        return Mono.zip(Mono.just(userPk), Mono.just(true));
+    public Mono<Boolean> existByMemberPk(long memberPk) {
+        return Mono.just(otpMapper.existByMemberPk(memberPk));
     }
 
-    public Mono<Boolean> existByUserPk(long userPk) {
-        return Mono.just(otpMapper.existByMemberPk(userPk));
-    }
-
-    @Transactional
-    public Mono<Tuple2<OTP, Boolean>> verify(Tuple2<OTP, Integer> tuple) {
-        return Mono.just(tuple.mapT2(otp ->
-                gAuth.authorize(tuple.getT1().getHash(), tuple.getT2())));
+    public Mono<Boolean> verify(String hash, int code) {
+        return Mono.just(true)
+                .flatMap(i -> Mono.just(gAuth.authorize(hash, code)));
     }
 
 }

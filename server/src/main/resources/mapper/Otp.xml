@@ -48,7 +48,7 @@
 
     <update id="disableOTP" parameterType="long">
         UPDATE otp
-           SET is_use = 0
+           SET is_use    = 0
          WHERE member_pk = #{memberPk}
     </update>
 

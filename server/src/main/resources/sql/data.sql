@@ -196,6 +196,27 @@ VALUES (1, '001', '제목1'
      , (4, '002', '제목4'
        ,'내용1', current_timestamp, current_timestamp
        ,TRUE, 'extra1', 'extra2'
-       ,'extra3', 'extra4', 'extra5')
+       ,'extra3', 'extra4', 'extra5');
+
+INSERT INTO otp
+       (id, member_pk, hash, create_at, is_use)
+VALUES (1, 1, 'hash1', current_timestamp, FALSE)
+     , (2, 1, 'hash2', current_timestamp, FALSE)
+     , (3, 1, 'hash3', current_timestamp, TRUE)
+     , (4, 2, 'hash4', current_timestamp, TRUE)
+     , (5, 3, 'hash5', current_timestamp, TRUE);
 
 
+INSERT INTO login_history
+       (id, member_pk, ip, location, device, create_at)
+VALUES (1, 1, '127.0.0.1', 'Asis/Seoul', 'PC', current_timestamp)
+     , (2, 1, '127.0.0.1', 'Asis/Seoul', 'PC', current_timestamp)
+     , (3, 1, '127.0.0.1', 'Asis/Seoul', 'PC', current_timestamp)
+     , (4, 1, '127.0.0.1', 'Asis/Seoul', 'PC', current_timestamp)
+     , (5, 2, '127.0.0.1', 'Asis/Seoul', 'PC', current_timestamp)
+     , (6, 2, '127.0.0.1', 'Asis/Seoul', 'PC', current_timestamp)
+     , (7, 2, '127.0.0.1', 'Asis/Seoul', 'PC', current_timestamp)
+     , (8, 3, '127.0.0.1', 'Asis/Seoul', 'PC', current_timestamp)
+     , (9, 3, '127.0.0.1', 'Asis/Seoul', 'PC', current_timestamp)
+     , (10, 4, '127.0.0.1', 'Asis/Seoul', 'PC', current_timestamp)
+     , (11, 5, '127.0.0.1', 'Asis/Seoul', 'PC', current_timestamp)

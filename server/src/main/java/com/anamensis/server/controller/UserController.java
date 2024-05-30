@@ -61,19 +61,20 @@ public class UserController {
                    );
     }
 
-    @PublicAPI
-    @PostMapping("verify")
-    public Mono<UserResponse.Login> verify(
-            @RequestBody UserRequest.Login user,
-            Device device
-    ) {
-        if(AuthType.OTP.equals(user.getAuthType())) {
-            return otpLogin(user, device);
-        } else if(AuthType.EMAIL.equals(user.getAuthType())) {
-            return emailLogin(user, device);
-        }
-        return notAuth(user, device);
-    }
+// todo : 로직 수정 예정
+//    @PublicAPI
+//    @PostMapping("verify")
+//    public Mono<UserResponse.Login> verify(
+//            @RequestBody UserRequest.Login user,
+//            Device device
+//    ) {
+//        if(AuthType.OTP.equals(user.getAuthType())) {
+//            return otpLogin(user, device);
+//        } else if(AuthType.EMAIL.equals(user.getAuthType())) {
+//            return emailLogin(user, device);
+//        }
+//        return notAuth(user, device);
+//    }
 
 
     @PublicAPI
@@ -220,38 +221,39 @@ public class UserController {
                 .map(t -> UserResponse.Login.transToLogin(t.getT1(), t.getT2()));
     }
 
-    private Mono<UserResponse.Login> otpLogin(
-            UserRequest.Login user,
-            Device device
-    ) {
-        return Mono.just(user)
-                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
-                .flatMap(u ->
-                    otpService.selectByUserPk(u.getId())
-                                    .flatMap(otp -> transToTuple2(u, otp))
-                )
-                .publishOn(Schedulers.boundedElastic())
-                .map(t -> t.mapT2(m2 -> Tuples.of(m2, user.getCode())))
-                .map(t -> t.mapT2(otpService::verify))
-                .publishOn(Schedulers.boundedElastic())
-                .doOnNext(t -> {
-                    // todo: 다시 체크
-                    t.getT2().doOnNext(u -> {
-                        if(!u.getT2()) {
-                            throw new RuntimeException("OTP 인증에 실패하였습니다.");
-                        }
-                    }).subscribe();
-                })
-                .publishOn(Schedulers.boundedElastic())
-                .doOnNext(u -> loginHistoryService.save(device, u.getT1()).subscribe())
-                .map(t -> t.mapT2(m2 -> generateToken(t.getT1().getUserId())))
-                .map(t -> t.mapT1(m1 -> userService.findUserInfo(m1.getUserId())))
-                .publishOn(Schedulers.boundedElastic())
-                .flatMap(t ->
-                        t.mapT1(t1 -> t1.map(m1 ->  UserResponse.Login.transToLogin(m1, t.getT2())))
-                                .getT1()
-                );
-    }
+// todo : 로직 수정 예정
+//    private Mono<UserResponse.Login> otpLogin(
+//            UserRequest.Login user,
+//            Device device
+//    ) {
+//        return Mono.just(user)
+//                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
+//                .flatMap(u ->
+//                    otpService.selectByMemberPk(u.getId())
+//                                    .flatMap(otp -> transToTuple2(u, otp))
+//                )
+//                .publishOn(Schedulers.boundedElastic())
+//                .map(t -> t.mapT2(m2 -> Tuples.of(m2, user.getCode())))
+//                .map(t -> t.mapT2(otpService::verify))
+//                .publishOn(Schedulers.boundedElastic())
+//                .doOnNext(t -> {
+//                    // todo: 다시 체크
+//                    t.getT2().doOnNext(u -> {
+//                        if(!u.getT2()) {
+//                            throw new RuntimeException("OTP 인증에 실패하였습니다.");
+//                        }
+//                    }).subscribe();
+//                })
+//                .publishOn(Schedulers.boundedElastic())
+//                .doOnNext(u -> loginHistoryService.save(device, u.getT1()).subscribe())
+//                .map(t -> t.mapT2(m2 -> generateToken(t.getT1().getUserId())))
+//                .map(t -> t.mapT1(m1 -> userService.findUserInfo(m1.getUserId())))
+//                .publishOn(Schedulers.boundedElastic())
+//                .flatMap(t ->
+//                        t.mapT1(t1 -> t1.map(m1 ->  UserResponse.Login.transToLogin(m1, t.getT2())))
+//                                .getT1()
+//                );
+//    }
 
 
     private Mono<Tuple2<Member, OTP>> transToTuple2(Member users, OTP otp) {

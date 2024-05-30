@@ -17,21 +17,22 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
+@Transactional
 public class LoginHistoryService {
+
     private final LoginHistoryMapper loginHistoryMapper;
 
 
-    public Mono<Integer> count(long userId) {
-        return Mono.just(loginHistoryMapper.count(userId));
+    public Mono<Integer> count(long memberPk) {
+        return Mono.just(loginHistoryMapper.count(memberPk));
     }
 
     public Flux<LoginHistory> selectAll(Member users, Page page) {
         return Flux.fromIterable(loginHistoryMapper.selectAll(users, page));
     }
 
-    @Transactional
-    public Mono<Void> save(Device device, Member users) {
+
+    public Mono<Void> save(Device device, Member member) {
         LoginHistory loginHistory = LoginHistory.builder()
                 .ip(device.getIp())
                 .device(device.getDevice())
@@ -39,8 +40,12 @@ public class LoginHistoryService {
                 .createAt(LocalDateTime.now())
                 .build();
 
-        int save = loginHistoryMapper.save(loginHistory, users);
-        if(save != 1) throw new RuntimeException("LoginHistory save failed");
-        return Mono.empty();
+        return Mono.just(loginHistory)
+                .flatMap(lh -> Mono.just(loginHistoryMapper.save(lh, member)))
+                .onErrorMap(e -> new RuntimeException("LoginHistory save failed"))
+                .flatMap(i ->
+                    i == 1 ? Mono.empty()
+                           : Mono.error(new RuntimeException("LoginHistory save failed"))
+                );
     }
 }

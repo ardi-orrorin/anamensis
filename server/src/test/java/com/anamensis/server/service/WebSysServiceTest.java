@@ -226,16 +226,16 @@ class WebSysServiceTest {
     @Order(7)
     @DisplayName("시스템 메시지 코드 삭제")
     void deleteByCode() {
-        StepVerifier.create(wss.findByCode("001"))
+        StepVerifier.create(wss.findByCode("004"))
                 .assertNext(sys -> {
-                    assertEquals("001", sys.getCode());
+                    assertEquals("004", sys.getCode());
                 })
                 .verifyComplete();
 
-        StepVerifier.create(wss.deleteByCode("001"))
+        StepVerifier.create(wss.deleteByCode("004"))
                 .verifyComplete();
 
-        StepVerifier.create(wss.findByCode("001"))
+        StepVerifier.create(wss.findByCode("004"))
                 .verifyErrorMessage("webSys not found");
     }
 }

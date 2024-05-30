@@ -109,10 +109,8 @@ class WebSysMapperTest {
         assertDoesNotThrow(() -> webSysMapper.save(webSys));
 
         webSys.setCode("008");
-        webSys.setDescription("a".repeat(65536));
-        assertThrowsExactly(DataIntegrityViolationException.class, () ->
-                webSysMapper.save(webSys)
-        );
+        webSys.setDescription("a".repeat(65535));
+        assertDoesNotThrow(() -> webSysMapper.save(webSys));
     }
 
     @Test

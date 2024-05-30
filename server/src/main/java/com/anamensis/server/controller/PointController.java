@@ -27,6 +27,7 @@ public class PointController {
 
     @PostMapping("")
     public Mono<Boolean> insert(@RequestBody Mono<PointCode> pointCode) {
-        return pointCode.map(pointService::insert);
+        return pointCode
+                .flatMap(pointService::insert);
     }
 }

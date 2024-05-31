@@ -43,6 +43,8 @@ public class BoardResponse {
                     .createdAt(board.getBoard().getCreateAt())
                     .isAdsense(board.getBoard().isAdsense());
 
+//            if(board.getFile() == null)  return builder.build();
+
             if (board.getFile().getFilePath() != null) {
                 builder.profileImage(board.getFile().getFilePath() + board.getFile().getFileName());
             }
@@ -83,6 +85,9 @@ public class BoardResponse {
                     .writer(board.getMember().getName())
                     .viewCount(board.getBoard().getViewCount())
                     .createdAt(board.getBoard().getCreateAt());
+
+
+//            if(board.getFile() == null)  return builder.build();
 
             if (board.getFile().getFilePath() != null) {
                 builder.profileImage(board.getFile().getFilePath() + board.getFile().getFileName());

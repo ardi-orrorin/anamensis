@@ -4,7 +4,6 @@ import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.entity.Board;
 import com.anamensis.server.mapper.BoardMapper;
-import com.anamensis.server.resultMap.BoardResultMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,11 +14,12 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BoardService {
     private final BoardMapper boardMapper;
 
     public Mono<Long> count(Board board) {
-        return Mono.just(boardMapper.count(board));
+        return Mono.fromCallable(() -> boardMapper.count(board));
     }
 
     public Flux<BoardResponse.List> findAll(Page page, Board board) {
@@ -28,36 +28,40 @@ public class BoardService {
     }
 
     public Mono<BoardResponse.Content> findByPk(long boardPk) {
-        BoardResultMap.Board board = boardMapper.findByPk(boardPk)
-                .orElseThrow(() -> new RuntimeException("게시글이 없습니다."));
-        return Mono.just(board)
+        return Mono.justOrEmpty(boardMapper.findByPk(boardPk))
+                .switchIfEmpty(Mono.error(new RuntimeException("게시글이 없습니다.")))
                 .map(BoardResponse.Content::from);
     }
 
-    public Flux<BoardResponse.SummaryList> findByUserPk(long userPk) {
-        return Flux.fromIterable(boardMapper.findByMemberPk(userPk))
+    public Flux<BoardResponse.SummaryList> findByMemberPk(long memberPk) {
+        return Flux.fromIterable(boardMapper.findByMemberPk(memberPk))
                 .map(BoardResponse.SummaryList::from);
     }
 
-    @Transactional
     public Mono<Board> save(Board board) {
+        if(board.getTitle() == null || board.getTitle().isEmpty())
+            return Mono.error(new RuntimeException("제목을 입력해주세요."));
+        if(board.getContent() == null || board.getContent().isEmpty())
+            return Mono.error(new RuntimeException("내용을 입력해주세요."));
+
         board.setCreateAt(LocalDateTime.now());
-        return Mono.just(boardMapper.save(board))
+        return Mono.fromCallable(()-> boardMapper.save(board))
                 .onErrorMap(RuntimeException::new)
                 .flatMap($ -> Mono.just(board));
     }
 
-    @Transactional
     public Mono<Boolean> viewUpdateByPk(long boardPk) {
-        return Mono.just(boardMapper.viewUpdateByPk(boardPk) == 1);
+        return Mono.fromCallable(() -> boardMapper.viewUpdateByPk(boardPk) == 1)
+                .onErrorReturn(false);
     }
 
-    @Transactional
-    public Mono<Boolean> disableByPk(long boardPk, long userPk) {
-        return Mono.just(boardMapper.disableByPk(boardPk, userPk) == 1);
+    public Mono<Boolean> disableByPk(long boardPk, long memberPk) {
+        return Mono.just(boardMapper.disableByPk(boardPk, memberPk) == 1)
+                .onErrorReturn(false);
     }
 
     public Mono<Boolean> updateByPk(Board board) {
-        return Mono.just(boardMapper.updateByPk(board) == 1);
+        return Mono.fromCallable(() -> boardMapper.updateByPk(board) == 1)
+                .onErrorReturn(false);
     }
 }

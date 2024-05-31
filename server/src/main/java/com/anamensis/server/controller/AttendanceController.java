@@ -34,7 +34,7 @@ public class AttendanceController {
     ) {
         return user
                 .flatMap(u -> userService.findUserByUserId(u.getUsername()))
-                .flatMap(u -> attendanceService.findByUserPk(u.getId())
+                .flatMap(u -> attendanceService.findByMemberPk(u.getId())
                                 .map(attend -> Tuples.of(u, attend))
                 )
                 .flatMap(t ->

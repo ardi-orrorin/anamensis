@@ -72,7 +72,7 @@ public class BoardController {
     ) {
         return user
                 .flatMap(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
-                .flatMapMany(u -> boardService.findByUserPk(u.getId()))
+                .flatMapMany(u -> boardService.findByMemberPk(u.getId()))
                 .flatMap(b -> rateService.countRate(b.getId())
                     .doOnNext(b::setRate)
                     .map($ -> b)

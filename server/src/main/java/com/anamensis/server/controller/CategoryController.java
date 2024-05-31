@@ -19,17 +19,17 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @GetMapping("")
-    public Mono<CategoryResponse.Result<List<Category>>> getAllCategories() {
-
-        return Mono.just(categoryService.selectAll())
-                .map(result -> CategoryResponse.Result.<List<Category>>builder()
-                        .body(result)
-                        .status(HttpStatus.OK)
-                        .message("OK")
-                        .build()
-                );
-    }
+//    @GetMapping("")
+//    public Mono<CategoryResponse.Result<List<Category>>> getAllCategories() {
+//
+//        return Mono.just(categoryService.selectAll())
+//                .map(result -> CategoryResponse.Result.<List<Category>>builder()
+//                        .body(result)
+//                        .status(HttpStatus.OK)
+//                        .message("OK")
+//                        .build()
+//                );
+//    }
 
     @PostMapping("")
     public Mono<CategoryResponse.Result<Category>> insertCategory(

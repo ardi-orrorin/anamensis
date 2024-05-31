@@ -47,8 +47,7 @@ public class OTPService {
 
         String url = GoogleAuthenticatorQRGenerator.getOtpAuthURL("Anamensis", member.getUserId(), key);
 
-        return Mono.just("")
-                .doOnNext(i -> otpMapper.disableOTP(member.getId()))
+        return Mono.fromCallable(() -> otpMapper.disableOTP(member.getId()))
                 .flatMap(i -> Mono.just(otpMapper.insert(otp)))
                 .flatMap(i ->
                     i == 1 ? Mono.just(url)
@@ -61,11 +60,9 @@ public class OTPService {
         if(otp == null) return Mono.error(new RuntimeException("otp is null"));
         if(otp.getHash() == null) return Mono.error(new RuntimeException("otp hash is null"));
 
-
         otp.setUse(false);
 
-        return Mono.just(true)
-                .flatMap(i -> Mono.just(otpMapper.updateIsUse(otp)))
+        return Mono.fromCallable(() -> otpMapper.updateIsUse(otp))
                 .flatMap(i ->
                     i == 1 ? Mono.just(true)
                            : Mono.error(new RuntimeException("update fail"))
@@ -74,8 +71,7 @@ public class OTPService {
 
     }
     public Mono<Boolean> disableOTP(long memberPk) {
-        return Mono.just(true)
-                .flatMap(i -> Mono.just(otpMapper.disableOTP(memberPk)))
+        return Mono.fromCallable(() -> otpMapper.disableOTP(memberPk))
                 .flatMap(i ->
                     i == 1 ? Mono.just(true)
                            : Mono.error(new RuntimeException("“Failed to disable OPT"))
@@ -84,12 +80,11 @@ public class OTPService {
     }
 
     public Mono<Boolean> existByMemberPk(long memberPk) {
-        return Mono.just(otpMapper.existByMemberPk(memberPk));
+        return Mono.fromCallable(() -> otpMapper.existByMemberPk(memberPk));
     }
 
     public Mono<Boolean> verify(String hash, int code) {
-        return Mono.just(true)
-                .flatMap(i -> Mono.just(gAuth.authorize(hash, code)));
+        return Mono.fromCallable(() -> gAuth.authorize(hash, code));
     }
 
 }

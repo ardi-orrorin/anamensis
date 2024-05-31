@@ -72,7 +72,7 @@ public class UserService implements ReactiveUserDetailsService {
     public Mono<Void> updatePoint(long memberPk, int point) {
         if(memberPk == 0) return Mono.error(new RuntimeException("User not found"));
         if(point <= 0) return Mono.error(new RuntimeException("Point must be greater than 0"));
-        return Mono.just(memberMapper.updatePoint(memberPk, point))
+        return Mono.fromCallable(() -> memberMapper.updatePoint(memberPk, point))
                 .flatMap(i ->
                     i == 1 ? Mono.empty()
                     : Mono.error(new RuntimeException("Update point failed"))
@@ -80,19 +80,18 @@ public class UserService implements ReactiveUserDetailsService {
     }
 
     public Mono<Boolean> existsUser(UserRequest.existsMember existsMember) {
-        return Mono.just(memberMapper.existsMember(existsMember));
+        return Mono.fromCallable(() -> memberMapper.existsMember(existsMember));
     }
 
     public Mono<Boolean> editAuth(long memberPk, boolean isAuth, AuthType authType) {
         if(memberPk == 0) return Mono.error(new RuntimeException("User not found"));
-        return Mono.just(memberMapper.editAuth(memberPk, isAuth, authType))
+        return Mono.fromCallable(() -> memberMapper.editAuth(memberPk, isAuth, authType))
                 .map(i -> i > 0);
     }
 
 
     public Mono<Member> saveUser(UserRequest.Register user) {
-        return Mono.just(user)
-                   .map(UserRequest.Register::transToUser)
+        return Mono.fromCallable(()-> UserRequest.Register.transToUser(user))
                    .doOnNext(u -> {
                        u.setPwd(bCryptPasswordEncoder.encode(u.getPwd()));
                        u.setCreateAt(LocalDateTime.now());
@@ -128,7 +127,7 @@ public class UserService implements ReactiveUserDetailsService {
             return Mono.error(new RuntimeException("Name or Email or Phone number is required"));
         }
 
-        return Mono.just(memberMapper.update(member))
+        return Mono.fromCallable(() -> memberMapper.update(member))
                 .map(i -> i == 1);
     }
 

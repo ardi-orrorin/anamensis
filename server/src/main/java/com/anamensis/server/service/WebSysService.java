@@ -17,7 +17,7 @@ public class WebSysService {
     private final WebSysMapper webSysMapper;
 
     public Mono<List<WebSys>> findAll() {
-        return Mono.just(webSysMapper.findAll());
+        return Mono.fromCallable(webSysMapper::findAll);
     }
 
     public Mono<WebSys> findByCode(String code) {
@@ -26,31 +26,26 @@ public class WebSysService {
     }
 
     public Mono<List<WebSys>> findByPermission(RoleType permission) {
-        return Mono.just(webSysMapper.findByPermission(permission));
+        return Mono.fromCallable(() -> webSysMapper.findByPermission(permission));
     }
 
     public Mono<Void> save(WebSys webSys) {
         if(webSys.getCode() == null || webSys.getName() == null || webSys.getPermission() == null) {
             return Mono.error(new IllegalArgumentException("Invalid WebSys"));
         }
-
-        webSysMapper.save(webSys);
-        return Mono.empty();
+        return Mono.fromRunnable(() -> webSysMapper.save(webSys));
     }
 
     public Mono<Void> saveAll(List<WebSys> webSysList) {
-        webSysMapper.saveAll(webSysList);
-        return Mono.empty();
+        return Mono.fromRunnable(() -> webSysMapper.saveAll(webSysList));
     }
 
     public Mono<Void> update(WebSys webSys) {
-        webSysMapper.update(webSys);
-        return Mono.empty();
+        return Mono.fromRunnable(() -> webSysMapper.update(webSys));
     }
 
     public Mono<Void> deleteByCode(String code) {
-        webSysMapper.deleteByCode(code);
-        return Mono.empty();
+        return Mono.fromRunnable(()-> webSysMapper.deleteByCode(code));
     }
 
 

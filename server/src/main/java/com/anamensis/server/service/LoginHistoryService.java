@@ -31,7 +31,6 @@ public class LoginHistoryService {
         return Flux.fromIterable(loginHistoryMapper.selectAll(users, page));
     }
 
-
     public Mono<Void> save(Device device, Member member) {
         LoginHistory loginHistory = LoginHistory.builder()
                 .ip(device.getIp())
@@ -40,8 +39,7 @@ public class LoginHistoryService {
                 .createAt(LocalDateTime.now())
                 .build();
 
-        return Mono.just(loginHistory)
-                .flatMap(lh -> Mono.just(loginHistoryMapper.save(lh, member)))
+        return Mono.fromCallable(() -> loginHistoryMapper.save(loginHistory, member))
                 .onErrorMap(e -> new RuntimeException("LoginHistory save failed"))
                 .flatMap(i ->
                     i == 1 ? Mono.empty()

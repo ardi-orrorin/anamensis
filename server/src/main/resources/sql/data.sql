@@ -219,4 +219,18 @@ VALUES (1, 1, '127.0.0.1', 'Asis/Seoul', 'PC', current_timestamp)
      , (8, 3, '127.0.0.1', 'Asis/Seoul', 'PC', current_timestamp)
      , (9, 3, '127.0.0.1', 'Asis/Seoul', 'PC', current_timestamp)
      , (10, 4, '127.0.0.1', 'Asis/Seoul', 'PC', current_timestamp)
-     , (11, 5, '127.0.0.1', 'Asis/Seoul', 'PC', current_timestamp)
+     , (11, 5, '127.0.0.1', 'Asis/Seoul', 'PC', current_timestamp);
+
+INSERT INTO log_history
+       (id, member_pk, method,
+        path, query, body,
+        uri, headers, session,
+        local_address, remote_address, create_at)
+VALUES (1, 1, 'GET'
+       ,'/api/v1/member/1', 'select=1', ''
+       ,'http://localhost:8080/api/v1/member/1', 'header1', 'session1'
+       ,'127.0.0.1', '127.0.0.1', current_timestamp)
+     , (2, 1, 'POST'
+       ,'/api/v1/member', '', '{"id" : 1}'
+       ,'http://localhost:8080/api/v1/member/1', 'header1', 'session1'
+       ,'127.0.0.1', '127.0.0.1', current_timestamp);

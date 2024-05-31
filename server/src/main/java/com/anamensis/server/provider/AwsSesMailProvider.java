@@ -19,9 +19,8 @@ public class AwsSesMailProvider {
     @Value("${aws.ses.from}")
     private String from;
 
-    public Mono<Void> verifyEmail(String code, String to) throws MessagingException {
+    public void verifyEmail(String code, String to) throws MessagingException {
         sendEmail("Verify your email", "Your verification code is: " + code, to, from);
-        return Mono.empty();
     }
 
     public void sendEmail(String subject, String content, String to, String from) throws MessagingException {

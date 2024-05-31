@@ -200,16 +200,19 @@ class WebSysServiceTest {
                 .assertNext(sys -> {
                     sys.setName(null);
                     StepVerifier.create(wss.update(sys))
+                            .expectNext(true)
                             .verifyComplete();
                     sys.setName("테스트1-1");
 
 
                     sys.setPermission(null);
                     StepVerifier.create(wss.update(sys))
+                            .expectNext(true)
                             .verifyComplete();
 
                     sys.setPermission(RoleType.USER);
                     StepVerifier.create(wss.update(sys))
+                            .expectNext(true)
                             .verifyComplete();
                 })
                 .verifyComplete();
@@ -233,6 +236,7 @@ class WebSysServiceTest {
                 .verifyComplete();
 
         StepVerifier.create(wss.deleteByCode("004"))
+                .expectNext(true)
                 .verifyComplete();
 
         StepVerifier.create(wss.findByCode("004"))

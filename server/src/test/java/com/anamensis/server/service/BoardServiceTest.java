@@ -217,7 +217,7 @@ class BoardServiceTest {
 
         StepVerifier.create(bs.save(b))
                 .assertNext(board -> {
-                    assertEquals(11, board.getId());
+                    b.setId(board.getId());
                     assertEquals("테스트 제목 추가", board.getTitle());
                     assertEquals(1, board.getMemberPk());
                     assertEquals(1, board.getCategoryPk());
@@ -225,9 +225,8 @@ class BoardServiceTest {
                 })
                 .verifyComplete();
 
-        StepVerifier.create(bs.findByPk(11))
+        StepVerifier.create(bs.findByPk(b.getId()))
                 .assertNext(it -> {
-                    assertEquals(11, it.getId());
                     assertEquals("테스트 제목 추가", it.getTitle());
                     assertEquals(0, it.getRate());
                     assertEquals(0, it.getViewCount());

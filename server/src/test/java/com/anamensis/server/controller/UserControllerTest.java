@@ -2,18 +2,18 @@ package com.anamensis.server.controller;
 
 import com.anamensis.server.dto.PageResponse;
 import com.anamensis.server.dto.response.UserResponse;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import com.anamensis.server.provider.TokenProvider;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.StatusAssertions;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.util.HashMap;
@@ -25,16 +25,23 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class UserControllerTest {
 
     @LocalServerPort
     int port;
+
+    @SpyBean
+    TokenProvider tokenProvider;
 
     Logger log = org.slf4j.LoggerFactory.getLogger(UserControllerTest.class);
 
     WebTestClient wtc;
 
     String token = "";
+
+    String token2 = "";
 
     @BeforeEach
     @Order(1)
@@ -62,6 +69,25 @@ class UserControllerTest {
             .consumeWith(result ->
                 token = Objects.requireNonNull(result.getResponseBody()).getAccessToken()
             );
+
+        Map<String, String> map2 = new HashMap<>();
+        map2.put("username", "d-member-2");
+        map2.put("password", "d-member-2");
+        map2.put("authType", "email");
+        map2.put("code", "0");
+        wtc.post()
+                .uri("/public/api/user/verify")
+                .body(BodyInserters.fromValue(map2))
+                .headers(httpHeaders -> {
+                    httpHeaders.set("Device", "chrome");
+                    httpHeaders.set("Location", "seoul");
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserResponse.Login.class)
+                .consumeWith(result ->
+                        token2 = Objects.requireNonNull(result.getResponseBody()).getAccessToken()
+                );
     }
 
     @Test
@@ -89,39 +115,34 @@ class UserControllerTest {
             .jsonPath("$.authType").isEqualTo("OTP")
             .jsonPath("$.verity").isEqualTo(false);
 
-        wtc.post()
-                .uri("/public/api/user/login")
-                .body(BodyInserters.fromValue("{\"username\":\"d-member-6\",\"password\":\"d-member-6\"}"))
-                .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .exchange().expectStatus().is5xxServerError();
-
 
         wtc.post()
                 .uri("/public/api/user/login")
                 .body(BodyInserters.fromValue("{\"username\":\"d-member-1\",\"password\":\"d-member-6\"}"))
                 .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .exchange().expectStatus().is5xxServerError();
+                .exchange().expectStatus().is4xxClientError();
 
         wtc.post()
                 .uri("/public/api/user/login")
                 .body(BodyInserters.fromValue("{\"username\":\"\",\"password\":\"d-member-6\"}"))
                 .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .exchange().expectStatus().is5xxServerError();
+                .exchange().expectStatus().is4xxClientError();
 
         wtc.post()
                 .uri("/public/api/user/login")
                 .body(BodyInserters.fromValue("{\"username\":\"d-member-6\",\"password\":\"\"}"))
                 .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                .exchange().expectStatus().is5xxServerError();
+                .exchange().expectStatus().is4xxClientError();
 
     }
 
     @Test
     @DisplayName("2차 인증 테스트")
+    @Transactional
     void verify() {
         WebTestClient.ResponseSpec req1 =  wtc.post()
                 .uri("/public/api/user/verify")
-                .body(BodyInserters.fromValue("{\"username\":\"d-member-1\",\"password\":\"d-member-1\",\"authType\":\"NONE\",\"code\":0}"))
+                .body(BodyInserters.fromValue("{\"username\":\"d-member-3\",\"password\":\"d-member-3\",\"authType\":\"NONE\",\"code\":0}"))
                 .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .headers(httpHeaders -> {
                     httpHeaders.set("Device", "chrome");
@@ -132,18 +153,19 @@ class UserControllerTest {
         req1.expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.accessToken").exists()
-                .jsonPath("$.accessTokenExpiresIn").isEqualTo(1800000)
+                .jsonPath("$.accessTokenExpiresIn").isEqualTo(tokenProvider.ACCESS_EXP)
                 .jsonPath("$.refreshToken").exists()
-                .jsonPath("$.refreshTokenExpiresIn").isEqualTo(86400000)
-                .jsonPath("$.username").isEqualTo("d-member-1")
+                .jsonPath("$.refreshTokenExpiresIn").isEqualTo(tokenProvider.REFRESH_EXP)
+                .jsonPath("$.username").isEqualTo("d-member-3")
                 .jsonPath("$.roles").value(roles -> {
                     assertTrue(roles instanceof List);
-                    assertEquals(3, ((List) roles).size());
+                    assertEquals(1, ((List) roles).size());
                 });
     }
 
     @Test
     @DisplayName("회원가입 테스트")
+    @Transactional
     void signup() {
         Map<String, String> map = new HashMap<>();
 
@@ -318,8 +340,11 @@ class UserControllerTest {
             .expectBody(PageResponse.class)
             .consumeWith(result -> {
                 if(result.getResponseBody() == null) return;
+                assertTrue(result.getResponseBody().getPage().getTotal() > 4);
                 List loginHistory = result.getResponseBody().getContent();
                 assertTrue(loginHistory.size() > 4);
+
+                assertTrue(result.getResponseBody().getPage().getTotal() >= loginHistory.size());
             });
     }
 
@@ -345,24 +370,155 @@ class UserControllerTest {
     void info() {
         wtc.get()
             .uri("/api/user/info")
+            .headers(httpHeaders -> httpHeaders.setBearerAuth(token2))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(UserResponse.MyPage.class)
+            .consumeWith(result -> {
+                assertEquals("d-member-2", result.getResponseBody().getUserId());
+                assertEquals("d-member-2@gmail.com", result.getResponseBody().getEmail());
+                assertEquals("010-0000-0002", result.getResponseBody().getPhone());
+            });
+    }
+
+    @Test
+    @DisplayName("회원 정보 수정 테스트")
+    void update() {
+        Map<String, String> map = new HashMap<>();
+        map.put("name", "d-member-11212");
+
+        wtc.put()
+            .uri("/api/user/info")
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(BodyInserters.fromValue(map))
+            .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(UserResponse.Status.class)
+            .consumeWith(result -> {
+                assertEquals(HttpStatus.OK, result.getResponseBody().getStatus());
+                assertEquals("Success", result.getResponseBody().getMessage());
+
+            });
+
+        wtc.get()
+            .uri("/api/user/info")
             .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
             .exchange()
             .expectStatus().isOk()
             .expectBody(UserResponse.MyPage.class)
             .consumeWith(result -> {
-                assertEquals("d-member-1", result.getResponseBody().getUserId());
-                assertEquals("d-member-1@gmail.com", result.getResponseBody().getEmail());
-                assertEquals("010-0000-0001", result.getResponseBody().getPhone());
+                assertEquals("d-member-11212", result.getResponseBody().getName());
             });
 
+        map.clear();
+        map.put("email", "d-member-11212@gmail.com");
+
+        wtc.put()
+                .uri("/api/user/info")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(map))
+                .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserResponse.Status.class)
+                .consumeWith(result -> {
+                    assertEquals(HttpStatus.OK, result.getResponseBody().getStatus());
+                    assertEquals("Success", result.getResponseBody().getMessage());
+                });
+
+        wtc.get()
+                .uri("/api/user/info")
+                .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserResponse.MyPage.class)
+                .consumeWith(result -> {
+                    assertEquals("d-member-11212@gmail.com", result.getResponseBody().getEmail());
+                });
+
+        map.clear();
+        map.put("phone", "010-2222-3333");
+
+        wtc.put()
+            .uri("/api/user/info")
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(BodyInserters.fromValue(map))
+            .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(UserResponse.Status.class)
+            .consumeWith(result -> {
+                assertEquals(HttpStatus.OK, result.getResponseBody().getStatus());
+                assertEquals("Success", result.getResponseBody().getMessage());
+            });
+
+        wtc.get()
+            .uri("/api/user/info")
+            .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(UserResponse.MyPage.class)
+            .consumeWith(result -> {
+                assertEquals("010-2222-3333", result.getResponseBody().getPhone());
+            });
+
+        map.clear();
+        map.put("phone", "010-0000-0002");
+
+        wtc.put()
+                .uri("/api/user/info")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(map))
+                .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserResponse.Status.class)
+                .consumeWith(result -> {
+                    assertEquals(HttpStatus.BAD_REQUEST, result.getResponseBody().getStatus());
+                    assertEquals("Failed", result.getResponseBody().getMessage());
+                });
+
     }
 
     @Test
-    void update() {
-    }
-
-    @Test
+    @DisplayName("2차 인증 수정 테스트")
     void sAuth() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("sauthType", "EMAIL");
+        map.put("sauth", true);
+
+        wtc.put()
+            .uri("/api/user/s-auth")
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(BodyInserters.fromValue(map))
+            .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(UserResponse.Status.class)
+            .consumeWith(result -> {
+                assertEquals(HttpStatus.OK, result.getResponseBody().getStatus());
+                assertEquals("Success", result.getResponseBody().getMessage());
+            });
+
+        map.clear();
+
+        map.put("sauthType", "OTP");
+        map.put("sauth", true);
+
+        wtc.put()
+            .uri("/api/user/s-auth")
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(BodyInserters.fromValue(map))
+            .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(UserResponse.Status.class)
+            .consumeWith(result -> {
+                assertEquals(HttpStatus.OK, result.getResponseBody().getStatus());
+                assertEquals("Success", result.getResponseBody().getMessage());
+            });
+
     }
 
 

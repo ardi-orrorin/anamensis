@@ -40,12 +40,16 @@ public class WebSysService {
         return Mono.fromRunnable(() -> webSysMapper.saveAll(webSysList));
     }
 
-    public Mono<Void> update(WebSys webSys) {
-        return Mono.fromRunnable(() -> webSysMapper.update(webSys));
+    public Mono<Boolean> update(WebSys webSys) {
+        return Mono.fromCallable(() -> webSysMapper.update(webSys))
+                .map(i -> i == 1)
+                .onErrorReturn(false);
     }
 
-    public Mono<Void> deleteByCode(String code) {
-        return Mono.fromRunnable(()-> webSysMapper.deleteByCode(code));
+    public Mono<Boolean> deleteByCode(String code) {
+        return Mono.fromCallable(()-> webSysMapper.deleteByCode(code))
+                .map(i -> i == 1)
+                .onErrorReturn(false);
     }
 
 

@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Transactional
+@Disabled("s3 연동으로 비용 발생 가능성 있음")
 class EmailVerifyServiceTest {
 
     @SpyBean

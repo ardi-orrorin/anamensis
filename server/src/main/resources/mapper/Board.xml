@@ -108,7 +108,7 @@
         <id property="id" column="id"/>
         <association property="board" resultMap="BoardEntity" />
         <association property="member" resultMap="MemberEntity" />
-<!--        <association property="file" resultMap="FileEntity" />-->
+        <association property="file" resultMap="FileEntity" />
     </resultMap>
 
     <resultMap id="BoardEntity" type="Board" autoMapping="true">

@@ -234,3 +234,9 @@ VALUES (1, 1, 'GET'
        ,'/api/v1/member', '', '{"id" : 1}'
        ,'http://localhost:8080/api/v1/member/1', 'header1', 'session1'
        ,'127.0.0.1', '127.0.0.1', current_timestamp);
+
+INSERT INTO attendance
+       (member_pk, days, lastDate)
+VALUES (1, 1, current_timestamp)
+     , (2, 1, current_timestamp - interval '1' DAY)
+     , (5, 1, current_timestamp);

@@ -28,8 +28,7 @@ public class PointHistoryService {
 
 
     public Mono<Boolean> insert(PointHistory pointHistory) {
-        return Mono.just(true)
-                .flatMap(r -> Mono.just(pointHistoryMapper.insert(pointHistory)))
+        return Mono.fromCallable(()-> pointHistoryMapper.insert(pointHistory))
                 .flatMap(r ->
                     r == 1 ? Mono.just(true)
                            : Mono.error(new RuntimeException("insert fail"))

@@ -34,8 +34,7 @@ public class PointService {
     }
 
     public Mono<Boolean> insert(PointCode pointCode) {
-        return Mono.just(true)
-                .flatMap(r -> Mono.just(pointCodeMapper.insert(pointCode)))
+        return Mono.fromCallable(() -> pointCodeMapper.insert(pointCode))
                 .flatMap(r ->
                     r == 1 ? Mono.just(true)
                            : Mono.error(new RuntimeException("insert fail")))

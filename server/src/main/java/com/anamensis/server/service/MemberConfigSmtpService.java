@@ -22,8 +22,7 @@ public class MemberConfigSmtpService {
     private final MemberConfigSmtpMapper userConfigSmtpMapper;
 
     public Flux<MemberConfigSmtp> selectByUserPk(long memberPk) {
-        return Mono.just(memberPk)
-                .map(userConfigSmtpMapper::selectByMemberPk)
+        return Mono.fromCallable(() -> userConfigSmtpMapper.selectByMemberPk(memberPk))
                 .flatMapMany(Flux::fromIterable);
     }
 
@@ -33,20 +32,18 @@ public class MemberConfigSmtpService {
     }
 
     public Mono<MemberConfigSmtp> save(MemberConfigSmtp userConfigSmtp) {
-        return Mono.just(userConfigSmtp)
-                .doOnNext(u -> {
-                    if (u.getIsDefault()) {
-                        userConfigSmtpMapper
-                                .disabledDefaults(u.getMemberPk());
+        return Mono.fromCallable(()-> {
+                    if (userConfigSmtp.getIsDefault()) {
+                        userConfigSmtpMapper.disabledDefaults(userConfigSmtp.getMemberPk());
                     }
+                    return userConfigSmtp;
                 })
                 .doOnNext(userConfigSmtpMapper::save)
                 .onErrorMap(throwable -> new RuntimeException("UserConfigSmtp not save"));
     }
 
     public Mono<Boolean> update(MemberConfigSmtp userConfigSmtp) {
-        return Mono.just(userConfigSmtp)
-                .map(userConfigSmtpMapper::update)
+        return Mono.fromCallable(() -> userConfigSmtpMapper.update(userConfigSmtp))
                 .flatMap(b ->
                     b > 0 ? Mono.just(true)
                           : Mono.error(new RuntimeException("UserConfigSmtp not update"))
@@ -54,9 +51,8 @@ public class MemberConfigSmtpService {
     }
 
     public Mono<Boolean> testConnection(MemberConfigSmtp userConfigSmtp) {
-        return Mono.just(userConfigSmtp)
-                .doOnNext(u ->  new MailProvider.Builder()
-                        .config(u)
+        return Mono.fromRunnable(() -> new MailProvider.Builder()
+                        .config(userConfigSmtp)
                         .build()
                         .testConnection()
                 )

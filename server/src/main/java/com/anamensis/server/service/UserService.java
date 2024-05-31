@@ -86,7 +86,8 @@ public class UserService implements ReactiveUserDetailsService {
     public Mono<Boolean> editAuth(long memberPk, boolean isAuth, AuthType authType) {
         if(memberPk == 0) return Mono.error(new RuntimeException("User not found"));
         return Mono.fromCallable(() -> memberMapper.editAuth(memberPk, isAuth, authType))
-                .map(i -> i > 0);
+                .map(i -> i > 0)
+                .onErrorReturn(false);
     }
 
 
@@ -128,7 +129,8 @@ public class UserService implements ReactiveUserDetailsService {
         }
 
         return Mono.fromCallable(() -> memberMapper.update(member))
-                .map(i -> i == 1);
+                .map(i -> i == 1)
+                .onErrorReturn(false);
     }
 
 //    public Mono<Integer> deleteRole(Tuple2<UserDetails, RoleType> tuple) {

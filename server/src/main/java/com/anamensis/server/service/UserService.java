@@ -1,15 +1,17 @@
 package com.anamensis.server.service;
 
 
-import com.anamensis.server.entity.*;
 import com.anamensis.server.dto.UserDto;
 import com.anamensis.server.dto.request.UserRequest;
+import com.anamensis.server.entity.AuthType;
+import com.anamensis.server.entity.Member;
+import com.anamensis.server.entity.Role;
+import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.exception.DuplicateUserException;
 import com.anamensis.server.mapper.MemberMapper;
 import com.anamensis.server.mapper.PointCodeMapper;
 import com.anamensis.server.resultMap.MemberResultMap;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
@@ -19,13 +21,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import reactor.util.function.Tuple2;
 
 import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
+@Transactional
 public class UserService implements ReactiveUserDetailsService {
 
     @Value("${db.setting.user.attendance_point_code_prefix}")
@@ -53,44 +54,57 @@ public class UserService implements ReactiveUserDetailsService {
     }
 
     public Mono<MemberResultMap> findUserInfo(String userId) {
-        log.info("findUserInfo: {}", userId);
         return Mono.justOrEmpty(memberMapper.findMemberInfo(userId))
-                .onErrorMap(e -> new RuntimeException("User not found"));
+                .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
     }
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
         return Mono.justOrEmpty(memberMapper.findMemberInfo(username))
+                .switchIfEmpty(Mono.error(new RuntimeException("User not found")))
                 .map(user -> new UserDto(
                         user.getMember().getUserId(),
-                        bCryptPasswordEncoder.encode(user.getMember().getPwd()),
+                        user.getMember().getPwd(),
                         user.getRoles().stream().map(Role::getRole).toList()
                 ));
     }
 
-    public Mono<Void> updatePoint(long userPk, int point) {
-        memberMapper.updatePoint(userPk, point);
-        return Mono.empty();
+    public Mono<Boolean> updatePoint(long memberPk, int point) {
+        if(memberPk == 0) return Mono.error(new RuntimeException("User not found"));
+        if(point <= 0) return Mono.error(new RuntimeException("Point must be greater than 0"));
+        return Mono.fromCallable(() -> memberMapper.updatePoint(memberPk, point))
+                .flatMap(i ->
+                    i == 1 ? Mono.just(true)
+                    : Mono.error(new RuntimeException("Update point failed"))
+                )
+                .onErrorReturn(false);
     }
 
     public Mono<Boolean> existsUser(UserRequest.existsMember existsMember) {
-        return Mono.just(memberMapper.existsMember(existsMember));
+        return Mono.fromCallable(() -> memberMapper.existsMember(existsMember));
     }
 
-    public Mono<Boolean> editAuth(long id, boolean isAuth, AuthType authType) {
-        return Mono.just(memberMapper.editAuth(id, isAuth, authType))
-                .map(i -> i > 0);
+    public Mono<Boolean> editAuth(long memberPk, boolean isAuth, AuthType authType) {
+        if(memberPk == 0) return Mono.error(new RuntimeException("User not found"));
+        return Mono.fromCallable(() -> memberMapper.editAuth(memberPk, isAuth, authType))
+                .map(i -> i > 0)
+                .onErrorReturn(false);
     }
 
-    @Transactional
-    public Mono<Member> saveUser(Mono<UserRequest.Register> user) {
-        return user.map(UserRequest.Register::transToUser)
-                   .doOnNext(u -> u.setPwd(bCryptPasswordEncoder.encode(u.getPwd())))
-                   .doOnNext(u -> u.setCreateAt(LocalDateTime.now()))
+
+    public Mono<Member> saveUser(UserRequest.Register user) {
+        return Mono.fromCallable(()-> UserRequest.Register.transToUser(user))
                    .doOnNext(u -> {
-                       PointCode pointCode = pointCodeMapper.selectByIdOrName(0,ATTENDANCE_POINT_CODE_PREFIX + "1")
-                               .orElseThrow(() -> new RuntimeException("PointCode not found"));
-                      u.setPoint(pointCode.getPoint());
+                       u.setPwd(bCryptPasswordEncoder.encode(u.getPwd()));
+                       u.setCreateAt(LocalDateTime.now());
+                       u.setSAuthType(AuthType.NONE);
+                   })
+                   .doOnNext(u -> {
+                       pointCodeMapper.selectByIdOrName(0,ATTENDANCE_POINT_CODE_PREFIX + "1")
+                           .ifPresentOrElse(
+                               pc -> u.setPoint(pc.getPoint()),
+                               () -> new RuntimeException("Point code not found")
+                           );
                    })
                    .doOnNext(memberMapper::save)
                    .publishOn(Schedulers.boundedElastic())
@@ -101,29 +115,31 @@ public class UserService implements ReactiveUserDetailsService {
                    .onErrorMap(e -> new DuplicateUserException(e.getMessage(), HttpStatus.BAD_REQUEST));
     }
 
-    @Transactional
-    public Mono<Integer> saveRole(Tuple2<UserDetails, RoleType> tuple) {
-        return tuple.mapT1(ud -> findUserByUserId(ud.getUsername()))
-                .mapT1(user -> user.flatMap(u -> generateRole(u, tuple.getT2()))
-                )
-                .mapT1(user -> user.map(memberMapper::saveRole))
-                .getT1();
+//    public Mono<Integer> saveRole(Tuple2<UserDetails, RoleType> tuple) {
+//        return tuple.mapT1(ud -> findUserByUserId(ud.getUsername()))
+//                .mapT1(user -> user.flatMap(u -> generateRole(u, tuple.getT2()))
+//                )
+//                .mapT1(user -> user.map(memberMapper::saveRole))
+//                .getT1();
+//
+//    }
 
+    public Mono<Boolean> updateUser(Member member) {
+        if(member.getName() == null && member.getEmail() == null && member.getPhone() == null) {
+            return Mono.error(new RuntimeException("Name or Email or Phone number is required"));
+        }
+
+        return Mono.fromCallable(() -> memberMapper.update(member))
+                .map(i -> i == 1)
+                .onErrorReturn(false);
     }
 
-    @Transactional
-    public Mono<Boolean> updateUser(Member users) {
-        return Mono.just(memberMapper.update(users))
-                .map(i -> i == 1);
-    }
-
-    @Transactional
-    public Mono<Integer> deleteRole(Tuple2<UserDetails, RoleType> tuple) {
-        return tuple.mapT1(ud -> findUserByUserId(ud.getUsername()))
-                .mapT1(user -> user.flatMap(u -> generateRole(u, tuple.getT2())))
-                .mapT1(user -> user.map(memberMapper::deleteRole))
-                .getT1();
-    }
+//    public Mono<Integer> deleteRole(Tuple2<UserDetails, RoleType> tuple) {
+//        return tuple.mapT1(ud -> findUserByUserId(ud.getUsername()))
+//                .mapT1(user -> user.flatMap(u -> generateRole(u, tuple.getT2())))
+//                .mapT1(user -> user.map(memberMapper::deleteRole))
+//                .getT1();
+//    }
 
 
     private Mono<Role> generateRole(Member users, RoleType roleType) {

@@ -19,55 +19,56 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @GetMapping("")
-    public Mono<CategoryResponse.Result<List<Category>>> getAllCategories() {
-
-        return Mono.just(categoryService.selectAll())
-                .map(result -> CategoryResponse.Result.<List<Category>>builder()
-                        .body(result)
-                        .status(HttpStatus.OK)
-                        .message("OK")
-                        .build()
-                );
-    }
+//    @GetMapping("")
+//    public Mono<CategoryResponse.Result<List<Category>>> getAllCategories() {
+//
+//        return Mono.just(categoryService.selectAll())
+//                .map(result -> CategoryResponse.Result.<List<Category>>builder()
+//                        .body(result)
+//                        .status(HttpStatus.OK)
+//                        .message("OK")
+//                        .build()
+//                );
+//    }
 
     @PostMapping("")
     public Mono<CategoryResponse.Result<Category>> insertCategory(
-            @RequestBody @Valid Mono<CategoryRequest.Create> category
+            @Valid @RequestBody CategoryRequest.Create category
     ) {
-        return category
-                .map(create ->
-                        new Category(0, create.getName(), create.getParentId(), true)
-                )
-                .doOnNext(categoryService::insert)
-                .map(result ->  CategoryResponse.Result.transToCategory(
-                        result, HttpStatus.CREATED, "Created")
-                );
+
+        Category newCategory = new Category(0, category.getName(), category.getParentId(), true);
+
+        return categoryService.insert(newCategory)
+                .map(result ->  {
+                    HttpStatus status = result ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST;
+                    String message = result ? "Created" : "Bad Request";
+                    return CategoryResponse.Result.transToCategory(newCategory, status, message);
+                });
     }
 
     @PutMapping("")
     public Mono<CategoryResponse.Result<Category>> updateCategory(
-            @RequestBody @Valid Mono<CategoryRequest.Update> category
+            @RequestBody @Valid CategoryRequest.Update category
     ) {
-        return category
-                .map(update ->
-                        new Category(update.getId(), update.getName(), update.getParentId(), true)
-                )
-                .doOnNext(categoryService::update)
-                .map(result -> CategoryResponse.Result.transToCategory(
-                        result, HttpStatus.OK, "Updated")
-                );
+        Category prevCategory = new Category(category.getId(), category.getName(), category.getParentId(), true);
+
+        return categoryService.update(prevCategory)
+                .map(result -> {
+                    HttpStatus status = result ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
+                    String message = result ? "ok" : "Bad Request";
+                    return CategoryResponse.Result.transToCategory(prevCategory, status, message);
+                });
     }
 
     @DeleteMapping("{id}")
     public Mono<CategoryResponse.Result<Long>> deleteCategory(
             @PathVariable long id
     ) {
-        return Mono.just(id)
-                .publishOn(Schedulers.boundedElastic())
-                .doOnNext(categoryService::delete)
-                .map(idx -> CategoryResponse.Result.transToDelete(
-                        idx, HttpStatus.OK, "Deleted")
-                );
+        return categoryService.delete(id)
+                .map(result -> {
+                    HttpStatus status = result ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
+                    String message = result ? "Deleted" : "Bad Request";
+                    return CategoryResponse.Result.transToDelete(id, status, message);
+                });
     }
 }

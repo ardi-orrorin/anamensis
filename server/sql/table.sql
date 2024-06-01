@@ -1,26 +1,26 @@
 SET foreign_key_checks = 0;
-DROP TABLE login_history           CASCADE;
-DROP TABLE log_history             CASCADE;
-DROP TABLE role                    CASCADE;
-DROP TABLE board                   CASCADE;
-DROP TABLE table_code              CASCADE;
-DROP TABLE file                    CASCADE;
-DROP TABLE board_history           CASCADE;
-DROP TABLE change_code             CASCADE;
-DROP TABLE board_comment           CASCADE;
-DROP TABLE share_link              CASCADE;
-DROP TABLE point_code              CASCADE;
-DROP TABLE point_history           CASCADE;
-DROP TABLE category                CASCADE;
-DROP TABLE email_verify            CASCADE;
-DROP TABLE otp                     CASCADE;
-DROP TABLE member_config_smtp      CASCADE;
-DROP TABLE smtp_push_history       CASCADE;
-DROP TABLE attendance              CASCADE;
-DROP TABLE member                  CASCADE;
-DROP TABLE web_sys                 CASCADE;
-DROP TABLE system_message          CASCADE;
-DROP TABLE smtp_push_history_count CASCADE;
+DROP TABLE IF EXISTS login_history           CASCADE;
+DROP TABLE IF EXISTS log_history             CASCADE;
+DROP TABLE IF EXISTS role                    CASCADE;
+DROP TABLE IF EXISTS board                   CASCADE;
+DROP TABLE IF EXISTS table_code              CASCADE;
+DROP TABLE IF EXISTS file                    CASCADE;
+DROP TABLE IF EXISTS board_history           CASCADE;
+DROP TABLE IF EXISTS change_code             CASCADE;
+DROP TABLE IF EXISTS board_comment           CASCADE;
+DROP TABLE IF EXISTS share_link              CASCADE;
+DROP TABLE IF EXISTS point_code              CASCADE;
+DROP TABLE IF EXISTS point_history           CASCADE;
+DROP TABLE IF EXISTS category                CASCADE;
+DROP TABLE IF EXISTS email_verify            CASCADE;
+DROP TABLE IF EXISTS otp                     CASCADE;
+DROP TABLE IF EXISTS member_config_smtp      CASCADE;
+DROP TABLE IF EXISTS smtp_push_history       CASCADE;
+DROP TABLE IF EXISTS attendance              CASCADE;
+DROP TABLE IF EXISTS member                  CASCADE;
+DROP TABLE IF EXISTS web_sys                 CASCADE;
+DROP TABLE IF EXISTS system_message          CASCADE;
+DROP TABLE IF EXISTS smtp_push_history_count CASCADE;
 SET foreign_key_checks = 1;
 
 CREATE TABLE member (
@@ -136,7 +136,7 @@ CREATE TABLE file (
 
 CREATE TABLE category (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT           COMMENT 'PK',
-    name           VARCHAR(255)    NOT NULL                                COMMENT '카테고리 이름',
+    name           VARCHAR(255)    NOT NULL       UNIQUE                   COMMENT '카테고리 이름',
     parent_pk      BIGINT                                                  COMMENT '카테고리 PK',
     is_use         TINYINT(1)      NOT NULL       DEFAULT               1  COMMENT '사용여부 0:사용안함, 1:사용',
     FOREIGN KEY    (parent_pk)     REFERENCES     category(id),
@@ -203,7 +203,7 @@ CREATE TABLE share_link (
 
 CREATE TABLE point_code (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT    COMMENT 'PK',
-    name           VARCHAR(255)    NOT NULL                         COMMENT '포인트 적립 이름',
+    name           VARCHAR(255)    NOT NULL       UNIQUE            COMMENT '포인트 적립 이름',
     point          BIGINT          NOT NULL                         COMMENT '포인트 값',
     is_use         TINYINT(1)      NOT NULL       DEFAULT 1         COMMENT '사용여부 0:사용안함, 1:사용',
     INDEX          point_name_idx  (name),
@@ -211,25 +211,26 @@ CREATE TABLE point_code (
 ) COMMENT '포인트 코드';
 
 CREATE TABLE point_history (
-    id             BIGINT          PRIMARY KEY    AUTO_INCREMENT                              COMMENT 'PK',
-    table_name     VARCHAR(255)    NOT NULL                                                   COMMENT '테이블 이름',
-    table_pk       BIGINT          NOT NULL                                                   COMMENT '참조된 테이블 PK',
-    member_pk      BIGINT          NOT NULL                                                   COMMENT '유저 PK',
-    point_code_pk  BIGINT          NOT NULL                                                   COMMENT '포인트 코드 PK',
-    create_at      TIMESTAMP(6)    NOT NULL                                                   COMMENT '생성일자',
+    id             BIGINT          PRIMARY KEY    AUTO_INCREMENT    COMMENT 'PK',
+    table_code_pk  BIGINT          NOT NULL                         COMMENT '테이블 이름',
+    table_ref_pk   BIGINT          NOT NULL                         COMMENT '참조된 테이블 PK',
+    member_pk      BIGINT          NOT NULL                         COMMENT '유저 PK',
+    point_code_pk  BIGINT          NOT NULL                         COMMENT '포인트 코드 PK',
+    create_at      TIMESTAMP(6)    NOT NULL                         COMMENT '생성일자',
     FOREIGN KEY    (member_pk)     REFERENCES     member(id),
     FOREIGN KEY    (point_code_pk) REFERENCES     point_code(id),
+    FOREIGN KEY    (table_code_pk) REFERENCES     table_code(id),
     INDEX          create_at_idx   (create_at)
 ) COMMENT '포인트 이력';
 
 
 CREATE TABLE board_history (
-    id              BIGINT            PRIMARY KEY         AUTO_INCREMENT                           COMMENT 'PK',
-    board_pk        BIGINT            NOT NULL                                                     COMMENT '게시글 PK',
-    title           VARCHAR(255)      NOT NULL                                                     COMMENT '제목',
-    content         TEXT              NOT NULL                                                     COMMENT '본문',
-    change_code_pk  BIGINT            NOT NULL                                                     COMMENT '변경코드 PK',
-    create_at       TIMESTAMP(6)      NOT NULL                                                     COMMENT '생성일자',
+    id              BIGINT            PRIMARY KEY         AUTO_INCREMENT       COMMENT 'PK',
+    board_pk        BIGINT            NOT NULL                                 COMMENT '게시글 PK',
+    title           VARCHAR(255)      NOT NULL                                 COMMENT '제목',
+    content         TEXT              NOT NULL                                 COMMENT '본문',
+    change_code_pk  BIGINT            NOT NULL                                 COMMENT '변경코드 PK',
+    create_at       TIMESTAMP(6)      NOT NULL                                 COMMENT '생성일자',
     FOREIGN KEY     (board_pk)        REFERENCES          board(id),
     FOREIGN KEY     (change_code_pk)  REFERENCES          change_code(id),
     INDEX           create_at_idx     (create_at DESC),
@@ -238,12 +239,12 @@ CREATE TABLE board_history (
 
 
 CREATE TABLE email_verify (
-    id              BIGINT            PRIMARY KEY         AUTO_INCREMENT                           COMMENT 'PK',
-    email           VARCHAR(255)      NOT NULL                                                     COMMENT '이메일',
-    code            VARCHAR(255)      NOT NULL                                                     COMMENT '인증 코드',
-    create_at       TIMESTAMP(6)      NOT NULL                                                     COMMENT '생성일자',
-    expire_at       TIMESTAMP(6)      NOT NULL                                                     COMMENT '만료일자',
-    is_use          TINYINT(1)        NOT NULL            DEFAULT               1                  COMMENT '사용 여부 0:사용안함, 1:사용',
+    id              BIGINT            PRIMARY KEY         AUTO_INCREMENT            COMMENT 'PK',
+    email           VARCHAR(255)      NOT NULL                                      COMMENT '이메일',
+    code            CHAR(6)           NOT NULL                                      COMMENT '인증 코드',
+    create_at       TIMESTAMP(6)      NOT NULL                                      COMMENT '생성일자',
+    expire_at       TIMESTAMP(6)      NOT NULL                                      COMMENT '만료일자',
+    is_use          TINYINT(1)        NOT NULL            DEFAULT           1       COMMENT '사용 여부 0:사용안함, 1:사용',
     INDEX           email_idx         (email),
     INDEX           code_idx          (code),
     INDEX           create_at_idx     (create_at),
@@ -268,19 +269,19 @@ CREATE TABLE member_config_smtp (
 ) COMMENT '사용자 SMTP 설정';
 
 CREATE TABLE smtp_push_history (
-    id                  BIGINT                    AUTO_INCREMENT PRIMARY KEY,
-    member_pk           BIGINT                    NOT NULL                           COMMENT '사용자 PK',
-    user_config_smtp_pk BIGINT                    NOT NULL                           COMMENT '사용자 SMTP 설정 PK',
-    subject             VARCHAR(255)              NOT NULL                           COMMENT '제목',
-    content             TEXT                      NOT NULL                           COMMENT '내용',
-    status              VARCHAR(20)               NOT NULL                           COMMENT '상태',
-    message             VARCHAR(255)              NOT NULL                           COMMENT '메시지',
-    create_at           TIMESTAMP(6)              NOT NULL                           COMMENT '생성일자',
-    FOREIGN KEY         (member_pk)               REFERENCES member (id),
-    FOREIGN KEY         (user_config_smtp_pk)     REFERENCES member_config_smtp (id),
-    INDEX               idx_member_pk             (member_pk),
-    INDEX               idx_user_config_smtp_pk   (user_config_smtp_pk),
-    INDEX               idx_create_at             (create_at)
+    id                    BIGINT                      AUTO_INCREMENT PRIMARY KEY,
+    member_pk             BIGINT                      NOT NULL                           COMMENT '사용자 PK',
+    member_config_smtp_pk BIGINT                      NOT NULL                           COMMENT '사용자 SMTP 설정 PK',
+    subject               VARCHAR(255)                NOT NULL                           COMMENT '제목',
+    content               TEXT                        NOT NULL                           COMMENT '내용',
+    status                VARCHAR(20)                 NOT NULL                           COMMENT '상태',
+    message               VARCHAR(255)                NOT NULL                           COMMENT '메시지',
+    create_at             TIMESTAMP(6)                NOT NULL                           COMMENT '생성일자',
+    FOREIGN KEY           (member_pk)                 REFERENCES member (id),
+    FOREIGN KEY           (member_config_smtp_pk)     REFERENCES member_config_smtp (id),
+    INDEX                 idx_member_pk               (member_pk),
+    INDEX                 idx_member_config_smtp_pk   (member_config_smtp_pk),
+    INDEX                 idx_create_at               (create_at)
 ) COMMENT '사용자 PUSH 설정';
 
 CREATE TABLE web_sys (
@@ -317,8 +318,8 @@ CREATE TABLE system_message (
 
 
 CREATE TABLE smtp_push_history_count (
-    member_pk            INT      NOT NULL,
-    user_config_smtp_pk  INT      NOT NULL,
-    count                INT      NOT NULL        DEFAULT      0,
-    PRIMARY KEY          (member_pk, user_config_smtp_pk)
-) COMMENT 'smtp_push_history 카운트'
+    member_pk              INT      NOT NULL,
+    member_config_smtp_pk  INT      NOT NULL,
+    count                  INT      NOT NULL        DEFAULT      0,
+    PRIMARY KEY            (member_pk, member_config_smtp_pk)
+) COMMENT 'smtp_push_history 카운트';

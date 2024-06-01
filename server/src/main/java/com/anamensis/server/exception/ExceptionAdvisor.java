@@ -18,6 +18,11 @@ public class ExceptionAdvisor {
         return ResponseEntity.status(e.getStatus()).body(e.getMessage());
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> runtimeException(RuntimeException e) {
+        return ResponseEntity.status(400).body(e.getMessage());
+    }
+
 
 
 }

@@ -2,6 +2,7 @@ package com.anamensis.server.dto.request;
 
 import com.anamensis.server.entity.SystemMessage;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,9 +15,11 @@ public class SystemMessageRequest {
         private int id;
 
         @NotNull(message = "webSysPk is required")
+        @Size(min = 1, max = 4, message = "webSysPk must be between 1 and 4 characters")
         private String webSysPk;
 
         @NotNull(message = "subject is required")
+        @Size(min = 1, max = 255, message = "subject must be between 1 and 100 characters")
         private String subject;
 
         @NotNull(message = "content is required")

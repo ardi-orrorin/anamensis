@@ -1,68 +1,82 @@
 package com.anamensis.server.controller;
 
 import com.anamensis.server.entity.AuthType;
+import com.anamensis.server.entity.Member;
+import com.anamensis.server.entity.OTP;
 import com.anamensis.server.service.OTPService;
 import com.anamensis.server.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-import reactor.util.function.Tuples;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/otp")
+@Slf4j
 public class OTPController {
 
     private final OTPService otpService;
     private final UserService userService;
 
     @GetMapping("")
-    public Mono<String> generate(@AuthenticationPrincipal Mono<UserDetails> user){
-        return user
-                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
-                .publishOn(Schedulers.boundedElastic())
-                .doOnNext(u -> {
-                    //check otp already exist
-                    otpService.selectByUserPk(u.getId())
-                            .doOnSuccess(otp -> {
-                                new RuntimeException("already exist");
-                            }).subscribe();
-                })
-                .flatMap(otpService::insert);
+    public Mono<String> generate(
+            @AuthenticationPrincipal UserDetails user
+    ){
+        AtomicReference<Member> memberAtomic = new AtomicReference<>();
+        return userService.findUserByUserId(user.getUsername())
+                .doOnNext(memberAtomic::set)
+                .flatMap(u -> otpService.selectByMemberPk(u.getId()))
+                .onErrorComplete()
+                .flatMap(otp ->
+                    otp != null && otp.getHash() != null
+                    ? otpService.disableOTP(memberAtomic.get().getId())
+                    : Mono.just(true)
+                )
+                .then(Mono.defer(() -> otpService.insert(memberAtomic.get())));
     }
 
     @GetMapping("/exist")
-    public Mono<Boolean> exist(@AuthenticationPrincipal Mono<UserDetails> user){
-        return user.flatMap(u -> userService.findUserByUserId(u.getUsername()))
-                .flatMap(u -> otpService.existByUserPk(u.getId()));
+    public Mono<Boolean> exist(
+            @AuthenticationPrincipal UserDetails user
+    ){
+        return userService.findUserByUserId(user.getUsername())
+                .flatMap(u -> otpService.existByMemberPk(u.getId()));
     }
 
     @PostMapping("/verify")
-    public Mono<String> verify(
-            @AuthenticationPrincipal Mono<UserDetails> user,
-            @RequestBody Mono<Integer> code
+    public Mono<Boolean> verify(
+            @AuthenticationPrincipal UserDetails user,
+            @RequestBody Integer code
     ){
-        return user.zipWith(code)
-                .flatMap(tuple ->
-                    otpService.selectByUserId(tuple.getT1().getUsername())
-                            .map(t -> Tuples.of(t, tuple.getT2()))
+        AtomicReference<OTP> otpAtomic = new AtomicReference<>();
+        return otpService.selectByUserId(user.getUsername())
+                .doOnNext(otpAtomic::set)
+                .flatMap(otp -> otpService.verify(otp.getHash(), code))
+                .flatMap(result ->
+                    result ? userService.editAuth(otpAtomic.get().getMemberPk(), true, AuthType.OTP)
+                           : Mono.just(false)
                 )
-                .flatMap(otpService::verify)
-                .flatMap(t -> userService.editAuth(t.getT1().getMemberPk(), true, AuthType.OTP))
-                .map(t -> t ? "success" : "fail");
+                .onErrorReturn(false);
     }
 
-    @PutMapping("/disable")
-    public Mono<String> disable(@AuthenticationPrincipal Mono<UserDetails> user){
-        return user
-                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
-                .publishOn(Schedulers.boundedElastic())
+    @DeleteMapping("disable")
+    public Mono<Boolean> disable(
+        @AuthenticationPrincipal UserDetails user
+    ){
+        AtomicReference<Member> memberAtomic = new AtomicReference<>();
+        return userService.findUserByUserId(user.getUsername())
+                .doOnNext(memberAtomic::set)
                 .flatMap(u -> otpService.disableOTP(u.getId()))
-                .flatMap(t -> userService.editAuth(t.getT1(), false, AuthType.NONE))
-                .map(b -> b ? "success" : "fail");
+                .flatMap(result ->
+                    result ? userService.editAuth(memberAtomic.get().getId(), false, AuthType.NONE)
+                           : Mono.just(false)
+                )
+                .onErrorReturn(false);
     }
 
 }

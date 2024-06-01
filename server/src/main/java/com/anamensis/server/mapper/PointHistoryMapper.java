@@ -1,7 +1,11 @@
 package com.anamensis.server.mapper;
 
+import com.anamensis.server.dto.Page;
+import com.anamensis.server.dto.request.PointHistoryRequest;
 import com.anamensis.server.entity.PointHistory;
+import com.anamensis.server.resultMap.PointHistoryResultMap;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -9,5 +13,8 @@ import java.util.List;
 public interface PointHistoryMapper {
     int insert(PointHistory pointHistory);
 
-    List<PointHistory> selectByPointHistory(PointHistory pointHistory);
+    List<PointHistoryResultMap> selectByPointHistory(
+        @Param("page") Page page,
+        @Param("param") PointHistoryRequest.Param param
+    );
 }

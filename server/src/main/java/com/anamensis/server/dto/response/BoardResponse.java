@@ -39,9 +39,11 @@ public class BoardResponse {
                     .id(board.getId())
                     .title(board.getBoard().getTitle())
                     .viewCount(board.getBoard().getViewCount())
-                    .writer(board.getUsers().getName())
+                    .writer(board.getMember().getName())
                     .createdAt(board.getBoard().getCreateAt())
                     .isAdsense(board.getBoard().isAdsense());
+
+//            if(board.getFile() == null)  return builder.build();
 
             if (board.getFile().getFilePath() != null) {
                 builder.profileImage(board.getFile().getFilePath() + board.getFile().getFileName());
@@ -80,9 +82,12 @@ public class BoardResponse {
                     .title(board.getBoard().getTitle())
                     .categoryPk(board.getBoard().getCategoryPk())
                     .content(board.getBoard().getContent())
-                    .writer(board.getUsers().getName())
+                    .writer(board.getMember().getName())
                     .viewCount(board.getBoard().getViewCount())
                     .createdAt(board.getBoard().getCreateAt());
+
+
+//            if(board.getFile() == null)  return builder.build();
 
             if (board.getFile().getFilePath() != null) {
                 builder.profileImage(board.getFile().getFilePath() + board.getFile().getFileName());

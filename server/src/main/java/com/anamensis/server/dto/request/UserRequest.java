@@ -3,6 +3,7 @@ package com.anamensis.server.dto.request;
 import com.anamensis.server.entity.Member;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -26,16 +27,19 @@ public class UserRequest {
     @ToString
     public static class Register {
         @NotNull(message = "User ID is required")
+        @Size(min = 5, max = 50, message = "User ID must be between 4 and 50 characters")
         private String id;
 
         @NotNull(message = "Password is required")
+        @Size(min = 8, max = 255, message = "Password must be between 8 and 255 characters")
         private String pwd;
 
         @NotNull(message = "Name is required")
+        @Size(max = 100, message = "Name must be less than 100 characters")
         private String name;
 
         @NotNull(message = "Email is required")
-        @Pattern(regexp = "^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$", message = "Invalid email")
+        @Pattern(regexp = "^[a-zA-Z0-9.-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9]+$", message = "Invalid email")
         private String email;
 
         @NotNull(message = "Phone number is required")
@@ -93,14 +97,12 @@ public class UserRequest {
     @Setter
     public static class Profile {
 
-        @NotNull(message = "Name is required")
+        @Size(max = 100, message = "Name must be less than 100 characters")
         private String name;
 
-        @NotNull(message = "Email is required")
-        @Pattern(regexp = "^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$", message = "Invalid email")
+        @Pattern(regexp = "^[a-zA-Z0-9.-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9]+$", message = "Invalid email")
         private String email;
 
-        @NotNull(message = "Phone number is required")
         @Pattern(regexp = "^01(?:0|1|[6-9])-(?:\\d{3}|\\d{4})-\\d{4}$", message = "Invalid phone number")
         private String phone;
     }

@@ -5,6 +5,7 @@ import com.anamensis.server.dto.response.RateResponse;
 import com.anamensis.server.service.RateService;
 import com.anamensis.server.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/rate")
+@Slf4j
 public class RateController {
 
     private final RateService rateService;
@@ -22,10 +24,10 @@ public class RateController {
     @GetMapping("{id}")
     public Mono<RateResponse.Info> hasRate(
             @PathVariable(name = "id") long boardPk,
-            @AuthenticationPrincipal Mono<UserDetails> user
+            @AuthenticationPrincipal UserDetails user
     ) {
-        return user
-                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
+        log.info("hasRate: {}", boardPk);
+        return userService.findUserByUserId(user.getUsername())
                 .flatMap(u -> rateService.hasRate(boardPk, u.getId()))
                 .map(hasRate -> {
                     RateResponse.Info info = new RateResponse.Info();
@@ -41,13 +43,13 @@ public class RateController {
                 );
     }
 
-    @PostMapping("{id}")
+    @GetMapping("add/{id}")
     public Mono<RateResponse.Info> addRate(
             @PathVariable(name = "id") long boardPk,
-            @AuthenticationPrincipal Mono<UserDetails> user
+            @AuthenticationPrincipal UserDetails user
     ) {
-        return user
-                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
+        log.info("addRate: {}", boardPk);
+        return userService.findUserByUserId(user.getUsername())
                 .flatMap(u -> rateService.addRate(boardPk, u.getId()))
                 .flatMap($ -> rateService.countRate(boardPk))
                 .map(count -> {

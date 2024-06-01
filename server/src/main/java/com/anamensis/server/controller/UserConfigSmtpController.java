@@ -9,11 +9,9 @@ import com.anamensis.server.service.MemberConfigSmtpService;
 import com.anamensis.server.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -51,7 +49,7 @@ public class UserConfigSmtpController {
 
     @PostMapping("")
     public Mono<MemberConfigSmtp> save(
-            @Valid @RequestBody UserConfigSmtpRequest.UserConfigSmtp userConfigSmtp,
+            @Valid @RequestBody UserConfigSmtpRequest.MemberConfigSmtp userConfigSmtp,
             @AuthenticationPrincipal UserDetails user
     ) {
 
@@ -59,19 +57,18 @@ public class UserConfigSmtpController {
 
         return userService.findUserByUserId(user.getUsername())
                    .doOnNext(member::set)
-                   .map(t -> UserConfigSmtpRequest.UserConfigSmtp.fromEntity(userConfigSmtp, member.get()))
+                   .map(t -> UserConfigSmtpRequest.MemberConfigSmtp.fromEntity(userConfigSmtp, member.get()))
                    .flatMap(userConfigSmtpService::save);
     }
 
     @PutMapping("")
     public Mono<Boolean> update(
-            @RequestBody Mono<MemberConfigSmtp> userConfigSmtp,
-            @AuthenticationPrincipal Mono<UserDetails> user
+            @Valid @RequestBody UserConfigSmtpRequest.MemberConfigSmtp userConfigSmtp,
+            @AuthenticationPrincipal UserDetails user
     ) {
-        return user.flatMap(u -> userService.findUserByUserId(u.getUsername()))
-                   .zipWith(userConfigSmtp)
-                   .doOnNext(t -> t.getT2().setMemberPk(t.getT1().getId()))
-                   .flatMap(t -> userConfigSmtpService.update(t.getT2()));
+        return userService.findUserByUserId(user.getUsername())
+                .map(u -> UserConfigSmtpRequest.MemberConfigSmtp.fromEntity(userConfigSmtp, u))
+                .flatMap(userConfigSmtpService::update);
     }
 
     @GetMapping("/disabled/{id}")
@@ -85,9 +82,10 @@ public class UserConfigSmtpController {
 
 
     @PostMapping("test")
-    public Mono<Boolean> testConnection(@RequestBody UserConfigSmtpRequest.Test test) {
-        return Mono.just(test)
-                   .map(UserConfigSmtpRequest.Test::toUserConfigSmtp)
-                   .flatMap(userConfigSmtpService::testConnection);
+    public Mono<Boolean> testConnection(
+            @Valid @RequestBody UserConfigSmtpRequest.Test test
+    ) {
+        MemberConfigSmtp userConfigSmtp = UserConfigSmtpRequest.Test.toUserConfigSmtp(test);
+        return userConfigSmtpService.testConnection(userConfigSmtp);
     }
 }

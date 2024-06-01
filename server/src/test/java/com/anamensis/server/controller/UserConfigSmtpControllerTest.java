@@ -1,9 +1,11 @@
 package com.anamensis.server.controller;
 
 import com.anamensis.server.dto.response.UserResponse;
+import com.anamensis.server.entity.MemberConfigSmtp;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
@@ -51,6 +53,7 @@ class UserConfigSmtpControllerTest {
         wtc = WebTestClient
                 .bindToServer()
                 .baseUrl("http://localhost:" + port)
+                .responseTimeout(java.time.Duration.ofMillis(30000000))
                 .build();
 
         Map<String, String> map = new HashMap<>();
@@ -303,14 +306,239 @@ class UserConfigSmtpControllerTest {
     }
 
     @Test
+    @DisplayName("유저 설정 수정")
     void update() {
+        MemberConfigSmtp mc = wtc.get()
+                .uri("/api/user-config-smtp/1")
+                .headers(httpHeaders -> {
+                    httpHeaders.setBearerAuth(token);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(MemberConfigSmtp.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertNotEquals(mc.getUsername(), SMTP_USERNAME);
+        assertNotEquals(mc.getPassword(), SMTP_PASSWORD);
+        mc.setUsername(SMTP_USERNAME);
+        mc.setPassword(SMTP_PASSWORD);
+
+        assertEquals(mc.getHost(), SMTP_HOST);
+        assertEquals(mc.getPort(), SMTP_PORT);
+        mc.setHost("sdfdfdfdf");
+        mc.setPort("12345");
+
+        wtc.put()
+            .uri("/api/user-config-smtp")
+            .body(BodyInserters.fromValue(mc))
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(Boolean.class)
+            .isEqualTo(true);
+
+
+        wtc.get()
+            .uri("/api/user-config-smtp/1")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.username").isEqualTo(SMTP_USERNAME)
+            .jsonPath("$.password").isEqualTo(SMTP_PASSWORD)
+            .jsonPath("$.host").isEqualTo("sdfdfdfdf")
+            .jsonPath("$.port").isEqualTo("12345");
+
+
+        mc.setPort("1234567");
+
+        wtc.put()
+            .uri("/api/user-config-smtp")
+            .body(BodyInserters.fromValue(mc))
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().is4xxClientError();
+
+
+        mc.setPort("");
+
+        wtc.put()
+            .uri("/api/user-config-smtp")
+            .body(BodyInserters.fromValue(mc))
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().is4xxClientError();
+
+        mc.setPort("1234");
+        mc.setUsername(null);
+        wtc.put()
+            .uri("/api/user-config-smtp")
+            .body(BodyInserters.fromValue(mc))
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().is4xxClientError();
+
+        mc.setUsername("sdfsdf");
+        mc.setPassword(null);
+        wtc.put()
+            .uri("/api/user-config-smtp")
+            .body(BodyInserters.fromValue(mc))
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().is4xxClientError();
+
+        mc.setPassword("sdfsdf");
+        mc.setHost(null);
+        wtc.put()
+            .uri("/api/user-config-smtp")
+            .body(BodyInserters.fromValue(mc))
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().is4xxClientError();
+
     }
 
     @Test
+    @DisplayName("유저 설정 삭제")
     void disabled() {
+
+        wtc.get()
+            .uri("/api/user-config-smtp/1")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk();
+
+
+        wtc.get()
+            .uri("/api/user-config-smtp/disabled/1")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(Boolean.class)
+            .isEqualTo(true);
+
+        wtc.get()
+            .uri("/api/user-config-smtp/1")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().is4xxClientError();
+
+
+        wtc.get()
+            .uri("/api/user-config-smtp/5")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token2);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.id").isEqualTo(5)
+            .jsonPath("$.username").isEqualTo("username5");
+
+        wtc.get()
+            .uri("/api/user-config-smtp/disabled/5")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(Boolean.class)
+            .isEqualTo(true);
+
+        wtc.get()
+            .uri("/api/user-config-smtp/5")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token2);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.id").isEqualTo(5)
+            .jsonPath("$.username").isEqualTo("username5");
     }
 
     @Test
+    @DisplayName("유저 SMTP 연결 테스트")
     void testConnection() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("host", SMTP_HOST);
+        map.put("port", SMTP_PORT);
+        map.put("username", SMTP_USERNAME);
+        map.put("password", SMTP_PASSWORD);
+        map.put("useSSL", true);
+
+
+        wtc.post()
+            .uri("/api/user-config-smtp/test")
+            .body(BodyInserters.fromValue(map))
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(Boolean.class)
+            .isEqualTo(true);
+
+        map.put("port", "12345");
+        wtc.post()
+            .uri("/api/user-config-smtp/test")
+            .body(BodyInserters.fromValue(map))
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(Boolean.class)
+            .isEqualTo(false);
+
+        map.put("port", SMTP_PORT);
+        map.put("password", "sdfsdf");
+
+        wtc.post()
+            .uri("/api/user-config-smtp/test")
+            .body(BodyInserters.fromValue(map))
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(Boolean.class)
+            .isEqualTo(false);
+
+        map.put("password", SMTP_PASSWORD);
+        map.put("username", "sdf");
+
+
+        wtc.post()
+            .uri("/api/user-config-smtp/test")
+            .body(BodyInserters.fromValue(map))
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(Boolean.class);
+
     }
 }

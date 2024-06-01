@@ -50,8 +50,8 @@ public class OTPService {
         return Mono.fromCallable(() -> otpMapper.disableOTP(member.getId()))
                 .flatMap(i -> Mono.just(otpMapper.insert(otp)))
                 .flatMap(i ->
-                    i == 1 ? Mono.just(url)
-                           : Mono.error(new RuntimeException("insert fail"))
+                    i > 0 ? Mono.just(url)
+                          : Mono.error(new RuntimeException("insert fail"))
                 );
 
     }
@@ -64,8 +64,8 @@ public class OTPService {
 
         return Mono.fromCallable(() -> otpMapper.updateIsUse(otp))
                 .flatMap(i ->
-                    i == 1 ? Mono.just(true)
-                           : Mono.error(new RuntimeException("update fail"))
+                    i > 0 ? Mono.just(true)
+                          : Mono.error(new RuntimeException("update fail"))
                 )
                 .onErrorReturn(false);
 
@@ -73,8 +73,8 @@ public class OTPService {
     public Mono<Boolean> disableOTP(long memberPk) {
         return Mono.fromCallable(() -> otpMapper.disableOTP(memberPk))
                 .flatMap(i ->
-                    i == 1 ? Mono.just(true)
-                           : Mono.error(new RuntimeException("“Failed to disable OPT"))
+                    i > 0 ? Mono.just(true)
+                          : Mono.error(new RuntimeException("“Failed to disable OPT"))
                 )
                 .onErrorReturn(false);
     }

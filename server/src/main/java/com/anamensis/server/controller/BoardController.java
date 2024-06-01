@@ -34,10 +34,10 @@ public class BoardController {
         Board board
     ) {
         return boardService.findAll(page, board)
-                .flatMap(b -> rateService.countRate(b.getId())
-                    .doOnNext(b::setRate)
-                    .map($ -> b)
-                )
+            .flatMap(b -> rateService.countRate(b.getId())
+                .doOnNext(b::setRate)
+                .map($ -> b)
+            )
             .collectList()
             .flatMap(list ->
                 boardService.count(board)
@@ -67,11 +67,10 @@ public class BoardController {
     }
 
     @GetMapping("summary")
-    public Mono<List<BoardResponse.SummaryList>> findByUserPk(
-        @AuthenticationPrincipal Mono<UserDetails> user
+    public Mono<List<BoardResponse.SummaryList>> findByMemberPk(
+        @AuthenticationPrincipal UserDetails user
     ) {
-        return user
-                .flatMap(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
+        return userService.findUserByUserId(user.getUsername())
                 .flatMapMany(u -> boardService.findByMemberPk(u.getId()))
                 .flatMap(b -> rateService.countRate(b.getId())
                     .doOnNext(b::setRate)

@@ -5,10 +5,8 @@ import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.util.HashMap;
@@ -21,8 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class RateControllerTest {
-
+class OTPControllerTest {
     @LocalServerPort
     int port;
 
@@ -64,7 +61,7 @@ class RateControllerTest {
         Map<String, String> map2 = new HashMap<>();
         map2.put("username", "d-member-2");
         map2.put("password", "d-member-2");
-        map2.put("authType", "email");
+        map2.put("authType", "EMAIL");
         map2.put("code", "0");
         wtc.post()
             .uri("/public/api/user/verify")
@@ -77,169 +74,181 @@ class RateControllerTest {
             .expectStatus().isOk()
             .expectBody(UserResponse.Login.class)
             .consumeWith(result ->
-                token2 = Objects.requireNonNull(result.getResponseBody()).getAccessToken()
+                    token2 = Objects.requireNonNull(result.getResponseBody()).getAccessToken()
             );
 
-        wtc.delete()
-            .uri("/api/rate/1")
-            .headers(httpHeaders -> {
-                httpHeaders.setBearerAuth(token);
-            })
-            .exchange()
-            .expectStatus().isOk();
-
-        wtc.delete()
-            .uri("/api/rate/1")
-            .headers(httpHeaders -> {
-                httpHeaders.setBearerAuth(token2);
-            })
-            .exchange()
-            .expectStatus().isOk();
-
     }
 
     @Test
-    @DisplayName("게시글 좋아요 수 조회")
-    void hasRate() {
+    @DisplayName("OTP를 생성한다.")
+    void generate() {
         wtc.get()
-            .uri("/api/rate/add/1")
+            .uri("/api/otp")
             .headers(httpHeaders -> {
                 httpHeaders.setBearerAuth(token);
             })
             .exchange()
             .expectStatus().isOk()
-            .expectBody()
-            .jsonPath("$.status").isEqualTo(true)
-            .jsonPath("$.count").isEqualTo(1)
-            .jsonPath("$.id").isEqualTo(1);
+            .expectBody(String.class)
+            .consumeWith(result -> {
+                assertTrue(result.getResponseBody().contains("https://"));
+            });
 
         wtc.get()
-            .uri("/api/rate/1")
+            .uri("/api/otp")
             .headers(httpHeaders -> {
                 httpHeaders.setBearerAuth(token);
             })
             .exchange()
             .expectStatus().isOk()
-            .expectBody()
-            .jsonPath("$.status").isEqualTo(true)
-            .jsonPath("$.count").isEqualTo(1)
-            .jsonPath("$.id").isEqualTo(1);
-    }
-
-
-    @Test
-    @DisplayName("게시글 좋아요 수 추가")
-    void addRate() {
-        wtc.get()
-            .uri("/api/rate/add/1")
-            .headers(httpHeaders -> {
-                httpHeaders.setBearerAuth(token);
-            })
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody()
-            .jsonPath("$.status").isEqualTo(true)
-            .jsonPath("$.count").isEqualTo(1)
-            .jsonPath("$.id").isEqualTo(1);
+            .expectBody(String.class)
+            .consumeWith(result -> {
+                assertTrue(result.getResponseBody().contains("https://"));
+            });
 
         wtc.get()
-            .uri("/api/rate/add/1")
+            .uri("/api/otp")
             .headers(httpHeaders -> {
                 httpHeaders.setBearerAuth(token2);
             })
             .exchange()
             .expectStatus().isOk()
-            .expectBody()
-            .jsonPath("$.status").isEqualTo(true)
-            .jsonPath("$.count").isEqualTo(2)
-            .jsonPath("$.id").isEqualTo(1);
-
-    }
-
-    @Test
-    @DisplayName("게시글 좋아요 삭제")
-    void deleteRate() {
-        wtc.get()
-            .uri("/api/rate/add/1")
-            .headers(httpHeaders -> {
-                httpHeaders.setBearerAuth(token);
-            })
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody()
-            .jsonPath("$.status").isEqualTo(true)
-            .jsonPath("$.count").isEqualTo(1)
-            .jsonPath("$.id").isEqualTo(1);
-
-        wtc.delete()
-            .uri("/api/rate/1")
-            .headers(httpHeaders -> {
-                httpHeaders.setBearerAuth(token);
-            })
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody()
-            .jsonPath("$.status").isEqualTo(false)
-            .jsonPath("$.count").isEqualTo(0)
-            .jsonPath("$.id").isEqualTo(1);
-
-    }
-
-    @Test
-    @DisplayName("게시글 좋아요 수 조회")
-    void countRate() {
-        wtc.get()
-            .uri("/api/rate/add/1")
-            .headers(httpHeaders -> {
-                httpHeaders.setBearerAuth(token);
-            })
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody()
-            .jsonPath("$.status").isEqualTo(true)
-            .jsonPath("$.count").isEqualTo(1)
-            .jsonPath("$.id").isEqualTo(1);
+            .expectBody(String.class)
+            .consumeWith(result -> {
+                assertTrue(result.getResponseBody().contains("https://"));
+            });
 
         wtc.get()
-            .uri("/api/rate/add/1")
+            .uri("/api/otp")
             .headers(httpHeaders -> {
                 httpHeaders.setBearerAuth(token2);
             })
             .exchange()
             .expectStatus().isOk()
-            .expectBody()
-            .jsonPath("$.status").isEqualTo(true)
-            .jsonPath("$.count").isEqualTo(2)
-            .jsonPath("$.id").isEqualTo(1);
+            .expectBody(String.class)
+            .consumeWith(result -> {
+                assertTrue(result.getResponseBody().contains("https://"));
+            });
+    }
 
+    @Test
+    @DisplayName("OTP가 존재하는지 확인한다.")
+    void exist() {
         wtc.get()
-            .uri("/api/rate/count/1")
+            .uri("/api/otp/exist")
             .headers(httpHeaders -> {
                 httpHeaders.setBearerAuth(token);
             })
             .exchange()
             .expectStatus().isOk()
-            .expectBody()
-            .jsonPath("$.count").isEqualTo(2)
-            .jsonPath("$.id").isEqualTo(1);
+            .expectBody(Boolean.class)
+            .isEqualTo(true);
 
-        wtc.delete()
-            .uri("/api/rate/1")
+        wtc.get()
+            .uri("/api/otp/exist")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token2);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(Boolean.class)
+            .isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("OTP를 비활성화한다.")
+    void disable() {
+        wtc.get()
+            .uri("/api/otp/exist")
             .headers(httpHeaders -> {
                 httpHeaders.setBearerAuth(token);
             })
             .exchange()
-            .expectStatus().isOk();
+            .expectStatus().isOk()
+            .expectBody(Boolean.class)
+            .isEqualTo(true);
+
+        wtc.delete()
+            .uri("/api/otp/disable")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(Boolean.class)
+            .isEqualTo(true);
 
         wtc.get()
-                .uri("/api/rate/count/1")
+            .uri("/api/otp/exist")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(Boolean.class)
+            .isEqualTo(false);
+
+
+        wtc.get()
+                .uri("/api/otp/exist")
                 .headers(httpHeaders -> {
-                    httpHeaders.setBearerAuth(token);
+                    httpHeaders.setBearerAuth(token2);
                 })
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.count").isEqualTo(1)
-                .jsonPath("$.id").isEqualTo(1);
+                .expectBody(Boolean.class)
+                .isEqualTo(true);
+
+        wtc.delete()
+                .uri("/api/otp/disable")
+                .headers(httpHeaders -> {
+                    httpHeaders.setBearerAuth(token2);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Boolean.class)
+                .isEqualTo(true);
+
+        wtc.get()
+                .uri("/api/otp/exist")
+                .headers(httpHeaders -> {
+                    httpHeaders.setBearerAuth(token2);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Boolean.class)
+                .isEqualTo(false);
+    }
+
+
+    @Test
+    @DisplayName("OTP를 검증한다.")
+    @Disabled
+    void verify() {
+        Map<String, Integer> map = new HashMap<>();
+        map.put("code", 123456);
+
+        wtc.post()
+            .uri("/api/otp/verify")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .body(BodyInserters.fromValue(map))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(Boolean.class)
+            .isEqualTo(false);
+
+        wtc.post()
+                .uri("/api/otp/verify")
+                .headers(httpHeaders -> {
+                    httpHeaders.setBearerAuth(token2);
+                })
+                .body(BodyInserters.fromValue(map))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Boolean.class)
+                .isEqualTo(false);
+
     }
 }

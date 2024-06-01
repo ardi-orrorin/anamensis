@@ -195,7 +195,7 @@ class OTPServiceTest {
                 .verifyComplete();
 
         StepVerifier.create(os.disableOTP(1))
-                    .expectNext(false)
+                    .expectNext(true)
                     .verifyComplete();
 
         StepVerifier.create(os.disableOTP(0))

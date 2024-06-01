@@ -6,36 +6,39 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CategoryService {
 
     private final CategoryMapper categoryMapper;
 
-    public List<Category> selectAll() {
-        return categoryMapper.selectAll();
+    public Mono<List<Category>> selectAll() {
+        return Mono.fromCallable(categoryMapper::selectAll);
     }
 
-    @Transactional
-    public boolean insert(Category category) {
-        int result = categoryMapper.insert(category);
-
-        return result == 1;
+    public Mono<Boolean> insert(Category category) {
+        return Mono.fromCallable(() ->
+                        categoryMapper.insert(category) == 1
+                    )
+                    .onErrorReturn(false);
     }
 
-    @Transactional
-    public boolean update(Category category) {
-        int result = categoryMapper.update(category);
-
-        return result == 1;
+    public Mono<Boolean> update(Category category) {
+        return Mono.fromCallable(()->
+                        categoryMapper.update(category) == 1
+                    )
+                    .onErrorReturn(false);
     }
 
-    @Transactional
-    public boolean delete(long id) {
-        int result = categoryMapper.delete(id);
-        return result == 1;
+    public Mono<Boolean> delete(long id) {
+        return Mono.fromCallable(() ->
+                        categoryMapper.delete(id) == 1
+                    )
+                    .onErrorReturn(false);
     }
 }

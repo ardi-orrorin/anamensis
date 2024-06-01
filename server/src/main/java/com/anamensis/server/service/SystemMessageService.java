@@ -17,39 +17,49 @@ public class SystemMessageService {
     private final SystemMessageMapper systemMessageMapper;
 
     public Mono<SystemMessage> findById(int id) {
-        return Mono.justOrEmpty(systemMessageMapper.findById(id));
+        return Mono.justOrEmpty(systemMessageMapper.findById(id))
+                .switchIfEmpty(Mono.error(new RuntimeException("Not found id: " + id)));
     }
 
     public Mono<List<SystemMessage>> findByWebSysPk(String webSysPk) {
         return Mono.justOrEmpty(systemMessageMapper.findByWebSysPk(webSysPk));
     }
 
-    @Transactional
     public Mono<Boolean> save(SystemMessage sm) {
         sm.setCreateAt(LocalDateTime.now());
         sm.setUpdateAt(LocalDateTime.now());
-        systemMessageMapper.save(sm);
-        return Mono.just(true);
+        return Mono.fromRunnable(() -> systemMessageMapper.save(sm))
+                .thenReturn(true)
+                .onErrorReturn(false);
     }
 
-    @Transactional
     public Mono<Boolean> update(SystemMessage sm) {
         sm.setUpdateAt(LocalDateTime.now());
-        systemMessageMapper.update(sm);
-        return Mono.just(true);
+
+        return Mono.fromCallable(()-> systemMessageMapper.update(sm))
+                .flatMap(b ->
+                        b == 1 ? Mono.just(true)
+                               : Mono.error(new RuntimeException("수정이 불가능 합니다.")))
+                .onErrorReturn(false);
+
     }
 
-    @Transactional
     public Mono<Boolean> updateIsUse(int id, boolean isUse) {
+        return Mono.fromCallable(() -> systemMessageMapper.updateIsUse(id, isUse, LocalDateTime.now()))
+                .flatMap(b ->
+                        b == 1 ? Mono.just(true)
+                               : Mono.error(new RuntimeException("수정이 불가능 합니다.")))
+                .onErrorReturn(false);
 
-        systemMessageMapper.updateIsUse(id, isUse, LocalDateTime.now());
-        return Mono.just(true);
     }
 
-    @Transactional
     public Mono<Boolean> delete(int id) {
-        systemMessageMapper.delete(id);
-        return Mono.just(true);
+        ;
+        return Mono.fromCallable(() -> systemMessageMapper.delete(id))
+                .flatMap(b ->
+                        b == 1 ? Mono.just(true)
+                               : Mono.error(new RuntimeException("삭제가 불가능 합니다.")))
+                .onErrorReturn(false);
     }
 
 }

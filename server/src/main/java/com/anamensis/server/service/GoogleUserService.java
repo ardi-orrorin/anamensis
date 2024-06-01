@@ -47,7 +47,7 @@ public class GoogleUserService extends OidcReactiveOAuth2UserService {
 
     private Mono<Void> saveUser(OidcUserRequest userRequest, OidcUser user) {
         return Mono.just(user)
-                .map(u -> {
+                .flatMap(u -> {
                     String userId = userRequest.getClientRegistration().getRegistrationId() + "-" + u.getName();
                     UserRequest.Register register = new UserRequest.Register();
                     register.setId(userId);

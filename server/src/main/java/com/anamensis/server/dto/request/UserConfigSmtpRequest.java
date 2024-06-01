@@ -1,7 +1,6 @@
 package com.anamensis.server.dto.request;
 
 import com.anamensis.server.entity.Member;
-import com.anamensis.server.entity.MemberConfigSmtp;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
@@ -11,12 +10,14 @@ public class UserConfigSmtpRequest {
 
     @Getter
     @Setter
-    public static class UserConfigSmtp {
+    public static class MemberConfigSmtp {
+
+        private long id;
 
         @NotNull(message = "host is required")
         private String host;
 
-        @Pattern(regexp = "^[0-9]*$")
+        @Pattern(regexp = "^[0-9]{1,6}$", message = "port is invalid")
         @NotNull(message = "port is required")
         private String port;
 
@@ -26,17 +27,18 @@ public class UserConfigSmtpRequest {
         @NotNull(message = "password is required")
         private String password;
 
-        private String fromEmail;
+        private String fromEmail = "";
 
-        private String fromName;
+        private String fromName = "";
 
         private Boolean useSSL;
 
         private Boolean isDefault;
 
-        public static MemberConfigSmtp fromEntity(UserConfigSmtp entity, Member users) {
-            MemberConfigSmtp dto = new MemberConfigSmtp();
-            dto.setMemberPk(users.getId());
+        public static com.anamensis.server.entity.MemberConfigSmtp fromEntity(MemberConfigSmtp entity, Member member) {
+            com.anamensis.server.entity.MemberConfigSmtp dto = new com.anamensis.server.entity.MemberConfigSmtp();
+            if(entity.getId() != 0) dto.setId(entity.getId());
+            dto.setMemberPk(member.getId());
             dto.setHost(entity.getHost());
             dto.setPort(entity.getPort());
             dto.setUsername(entity.getUsername());
@@ -69,8 +71,8 @@ public class UserConfigSmtpRequest {
         private boolean useSSL;
 
 
-        public static MemberConfigSmtp toUserConfigSmtp(Test test) {
-            MemberConfigSmtp userConfigSmtp = new MemberConfigSmtp();
+        public static com.anamensis.server.entity.MemberConfigSmtp toUserConfigSmtp(Test test) {
+            com.anamensis.server.entity.MemberConfigSmtp userConfigSmtp = new com.anamensis.server.entity.MemberConfigSmtp();
             userConfigSmtp.setHost(test.getHost());
             userConfigSmtp.setPort(test.getPort());
             userConfigSmtp.setUsername(test.getUsername());

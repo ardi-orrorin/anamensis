@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -16,35 +17,39 @@ public class WebSysService {
     private final WebSysMapper webSysMapper;
 
     public Mono<List<WebSys>> findAll() {
-        return Mono.just(webSysMapper.findAll());
+        return Mono.fromCallable(webSysMapper::findAll);
     }
 
     public Mono<WebSys> findByCode(String code) {
-        return Mono.justOrEmpty(webSysMapper.findByCode(code));
+        return Mono.justOrEmpty(webSysMapper.findByCode(code))
+                .switchIfEmpty(Mono.error(new RuntimeException("webSys not found")));
     }
 
     public Mono<List<WebSys>> findByPermission(RoleType permission) {
-        return Mono.just(webSysMapper.findByPermission(permission));
+        return Mono.fromCallable(() -> webSysMapper.findByPermission(permission));
     }
 
     public Mono<Void> save(WebSys webSys) {
-        webSysMapper.save(webSys);
-        return Mono.empty();
+        if(webSys.getCode() == null || webSys.getName() == null || webSys.getPermission() == null) {
+            return Mono.error(new IllegalArgumentException("Invalid WebSys"));
+        }
+        return Mono.fromRunnable(() -> webSysMapper.save(webSys));
     }
 
     public Mono<Void> saveAll(List<WebSys> webSysList) {
-        webSysMapper.saveAll(webSysList);
-        return Mono.empty();
+        return Mono.fromRunnable(() -> webSysMapper.saveAll(webSysList));
     }
 
-    public Mono<Void> update(WebSys webSys) {
-        webSysMapper.update(webSys);
-        return Mono.empty();
+    public Mono<Boolean> update(WebSys webSys) {
+        return Mono.fromCallable(() -> webSysMapper.update(webSys))
+                .map(i -> i == 1)
+                .onErrorReturn(false);
     }
 
-    public Mono<Void> deleteByCode(String code) {
-        webSysMapper.deleteByCode(code);
-        return Mono.empty();
+    public Mono<Boolean> deleteByCode(String code) {
+        return Mono.fromCallable(()-> webSysMapper.deleteByCode(code))
+                .map(i -> i == 1)
+                .onErrorReturn(false);
     }
 
 

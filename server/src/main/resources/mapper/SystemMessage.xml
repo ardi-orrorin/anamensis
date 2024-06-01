@@ -60,6 +60,7 @@
             </if>
         </set>
         WHERE id = #{id}
+          AND web_sys_pk = ${webSysPk}
     </insert>
 
     <update id="updateIsUse" parameterType="Map">

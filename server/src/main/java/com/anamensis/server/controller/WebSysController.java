@@ -1,9 +1,12 @@
 package com.anamensis.server.controller;
 
+import com.anamensis.server.dto.StatusType;
 import com.anamensis.server.dto.request.WebSysRequest;
+import com.anamensis.server.dto.response.StatusResponse;
 import com.anamensis.server.entity.WebSys;
 import com.anamensis.server.service.WebSysService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -16,10 +19,10 @@ public class WebSysController {
 
     private final WebSysService webSysService;
 
-    @GetMapping("")
-    public Mono<List<WebSys>> findAll() {
-        return webSysService.findAll();
-    }
+//    @GetMapping("")
+//    public Mono<List<WebSys>> findAll() {
+//        return webSysService.findAll();
+//    }
 
     @GetMapping("/code")
     public Mono<WebSys> findByCode(@RequestParam String code) {
@@ -37,12 +40,29 @@ public class WebSysController {
     }
 
     @PutMapping("")
-    public Mono<Void> update(@RequestBody WebSys webSys) {
-        return webSysService.update(webSys);
+    public Mono<StatusResponse> update(@RequestBody WebSys webSys) {
+        return webSysService.update(webSys)
+                .map(result -> {
+                    StatusType status = result ? StatusType.SUCCESS : StatusType.FAIL;
+                    String message = result ? "Success" : "Fail";
+                    return StatusResponse.builder()
+                            .status(status)
+                            .message(message)
+                            .build();
+                });
     }
 
     @DeleteMapping("/code/{code}")
-    public Mono<Void> deleteByCode(@PathVariable String code) {
-        return webSysService.deleteByCode(code);
+    public Mono<StatusResponse> deleteByCode(@PathVariable String code) {
+
+        return webSysService.deleteByCode(code)
+                .map(result -> {
+                    StatusType status = result ? StatusType.SUCCESS : StatusType.FAIL;
+                    String message = result ? "Success" : "Fail";
+                    return StatusResponse.builder()
+                            .status(status)
+                            .message(message)
+                            .build();
+                });
     }
 }

@@ -34,10 +34,10 @@ public class BoardController {
         Board board
     ) {
         return boardService.findAll(page, board)
-                .flatMap(b -> rateService.countRate(b.getId())
-                    .doOnNext(b::setRate)
-                    .map($ -> b)
-                )
+            .flatMap(b -> rateService.countRate(b.getId())
+                .doOnNext(b::setRate)
+                .map($ -> b)
+            )
             .collectList()
             .flatMap(list ->
                 boardService.count(board)
@@ -67,12 +67,11 @@ public class BoardController {
     }
 
     @GetMapping("summary")
-    public Mono<List<BoardResponse.SummaryList>> findByUserPk(
-        @AuthenticationPrincipal Mono<UserDetails> user
+    public Mono<List<BoardResponse.SummaryList>> findByMemberPk(
+        @AuthenticationPrincipal UserDetails user
     ) {
-        return user
-                .flatMap(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
-                .flatMapMany(u -> boardService.findByUserPk(u.getId()))
+        return userService.findUserByUserId(user.getUsername())
+                .flatMapMany(u -> boardService.findByMemberPk(u.getId()))
                 .flatMap(b -> rateService.countRate(b.getId())
                     .doOnNext(b::setRate)
                     .map($ -> b)
@@ -84,11 +83,10 @@ public class BoardController {
     @PostMapping("")
     public Mono<Board> save(
         @RequestBody Board board,
-        @AuthenticationPrincipal Mono<UserDetails> user
+        @AuthenticationPrincipal UserDetails user
     ) {
-        return user
-                .flatMap(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
-                .doOnNext(u -> board.setUserPk(u.getId()))
+        return userService.findUserByUserId(user.getUsername())
+                .doOnNext(u -> board.setMemberPk(u.getId()))
                 .flatMap(u -> boardService.save(board));
     }
 
@@ -96,25 +94,22 @@ public class BoardController {
     public Mono<StatusResponse> updateByPk(
         @PathVariable(name = "id") long boardPk,
         @RequestBody Board board,
-        @AuthenticationPrincipal Mono<UserDetails> user
+        @AuthenticationPrincipal UserDetails user
     ) {
-        return user
-                .flatMap(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
+        return userService.findUserByUserId(user.getUsername())
                 .doOnNext(u -> {
-                    board.setUserPk(u.getId());
+                    board.setMemberPk(u.getId());
                     board.setId(boardPk);
                 })
                 .flatMap(u -> boardService.updateByPk(board))
                 .map(result -> {
                     StatusResponse.StatusResponseBuilder sb = StatusResponse.builder();
-                    if (result) {
-                        sb.status(StatusType.SUCCESS)
-                          .message("게시글이 수정 되었습니다.");
-                    } else {
-                        sb.status(StatusType.FAIL)
-                          .message("게시글 수정에 실패하였습니다.");
-                    }
-                    return sb.build();
+                    return result ? sb.status(StatusType.SUCCESS)
+                                      .message("게시글이 수정 되었습니다.")
+                                      .build()
+                                  : sb.status(StatusType.FAIL)
+                                      .message("게시글 수정에 실패하였습니다.")
+                                      .build();
                 });
     }
 

@@ -26,7 +26,7 @@ public interface MemberMapper {
             @Param("isAuth") boolean isAuth,
             @Param("authType") AuthType authType);
 
-    void updatePoint(
+    int updatePoint(
             @Param("id") long id,
             @Param("point") int point
     );

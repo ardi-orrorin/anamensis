@@ -12,44 +12,37 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AttendanceService {
 
     private final AttendanceMapper attendanceMapper;
 
-    @Transactional
-    public Mono<Attendance> findByUserPk(long userPk) {
-
-        Optional<Attendance> attendance = attendanceMapper.findByMemberPk(userPk);
-
-        if(attendance.isEmpty()) {
-            return this.init(userPk)
-                    .then(Mono.defer(() ->
-                            Mono.justOrEmpty(attendanceMapper.findByMemberPk(userPk))
-                        )
-                    );
-        }
-
-        return Mono.justOrEmpty(attendance)
-                .switchIfEmpty(Mono.error(new RuntimeException("출석 정보를 찾을 수 없습니다.")));
+    public Mono<Attendance> findByMemberPk(long memberPk) {
+        return Mono.fromCallable(() -> attendanceMapper.findByMemberPk(memberPk))
+                .flatMap(attend ->
+                    attend.map(Mono::just)
+                            .orElseGet(() -> this.init(memberPk)
+                                .then(Mono.defer(() -> Mono.justOrEmpty(attendanceMapper.findByMemberPk(memberPk))))
+                                .switchIfEmpty(Mono.error(new RuntimeException("출석 정보 조회 실패")))
+                            )
+                );
     }
 
-    @Transactional
-    public Mono<Void> init(long userPk) {
-        attendanceMapper.init(userPk, LocalDate.now());
-        return Mono.empty();
+    public Mono<Void> init(long memberPk) {
+        return Mono.fromRunnable(() -> attendanceMapper.init(memberPk, LocalDate.now()))
+                .onErrorMap(e -> new RuntimeException("출석 정보 초기화 실패"))
+                .then();
     }
 
 
-    @Transactional
-    public Mono<Attendance> update(long userPk) {
-        return Mono.just(userPk)
-                   .flatMap(this::findByUserPk)
-                   .doOnNext(this::updateAttendance)
-                   .doOnNext(attendanceMapper::update);
+    public Mono<Attendance> update(long memberPk) {
+        return findByMemberPk(memberPk)
+                .doOnNext(this::updateAttendance)
+                .doOnNext(attendanceMapper::update);
     }
 
 
-    private Mono<Void> updateAttendance(Attendance attendance) {
+    private void updateAttendance(Attendance attendance) {
         if (attendance.getLastDate().isEqual(LocalDate.now())) {
             throw new RuntimeException("오늘은 이미 출석 했습니다.");
         }
@@ -61,6 +54,5 @@ public class AttendanceService {
         }
 
         attendance.setLastDate(LocalDate.now());
-        return Mono.empty();
     }
 }

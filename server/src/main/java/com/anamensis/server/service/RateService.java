@@ -1,8 +1,10 @@
 package com.anamensis.server.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -21,9 +23,10 @@ public class RateService {
         String userKey = String.format(USER_BOARD_PREFIX, userPk);
         String userValue = String.valueOf(boardPk);
 
-        return Mono.just(redisTemplate.boundSetOps(rateKey).add(rateValue))
+        return Mono.fromCallable(() -> redisTemplate.boundSetOps(rateKey).add(rateValue))
                 .doOnNext($ -> redisTemplate.boundSetOps(userKey).add(userValue))
-                .map(result -> result == 1);
+                .map(result -> result == 1)
+                .onErrorReturn(false);
     }
 
     public Mono<Boolean> removeRate(long boardPk, long userPk) {
@@ -38,11 +41,11 @@ public class RateService {
                 .map(result -> result == 1);
     }
 
-    public Mono<Boolean> hasRate(long boardPk, long userPk) {
+    public Mono<Boolean> hasRate(long boardPk, long memberPk) {
         String key = String.format(RATE_PREFIX, boardPk);
-        String value = String.valueOf(userPk);
+        String value = String.valueOf(memberPk);
 
-        return Mono.just(redisTemplate.boundSetOps(key).isMember(value));
+        return Mono.fromCallable(() -> redisTemplate.boundSetOps(key).isMember(value));
     }
 
     public Mono<Long> countRate(long boardPk) {

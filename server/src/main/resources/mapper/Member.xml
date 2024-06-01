@@ -73,9 +73,17 @@
 
     <update id="update" parameterType="Member">
         UPDATE member
-           SET name  = #{name},
-               email = #{email},
-               phone = #{phone}
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="email != null and email != ''">
+                email = #{email},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+        </set>
          WHERE id    = #{id}
     </update>
 

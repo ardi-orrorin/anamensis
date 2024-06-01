@@ -10,12 +10,11 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@Builder
 public class PointHistory {
     private long id;
-    private String tableName;
-    private long tablePk;
-    private long userPk;
+    private long tableCodePk;
+    private long tableRefPk;
+    private long memberPk;
     private long pointCodePk;
     private LocalDateTime createAt;
 }

@@ -83,10 +83,9 @@ public class BoardController {
     @PostMapping("")
     public Mono<Board> save(
         @RequestBody Board board,
-        @AuthenticationPrincipal Mono<UserDetails> user
+        @AuthenticationPrincipal UserDetails user
     ) {
-        return user
-                .flatMap(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
+        return userService.findUserByUserId(user.getUsername())
                 .doOnNext(u -> board.setMemberPk(u.getId()))
                 .flatMap(u -> boardService.save(board));
     }
@@ -95,10 +94,9 @@ public class BoardController {
     public Mono<StatusResponse> updateByPk(
         @PathVariable(name = "id") long boardPk,
         @RequestBody Board board,
-        @AuthenticationPrincipal Mono<UserDetails> user
+        @AuthenticationPrincipal UserDetails user
     ) {
-        return user
-                .flatMap(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
+        return userService.findUserByUserId(user.getUsername())
                 .doOnNext(u -> {
                     board.setMemberPk(u.getId());
                     board.setId(boardPk);
@@ -106,14 +104,12 @@ public class BoardController {
                 .flatMap(u -> boardService.updateByPk(board))
                 .map(result -> {
                     StatusResponse.StatusResponseBuilder sb = StatusResponse.builder();
-                    if (result) {
-                        sb.status(StatusType.SUCCESS)
-                          .message("게시글이 수정 되었습니다.");
-                    } else {
-                        sb.status(StatusType.FAIL)
-                          .message("게시글 수정에 실패하였습니다.");
-                    }
-                    return sb.build();
+                    return result ? sb.status(StatusType.SUCCESS)
+                                      .message("게시글이 수정 되었습니다.")
+                                      .build()
+                                  : sb.status(StatusType.FAIL)
+                                      .message("게시글 수정에 실패하였습니다.")
+                                      .build();
                 });
     }
 

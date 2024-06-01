@@ -2,6 +2,7 @@ package com.anamensis.server.controller;
 
 import com.anamensis.server.dto.response.AttendResponse;
 import com.anamensis.server.entity.Attendance;
+import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.PointCode;
 import com.anamensis.server.service.AttendanceService;
 import com.anamensis.server.service.PointService;
@@ -16,6 +17,9 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,40 +34,34 @@ public class AttendanceController {
 
     @GetMapping("")
     public Mono<AttendResponse.AttendInfo> info(
-        @AuthenticationPrincipal Mono<UserDetails> user
+        @AuthenticationPrincipal UserDetails user
     ) {
-        return user
-                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
+        AtomicReference<Member> memberAtomic = new AtomicReference<>();
+        return userService.findUserByUserId(user.getUsername())
+                .doOnNext(memberAtomic::set)
                 .flatMap(u -> attendanceService.findByMemberPk(u.getId())
-                                .map(attend -> Tuples.of(u, attend))
                 )
-                .flatMap(t ->
-                    Mono.just(AttendResponse.AttendInfo.mergeUserAndAttendance(t.getT1(), t.getT2()))
+                .flatMap(attend ->
+                    Mono.just(AttendResponse.AttendInfo.mergeUserAndAttendance(memberAtomic.get(), attend))
                 );
     }
 
 
     @GetMapping("check")
     public Mono<String> update(
-            @AuthenticationPrincipal Mono<UserDetails> user
+            @AuthenticationPrincipal UserDetails user
     ) {
-        return user
-                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
+        AtomicReference<Member> memberAtomic = new AtomicReference<>();
+        return userService.findUserByUserId(user.getUsername())
+                .doOnNext(memberAtomic::set)
                 .flatMap(u -> attendanceService.update(u.getId()))
-                .flatMap(this::getPointByAttendance)
-                .publishOn(Schedulers.boundedElastic())
-                .doOnNext(t -> userService.updatePoint(
-                        t.getT1().getMemberPk(),
-                        (int) t.getT2().getPoint()
-                    ).subscribe()
-                )
-                .map(t -> "출석체크 완료");
-    }
-
-    private Mono<Tuple2<Attendance, PointCode>> getPointByAttendance(Attendance attendance) {
-        String seq = attendance.getDays() > 10  ? "10" : String.valueOf(attendance.getDays());
-
-        return pointService.selectByIdOrName(seq)
-                .map(point -> Tuples.of(attendance, point));
+                .flatMap(attend -> {
+                    String seq = attend.getDays() > 10
+                        ? "10"
+                        : String.valueOf(attend.getDays());
+                    return pointService.selectByIdOrName(seq);
+                })
+                .flatMap(pointCode -> userService.updatePoint(memberAtomic.get().getId(), (int) pointCode.getPoint()))
+                .map(result ->  result ? "success" : "fail");
     }
 }

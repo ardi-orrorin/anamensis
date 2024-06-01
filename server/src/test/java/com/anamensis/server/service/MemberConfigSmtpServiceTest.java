@@ -67,7 +67,7 @@ class MemberConfigSmtpServiceTest {
     @Order(2)
     @DisplayName("ID로 유저 SMTP 설정 조회")
     void selectById() {
-        StepVerifier.create(mcss.selectById(1L))
+        StepVerifier.create(mcss.selectById(1L, 1))
                 .assertNext(userConfigSmtp -> {
                     assertEquals(1L, userConfigSmtp.getMemberPk());
                     assertEquals("smtp.gmail.com", userConfigSmtp.getHost());
@@ -77,7 +77,7 @@ class MemberConfigSmtpServiceTest {
                 })
                 .verifyComplete();
 
-        StepVerifier.create(mcss.selectById(2L))
+        StepVerifier.create(mcss.selectById(2L, 1))
                 .assertNext(userConfigSmtp -> {
                     assertEquals(1L, userConfigSmtp.getMemberPk());
                     assertEquals("smtp.gmail.com", userConfigSmtp.getHost());
@@ -87,10 +87,10 @@ class MemberConfigSmtpServiceTest {
                 })
                 .verifyComplete();
 
-        StepVerifier.create(mcss.selectById(6L))
+        StepVerifier.create(mcss.selectById(6L, 1))
                 .verifyErrorMessage("UserConfigSmtp not found");
 
-        StepVerifier.create(mcss.selectById(99L))
+        StepVerifier.create(mcss.selectById(99L, 1))
                 .verifyErrorMessage("UserConfigSmtp not found");
     }
 
@@ -136,7 +136,7 @@ class MemberConfigSmtpServiceTest {
     @DisplayName("유저 SMTP 설정 수정")
     void update() {
 
-        MemberConfigSmtp ucs = mcss.selectById(1L).block();
+        MemberConfigSmtp ucs = mcss.selectById(1L, 1).block();
         ucs.setUsername("username2");
 
         StepVerifier.create(mcss.update(ucs))
@@ -145,7 +145,7 @@ class MemberConfigSmtpServiceTest {
                 })
                 .verifyComplete();
 
-        StepVerifier.create(mcss.selectById(1L))
+        StepVerifier.create(mcss.selectById(1L, 1))
                 .assertNext(userConfigSmtp -> {
                     assertEquals("username2", userConfigSmtp.getUsername());
                 })
@@ -160,7 +160,7 @@ class MemberConfigSmtpServiceTest {
     @Order(5)
     @DisplayName("유저 SMTP 연결 테스트")
     void testConnection() {
-        MemberConfigSmtp ucs = mcss.selectById(1L).block();
+        MemberConfigSmtp ucs = mcss.selectById(1L, 1).block();
         StepVerifier.create(mcss.testConnection(ucs))
                 .assertNext(aBoolean -> {
                     assertFalse(aBoolean);

@@ -3,15 +3,20 @@ package com.anamensis.server.controller;
 import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.PageResponse;
 import com.anamensis.server.dto.request.UserConfigSmtpRequest;
+import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.MemberConfigSmtp;
 import com.anamensis.server.service.MemberConfigSmtpService;
 import com.anamensis.server.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,11 +28,11 @@ public class UserConfigSmtpController {
 
     @GetMapping("")
     public Mono<PageResponse<MemberConfigSmtp>> list(
-            @AuthenticationPrincipal Mono<UserDetails> user
+            @AuthenticationPrincipal UserDetails user
     ) {
-        return user.flatMap(u -> userService.findUserByUserId(u.getUsername()))
-                   .map(u -> userConfigSmtpService.selectByUserPk(u.getId()))
-                   .flatMap(Flux::collectList)
+        return userService.findUserByUserId(user.getUsername())
+                   .flatMapMany(u -> userConfigSmtpService.selectByUserPk(u.getId()))
+                   .collectList()
                    .map(r -> PageResponse.<MemberConfigSmtp>builder()
                                .page(new Page())
                                .content(r)
@@ -37,20 +42,24 @@ public class UserConfigSmtpController {
 
     @GetMapping("{id}")
     public Mono<MemberConfigSmtp> get(
-            @PathVariable long id
+            @PathVariable long id,
+            @AuthenticationPrincipal UserDetails user
     ) {
-        return Mono.just(id)
-                   .flatMap(userConfigSmtpService::selectById);
+        return userService.findUserByUserId(user.getUsername())
+                 .flatMap(u -> userConfigSmtpService.selectById(id, u.getId()));
     }
 
     @PostMapping("")
     public Mono<MemberConfigSmtp> save(
-            @RequestBody Mono<UserConfigSmtpRequest.UserConfigSmtp> userConfigSmtp,
-            @AuthenticationPrincipal Mono<UserDetails> user
+            @Valid @RequestBody UserConfigSmtpRequest.UserConfigSmtp userConfigSmtp,
+            @AuthenticationPrincipal UserDetails user
     ) {
-        return user.flatMap(u -> userService.findUserByUserId(u.getUsername()))
-                   .zipWith(userConfigSmtp)
-                   .map(t -> UserConfigSmtpRequest.UserConfigSmtp.fromEntity(t.getT2(), t.getT1()))
+
+        AtomicReference<Member> member = new AtomicReference<>();
+
+        return userService.findUserByUserId(user.getUsername())
+                   .doOnNext(member::set)
+                   .map(t -> UserConfigSmtpRequest.UserConfigSmtp.fromEntity(userConfigSmtp, member.get()))
                    .flatMap(userConfigSmtpService::save);
     }
 

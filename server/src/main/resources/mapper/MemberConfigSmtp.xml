@@ -15,8 +15,9 @@
     </select>
     <select id="selectById" resultType="MemberConfigSmtp">
       <include refid="tbl_member_config_smtp"/>
-         WHERE id = #{id}
-           AND is_use = 1
+         WHERE id        = #{id}
+           AND member_pk = #{memberPk}
+           AND is_use    = 1
     </select>
 
     <select id="isDefault" resultType="boolean">

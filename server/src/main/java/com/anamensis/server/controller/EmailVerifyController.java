@@ -13,22 +13,20 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("api/verify")
-@Slf4j
-public class  EmailVerifyController {
+public class EmailVerifyController {
 
     private final EmailVerifyService emailVerifyService;
 
     @PublicAPI
     @PostMapping("email")
-    public Mono<String> verify(@RequestBody Mono<EmailVerify> email) {
-
-        return email.flatMap(emailVerifyService::insert);
+    public Mono<String> verify(@RequestBody EmailVerify email) {
+        return emailVerifyService.insert(email);
     }
 
     @PublicAPI
     @PostMapping("verifyCode")
-    public Mono<Boolean> verifyCode(@RequestBody Mono<EmailVerify> email) {
-        return email.flatMap(emailVerifyService::updateIsUse);
+    public Mono<Boolean> verifyCode(@RequestBody EmailVerify email) {
+        return emailVerifyService.updateIsUse(email);
     }
 
 

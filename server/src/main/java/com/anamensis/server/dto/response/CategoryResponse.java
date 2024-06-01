@@ -44,6 +44,5 @@ public class CategoryResponse {
                     .message(message)
                     .build();
         }
-
     }
 }

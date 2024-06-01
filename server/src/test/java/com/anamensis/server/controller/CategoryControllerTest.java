@@ -5,10 +5,8 @@ import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.util.HashMap;
@@ -21,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class RateControllerTest {
+class CategoryControllerTest {
 
     @LocalServerPort
     int port;
@@ -64,7 +62,7 @@ class RateControllerTest {
         Map<String, String> map2 = new HashMap<>();
         map2.put("username", "d-member-2");
         map2.put("password", "d-member-2");
-        map2.put("authType", "email");
+        map2.put("authType", "EMAIL");
         map2.put("code", "0");
         wtc.post()
             .uri("/public/api/user/verify")
@@ -77,169 +75,188 @@ class RateControllerTest {
             .expectStatus().isOk()
             .expectBody(UserResponse.Login.class)
             .consumeWith(result ->
-                token2 = Objects.requireNonNull(result.getResponseBody()).getAccessToken()
+                    token2 = Objects.requireNonNull(result.getResponseBody()).getAccessToken()
             );
 
-        wtc.delete()
-            .uri("/api/rate/1")
-            .headers(httpHeaders -> {
-                httpHeaders.setBearerAuth(token);
-            })
-            .exchange()
-            .expectStatus().isOk();
-
-        wtc.delete()
-            .uri("/api/rate/1")
-            .headers(httpHeaders -> {
-                httpHeaders.setBearerAuth(token2);
-            })
-            .exchange()
-            .expectStatus().isOk();
-
     }
 
     @Test
-    @DisplayName("게시글 좋아요 수 조회")
-    void hasRate() {
-        wtc.get()
-            .uri("/api/rate/add/1")
-            .headers(httpHeaders -> {
-                httpHeaders.setBearerAuth(token);
-            })
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody()
-            .jsonPath("$.status").isEqualTo(true)
-            .jsonPath("$.count").isEqualTo(1)
-            .jsonPath("$.id").isEqualTo(1);
-
-        wtc.get()
-            .uri("/api/rate/1")
-            .headers(httpHeaders -> {
-                httpHeaders.setBearerAuth(token);
-            })
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody()
-            .jsonPath("$.status").isEqualTo(true)
-            .jsonPath("$.count").isEqualTo(1)
-            .jsonPath("$.id").isEqualTo(1);
-    }
-
-
-    @Test
-    @DisplayName("게시글 좋아요 수 추가")
-    void addRate() {
-        wtc.get()
-            .uri("/api/rate/add/1")
-            .headers(httpHeaders -> {
-                httpHeaders.setBearerAuth(token);
-            })
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody()
-            .jsonPath("$.status").isEqualTo(true)
-            .jsonPath("$.count").isEqualTo(1)
-            .jsonPath("$.id").isEqualTo(1);
-
-        wtc.get()
-            .uri("/api/rate/add/1")
-            .headers(httpHeaders -> {
-                httpHeaders.setBearerAuth(token2);
-            })
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody()
-            .jsonPath("$.status").isEqualTo(true)
-            .jsonPath("$.count").isEqualTo(2)
-            .jsonPath("$.id").isEqualTo(1);
-
+    @Disabled
+    void getAllCategories() {
     }
 
     @Test
-    @DisplayName("게시글 좋아요 삭제")
-    void deleteRate() {
-        wtc.get()
-            .uri("/api/rate/add/1")
+    @DisplayName("카테고리를 추가한다.")
+    void insertCategory() {
+        Map<String, String> map = new HashMap<>();
+        map.put("name", "test");
+        wtc.post()
+            .uri("/api/categories")
+            .body(BodyInserters.fromValue(map))
             .headers(httpHeaders -> {
                 httpHeaders.setBearerAuth(token);
             })
             .exchange()
             .expectStatus().isOk()
             .expectBody()
-            .jsonPath("$.status").isEqualTo(true)
-            .jsonPath("$.count").isEqualTo(1)
-            .jsonPath("$.id").isEqualTo(1);
+            .jsonPath("$.status").isEqualTo("CREATED")
+            .jsonPath("$.body.name").isEqualTo("test");
 
-        wtc.delete()
-            .uri("/api/rate/1")
+        map.put("name", "test2");
+        map.put("parentId", "0");
+        wtc.post()
+            .uri("/api/categories")
+            .body(BodyInserters.fromValue(map))
             .headers(httpHeaders -> {
                 httpHeaders.setBearerAuth(token);
             })
             .exchange()
             .expectStatus().isOk()
             .expectBody()
-            .jsonPath("$.status").isEqualTo(false)
-            .jsonPath("$.count").isEqualTo(0)
-            .jsonPath("$.id").isEqualTo(1);
+            .jsonPath("$.status").isEqualTo("BAD_REQUEST")
+            .jsonPath("$.body.name").isEqualTo("test2");
 
+        map.put("name", "test3");
+        map.put("parentId", "1");
+        wtc.post()
+            .uri("/api/categories")
+            .body(BodyInserters.fromValue(map))
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.status").isEqualTo("CREATED")
+            .jsonPath("$.body.name").isEqualTo("test3");
+
+        map.put("name", "test4");
+        map.put("parentId", "99");
+        wtc.post()
+            .uri("/api/categories")
+            .body(BodyInserters.fromValue(map))
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.status").isEqualTo("BAD_REQUEST")
+            .jsonPath("$.message").isEqualTo("Bad Request");
+
+        map.put("name", null);
+        map.put("parentId", null);
+        wtc.post()
+            .uri("/api/categories")
+            .body(BodyInserters.fromValue(map))
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isBadRequest();
     }
 
     @Test
-    @DisplayName("게시글 좋아요 수 조회")
-    void countRate() {
-        wtc.get()
-            .uri("/api/rate/add/1")
+    @DisplayName("카테고리를 수정한다.")
+    void updateCategory() {
+
+        Map<String, String> map = new HashMap<>();
+        map.put("id", "1");
+        map.put("name", "test11");
+        wtc.put()
+            .uri("/api/categories")
+            .body(BodyInserters.fromValue(map))
             .headers(httpHeaders -> {
                 httpHeaders.setBearerAuth(token);
             })
             .exchange()
             .expectStatus().isOk()
             .expectBody()
-            .jsonPath("$.status").isEqualTo(true)
-            .jsonPath("$.count").isEqualTo(1)
-            .jsonPath("$.id").isEqualTo(1);
+            .jsonPath("$.status").isEqualTo("OK")
+            .jsonPath("$.body.name").isEqualTo("test11");
 
-        wtc.get()
-            .uri("/api/rate/add/1")
-            .headers(httpHeaders -> {
-                httpHeaders.setBearerAuth(token2);
-            })
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody()
-            .jsonPath("$.status").isEqualTo(true)
-            .jsonPath("$.count").isEqualTo(2)
-            .jsonPath("$.id").isEqualTo(1);
-
-        wtc.get()
-            .uri("/api/rate/count/1")
+        map.put("id", "1");
+        map.put("name", "test12");
+        map.put("parentId", "0");
+        wtc.put()
+            .uri("/api/categories")
+            .body(BodyInserters.fromValue(map))
             .headers(httpHeaders -> {
                 httpHeaders.setBearerAuth(token);
             })
             .exchange()
             .expectStatus().isOk()
             .expectBody()
-            .jsonPath("$.count").isEqualTo(2)
-            .jsonPath("$.id").isEqualTo(1);
+            .jsonPath("$.status").isEqualTo("BAD_REQUEST")
+            .jsonPath("$.body.name").isEqualTo("test12");
 
-        wtc.delete()
-            .uri("/api/rate/1")
+
+        map.put("id", "2");
+        map.put("name", "test13");
+        map.put("parentId", null);
+        wtc.put()
+            .uri("/api/categories")
+            .body(BodyInserters.fromValue(map))
             .headers(httpHeaders -> {
                 httpHeaders.setBearerAuth(token);
             })
             .exchange()
-            .expectStatus().isOk();
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.status").isEqualTo("OK")
+            .jsonPath("$.body.name").isEqualTo("test13");
 
-        wtc.get()
-                .uri("/api/rate/count/1")
+        map.put("id", "12");
+        map.put("name", "test14");
+        wtc.put()
+                .uri("/api/categories")
+                .body(BodyInserters.fromValue(map))
                 .headers(httpHeaders -> {
                     httpHeaders.setBearerAuth(token);
                 })
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.count").isEqualTo(1)
-                .jsonPath("$.id").isEqualTo(1);
+                .jsonPath("$.status").isEqualTo("BAD_REQUEST")
+                .jsonPath("$.body.name").isEqualTo("test14");
+    }
+
+    @Test
+    @DisplayName("카테고리를 삭제한다.")
+    void deleteCategory() {
+
+        wtc.delete()
+            .uri("/api/categories/1")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.status").isEqualTo("BAD_REQUEST")
+            .jsonPath("$.body").isEqualTo(1);
+
+        wtc.delete()
+            .uri("/api/categories/10")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.status").isEqualTo("OK")
+            .jsonPath("$.body").isEqualTo(10);
+
+
+        wtc.delete()
+                .uri("/api/categories/10")
+                .headers(httpHeaders -> {
+                    httpHeaders.setBearerAuth(token);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("BAD_REQUEST")
+                .jsonPath("$.body").isEqualTo(10);
     }
 }

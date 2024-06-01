@@ -128,14 +128,15 @@ class UserServiceTest {
     @DisplayName("포인트 업데이트")
     void updatePoint() {
         StepVerifier.create(us.updatePoint(100, 100))
-                .expectErrorMessage("Update point failed")
-                .verify();
+                .expectNext(false)
+                .verifyComplete();
 
         StepVerifier.create(us.updatePoint(1, 0))
                 .expectErrorMessage("Point must be greater than 0")
                 .verify();
 
         StepVerifier.create(us.updatePoint(1, 100))
+                .expectNext(true)
                 .verifyComplete();
 
         StepVerifier.create(us.findUserByUserId("d-member-1"))

@@ -480,6 +480,7 @@ class UserConfigSmtpControllerTest {
 
     @Test
     @DisplayName("유저 SMTP 연결 테스트")
+    @Disabled("실패시 타임아웃 시간으로 테스트 지연됨")
     void testConnection() {
         Map<String, Object> map = new HashMap<>();
         map.put("host", SMTP_HOST);

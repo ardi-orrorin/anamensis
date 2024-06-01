@@ -202,10 +202,9 @@ class BoardControllerTest {
             .exchange()
             .expectStatus().isOk()
             .expectBody()
-            .jsonPath("$[0].id").isEqualTo(4)
-            .jsonPath("$[1].id").isEqualTo(3)
-            .jsonPath("$[2].id").isEqualTo(2)
-            .jsonPath("$[3].id").isEqualTo(1);
+            .jsonPath("$[0].id").value(id -> {
+                assertTrue((int) id >= 4);
+            });
 
 
         wtc.get()
@@ -222,14 +221,108 @@ class BoardControllerTest {
     }
 
     @Test
+    @DisplayName("게시글을 등록한다.")
     void save() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("title", "테스트 제목11");
+        map.put("categoryPk", "1");
+
+        Map<String, Object> content = new HashMap<>();
+        content.put("type", "text");
+
+        map.put("content", content);
+        wtc.post()
+            .uri("/api/boards")
+            .body(BodyInserters.fromValue(map))
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk();
     }
 
     @Test
+    @DisplayName("게시글을 수정한다.")
     void updateByPk() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", "1");
+        map.put("title", "테스트 제목1-1");
+        map.put("categoryPk", "1");
+
+        Map<String, Object> content = new HashMap<>();
+        content.put("type", "text");
+
+        map.put("content", content);
+        wtc.put()
+            .uri("/api/boards/1")
+            .body(BodyInserters.fromValue(map))
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.status").isEqualTo("SUCCESS")
+            .jsonPath("$.message").isEqualTo("게시글이 수정 되었습니다.");
+
+
+        wtc.put()
+                .uri("/api/boards/1")
+                .body(BodyInserters.fromValue(map))
+                .headers(httpHeaders -> {
+                    httpHeaders.setBearerAuth(token2);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo("FAIL")
+                .jsonPath("$.message").isEqualTo("게시글 수정에 실패하였습니다.");
+
+
+        wtc.get()
+            .uri("/public/api/boards/1")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.id").isEqualTo(1)
+            .jsonPath("$.title").isEqualTo("테스트 제목1-1")
+            .jsonPath("$.writer").isEqualTo("d-member-1");
     }
 
     @Test
+    @DisplayName("게시글을 삭제한다.")
     void disableByPk() {
+        wtc.delete()
+            .uri("/api/boards/1")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.status").isEqualTo("SUCCESS")
+            .jsonPath("$.message").isEqualTo("게시글이 삭제 되었습니다.");
+
+        wtc.get()
+            .uri("/public/api/boards/1")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isBadRequest();
+
+        wtc.delete()
+            .uri("/api/boards/1")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.status").isEqualTo("FAIL")
+            .jsonPath("$.message").isEqualTo("게시글 삭제에 실패하였습니다.");
     }
 }

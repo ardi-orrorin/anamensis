@@ -37,12 +37,13 @@ class MemberConfigSmtpMapperTest {
 
     MemberConfigSmtp userConfigSmtp = new MemberConfigSmtp();
     MemberConfigSmtp ucsp = new MemberConfigSmtp();
+    Member member1 = new Member();
+    Member member2 = new Member();
+    Member member3 = new Member();
 
     @BeforeAll
     public void setUp() {
-        Member member1 = new Member();
-        Member member2 = new Member();
-        Member member3 = new Member();
+
         member1.setUserId("ucsm1");
         member1.setPwd(encoder.encode("ucsm1"));
         member1.setName("ucsm1");
@@ -276,7 +277,7 @@ class MemberConfigSmtpMapperTest {
     @DisplayName("id로 조회")
     void selectById() {
 
-        MemberConfigSmtp userConfigSmtp1 = userConfigSmtpMapper.selectById(userConfigSmtp.getId()).get();
+        MemberConfigSmtp userConfigSmtp1 = userConfigSmtpMapper.selectById(userConfigSmtp.getId(), member1.getId()).get();
         assertEquals(userConfigSmtp.getId(), userConfigSmtp1.getId());
         assertEquals(userConfigSmtp.getHost(), userConfigSmtp1.getHost());
         assertEquals(userConfigSmtp.getPort(), userConfigSmtp1.getPort());
@@ -290,11 +291,9 @@ class MemberConfigSmtpMapperTest {
         assertNull(userConfigSmtp.getIsUse());
         assertTrue(userConfigSmtp1.getIsUse());
 
-
-
         MemberConfigSmtp userConfigSmtp2 = new MemberConfigSmtp();
-        memberMapper.findMemberByUserId("ucsm1")
-                .ifPresent(member -> userConfigSmtp2.setMemberPk(member.getId()));
+        Member member = memberMapper.findMemberByUserId("ucsm1").get();
+        userConfigSmtp2.setMemberPk(member.getId());
         userConfigSmtp2.setHost("smtp.naver.com");
         userConfigSmtp2.setPort("03939");
         userConfigSmtp2.setUsername("username");
@@ -305,22 +304,22 @@ class MemberConfigSmtpMapperTest {
         userConfigSmtp2.setIsDefault(true);
         userConfigSmtpMapper.save(userConfigSmtp2);
 
-        assertTrue(userConfigSmtpMapper.selectById(userConfigSmtp.getId()).isPresent());
+        assertTrue(userConfigSmtpMapper.selectById(userConfigSmtp.getId(), member.getId()).isPresent());
         assertDoesNotThrow(()->{
-            userConfigSmtpMapper.selectById(userConfigSmtp.getId()).get();
+            userConfigSmtpMapper.selectById(userConfigSmtp.getId(), member.getId()).get();
         });
 
         userConfigSmtpMapper.disabled(userConfigSmtp2.getId(), userConfigSmtp2.getMemberPk());
 
-        assertFalse(userConfigSmtpMapper.selectById(userConfigSmtp2.getId()).isPresent());
-        assertTrue(userConfigSmtpMapper.selectById(userConfigSmtp2.getId()).isEmpty());
+        assertFalse(userConfigSmtpMapper.selectById(userConfigSmtp2.getId(), member.getId()).isPresent());
+        assertTrue(userConfigSmtpMapper.selectById(userConfigSmtp2.getId(), member.getId()).isEmpty());
 
         assertThrowsExactly(NoSuchElementException.class, ()->{
-            userConfigSmtpMapper.selectById(userConfigSmtp2.getId()).get();
+            userConfigSmtpMapper.selectById(userConfigSmtp2.getId(), member.getId()).get();
         });
 
         assertThrowsExactly(NoSuchElementException.class, ()->{
-            userConfigSmtpMapper.selectById(1000).get();
+            userConfigSmtpMapper.selectById(1000, member.getId()).get();
         });
     }
 
@@ -330,8 +329,8 @@ class MemberConfigSmtpMapperTest {
     @DisplayName("수정")
     void update() {
         MemberConfigSmtp userConfigSmtp = new MemberConfigSmtp();
-        memberMapper.findMemberByUserId("ucsm1")
-                .ifPresent(member -> userConfigSmtp.setMemberPk(member.getId()));
+        Member member = memberMapper.findMemberByUserId("ucsm1").get();
+        userConfigSmtp.setMemberPk(member.getId());
         userConfigSmtp.setHost("smtp.naver.com");
         userConfigSmtp.setPort("03939");
         userConfigSmtp.setUsername("username");
@@ -345,56 +344,56 @@ class MemberConfigSmtpMapperTest {
 
         userConfigSmtp.setHost("smtp.daum.net");
         userConfigSmtpMapper.update(userConfigSmtp);
-        userConfigSmtpMapper.selectById(userConfigSmtp.getId())
+        userConfigSmtpMapper.selectById(userConfigSmtp.getId(), member.getId())
                 .ifPresent(userConfigSmtp1 ->
                         assertEquals(userConfigSmtp.getHost(), userConfigSmtp1.getHost())
                 );
 
         userConfigSmtp.setPort("1234");
         userConfigSmtpMapper.update(userConfigSmtp);
-        userConfigSmtpMapper.selectById(userConfigSmtp.getId())
+        userConfigSmtpMapper.selectById(userConfigSmtp.getId(), member.getId())
                 .ifPresent(userConfigSmtp1 ->
                         assertEquals(userConfigSmtp.getPort(), userConfigSmtp1.getPort())
                 );
 
         userConfigSmtp.setUsername("username1");
         userConfigSmtpMapper.update(userConfigSmtp);
-        userConfigSmtpMapper.selectById(userConfigSmtp.getId())
+        userConfigSmtpMapper.selectById(userConfigSmtp.getId(), member.getId())
                 .ifPresent(userConfigSmtp1 ->
                         assertEquals(userConfigSmtp.getUsername(), userConfigSmtp1.getUsername())
                 );
 
         userConfigSmtp.setPassword("password1");
         userConfigSmtpMapper.update(userConfigSmtp);
-        userConfigSmtpMapper.selectById(userConfigSmtp.getId())
+        userConfigSmtpMapper.selectById(userConfigSmtp.getId(), member.getId())
                 .ifPresent(userConfigSmtp1 ->
                         assertEquals(userConfigSmtp.getPassword(), userConfigSmtp1.getPassword())
                 );
 
         userConfigSmtp.setFromEmail("fromEmail1");
         userConfigSmtpMapper.update(userConfigSmtp);
-        userConfigSmtpMapper.selectById(userConfigSmtp.getId())
+        userConfigSmtpMapper.selectById(userConfigSmtp.getId(), member.getId())
                 .ifPresent(userConfigSmtp1 ->
                         assertEquals(userConfigSmtp.getFromEmail(), userConfigSmtp1.getFromEmail())
                 );
 
         userConfigSmtp.setFromName("fromName1");
         userConfigSmtpMapper.update(userConfigSmtp);
-        userConfigSmtpMapper.selectById(userConfigSmtp.getId())
+        userConfigSmtpMapper.selectById(userConfigSmtp.getId(), member.getId())
                 .ifPresent(userConfigSmtp1 ->
                         assertEquals(userConfigSmtp.getFromName(), userConfigSmtp1.getFromName())
                 );
 
         userConfigSmtp.setUseSSL(false);
         userConfigSmtpMapper.update(userConfigSmtp);
-        userConfigSmtpMapper.selectById(userConfigSmtp.getId())
+        userConfigSmtpMapper.selectById(userConfigSmtp.getId(), member.getId())
                 .ifPresent(userConfigSmtp1 ->
                         assertEquals(userConfigSmtp.getUseSSL(), userConfigSmtp1.getUseSSL())
                 );
 
         userConfigSmtp.setIsDefault(false);
         userConfigSmtpMapper.update(userConfigSmtp);
-        userConfigSmtpMapper.selectById(userConfigSmtp.getId())
+        userConfigSmtpMapper.selectById(userConfigSmtp.getId(), member.getId())
                 .ifPresent(userConfigSmtp1 ->
                         assertEquals(userConfigSmtp.getIsDefault(), userConfigSmtp1.getIsDefault())
                 );
@@ -403,9 +402,9 @@ class MemberConfigSmtpMapperTest {
         userConfigSmtp.setIsUse(false);
         userConfigSmtpMapper.update(userConfigSmtp);
 
-        assertTrue(userConfigSmtpMapper.selectById(userConfigSmtp.getId()).isEmpty());
+        assertTrue(userConfigSmtpMapper.selectById(userConfigSmtp.getId(), member.getId()).isEmpty());
         assertThrowsExactly(NoSuchElementException.class, ()->{
-            userConfigSmtpMapper.selectById(userConfigSmtp.getId()).get();
+            userConfigSmtpMapper.selectById(userConfigSmtp.getId(), member.getId()).get();
         });
     }
 
@@ -462,11 +461,11 @@ class MemberConfigSmtpMapperTest {
         userConfigSmtpMapper.save(userConfigSmtp1);
 
         userConfigSmtpMapper.disabled(userConfigSmtp1.getId(), userConfigSmtp1.getMemberPk());
-        assertFalse(userConfigSmtpMapper.selectById(userConfigSmtp1.getId()).isPresent());
-        assertTrue(userConfigSmtpMapper.selectById(userConfigSmtp1.getId()).isEmpty());
+        assertFalse(userConfigSmtpMapper.selectById(userConfigSmtp1.getId(), member.getId()).isPresent());
+        assertTrue(userConfigSmtpMapper.selectById(userConfigSmtp1.getId(), member.getId()).isEmpty());
 
         assertThrowsExactly(NoSuchElementException.class, ()->{
-            userConfigSmtpMapper.selectById(userConfigSmtp1.getId()).get();
+            userConfigSmtpMapper.selectById(userConfigSmtp1.getId(), member.getId()).get();
         });
     }
 

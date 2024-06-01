@@ -1,9 +1,12 @@
 package com.anamensis.server.config;
 
+import com.anamensis.server.config.converter.StringToAuthTypeConverter;
+import com.anamensis.server.config.converter.StringToRoleTypeConverter;
 import com.anamensis.server.service.GoogleUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -106,5 +109,12 @@ public class SecurityConfig implements WebFluxConfigurer {
     @Bean
     public DeviceResolver deviceResolver() {
         return new DeviceResolver();
+    }
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addConverter(new StringToRoleTypeConverter());
+        registry.addConverter(new StringToAuthTypeConverter());
+
     }
 }

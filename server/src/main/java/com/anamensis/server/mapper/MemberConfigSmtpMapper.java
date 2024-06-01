@@ -10,7 +10,7 @@ import java.util.Optional;
 @Mapper
 public interface MemberConfigSmtpMapper {
 
-    Optional<MemberConfigSmtp> selectById(long id);
+    Optional<MemberConfigSmtp> selectById(long id, long memberPk);
 
     List<MemberConfigSmtp> selectByMemberPk(long memberPk);
 

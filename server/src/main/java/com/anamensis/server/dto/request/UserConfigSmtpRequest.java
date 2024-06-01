@@ -16,7 +16,7 @@ public class UserConfigSmtpRequest {
         @NotNull(message = "host is required")
         private String host;
 
-        @Pattern(regexp = "^[0-9]*$")
+        @Pattern(regexp = "^[0-9]{1,6}$", message = "port is invalid")
         @NotNull(message = "port is required")
         private String port;
 
@@ -34,9 +34,9 @@ public class UserConfigSmtpRequest {
 
         private Boolean isDefault;
 
-        public static MemberConfigSmtp fromEntity(UserConfigSmtp entity, Member users) {
+        public static MemberConfigSmtp fromEntity(UserConfigSmtp entity, Member member) {
             MemberConfigSmtp dto = new MemberConfigSmtp();
-            dto.setMemberPk(users.getId());
+            dto.setMemberPk(member.getId());
             dto.setHost(entity.getHost());
             dto.setPort(entity.getPort());
             dto.setUsername(entity.getUsername());

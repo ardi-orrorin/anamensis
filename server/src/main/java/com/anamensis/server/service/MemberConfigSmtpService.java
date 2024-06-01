@@ -26,8 +26,8 @@ public class MemberConfigSmtpService {
                 .flatMapMany(Flux::fromIterable);
     }
 
-    public Mono<MemberConfigSmtp> selectById(long id) {
-        return Mono.justOrEmpty(userConfigSmtpMapper.selectById(id))
+    public Mono<MemberConfigSmtp> selectById(long id, long memberPk) {
+        return Mono.justOrEmpty(userConfigSmtpMapper.selectById(id, memberPk))
                 .switchIfEmpty(Mono.error(new RuntimeException("UserConfigSmtp not found")));
     }
 

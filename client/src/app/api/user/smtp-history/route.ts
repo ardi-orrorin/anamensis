@@ -1,26 +1,23 @@
 import {NextRequest, NextResponse} from "next/server";
-import {cookies} from "next/headers";
-import axios, {AxiosResponse} from "axios";
-import {UserInfoI} from "@/app/user/email/page";
 import {PageResponse} from "@/app/{commons}/types/commons";
 import {SmtpHistoryI} from "@/app/user/smtp-history/page";
+import apiCall from "@/app/{commons}/func/api";
 
 export async function GET(req: NextRequest): Promise<NextResponse<PageResponse<SmtpHistoryI>>> {
     const search = new URLSearchParams(req.nextUrl.search);
 
-    const url = process.env.NEXT_PUBLIC_SERVER + '/api/smtp-push-history';
-    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
+    const params = {
+            page: search.get('page') || 1,
+            size: search.get('size') || 10,
+    };
 
-    const result = await axios.get(url, {
-        params: {
-            page : search.get('page') || 1,
-            size : search.get('size') || 10,
-        },
-        headers: {
-            'Authorization': 'Bearer ' + token?.value,
-        }
-    }).then((res: AxiosResponse<UserInfoI>) => {
-        return res.data;
+    const result = await apiCall<PageResponse<SmtpHistoryI>>({
+        path: '/api/user-config-smtp',
+        method: 'GET',
+        call: 'Server',
+        params,
+        setAuthorization: true,
+        isReturnData: true,
     });
 
     return new NextResponse(JSON.stringify(result), {

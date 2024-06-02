@@ -1,35 +1,30 @@
-import {cookies} from "next/headers";
-import axios, {AxiosResponse} from "axios";
 import {NextRequest, NextResponse} from "next/server";
 import {WebSysI} from "@/app/user/system/page";
+import apiCall from "@/app/{commons}/func/api";
 
 export async function GET() {
-    const url = process.env.NEXT_PUBLIC_SERVER + '/admin/api/web-sys';
-
-    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
-
-    const res:AxiosResponse<WebSysI[]> = await axios.get(url, {
-        headers: {
-            'Authorization': `Bearer ${token?.value}`
-        }
+    const res = await apiCall<WebSysI[]>({
+        path: `/admin/api/web-sys`,
+        method: 'GET',
+        call: 'Server',
+        setAuthorization: true,
+        isReturnData: true,
     });
 
-    return new NextResponse(JSON.stringify(res.data), {
+    return new NextResponse(JSON.stringify(res), {
         status: 200,
     });
 }
 
 export async function POST(req: NextRequest) {
-    const data = await req.json() as WebSysI;
+    const body = await req.json() as WebSysI;
 
-    const url = process.env.NEXT_PUBLIC_SERVER + '/admin/api/web-sys';
-
-    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
-
-    const res = await axios.post(url, data, {
-        headers: {
-            'Authorization': `Bearer ${token?.value}`
-        }
+    await apiCall<any>({
+        path: '/admin/api/web-sys',
+        method: 'POST',
+        call: 'Server',
+        body,
+        setAuthorization: true,
     });
 
     return new NextResponse(null, {
@@ -38,17 +33,14 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
+    const body = await req.json() as WebSysI;
 
-    const data = await req.json() as WebSysI;
-
-    const url = process.env.NEXT_PUBLIC_SERVER + '/admin/api/web-sys';
-
-    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
-
-    const res = await axios.put(url, data, {
-        headers: {
-            'Authorization': `Bearer ${token?.value}`
-        }
+    await apiCall<any>({
+        path: '/admin/api/web-sys',
+        method: 'PUT',
+        call: 'Server',
+        body,
+        setAuthorization: true,
     });
 
     return new NextResponse(null, {

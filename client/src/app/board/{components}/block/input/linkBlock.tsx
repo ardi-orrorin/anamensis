@@ -77,6 +77,7 @@ const LinkBlock = (props: BlockProps) => {
             onKeyUpHandler
             && onKeyUpHandler(e);
         } catch (e) {
+            console.log(e)
             alert('링크를 가져오는데 실패했습니다.');
         }
     }

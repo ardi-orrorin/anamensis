@@ -270,7 +270,7 @@ export default function Page({params}: {params : {id: string}}) {
     const onKeyUpHandler = (e: React.KeyboardEvent<HTMLElement>, seq: number) => {
         if(e.key !== 'Enter') return;
 
-        seq === 0 && e.currentTarget.getAttribute('name') === 'title' && blockRef.current[0]?.focus();
+        seq === 0 && e?.currentTarget?.getAttribute('name') === 'title' && blockRef.current[0]?.focus();
 
         const list = board.data?.content?.list;
 

@@ -1,14 +1,11 @@
-import {cookies} from "next/headers";
-import axios from "axios";
+import apiCall from "@/app/{commons}/func/api";
 
 export async function GET(){
-    const url = process.env.NEXT_PUBLIC_SERVER + '/api/otp/exist';
-    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
-
-    const res = await axios.get(url, {
-        headers: {
-            'Authorization': 'Bearer ' + token?.value
-        }
+    const res = await apiCall<any>({
+        path: '/api/otp/exist',
+        method: 'GET',
+        call: 'Server',
+        setAuthorization: true,
     });
 
     return new Response(JSON.stringify(res.data), {

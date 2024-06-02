@@ -105,12 +105,15 @@ public class UserController {
 
     @PublicAPI
     @PostMapping("exists")
-    public Mono<UserResponse.Status> exists(@Valid @RequestBody UserRequest.existsMember data) {
+    public Mono<UserResponse.Status> exists(
+            @Valid @RequestBody UserRequest.existsMember data
+    ) {
 
         return userService.existsUser(data)
                    .map(exists -> UserResponse.Status
                            .transToStatus(HttpStatus.OK, exists.toString())
-                   );
+                   )
+                .log();
     }
 
     @GetMapping("histories")

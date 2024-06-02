@@ -54,3 +54,10 @@
 ## ERD --> [Link](https://www.erdcloud.com/d/kaLkfNKiwKcPe85k4)
 ![](./resource/erd.jpg)
 
+
+## JKS 인증키 생성 방법
+```shell
+keytool -genkeypair -alias 'alias' -keyalg RSA \
+-dname "CN=Web Server,OU=Unit,O=Organization,L=City,S=State,C=US" \
+-keypass 'secret' -keystore 'file.jks' -storepass 'password'
+```

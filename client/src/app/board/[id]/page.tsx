@@ -320,8 +320,8 @@ export default function Page({params}: {params : {id: string}}) {
 
     const onChangeRateHandler = async () => {
         return await apiCall<RateInfoI>({
-            path: '/api/board/rate/' + params.id,
-            method: rateInfo.status ? 'DELETE' : 'POST',
+            path: rateInfo.status ? '/api/board/rate/' + params.id : '/api/board/rate/add/' + params.id,
+            method: rateInfo.status ? 'DELETE' : 'GET',
             call: 'Proxy'
         })
         .then(res => {
@@ -419,12 +419,16 @@ export default function Page({params}: {params : {id: string}}) {
                                         </p>
                                       </div>
                                       <div className={'flex gap-2 items-center'}>
-                                        <Image src={process.env.NEXT_PUBLIC_CDN_SERVER + board.data.profileImage}
-                                               className={'rounded-full border-2 border-solid border-blue-300'}
-                                               width={50}
-                                               height={50}
-                                               alt={''}
-                                        />
+                                          {
+                                              board?.data?.profileImage &&
+                                              <Image src={process.env.NEXT_PUBLIC_CDN_SERVER + board.data.profileImage}
+                                                     className={'rounded-full border-2 border-solid border-blue-300'}
+                                                     width={50}
+                                                     height={50}
+                                                     alt={''}
+                                              />
+                                          }
+
                                         <p className={'font-bold'}
                                         >{board.data.writer}</p>
                                       </div>

@@ -112,6 +112,7 @@ export default function FileUpload (props: FileUploadProps) {
         <>
             <div className={'w-full'}
                  onMouseEnter={onMouseEnterHandler}
+                 aria-roledescription={'object'}
             >
                 <button style={customStyle}
                         onClick={onClick}
@@ -139,6 +140,7 @@ export default function FileUpload (props: FileUploadProps) {
                    hidden={true}
                    multiple={false}
                    accept={ isImage ? 'image/*' : '*/*'}
+
             />
         </>
     )

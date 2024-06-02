@@ -62,6 +62,7 @@ public class AttendanceController {
                     return pointService.selectByIdOrName(seq);
                 })
                 .flatMap(pointCode -> userService.updatePoint(memberAtomic.get().getId(), (int) pointCode.getPoint()))
+                .onErrorReturn(false)
                 .map(result ->  result ? "success" : "fail");
     }
 }

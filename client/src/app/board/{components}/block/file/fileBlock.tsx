@@ -18,7 +18,7 @@ export default function FileBlock (data: FileBlockProps) {
     } = data;
 
     return (
-        <div id={`block-${seq}`} className={'w-full'}>
+        <div id={`block-${seq}`} className={'w-full'} aria-roledescription={'object'}>
             {
                 !value &&
                 <FileUpload seq={seq}

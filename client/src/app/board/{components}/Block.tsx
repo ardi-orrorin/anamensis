@@ -56,6 +56,7 @@ export default function Block(props: BlockProps) {
     }
 
     const onMouseEnterHandler = (e: React.MouseEvent<MouseEnterHTMLElements> ) => {
+        if(e.currentTarget.ariaRoleDescription !== 'object') return;
         const blockMenu: BlockMenu = 'openObjectMenu';
 
         const block: BlockI = {seq, code, value, textStyle};

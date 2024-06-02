@@ -1,24 +1,17 @@
-import {cookies} from "next/headers";
-import axios, {AxiosResponse} from "axios";
 import {NextResponse} from "next/server";
-import {AttendInfoI} from "@/app/user/{components}/AttendInfo";
+import apiCall from "@/app/{commons}/func/api";
 
 export async function GET(){
-    const url = process.env.NEXT_PUBLIC_SERVER + '/api/attendance';
-
-    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
-
-    const result: string = await axios.get(url, {
-        headers: {
-            'Authorization': 'Bearer ' + token?.value,
-        }
+    const result = await apiCall<string>({
+        path: '/api/attendance',
+        method: 'GET',
+        call: 'Server',
+        setAuthorization: true,
+        isReturnData: true,
     })
-        .then((res: AxiosResponse<AttendInfoI>) => {
-            return res.data;
-        })
-        .catch(err => {
-            return err.response.data.message;
-        });
+    .catch(err => {
+        return err.response.data.message;
+    });
 
     return new NextResponse(JSON.stringify(result), {
         status: 200,

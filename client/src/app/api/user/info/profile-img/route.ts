@@ -2,20 +2,20 @@ import {NextRequest, NextResponse} from "next/server";
 import {cookies} from "next/headers";
 import axios, {AxiosResponse} from "axios";
 import {UserInfoI} from "@/app/user/email/page";
+import apiCall from "@/app/{commons}/func/api";
 
 export async function POST(req: NextRequest) {
     const data = await req.formData();
 
-    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
-    const url = process.env.NEXT_PUBLIC_SERVER + '/api/files/profile';
-    const result = await axios.post(url, data, {
-        headers: {
-            'Authorization': 'Bearer ' + token?.value,
-            'Content-Type': 'multipart/form-data'
-        }
-    }).then((res: AxiosResponse<UserInfoI>) => {
-        return res.data;
-    })
+    const result = await apiCall<UserInfoI>({
+        path: '/api/files/profile',
+        method: 'POST',
+        call: 'Server',
+        body: data,
+        contentType: 'multipart/form-data',
+        setAuthorization: true,
+        isReturnData: true,
+    });
 
     return new NextResponse(JSON.stringify(result), {
         status: 200,
@@ -26,16 +26,13 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
-    const url = process.env.NEXT_PUBLIC_SERVER + '/api/user/profile-img';
-
-    const result = await axios.get(url, {
-        headers: {
-            'Authorization': 'Bearer ' + token?.value,
-        }
-    }).then((res: AxiosResponse<UserInfoI>) => {
-        return res.data;
-    })
+    const result = await apiCall<UserInfoI>({
+        path: '/api/user/profile-img',
+        method: 'GET',
+        call: 'Server',
+        setAuthorization: true,
+        isReturnData: true,
+    });
 
     return new NextResponse(JSON.stringify(result), {
         status: 200,
@@ -46,16 +43,13 @@ export async function GET() {
 }
 
 export async function DELETE() {
-    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
-    const url = process.env.NEXT_PUBLIC_SERVER + '/api/files/profile';
-
-    const result = await axios.delete(url, {
-        headers: {
-            'Authorization': 'Bearer ' + token?.value,
-        }
-    }).then((res: AxiosResponse<UserInfoI>) => {
-        return res.data;
-    })
+    const result = await apiCall<UserInfoI>({
+        path: '/api/files/profile',
+        method: 'DELETE',
+        call: 'Server',
+        setAuthorization: true,
+        isReturnData: true,
+    });
 
     return new NextResponse(JSON.stringify(result), {
         status: 200,

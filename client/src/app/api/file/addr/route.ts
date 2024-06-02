@@ -1,19 +1,15 @@
-import {NextRequest, NextResponse} from "next/server";
-import {cookies} from "next/headers";
-import axios, {AxiosResponse} from "axios";
-import {UserInfoI} from "@/app/user/email/page";
+import {NextResponse} from "next/server";
+import apiCall from "@/app/{commons}/func/api";
 
 export async function GET() {
-    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
-    const url = process.env.NEXT_PUBLIC_SERVER + '/api/files/addr';
-    const result = await axios.get(url, {
-        headers: {
-            'Authorization': 'Bearer ' + token?.value,
-            'Content-Type': 'multipart/form-data'
-        }
-    }).then((res: AxiosResponse<string>) => {
-        return res.data;
-    })
+    const result = await apiCall<string>({
+        path: '/api/files/addr',
+        method: 'GET',
+        call: 'Server',
+        contentType: 'multipart/form-data',
+        setAuthorization: true,
+        isReturnData: true
+    });
 
     return new NextResponse(result, {
         status: 200,

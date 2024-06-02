@@ -1,8 +1,8 @@
 import axios, {AxiosHeaders, AxiosRequestConfig, AxiosResponse} from "axios";
 
-export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
+export type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export type Call = 'Proxy' | 'Server';
-export type ContentType = 'application/json' | 'multipart/form-data' | string;
+export type ContentType = 'application/json' | 'multipart/form-data' | '' | string;
 
 export type ApiCallProps = {
     path              : string;
@@ -60,7 +60,7 @@ async function apiCall <R = any, I = any>(props: ApiCallProps): Promise<R | Axio
         url,
     }
 
-    if(method === 'POST' || method === 'PUT') {
+    if(method === 'POST' || method === 'PUT' || method === 'PATCH') {
         if(!body) Error('path body is required');
         config.data = body;
     } if(method === 'GET' || method === 'DELETE') {

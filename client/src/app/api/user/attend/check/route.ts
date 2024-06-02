@@ -1,23 +1,17 @@
-import {cookies} from "next/headers";
-import axios, {AxiosResponse} from "axios";
 import {NextResponse} from "next/server";
+import apiCall from "@/app/{commons}/func/api";
 
 export async function GET() {
-    const url = process.env.NEXT_PUBLIC_SERVER + '/api/attendance/check';
-
-    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
-
-    const result: string = await axios.get(url, {
-            headers: {
-                'Authorization': 'Bearer ' + token?.value,
-            }
-        })
-        .then((res: AxiosResponse<string>) => {
-            return res.data;
-        })
-        .catch(err => {
-            return err.response.data.message;
-        });
+    const result = await apiCall<string>({
+        path: '/api/attendance/check',
+        method: 'GET',
+        call: 'Server',
+        setAuthorization: true,
+        isReturnData: true,
+    })
+    .catch(err => {
+        return err.response.data.message;
+    });
 
     return new NextResponse(result, {
         status: 200,

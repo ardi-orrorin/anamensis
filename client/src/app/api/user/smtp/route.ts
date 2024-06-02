@@ -2,24 +2,19 @@ import {NextRequest, NextResponse} from "next/server";
 import {SmtpI} from "@/app/user/smtp/page";
 import {cookies} from "next/headers";
 import axios from "axios";
+import apiCall from "@/app/{commons}/func/api";
 
 export async function GET(req: NextRequest) {
 
     const id = req.nextUrl.searchParams.get('id');
 
-    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
-
-    const url = `${process.env.NEXT_PUBLIC_SERVER}/api/user-config-smtp${id ? `/${id}` : ''}`;
-
-    const result: SmtpI = await axios.get(url, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token?.value}`
-            }
-        })
-        .then(res => {
-            return res.data;
-        });
+    const result = await apiCall<any>({
+        path: `/api/user-config-smtp${id ? `/${id}` : ''}`,
+        method: 'GET',
+        call: 'Server',
+        setAuthorization: true,
+        isReturnData: true,
+    });
 
     return new NextResponse(JSON.stringify(result), {
         status: 200,
@@ -32,18 +27,15 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
 
     const data = await req.json() as SmtpI;
-    const token = cookies().get('next.access.token') || cookies().get('next.wrefresh.token');
 
-    const url = process.env.NEXT_PUBLIC_SERVER + '/api/user-config-smtp';
-
-    const result: SmtpI  = await axios.post(url, data, {
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token?.value}`
-        }})
-        .then(res => {
-            return res.data;
-        });
+    const result = await apiCall<SmtpI>({
+        path: '/api/user-config-smtp',
+        method: 'POST',
+        call: 'Server',
+        body: data,
+        setAuthorization: true,
+        isReturnData: true,
+    });
 
     return new NextResponse(JSON.stringify(result), {
         status: 200,

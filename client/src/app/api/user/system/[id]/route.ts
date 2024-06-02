@@ -1,19 +1,13 @@
 import {NextRequest, NextResponse} from "next/server";
-import {cookies} from "next/headers";
-import axios from "axios";
+import apiCall from "@/app/{commons}/func/api";
 
-export async function DELETE(req: NextRequest) {
+export async function DELETE(req: NextRequest, {params}: {params: {id: string}}) {
 
-    const id = req.nextUrl.pathname.split('/')[4];
-
-    const url = process.env.NEXT_PUBLIC_SERVER + '/admin/api/web-sys/code/' + id;
-
-    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
-
-    const res = await axios.delete(url, {
-        headers: {
-            'Authorization': `Bearer ${token?.value}`
-        }
+    await apiCall<any>({
+        path: `/admin/api/web-sys/code/${params.id}`,
+        method: 'DELETE',
+        call: 'Server',
+        setAuthorization: true,
     });
 
     return new NextResponse(null, {

@@ -60,6 +60,16 @@ public class FileController {
                 .flatMap(user -> fileService.saveProfile(user, filePart));
     }
 
+    @DeleteMapping("profile")
+    public Mono<Boolean> deleteProfile(
+        @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        return userService.findUserByUserId(userDetails.getUsername())
+                .flatMap(u -> fileService.findByTableNameAndTableRefPk("member", u.getId()))
+                .flatMap(files -> fileService.deleteFile(files.get(0)))
+                .onErrorReturn(false);
+    }
+
     @PatchMapping("content")
     public Mono<Void> deleteContent(
             @RequestBody Flux<File> files

@@ -76,8 +76,8 @@ export default function Page() {
         }
 
         debounce(fetch);
-
     }
+
     const onSubmitHandler = async () => {
         setLoading({
             ...loading,
@@ -101,6 +101,19 @@ export default function Page() {
         }
 
         debounce(fetch);
+    }
+
+    const onDeleteHandler = async () => {
+        await apiCall({
+            path: '/api/user/info/profile-img',
+            method: 'DELETE',
+        })
+        .then((res) => {
+            setImg('')
+        })
+        .catch((err) => {
+            console.log(err)
+        })
     }
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -148,7 +161,7 @@ export default function Page() {
                          onMouseLeave={onMouseLeave}
                     >
                       <button className={'w-full h-full text-xs'}
-                              onClick={()=> {setImg('');}}
+                              onClick={onDeleteHandler}
                       >
                         프로필 삭제
                       </button>

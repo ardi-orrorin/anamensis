@@ -13,15 +13,19 @@ export type ApiCallProps = {
     setAuthorization? : boolean;
     contentType?      : ContentType;
     cookie?           : string;
-
+    isReturnData?     : boolean;
 }
 
-const apiCall = async <R = any, I = any>({
-    path, method,
-    body, params, call,
-    setAuthorization, contentType, cookie,
-}: ApiCallProps
-) => {
+async function apiCall<R = any, I = any>(props: ApiCallProps & { isReturnData: true }): Promise<R>;
+async function apiCall<R = any, I = any>(props: ApiCallProps & { isReturnData: false}): Promise<AxiosResponse<R>>;
+async function apiCall<R = any, I = any>(props: ApiCallProps): Promise<AxiosResponse<R>>;
+
+async function apiCall <R = any, I = any>(props: ApiCallProps): Promise<R | AxiosResponse<R>> {
+    const {path, method
+        , body, params, call
+        , setAuthorization, contentType, cookie
+        , isReturnData} = props;
+
     if(!path) Error('path is required');
     if(!method) Error('method is required');
 
@@ -63,7 +67,9 @@ const apiCall = async <R = any, I = any>({
         config.params = params;
     }
 
-    return await Axios.request<I, AxiosResponse<R>, I>(config);
+    const res = await Axios.request<I, AxiosResponse<R>, I>(config);
+    if (isReturnData) return res.data;
+    return res;
 }
 
 export default apiCall;

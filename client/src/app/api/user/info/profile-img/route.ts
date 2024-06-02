@@ -44,3 +44,24 @@ export async function GET() {
         }
     });
 }
+
+export async function DELETE() {
+    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
+    const url = process.env.NEXT_PUBLIC_SERVER + '/api/files/profile';
+
+    const result = await axios.delete(url, {
+        headers: {
+            'Authorization': 'Bearer ' + token?.value,
+        }
+    }).then((res: AxiosResponse<UserInfoI>) => {
+        return res.data;
+    })
+
+    return new NextResponse(JSON.stringify(result), {
+        status: 200,
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    });
+}
+

@@ -1,5 +1,5 @@
 import {cookies} from "next/headers";
-import axios, {AxiosError, AxiosResponse} from "axios";
+import axios, {AxiosResponse} from "axios";
 import {NextResponse} from "next/server";
 
 export async function GET() {

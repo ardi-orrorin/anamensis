@@ -37,7 +37,11 @@ export default function AttendInfo() {
                 method: "GET",
             })
             .then((res) => {
-                alert(res.data);
+                const message = res.data === 'success'
+                    ? '출석체크 성공!'
+                    : '이미 출석하셨습니다. 내일 다시 시도해주세요.';
+
+                alert(message);
                 router.refresh();
             })
             .finally(() => {

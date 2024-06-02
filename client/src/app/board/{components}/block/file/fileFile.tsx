@@ -33,6 +33,7 @@ export default function FileFile(props: FileFileProps){
             <Link style={downloadStyle}
                   href={downloadUrl}
                   download={true}
+                  aria-roledescription={'object'}
             >
                 <p>
                     {value.split('/').pop()}

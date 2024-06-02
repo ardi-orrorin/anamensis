@@ -31,6 +31,7 @@ export default function FileImage(props: FileImageProps){
                    onMouseLeave={onMouseLeaveHandler}
                    priority={true}
                    onLoadingComplete={onLoadingComplete}
+                   aria-roledescription={'object'}
             />
         </div>
     )

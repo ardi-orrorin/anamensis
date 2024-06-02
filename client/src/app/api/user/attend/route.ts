@@ -20,8 +20,6 @@ export async function GET(){
             return err.response.data.message;
         });
 
-
-
     return new NextResponse(JSON.stringify(result), {
         status: 200,
         headers: {

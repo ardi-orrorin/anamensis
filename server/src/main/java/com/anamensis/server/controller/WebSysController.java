@@ -19,10 +19,10 @@ public class WebSysController {
 
     private final WebSysService webSysService;
 
-//    @GetMapping("")
-//    public Mono<List<WebSys>> findAll() {
-//        return webSysService.findAll();
-//    }
+    @GetMapping("")
+    public Mono<List<WebSys>> findAll() {
+        return webSysService.findAll();
+    }
 
     @GetMapping("/code")
     public Mono<WebSys> findByCode(@RequestParam String code) {

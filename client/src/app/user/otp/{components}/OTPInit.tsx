@@ -6,7 +6,7 @@ const OTPInit = () => {
     const onInit = async () => {
         await apiCall({
             path: '/api/user/otp',
-            method: 'PUT'
+            method: 'DELETE'
         })
         .then(res => {
             alert('OTP 삭제 완료');

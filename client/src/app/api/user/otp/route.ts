@@ -21,13 +21,14 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-    const {otp} = await req.json();
+    const {code} = await req.json();
+    console.log(code)
 
     const url = process.env.NEXT_PUBLIC_SERVER + '/api/otp/verify';
 
     const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
 
-    const res = await axios.post(url, otp, {
+    const res = await axios.post(url, code, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + token?.value
@@ -44,13 +45,13 @@ export async function POST(req: NextRequest) {
 
 
 
-export async function PUT(req: NextRequest) {
+export async function DELETE(req: NextRequest) {
 
     console.log('sdfs')
     const url = process.env.NEXT_PUBLIC_SERVER + '/api/otp/disable';
     const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
 
-    const res = await axios.put(url, {}, {
+    const res = await axios.delete(url,{
         headers: {
             'Authorization': 'Bearer ' + token?.value
         }

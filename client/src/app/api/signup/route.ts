@@ -1,19 +1,15 @@
 import {NextRequest, NextResponse} from "next/server";
-import axios from "axios";
 import {UserProps} from "@/app/signup/page";
+import apiCall from "@/app/{commons}/func/api";
 
 export async function POST(req: NextRequest) {
 
-    const data = await req.json() as UserProps;
-
-    const url = process.env.NEXT_PUBLIC_SERVER + '/public/api/user/signup';
-
-    const response = await axios.post(url, data, {
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }).then(res => {
-        return res.data;
+    const response = await apiCall<UserProps>({
+        path: '/public/api/user/signup',
+        method: 'POST',
+        body: await req.json(),
+        call: 'Server',
+        isReturnData: true,
     });
 
     return new NextResponse(JSON.stringify(response), {

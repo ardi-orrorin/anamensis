@@ -16,10 +16,16 @@ const NavMain = async () => {
 
     const menuItems : NavItemProps[] = [
         {
+            name: 'Notice',
+            url: '/notice',
+            loginRequired: false
+        },
+        {
             name: 'Board',
             url: '/board',
             loginRequired: false
         },
+
     ];
 
     const rightMenuItems : NavItemProps[] = [
@@ -49,11 +55,6 @@ const NavMain = async () => {
     return (
         <nav className={'w-full flex justify-between items-center bg-blue-500 text-white h-12'}>
             <div className={'w-1/3 duration-300'}>
-                <ul className={'flex md:hidden h-full ms-4 w-4 duration-300'}>
-                    <button className={'w-5'}>
-                        <FontAwesomeIcon icon={faBars} />
-                    </button>
-                </ul>
                 <ul className={'hidden md:flex duration-300'}>
                     {
                         menuItems.map((item, index) => {

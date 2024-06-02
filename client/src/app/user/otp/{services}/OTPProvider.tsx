@@ -11,7 +11,7 @@ export interface OTPProps {
     isViewOtpQRCode : boolean;
     callApiReq      : boolean;
     verifyCode      : string;
-    verifyState     : 'success' | 'fail' | undefined;
+    verifyState?    : boolean;
 }
 
 const OTPProvider = createContext<OTPContextI>({} as OTPContextI);

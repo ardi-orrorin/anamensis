@@ -1,6 +1,5 @@
 import OTPProvider, {OTPContextI} from "@/app/user/otp/{services}/OTPProvider";
 import {useContext, useState} from "react";
-import axios from "axios";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {useRouter} from "next/navigation";
 import apiCall from "@/app/{commons}/func/api";
@@ -13,7 +12,7 @@ const OTPVerify = () => {
     const [loading, setLoading] = useState(false);
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setOtp({...otp, verifyCode: e.target.value, verifyState: undefined});
+        setOtp({...otp, verifyCode: e.target.value});
     }
 
     const onVerify = async () => {
@@ -22,7 +21,7 @@ const OTPVerify = () => {
         await apiCall({
             path: '/api/user/otp',
             method: 'POST',
-            body: {otp: otp.verifyCode}
+            body: {code: otp.verifyCode}
         })
         .then(res => {
             setOtp({
@@ -54,7 +53,7 @@ const OTPVerify = () => {
             </button>
             {
                 otp.verifyState &&
-                <p className={otp.verifyState === 'success' ? 'text-blue-700' : 'text-red-600'}>{otp.verifyState.toUpperCase()}</p>
+                <p className={otp?.verifyState ? 'text-blue-700' : 'text-red-600'}>{otp.verifyState ? '성공' : '실패'}</p>
             }
         </div>
     )

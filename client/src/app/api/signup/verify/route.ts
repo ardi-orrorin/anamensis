@@ -1,15 +1,18 @@
 import {NextRequest, NextResponse} from "next/server";
 import axios from "axios";
+import apiCall from "@/app/{commons}/func/api";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest)  {
     const { email, code } = await req.json();
     const url = process.env.NEXT_PUBLIC_SERVER + '/public/api/verify/verifyCode';
 
     try {
-        const res = await axios.post(url, {email, code}, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
+
+        await apiCall<any>({
+            path: '/public/api/verify/verifyCode',
+            method: 'POST',
+            body: {email, code},
+            call: 'Server',
         });
 
         return new NextResponse(null,{

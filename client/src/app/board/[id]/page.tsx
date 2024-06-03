@@ -16,6 +16,8 @@ import {faHeart} from "@fortawesome/free-solid-svg-icons/faHeart";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import SubTextMenu from "@/app/board/{components}/SubTextMenu";
+import {useSearchParams} from "next/navigation";
+import Head from "next/head";
 
 export interface RateInfoI {
     id      : number;
@@ -43,6 +45,8 @@ export default function Page({params}: {params : {id: string}}) {
 
     const debounce = createDebounce(300);
 
+    const searchParams = useSearchParams();
+
     const defaultBlock = useMemo(()=>(
         {seq: 0, value: '', code: '00005', textStyle: {}}
     ),[]);
@@ -65,7 +69,7 @@ export default function Page({params}: {params : {id: string}}) {
             data: {
                 ...board.data,
                 content: {list},
-                categoryPk: 2,
+                categoryPk: Number(searchParams.get('categoryPk') || 0),
                 title: '', writer: ''
             },
             isView: false
@@ -135,7 +139,7 @@ export default function Page({params}: {params : {id: string}}) {
         return title && content;
     },[board.data]);
 
-    const onChangeBlockHandler = useCallback((e: ChangeEvent<HtmlElements>, seq: number) => {
+    const onChangeBlockHandler = (e: ChangeEvent<HtmlElements>, seq: number) => {
         const block = shortList.find(item => item.command + ' ' === e.target?.value);
         if(!block) return false;
         const newList = board.data?.content?.list.map((item, index) => {
@@ -145,14 +149,14 @@ export default function Page({params}: {params : {id: string}}) {
             }
             return item;
         });
-        setBoard({...board, data: {...board.data, content: {list: newList}}});
+        setBoard({...board, data: {...board.data,  content: {list: newList}}});
 
         setTimeout(() => {
             blockRef.current[seq]?.focus();
         },100);
 
         return true;
-    },[board.data]);
+    };
 
     if(loading) return <GlobalLoadingSpinner />;
 
@@ -195,7 +199,7 @@ export default function Page({params}: {params : {id: string}}) {
         } catch (e) {
             console.log(e);
         } finally {
-            location.href = '/board';
+            location.href = '../';
         }
     };
 

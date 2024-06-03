@@ -10,7 +10,7 @@ export async function GET() {
         isReturnData: true,
     })
     .catch(err => {
-        return err.response.data.message;
+        return err?.response?.data?.message;
     });
 
     return new NextResponse(result, {

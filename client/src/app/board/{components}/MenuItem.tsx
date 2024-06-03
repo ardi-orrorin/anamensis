@@ -30,7 +30,7 @@ const MenuItem = ({
         setBlockService({...blockService, blockMenu: ''})
     }
 
-    const openMenuClick = useCallback((code: string) => {
+    const openMenuClick = (code: string) => {
         if(!code || code === '') return ;
 
         const newList = board.data?.content?.list.map((item, index) => {
@@ -52,12 +52,13 @@ const MenuItem = ({
                 code: '',
                 value: '',
             }});
+
         setBoard({...board, data: {...board.data, content: {list: newList}}});
 
         setTimeout(() => {
             blockRef?.current[seq]?.focus();
         },100);
-    },[]);
+    };
 
     return (
         <>

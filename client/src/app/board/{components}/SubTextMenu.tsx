@@ -44,6 +44,7 @@ const SubTextMenu = ({
             }
             return item;
         });
+
         setBoard({...board, data: {...board.data, content: {list: newList}}});
         setTimeout(() => {
             blockRef.current[seq]?.focus();

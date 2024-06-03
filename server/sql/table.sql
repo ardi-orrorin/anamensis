@@ -188,6 +188,20 @@ CREATE TABLE board_comment (
     FULLTEXT       INDEX           content_idx    (content)        WITH PARSER ngram
 ) COMMENT '게시글 댓글';
 
+
+CREATE TABLE board_history (
+    id              BIGINT            PRIMARY KEY         AUTO_INCREMENT       COMMENT 'PK',
+    board_pk        BIGINT            NOT NULL                                 COMMENT '게시글 PK',
+    title           VARCHAR(255)      NOT NULL                                 COMMENT '제목',
+    content         TEXT              NOT NULL                                 COMMENT '본문',
+    change_code_pk  BIGINT            NOT NULL                                 COMMENT '변경코드 PK',
+    create_at       TIMESTAMP(6)      NOT NULL                                 COMMENT '생성일자',
+    FOREIGN KEY     (board_pk)        REFERENCES          board(id),
+    FOREIGN KEY     (change_code_pk)  REFERENCES          change_code(id),
+    INDEX           create_at_idx     (create_at DESC),
+    INDEX           change_code_idx   (change_code_pk)
+) COMMENT '게시글 변경 이력';
+
 CREATE TABLE share_link (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT                        COMMENT 'PK',
     org_link       VARCHAR(255)    NOT NULL                                             COMMENT '원본 링크',
@@ -224,18 +238,7 @@ CREATE TABLE point_history (
 ) COMMENT '포인트 이력';
 
 
-CREATE TABLE board_history (
-    id              BIGINT            PRIMARY KEY         AUTO_INCREMENT       COMMENT 'PK',
-    board_pk        BIGINT            NOT NULL                                 COMMENT '게시글 PK',
-    title           VARCHAR(255)      NOT NULL                                 COMMENT '제목',
-    content         TEXT              NOT NULL                                 COMMENT '본문',
-    change_code_pk  BIGINT            NOT NULL                                 COMMENT '변경코드 PK',
-    create_at       TIMESTAMP(6)      NOT NULL                                 COMMENT '생성일자',
-    FOREIGN KEY     (board_pk)        REFERENCES          board(id),
-    FOREIGN KEY     (change_code_pk)  REFERENCES          change_code(id),
-    INDEX           create_at_idx     (create_at DESC),
-    INDEX           change_code_idx   (change_code_pk)
-) COMMENT '게시글 변경 이력';
+
 
 
 CREATE TABLE email_verify (

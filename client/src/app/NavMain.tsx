@@ -1,6 +1,6 @@
 import Link from "next/link";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faBars, faRightFromBracket, faUser} from "@fortawesome/free-solid-svg-icons";
+import {faRightFromBracket, faUser} from "@fortawesome/free-solid-svg-icons";
 import {cookies} from "next/headers";
 
 type NavItemProps = {
@@ -16,16 +16,10 @@ const NavMain = async () => {
 
     const menuItems : NavItemProps[] = [
         {
-            name: 'Notice',
-            url: '/notice',
-            loginRequired: false
-        },
-        {
             name: 'Board',
             url: '/board',
             loginRequired: false
         },
-
     ];
 
     const rightMenuItems : NavItemProps[] = [

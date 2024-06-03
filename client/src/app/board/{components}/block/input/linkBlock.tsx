@@ -4,6 +4,7 @@ import React, {CSSProperties, useEffect, useMemo} from "react";
 import {BlockProps} from "@/app/board/{components}/block/type/Types";
 import axios from "axios";
 import localFont from "next/dist/compiled/@next/font/dist/local";
+import apiCall from "@/app/{commons}/func/api";
 
 type OGType = {
     title       : string;
@@ -23,7 +24,7 @@ const LinkBlock = (props: BlockProps) => {
     } = props;
 
     useEffect(() => {
-        if(!value?.includes('https://')) onChangeValueHandler && onChangeValueHandler('https://' + value);
+        if(!value?.includes('https://')) onChangeValueHandler!('https://' + value);
     },[])
 
     const customInputStyle: CSSProperties = {
@@ -53,14 +54,18 @@ const LinkBlock = (props: BlockProps) => {
 
         try {
             if(!urlRegex.test(value)) return alert('링크 형식이 올바르지 않습니다.');
+            const params = {
+                url: value
+            }
 
-            const res = await axios.get('/api/link/og', {
-                params: {
-                    url: value
-                }
-            })
+            const res = await apiCall<any>({
+                path: '/api/link/og',
+                method: 'GET',
+                params,
+                isReturnData: true,
+            });
 
-            const htmlDoc = new DOMParser().parseFromString(res.data, 'text/html');
+            const htmlDoc = new DOMParser().parseFromString(res, 'text/html');
             const ogTitle = htmlDoc.querySelector('meta[property="og:title"]')?.getAttribute('content');
             const ogDescription = htmlDoc.querySelector('meta[property="og:description"]')?.getAttribute('content');
             const ogImage = htmlDoc.querySelector('meta[property="og:image"]')?.getAttribute('content');
@@ -71,21 +76,17 @@ const LinkBlock = (props: BlockProps) => {
                 image: ogImage || '',
             };
 
-            onChangeExtraValueHandler
-            && onChangeExtraValueHandler(data);
+            onChangeExtraValueHandler!(data);
 
-            onKeyUpHandler
-            && onKeyUpHandler(e);
+            onKeyUpHandler!(e);
+
         } catch (e) {
-            console.log(e)
             alert('링크를 가져오는데 실패했습니다.');
         }
     }
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (onChangeValueHandler) {
-            onChangeValueHandler(e.target.value);
-        }
+        onChangeValueHandler!(e.target.value);
     }
 
     return (

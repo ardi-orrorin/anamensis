@@ -5,7 +5,6 @@ import Link from "next/link";
 import {cookies} from "next/headers";
 import Image from "next/image";
 import apiCall from "@/app/{commons}/func/api";
-import {AxiosResponse} from "axios";
 
 interface BoardListI {
     id           : string;
@@ -18,7 +17,7 @@ interface BoardListI {
 }
 
 export interface GetProps {
-    searchParams: URLSearchParams;
+    searchParams: URLSearchParams | BoardListPrams;
 }
 
 const getServerSideProps: GetServerSideProps<GetProps> = async (context) => {
@@ -32,19 +31,21 @@ const getServerSideProps: GetServerSideProps<GetProps> = async (context) => {
 
 export default async function Page(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const {searchParams} = props;
-    const data = await getData(searchParams);
+    const {categoryPk} = searchParams as BoardListPrams;
+    const data = await getData(searchParams as BoardListPrams);
     const maxIndex = data.page.total - ((data.page.page - 1) * data.page.size);
     const isLogin = cookies().get('next.access.token') || cookies().get('next.refresh.token') !== undefined;
 
     return (
-        <div className={'p-5'}>
+        <div>
             <form method={'get'}>
+                <input hidden={true} />
                 <div className={'h-10'}>
                     <div className={'flex justify-between gap-2'}>
                         <div>
                             {
                                 isLogin &&
-                                <Link href={'/board/new'}
+                                <Link href={`./board/new?categoryPk=${categoryPk}`}
                                       className={'w-auto'}
                                 >
                                   <div className={'flex justify-center w-20 border border-solid border-blue-300 rounded-md text-sm px-3 py-1'}>
@@ -104,7 +105,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                                 >
                                     <td className={'py-2 px-3 text-center'}>{ maxIndex - index }</td>
                                     <td className={'py-2 px-3'}>
-                                        <Link href={'/board/' + history.id}
+                                        <Link href={'./board/' + history.id}
                                               className={'w-auto'}
                                         >
                                             { history.title }
@@ -171,12 +172,13 @@ type BoardListPrams = {
     size: string;
     type: string;
     value: string;
+    categoryPk: string;
 }
 
-const getData = async (req: URLSearchParams | BoardListPrams) => {
-    const {size, type, value} = req as BoardListPrams;
+const getData = async (req: BoardListPrams) => {
+    const {size, type, value,categoryPk} = req
 
-    const params = {[type]: value, size}
+    const params = {[type]: value, size, categoryPk}
     return apiCall<PageResponse<BoardListI>, URLSearchParams>({
         path: '/public/api/boards',
         method: 'GET',

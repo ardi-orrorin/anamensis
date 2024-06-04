@@ -4,11 +4,15 @@ import Block from "@/app/board/{components}/Block";
 import {ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 import {HtmlElements} from "@/app/board/{components}/block/type/Types";
-import {BoardI} from "@/app/board/{services}/types";
+import {BoardI, CommentI} from "@/app/board/{services}/types";
 import {blockTypeList} from "@/app/board/{components}/block/list";
 import BlockProvider, {BlockService} from "@/app/board/{services}/BlockProvider";
 import BoardProvider, {BoardService} from "@/app/board/{services}/BoardProvider";
-import {faDownLeftAndUpRightToCenter, faUpRightAndDownLeftFromCenter} from "@fortawesome/free-solid-svg-icons";
+import {
+    faComment,
+    faDownLeftAndUpRightToCenter,
+    faUpRightAndDownLeftFromCenter
+} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import TempFileProvider, {TempFileI} from "@/app/board/{services}/TempFileProvider";
 import Image from "next/image";
@@ -18,6 +22,7 @@ import {createDebounce} from "@/app/{commons}/func/debounce";
 import SubTextMenu from "@/app/board/{components}/SubTextMenu";
 import {useSearchParams} from "next/navigation";
 import Head from "next/head";
+import Comment from "@/app/board/[id]/{components}/comment";
 
 export interface RateInfoI {
     id      : number;
@@ -28,6 +33,8 @@ export interface RateInfoI {
 export default function Page({params}: {params : {id: string}}) {
 
     const [board, setBoard] = useState<BoardService>({} as BoardService);
+
+    const [comment, setComment] = useState<CommentI[]>([]);
 
     const [rateInfo, setRateInfo] = useState<RateInfoI>({} as RateInfoI);
 
@@ -63,6 +70,12 @@ export default function Page({params}: {params : {id: string}}) {
 
     useEffect(() => {
         if(!isNewBoard) return ;
+        if(!searchParams?.get('categoryPk') || searchParams.get('categoryPk') === 'undefined') {
+
+            alert('잘못된 접근입니다.');
+            location.href = '/board/';
+        }
+
         const list = [addBlock(0, true)];
         setBoard({
             ...board,
@@ -341,10 +354,10 @@ export default function Page({params}: {params : {id: string}}) {
     }
 
     return (
-        <BoardProvider.Provider value={{board, setBoard}}>
+        <BoardProvider.Provider value={{board, setBoard, comment, setComment}}>
             <TempFileProvider.Provider value={{tempFiles, setTempFiles}}>
                 <BlockProvider.Provider value={{blockService, setBlockService}}>
-                    <div className={'p-5 flex justify-center'}>
+                    <div className={'p-5 flex flex-col gap-5 justify-center items-center'}>
                         <div className={`w-full flex flex-col gap-3 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-1/2'}`}>
                             <div className={'flex justify-between gap-2 h-auto border-b-2 border-solid border-blue-200 py-3'}>
                                 <div className={'font-bold flex items-center w-full'}>
@@ -468,6 +481,7 @@ export default function Page({params}: {params : {id: string}}) {
                             <div className={'flex justify-center'}>
                                 {
                                     !isNewBoard && board.isView
+                                    && board.data.categoryPk !== 1
                                     && <button className={'px-6 py-3 flex gap-2 justify-center items-center border border-blue-400 text-xl rounded hover:bg-blue-400 hover:text-white duration-300'}
                                                onClick={()=>debounce(onChangeRateHandler)}
                                     >
@@ -478,11 +492,22 @@ export default function Page({params}: {params : {id: string}}) {
                                     </button>
                                 }
                             </div>
+                            <div className={'w-auto'}>
+                                <div className={'flex gap-2 text-lg items-center py-2'}>
+                                    <FontAwesomeIcon icon={faComment} />
+                                    <h2>
+                                        댓글
+                                    </h2>
+                                </div>
+                                <Comment />
+                            </div>
                         </div>
+                        <div>
                         {
                             !board.isView && blockService.blockMenu === 'openTextMenu'
                             && <SubTextMenu blockRef={blockRef} />
                         }
+                        </div>
                     </div>
                 </BlockProvider.Provider>
             </TempFileProvider.Provider>

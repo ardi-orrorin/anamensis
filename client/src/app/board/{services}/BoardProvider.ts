@@ -1,4 +1,4 @@
-import {BoardI} from "@/app/board/{services}/types";
+import {BoardI, CommentI} from "@/app/board/{services}/types";
 import {createContext, Dispatch, SetStateAction} from "react";
 
 export interface BoardService {
@@ -9,6 +9,11 @@ export interface BoardService {
 export interface BoardProviderI {
     board: BoardService;
     setBoard: Dispatch<SetStateAction<BoardService>>
+}
+
+export interface BoardProviderI {
+    comment: CommentI[];
+    setComment: Dispatch<SetStateAction<CommentI[]>>
 }
 
 const BoardProvider = createContext<BoardProviderI>({} as BoardProviderI);

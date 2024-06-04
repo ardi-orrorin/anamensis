@@ -1,0 +1,138 @@
+package com.anamensis.server.service;
+
+import com.anamensis.server.entity.BoardComment;
+import org.junit.jupiter.api.*;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+import reactor.test.StepVerifier;
+
+import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.*;
+@SpringBootTest
+@ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Transactional
+class BoardCommentServiceTest {
+
+    @SpyBean
+    BoardCommentService bcs;
+
+    @Test
+    @Order(1)
+    @DisplayName("게시글 번호로 댓글 조회")
+    void findAllByBoardPk() {
+        StepVerifier.create(bcs.findAllByBoardPk(1))
+                .expectNextCount(6)
+                .verifyComplete();
+
+
+        StepVerifier.create(bcs.findAllByBoardPk(1))
+                .assertNext(boardComment -> {
+                    BoardComment bc = boardComment.getBoardComment();
+                    assertEquals(6, bc.getId());
+                    assertEquals(1, bc.getBoardPk());
+                    assertEquals("테스트 댓글6", bc.getContent());
+                    assertNull(bc.getParentPk());
+                })
+                .assertNext(boardComment -> {
+                    BoardComment bc = boardComment.getBoardComment();
+                    assertEquals(5, bc.getId());
+                    assertEquals(1, bc.getBoardPk());
+                    assertEquals("테스트 댓글5", bc.getContent());
+                    assertNotNull(bc.getParentPk());
+                })
+                .expectNextCount(4)
+                .verifyComplete();
+
+        StepVerifier.create(bcs.findAllByBoardPk(2))
+                .expectNextCount(4)
+                .verifyComplete();
+
+
+        StepVerifier.create(bcs.findAllByBoardPk(2))
+                .assertNext(boardComment -> {
+                    BoardComment bc = boardComment.getBoardComment();
+                    assertEquals(10, bc.getId());
+                    assertEquals(2, bc.getBoardPk());
+                    assertEquals("테스트 댓글10", bc.getContent());
+                    assertNull(bc.getParentPk());
+                })
+                .assertNext(boardComment -> {
+                    BoardComment bc = boardComment.getBoardComment();
+                    assertEquals(9, bc.getId());
+                    assertEquals(2, bc.getBoardPk());
+                    assertEquals("테스트 댓글9", bc.getContent());
+                    assertNull(bc.getParentPk());
+                })
+                .expectNextCount(2)
+                .verifyComplete();
+
+
+        StepVerifier.create(bcs.findAllByBoardPk(3))
+                .expectNextCount(0)
+                .verifyComplete();
+    }
+
+    @Test
+    @Order(2)
+    @DisplayName("댓글 저장")
+    void save() {
+        BoardComment bc = new BoardComment();
+        bc.setBoardPk(1);
+        bc.setContent("테스트 댓글7");
+        bc.setUserId("d-member-1");
+        bc.setCreateAt(LocalDateTime.now());
+
+        StepVerifier.create(bcs.save(bc))
+                .expectNext(true)
+                .verifyComplete();
+
+        StepVerifier.create(bcs.findAllByBoardPk(1))
+                .expectNextCount(7)
+                .verifyComplete();
+
+        StepVerifier.create(bcs.findAllByBoardPk(1))
+                .assertNext(boardComment -> {
+                    BoardComment bc1 = boardComment.getBoardComment();
+                    assertEquals(1, bc1.getBoardPk());
+                    assertEquals("테스트 댓글7", bc1.getContent());
+                    assertNull(bc1.getParentPk());
+                })
+                .expectNextCount(6)
+                .verifyComplete();
+
+        bc.setCreateAt(null);
+
+        StepVerifier.create(bcs.save(bc))
+                .expectNext(false)
+                .verifyComplete();
+
+        bc.setCreateAt(LocalDateTime.now());
+        bc.setUserId(null);
+
+        StepVerifier.create(bcs.save(bc))
+                .expectNext(false)
+                .verifyComplete();
+
+        bc.setUserId("d-member-5");
+        bc.setContent(null);
+        StepVerifier.create(bcs.save(bc))
+                .expectNext(false)
+                .verifyComplete();
+
+        bc.setContent("테스트 댓글7");
+        bc.setBoardPk(99);
+        StepVerifier.create(bcs.save(bc))
+                .expectNext(false)
+                .verifyComplete();
+
+        bc.setBoardPk(2);
+        StepVerifier.create(bcs.save(bc))
+                .expectNext(true)
+                .verifyComplete();
+    }
+}

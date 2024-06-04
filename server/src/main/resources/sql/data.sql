@@ -121,6 +121,19 @@ VALUES (1, 1, '테스트 제목1', '{"content" : "테스트제목"}', 0, 0, curr
      , (9, 1, '테스트 제목9', '{"content" : "테스트제목"}', 0, 0, current_timestamp, 3, FALSE, TRUE)
      , (10, 1, '테스트 제목10', '{"content" : "테스트제목"}', 0, 0, current_timestamp, 4, TRUE, TRUE);
 
+INSERT INTO board_comment
+       (id, board_pk, content, create_at, user_id, parent_pk)
+VALUES (1, 1, '테스트 댓글1', current_timestamp, 'd-member-1', NULL)
+     , (2, 1, '테스트 댓글2', current_timestamp, 'd-member-2', NULL)
+     , (3, 1, '테스트 댓글3', current_timestamp, 'd-member-2', 1)
+     , (4, 1, '테스트 댓글4', current_timestamp, 'd-member-3', NULL)
+     , (5, 1, '테스트 댓글5', current_timestamp, 'd-member-4', 1)
+     , (6, 1, '테스트 댓글6', current_timestamp, 'd-member-4', NULL)
+     , (7, 2, '테스트 댓글7', current_timestamp, 'd-member-4', NULL)
+     , (8, 2, '테스트 댓글8', current_timestamp, 'd-member-4', NULL)
+     , (9, 2, '테스트 댓글9', current_timestamp, 'd-member-5', NULL)
+     , (10, 2, '테스트 댓글10', current_timestamp, 'd-member-1', NULL);
+
 INSERT INTO file
        (id, table_code_pk, table_ref_pk,
         org_file_name, file_name, file_path,

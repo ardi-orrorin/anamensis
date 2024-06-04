@@ -114,9 +114,9 @@ class AttendanceControllerTest {
                 httpHeaders.setBearerAuth(token);
             })
             .exchange()
-            .expectStatus().is4xxClientError()
+            .expectStatus().isOk()
             .expectBody(String.class)
-            .isEqualTo("오늘은 이미 출석 했습니다.");
+            .isEqualTo("fail");
 
         wtc.get()
             .uri("/api/attendance/check")

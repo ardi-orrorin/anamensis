@@ -27,3 +27,11 @@ VALUES (1, 'member'  , 1),
        (2, 'board' , 1),
        (3, 'board_comment', 1);
 
+INSERT INTO category
+       (id, name, parent_pk, is_use)
+VALUES (1, 'notice'  , NULL, 1)
+     , (2, 'free'    , NULL, 1)
+     , (3, 'qna'     , NULL, 1)
+     , (4, 'alttuel' , NULL, 1);
+
+

@@ -16,12 +16,20 @@ interface BoardListI {
     createdAt    : string;
 }
 
+type BoardListPrams = {
+    size: string;
+    type: string;
+    value: string;
+    categoryPk: string;
+}
+
 export interface GetProps {
     searchParams: URLSearchParams | BoardListPrams;
 }
 
 const getServerSideProps: GetServerSideProps<GetProps> = async (context) => {
     const searchParams = new URLSearchParams(context.query as any);
+
     return {
         props: {
             searchParams,
@@ -36,6 +44,10 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
     const maxIndex = data.page.total - ((data.page.page - 1) * data.page.size);
     const isLogin = cookies().get('next.access.token') || cookies().get('next.refresh.token') !== undefined;
 
+    const skipIndex = ['1'];
+    const skipLike = ['1'];
+    const skipWriter = ['1'];
+
     return (
         <div>
             <form method={'get'}>
@@ -44,7 +56,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                     <div className={'flex justify-between gap-2'}>
                         <div>
                             {
-                                isLogin &&
+                                isLogin && categoryPk &&
                                 <Link href={`./board/new?categoryPk=${categoryPk}`}
                                       className={'w-auto'}
                                 >
@@ -76,20 +88,40 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                 </div>
                 <table className={'w-full'}>
                     <colgroup>
-                        <col style={{width: '5%'}}/>
+                        {
+                            skipIndex.find(pk => pk !== categoryPk) &&
+                            <col style={{width: '5%'}}/>
+                        }
+
                         <col style={{width: '55%'}}/>
                         <col style={{width: '5%'}}/>
-                        <col style={{width: '5%'}}/>
-                        <col style={{width: '10%'}}/>
+                        {
+                            skipLike.find(pk => pk !== categoryPk) &&
+                            <col style={{width: '5%'}}/>
+                        }
+                        {
+                            skipWriter.find(pk => pk !== categoryPk) &&
+                            <col style={{width: '10%'}}/>
+                        }
                         <col style={{width: '20%'}}/>
                     </colgroup>
                     <thead className={'bg-blue-300 text-white h-8 align-middle'}>
                         <tr className={'text-sm border-x border-white border-solid'}>
-                            <th className={'border-x border-white border-solid'}>#</th>
+                            {
+                                skipIndex.find(pk => pk !== categoryPk) &&
+                                <th className={'border-x border-white border-solid'}>#</th>
+                            }
                             <th className={'border-x border-white border-solid'}>제목</th>
                             <th className={'border-x border-white border-solid'}>View</th>
-                            <th className={'border-x border-white border-solid'}>Like</th>
-                            <th className={'border-x border-white border-solid'}>작성자</th>
+                            {
+                                skipLike.find(pk => pk !== categoryPk) &&
+                                <th className={'border-x border-white border-solid'}>Like</th>
+                            }
+                            {
+                                skipWriter.find(pk => pk !== categoryPk) &&
+                                <th className={'border-x border-white border-solid'}>작성자</th>
+                            }
+
                             <th className={'border-x border-white border-solid'}>작성일자</th>
                         </tr>
                     </thead>
@@ -103,7 +135,10 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                                         index % 2 === 1 ? 'bg-blue-50': ''
                                     ].join(' ')}
                                 >
-                                    <td className={'py-2 px-3 text-center'}>{ maxIndex - index }</td>
+                                    {
+                                        skipIndex.find(pk => pk !== categoryPk) &&
+                                        <td className={'py-2 px-3 text-center'}>{ maxIndex - index }</td>
+                                    }
                                     <td className={'py-2 px-3'}>
                                         <Link href={'./board/' + history.id}
                                               className={'w-auto'}
@@ -112,19 +147,25 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                                         </Link>
                                     </td>
                                     <td className={'py-2 px-3'}>{ history.viewCount }</td>
-                                    <td className={'py-2 px-3'}>{ history.rate }</td>
-                                    <td className={'py-2 px-3 flex gap-2 items-center'}>
-                                        {
-                                            history.profileImage &&
-                                            <Image src={ process.env.NEXT_PUBLIC_CDN_SERVER + history.profileImage}
-                                                   className={'rounded-full border border-solid border-blue-300 bg-cover bg-center'}
-                                                   width={20}
-                                                   height={20}
-                                                   alt={''}
-                                            />
-                                        }
-                                        { history.writer }
-                                    </td>
+                                    {
+                                        skipLike.find(pk => pk !== categoryPk) &&
+                                        <td className={'py-2 px-3'}>{ history.rate }</td>
+                                    }
+                                    {
+                                        skipWriter.find(pk => pk !== categoryPk) &&
+                                        <td className={'py-2 px-3 flex gap-2 items-center'}>
+                                            {
+                                                history.profileImage &&
+                                              <Image src={ process.env.NEXT_PUBLIC_CDN_SERVER + history.profileImage}
+                                                     className={'rounded-full border border-solid border-blue-300 bg-cover bg-center'}
+                                                     width={20}
+                                                     height={20}
+                                                     alt={''}
+                                              />
+                                            }
+                                            { history.writer }
+                                        </td>
+                                    }
                                     <td className={'py-2 px-3'}>{ history.createdAt }</td>
                                 </tr>
                             )
@@ -168,12 +209,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
     )
 }
 
-type BoardListPrams = {
-    size: string;
-    type: string;
-    value: string;
-    categoryPk: string;
-}
+
 
 const getData = async (req: BoardListPrams) => {
     const {size, type, value,categoryPk} = req

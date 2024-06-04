@@ -33,14 +33,11 @@ export type TextStylesType = {
     [key: string] : any;
 } & CSSProperties
 
-export type OpenMenuProps = {
-    open  : boolean;
-    seq   : number;
-}
-
-export type SubTextMenuType = {
-    icon  : IconDefinition;
-    label : string;
-    code  : string;
-    value : string;
+export interface CommentI {
+    id            : number;
+    writer        : string;
+    profileImage  : string;
+    content       : string;
+    createdAt     : string;
+    children?     : CommentI[];
 }

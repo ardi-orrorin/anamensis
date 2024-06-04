@@ -39,7 +39,4 @@ public class BoardCommentController {
         return boardCommentService.save(bc);
     }
 
-
-
-
 }

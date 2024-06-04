@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
 public class BoardComment {
     private long id;
     private long boardPk;
+    private Integer blockSeq;
     private Long parentPk;
     private String userId;
     private String content;
     private LocalDateTime createAt;
     private boolean isUse;
-
 }

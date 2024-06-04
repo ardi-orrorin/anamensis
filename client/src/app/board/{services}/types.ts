@@ -1,4 +1,3 @@
-import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import {CSSProperties} from "react";
 
 export interface BoardI {
@@ -35,6 +34,7 @@ export type TextStylesType = {
 
 export interface CommentI {
     id            : number;
+    blockSeq?     : number;
     writer        : string;
     profileImage  : string;
     content       : string;

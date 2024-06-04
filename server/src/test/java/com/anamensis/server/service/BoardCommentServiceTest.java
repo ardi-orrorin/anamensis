@@ -33,17 +33,18 @@ class BoardCommentServiceTest {
         StepVerifier.create(bcs.findAllByBoardPk(1))
                 .assertNext(boardComment -> {
                     BoardComment bc = boardComment.getBoardComment();
-                    assertEquals(6, bc.getId());
+                    assertEquals(1, bc.getId());
                     assertEquals(1, bc.getBoardPk());
-                    assertEquals("테스트 댓글6", bc.getContent());
+                    assertEquals("테스트 댓글1", bc.getContent());
                     assertNull(bc.getParentPk());
+                    assertNull(bc.getBlockSeq());
                 })
                 .assertNext(boardComment -> {
                     BoardComment bc = boardComment.getBoardComment();
-                    assertEquals(5, bc.getId());
+                    assertEquals(2, bc.getId());
                     assertEquals(1, bc.getBoardPk());
-                    assertEquals("테스트 댓글5", bc.getContent());
-                    assertNotNull(bc.getParentPk());
+                    assertEquals("테스트 댓글2", bc.getContent());
+                    assertNull(bc.getParentPk());
                 })
                 .expectNextCount(4)
                 .verifyComplete();
@@ -54,21 +55,30 @@ class BoardCommentServiceTest {
 
 
         StepVerifier.create(bcs.findAllByBoardPk(2))
+                .assertNext(boardComment -> {
+                    BoardComment bc = boardComment.getBoardComment();
+                    assertEquals(7, bc.getId());
+                    assertEquals(2, bc.getBoardPk());
+                    assertEquals("테스트 댓글7", bc.getContent());
+                    assertNull(bc.getParentPk());
+
+                })
+                .assertNext(boardComment -> {
+                    BoardComment bc = boardComment.getBoardComment();
+                    assertEquals(8, bc.getId());
+                    assertEquals(2, bc.getBoardPk());
+                    assertEquals("테스트 댓글8", bc.getContent());
+                    assertNull(bc.getParentPk());
+                })
+                .expectNextCount(1)
                 .assertNext(boardComment -> {
                     BoardComment bc = boardComment.getBoardComment();
                     assertEquals(10, bc.getId());
                     assertEquals(2, bc.getBoardPk());
                     assertEquals("테스트 댓글10", bc.getContent());
                     assertNull(bc.getParentPk());
+                    assertNotNull(bc.getBlockSeq());
                 })
-                .assertNext(boardComment -> {
-                    BoardComment bc = boardComment.getBoardComment();
-                    assertEquals(9, bc.getId());
-                    assertEquals(2, bc.getBoardPk());
-                    assertEquals("테스트 댓글9", bc.getContent());
-                    assertNull(bc.getParentPk());
-                })
-                .expectNextCount(2)
                 .verifyComplete();
 
 
@@ -96,13 +106,13 @@ class BoardCommentServiceTest {
                 .verifyComplete();
 
         StepVerifier.create(bcs.findAllByBoardPk(1))
+                .expectNextCount(6)
                 .assertNext(boardComment -> {
                     BoardComment bc1 = boardComment.getBoardComment();
                     assertEquals(1, bc1.getBoardPk());
                     assertEquals("테스트 댓글7", bc1.getContent());
                     assertNull(bc1.getParentPk());
                 })
-                .expectNextCount(6)
                 .verifyComplete();
 
         bc.setCreateAt(null);
@@ -134,5 +144,17 @@ class BoardCommentServiceTest {
         StepVerifier.create(bcs.save(bc))
                 .expectNext(true)
                 .verifyComplete();
+
+        bc.setBlockSeq(1);
+        StepVerifier.create(bcs.save(bc))
+                .expectNext(true)
+                .verifyComplete();
+
+        bc.setBlockSeq(null);
+        StepVerifier.create(bcs.save(bc))
+                .expectNext(true)
+                .verifyComplete();
+
+
     }
 }

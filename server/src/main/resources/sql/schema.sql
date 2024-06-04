@@ -114,8 +114,9 @@ CREATE TABLE IF NOT EXISTS board (
 CREATE TABLE IF NOT EXISTS board_comment (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT                                      COMMENT 'PK',
     board_pk       BIGINT          NOT NULL                                                           COMMENT '게시글 PK',
+    blockSeq       Int                                                                                COMMENT '블록 시퀀스',
     content        TEXT            NOT NULL                                                           COMMENT '댓글 내용',
-    create_at      TIMESTAMP(6)        NOT NULL                                                           COMMENT '생성일자',
+    create_at      TIMESTAMP(6)        NOT NULL                                                       COMMENT '생성일자',
     user_id        VARCHAR(255)    NOT NULL                                                           COMMENT '유저 아이디',
     parent_pk      BIGINT                                                                             COMMENT '댓글 PK',
     is_use         TINYINT(1)      NOT NULL       DEFAULT          1                                  COMMENT '사용 여부 0:사용안함, 1:사용',

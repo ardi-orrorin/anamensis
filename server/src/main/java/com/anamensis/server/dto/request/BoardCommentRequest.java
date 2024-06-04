@@ -20,6 +20,8 @@ public class BoardCommentRequest {
         @NotNull
         private Long boardPk;
 
+        private Integer blockSeq;
+
         private Long parentPk;
 
         @NotNull
@@ -31,6 +33,7 @@ public class BoardCommentRequest {
             bc.setParentPk(save.getParentPk());
             bc.setContent(save.getContent());
             bc.setUserId(member.getUsername());
+            bc.setBlockSeq(save.getBlockSeq());
             bc.setCreateAt(LocalDateTime.now());
             return bc;
         }

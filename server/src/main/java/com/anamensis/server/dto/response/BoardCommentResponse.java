@@ -15,6 +15,8 @@ public class BoardCommentResponse {
 
         private long id;
 
+        private Integer blockSeq;
+
         private String content;
 
         private String writer;
@@ -35,6 +37,7 @@ public class BoardCommentResponse {
                     .writer(resultMap.getBoardComment().getUserId())
                     .profileImage(resultMap.getFile().getFilePath() + resultMap.getFile().getFileName())
                     .parentPk(resultMap.getBoardComment().getParentPk())
+                    .blockSeq(resultMap.getBoardComment().getBlockSeq())
                     .createdAt(resultMap.getBoardComment().getCreateAt())
                     .build();
         }

@@ -20,12 +20,12 @@
                                    WHERE tc.table_name = 'member')
            AND f.is_use    = 1
          WHERE bc.board_pk = #{boardPk}
-         ORDER BY bc.id DESC
+         ORDER BY bc.id
     </select>
     <insert id="save" parameterType="BoardComment">
         INSERT INTO board_comment
-               (board_pk, content, create_at, user_id, parent_pk)
-        VALUES (#{boardPk}, #{content}, #{createAt}, #{userId}, #{parentPk})
+               (board_pk, content, create_at, user_id, parent_pk, blockSeq)
+        VALUES (#{boardPk}, #{content}, #{createAt}, #{userId}, #{parentPk}, #{blockSeq})
     </insert>
 
     <resultMap id="boardCommentResultMap" type="com.anamensis.server.resultMap.BoardCommentResultMap$BoardComment">

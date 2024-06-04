@@ -10,8 +10,7 @@ import {faShop} from "@fortawesome/free-solid-svg-icons/faShop";
 
 export default function Page({children} : {children: ReactNode}) {
 
-    const [toggle, setToggle] = useState<boolean>(false);
-    const toggleRef = useRef<HTMLDivElement>(null);
+    const [openMenu, setOpenMenu] = useState<boolean>(false);
 
     const menuItems = [
         {
@@ -41,7 +40,7 @@ export default function Page({children} : {children: ReactNode}) {
     ];
 
     const onClickHandler = () => {
-        setToggle(!toggle);
+        setOpenMenu(!openMenu);
     }
 
     return (
@@ -49,17 +48,17 @@ export default function Page({children} : {children: ReactNode}) {
             <div className={'w-full'}>
                 <div className={'pt-5 px-5'}>
                     <button onClick={onClickHandler}>
-                        <FontAwesomeIcon icon={faBars} className={'text-sm border rounded border-blue-300 px-4 py-2 text-blue-400 hover:bg-blue-300 hover:text-white duration-500'}/>
+                        <FontAwesomeIcon icon={faBars} className={'text-sm border rounded border-blue-300 px-4 py-2 text-blue-400 hover:bg-blue-300 hover:text-white duration-300'}/>
                     </button>
                 </div>
                 <div className={'p-5'}>
                     {children}
                 </div>
             </div>
-            <div className={[`fixed z-30 left-0 top-0 bg-blue-500 duration-500 h-screen`, toggle ? '-translate-x-full w-0' : 'w-52 translate-x-0 items-end shadow-md shadow-zinc-800'].join(' ')}>
-                <div className={['flex flex-col w-full px-1 items-start duration-500', toggle ? 'hidden' : ''].join(' ')}>
+            <div className={[`fixed z-30 left-0 top-0 bg-blue-500 duration-500 h-screen`, openMenu ? 'w-52 translate-x-0 items-end shadow-md shadow-zinc-800' : '-translate-x-full w-0'].join(' ')}>
+                <div className={['flex flex-col w-full px-1 items-start duration-500', openMenu ? '' : 'hidden'].join(' ')}>
                     <div className={'w-full flex justify-end'}>
-                        <button className={'p-2 px-3 text-lg text-white hover:bg-blue-300 duration-300 rounded'}
+                        <button className={'p-2 px-3 text-lg text-white hover:text-blue-200 duration-300 rounded'}
                                 onClick={onClickHandler}
                         >
                             <FontAwesomeIcon icon={faXmark} height={12} />
@@ -86,8 +85,8 @@ export default function Page({children} : {children: ReactNode}) {
                 </div>
             </div>
             {
-                !toggle &&
-              <div className={'fixed z-20 w-full h-full bg-black bg-opacity-25'} onClick={onClickHandler} />
+                openMenu &&
+                <div className={'fixed z-20 w-full h-full bg-black bg-opacity-25'} onClick={onClickHandler} />
             }
         </div>
     );

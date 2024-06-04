@@ -94,13 +94,14 @@ class BoardCommentControllerTest {
             .expectStatus().isOk()
             .expectBody()
             .jsonPath("$.length()").isEqualTo(6)
-            .jsonPath("$[0].id").isEqualTo(6)
-            .jsonPath("$[0].writer").isEqualTo("d-member-4")
-            .jsonPath("$[1].id").isEqualTo(5)
-            .jsonPath("$[2].id").isEqualTo(4)
-            .jsonPath("$[3].id").isEqualTo(3)
-            .jsonPath("$[3].writer").isEqualTo("d-member-2")
-            .jsonPath("$[3].parentPk").isEqualTo("1");
+            .jsonPath("$[0].id").isEqualTo(1)
+            .jsonPath("$[0].writer").isEqualTo("d-member-1")
+            .jsonPath("$[1].id").isEqualTo(2)
+            .jsonPath("$[2].id").isEqualTo(3)
+            .jsonPath("$[2].writer").isEqualTo("d-member-2")
+            .jsonPath("$[2].parentPk").isEqualTo("1")
+            .jsonPath("$[3].id").isEqualTo(4);
+
 
 
         wtc.get()
@@ -113,10 +114,10 @@ class BoardCommentControllerTest {
             .expectStatus().isOk()
             .expectBody()
             .jsonPath("$.length()").isEqualTo(4)
-            .jsonPath("$[0].id").isEqualTo(10)
-            .jsonPath("$[1].id").isEqualTo(9)
-            .jsonPath("$[2].id").isEqualTo(8)
-            .jsonPath("$[3].id").isEqualTo(7);
+            .jsonPath("$[0].id").isEqualTo(7)
+            .jsonPath("$[1].id").isEqualTo(8)
+            .jsonPath("$[2].id").isEqualTo(9)
+            .jsonPath("$[3].id").isEqualTo(10);
 
     }
 
@@ -126,6 +127,7 @@ class BoardCommentControllerTest {
         Map<String, Object> map = new HashMap<>();
         map.put("boardPk", 1);
         map.put("content", "테스트 댓글7");
+        map.put("blockSeq", 1);
 
         wtc.post()
             .uri("/api/board/comments")
@@ -148,8 +150,9 @@ class BoardCommentControllerTest {
             .expectStatus().isOk()
             .expectBody()
             .jsonPath("$.length()").isEqualTo(7)
-            .jsonPath("$[0].writer").isEqualTo("d-member-1")
-            .jsonPath("$[0].content").isEqualTo("테스트 댓글7");
+            .jsonPath("$[6].writer").isEqualTo("d-member-1")
+            .jsonPath("$[6].content").isEqualTo("테스트 댓글7")
+            .jsonPath("$[6].blockSeq").isEqualTo(1);
 
         map.put("content", null);
         wtc.post()

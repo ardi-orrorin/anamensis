@@ -34,12 +34,12 @@ class BoardCommentMapperTest {
 
         assertEquals(6, result.size());
         result.stream().reduce((acc, next) -> {
-            assertTrue(acc.getId() > next.getId());
+            assertTrue(acc.getId() < next.getId());
             return next;
         });
 
         IntStream.range(0, result.size()).forEach(i -> {
-            assertEquals(result.size() - i, result.get(i).getId());
+            assertEquals(1 + i, result.get(i).getId());
         });
 
         assertTrue(result.stream().anyMatch(bc -> bc.getBoardComment().getContent().equals("테스트 댓글4")));
@@ -52,12 +52,12 @@ class BoardCommentMapperTest {
 
         assertEquals(4, result1.size());
         result1.stream().reduce((acc, next) -> {
-            assertTrue(acc.getId() > next.getId());
+            assertTrue(acc.getId() < next.getId());
             return next;
         });
 
         IntStream.range(0, result1.size()).forEach(i -> {
-            assertEquals(10 - i, result1.get(i).getId());
+            assertEquals(7 + i, result1.get(i).getId());
         });
 
         assertTrue(result1.stream().anyMatch(bc -> bc.getBoardComment().getContent().equals("테스트 댓글10")));
@@ -92,6 +92,12 @@ class BoardCommentMapperTest {
         bc1.setCreateAt(LocalDateTime.now());
         assertDoesNotThrow(() -> bcm.save(bc1));
 
+        bc1.setBlockSeq(1);
+        assertDoesNotThrow(() -> bcm.save(bc1));
+
+        bc1.setParentPk(null);
+        assertDoesNotThrow(() -> bcm.save(bc1));
+
         bc1.setContent(null);
         assertThrowsExactly(DataIntegrityViolationException.class, () -> bcm.save(bc1));
         bc1.setContent("테스트 댓글 12");
@@ -106,6 +112,8 @@ class BoardCommentMapperTest {
 
         bc1.setBoardPk(3L);
         assertDoesNotThrow(() -> bcm.save(bc1));
+
+
 
     }
 }

@@ -9,8 +9,9 @@ import React, {useContext, useMemo, useState} from "react";
 import MenuItem from "@/app/board/{components}/MenuItem";
 import BlockProvider, {BlockMenu, BlockService} from "@/app/board/{services}/BlockProvider";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
-import {BlockI, ExtraValueI} from "@/app/board/{services}/types";
+import {BlockI, CommentI, ExtraValueI} from "@/app/board/{services}/types";
 import SubObjectMenu from "@/app/board/{components}/SubObjectMenu";
+import {findElement} from "@/app/board/{services}/funcs";
 
 
 type CopyProps = {
@@ -27,8 +28,8 @@ export default function Block(props: BlockProps) {
         onClickDeleteHandler,
     } = props;
 
-    const {board, setBoard} = useContext(BoardProvider);
-    const {blockService, setBlockService} = useContext(BlockProvider);
+    const {board, setBoard, comment} = useContext(BoardProvider);
+    const {blockService, setBlockService, commentService, setCommentService} = useContext(BlockProvider);
     const [isCopy, setIsCopy] = useState<CopyProps>({} as CopyProps);
 
     const isCursor = useMemo(() => {
@@ -56,20 +57,34 @@ export default function Block(props: BlockProps) {
     }
 
     const onMouseEnterHandler = (e: React.MouseEvent<MouseEnterHTMLElements> ) => {
-        if(e.currentTarget.ariaRoleDescription !== 'object') return;
-        const blockMenu: BlockMenu = 'openObjectMenu';
+        if(e.currentTarget.ariaRoleDescription === 'object') {
+            const blockMenu: BlockMenu = 'openObjectMenu';
 
-        const block: BlockI = {seq, code, value, textStyle};
-        setBlockService({
-            block,
-            blockMenu: blockMenu,
-            screenX: 0,
-            screenY: 0,
+            const block: BlockI = {seq, code, value, textStyle};
+            setBlockService({
+                block,
+                blockMenu: blockMenu,
+                screenX: 0,
+                screenY: 0,
+            })
+        }
+
+        let ele = findElement(e.currentTarget);
+        const rect = ele.getBoundingClientRect();
+        const blockSeq = Number(ele.id.split('-')[1]);
+        const comments: CommentI[] = comment.filter(c => c.blockSeq === blockSeq);
+        setCommentService({
+            commentMenu: true,
+            screenX: rect.x + 550 > window.innerWidth ? 50 : rect.x + 120,
+            screenY: rect.y - 45,
+            blockSeq: Number(ele.id.split('-')[1]),
+            comments: comments,
         })
     }
 
     const onMouseLeaveHandler = (e: React.MouseEvent<HTMLImageElement | HTMLInputElement> ) => {
         setBlockService({blockMenu: '', block: {} as BlockI, screenX: 0, screenY: 0});
+        setCommentService({commentMenu: false, screenX: 0, screenY: 0, blockSeq: 0, comments: []});
     }
 
     const openMenuToggle  = () => {
@@ -189,26 +204,28 @@ export default function Block(props: BlockProps) {
                     blockTypeList.filter(b=> b.code === props.code)?.map(c => {
                         'use client'
                         const Component = c.component;
-                        return <div key={'blockContainer' + seq} className={'flex w-full'}>
-                            {
-                                blockService?.block?.seq === seq
-                                && c.type === 'object'
-                                && <SubObjectMenu key={'subMenu' + seq}
-                                                  isView={board.isView}
-                                                  value={value}
-                                                  onClick={onClickObjectMenu}
+                        return (
+                            <div key={'blockContainer' + seq} className={'flex flex-col w-full'}>
+                                {
+                                    blockService?.block?.seq === seq
+                                    && c.type === 'object'
+                                    && <SubObjectMenu key={'subMenu' + seq}
+                                                      isView={board.isView}
+                                                      value={value}
+                                                      onClick={onClickObjectMenu}
+                                    />
+                                }
+                                <Component key={'block' + seq}
+                                           isView={board.isView}
+                                           onMouseEnterHandler={onMouseEnterHandler}
+                                           onMouseLeaveHandler={onMouseLeaveHandler}
+                                           onChangeValueHandler={onChangeValueHandler}
+                                           onFocusHandler={onFocusHandler}
+                                           onChangeExtraValueHandler={onChangeExtraValueHandler}
+                                           {...props}
                                 />
-                            }
-                            <Component key={'block' + seq}
-                                       isView={board.isView}
-                                       onMouseEnterHandler={onMouseEnterHandler}
-                                       onMouseLeaveHandler={onMouseLeaveHandler}
-                                       onChangeValueHandler={onChangeValueHandler}
-                                       onFocusHandler={onFocusHandler}
-                                       onChangeExtraValueHandler={onChangeExtraValueHandler}
-                                       {...props}
-                            />
-                        </div>
+                            </div>
+                        )
                     })
                 }
             </div>

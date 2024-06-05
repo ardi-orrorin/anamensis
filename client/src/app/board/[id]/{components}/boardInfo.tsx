@@ -18,12 +18,12 @@ const BoardInfo = (props: { board: BoardService }) => {
                     board?.data?.profileImage &&
                     <Image src={process.env.NEXT_PUBLIC_CDN_SERVER + board.data.profileImage}
                            className={"rounded-full border-2 border-solid border-blue-300"}
-                           width={50}
-                           height={50}
+                           width={35}
+                           height={35}
                            alt={""}
                     />
                 }
-                <p className={"font-bold"}
+                <p className={"font-bold text-sm"}
                 >{board.data.writer}</p>
             </div>
         </div>

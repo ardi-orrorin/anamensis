@@ -16,13 +16,13 @@ import {findElement} from "@/app/board/{services}/funcs";
 
 type CopyProps = {
     isCopy: boolean;
-    seq: number;
+    seq: string;
 }
 
 export default function Block(props: BlockProps) {
     const {
         seq, code,
-        value,
+        value, hash,
         textStyle, blockRef,
         onClickAddHandler,
         onClickDeleteHandler,
@@ -51,7 +51,7 @@ export default function Block(props: BlockProps) {
         const positionX = rect.x + 550 > window.innerWidth ? 50 : rect.x + 120;
         const positionY = rect.y - 45
 
-        const block: BlockI = {seq, code, value, textStyle};
+        const block: BlockI = {seq, code, value, textStyle, hash};
         setBlockService({
             ...blockService,
             block,
@@ -65,7 +65,7 @@ export default function Block(props: BlockProps) {
         if(e.currentTarget.ariaRoleDescription === 'object') {
             const blockMenu: BlockMenu = 'openObjectMenu';
 
-            const block: BlockI = {seq, code, value, textStyle};
+            const block: BlockI = {seq, code, value, textStyle, hash};
             setBlockService({
                 block,
                 blockMenu: blockMenu,
@@ -76,33 +76,32 @@ export default function Block(props: BlockProps) {
 
         let ele = findElement(e.currentTarget);
         const rect = ele.getBoundingClientRect();
-        const blockSeq = Number(ele.id.split('-')[1]);
+        const blockSeq = ele.id.replaceAll('block-', '');
         const comments: CommentI[] = comment.filter(c => c.blockSeq === blockSeq);
         setCommentService({
             commentMenu: true,
             screenX: rect.x + 550 > window.innerWidth ? 50 : rect.x + 120,
             screenY: rect.y - 45,
-            blockSeq: Number(ele.id.split('-')[1]),
+            blockSeq: ele.id.replaceAll('block-', ''),
             comments: comments,
         })
     }
 
     const onMouseLeaveHandler = (e: React.MouseEvent<HTMLImageElement | HTMLInputElement> ) => {
         setBlockService({blockMenu: '', block: {} as BlockI, screenX: 0, screenY: 0});
-        setCommentService({commentMenu: false, screenX: 0, screenY: 0, blockSeq: 0, comments: []});
+        setCommentService({commentMenu: false, screenX: 0, screenY: 0, blockSeq: '', comments: []});
     }
 
     const openMenuToggle  = () => {
         if(blockService.blockMenu !== 'openMenu' || blockService.block.seq !== seq) {
-            setBlockService({...blockService, blockMenu: 'openMenu', block: {seq, code, value, textStyle}});
+            setBlockService({...blockService, blockMenu: 'openMenu', block: {seq, code, value, textStyle, hash}});
             return ;
         }
 
         setBlockService({...blockService, blockMenu: '', block: {
-                seq: 0,
-                code: '',
-                value: '',
-            }});
+                seq: 0, code: '', value: '', hash: '',
+            }
+        });
     }
 
     const onClickObjectMenu = (type: string) => {
@@ -113,7 +112,7 @@ export default function Block(props: BlockProps) {
         }
 
         if(type === 'detailView') {
-            const block =blockTypeList.find(b=> b.code === code);
+            const block = blockTypeList.find(b=> b.code === code);
 
             let url = '';
 
@@ -160,15 +159,15 @@ export default function Block(props: BlockProps) {
         if(typeof window === 'undefined') return ;
         const bastUrl = window.location.href.split('#')[0];
 
-        const url = bastUrl + `#block-${seq}`;
+        const url = bastUrl + `#block-${hash}`;
 
         await navigator.clipboard.writeText(url);
 
-        setIsCopy({isCopy: true, seq});
+        setIsCopy({isCopy: true, seq: hash});
 
         setTimeout(() => {
-            setIsCopy({isCopy: false, seq});
-            if(board.data.isLogin) setNewComment({...newComment, blockSeq: seq});
+            setIsCopy({isCopy: false, seq: hash});
+            if(board.data.isLogin) setNewComment({...newComment, blockSeq: hash});
         }, 700);
     }
 
@@ -186,7 +185,7 @@ export default function Block(props: BlockProps) {
                     isCopy.isCopy ? 'opacity-100' : 'opacity-0',
                 ].join(' ')
                 }>
-                    {`block-${isCopy.seq}`} {shareLinkText}
+                    {`block-${isCopy.seq?.split('-')[1]}`} {shareLinkText}
                 </div>
             }
             {

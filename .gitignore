@@ -41,3 +41,5 @@ out/
 ### Spring Boot ###
 application*.yml
 *.jks
+server/src/main/resources/application.yml
+.gitignore

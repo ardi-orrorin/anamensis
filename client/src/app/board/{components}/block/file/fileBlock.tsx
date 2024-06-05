@@ -10,7 +10,7 @@ export type FileBlockProps = BlockProps & {
 }
 
 export default function FileBlock (data: FileBlockProps) {
-    const {seq, value, code,
+    const {seq, value, code, hash,
         onChangeValueHandler,
         onMouseEnterHandler,
         onMouseLeaveHandler,
@@ -18,12 +18,13 @@ export default function FileBlock (data: FileBlockProps) {
     } = data;
 
     return (
-        <div id={`block-${seq}`} className={'w-full'} aria-roledescription={'object'}>
+        <div id={`block-${hash}`} className={'w-full'} aria-roledescription={'object'}>
             {
                 !value &&
                 <FileUpload seq={seq}
                             code={code}
                             value={value}
+                            hash={hash}
                             onUploadFileUrl={onChangeValueHandler!}
                             onMouseEnterHandler={onMouseEnterHandler!}
                             isImage={Component === FileImage}

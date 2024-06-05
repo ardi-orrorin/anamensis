@@ -145,7 +145,7 @@ class BoardCommentServiceTest {
                 .expectNext(true)
                 .verifyComplete();
 
-        bc.setBlockSeq(1);
+        bc.setBlockSeq("1111-1");
         StepVerifier.create(bcs.save(bc))
                 .expectNext(true)
                 .verifyComplete();

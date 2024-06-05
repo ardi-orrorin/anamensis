@@ -132,7 +132,7 @@ VALUES (1, 1, '테스트 댓글1', current_timestamp, 'd-member-1', NULL, NULL)
      , (7, 2, '테스트 댓글7', current_timestamp, 'd-member-4', NULL, NULL)
      , (8, 2, '테스트 댓글8', current_timestamp, 'd-member-4', NULL, NULL)
      , (9, 2, '테스트 댓글9', current_timestamp, 'd-member-5', NULL, NULL)
-     , (10, 2, '테스트 댓글10', current_timestamp, 'd-member-1', NULL, 5);
+     , (10, 2, '테스트 댓글10', current_timestamp, 'd-member-1', NULL, '5');
 
 INSERT INTO file
        (id, table_code_pk, table_ref_pk,

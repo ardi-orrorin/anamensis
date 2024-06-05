@@ -4,3 +4,4 @@ spring:
     name: server, aws, security, redis
   config:
     import: optional:configserver:http://localhost:8077
+

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class BoardComment {
     private long id;
     private long boardPk;
-    private Integer blockSeq;
+    private String blockSeq;
     private Long parentPk;
     private String userId;
     private String content;

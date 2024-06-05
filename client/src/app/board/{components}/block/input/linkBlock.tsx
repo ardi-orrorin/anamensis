@@ -17,7 +17,7 @@ const LinkBlock = (props: BlockProps) => {
     const {
         seq, blockRef,
         value, extraValue,
-        isView,
+        isView, hash,
         onChangeValueHandler, onKeyUpHandler,
         onKeyDownHandler, onMouseEnterHandler,
         onFocusHandler, onChangeExtraValueHandler,
@@ -90,7 +90,7 @@ const LinkBlock = (props: BlockProps) => {
     }
 
     return (
-        <div id={`block-${seq}`}
+        <div id={`block-${hash}`}
              className={['w-full'].join(' ')}
         >
             {

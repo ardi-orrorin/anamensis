@@ -4,7 +4,7 @@ import Block from "@/app/board/{components}/Block";
 import {ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 import {HtmlElements} from "@/app/board/{components}/block/type/Types";
-import {BoardI, CommentI} from "@/app/board/{services}/types";
+import {BlockI, BoardI, CommentI, DeleteCommentI} from "@/app/board/{services}/types";
 import {blockTypeList} from "@/app/board/{components}/block/list";
 import BlockProvider, {BlockService, CommentService} from "@/app/board/{services}/BlockProvider";
 import BoardProvider, {BoardService} from "@/app/board/{services}/BoardProvider";
@@ -29,6 +29,7 @@ import HeaderBtn from "@/app/board/[id]/{components}/headerBtn";
 import BoardInfo from "@/app/board/[id]/{components}/boardInfo";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import CommentModal from "@/app/board/[id]/{components}/commentModal";
+import {randomUUID} from "crypto";
 
 export interface RateInfoI {
     id      : number;
@@ -42,6 +43,8 @@ export default function Page({params}: {params : {id: string}}) {
 
     const [commentService, setCommentService] = useState<CommentService>({} as CommentService);
 
+    const [deleteComment, setDeleteComment] = useState<DeleteCommentI>({} as DeleteCommentI);
+
     const [newComment, setNewComment] = useState<SaveComment>({} as SaveComment);
 
     const [comment, setComment] = useState<CommentI[]>([]);
@@ -49,6 +52,7 @@ export default function Page({params}: {params : {id: string}}) {
     const [rateInfo, setRateInfo] = useState<RateInfoI>({} as RateInfoI);
 
     const [loading, setLoading] = useState<boolean>(false);
+
     const [commentLoading, setCommentLoading] = useState<boolean>(false);
 
     const [fullScreen, setFullScreen] = useState<boolean>(false);
@@ -65,8 +69,8 @@ export default function Page({params}: {params : {id: string}}) {
 
     const searchParams = useSearchParams();
 
-    const defaultBlock = useMemo(()=>(
-        {seq: 0, value: '', code: '00005', textStyle: {}}
+    const defaultBlock:BlockI = useMemo(()=>(
+        {seq: 0, value: '', code: '00005', textStyle: {}, hash: Date.now().toString() + '-0'}
     ),[]);
 
     const shortList = useMemo(()=> (
@@ -212,11 +216,18 @@ export default function Page({params}: {params : {id: string}}) {
         }
         setLoading(true);
         try {
+            const bodyContent = board.data.content.list.filter(item => item.value !== '');
+            const body = {
+                ...board.data,
+                content: {
+                    list: bodyContent
+                }
+            };
+
             const result = await apiCall<BoardI, BoardI>({
                 path: '/api/board/' + (isSave ? 'new' : params.id),
                 method: isSave ? 'POST': 'PUT',
-                call: 'Proxy',
-                body: board.data
+                body,
             })
             .then(res => {
                 return res.data;
@@ -239,7 +250,6 @@ export default function Page({params}: {params : {id: string}}) {
             await apiCall({
                 path: '/api/board/' + params.id,
                 method: 'DELETE',
-                call: 'Proxy'
             })
         } catch (e) {
             console.log(e);
@@ -261,6 +271,7 @@ export default function Page({params}: {params : {id: string}}) {
         list.sort((a, b) => a.seq - b.seq)
             .map((item, index) => {
                 item.seq = index;
+                item.hash = Date.now().toString() + '-' + index;
                 return item;
         });
 
@@ -292,7 +303,8 @@ export default function Page({params}: {params : {id: string}}) {
 
         let newList = list.filter(item => item.seq !== seq);
         if (newList?.length === 0) {
-            newList = [{seq, value: '', code: '00005', textStyle: {}}];
+            newList = [{seq, value: '', code: '00005', textStyle: {}, hash: Date.now().toString() + '-' + seq}];
+            console.log(newList);
         }
 
         setBoard({
@@ -390,7 +402,8 @@ export default function Page({params}: {params : {id: string}}) {
             board, setBoard,
             comment, setComment,
             rateInfo, setRateInfo,
-            newComment, setNewComment
+            newComment, setNewComment,
+            deleteComment, setDeleteComment
         }}>
             <TempFileProvider.Provider value={{
                 tempFiles, setTempFiles

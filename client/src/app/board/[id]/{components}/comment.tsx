@@ -8,10 +8,11 @@ import apiCall from "@/app/{commons}/func/api";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
+import {Node} from "postcss";
 
 export type SaveComment = {
     boardPk   : string;
-    blockSeq  : number | null;
+    blockSeq  : string | null;
     content   : string;
     parentPk? : string;
 }
@@ -32,6 +33,7 @@ const Comment = () => {
 
         try {
             const body: SaveComment = {boardPk: board.data.id, content: newComment.content, blockSeq: newComment.blockSeq};
+            console.log(body)
 
             await apiCall<boolean, SaveComment>({
                 path: '/api/board/comment',
@@ -89,22 +91,23 @@ const Comment = () => {
                 board.isView
                 && board.data.isLogin
                 && <div className={'w-full flex gap-1'}>
-                    {
-                        <button className={[
-                            'flex flex-col justify-center items-center rounded text-xs text-white bg-blue-400 hover:bg-red-600 duration-300 shadow',
-                            newComment.blockSeq !== undefined && newComment.blockSeq !== null ? 'w-9' : 'w-0'
-                        ].join(' ')}
-                                onClick={onDeleteHandler}
-                        >
-                          <span>{newComment.blockSeq}</span>
-                        </button>
-                    }
-                   <textarea className={'w-full border-2 border-solid border-gray-200 rounded p-2 resize-none text-sm outline-0 shadow'}
+                    <button className={[
+                        'absolute h-16 flex flex-col justify-center items-center text-xs text-white bg-blue-400 hover:bg-red-600 duration-300'
+                    ].join(' ')}
+                            style={{width: newComment.blockSeq !== undefined && newComment.blockSeq !== null ? '29px' : '0'}}
+                            onClick={onDeleteHandler}
+                    >
+                      <span>{newComment.blockSeq?.split('-')[1]}</span>
+                    </button>
+                   <textarea className={[
+                       'w-full h-16 border border-solid border-gray-200  resize-none text-sm outline-0 duration-300',
+                      newComment.blockSeq !== undefined && newComment.blockSeq !== null ? 'pl-10 pr-2 py-2' : 'p-2'
+                   ].join(' ')}
                               placeholder={'댓글을 입력하세요'}
                               value={newComment.content}
                               onChange={onChange}
                     />
-                  <button className={'w-20 border-2 border-solid border-gray-200 text-gray-700 rounded hover:bg-gray-700 hover:text-white duration-300 shadow'}
+                  <button className={'w-20 border border-solid border-gray-200 text-gray-700 hover:bg-gray-700 hover:text-white duration-300'}
                           onClick={submitClickHandler}
                   >
                     등록
@@ -123,13 +126,19 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
         , id
     } = props;
 
-    const {setComment} = useContext(BoardProvider);
+
+    const {setComment,deleteComment, setDeleteComment} = useContext(BoardProvider);
 
     const existBlock = useMemo(()=> {
-        return board.data.content.list.find(item => item.seq === blockSeq) !== undefined;
+        return board.data.content.list.find(item => item.hash === blockSeq) !== undefined;
     }, [board.data.content.list, blockSeq]);
 
     const deleteHandler = async () => {
+        if(deleteComment.id !== id || !deleteComment.confirm) {
+            setDeleteComment({id, confirm: true});
+            return;
+        }
+
         try {
             const deleteRes = await apiCall({
                 path: '/api/board/comment/' + id,
@@ -150,21 +159,30 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
 
         } catch (err: any) {
             alert(err.response.data.message);
+        } finally {
+            setDeleteComment({confirm: false});
         }
     }
 
+    const disabledDeleteConfirm = () => {
+        setDeleteComment({confirm: false});
+    }
+
     return (
-        <div className={'w-full flex justify-start text-sm shadow bg-white'}>
+        <div className={['w-full flex justify-start text-sm shadow duration-300', deleteComment.id === id && deleteComment.confirm ? 'bg-red-500 text-white' : 'bg-white text-black'].join(' ')}>
             {
                 blockSeq
-                ? <Link className={['w-10 flex justify-center items-center text-white',existBlock ? 'bg-blue-400 hover:bg-blue-800 duration-300' : 'bg-red-400 line-through'].join(' ')}
+                ? <Link className={['flex justify-center items-center text-white',existBlock ? 'bg-blue-400 hover:bg-blue-800 duration-300' : 'bg-red-400 line-through'].join(' ')}
+                        style={{width: '40px'}}
                         href={`${existBlock ? `#block-${blockSeq}` : '' }`}
                     >
-                        {blockSeq}
+                        {blockSeq.split('-')[1]}
                     </Link>
                 : <div className={['w-10'].join(' ')} />
             }
-            <div className={'flex flex-col w-48 gap-2 border-x p-3 border-solid border-gray-200'}>
+            <div className={'flex flex-col w-48 gap-2 border-x p-3 border-solid border-gray-200'}
+                 onClick={() => {deleteComment.confirm && disabledDeleteConfirm()}}
+            >
                 <div className={'flex gap-2 items-end'}>
                     <Image className={'h-6 w-6 rounded-full'}
                            src={process.env.NEXT_PUBLIC_CDN_SERVER + profileImage}
@@ -177,7 +195,9 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
                 </div>
                 <span className={'text-xs'}>{createdAt}</span>
             </div>
-            <div className={'w-full whitespace-pre-wrap text-xs  p-3'}>
+            <div className={'w-full whitespace-pre-wrap text-xs  p-3'}
+                 onClick={() => {deleteComment.confirm && disabledDeleteConfirm()}}
+            >
                 <p>
                     {content}
                 </p>

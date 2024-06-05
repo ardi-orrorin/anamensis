@@ -11,8 +11,6 @@ export async function DELETE(req: NextRequest){
         isReturnData: true,
     })
 
-    console.log(result);
-
     return new Response(JSON.stringify(result), {
         status: 200,
         headers: {

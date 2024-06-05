@@ -5,7 +5,6 @@ import Link from "next/link";
 import {cookies} from "next/headers";
 import Image from "next/image";
 import apiCall from "@/app/{commons}/func/api";
-import {useRouter} from "next/navigation";
 
 interface BoardListI {
     id           : string;

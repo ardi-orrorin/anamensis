@@ -7,16 +7,18 @@ import {faComment} from "@fortawesome/free-solid-svg-icons";
 import apiCall from "@/app/{commons}/func/api";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
+import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 
 export type SaveComment = {
-    boardPk: string;
-    content: string;
-    parentPk?: string;
+    boardPk   : string;
+    blockSeq  : number | null;
+    content   : string;
+    parentPk? : string;
 }
 
-const Comment = ({setCommentLoading} : {setCommentLoading: Dispatch<SetStateAction<boolean>>}) => {
+const Comment = () => {
     const {comment, setComment, board} = useContext(BoardProvider);
-    const [newComment, setNewComment] = useState<SaveComment>({} as SaveComment);
+    const {newComment, setNewComment} = useContext(BoardProvider);
 
     const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setNewComment({...newComment, content: e.target.value});
@@ -29,7 +31,7 @@ const Comment = ({setCommentLoading} : {setCommentLoading: Dispatch<SetStateActi
         }
 
         try {
-            const body: SaveComment = {boardPk: board.data.id, content: newComment.content};
+            const body: SaveComment = {boardPk: board.data.id, content: newComment.content, blockSeq: newComment.blockSeq};
 
             await apiCall<boolean, SaveComment>({
                 path: '/api/board/comment',
@@ -57,6 +59,13 @@ const Comment = ({setCommentLoading} : {setCommentLoading: Dispatch<SetStateActi
         }
     }
 
+    const onDeleteHandler = () => {
+        setNewComment({
+            ...newComment,
+            blockSeq: null,
+        });
+    }
+
     if(!board.isView) return <></>
 
     return (
@@ -78,17 +87,32 @@ const Comment = ({setCommentLoading} : {setCommentLoading: Dispatch<SetStateActi
             </div>
             {
                 board.isView
-                && <div className={'flex gap-2'}>
-                    <textarea className={'w-full border-2 border-solid border-gray-200 rounded p-2 resize-none text-sm outline-0'}
-                              placeholder={'댓글을 입력하세요'}
-                              value={newComment.content}
-                              onChange={onChange}
-                    />
-                    <button className={'w-20 border-2 border-solid border-gray-200 text-gray-700 rounded hover:bg-gray-700 hover:text-white duration-300'}
-                            onClick={submitClickHandler}
-                    >
-                    등록
-                    </button>
+                && board.data.isLogin
+                && <div className={'flex flex-col gap-2'}>
+                    {
+                        newComment.blockSeq !== undefined
+                        && newComment.blockSeq !== null
+                        && <ul className={'flex gap-2'}>
+                          <button className={'rounded text-xs py-1 px-3 bg-blue-400 text-white'}
+                                  onClick={onDeleteHandler}
+                          >
+                            <span>B-{newComment.blockSeq} &nbsp;</span>
+                            <FontAwesomeIcon icon={faXmark} />
+                          </button>
+                        </ul>
+                    }
+                    <div className={'w-full flex gap-2'}>
+                       <textarea className={'w-full border-2 border-solid border-gray-200 rounded p-2 resize-none text-sm outline-0'}
+                                  placeholder={'댓글을 입력하세요'}
+                                  value={newComment.content}
+                                  onChange={onChange}
+                        />
+                      <button className={'w-20 border-2 border-solid border-gray-200 text-gray-700 rounded hover:bg-gray-700 hover:text-white duration-300'}
+                              onClick={submitClickHandler}
+                      >
+                        등록
+                      </button>
+                    </div>
                 </div>
             }
         </div>
@@ -108,14 +132,19 @@ const CommentItem = (props: CommentI) => {
                 </div>
                 <span className={'text-xs'}>{createdAt}</span>
             </div>
-            <div className={'w-full whitespace-pre-wrap px-2 text-xs'}>
+            <div className={'w-full flex flex-col gap-2'}>
                 {
-                    blockSeq
-                    && <Link className={'py-2 text-blue-700'} href={`#block-${blockSeq}`}>block-{blockSeq}</Link>
+                    blockSeq !== null
+                    && <span>
+                    <Link className={'py-1 px-3 bg-blue-400 text-white text-xs rounded'} href={`#block-${blockSeq}`}>B-{blockSeq}</Link>
+                  </span>
+
                 }
-                <p>
-                    {content}
-                </p>
+                <div className={'w-full whitespace-pre-wrap text-xs'}>
+                    <p>
+                        {content}
+                    </p>
+                </div>
             </div>
         </div>
     )

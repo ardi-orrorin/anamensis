@@ -25,8 +25,8 @@ const LeftNavBar = ({
     ]
 
     return (
-        <nav className={['min-h-svh bg-blue-400 py-2 duration-300', isOpen ? 'translate-x-0 shadow-outset-lg w-10 md:w-[300px]' : 'translate-x-[-1000px] w-0'].join(' ')}>
-            <div className={'flex justify-center md:justify-end md:pe-5'}>
+        <nav className={['fixed min-h-svh bg-blue-400 py-2 duration-500 w-[200px]', isOpen ? 'translate-x-0 shadow-outset-lg' : 'translate-x-[-1000px]'].join(' ')}>
+            <div className={'flex justify-end pe-5'}>
                 <button className={''} onClick={()=>{setIsOpen(!isOpen)}}>
                     <FontAwesomeIcon icon={faXmark} className={'text-white text-xl'} />
                 </button>
@@ -34,11 +34,11 @@ const LeftNavBar = ({
             <ul className={'w-full'}>
                 <li className={'text text-white'}>
                     <Link href={'/user'}
+                          onClick={()=>{setIsOpen(!isOpen)}}
                     >
-                        <div className={'p-3 w-full hover:bg-blue-500 duration-300'}>
+                        <div className={'p-3 w-full hover:bg-blue-500'}>
                             <FontAwesomeIcon icon={faAddressCard} width={iconSize} />
-
-                            <span className={'hidden md:inline'}>&nbsp; User</span>
+                            <span>&nbsp; User</span>
                         </div>
                     </Link>
                 </li>
@@ -50,10 +50,11 @@ const LeftNavBar = ({
                             >
                                 <Link className={'text text-white w-full'}
                                       href={item.href}
+                                      onClick={()=>{setIsOpen(!isOpen)}}
                                 >
                                     <div className={'w-full p-3 hover:bg-blue-500 duration-300'}>
                                         <FontAwesomeIcon icon={item.icon} width={iconSize} />
-                                        <span className={'hidden md:inline'}>&nbsp; {item.name}</span>
+                                        <span>&nbsp; {item.name}</span>
                                     </div>
                                 </Link>
                             </li>

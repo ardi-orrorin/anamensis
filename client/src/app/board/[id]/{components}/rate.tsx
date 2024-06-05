@@ -17,6 +17,8 @@ const Rate = (props: {
             : board?.data?.rate;
     },[rateInfo?.count, board.data?.rate]);
 
+    if(!board.data.isLogin) return <></>
+
     return (
         <div className={"flex justify-center"}>
             {

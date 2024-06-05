@@ -2,9 +2,12 @@ import {NextRequest, NextResponse} from "next/server";
 import {BoardI} from "@/app/board/{services}/types";
 import apiCall from "@/app/{commons}/func/api";
 import {StatusResponse} from "@/app/{commons}/types/commons";
+import {cookies} from "next/headers";
 
 export async function GET(req: NextRequest) {
     const id = req.nextUrl.pathname.split('/')[req.nextUrl.pathname.split('/').length - 1];
+
+    const getCookies = (cookies().get('next.access.token') || cookies().get('next.refresh.token'))?.value !== undefined;
 
     const data = await apiCall<BoardI>({
         path: '/public/api/boards/' + id,
@@ -13,7 +16,9 @@ export async function GET(req: NextRequest) {
         isReturnData: true,
     });
 
-    return new NextResponse(JSON.stringify(data),{
+
+
+    return new NextResponse(JSON.stringify({...data, isLogin: getCookies}),{
         status: 200,
         headers: {
             'Content-Type': 'application/json',

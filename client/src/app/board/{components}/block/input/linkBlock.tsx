@@ -91,7 +91,7 @@ const LinkBlock = (props: BlockProps) => {
 
     return (
         <div id={`block-${seq}`}
-             className={['w-full', isView && 'py-2'].join(' ')}
+             className={['w-full'].join(' ')}
         >
             {
                 !extraValue || !(extraValue as OGType).title

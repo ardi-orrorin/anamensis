@@ -35,6 +35,7 @@ export const blockTypeList: BlockComponentType[] = [
             fontSize      : '2.4rem',
             fontWeight    : '700',
             letterSpacing : '0.03rem',
+            padding       : '0.5rem',
         }),
     },
     {
@@ -49,6 +50,7 @@ export const blockTypeList: BlockComponentType[] = [
             fontSize      : '1.8rem',
             fontWeight    : '600',
             letterSpacing : '0.03rem',
+            padding       : '0.5rem',
         }),
     },
     {
@@ -63,6 +65,8 @@ export const blockTypeList: BlockComponentType[] = [
             fontSize      : '1.2rem',
             fontWeight    : '500',
             letterSpacing : '0.03rem',
+            padding       : '0.5rem',
+
         }),
     },
     {
@@ -76,6 +80,7 @@ export const blockTypeList: BlockComponentType[] = [
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '1rem',
             letterSpacing : '0.03rem',
+            padding       : '0.5rem',
         }),
     },
     {
@@ -89,6 +94,7 @@ export const blockTypeList: BlockComponentType[] = [
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '0.8rem',
             letterSpacing : '0.03rem',
+            padding       : '0.5rem',
         }),
     },
     {

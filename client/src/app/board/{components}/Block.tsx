@@ -28,13 +28,18 @@ export default function Block(props: BlockProps) {
         onClickDeleteHandler,
     } = props;
 
-    const {board, setBoard, comment} = useContext(BoardProvider);
+    const {board, setBoard, comment, setNewComment, newComment} = useContext(BoardProvider);
+
     const {blockService, setBlockService, commentService, setCommentService} = useContext(BlockProvider);
     const [isCopy, setIsCopy] = useState<CopyProps>({} as CopyProps);
 
     const isCursor = useMemo(() => {
         return window.location.hash === `#block-${seq}`;
     },[window.location.hash]);
+
+    const shareLinkText = useMemo(() => {
+        return board.data.isLogin ? '링크 및 댓글 북마크로 복사되었습니다.' : '링크가 복사되었습니다.';
+    },[board.data.isLogin]);
 
     const onFocusHandler = (e: React.FocusEvent<HtmlElements>) => {
         if(e.currentTarget.ariaRoleDescription !== 'text') {
@@ -163,12 +168,13 @@ export default function Block(props: BlockProps) {
 
         setTimeout(() => {
             setIsCopy({isCopy: false, seq});
+            if(board.data.isLogin) setNewComment({...newComment, blockSeq: seq});
         }, 700);
     }
 
     return (
         <div className={[
-            'flex relative',
+            'flex relative items-center',
             isCursor && 'bg-red-700 border-2 border-dashed border-red-800 border-opacity-20 bg-opacity-20 rounded',
         ].join(' ')}
              onContextMenu={shareLinkHandler}
@@ -176,24 +182,24 @@ export default function Block(props: BlockProps) {
             {
                 board.isView
                 && <div className={[
-                    'absolute left-1/2 top-1/2 z-30 text-sm w-52 h-14 flex justify-center items-center bg-white rounded shadow border-l-8 border-solid border-blue-300 duration-200',
+                    'absolute left-1/2 top-1/2 z-50 text-xs w-72 h-14 flex justify-center items-center bg-white rounded shadow border-l-8 border-solid border-blue-300 duration-200',
                     isCopy.isCopy ? 'opacity-100' : 'opacity-0',
                 ].join(' ')
                 }>
-                      {`block-${isCopy.seq}`} 링크가 복사되었습니다.
+                    {`block-${isCopy.seq}`} {shareLinkText}
                 </div>
             }
             {
-                !board.isView &&
-                <button className={'w-8 h-full flex justify-center items-center text-gray-600 hover:text-gray-950'}
+                !board.isView
+                && <button className={'w-8 h-full flex justify-center items-center text-gray-600 hover:text-gray-950'}
                         onClick={onClickAddHandler}
                 >
                   <FontAwesomeIcon icon={faPlus} height={20} />
                 </button>
             }
             {
-                !board.isView &&
-                <button className={'w-8 h-full flex justify-center items-center text-gray-600 hover:text-gray-950'}
+                !board.isView
+                && <button className={'w-8 h-full flex justify-center items-center text-gray-600 hover:text-gray-950'}
                         onClick={()=> openMenuToggle()}
                 >
                   <FontAwesomeIcon icon={faEllipsisVertical} height={20} />
@@ -202,7 +208,6 @@ export default function Block(props: BlockProps) {
             <div className={`relative w-full h-full flex items-center rounded`}>
                 {
                     blockTypeList.filter(b=> b.code === props.code)?.map(c => {
-                        'use client'
                         const Component = c.component;
                         return (
                             <div key={'blockContainer' + seq} className={'flex flex-col w-full'}>

@@ -174,7 +174,7 @@ CREATE TABLE board (
 CREATE TABLE board_comment (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT                                      COMMENT 'PK',
     board_pk       BIGINT          NOT NULL                                                           COMMENT '게시글 PK',
-    lineSeq        INT                                                                                COMMENT '블록 시퀀스',
+    blockSeq       VARCHAR(255)                                                                       COMMENT '블록 시퀀스',
     content        TEXT            NOT NULL                                                           COMMENT '댓글 내용',
     create_at      TIMESTAMP(6)    NOT NULL                                                           COMMENT '생성일자',
     user_id        VARCHAR(255)    NOT NULL                                                           COMMENT '유저 아이디',

@@ -61,7 +61,6 @@ class BoardCommentMapperTest {
         });
 
         assertTrue(result1.stream().anyMatch(bc -> bc.getBoardComment().getContent().equals("테스트 댓글10")));
-
     }
 
     @Test
@@ -92,7 +91,7 @@ class BoardCommentMapperTest {
         bc1.setCreateAt(LocalDateTime.now());
         assertDoesNotThrow(() -> bcm.save(bc1));
 
-        bc1.setBlockSeq(1);
+        bc1.setBlockSeq("1111-1");
         assertDoesNotThrow(() -> bcm.save(bc1));
 
         bc1.setParentPk(null);

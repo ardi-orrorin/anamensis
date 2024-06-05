@@ -12,7 +12,7 @@ export interface BlockService {
 
 export interface CommentService {
     commentMenu: boolean;
-    blockSeq: number;
+    blockSeq: string;
     screenX: number;
     screenY: number;
     comments: CommentI[];

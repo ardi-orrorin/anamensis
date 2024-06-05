@@ -21,6 +21,7 @@ export interface BoardContentI {
 
 export interface BlockI {
     seq         : number;
+    hash        : string;
     value       : string;
     extraValue? : ExtraValueI | string | number | boolean ;
     textStyle?  : TextStylesType;
@@ -37,11 +38,16 @@ export type TextStylesType = {
 
 export interface CommentI {
     id            : number;
-    blockSeq?     : number;
+    blockSeq?     : string;
     writer        : string;
     profileImage  : string;
     content       : string;
     createdAt     : string;
     children?     : CommentI[];
     isWriter?     : boolean;
+}
+
+export interface DeleteCommentI {
+    id?      : number;
+    confirm : boolean;
 }

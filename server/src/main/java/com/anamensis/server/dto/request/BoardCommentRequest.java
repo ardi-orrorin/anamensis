@@ -20,7 +20,7 @@ public class BoardCommentRequest {
         @NotNull
         private Long boardPk;
 
-        private Integer blockSeq;
+        private String blockSeq;
 
         private Long parentPk;
 

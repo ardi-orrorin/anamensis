@@ -10,7 +10,7 @@ const CheckBlock = (props: BlockProps) => {
     const {
         seq, blockRef,
         value, extraValue,
-        isView,
+        isView, hash,
         onChangeValueHandler, onChangeExtraValueHandler,
         onKeyUpHandler, onKeyDownHandler,
         onFocusHandler
@@ -83,7 +83,7 @@ const CheckBlock = (props: BlockProps) => {
     }
 
     return (
-        <div id={`block-${seq}`} className={'w-full'}>
+        <div id={`block-${hash}`} className={'w-full'}>
             <div style={containerStyle}>
                 {
                     !isView

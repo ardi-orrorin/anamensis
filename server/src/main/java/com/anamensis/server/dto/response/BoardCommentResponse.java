@@ -15,7 +15,7 @@ public class BoardCommentResponse {
 
         private long id;
 
-        private Integer blockSeq;
+        private String blockSeq;
 
         private String content;
 

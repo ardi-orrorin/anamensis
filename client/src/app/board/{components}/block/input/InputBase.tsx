@@ -14,7 +14,7 @@ export default function InputBase({
         onKeyDownHandler, onChangeHandler,
         onBlurHandler, onMouseEnterHandler,
         value, isView,
-        textStyle,
+        textStyle, hash,
         blockRef, seq
     } = data;
 
@@ -53,7 +53,7 @@ export default function InputBase({
     }
 
     return (
-        <div id={`block-${seq}`} style={{display: 'flex', width: '100%'}}>
+        <div id={`block-${hash}`} style={{display: 'flex', width: '100%'}}>
             {
                 isView
                 ? <p style={{...customStyle, backgroundColor: textStyle?.backgroundColor || defaultBg.p}}

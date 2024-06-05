@@ -22,7 +22,7 @@ import {createDebounce} from "@/app/{commons}/func/debounce";
 import SubTextMenu from "@/app/board/{components}/SubTextMenu";
 import {useSearchParams} from "next/navigation";
 import Head from "next/head";
-import Comment from "@/app/board/[id]/{components}/comment";
+import Comment, {SaveComment} from "@/app/board/[id]/{components}/comment";
 import Rate from "@/app/board/[id]/{components}/rate";
 import BoardTitle from "@/app/board/[id]/{components}/boardTitle";
 import HeaderBtn from "@/app/board/[id]/{components}/headerBtn";
@@ -39,7 +39,10 @@ export interface RateInfoI {
 export default function Page({params}: {params : {id: string}}) {
 
     const [board, setBoard] = useState<BoardService>({} as BoardService);
+
     const [commentService, setCommentService] = useState<CommentService>({} as CommentService);
+
+    const [newComment, setNewComment] = useState<SaveComment>({} as SaveComment);
 
     const [comment, setComment] = useState<CommentI[]>([]);
 
@@ -99,7 +102,7 @@ export default function Page({params}: {params : {id: string}}) {
         setLoading(true);
 
         const fetch = async () => {
-            await apiCall<BoardI>({
+            await apiCall<BoardI & {isLogin : boolean}>({
                 path: '/api/board/' + params.id,
                 method: 'GET',
                 call: 'Proxy'
@@ -382,9 +385,19 @@ export default function Page({params}: {params : {id: string}}) {
     }
 
     return (
-        <BoardProvider.Provider value={{board, setBoard, comment, setComment, rateInfo, setRateInfo}}>
-            <TempFileProvider.Provider value={{tempFiles, setTempFiles}}>
-                <BlockProvider.Provider value={{blockService, setBlockService, commentService, setCommentService}}>
+        <BoardProvider.Provider value={{
+            board, setBoard,
+            comment, setComment,
+            rateInfo, setRateInfo,
+            newComment, setNewComment
+        }}>
+            <TempFileProvider.Provider value={{
+                tempFiles, setTempFiles
+            }}>
+                <BlockProvider.Provider value={{
+                    blockService, setBlockService,
+                    commentService, setCommentService
+                }}>
                     <div className={'p-5 flex flex-col gap-5 justify-center items-center'}>
                         <div className={`w-full flex flex-col gap-3 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-1/2'}`}>
                             <div className={'flex justify-between gap-2 h-auto border-b-2 border-solid border-blue-200 py-3'}>
@@ -407,23 +420,24 @@ export default function Page({params}: {params : {id: string}}) {
                                         onClick={() => setFullScreen(!fullScreen)}>
                                         {
                                             fullScreen
-                                                ? <FontAwesomeIcon className={'text-blue-400'}
-                                                                   icon={faDownLeftAndUpRightToCenter}
-                                                />
-                                                : <FontAwesomeIcon className={'text-blue-400'}
-                                                                   icon={faUpRightAndDownLeftFromCenter}
-                                                />
+                                            ? <FontAwesomeIcon className={'text-blue-400'}
+                                                               icon={faDownLeftAndUpRightToCenter}
+                                            />
+                                            : <FontAwesomeIcon className={'text-blue-400'}
+                                                               icon={faUpRightAndDownLeftFromCenter}
+                                            />
                                         }
                                     </button>
                                 </div>
                             </div>
                             <div>
                                 {
-                                    !isNewBoard && board.isView
+                                    !isNewBoard
+                                    && board.isView
                                     && <BoardInfo board={board}/>
                                 }
                             </div>
-                            <div className={['flex flex-col', board.isView ? 'gap-4' : 'gap-4'].join(' ')}>
+                            <div className={['flex flex-col', board.isView ? 'gap-2' : 'gap-4'].join(' ')}>
                                 {
                                     board.data.content.list.map((item, index) => {
                                         return <Block key={'block' + index}
@@ -460,24 +474,17 @@ export default function Page({params}: {params : {id: string}}) {
                                   onClick={() => debounce(onChangeRateHandler)}
                             />
                             {
-                                commentLoading
-                                ? <LoadingSpinner size={20} />
-                                : <Comment setCommentLoading={setCommentLoading} />
+                                !commentLoading
+                                && <Comment />
                             }
                         </div>
                         <div>
                             {
-                                !board.isView && blockService.blockMenu === 'openTextMenu'
+                                !board.isView
+                                && blockService.blockMenu === 'openTextMenu'
                                 && <SubTextMenu blockRef={blockRef}/>
                             }
                         </div>
-                        {/*<div>*/}
-                        {/*    {*/}
-                        {/*        board.isView && commentService.commentMenu*/}
-                        {/*        && <CommentModal />*/}
-
-                        {/*    }*/}
-                        {/*</div>*/}
                     </div>
                 </BlockProvider.Provider>
             </TempFileProvider.Provider>

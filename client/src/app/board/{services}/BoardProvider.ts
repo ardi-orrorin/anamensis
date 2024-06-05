@@ -1,10 +1,12 @@
 import {BoardI, CommentI} from "@/app/board/{services}/types";
-import {createContext, Dispatch, SetStateAction} from "react";
+import {createContext, Dispatch, SetStateAction, useState} from "react";
 import {RateInfoI} from "@/app/board/[id]/page";
+import {SaveComment} from "@/app/board/[id]/{components}/comment";
 
 export interface BoardService {
     data: BoardI;
     isView: boolean;
+
 }
 
 export interface BoardProviderI {
@@ -14,7 +16,8 @@ export interface BoardProviderI {
     setComment: Dispatch<SetStateAction<CommentI[]>>
     rateInfo: RateInfoI;
     setRateInfo: Dispatch<SetStateAction<RateInfoI>>;
-
+    newComment: SaveComment;
+    setNewComment: Dispatch<SetStateAction<SaveComment>>;
 }
 
 const BoardProvider = createContext<BoardProviderI>({} as BoardProviderI);

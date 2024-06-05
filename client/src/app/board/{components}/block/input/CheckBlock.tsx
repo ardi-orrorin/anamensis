@@ -83,7 +83,7 @@ const CheckBlock = (props: BlockProps) => {
     }
 
     return (
-        <div id={`block-${seq}`} className={'w-full px-2'}>
+        <div id={`block-${seq}`} className={'w-full'}>
             <div style={containerStyle}>
                 {
                     !isView

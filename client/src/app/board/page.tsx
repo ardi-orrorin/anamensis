@@ -5,6 +5,7 @@ import Link from "next/link";
 import {cookies} from "next/headers";
 import Image from "next/image";
 import apiCall from "@/app/{commons}/func/api";
+import {useRouter} from "next/navigation";
 
 interface BoardListI {
     id           : string;
@@ -131,7 +132,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                             return (
                                 <tr key={'boards' + history.id}
                                     className={[
-                                        'w-full border-b border-blue-200 border-solid',
+                                        'w-full border-b border-blue-200 border-solid duration-300 hover:bg-blue-400 hover:text-white',
                                         index % 2 === 1 ? 'bg-blue-50': ''
                                     ].join(' ')}
                                 >
@@ -139,9 +140,9 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                                         skipIndex.find(pk => pk !== categoryPk) &&
                                         <td className={'py-2 px-3 text-center'}>{ maxIndex - index }</td>
                                     }
-                                    <td className={'py-2 px-3'}>
+                                    <td className={'px-3 py-0'}>
                                         <Link href={'./board/' + history.id}
-                                              className={'w-auto'}
+                                              className={'flex items-center w-full h-full my-0 py-0'}
                                         >
                                             { history.title }
                                         </Link>

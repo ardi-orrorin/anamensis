@@ -10,7 +10,10 @@ export interface BoardI {
     createdAt   : string;
     viewCount   : number;
     rate        : number;
+    isLogin?    : boolean;
 }
+
+
 export interface BoardContentI {
     list          : BlockI[];
     [key: string] : string | number | boolean | BlockI[];

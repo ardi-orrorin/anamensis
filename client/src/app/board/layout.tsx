@@ -55,7 +55,7 @@ export default function Page({children} : {children: ReactNode}) {
                     {children}
                 </div>
             </div>
-            <div className={[`fixed z-30 left-0 top-0 bg-blue-500 duration-500 h-screen`, openMenu ? 'w-52 translate-x-0 items-end shadow-md shadow-zinc-800' : '-translate-x-full w-0'].join(' ')}>
+            <div className={[`fixed z-30 left-0 top-0 bg-blue-500 duration-500 h-screen w-[200px]`, openMenu ? ' translate-x-0 items-end shadow-md shadow-zinc-800' : '-translate-x-full'].join(' ')}>
                 <div className={['flex flex-col w-full px-1 items-start duration-500', openMenu ? '' : 'hidden'].join(' ')}>
                     <div className={'w-full flex justify-end'}>
                         <button className={'p-2 px-3 text-lg text-white hover:text-blue-200 duration-300 rounded'}

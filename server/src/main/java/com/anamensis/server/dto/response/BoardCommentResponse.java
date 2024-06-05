@@ -25,21 +25,31 @@ public class BoardCommentResponse {
 
         private Long parentPk;
 
+        private Boolean isWriter;
+
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime createdAt;
 
-        public static Comment fromResultMap(BoardCommentResultMap.BoardComment resultMap) {
-
-
-            return Comment.builder()
+        public static Comment fromResultMap(BoardCommentResultMap.BoardComment resultMap, String userId) {
+            CommentBuilder builder = Comment.builder()
                     .id(resultMap.getId())
                     .content(resultMap.getBoardComment().getContent())
                     .writer(resultMap.getBoardComment().getUserId())
                     .profileImage(resultMap.getFile().getFilePath() + resultMap.getFile().getFileName())
                     .parentPk(resultMap.getBoardComment().getParentPk())
                     .blockSeq(resultMap.getBoardComment().getBlockSeq())
-                    .createdAt(resultMap.getBoardComment().getCreateAt())
-                    .build();
+                    .createdAt(resultMap.getBoardComment().getCreateAt());
+
+            if(userId != null && userId.length() > 0){
+                builder.isWriter(resultMap.getBoardComment().getUserId().equals(userId) );
+            } else {
+                builder.isWriter(false);
+            }
+
+            System.out.println(builder);
+
+
+            return builder.build();
         }
 
     }

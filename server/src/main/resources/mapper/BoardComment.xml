@@ -20,6 +20,7 @@
                                    WHERE tc.table_name = 'member')
            AND f.is_use    = 1
          WHERE bc.board_pk = #{boardPk}
+          AND  bc.is_use   = 1
          ORDER BY bc.id
     </select>
     <insert id="save" parameterType="BoardComment">
@@ -27,6 +28,14 @@
                (board_pk, content, create_at, user_id, parent_pk, blockSeq)
         VALUES (#{boardPk}, #{content}, #{createAt}, #{userId}, #{parentPk}, #{blockSeq})
     </insert>
+
+    <update id="delete">
+        UPDATE board_comment
+           SET is_use   = 0
+         WHERE id       = #{id}
+           AND user_id  = #{userId}
+           AND is_use   = 1
+    </update>
 
     <resultMap id="boardCommentResultMap" type="com.anamensis.server.resultMap.BoardCommentResultMap$BoardComment">
         <id property="id" column="id"/>

@@ -2,26 +2,39 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBars} from "@fortawesome/free-solid-svg-icons";
 import React, {Suspense} from "react";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
+import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 
 const Contents = ({
     isOpen,
+    isModalMode,
     setIsOpen,
-    children
+    children,
 }: {
     isOpen: boolean,
+    isModalMode: boolean,
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>,
     children: React.ReactNode
 }) => {
+
+    const openToggle = () => {
+        bodyScrollToggle();
+        setIsOpen(!isOpen);
+    }
 
 
     return (
         <section className={'w-full flex flex-col justify-center border-s border-solid border-gray-200 p-4'}>
             <div className={'w-full flex items-start h-12'}>
-                <div className={['w-1/3 flex'].join(' ')}>
-                    <button className={[isOpen ? 'hidden' : ''].join(' ')} onClick={()=>{setIsOpen(!isOpen)}}>
-                        <FontAwesomeIcon icon={faBars} />
+                {
+                    isModalMode
+                    && <div className={['w-1/3 flex'].join(' ')}>
+                    <button className={[isOpen ? 'hidden' : ''].join(' ')} onClick={openToggle}>
+                      <FontAwesomeIcon icon={faBars} />
                     </button>
-                </div>
+                  </div>
+
+                }
+
                 {/*<div className={'w-1/3 flex justify-center text-lg'}>*/}
                     {/*<h1>로그인</h1>*/}
                 {/*</div>*/}

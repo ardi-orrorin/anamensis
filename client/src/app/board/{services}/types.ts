@@ -43,4 +43,5 @@ export interface CommentI {
     content       : string;
     createdAt     : string;
     children?     : CommentI[];
+    isWriter?     : boolean;
 }

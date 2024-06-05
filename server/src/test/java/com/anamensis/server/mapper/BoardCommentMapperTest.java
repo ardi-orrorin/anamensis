@@ -112,7 +112,20 @@ class BoardCommentMapperTest {
 
         bc1.setBoardPk(3L);
         assertDoesNotThrow(() -> bcm.save(bc1));
+    }
 
+    @Test
+    @Order(3)
+    @DisplayName("게시글의 댓글을 삭제한다.")
+    void delete() {
+
+        assertEquals(1, bcm.delete(1L, "d-member-1"));
+
+        assertEquals(0, bcm.delete(2L, "d-member-1"));
+        assertEquals(1, bcm.delete(2L, "d-member-2"));
+
+        assertEquals(0, bcm.delete(99L, "d-member-1"));
+        assertEquals(0, bcm.delete(99L, "d-member-1"));
 
 
     }

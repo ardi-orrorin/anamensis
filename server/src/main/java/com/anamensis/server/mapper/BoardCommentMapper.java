@@ -12,4 +12,6 @@ public interface BoardCommentMapper {
     List<BoardCommentResultMap.BoardComment> findAllByBoardPk(long boardPk);
 
     int save(BoardComment boardComment);
+
+    int delete(long id, String userId);
 }

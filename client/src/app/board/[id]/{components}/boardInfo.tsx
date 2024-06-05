@@ -4,7 +4,7 @@ import Image from "next/image";
 const BoardInfo = (props: { board: BoardService }) => {
     const {board} = props;
     return (
-        <div className={"flex gap-2 justify-between"}>
+        <div className={"flex gap-2 justify-between px-2"}>
             <div className={"flex flex-col justify-between text-sm"}>
                 <p>
                     작성일: {board.data.createdAt}

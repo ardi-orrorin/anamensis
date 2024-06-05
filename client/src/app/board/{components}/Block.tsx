@@ -175,7 +175,7 @@ export default function Block(props: BlockProps) {
     return (
         <div className={[
             'flex relative items-center',
-            isCursor && 'bg-red-700 border-2 border-dashed border-red-800 border-opacity-20 bg-opacity-20 rounded',
+            isCursor && board.isView && 'bg-red-700 border-2 border-dashed border-red-800 border-opacity-20 bg-opacity-20 rounded',
         ].join(' ')}
              onContextMenu={shareLinkHandler}
         >

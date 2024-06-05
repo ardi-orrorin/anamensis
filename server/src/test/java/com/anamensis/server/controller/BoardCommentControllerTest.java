@@ -119,6 +119,36 @@ class BoardCommentControllerTest {
             .jsonPath("$[2].id").isEqualTo(9)
             .jsonPath("$[3].id").isEqualTo(10);
 
+        wtc.get()
+            .uri(uriBuilder -> uriBuilder
+                    .path("/public/api/board/comments")
+                    .queryParam("boardPk", 1)
+                    .build()
+            )
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$[0].isWriter").isEqualTo(true)
+            .jsonPath("$[1].isWriter").isEqualTo(false);
+
+        wtc.get()
+            .uri(uriBuilder -> uriBuilder
+                    .path("/public/api/board/comments")
+                    .queryParam("boardPk", 1)
+                    .build()
+            )
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token2);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$[0].isWriter").isEqualTo(false)
+            .jsonPath("$[1].isWriter").isEqualTo(true);
+
     }
 
     @Test
@@ -176,5 +206,85 @@ class BoardCommentControllerTest {
             .exchange()
             .expectStatus().isBadRequest();
 
+    }
+
+    @Test
+    @DisplayName("댓글 삭제")
+    void delete() {
+        wtc.delete()
+            .uri("/api/board/comments/1")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(Boolean.class)
+            .isEqualTo(true);
+
+        wtc.get()
+            .uri(uriBuilder -> uriBuilder
+                    .path("/public/api/board/comments")
+                    .queryParam("boardPk", 1)
+                    .build()
+            )
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody()
+            .jsonPath("$.length()").isEqualTo(5);
+
+
+        wtc.delete()
+            .uri("/api/board/comments/1")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(Boolean.class)
+            .isEqualTo(false);
+
+
+        wtc.delete()
+                .uri("/api/board/comments/2")
+                .headers(httpHeaders -> {
+                    httpHeaders.setBearerAuth(token2);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Boolean.class)
+                .isEqualTo(true);
+
+        wtc.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/public/api/board/comments")
+                        .queryParam("boardPk", 1)
+                        .build()
+                )
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.length()").isEqualTo(4);
+
+
+        wtc.delete()
+                .uri("/api/board/comments/1")
+                .headers(httpHeaders -> {
+                    httpHeaders.setBearerAuth(token2);
+                })
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Boolean.class)
+                .isEqualTo(false);
+
+
+        wtc.delete()
+            .uri("/api/board/comments/99")
+            .headers(httpHeaders -> {
+                httpHeaders.setBearerAuth(token2);
+            })
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(Boolean.class)
+            .isEqualTo(false);
     }
 }

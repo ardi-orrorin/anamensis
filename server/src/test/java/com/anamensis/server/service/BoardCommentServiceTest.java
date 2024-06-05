@@ -154,7 +154,35 @@ class BoardCommentServiceTest {
         StepVerifier.create(bcs.save(bc))
                 .expectNext(true)
                 .verifyComplete();
+    }
 
+    @Test
+    @DisplayName("댓글 삭제")
+    @Order(3)
+    void delete() {
+        StepVerifier.create(bcs.delete(1, "d-member-1"))
+                .expectNext(true)
+                .verifyComplete();
+
+        StepVerifier.create(bcs.findAllByBoardPk(1))
+                .expectNextCount(5)
+                .verifyComplete();
+
+        StepVerifier.create(bcs.delete(1, "d-member-1"))
+                .expectNext(false)
+                .verifyComplete();
+
+        StepVerifier.create(bcs.delete(99, "d-member-1"))
+                .expectNext(false)
+                .verifyComplete();
+
+        StepVerifier.create(bcs.delete(2, "d-member-2"))
+                .expectNext(true)
+                .verifyComplete();
+
+        StepVerifier.create(bcs.findAllByBoardPk(1))
+                .expectNextCount(4)
+                .verifyComplete();
 
     }
 }

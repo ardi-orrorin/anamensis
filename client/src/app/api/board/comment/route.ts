@@ -1,17 +1,18 @@
 import {NextRequest} from "next/server";
 import {cookies} from "next/headers";
-import {BoardI} from "@/app/board/{services}/types";
 import apiCall from "@/app/{commons}/func/api";
 import {SaveComment} from "@/app/board/[id]/{components}/comment";
+import {CommentI} from "@/app/board/{services}/types";
 
 
 export async function GET(req: NextRequest){
     const boardPk = req.nextUrl.searchParams.get('boardPk')!;
-    const result = await apiCall<any>({
+    const result = await apiCall<CommentI[]>({
         path: '/public/api/board/comments',
         method: 'GET',
         params: {boardPk: boardPk as string},
         call: 'Server',
+        setAuthorization: true,
         isReturnData: true,
     })
 

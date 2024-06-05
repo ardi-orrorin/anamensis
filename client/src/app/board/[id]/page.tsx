@@ -135,6 +135,7 @@ export default function Page({params}: {params : {id: string}}) {
                 call: 'Proxy'
             })
             .then(res => {
+                console.log(res.data)
                 setComment(res.data);
             })
             .finally(() => {

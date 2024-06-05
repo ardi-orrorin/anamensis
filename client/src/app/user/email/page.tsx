@@ -83,7 +83,11 @@ export default function Page() {
                         Email 2차 인증 사용 여부
                     </h1>
                     <label className="inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className={"sr-only peer hidden"} onChange={onChangeHandler} checked={isSAuthEamil}/>
+                        <input type="checkbox"
+                               className={"sr-only peer hidden"}
+                               checked={isSAuthEamil}
+                               onChange={onChangeHandler}
+                        />
                         <div className="relative w-11 h-6 ray-200 peer-focus:outline-none peer-focus:ring-4
                                         peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-300
                                         peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full

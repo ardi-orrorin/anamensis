@@ -1,14 +1,12 @@
 'use client';
 
 import {useEffect, useState} from "react";
-import axios from "axios";
 import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import Add from "@/app/user/system/{components}/Add";
 import Row from "@/app/user/system/{components}/Row";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
-
 
 export interface WebSysI {
     code: string;

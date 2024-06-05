@@ -1,16 +1,28 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import Link from "next/link";
-import {faAddressCard, faCheckToSlot, faClockRotateLeft, faEnvelope, faKey} from "@fortawesome/free-solid-svg-icons";
+import {
+    faAddressCard,
+    faCheckToSlot,
+    faClockRotateLeft,
+    faEnvelope,
+    faKey, faRectangleList, fas,
+} from "@fortawesome/free-solid-svg-icons";
 import React from "react";
 import {faGear} from "@fortawesome/free-solid-svg-icons/faGear";
+import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
+import {faTableList} from "@fortawesome/free-solid-svg-icons/faTableList";
 
 const LeftNavBar = ({
     isOpen,
-    setIsOpen
+    setIsOpen,
+    isModalMode,
+    setIsModalMode
 }: {
     isOpen: boolean,
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+    isModalMode: boolean,
+    setIsModalMode: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
 
     const iconSize = 16;
@@ -24,17 +36,44 @@ const LeftNavBar = ({
         {name: 'SYSTEM', href:'/user/system', icon: faGear},
     ]
 
+    const openToggle = () => {
+        bodyScrollToggle();
+        setIsModalMode(!isModalMode);
+        setIsOpen(!isOpen);
+    }
+
+    const fixedToggle = () => {
+        bodyScrollToggle();
+        setIsOpen(!isOpen);
+    }
+
+    const onChangeDisabledHandler = () => {
+        setIsOpen(false);
+    }
+
     return (
-        <nav className={['fixed min-h-svh bg-blue-400 py-2 duration-500 w-[200px]', isOpen ? 'translate-x-0 shadow-outset-lg' : 'translate-x-[-1000px]'].join(' ')}>
-            <div className={'flex justify-end pe-5'}>
-                <button className={''} onClick={()=>{setIsOpen(!isOpen)}}>
+        <>
+        <nav className={['z-30 min-h-svh bg-blue-400 py-2 duration-500 '
+            , isOpen || !isModalMode  ? 'translate-x-0 shadow-outset-lg' : 'translate-x-[-1000px]'
+            , isModalMode ? 'fixed w-[220px]': 'w-[250px]'
+        ].join(' ')}>
+            <div className={'flex justify-between px-5 py-2'}>
+                <button onClick={openToggle} className={'text-white'}>
+                    {
+                        isModalMode
+                        ? <FontAwesomeIcon icon={faRectangleList} />
+                        : <FontAwesomeIcon icon={faTableList} />
+                    }
+
+                </button>
+                <button onClick={openToggle}>
                     <FontAwesomeIcon icon={faXmark} className={'text-white text-xl'} />
                 </button>
             </div>
             <ul className={'w-full'}>
                 <li className={'text text-white'}>
                     <Link href={'/user'}
-                          onClick={()=>{setIsOpen(!isOpen)}}
+                          onClick={onChangeDisabledHandler}
                     >
                         <div className={'p-3 w-full hover:bg-blue-500'}>
                             <FontAwesomeIcon icon={faAddressCard} width={iconSize} />
@@ -50,7 +89,7 @@ const LeftNavBar = ({
                             >
                                 <Link className={'text text-white w-full'}
                                       href={item.href}
-                                      onClick={()=>{setIsOpen(!isOpen)}}
+                                      onClick={onChangeDisabledHandler}
                                 >
                                     <div className={'w-full p-3 hover:bg-blue-500 duration-300'}>
                                         <FontAwesomeIcon icon={item.icon} width={iconSize} />
@@ -63,6 +102,13 @@ const LeftNavBar = ({
                 }
             </ul>
         </nav>
+            {
+                isOpen
+                && <div className={'absolute z-10 bg-opacity-25 bg-gray-800 w-full h-full'}
+                        onClick={onChangeDisabledHandler}
+                   />
+            }
+        </>
     )
 }
 

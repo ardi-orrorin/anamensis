@@ -23,10 +23,12 @@ public class BoardCommentController {
     @PublicAPI
     @GetMapping("")
     public Mono<List<BoardCommentResponse.Comment>> list(
-            @RequestParam long boardPk
+            @RequestParam long boardPk,
+            @AuthenticationPrincipal UserDetails user
     ) {
+        String userId = user != null ? user.getUsername() : null;
         return boardCommentService.findAllByBoardPk(boardPk)
-                .map(BoardCommentResponse.Comment::fromResultMap)
+                .map(board -> BoardCommentResponse.Comment.fromResultMap(board, userId))
                 .collectList();
     }
 
@@ -37,6 +39,14 @@ public class BoardCommentController {
     ) {
         BoardComment bc = BoardCommentRequest.Save.toEntity(comment, user);
         return boardCommentService.save(bc);
+    }
+
+    @DeleteMapping("/{id}")
+    public Mono<Boolean> delete(
+            @PathVariable long id,
+            @AuthenticationPrincipal UserDetails user
+    ) {
+        return boardCommentService.delete(id, user.getUsername());
     }
 
 }

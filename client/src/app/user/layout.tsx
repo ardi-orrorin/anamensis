@@ -12,6 +12,7 @@ export default function Layout({children}: {children: React.ReactNode}) {
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [modal, setModal] = useState<ModalI>({} as ModalI);
+    const [isModalMode, setIsModalMode] = React.useState<boolean>(true);
 
     const modalClose = () => {
         bodyScrollToggle();
@@ -21,8 +22,12 @@ export default function Layout({children}: {children: React.ReactNode}) {
     return (
         <main className={'flex items-start'}>
             <ModalProvider.Provider value={{modal, setModal}}>
-                <LeftNavBar isOpen={isOpen} setIsOpen={setIsOpen} />
-                <Contents isOpen={isOpen} setIsOpen={setIsOpen}>
+                <LeftNavBar isOpen={isOpen}
+                            setIsOpen={setIsOpen}
+                            isModalMode={isModalMode}
+                            setIsModalMode={setIsModalMode}
+                />
+                <Contents isOpen={isOpen} setIsOpen={setIsOpen} isModalMode={isModalMode}>
                     {children}
                 </Contents>
                 {

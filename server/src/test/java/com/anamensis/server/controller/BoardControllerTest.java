@@ -94,6 +94,8 @@ class BoardControllerTest {
             .jsonPath("$.content[0].id").isEqualTo(10)
             .jsonPath("$.content[1].id").isEqualTo(9)
             .jsonPath("$.content[2].id").isEqualTo(8)
+            .jsonPath("$.content[8].commentCount").isEqualTo(4)
+            .jsonPath("$.content[9].commentCount").isEqualTo(6)
             .jsonPath("$.page.total").isEqualTo(10);
 
 

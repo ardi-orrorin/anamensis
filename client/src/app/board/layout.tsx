@@ -86,7 +86,9 @@ export default function Page({children} : {children: ReactNode}) {
             </div>
             {
                 openMenu &&
-                <div className={'fixed z-20 w-full h-full bg-black bg-opacity-25'} onClick={onClickHandler} />
+                <div className={'fixed z-20 w-full h-full bg-black bg-opacity-25'}
+                     onClick={onClickHandler}
+                />
             }
         </div>
     );

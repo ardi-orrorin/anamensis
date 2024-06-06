@@ -13,8 +13,10 @@ public class BoardResultMap {
     @ToString
     public static class Board {
         private long id;
+        private long commentCount;
         private Member member;
         private com.anamensis.server.entity.Board board;
         private File file;
+
     }
 }

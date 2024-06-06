@@ -74,9 +74,15 @@ const Comment = () => {
         <div className={'w-auto flex flex-col gap-4'}>
             <div className={'flex gap-2 text-lg items-center py-2'}>
                 <FontAwesomeIcon icon={faComment} />
-                <h2>
-                    댓글
-                </h2>
+                <div className={'flex'}>
+                    <h2>
+                        댓글
+                    </h2>
+                    <span>
+                        ({comment.length})
+                    </span>
+                </div>
+
             </div>
             <div className={'w-auto flex flex-col gap-2'}>
                 {
@@ -208,7 +214,7 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
                 isWriter
                 && <button className={'w-10 flex justify-center items-center bg-red-400 text-white hover:bg-red-800 duration-300'}
                            onClick={deleteHandler}
-              >
+                >
                     <FontAwesomeIcon icon={faXmark} />
                 </button>
             }

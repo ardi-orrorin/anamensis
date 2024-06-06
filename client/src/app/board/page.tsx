@@ -14,6 +14,7 @@ interface BoardListI {
     writer       : string;
     profileImage?: string;
     createdAt    : string;
+    commentCount : number;
 }
 
 type BoardListPrams = {
@@ -143,7 +144,16 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                                         <Link href={'./board/' + history.id}
                                               className={'flex items-center w-full h-full my-0 py-0'}
                                         >
+                                            <span>
                                             { history.title }
+                                            </span>
+                                            {
+                                                history.commentCount > 0 &&
+                                                <span className={'px-2 text-xs text-blue-500'}>
+                                                    {history.commentCount}
+                                                </span>
+                                            }
+
                                         </Link>
                                     </td>
                                     <td className={'py-2 px-3'}>{ history.viewCount }</td>

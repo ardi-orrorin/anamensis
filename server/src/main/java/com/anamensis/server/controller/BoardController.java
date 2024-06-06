@@ -171,8 +171,6 @@ public class BoardController {
                 .map(tuple ->
                    BoardResponse.ExContent.from(tuple.getT1(), tuple.getT3())
                 );
-
-
     }
 
 

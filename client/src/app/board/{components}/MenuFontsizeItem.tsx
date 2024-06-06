@@ -28,7 +28,7 @@ const MenuFontsizeItem = ({
                             {
                                 size === '' ? '기본'
                                     : value !== '' ? value
-                                        : size + 'px'
+                                        : size
                             }
                         </button>
                     )

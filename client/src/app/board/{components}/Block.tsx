@@ -30,12 +30,8 @@ export default function Block(props: BlockProps) {
 
     const {board, setBoard, comment, setNewComment, newComment} = useContext(BoardProvider);
 
-    const {blockService, setBlockService, commentService, setCommentService} = useContext(BlockProvider);
+    const {blockService, setBlockService, commentService, setCommentService, selectedBlock} = useContext(BlockProvider);
     const [isCopy, setIsCopy] = useState<CopyProps>({} as CopyProps);
-
-    const isCursor = useMemo(() => {
-        return window.location.hash === `#block-${seq}`;
-    },[window.location.hash]);
 
     const shareLinkText = useMemo(() => {
         return board.data.isLogin ? '링크 및 댓글 북마크로 복사되었습니다.' : '링크가 복사되었습니다.';
@@ -174,7 +170,7 @@ export default function Block(props: BlockProps) {
     return (
         <div className={[
             'flex relative items-center',
-            isCursor && board.isView && 'bg-red-700 border-2 border-dashed border-red-800 border-opacity-20 bg-opacity-20 rounded',
+            selectedBlock === hash && board.isView && 'bg-red-700 border-2 border-dashed border-red-800 border-opacity-20 bg-opacity-20 rounded',
         ].join(' ')}
              onContextMenu={shareLinkHandler}
         >

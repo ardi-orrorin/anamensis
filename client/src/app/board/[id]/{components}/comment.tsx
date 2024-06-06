@@ -9,6 +9,7 @@ import {useRouter} from "next/navigation";
 import Link from "next/link";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {Node} from "postcss";
+import BlockProvider from "@/app/board/{services}/BlockProvider";
 
 export type SaveComment = {
     boardPk   : string;
@@ -33,7 +34,6 @@ const Comment = () => {
 
         try {
             const body: SaveComment = {boardPk: board.data.id, content: newComment.content, blockSeq: newComment.blockSeq};
-            console.log(body)
 
             await apiCall<boolean, SaveComment>({
                 path: '/api/board/comment',
@@ -127,6 +127,7 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
     } = props;
 
 
+    const {setSelectedBlock} = useContext(BlockProvider);
     const {setComment,deleteComment, setDeleteComment} = useContext(BoardProvider);
 
     const existBlock = useMemo(()=> {
@@ -175,6 +176,7 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
                 ? <Link className={['flex justify-center items-center text-white',existBlock ? 'bg-blue-400 hover:bg-blue-800 duration-300' : 'bg-red-400 line-through'].join(' ')}
                         style={{width: '40px'}}
                         href={`${existBlock ? `#block-${blockSeq}` : '' }`}
+                        onClick={()=> setSelectedBlock(blockSeq)}
                     >
                         {blockSeq.split('-')[1]}
                     </Link>

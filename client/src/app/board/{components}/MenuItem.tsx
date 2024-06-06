@@ -46,11 +46,12 @@ const MenuItem = ({
 
         setBlockService({
             ...blockService,
-            blockMenu: '',
+            blockMenu : '',
             block: {
-                seq: 0,
-                code: '',
-                value: '',
+                seq   : 0,
+                code  : '',
+                value : '',
+                hash  : '',
             }});
 
         setBoard({...board, data: {...board.data, content: {list: newList}}});

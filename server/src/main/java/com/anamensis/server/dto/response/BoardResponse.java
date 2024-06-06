@@ -19,6 +19,8 @@ public class BoardResponse {
 
         private long id;
 
+        private long commentCount;
+
         private String title;
 
         private String writer;
@@ -41,7 +43,8 @@ public class BoardResponse {
                     .viewCount(board.getBoard().getViewCount())
                     .writer(board.getMember().getName())
                     .createdAt(board.getBoard().getCreateAt())
-                    .isAdsense(board.getBoard().isAdsense());
+                    .isAdsense(board.getBoard().isAdsense())
+                    .commentCount(board.getCommentCount());
 
 //            if(board.getFile() == null)  return builder.build();
 

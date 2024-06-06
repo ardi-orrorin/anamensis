@@ -1,25 +1,25 @@
 'use client';
 
 import Block from "@/app/board/{components}/Block";
-import {ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
+import {ChangeEvent, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 import {HtmlElements} from "@/app/board/{components}/block/type/Types";
-import {BlockI, BoardI, CommentI, DeleteCommentI} from "@/app/board/{services}/types";
+import {BlockI, BoardI, CommentI} from "@/app/board/{services}/types";
 import {blockTypeList} from "@/app/board/{components}/block/list";
-import BlockProvider, {BlockService, CommentService} from "@/app/board/{services}/BlockProvider";
-import BoardProvider, {BoardService} from "@/app/board/{services}/BoardProvider";
 import {faDownLeftAndUpRightToCenter, faUpRightAndDownLeftFromCenter} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import TempFileProvider, {TempFileI} from "@/app/board/{services}/TempFileProvider";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import SubTextMenu from "@/app/board/{components}/SubTextMenu";
 import {useSearchParams} from "next/navigation";
-import Comment, {SaveComment} from "@/app/board/[id]/{components}/comment";
+import Comment from "@/app/board/[id]/{components}/comment";
 import Rate from "@/app/board/[id]/{components}/rate";
 import BoardTitle from "@/app/board/[id]/{components}/boardTitle";
 import HeaderBtn from "@/app/board/[id]/{components}/headerBtn";
 import BoardInfo from "@/app/board/[id]/{components}/boardInfo";
+import BoardProvider from "@/app/board/{services}/BoardProvider";
+import BlockProvider from "@/app/board/{services}/BlockProvider";
+import LoadingProvider from "@/app/board/{services}/LoadingProvider";
 
 export interface RateInfoI {
     id      : number;
@@ -29,37 +29,28 @@ export interface RateInfoI {
 
 export default function Page({params}: {params : {id: string}}) {
 
-    const [board, setBoard] = useState<BoardService>({} as BoardService);
+    const {
+        board, setBoard
+        , rateInfo, setRateInfo
+        , setComment
+    } = useContext(BoardProvider);
 
-    const [selectedBlock, setSelectedBlock] = useState<String>('');
+    const {
+        blockService, setSelectedBlock
+    } = useContext(BlockProvider);
 
-    const [commentService, setCommentService] = useState<CommentService>({} as CommentService);
-
-    const [deleteComment, setDeleteComment] = useState<DeleteCommentI>({} as DeleteCommentI);
-
-    const [newComment, setNewComment] = useState<SaveComment>({} as SaveComment);
-
-    const [comment, setComment] = useState<CommentI[]>([]);
-
-    const [rateInfo, setRateInfo] = useState<RateInfoI>({} as RateInfoI);
-
-    const [loading, setLoading] = useState<boolean>(false);
-
-    const [commentLoading, setCommentLoading] = useState<boolean>(false);
+    const {
+        loading, setLoading
+        , commentLoading, setCommentLoading
+    } = useContext(LoadingProvider);
 
     const [fullScreen, setFullScreen] = useState<boolean>(false);
-
-    const [blockService, setBlockService] = useState<BlockService>({} as BlockService);
-
-    const [tempFiles, setTempFiles] = useState<TempFileI[]>([]);
 
     const blockRef = useRef<HTMLElement[] | null[]>([]);
 
     const isNewBoard = useMemo(() => !params.id || params.id === 'new',[params.id]);
 
     const debounce = createDebounce(300);
-
-    const searchParams = useSearchParams();
 
     const defaultBlock:BlockI = {seq: 0, value: '', code: '00005', textStyle: {}, hash: Date.now().toString() + '-0'};
 
@@ -68,103 +59,10 @@ export default function Page({params}: {params : {id: string}}) {
     ), []);
 
     useEffect(() => {
-        setSelectedBlock(window.location.hash.replace('#block-', '') || '');
-    },[]);
-
-
-    useEffect(() => {
-        if(!isNewBoard) return ;
-        if(!searchParams?.get('categoryPk') || searchParams.get('categoryPk') === 'undefined') {
-
-            alert('잘못된 접근입니다.');
-            location.href = '/board/';
-        }
-
-        const list = [addBlock(0, true)];
-        setBoard({
-            ...board,
-            data: {
-                ...board.data,
-                content: {list},
-                categoryPk: Number(searchParams.get('categoryPk') || 0),
-                title: '', writer: ''
-            },
-            isView: false
-        });
-    },[params.id]);
-
-    useEffect(() => {
-        if(isNewBoard) return ;
-
-        setLoading(true);
-
-        const fetch = async () => {
-            await apiCall<BoardI & {isLogin : boolean}>({
-                path: '/api/board/' + params.id,
-                method: 'GET',
-                call: 'Proxy'
-            })
-            .then(res => {
-                setBoard({
-                    ...board,
-                    data: res.data,
-                    isView: true
-                });
-            }).finally(() => {
-                setLoading(false);
-            });
-        }
-
-        const debounce = createDebounce(300);
-        debounce(fetch);
-
-    },[params.id]);
-
-    useEffect(() => {
-        if(isNewBoard) return ;
-
-        setCommentLoading(true);
-        const fetch = async () => {
-            await apiCall<CommentI[]>({
-                path: '/api/board/comment',
-                method: 'GET',
-                params: {boardPk: params.id},
-                call: 'Proxy'
-            })
-            .then(res => {
-                setComment(res.data);
-            })
-            .finally(() => {
-                setCommentLoading(false);
-            });
-        }
-
-        const debounce = createDebounce(300);
-        debounce(fetch);
-
-    },[params.id]);
-
-    useEffect(() => {
         const list = board.data?.content?.list;
         if (!list) return ;
         blockRef.current[list.length - 1]?.focus();
     },[board.data?.content?.list.length])
-
-    useEffect(() => {
-        if(params.id === 'new') return ;
-        const fetch = async () => {
-            await apiCall<RateInfoI>({
-                path: '/api/board/rate/' + params.id,
-                method: 'GET',
-                call: 'Proxy'
-            }).then(res => {
-                setRateInfo(res.data);
-            });
-        }
-
-        const debounce = createDebounce(300);
-        debounce(fetch);
-    },[params.id]);
 
     const addBlock = (seq: number, init: boolean) => {
         const block = {...defaultBlock};
@@ -389,111 +287,95 @@ export default function Page({params}: {params : {id: string}}) {
     }
 
     return (
-        <BoardProvider.Provider value={{
-            board, setBoard,
-            comment, setComment,
-            rateInfo, setRateInfo,
-            newComment, setNewComment,
-            deleteComment, setDeleteComment
-        }}>
-            <TempFileProvider.Provider value={{
-                tempFiles, setTempFiles
-            }}>
-                <BlockProvider.Provider value={{
-                    blockService, setBlockService,
-                    commentService, setCommentService,
-                    selectedBlock, setSelectedBlock,
-                }}>
-                    <div className={'p-5 flex flex-col gap-5 justify-center items-center'}>
-                        <div className={`w-full flex flex-col gap-3 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-1/2'}`}>
-                            <div className={'flex justify-between gap-2 h-auto border-b-2 border-solid border-blue-200 py-3'}>
-                                <BoardTitle board={board}
-                                            newBoard={isNewBoard}
-                                            onChange={onChangeTitleHandler}
-                                            onKeyUp={e => onKeyUpHandler(e, 0)}
-                                />
+        <>
+            <div className={'p-5 flex flex-col gap-5 justify-center items-center'}>
+                <div className={`w-full flex flex-col gap-3 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-1/2'}`}>
+                    <div className={'flex justify-between gap-2 h-auto border-b-2 border-solid border-blue-200 py-3'}>
+                        <BoardTitle board={board}
+                                    newBoard={isNewBoard}
+                                    onChange={onChangeTitleHandler}
+                                    onKeyUp={e => onKeyUpHandler(e, 0)}
+                        />
+                        {
+                            !isNewBoard &&
+                            <HeaderBtn isView={board.isView}
+                                       submitClickHandler={() => debounce(() => submitHandler(false))}
+                                       editClickHandler={editClickHandler}
+                                       deleteClickHandler={() => debounce(() => deleteHandler())}
+                            />
+                        }
+                        <div>
+                            <button
+                                className={'w-14 rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                                onClick={() => setFullScreen(!fullScreen)}>
                                 {
-                                    !isNewBoard &&
-                                    <HeaderBtn isView={board.isView}
-                                               submitClickHandler={() => debounce(() => submitHandler(false))}
-                                               editClickHandler={editClickHandler}
-                                               deleteClickHandler={() => debounce(() => deleteHandler())}
+                                    fullScreen
+                                    ? <FontAwesomeIcon className={'text-blue-400'}
+                                                       icon={faDownLeftAndUpRightToCenter}
+                                    />
+                                    : <FontAwesomeIcon className={'text-blue-400'}
+                                                       icon={faUpRightAndDownLeftFromCenter}
                                     />
                                 }
-                                <div>
-                                    <button
-                                        className={'w-14 rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
-                                        onClick={() => setFullScreen(!fullScreen)}>
-                                        {
-                                            fullScreen
-                                            ? <FontAwesomeIcon className={'text-blue-400'}
-                                                               icon={faDownLeftAndUpRightToCenter}
-                                            />
-                                            : <FontAwesomeIcon className={'text-blue-400'}
-                                                               icon={faUpRightAndDownLeftFromCenter}
-                                            />
-                                        }
-                                    </button>
-                                </div>
-                            </div>
-                            <div>
-                                {
-                                    !isNewBoard
-                                    && board.isView
-                                    && <BoardInfo board={board}/>
-                                }
-                            </div>
-                            <div className={['flex flex-col', board.isView ? 'gap-2' : 'gap-4'].join(' ')}>
-                                {
-                                    board.data.content.list.map((item, index) => {
-                                        return <Block key={'block' + index}
-                                                      blockRef={blockRef}
-                                                      onChangeHandler={e => {
-                                                          onChangeHandler(e, item.seq)
-                                                      }}
-                                                      onKeyDownHandler={e => {
-                                                          onKeyDownHandler(e, item.seq)
-                                                      }}
-                                                      onKeyUpHandler={e => {
-                                                          onKeyUpHandler(e, item.seq)
-                                                      }}
-                                                      onClickAddHandler={() => addBlockHandler(item.seq)}
-                                                      onClickDeleteHandler={onClickDeleteHandler}
-                                                      {...item}
-                                        />
-                                    })
-                                }
-                            </div>
-                            <div>
-                                {
-                                    isNewBoard
-                                    && <div className={'flex gap-1 justify-end'}>
-                                    <button
-                                      className={'w-full rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
-                                      onClick={() => debounce(() => submitHandler(true))}
-                                    >작성
-                                    </button>
-                                  </div>
-                                }
-                            </div>
-                            <Rate newBoard={isNewBoard}
-                                  onClick={() => debounce(onChangeRateHandler)}
-                            />
-                            {
-                                !commentLoading
-                                && <Comment />
-                            }
-                        </div>
-                        <div>
-                            {
-                                !board.isView
-                                && blockService.blockMenu === 'openTextMenu'
-                                && <SubTextMenu blockRef={blockRef}/>
-                            }
+                            </button>
                         </div>
                     </div>
-                </BlockProvider.Provider>
-            </TempFileProvider.Provider>
-        </BoardProvider.Provider>
+                    <div>
+                        {
+                            !isNewBoard
+                            && board.isView
+                            && <BoardInfo board={board}/>
+                        }
+                    </div>
+                    <div className={['flex flex-col', board.isView ? 'gap-2' : 'gap-4'].join(' ')}>
+                        {
+                            board.data.content.list.map((item, index) => {
+                                return <Block key={'block' + index}
+                                              blockRef={blockRef}
+                                              onChangeHandler={e => {
+                                                  onChangeHandler(e, item.seq)
+                                              }}
+                                              onKeyDownHandler={e => {
+                                                  onKeyDownHandler(e, item.seq)
+                                              }}
+                                              onKeyUpHandler={e => {
+                                                  onKeyUpHandler(e, item.seq)
+                                              }}
+                                              onClickAddHandler={() => addBlockHandler(item.seq)}
+                                              onClickDeleteHandler={onClickDeleteHandler}
+                                              {...item}
+                                />
+                            })
+                        }
+                    </div>
+                    <div>
+                        {
+                            isNewBoard
+                            && <div className={'flex gap-1 justify-end'}>
+                            <button
+                              className={'w-full rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                              onClick={() => debounce(() => submitHandler(true))}
+                            >작성
+                            </button>
+                          </div>
+                        }
+                    </div>
+                    <Rate newBoard={isNewBoard}
+                          onClick={() => debounce(onChangeRateHandler)}
+                    />
+                    {
+                        !commentLoading
+                        && <Comment />
+                    }
+                </div>
+                <div>
+                    {
+                        !board.isView
+                        && blockService.blockMenu === 'openTextMenu'
+                        && <SubTextMenu blockRef={blockRef}/>
+                    }
+                </div>
+            </div>
+        </>
     )
 }

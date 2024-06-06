@@ -28,16 +28,21 @@
            </if>
     </select>
     <select id="findList" resultMap="BoardResultMapBoard">
-        SELECT *,
-               m.id as member_pk,
-               b.id as board_pk,
-               f.id as file_pk
+        SELECT *
+             , m.id AS member_pk
+             , b.id AS board_pk
+             , f.id AS file_pk
+             , (SELECT count(*)
+                  FROM board_comment bc
+                 WHERE bc.board_pk  = b.id
+                   AND b.is_use     = 1
+             ) AS comment_count
           FROM board b
           JOIN member m
-            ON m.id = b.member_pk
+            ON m.id            = b.member_pk
           LEFT OUTER JOIN file f
-            ON f.table_ref_pk = m.id
-           AND f.is_use = 1
+            ON f.table_ref_pk  = m.id
+           AND f.is_use        = 1
            AND f.table_code_pk = (SELECT t.id
                                     FROM table_code t
                                    WHERE t.table_name = 'member')
@@ -106,6 +111,7 @@
 
     <resultMap id="BoardResultMapBoard" type="com.anamensis.server.resultMap.BoardResultMap$Board">
         <id property="id" column="id"/>
+        <result property="commentCount" column="comment_count"/>
         <association property="board" resultMap="BoardEntity" />
         <association property="member" resultMap="MemberEntity" />
         <association property="file" resultMap="FileEntity" />

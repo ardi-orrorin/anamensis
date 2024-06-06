@@ -44,8 +44,8 @@ public class UserService implements ReactiveUserDetailsService {
 
     public Mono<Member> findUserByUserId(String userId, String pwd) {
         return Mono.justOrEmpty(memberMapper.findMemberByUserId(userId))
-                .switchIfEmpty(Mono.error(new RuntimeException("User not found")))
                 .onErrorMap(e -> new RuntimeException("User not found"))
+                .switchIfEmpty(Mono.error(new RuntimeException("User not found")))
                 .doOnNext(user -> {
                     if (!bCryptPasswordEncoder.matches(pwd, user.getPwd())) {
                         throw new RuntimeException("Password not matched");
@@ -72,11 +72,7 @@ public class UserService implements ReactiveUserDetailsService {
     public Mono<Boolean> updatePoint(long memberPk, int point) {
         if(memberPk == 0) return Mono.error(new RuntimeException("User not found"));
         if(point <= 0) return Mono.error(new RuntimeException("Point must be greater than 0"));
-        return Mono.fromCallable(() -> memberMapper.updatePoint(memberPk, point))
-                .flatMap(i ->
-                    i == 1 ? Mono.just(true)
-                    : Mono.error(new RuntimeException("Update point failed"))
-                )
+        return Mono.fromCallable(() -> memberMapper.updatePoint(memberPk, point) > 0)
                 .onErrorReturn(false);
     }
 
@@ -86,51 +82,42 @@ public class UserService implements ReactiveUserDetailsService {
 
     public Mono<Boolean> editAuth(long memberPk, boolean isAuth, AuthType authType) {
         if(memberPk == 0) return Mono.error(new RuntimeException("User not found"));
-        return Mono.fromCallable(() -> memberMapper.editAuth(memberPk, isAuth, authType))
-                .map(i -> i > 0)
+        return Mono.fromCallable(() -> memberMapper.editAuth(memberPk, isAuth, authType) > 0)
                 .onErrorReturn(false);
     }
 
 
     public Mono<Member> saveUser(UserRequest.Register user) {
-        return Mono.fromCallable(()-> UserRequest.Register.transToUser(user))
-                   .doOnNext(u -> {
-                       u.setPwd(bCryptPasswordEncoder.encode(u.getPwd()));
-                       u.setCreateAt(LocalDateTime.now());
-                       u.setSAuthType(AuthType.NONE);
-                   })
-                   .doOnNext(u -> {
-                       pointCodeMapper.selectByIdOrName(0,ATTENDANCE_POINT_CODE_PREFIX + "1")
-                           .ifPresentOrElse(
-                               pc -> u.setPoint(pc.getPoint()),
-                               () -> new RuntimeException("Point code not found")
-                           );
-                   })
-                   .doOnNext(memberMapper::save)
-                   .publishOn(Schedulers.boundedElastic())
-                   .doOnNext(u -> generateRole(u, RoleType.USER)
-                           .doOnNext(memberMapper::saveRole)
-                           .subscribe()
-                   )
-                   .onErrorMap(e -> new DuplicateUserException(e.getMessage(), HttpStatus.BAD_REQUEST));
-    }
 
-//    public Mono<Integer> saveRole(Tuple2<UserDetails, RoleType> tuple) {
-//        return tuple.mapT1(ud -> findUserByUserId(ud.getUsername()))
-//                .mapT1(user -> user.flatMap(u -> generateRole(u, tuple.getT2()))
-//                )
-//                .mapT1(user -> user.map(memberMapper::saveRole))
-//                .getT1();
-//
-//    }
+        Member member = UserRequest.Register.transToUser(user);
+        member.setPwd(bCryptPasswordEncoder.encode(member.getPwd()));
+        member.setCreateAt(LocalDateTime.now());
+        member.setSAuthType(AuthType.NONE);
+
+        try {
+            pointCodeMapper.selectByIdOrName(0,ATTENDANCE_POINT_CODE_PREFIX + "1")
+                    .ifPresentOrElse(
+                            pc -> member.setPoint(pc.getPoint()),
+                            () -> new RuntimeException("Point code not found")
+                    );
+            memberMapper.save(member);
+        } catch (Exception e) {
+            return Mono.error(new RuntimeException("User not save"));
+        }
+
+
+        return generateRole(member, RoleType.USER)
+                .doOnNext(memberMapper::saveRole)
+                .flatMap(u -> Mono.just(member))
+                .onErrorMap(e -> new DuplicateUserException(e.getMessage(), HttpStatus.BAD_REQUEST));
+    }
 
     public Mono<Boolean> updateUser(Member member) {
         if(member.getName() == null && member.getEmail() == null && member.getPhone() == null) {
             return Mono.error(new RuntimeException("Name or Email or Phone number is required"));
         }
 
-        return Mono.fromCallable(() -> memberMapper.update(member))
-                .map(i -> i == 1)
+        return Mono.fromCallable(() -> memberMapper.update(member) > 0)
                 .onErrorReturn(false);
     }
 

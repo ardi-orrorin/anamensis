@@ -23,9 +23,8 @@ public class RateService {
         String userKey = String.format(USER_BOARD_PREFIX, userPk);
         String userValue = String.valueOf(boardPk);
 
-        return Mono.fromCallable(() -> redisTemplate.boundSetOps(rateKey).add(rateValue))
-                .doOnNext($ -> redisTemplate.boundSetOps(userKey).add(userValue))
-                .map(result -> result == 1)
+        redisTemplate.boundSetOps(rateKey).add(rateValue);
+        return Mono.fromCallable(() -> redisTemplate.boundSetOps(userKey).add(userValue) > 0)
                 .onErrorReturn(false);
     }
 
@@ -36,9 +35,9 @@ public class RateService {
         String userKey = String.format(USER_BOARD_PREFIX, userPk);
         String userValue = String.valueOf(boardPk);
 
-        return Mono.just(redisTemplate.boundSetOps(rateKey).remove(rateValue))
-                .doOnNext($ -> redisTemplate.boundSetOps(userKey).remove(userValue))
-                .map(result -> result == 1);
+        redisTemplate.boundSetOps(rateKey).remove(rateValue);
+        return Mono.fromCallable(() -> redisTemplate.boundSetOps(userKey).remove(userValue) > 0)
+                .onErrorReturn(false);
     }
 
     public Mono<Boolean> hasRate(long boardPk, long memberPk) {
@@ -51,6 +50,6 @@ public class RateService {
     public Mono<Long> countRate(long boardPk) {
         String key = String.format(RATE_PREFIX, boardPk);
 
-        return Mono.just(redisTemplate.boundSetOps(key).size());
+        return Mono.fromCallable(() -> redisTemplate.boundSetOps(key).size());
     }
 }

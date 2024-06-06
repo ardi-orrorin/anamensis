@@ -41,14 +41,12 @@ public class WebSysService {
     }
 
     public Mono<Boolean> update(WebSys webSys) {
-        return Mono.fromCallable(() -> webSysMapper.update(webSys))
-                .map(i -> i == 1)
+        return Mono.fromCallable(() -> webSysMapper.update(webSys) > 0)
                 .onErrorReturn(false);
     }
 
     public Mono<Boolean> deleteByCode(String code) {
-        return Mono.fromCallable(()-> webSysMapper.deleteByCode(code))
-                .map(i -> i == 1)
+        return Mono.fromCallable(()-> webSysMapper.deleteByCode(code) > 0)
                 .onErrorReturn(false);
     }
 

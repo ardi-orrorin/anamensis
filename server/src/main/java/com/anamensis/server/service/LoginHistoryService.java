@@ -39,11 +39,12 @@ public class LoginHistoryService {
                 .createAt(LocalDateTime.now())
                 .build();
 
-        return Mono.fromCallable(() -> loginHistoryMapper.save(loginHistory, member))
-                .onErrorMap(e -> new RuntimeException("LoginHistory save failed"))
-                .flatMap(i ->
-                    i == 1 ? Mono.empty()
-                           : Mono.error(new RuntimeException("LoginHistory save failed"))
-                );
+        try {
+            loginHistoryMapper.save(loginHistory, member);
+        } catch (Exception e) {
+            return Mono.error(new RuntimeException("LoginHistory save failed"));
+        }
+
+        return Mono.empty();
     }
 }

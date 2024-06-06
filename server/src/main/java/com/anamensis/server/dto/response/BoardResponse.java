@@ -97,6 +97,50 @@ public class BoardResponse {
         }
     }
 
+
+    @Getter
+    @Builder
+    @Setter
+    public static class ExContent {
+
+        private long id;
+
+        private String title;
+
+        private long categoryPk;
+
+        private Map<String, Object> content;
+
+        private String writer;
+
+        private String profileImage;
+
+        private long viewCount;
+
+        private long rate;
+
+        private java.util.List<BoardCommentResponse.Comment> comments;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime createdAt;
+
+        public static ExContent from(Content board, java.util.List<BoardCommentResponse.Comment> comments) {
+            ExContent.ExContentBuilder builder = ExContent.builder()
+                    .id(board.getId())
+                    .title(board.getTitle())
+                    .categoryPk(board.getCategoryPk())
+                    .content(board.getContent())
+                    .writer(board.getWriter())
+                    .viewCount(board.getViewCount())
+                    .createdAt(board.getCreatedAt())
+                    .comments(comments)
+                    .profileImage(board.getProfileImage());
+
+            return builder.build();
+        }
+    }
+
+
     @Getter
     @Builder
     @Setter

@@ -23,6 +23,8 @@ export interface BlockProviderI {
     setBlockService: Dispatch<SetStateAction<BlockService>>
     commentService: CommentService;
     setCommentService: Dispatch<SetStateAction<CommentService>>
+    selectedBlock: String;
+    setSelectedBlock: Dispatch<SetStateAction<String>>
 }
 
 

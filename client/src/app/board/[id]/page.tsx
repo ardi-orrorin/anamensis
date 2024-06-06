@@ -8,28 +8,18 @@ import {BlockI, BoardI, CommentI, DeleteCommentI} from "@/app/board/{services}/t
 import {blockTypeList} from "@/app/board/{components}/block/list";
 import BlockProvider, {BlockService, CommentService} from "@/app/board/{services}/BlockProvider";
 import BoardProvider, {BoardService} from "@/app/board/{services}/BoardProvider";
-import {
-    faComment,
-    faDownLeftAndUpRightToCenter,
-    faUpRightAndDownLeftFromCenter
-} from "@fortawesome/free-solid-svg-icons";
+import {faDownLeftAndUpRightToCenter, faUpRightAndDownLeftFromCenter} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import TempFileProvider, {TempFileI} from "@/app/board/{services}/TempFileProvider";
-import Image from "next/image";
-import {faHeart} from "@fortawesome/free-solid-svg-icons/faHeart";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import SubTextMenu from "@/app/board/{components}/SubTextMenu";
 import {useSearchParams} from "next/navigation";
-import Head from "next/head";
 import Comment, {SaveComment} from "@/app/board/[id]/{components}/comment";
 import Rate from "@/app/board/[id]/{components}/rate";
 import BoardTitle from "@/app/board/[id]/{components}/boardTitle";
 import HeaderBtn from "@/app/board/[id]/{components}/headerBtn";
 import BoardInfo from "@/app/board/[id]/{components}/boardInfo";
-import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import CommentModal from "@/app/board/[id]/{components}/commentModal";
-import {randomUUID} from "crypto";
 
 export interface RateInfoI {
     id      : number;
@@ -40,6 +30,8 @@ export interface RateInfoI {
 export default function Page({params}: {params : {id: string}}) {
 
     const [board, setBoard] = useState<BoardService>({} as BoardService);
+
+    const [selectedBlock, setSelectedBlock] = useState<String>('');
 
     const [commentService, setCommentService] = useState<CommentService>({} as CommentService);
 
@@ -69,14 +61,15 @@ export default function Page({params}: {params : {id: string}}) {
 
     const searchParams = useSearchParams();
 
-    const defaultBlock:BlockI = useMemo(()=>(
-        {seq: 0, value: '', code: '00005', textStyle: {}, hash: Date.now().toString() + '-0'}
-    ),[]);
+    const defaultBlock:BlockI = {seq: 0, value: '', code: '00005', textStyle: {}, hash: Date.now().toString() + '-0'};
 
     const shortList = useMemo(()=> (
         blockTypeList.map(item => ({ command: item.command, code: item.code}))
     ), []);
 
+    useEffect(() => {
+        setSelectedBlock(window.location.hash.replace('#block-', '') || '');
+    },[]);
 
 
     useEffect(() => {
@@ -139,7 +132,6 @@ export default function Page({params}: {params : {id: string}}) {
                 call: 'Proxy'
             })
             .then(res => {
-                console.log(res.data)
                 setComment(res.data);
             })
             .finally(() => {
@@ -174,13 +166,13 @@ export default function Page({params}: {params : {id: string}}) {
         debounce(fetch);
     },[params.id]);
 
-    const addBlock = useCallback((seq: number, init: boolean) => {
+    const addBlock = (seq: number, init: boolean) => {
         const block = {...defaultBlock};
         if(!init) {
             block.seq = seq + 0.1;
         }
         return block;
-    },[]);
+    };
 
     const validation = useCallback(() => {
         const title = board.data.title !== '';
@@ -271,7 +263,7 @@ export default function Page({params}: {params : {id: string}}) {
         list.sort((a, b) => a.seq - b.seq)
             .map((item, index) => {
                 item.seq = index;
-                item.hash = Date.now().toString() + '-' + index;
+                item.hash = item.hash.split('-')[0] + '-' + index;
                 return item;
         });
 
@@ -303,8 +295,7 @@ export default function Page({params}: {params : {id: string}}) {
 
         let newList = list.filter(item => item.seq !== seq);
         if (newList?.length === 0) {
-            newList = [{seq, value: '', code: '00005', textStyle: {}, hash: Date.now().toString() + '-' + seq}];
-            console.log(newList);
+            newList = [{seq, value: '', code: '00005', textStyle: {}, hash: Date.now() + '-' + seq}];
         }
 
         setBoard({
@@ -410,7 +401,8 @@ export default function Page({params}: {params : {id: string}}) {
             }}>
                 <BlockProvider.Provider value={{
                     blockService, setBlockService,
-                    commentService, setCommentService
+                    commentService, setCommentService,
+                    selectedBlock, setSelectedBlock,
                 }}>
                     <div className={'p-5 flex flex-col gap-5 justify-center items-center'}>
                         <div className={`w-full flex flex-col gap-3 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-1/2'}`}>

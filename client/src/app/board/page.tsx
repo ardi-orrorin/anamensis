@@ -18,10 +18,11 @@ interface BoardListI {
 }
 
 type BoardListPrams = {
-    size: string;
-    type: string;
-    value: string;
-    categoryPk: string;
+    size       : string;
+    type       : string;
+    value      : string;
+    categoryPk : string;
+    page       : string;
 }
 
 export interface GetProps {
@@ -40,7 +41,7 @@ const getServerSideProps: GetServerSideProps<GetProps> = async (context) => {
 
 export default async function Page(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const {searchParams} = props;
-    const {categoryPk} = searchParams as BoardListPrams;
+    const {categoryPk, page, value, size, type} = searchParams as BoardListPrams;
     const data = await getData(searchParams as BoardListPrams);
     const maxIndex = data.page.total - ((data.page.page - 1) * data.page.size);
     const isLogin = cookies().get('next.access.token') || cookies().get('next.refresh.token') !== undefined;
@@ -214,22 +215,21 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                         검색
                     </button>
                 </div>
+                <input type={'text'} hidden={true} defaultValue={page || 1} name={'page'}/>
             </form>
         </div>
     )
 }
 
-
-
 const getData = async (req: BoardListPrams) => {
-    const {size, type, value,categoryPk} = req
+    const {size, type, value,categoryPk, page} = req
 
-    const params = {[type]: value, size, categoryPk}
+    const params = {size, categoryPk, page};
     return apiCall<PageResponse<BoardListI>, URLSearchParams>({
         path: '/public/api/boards',
         method: 'GET',
         call: 'Server',
-        params,
+        params : type && value ? {...params, [type]: value} : params,
         isReturnData: true,
     })
 }

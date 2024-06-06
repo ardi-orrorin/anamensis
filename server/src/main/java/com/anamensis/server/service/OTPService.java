@@ -47,12 +47,15 @@ public class OTPService {
 
         String url = GoogleAuthenticatorQRGenerator.getOtpAuthURL("Anamensis", member.getUserId(), key);
 
-        return Mono.fromCallable(() -> otpMapper.disableOTP(member.getId()))
-                .flatMap(i -> Mono.just(otpMapper.insert(otp)))
-                .flatMap(i ->
-                    i > 0 ? Mono.just(url)
-                          : Mono.error(new RuntimeException("insert fail"))
-                );
+        Mono<Integer> disableOTP = Mono.fromCallable(()-> otpMapper.disableOTP(member.getId()));
+        Mono<Integer> insert = Mono.fromCallable(() -> otpMapper.insert(otp));
+
+        return Mono.zip(disableOTP, insert)
+                     .onErrorMap(e -> new RuntimeException("otp insert failed"))
+                     .flatMap(t -> t.getT2() > 0
+                             ? Mono.just(url)
+                             : Mono.error(new RuntimeException("otp insert failed"))
+                     );
 
     }
 
@@ -62,20 +65,12 @@ public class OTPService {
 
         otp.setUse(false);
 
-        return Mono.fromCallable(() -> otpMapper.updateIsUse(otp))
-                .flatMap(i ->
-                    i > 0 ? Mono.just(true)
-                          : Mono.error(new RuntimeException("update fail"))
-                )
+        return Mono.fromCallable(() ->  otpMapper.updateIsUse(otp) > 0)
                 .onErrorReturn(false);
 
     }
     public Mono<Boolean> disableOTP(long memberPk) {
-        return Mono.fromCallable(() -> otpMapper.disableOTP(memberPk))
-                .flatMap(i ->
-                    i > 0 ? Mono.just(true)
-                          : Mono.error(new RuntimeException("“Failed to disable OPT"))
-                )
+        return Mono.fromCallable(() -> otpMapper.disableOTP(memberPk) > 0)
                 .onErrorReturn(false);
     }
 

@@ -19,14 +19,12 @@ public class BoardCommentService {
     }
 
     public Mono<Boolean> save(BoardComment boardComment) {
-        return Mono.fromCallable(() -> boardCommentMapper.save(boardComment))
-                .map(result -> result > 0)
+        return Mono.fromCallable(() -> boardCommentMapper.save(boardComment) > 0)
                 .onErrorReturn(false);
     }
 
     public Mono<Boolean> delete(long id, String userId) {
-        return Mono.fromCallable(() -> boardCommentMapper.delete(id, userId))
-                .map(result -> result > 0)
+        return Mono.fromCallable(() -> boardCommentMapper.delete(id, userId) > 0)
                 .onErrorReturn(false);
     }
 

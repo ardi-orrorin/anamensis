@@ -32,32 +32,36 @@ public class MemberConfigSmtpService {
     }
 
     public Mono<MemberConfigSmtp> save(MemberConfigSmtp userConfigSmtp) {
-        return Mono.fromCallable(()-> {
-                    if (userConfigSmtp.getIsDefault()) {
-                        userConfigSmtpMapper.disabledDefaults(userConfigSmtp.getMemberPk());
-                    }
-                    return userConfigSmtp;
-                })
-                .doOnNext(userConfigSmtpMapper::save)
-                .onErrorMap(throwable -> new RuntimeException("UserConfigSmtp not save"));
+        try {
+            if (userConfigSmtp.getIsDefault()) {
+                userConfigSmtpMapper.disabledDefaults(userConfigSmtp.getMemberPk());
+            }
+
+            userConfigSmtpMapper.save(userConfigSmtp);
+
+        } catch (Exception e) {
+            return Mono.error(new RuntimeException("UserConfigSmtp not save"));
+        }
+        return Mono.just(userConfigSmtp);
     }
 
     public Mono<Boolean> update(MemberConfigSmtp userConfigSmtp) {
-        return Mono.fromCallable(() -> userConfigSmtpMapper.update(userConfigSmtp))
-                .flatMap(b ->
-                    b > 0 ? Mono.just(true)
-                          : Mono.error(new RuntimeException("UserConfigSmtp not update"))
-                );
+        return userConfigSmtpMapper.update(userConfigSmtp) > 0
+                ? Mono.just(true)
+                : Mono.error(new RuntimeException("UserConfigSmtp not update"));
+
     }
 
     public Mono<Boolean> testConnection(MemberConfigSmtp userConfigSmtp) {
-        return Mono.fromRunnable(() -> new MailProvider.Builder()
-                        .config(userConfigSmtp)
-                        .build()
-                        .testConnection()
-                )
-                .thenReturn(true)
-                .onErrorReturn(false);
+        try {
+            new MailProvider.Builder()
+                    .config(userConfigSmtp)
+                    .build()
+                    .testConnection();
+        } catch (Exception e) {
+            return Mono.just(false);
+        }
+        return Mono.just(true);
     }
 
     public Mono<Boolean> disabled(long id, long memberPk) {

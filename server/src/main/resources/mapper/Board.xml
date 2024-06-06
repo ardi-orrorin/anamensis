@@ -60,7 +60,7 @@
         SELECT *
           FROM board b
           JOIN member m
-               ON m.id = b.member_pk
+            ON m.id = b.member_pk
           LEFT OUTER JOIN file f
             ON f.table_ref_pk = m.id
            AND f.is_use        = 1

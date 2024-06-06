@@ -69,7 +69,7 @@ export default function Page({children} : {children: ReactNode}) {
                             menuItems.map((item, index) => {
                                 return (
                                     <li key={`board-${index}`} className={'w-full py-1 px-2 hover:bg-blue-200 duration-500 rounded'}>
-                                        <Link className={'flex gap-2 w-full'} href={item.url}>
+                                        <Link className={'flex gap-2 w-full'} href={item.url} onClick={onClickHandler}>
                                             <span className={'w-6 text-center'}>
                                                 <FontAwesomeIcon icon={item.icon} height={8} />
                                             </span>

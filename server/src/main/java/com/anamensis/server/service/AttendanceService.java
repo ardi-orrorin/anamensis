@@ -18,14 +18,14 @@ public class AttendanceService {
     private final AttendanceMapper attendanceMapper;
 
     public Mono<Attendance> findByMemberPk(long memberPk) {
-        return Mono.fromCallable(() -> attendanceMapper.findByMemberPk(memberPk))
-                .flatMap(attend ->
-                    attend.map(Mono::just)
-                            .orElseGet(() -> this.init(memberPk)
-                                .then(Mono.defer(() -> Mono.justOrEmpty(attendanceMapper.findByMemberPk(memberPk))))
-                                .switchIfEmpty(Mono.error(new RuntimeException("출석 정보 조회 실패")))
-                            )
-                );
+        Optional<Attendance> attend =  attendanceMapper.findByMemberPk(memberPk);
+        if(attend.isEmpty()) {
+            attendanceMapper.init(memberPk, LocalDate.now()) ;
+            attend = attendanceMapper.findByMemberPk(memberPk);
+        }
+
+        return Mono.justOrEmpty(attend)
+                .switchIfEmpty(Mono.error(new RuntimeException("출석 정보 조회 실패")));
     }
 
     public Mono<Void> init(long memberPk) {

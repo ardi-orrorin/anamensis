@@ -48,7 +48,6 @@ public class RateController {
             @PathVariable(name = "id") long boardPk,
             @AuthenticationPrincipal UserDetails user
     ) {
-        log.info("addRate: {}", boardPk);
         return userService.findUserByUserId(user.getUsername())
                 .flatMap(u -> rateService.addRate(boardPk, u.getId()))
                 .flatMap($ -> rateService.countRate(boardPk))

@@ -110,6 +110,12 @@ class UserControllerTest {
                 .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .exchange();
 
+        WebTestClient.ResponseSpec req3 =  wtc.post()
+                .uri("/public/api/user/login")
+                .body(BodyInserters.fromValue("{\"username\":\"d-member-4\",\"password\":\"d-member-4\"}"))
+                .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .exchange();
+
         req2.expectStatus().isOk()
             .expectBody()
             .jsonPath("$.authType").isEqualTo("OTP")

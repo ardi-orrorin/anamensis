@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 
@@ -24,6 +25,7 @@ public class BoardService {
 
     public Flux<BoardResponse.List> findAll(Page page, Board board) {
         return Flux.fromIterable(boardMapper.findList(page, board))
+                .publishOn(Schedulers.boundedElastic())
                 .map(BoardResponse.List::from);
     }
 

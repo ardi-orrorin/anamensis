@@ -17,7 +17,6 @@ import com.anamensis.server.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,8 +25,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.List;
 
 
 @RequiredArgsConstructor
@@ -44,35 +42,31 @@ public class UserController {
     private final TokenProvider tokenProvider;
     private final FileService fileService;
 
-    private final VirtualThreadTaskExecutor virtualThreadTaskExecutor;
-
-
-
     @PublicAPI
     @PostMapping("login")
     public Mono<UserResponse.Auth> login(
             @RequestBody UserRequest.Login user
     ) {
 
-        AtomicReference<Member> member = new AtomicReference<>() {{
-            set(new Member());
-        }};
+        Mono<Member> member = userService.findUserByUserId(user.getUsername(), user.getPassword())
+                .subscribeOn(Schedulers.boundedElastic())
+                .share();
 
-        return userService.findUserByUserId(user.getUsername(), user.getPassword())
-                    .doOnNext(member::set)
-                    .flatMap(u -> {
-                        if(AuthType.EMAIL.equals(u.getSAuthType())) {
-                            EmailVerify emailVerify = new EmailVerify();
-                            emailVerify.setEmail(u.getEmail());
-                            return emailVerifyService.insert(emailVerify);
-                        }
-                        return Mono.just("");
-                    })
-                   .map(u -> UserResponse.Auth.builder()
-                           .authType(member.get().getSAuthType())
-                           .verity(member.get().getSAuth())
-                           .build()
-                   );
+        Mono<String> emailVerifyResult = member.flatMap(u -> {
+                    if(AuthType.EMAIL.equals(u.getSAuthType())) {
+                        EmailVerify emailVerify = new EmailVerify();
+                        emailVerify.setEmail(u.getEmail());
+                        return emailVerifyService.insert(emailVerify);
+                    }
+                    return Mono.just("");
+                });
+
+        return Mono.zip(member, emailVerifyResult)
+                .map(t -> UserResponse.Auth.builder()
+                       .authType(t.getT1().getSAuthType())
+                       .verity(t.getT1().getSAuth())
+                       .build()
+                );
     }
 
     @PublicAPI
@@ -81,12 +75,24 @@ public class UserController {
             @RequestBody UserRequest.Login user,
             Device device
     ) {
+
+        Mono<MemberResultMap> member = userService.findUserInfo(user.getUsername())
+                .subscribeOn(Schedulers.boundedElastic())
+                .share();
+
+        Mono<Token> token = member.flatMap(u -> generateToken(u.getMember().getUserId()))
+                .subscribeOn(Schedulers.boundedElastic());
+
+        member.flatMap(u -> loginHistoryService.save(device, u.getMember()))
+                .subscribeOn(Schedulers.boundedElastic())
+                .subscribe();
+
         if(AuthType.OTP.equals(user.getAuthType().toUpperCase())) {
-            return otpLogin(user, device);
+            return otpLogin(user.getCode().toString(), member, token);
         } else if(AuthType.EMAIL.equals(user.getAuthType().toUpperCase())) {
-            return emailLogin(user, device);
+            return emailLogin(user.getCode().toString(), member, token);
         }
-        return notAuth(user, device);
+        return notAuth(member, token);
     }
 
 
@@ -118,26 +124,28 @@ public class UserController {
 
     @GetMapping("histories")
     public Mono<PageResponse<LoginHistoryResponse.LoginHistory>> histories(
-        Page page,
-        @AuthenticationPrincipal UserDetails userDetails
+            Page page,
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        AtomicInteger total = new AtomicInteger();
-        AtomicReference<Member> member = new AtomicReference<>() {{
-            set(new Member());
-        }};
+        Mono<Member> member = userService.findUserByUserId(userDetails.getUsername())
+                .subscribeOn(Schedulers.boundedElastic())
+                .share();
 
-        return userService.findUserByUserId(userDetails.getUsername())
-                .doOnNext(member::set)
-                .flatMap(u -> loginHistoryService.count(u.getId()))
-                .doOnNext(total::set)
-                .flatMapMany(t -> loginHistoryService.selectAll(member.get(), page))
+        Mono<Integer> count = member.flatMap(u -> loginHistoryService.count(u.getId()))
+                .subscribeOn(Schedulers.boundedElastic());
+
+        Mono<List<LoginHistoryResponse.LoginHistory>> content = member
+                .flatMapMany(t -> loginHistoryService.selectAll(t, page))
                 .map(LoginHistoryResponse.LoginHistory::from)
                 .collectList()
-                .map(content -> {
-                    page.setTotal(total.get());
+                .subscribeOn(Schedulers.boundedElastic());
+
+        return Mono.zip(content, count)
+                .map(t -> {
+                    page.setTotal(t.getT2());
                     return PageResponse.<LoginHistoryResponse.LoginHistory>builder()
                             .page(page)
-                            .content(content)
+                            .content(t.getT1())
                             .build();
                 });
     }
@@ -205,77 +213,48 @@ public class UserController {
     }
 
     private Mono<UserResponse.Login> notAuth(
-            UserRequest.Login user,
-            Device device
+            Mono<MemberResultMap> member,
+            Mono<Token> token
     ){
-
-        AtomicReference<MemberResultMap> memberResultMapAtomic = new AtomicReference<>(){{
-            set(new MemberResultMap());
-        }};
-
-        return userService.findUserByUserId(user.getUsername())
-                .flatMap(u -> userService.findUserInfo(u.getUserId()))
-                .doOnNext(memberResultMapAtomic::set)
-                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
-                .doOnNext(u -> loginHistoryService.save(device, u.getMember()).subscribe())
-                .flatMap(u -> generateToken(u.getMember().getUserId()))
-                .map(token -> UserResponse.Login.transToLogin(memberResultMapAtomic.get(), token));
+        return Mono.zip(member, token)
+                .map(t -> UserResponse.Login.transToLogin(t.getT1(), t.getT2()));
     }
 
     private Mono<UserResponse.Login> emailLogin(
-            UserRequest.Login user,
-            Device device
+            String code,
+            Mono<MemberResultMap> member,
+            Mono<Token> token
     ) {
-        AtomicReference<MemberResultMap> memberResultMapAtomic = new AtomicReference<>(){{
-            set(new MemberResultMap());
-        }};
+        Mono<Boolean> update = member.flatMap(m -> {
+            EmailVerify emailVerify = new EmailVerify();
+            emailVerify.setEmail(m.getMember().getEmail());
+            emailVerify.setCode(code);
+            emailVerify.setExpireAt(LocalDateTime.now());
 
-        return Mono.just(user)
-                .flatMap(u -> userService.findUserInfo(u.getUsername()))
-                .doOnNext(memberResultMapAtomic::set)
-                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
-                .doOnNext(u -> {
-                    EmailVerify emailVerify = new EmailVerify();
-                    emailVerify.setEmail(u.getMember().getEmail());
-                    emailVerify.setCode(String.valueOf(user.getCode()));
-                    emailVerify.setExpireAt(LocalDateTime.now());
+            return emailVerifyService.updateIsUse(emailVerify);
+        })
+        .subscribeOn(Schedulers.boundedElastic());
 
-                    emailVerifyService.updateIsUse(emailVerify)
-                            .subscribe();
-                })
-                .doOnNext(u -> loginHistoryService.save(device, u.getMember()).subscribe())
-                .publishOn(Schedulers.boundedElastic())
-                .flatMap(u -> generateToken(u.getMember().getUserId()))
-                .map(token -> UserResponse.Login.transToLogin(memberResultMapAtomic.get(), token));
+        return Mono.zip(member, update, token)
+                .map(t -> UserResponse.Login.transToLogin(t.getT1(), t.getT3()));
     }
 
     private Mono<UserResponse.Login> otpLogin(
-            UserRequest.Login user,
-            Device device
+            String code,
+            Mono<MemberResultMap> member,
+            Mono<Token> token
     ) {
-        AtomicReference<Member> memberAtomic = new AtomicReference<>(){{
-            set(new Member());
-        }};
-
-        AtomicReference<Token> tokenAtomic = new AtomicReference<>() {{
-            set(Token.builder().build());
-        }};
-
-        return userService.findUserByUserId(user.getUsername())
-                .doOnNext(memberAtomic::set)
-                .flatMap(u -> otpService.selectByMemberPk(u.getId()))
-                .flatMap(otpResult -> otpService.verify(otpResult.getHash(), user.getCode()))
+        Mono<Boolean> update = member
+                .flatMap(u -> otpService.selectByMemberPk(u.getMemberPk()))
+                .flatMap(otpResult -> otpService.verify(otpResult.getHash(), Integer.parseInt(code)))
                 .flatMap(result -> {
                     if (!result) return  Mono.error(new RuntimeException("OTP code is invalid"));
                     return Mono.just(true);
                 })
-                .flatMap($ -> loginHistoryService.save(device, memberAtomic.get()))
-                .then(Mono.defer(() -> generateToken(memberAtomic.get().getUserId())))
-                .doOnNext(tokenAtomic::set)
-                .flatMap(tokenResult -> userService.findUserInfo(memberAtomic.get().getUserId()))
-                .map(memberResultMap ->
-                    UserResponse.Login.transToLogin(memberResultMap, tokenAtomic.get())
-                );
+                .subscribeOn(Schedulers.boundedElastic());
+
+        return Mono.zip(member, update, token)
+                .map(t -> UserResponse.Login.transToLogin(t.getT1(), t.getT3()));
     }
 
     private Mono<Token> generateToken(String userId) {

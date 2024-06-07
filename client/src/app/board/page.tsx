@@ -230,6 +230,7 @@ const getData = async (req: BoardListPrams) => {
         method: 'GET',
         call: 'Server',
         params : type && value ? {...params, [type]: value} : params,
+        setAuthorization: true,
         isReturnData: true,
     })
 }

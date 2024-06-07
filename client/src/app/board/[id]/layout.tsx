@@ -42,7 +42,6 @@ export default function Page({children, params} : {children: ReactNode, params: 
     useEffect(() => {
         if(!isNewBoard) return ;
         if(!searchParams?.get('categoryPk') || searchParams.get('categoryPk') === 'undefined') {
-
             alert('잘못된 접근입니다.');
             location.href = '/board/';
         }

@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
         path: '/public/api/boards/' + id,
         method: 'GET',
         call: 'Server',
+        setAuthorization: true,
         isReturnData: true,
     });
 

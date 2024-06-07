@@ -8,7 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.stereotype.Component;
@@ -37,35 +39,90 @@ public class LogHistoryFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        String path = exchange.getRequest().getPath().toString();
-        HttpMethod method = exchange.getRequest().getMethod();
+        AtomicReference<byte[]> bodyByte = new AtomicReference<>();
+
+        Mono<ServerWebExchange> fileApi   = fileApi(exchange);
+        Mono<ServerWebExchange> noBodyApi = noBodyApi(exchange);
+        Mono<ServerWebExchange> bodyApi   = bodyApi(exchange, bodyByte);
+
+        return Mono.zip(fileApi, noBodyApi, bodyApi)
+                .flatMap(t ->
+                    chain.filter(
+                        bodyByte.get() != null
+                        ? newRequest(bodyByte.get(), exchange)
+                        : exchange
+                    )
+                );
+    }
+
+    private boolean isFileApi(ServerWebExchange ex) {
         String fileRegexp = "/api/files/\\S+";
+        String publicFileRegexp = "/public" + fileRegexp;
+        String path = ex.getRequest().getPath().toString();
+        HttpHeaders headers = ex.getRequest().getHeaders();
+        boolean isEventStream =  headers.getAccept().contains(MediaType.TEXT_EVENT_STREAM);
 
-        if(path.matches(fileRegexp)) {
-            return chain.filter(exchange);
+        return  !isEventStream
+                && (path.matches(fileRegexp) || path.matches(publicFileRegexp))
+                && (headers.getContentType() != null && headers.getContentType().getType().contains("multipart"));
+    }
+
+    private Mono<ServerWebExchange> fileApi(ServerWebExchange exchange) {
+        if(!this.isFileApi(exchange)) {
+            return Mono.just(exchange);
         }
 
-        if(HttpMethod.GET.equals(method) || HttpMethod.DELETE.equals(method)) {
-            return logWrite(new byte[0], exchange)
-                    .subscribeOn(Schedulers.boundedElastic())
-                    .then(chain.filter(exchange));
+        return exchange.getMultipartData()
+                .flatMap(data -> {
+                    byte[] file = data.getFirst("file")
+                            .headers().getContentDisposition()
+                            .getFilename().getBytes();
+                    return logWrite(file, exchange);
+                })
+                .subscribeOn(Schedulers.boundedElastic())
+                .onErrorResume(e -> {
+                    logWrite("upload File".getBytes(), exchange)
+                            .subscribe();
+                    return Mono.empty();
+                })
+                .then(Mono.just(exchange));
+    }
+
+    private Mono<ServerWebExchange> noBodyApi(ServerWebExchange exchange) {
+        if(this.isFileApi(exchange)) {
+            return Mono.just(exchange);
         }
 
-        if(HttpMethod.PUT.equals(method) || HttpMethod.POST.equals(method) || HttpMethod.PATCH.equals(method)) {
-            Flux<DataBuffer> body = exchange.getRequest().getBody().share();
-            AtomicReference<byte[]> bodyByte = new AtomicReference<>();
-            return DataBufferUtils.join(body)
-                    .map(this::toBytes)
-                    .doOnNext(bodyByte::set)
-                    .publishOn(Schedulers.boundedElastic())
-                    .flatMap(bytes -> logWrite(bytes, exchange))
-                    .then(Mono.defer(() -> {
-                        ServerWebExchange newExchange = newRequest(bodyByte.get(), exchange);
-                        return chain.filter(newExchange);
-                    }));
+        HttpMethod method = exchange.getRequest().getMethod();
+        if(!HttpMethod.GET.equals(method) && !HttpMethod.DELETE.equals(method)) {
+            return Mono.just(exchange);
         }
 
-        return chain.filter(exchange);
+        return logWrite(new byte[0], exchange)
+                .subscribeOn(Schedulers.boundedElastic())
+                .then(Mono.just(exchange));
+    }
+
+    private Mono<ServerWebExchange> bodyApi(ServerWebExchange exchange, AtomicReference<byte[]> bodyByte) {
+        if(this.isFileApi(exchange)) {
+            return Mono.just(exchange);
+        }
+
+        HttpMethod method = exchange.getRequest().getMethod();
+
+        if(!HttpMethod.PUT.equals(method) && !HttpMethod.POST.equals(method) && !HttpMethod.PATCH.equals(method)) {
+            return Mono.just(exchange);
+        }
+
+        Flux<DataBuffer> body = exchange.getRequest().getBody();
+
+        return DataBufferUtils.join(body)
+                .map(this::toBytes)
+                .doOnNext(bodyByte::set)
+                .publishOn(Schedulers.boundedElastic())
+                .flatMap(bytes -> logWrite(bytes, exchange))
+                .map(ex -> newRequest(bodyByte.get(), ex));
+
     }
 
     private byte[] toBytes (DataBuffer dataBuffer) {
@@ -75,7 +132,7 @@ public class LogHistoryFilter implements WebFilter {
         return bytes;
     }
 
-    private Mono<Void> logWrite(byte[] bytes, ServerWebExchange ex) {
+    private Mono<ServerWebExchange> logWrite(byte[] bytes, ServerWebExchange ex) {
         String path = ex.getRequest().getPath().toString();
         String body = new String(bytes, StandardCharsets.UTF_8);
         String header = ex.getRequest().getHeaders().toString();
@@ -104,8 +161,7 @@ public class LogHistoryFilter implements WebFilter {
                             .build()
                 )
                 .flatMap(logHistoryService::save)
-                .onErrorMap(t -> new RuntimeException("로그 저장에 실패했습니다."))
-                .then();
+                .then(Mono.just(ex));
 
     }
 

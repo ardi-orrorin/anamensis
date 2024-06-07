@@ -23,16 +23,12 @@ public class AuthConverter implements ServerAuthenticationConverter {
 
     @Override
     public Mono<Authentication> convert(ServerWebExchange exchange) {
-        return Mono.justOrEmpty(exchange)
-                .map(ServerWebExchange::getRequest)
-                .mapNotNull(request -> request.getHeaders().getFirst("Authorization"))
-                .doOnNext(authHeader -> {
-                    if(authHeader == null || !authHeader.startsWith("Bearer ")) {
-                        throw new MalformedJwtException("잘못된 토큰입니다.");
-                    }
-                })
-                .map(authHeader -> authHeader.substring(7))
-                .flatMap(token -> isValidateToken(token, exchange));
+        String auth = exchange.getRequest().getHeaders().getFirst("Authorization");
+        if(auth == null || !auth.startsWith("Bearer ")) {
+            return Mono.empty();
+        }
+        auth = auth.substring(7);
+        return isValidateToken(auth, exchange);
     }
 
     public Mono<Authentication> isValidateToken(String token, ServerWebExchange exchange) {

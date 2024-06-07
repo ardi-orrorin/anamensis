@@ -24,23 +24,6 @@ public class TokenProvider {
     public final long ACCESS_EXP  =  1 * 30 * 60 * 1000;
     public final long REFRESH_EXP = 24 * 60 * 60 * 1000;
 
-    public final long TEMP_EXP = 5 * 60 * 1000;
-
-    public String tempToken(String userId) {
-        SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
-        String type = AuthType.OTP.name();
-        Claims claims = Jwts.claims();
-        claims.put("user", userId);
-        claims.put("type", type);
-        return Jwts.builder()
-                .setClaims(claims)
-                .setExpiration(
-                        new Timestamp(Instant.now().toEpochMilli() + TEMP_EXP)
-                )
-                .signWith(SECRET_KEY)
-                .compact();
-    }
-
     public String generateToken(String userId, boolean isRefresh) {
         SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
         long exp = isRefresh ? REFRESH_EXP : ACCESS_EXP;

@@ -67,7 +67,7 @@ public class SecurityConfig implements WebFluxConfigurer {
                     corsSpec.configurationSource(corsConfigurationSource());
                 })
                 .oauth2Login(Customizer.withDefaults())
-                .addFilterAfter(
+                .addFilterBefore(
                         authenticationWebFilter,
                         SecurityWebFiltersOrder.AUTHENTICATION
                 )

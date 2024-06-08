@@ -241,6 +241,16 @@ class BoardControllerTest {
             })
             .exchange()
             .expectStatus().isOk();
+
+        wtc.get()
+            .uri("/api/user/info")
+            .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(UserResponse.MyPage.class)
+            .consumeWith(result -> {
+                assertTrue(result.getResponseBody().getPoint() > 0);
+            });
     }
 
     @Test

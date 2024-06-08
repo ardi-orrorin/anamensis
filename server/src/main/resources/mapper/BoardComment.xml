@@ -24,6 +24,9 @@
          ORDER BY bc.id
     </select>
     <insert id="save" parameterType="BoardComment">
+        <selectKey keyProperty="id" resultType="int" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
         INSERT INTO board_comment
                (board_pk, content, create_at, user_id, parent_pk, blockSeq)
         VALUES (#{boardPk}, #{content}, #{createAt}, #{userId}, #{parentPk}, #{blockSeq})

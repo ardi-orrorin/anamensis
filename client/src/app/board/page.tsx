@@ -94,13 +94,8 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                             skipIndex.find(pk => pk !== categoryPk) &&
                             <col style={{width: '5%'}}/>
                         }
-
                         <col style={{width: '55%'}}/>
                         <col style={{width: '5%'}}/>
-                        {
-                            skipLike.find(pk => pk !== categoryPk) &&
-                            <col style={{width: '5%'}}/>
-                        }
                         {
                             skipWriter.find(pk => pk !== categoryPk) &&
                             <col style={{width: '10%'}}/>
@@ -115,10 +110,6 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                             }
                             <th className={'border-x border-white border-solid'}>제목</th>
                             <th className={'border-x border-white border-solid'}>View</th>
-                            {
-                                skipLike.find(pk => pk !== categoryPk) &&
-                                <th className={'border-x border-white border-solid'}>Like</th>
-                            }
                             {
                                 skipWriter.find(pk => pk !== categoryPk) &&
                                 <th className={'border-x border-white border-solid'}>작성자</th>
@@ -145,9 +136,17 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                                         <Link href={'./board/' + history.id}
                                               className={'flex items-center w-full h-full my-0 py-0'}
                                         >
-                                            <span>
-                                            { history.title }
-                                            </span>
+                                            <div className={'flex gap-2'}>
+                                                {
+                                                    skipLike.find(pk => pk !== categoryPk)
+                                                    && <span className={'flex justify-center items-center rounded w-7 h-auto bg-blue-400 text-xs text-white'}>
+                                                        { history.rate }
+                                                    </span>
+                                                }
+                                                <span>
+                                                    { history.title }
+                                                </span>
+                                            </div>
                                             {
                                                 history.commentCount > 0 &&
                                                 <span className={'px-2 text-xs text-blue-500'}>
@@ -158,10 +157,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                                         </Link>
                                     </td>
                                     <td className={'py-2 px-3'}>{ history.viewCount }</td>
-                                    {
-                                        skipLike.find(pk => pk !== categoryPk) &&
-                                        <td className={'py-2 px-3'}>{ history.rate }</td>
-                                    }
+
                                     {
                                         skipWriter.find(pk => pk !== categoryPk) &&
                                         <td className={'py-2 px-3 flex gap-2 items-center'}>

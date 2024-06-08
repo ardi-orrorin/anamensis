@@ -65,17 +65,19 @@ VALUES (1, 'member', 1)
      , (3, 'board_comment', 1);
 
 INSERT INTO point_code
-       (id, name, point)
-VALUES (1, 'attend-1', 10)
-     , (2, 'attend-2', 15)
-     , (3, 'attend-3', 15)
-     , (4, 'attend-4', 30)
-     , (5, 'attend-5', 30)
-     , (6, 'attend-6', 50)
-     , (7, 'attend-7', 50)
-     , (8, 'attend-8', 50)
-     , (9, 'attend-9', 50)
-     , (10, 'attend-10', 100);
+        (name, point)
+VALUES ('attend-1', 10)
+     , ('attend-2', 15)
+     , ('attend-3', 15)
+     , ('attend-4', 30)
+     , ('attend-5', 30)
+     , ('attend-6', 50)
+     , ('attend-7', 50)
+     , ('attend-8', 50)
+     , ('attend-9', 50)
+     , ('attend-10', 100)
+     , ('board', 15)
+     , ('board_comment', 5);
 
 INSERT INTO point_history
        (id, table_code_pk, table_ref_pk,

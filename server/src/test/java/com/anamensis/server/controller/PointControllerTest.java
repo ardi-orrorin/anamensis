@@ -104,7 +104,7 @@ class PointControllerTest {
     @DisplayName("포인트 코드를 추가한다.")
     void insert() {
         Map<String, Object> map = new HashMap<>();
-        map.put("id", 11);
+        map.put("id", 13);
         map.put("name", "attend-11");
         map.put("point", 100);
         map.put("isUse", true);
@@ -128,8 +128,8 @@ class PointControllerTest {
             .exchange()
             .expectStatus().isOk()
             .expectBody()
-            .jsonPath("$[10].id").isEqualTo(11)
-            .jsonPath("$[10].name").isEqualTo("attend-11");
+            .jsonPath("$[12].id").isEqualTo(13)
+            .jsonPath("$[12].name").isEqualTo("attend-11");
 
     }
 

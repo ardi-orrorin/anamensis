@@ -169,6 +169,16 @@ class BoardCommentControllerTest {
             .isEqualTo(true);
 
         wtc.get()
+            .uri("/api/user/info")
+            .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(UserResponse.MyPage.class)
+            .consumeWith(result -> {
+                assertTrue(result.getResponseBody().getPoint() > 0);
+            });
+
+        wtc.get()
             .uri(uriBuilder -> uriBuilder
                     .path("/public/api/board/comments")
                     .queryParam("boardPk", 1)
@@ -204,6 +214,8 @@ class BoardCommentControllerTest {
             })
             .exchange()
             .expectStatus().isBadRequest();
+
+
 
     }
 

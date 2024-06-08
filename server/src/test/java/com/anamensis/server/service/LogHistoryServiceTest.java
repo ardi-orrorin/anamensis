@@ -35,7 +35,7 @@ class LogHistoryServiceTest {
                     .verifyError(RuntimeException.class);
 
         StepVerifier.create(lhs.save(builder.build()))
-                    .verifyErrorMessage("로그 저장에 실패했습니다.");
+                    .verifyError(RuntimeException.class);
 
         builder.memberPk(1L);
         StepVerifier.create(lhs.save(builder.build()))

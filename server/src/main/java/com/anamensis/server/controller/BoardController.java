@@ -6,21 +6,22 @@ import com.anamensis.server.dto.StatusType;
 import com.anamensis.server.dto.response.BoardCommentResponse;
 import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.dto.response.StatusResponse;
-import com.anamensis.server.entity.Board;
-import com.anamensis.server.service.BoardCommentService;
-import com.anamensis.server.service.BoardService;
-import com.anamensis.server.service.RateService;
-import com.anamensis.server.service.UserService;
+import com.anamensis.server.entity.*;
+import com.anamensis.server.service.*;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.PackagePrivate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
+import org.springframework.data.redis.connection.zset.Tuple;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.function.Tuple2;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
 @RequestMapping("api/boards")
@@ -32,6 +33,9 @@ public class BoardController {
     private final UserService userService;
     private final RateService rateService;
     private final BoardCommentService boardCommentService;
+    private final PointHistoryService pointHistoryService;
+    private final PointService pointService;
+    private final TableCodeService tableCodeService;
 
     @PublicAPI
     @GetMapping("")
@@ -95,9 +99,40 @@ public class BoardController {
         @RequestBody Board board,
         @AuthenticationPrincipal UserDetails user
     ) {
-        return userService.findUserByUserId(user.getUsername())
-                .doOnNext(u -> board.setMemberPk(u.getId()))
-                .flatMap(u -> boardService.save(board));
+
+        Mono<PointCode> pointCode = pointService.selectByIdOrTableName("board")
+                .subscribeOn(Schedulers.boundedElastic());
+
+        Mono<TableCode> tableCode = tableCodeService.findByIdByTableName(0, "board")
+                .subscribeOn(Schedulers.boundedElastic());
+
+        Mono<Board> insertBoard = userService.findUserByUserId(user.getUsername())
+                .flatMap(u -> {
+                    board.setMemberPk(u.getId());
+                    return boardService.save(board);
+                })
+                .subscribeOn(Schedulers.boundedElastic());
+
+        return Mono.zip(insertBoard, pointCode, tableCode)
+                .doOnNext(t -> {
+                    userService.updatePoint(t.getT1().getMemberPk(), (int) t.getT2().getPoint())
+                            .subscribeOn(Schedulers.boundedElastic())
+                            .subscribe();
+                })
+                .doOnNext(t -> {
+                    PointHistory ph = new PointHistory();
+                    ph.setMemberPk(t.getT1().getMemberPk());
+                    ph.setPointCodePk(t.getT2().getId());
+                    ph.setCreateAt(t.getT1().getCreateAt());
+                    ph.setTableCodePk(t.getT3().getId());
+                    ph.setTableRefPk(t.getT1().getId());
+
+                    pointHistoryService.insert(ph)
+                            .subscribeOn(Schedulers.boundedElastic())
+                            .subscribe();
+                })
+                .subscribeOn(Schedulers.boundedElastic())
+                .map(Tuple2::getT1);
     }
 
     @PutMapping("/{id}")

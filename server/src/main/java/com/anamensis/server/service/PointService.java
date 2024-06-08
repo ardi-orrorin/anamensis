@@ -33,6 +33,11 @@ public class PointService {
                 .switchIfEmpty(Mono.error(new RuntimeException("not found")));
     }
 
+    public Mono<PointCode> selectByIdOrTableName(String name) {
+        return Mono.justOrEmpty(pointCodeMapper.selectByIdOrName(0, name))
+                .switchIfEmpty(Mono.error(new RuntimeException("not found")));
+    }
+
     public Mono<Boolean> insert(PointCode pointCode) {
         return Mono.fromCallable(() -> pointCodeMapper.insert(pointCode) > 0)
                 .onErrorReturn(false);

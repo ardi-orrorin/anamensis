@@ -27,7 +27,7 @@ class PointServiceTest {
     void selectAll() {
         StepVerifier.create(ps.selectAll())
                 .assertNext(pc -> {
-                    assertEquals(10, pc.size());
+                    assertEquals(12, pc.size());
                     pc.stream().reduce((acc, next) -> {
                         assertTrue(acc.getId() < next.getId());
                         return next;

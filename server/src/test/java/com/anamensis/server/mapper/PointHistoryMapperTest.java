@@ -105,29 +105,26 @@ class PointHistoryMapperTest {
         page.setPage(1);
         page.setSize(10);
 
+
         param.setPointCodeName("attend-1");
-        List<PointHistoryResultMap> list = pointHistoryMapper.selectByPointHistory(page, param);
+        List<PointHistoryResultMap> list = pointHistoryMapper.selectByPointHistory(page, param,1);
         assertEquals(1, list.size());
 
         param.setPointCodeName(null);
         param.setTableName("board");
-        list = pointHistoryMapper.selectByPointHistory(page, param);
+        list = pointHistoryMapper.selectByPointHistory(page, param, 1);
         assertEquals(3, list.size());
 
         param.setTableName(null);
-        param.setMemberPk(1);
-        list = pointHistoryMapper.selectByPointHistory(page, param);
+        list = pointHistoryMapper.selectByPointHistory(page, param, 1);
         assertEquals(3, list.size());
 
-        param.setMemberPk(0);
-        param.setTableRefPk(1);
-        list = pointHistoryMapper.selectByPointHistory(page, param);
-        assertEquals(2, list.size());
+        list = pointHistoryMapper.selectByPointHistory(page, param, 0);
+        assertEquals(6, list.size());
 
-        param.setTableRefPk(0);
         page.setPage(1);
         page.setSize(4);
-        list = pointHistoryMapper.selectByPointHistory(page, param);
+        list = pointHistoryMapper.selectByPointHistory(page, param, 0);
         assertEquals(4, list.size());
 
         assertTrue(list.stream().anyMatch(p -> p.getId() == 6));
@@ -137,7 +134,7 @@ class PointHistoryMapperTest {
         assertFalse(list.stream().anyMatch(p -> p.getId() == 2));
 
         page.setPage(2);
-        list = pointHistoryMapper.selectByPointHistory(page, param);
+        list = pointHistoryMapper.selectByPointHistory(page, param, 0);
         assertNotEquals(4, list.size());
         assertEquals(2, list.size());
         assertFalse(list.stream().anyMatch(p -> p.getId() == 3));
@@ -146,4 +143,31 @@ class PointHistoryMapperTest {
         assertFalse(list.stream().anyMatch(p -> p.getId() == 0));
     }
 
+    @Test
+    @DisplayName("포인트 히스토리 카운트 테스트")
+    @Order(4)
+    void count() {
+
+        PointHistoryRequest.Param param = new PointHistoryRequest.Param();
+
+        int count = pointHistoryMapper.count(param,0);
+        assertEquals(6, count);
+
+        param.setPointCodeName("attend-1");
+        count = pointHistoryMapper.count(param,0);
+        assertEquals(1, count);
+
+        param.setPointCodeName(null);
+        param.setTableName("board");
+        count = pointHistoryMapper.count(param, 0);
+        assertEquals(3, count);
+
+        param.setTableName(null);
+        count = pointHistoryMapper.count(param, 2);
+        assertEquals(2, count);
+
+        count = pointHistoryMapper.count(param, 0);
+        assertEquals(6, count);
+
+    }
 }

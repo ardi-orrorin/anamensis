@@ -15,6 +15,12 @@ public interface PointHistoryMapper {
 
     List<PointHistoryResultMap> selectByPointHistory(
         @Param("page") Page page,
-        @Param("param") PointHistoryRequest.Param param
+        @Param("param") PointHistoryRequest.Param param,
+        @Param("memberPk") long memberPk
+    );
+
+    int count(
+        @Param("param") PointHistoryRequest.Param param,
+        @Param("memberPk") long memberPk
     );
 }

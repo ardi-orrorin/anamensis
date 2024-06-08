@@ -69,7 +69,7 @@ class PointHistoryServiceTest {
 
         PointHistoryRequest.Param param = new PointHistoryRequest.Param();
 
-        StepVerifier.create(phs.selectByPointHistory(param, page))
+        StepVerifier.create(phs.selectByPointHistory(param, page, 0))
                 .assertNext(ph -> {
                     assertEquals(4, ph.size());
                     ph.stream().reduce((acc, next) -> {
@@ -80,7 +80,7 @@ class PointHistoryServiceTest {
                 .verifyComplete();
 
         page.setPage(2);
-        StepVerifier.create(phs.selectByPointHistory(param, page))
+        StepVerifier.create(phs.selectByPointHistory(param, page,0))
                 .assertNext(ph -> {
                     assertEquals(2, ph.size());
                     ph.stream().reduce((acc, next) -> {
@@ -91,49 +91,89 @@ class PointHistoryServiceTest {
                 .verifyComplete();
 
         page.setPage(1);
-        param.setMemberPk(1L);
-        StepVerifier.create(phs.selectByPointHistory(param, page))
+        StepVerifier.create(phs.selectByPointHistory(param, page, 1))
                 .assertNext(ph -> {
                     assertEquals(3, ph.size());
                 })
                 .verifyComplete();
 
-        param.setMemberPk(2L);
-        StepVerifier.create(phs.selectByPointHistory(param, page))
+        StepVerifier.create(phs.selectByPointHistory(param, page, 2))
                 .assertNext(ph -> {
                     assertEquals(2, ph.size());
                 })
                 .verifyComplete();
 
-        param.setMemberPk(3L);
-        StepVerifier.create(phs.selectByPointHistory(param, page))
+        StepVerifier.create(phs.selectByPointHistory(param, page,3))
                 .assertNext(ph -> {
                     assertEquals(1, ph.size());
                 })
                 .verifyComplete();
-        param.setMemberPk(0);
+
         param.setTableName("board");
-        StepVerifier.create(phs.selectByPointHistory(param, page))
+        StepVerifier.create(phs.selectByPointHistory(param, page, 0))
                 .assertNext(ph -> {
                     assertEquals(3, ph.size());
                 })
                 .verifyComplete();
 
         param.setTableName(null);
-        param.setTableRefPk(1L);
-        StepVerifier.create(phs.selectByPointHistory(param, page))
+        StepVerifier.create(phs.selectByPointHistory(param, page, 0))
                 .assertNext(ph -> {
-                    assertEquals(2, ph.size());
-                })
-                .verifyComplete();
-
-        param.setTableName("board");
-        param.setTableRefPk(1L);
-        StepVerifier.create(phs.selectByPointHistory(param, page))
-                .assertNext(ph -> {
-                    assertEquals(1, ph.size());
+                    assertEquals(4, ph.size());
                 })
                 .verifyComplete();
     }
 
+    @Test
+    @Order(3)
+    @DisplayName("포인트 히스토리 카운트")
+    void count() {
+        PointHistoryRequest.Param param = new PointHistoryRequest.Param();
+
+        StepVerifier.create(phs.count(param, 0))
+                .assertNext(count -> {
+                    assertEquals(6, count);
+                })
+                .verifyComplete();
+
+        param.setPointCodeName("attend-1");
+        StepVerifier.create(phs.count(param, 0))
+                .assertNext(count -> {
+                    assertEquals(1, count);
+                })
+                .verifyComplete();
+
+        param.setPointCodeName(null);
+        param.setTableName("board");
+        StepVerifier.create(phs.count(param, 0))
+                .assertNext(count -> {
+                    assertEquals(3, count);
+                })
+                .verifyComplete();
+
+        param.setTableName(null);
+        StepVerifier.create(phs.count(param, 1))
+                .assertNext(count -> {
+                    assertEquals(3, count);
+                })
+                .verifyComplete();
+
+        StepVerifier.create(phs.count(param, 2))
+                .assertNext(count -> {
+                    assertEquals(2, count);
+                })
+                .verifyComplete();
+
+        StepVerifier.create(phs.count(param, 3))
+                .assertNext(count -> {
+                    assertEquals(1, count);
+                })
+                .verifyComplete();
+
+        StepVerifier.create(phs.count(param, 99))
+                .assertNext(count -> {
+                    assertEquals(0, count);
+                })
+                .verifyComplete();
+    }
 }

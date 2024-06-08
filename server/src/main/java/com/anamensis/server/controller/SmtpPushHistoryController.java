@@ -14,8 +14,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -32,22 +33,27 @@ public class SmtpPushHistoryController {
             Page page
         ) {
 
-        AtomicReference<MemberResultMap> memberResultMapAtomic = new AtomicReference<>();
+        Mono<MemberResultMap> memberResult = userService.findUserInfo(userDetails.getUsername())
+                .subscribeOn(Schedulers.boundedElastic())
+                .share();
 
-        return userService.findUserInfo(userDetails.getUsername())
-                .doOnNext(memberResultMapAtomic::set)
+        Mono<Long> count = memberResult
                 .flatMap(user -> smtpPushHistoryService.countByMemberPk(user.getMemberPk()))
-                .flatMapMany(count -> {
-                    page.setTotal(count.intValue());
-                    return smtpPushHistoryService.findByMemberPk(memberResultMapAtomic.get().getMemberPk(), page);
-                })
-                .collectList()
-                .map(content ->
-                    PageResponse.<SmtpPushHistoryResponse.ListSmtpPushHistory>builder()
-                        .page(page)
-                        .content(content)
-                        .build()
-                );
+                .subscribeOn(Schedulers.boundedElastic());
+
+        Mono<List<SmtpPushHistoryResponse.ListSmtpPushHistory>> content = memberResult
+                .flatMapMany(user -> smtpPushHistoryService.findByMemberPk(user.getMemberPk(), page))
+                .subscribeOn(Schedulers.boundedElastic())
+                .collectList();
+
+        return Mono.zip(content, count)
+                .map(t -> {
+                    page.setTotal(t.getT2().intValue());
+                    return PageResponse.<SmtpPushHistoryResponse.ListSmtpPushHistory>builder()
+                            .page(page)
+                            .content(t.getT1())
+                            .build();
+                });
     }
 
 

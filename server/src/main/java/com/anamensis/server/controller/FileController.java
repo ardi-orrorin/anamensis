@@ -53,10 +53,9 @@ public class FileController {
     @PostMapping("profile")
     public Mono<String> saveProfile(
         @RequestPart(name = "file") FilePart filePart,
-        @AuthenticationPrincipal Mono<UserDetails> userDetails
+        @AuthenticationPrincipal UserDetails userDetails
     ) {
-        return userDetails
-                .flatMap(u -> userService.findUserByUserId(u.getUsername()))
+        return userService.findUserByUserId(userDetails.getUsername())
                 .flatMap(user -> fileService.saveProfile(user, filePart));
     }
 

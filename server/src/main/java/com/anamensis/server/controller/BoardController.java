@@ -49,6 +49,7 @@ public class BoardController {
                         .doOnNext(b::setRate)
                         .map($ -> b)
                 )
+                .subscribeOn(Schedulers.boundedElastic())
                 .collectList();
 
         Mono<Long> count = boardService.count(board)
@@ -69,16 +70,21 @@ public class BoardController {
     public Mono<BoardResponse.Content> findByPk(
             @PathVariable(name = "id") long boardPk
     ) {
-        return boardService.findByPk(boardPk)
-                .flatMap(b -> rateService.countRate(b.getId())
-                    .doOnNext(b::setRate)
-                    .map($ -> b)
-                )
-                .publishOn(Schedulers.boundedElastic())
-                .doOnNext(b -> boardService.viewUpdateByPk(boardPk)
-                    .subscribe()
-                );
-    }
+        Mono<BoardResponse.Content> content = boardService.findByPk(boardPk)
+                .subscribeOn(Schedulers.boundedElastic());
+
+        Mono<Long> count = rateService.countRate(boardPk)
+                .subscribeOn(Schedulers.boundedElastic());
+
+        return Mono.zip(content, count)
+                .doOnNext(t -> t.getT1().setRate(t.getT2()))
+                .map(Tuple2::getT1)
+                .doOnNext($ -> {
+                    boardService.viewUpdateByPk(boardPk)
+                            .subscribeOn(Schedulers.boundedElastic())
+                            .subscribe();
+                });
+}
 
     @GetMapping("summary")
     public Mono<List<BoardResponse.SummaryList>> findByMemberPk(
@@ -91,7 +97,6 @@ public class BoardController {
                     .map($ -> b)
                 )
                 .collectList();
-
     }
 
     @PostMapping("")
@@ -113,26 +118,27 @@ public class BoardController {
                 })
                 .subscribeOn(Schedulers.boundedElastic());
 
-        return Mono.zip(insertBoard, pointCode, tableCode)
-                .doOnNext(t -> {
-                    userService.updatePoint(t.getT1().getMemberPk(), (int) t.getT2().getPoint())
-                            .subscribeOn(Schedulers.boundedElastic())
-                            .subscribe();
-                })
-                .doOnNext(t -> {
-                    PointHistory ph = new PointHistory();
-                    ph.setMemberPk(t.getT1().getMemberPk());
-                    ph.setPointCodePk(t.getT2().getId());
-                    ph.setCreateAt(t.getT1().getCreateAt());
-                    ph.setTableCodePk(t.getT3().getId());
-                    ph.setTableRefPk(t.getT1().getId());
+        return insertBoard
+                .doOnNext(b -> {
+                    Mono.zip(pointCode, tableCode)
+                        .doOnNext(t -> {
+                            userService.updatePoint(b.getMemberPk(), (int) t.getT1().getPoint())
+                                    .subscribeOn(Schedulers.boundedElastic())
+                                    .subscribe();
 
-                    pointHistoryService.insert(ph)
-                            .subscribeOn(Schedulers.boundedElastic())
-                            .subscribe();
-                })
-                .subscribeOn(Schedulers.boundedElastic())
-                .map(Tuple2::getT1);
+                            PointHistory ph = new PointHistory();
+                            ph.setMemberPk(b.getMemberPk());
+                            ph.setPointCodePk(t.getT2().getId());
+                            ph.setCreateAt(b.getCreateAt());
+                            ph.setTableCodePk(b.getId());
+                            ph.setTableRefPk(t.getT1().getId());
+
+                            pointHistoryService.insert(ph)
+                                    .subscribeOn(Schedulers.boundedElastic())
+                                    .subscribe();
+                        })
+                        .subscribe();
+            });
     }
 
     @PutMapping("/{id}")

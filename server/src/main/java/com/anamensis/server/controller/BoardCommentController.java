@@ -6,18 +6,19 @@ import com.anamensis.server.entity.*;
 import com.anamensis.server.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import reactor.util.function.Tuple2;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/board/comments")
 @RequiredArgsConstructor
+@Slf4j
 public class BoardCommentController {
 
     private final BoardCommentService boardCommentService;
@@ -57,24 +58,26 @@ public class BoardCommentController {
         Mono<Boolean> insertBoardComment = boardCommentService.save(bc)
                 .subscribeOn(Schedulers.boundedElastic());
 
-        return Mono.zip(insertBoardComment, pointCode, tableCode, member)
-                .doOnNext(t -> {
-                    userService.updatePoint(t.getT4().getId(), (int) t.getT2().getPoint())
-                            .subscribeOn(Schedulers.boundedElastic())
+        return insertBoardComment
+                .doOnNext($ -> {
+                    Mono.zip(pointCode, tableCode, member)
+                            .doOnNext(t -> {
+                                userService.updatePoint(t.getT3().getId(), (int) t.getT1().getPoint())
+                                        .subscribeOn(Schedulers.boundedElastic())
+                                        .subscribe();
+
+                                PointHistory ph = new PointHistory();
+                                ph.setMemberPk(t.getT3().getId());
+                                ph.setPointCodePk(t.getT2().getId());
+                                ph.setTableCodePk(t.getT3().getId());
+                                ph.setCreateAt(bc.getCreateAt());
+                                ph.setTableRefPk(bc.getId());
+                                pointHistoryService.insert(ph)
+                                        .subscribeOn(Schedulers.boundedElastic())
+                                        .subscribe();
+                            })
                             .subscribe();
-                })
-                .doOnNext(t -> {
-                    PointHistory ph = new PointHistory();
-                    ph.setMemberPk(t.getT4().getId());
-                    ph.setPointCodePk(t.getT2().getId());
-                    ph.setTableCodePk(t.getT3().getId());
-                    ph.setCreateAt(bc.getCreateAt());
-                    ph.setTableRefPk(bc.getId());
-                    pointHistoryService.insert(ph)
-                            .subscribeOn(Schedulers.boundedElastic())
-                            .subscribe();
-                })
-                .map(Tuple2::getT1);
+                });
     }
 
     @DeleteMapping("/{id}")

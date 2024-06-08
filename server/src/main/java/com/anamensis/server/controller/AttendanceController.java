@@ -1,12 +1,11 @@
 package com.anamensis.server.controller;
 
 import com.anamensis.server.dto.response.AttendResponse;
-import com.anamensis.server.entity.Attendance;
 import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.PointCode;
-import com.anamensis.server.service.AttendanceService;
-import com.anamensis.server.service.PointService;
-import com.anamensis.server.service.UserService;
+import com.anamensis.server.entity.PointHistory;
+import com.anamensis.server.entity.TableCode;
+import com.anamensis.server.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,9 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -29,6 +25,10 @@ public class AttendanceController {
     private final AttendanceService attendanceService;
 
     private final PointService pointService;
+
+    private final PointHistoryService pointHistoryService;
+
+    private final TableCodeService tableCodeService;
 
     private final UserService userService;
 
@@ -52,6 +52,12 @@ public class AttendanceController {
             @AuthenticationPrincipal UserDetails user
     ) {
         AtomicReference<Member> memberAtomic = new AtomicReference<>();
+
+        AtomicReference<PointCode> pointCodeAtomic = new AtomicReference<>();
+
+        Mono<TableCode> tableCode = tableCodeService.findByIdByTableName(0, "member")
+                .subscribeOn(Schedulers.boundedElastic());
+
         return userService.findUserByUserId(user.getUsername())
                 .doOnNext(memberAtomic::set)
                 .flatMap(u -> attendanceService.update(u.getId()))
@@ -61,7 +67,23 @@ public class AttendanceController {
                         : String.valueOf(attend.getDays());
                     return pointService.selectByIdOrName(seq);
                 })
+                .doOnNext(pointCodeAtomic::set)
                 .flatMap(pointCode -> userService.updatePoint(memberAtomic.get().getId(), (int) pointCode.getPoint()))
+                .publishOn(Schedulers.boundedElastic())
+                .doOnNext(isAttend -> {
+                    if(!isAttend) return;
+                    tableCode.doOnNext(tc -> {
+                        PointHistory ph = new PointHistory();
+                        ph.setMemberPk(memberAtomic.get().getId());
+                        ph.setPointCodePk(pointCodeAtomic.get().getId());
+                        ph.setTableRefPk(memberAtomic.get().getId());
+                        ph.setTableCodePk(tc.getId());
+                        pointHistoryService.insert(ph)
+                                .subscribeOn(Schedulers.boundedElastic())
+                                .subscribe();
+                    })
+                    .subscribe();
+                })
                 .onErrorReturn(false)
                 .map(result ->  result ? "success" : "fail");
     }

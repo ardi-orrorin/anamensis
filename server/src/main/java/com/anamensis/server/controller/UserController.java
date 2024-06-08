@@ -168,7 +168,6 @@ public class UserController {
                 );
     }
 
-
     @GetMapping("info")
     public Mono<UserResponse.MyPage> info(
             @AuthenticationPrincipal UserDetails userDetails

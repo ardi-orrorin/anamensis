@@ -1,5 +1,10 @@
 package com.anamensis.server.controller;
 
+import com.anamensis.server.dto.Page;
+import com.anamensis.server.dto.PageResponse;
+import com.anamensis.server.dto.request.PointHistoryRequest;
+import com.anamensis.server.dto.response.PointHistoryResponse;
+import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.PointHistory;
 import com.anamensis.server.service.PointHistoryService;
 import com.anamensis.server.service.UserService;
@@ -23,16 +28,36 @@ public class PointHistoryController {
     private final PointHistoryService pointHistoryService;
     private final UserService userService;
 
-//    @GetMapping("")
-//    public Mono<List<PointHistory>> getPointHistories(
-//            Mono<PointHistory> pointHistory,
-//            @AuthenticationPrincipal Mono<UserDetails> user
-//    ) {
-//        return pointHistory
-//                .zipWith(user)
-//                .doOnNext(this::transUserDetailToUserPk)
-//                .flatMap(tuple -> pointHistoryService.selectByPointHistory(tuple.getT1()));
-//    }
+    @GetMapping("")
+    public Mono<PageResponse<PointHistoryResponse.List>> getPointHistories(
+            Page page,
+            PointHistoryRequest.Param params,
+            @AuthenticationPrincipal UserDetails user
+    ) {
+
+        Mono<Member> member = userService.findUserByUserId(user.getUsername())
+                .subscribeOn(Schedulers.boundedElastic())
+                .share();
+
+        Mono<List<PointHistoryResponse.List>> list = member
+                .flatMap(u -> pointHistoryService.selectByPointHistory(params, page, u.getId()))
+                .subscribeOn(Schedulers.boundedElastic());
+
+
+        Mono<Integer> count = member
+                .flatMap(u -> pointHistoryService.count(params, u.getId()))
+                .subscribeOn(Schedulers.boundedElastic());
+
+        return Mono.zip(list, count)
+                .map(t -> {
+                    page.setTotal(t.getT2());
+                    return PageResponse.<PointHistoryResponse.List>builder()
+                            .page(page)
+                            .content(t.getT1())
+                            .build();
+                        }
+                );
+    }
 
     @PostMapping("")
     public Mono<Boolean> postPointHistory(

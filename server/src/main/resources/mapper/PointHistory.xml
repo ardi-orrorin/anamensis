@@ -4,29 +4,34 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.anamensis.server.mapper.PointHistoryMapper">
+    <sql id="pointHistory">
+        FROM point_history ph
+        JOIN point_code pc
+          ON ph.point_code_pk = pc.id
+        <if test="param.pointCodeName != null and param.pointCodeName != ''">
+            AND pc.name = #{param.pointCodeName}
+        </if>
+        JOIN table_code tc
+          ON ph.table_code_pk = tc.id
+        <if test="param.tableName != null and param.tableName != ''">
+            AND tc.table_name = #{param.tableName}
+        </if>
+       WHERE 1 = 1
+        <if test="param.id != 0">
+            AND ph.id = #{param.id}
+        </if>
+        <if test="memberPk != 0">
+            AND ph.member_pk = #{memberPk}
+        </if>
+    </sql>
+    <select id="count">
+        SELECT COUNT(*)
+        <include refid="pointHistory"/>
+    </select>
+
     <select id="selectByPointHistory" resultMap="pointHistoryResultMap">
         SELECT *
-          FROM point_history ph
-          JOIN point_code pc
-            ON ph.point_code_pk = pc.id
-        <if test="param.pointCodeName != null and param.pointCodeName != ''">
-           AND pc.name = #{param.pointCodeName}
-        </if>
-          JOIN table_code tc
-            ON ph.table_code_pk = tc.id
-        <if test="param.tableName != null and param.tableName != ''">
-           AND tc.table_name = #{param.tableName}
-        </if>
-         WHERE 1 = 1
-        <if test="param.id != 0">
-           AND ph.id = #{param.id}
-        </if>
-        <if test="param.tableRefPk != 0">
-           AND ph.table_ref_pk = #{param.tableRefPk}
-        </if>
-        <if test="param.memberPk != 0">
-           AND ph.member_pk = #{param.memberPk}
-        </if>
+        <include refid="pointHistory" />
         ORDER BY ph.id DESC
         LIMIT #{page.offset}, #{page.size}
     </select>
@@ -39,11 +44,11 @@
 
     <resultMap id="pointHistoryResultMap" type="PointHistoryResultMap">
         <id property="id" column="id"/>
-        <association property="pointHistory" resultMap="pointHistoryEntity" autoMapping="true" />
-        <association property="pointCode" resultMap="pointCodeEntity" autoMapping="true" />
-        <association property="tableCode" resultMap="tableCodeEntity" autoMapping="true" />
+        <association property="pointHistory" resultMap="pointHistoryEntity"/>
+        <association property="pointCode" resultMap="pointCodeEntity"/>
+        <association property="tableCode" resultMap="tableCodeEntity"/>
     </resultMap>
-    <resultMap id="pointHistoryEntity" type="PointHistory" />
-    <resultMap id="pointCodeEntity" type="PointCode" />
-    <resultMap id="tableCodeEntity" type="TableCode" />
+    <resultMap id="pointHistoryEntity" type="PointHistory" autoMapping="true" />
+    <resultMap id="pointCodeEntity" type="PointCode" autoMapping="true" />
+    <resultMap id="tableCodeEntity" type="TableCode" autoMapping="true" />
 </mapper>

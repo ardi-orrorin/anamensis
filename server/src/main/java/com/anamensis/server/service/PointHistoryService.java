@@ -2,12 +2,14 @@ package com.anamensis.server.service;
 
 import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.request.PointHistoryRequest;
+import com.anamensis.server.dto.response.PointHistoryResponse;
 import com.anamensis.server.entity.PointHistory;
 import com.anamensis.server.mapper.PointHistoryMapper;
 import com.anamensis.server.resultMap.PointHistoryResultMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -19,11 +21,24 @@ public class PointHistoryService {
 
     private final PointHistoryMapper pointHistoryMapper;
 
-    public Mono<List<PointHistoryResultMap>> selectByPointHistory(
+    public Mono<Integer> count(
             PointHistoryRequest.Param param,
-            Page page
+            long memberPk
     ) {
-        return Mono.just(pointHistoryMapper.selectByPointHistory(page, param));
+        return Mono.fromCallable(()-> pointHistoryMapper.count(param, memberPk))
+                .onErrorReturn(0);
+    }
+
+
+    public Mono<List<PointHistoryResponse.List>> selectByPointHistory(
+            PointHistoryRequest.Param param,
+            Page page,
+            long memberPk
+    ) {
+        return Flux.fromIterable(pointHistoryMapper.selectByPointHistory(page, param, memberPk))
+                .log()
+                .map(PointHistoryResponse.List::fromResultMap)
+                .collectList();
     }
 
 

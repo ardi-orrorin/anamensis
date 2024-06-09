@@ -18,7 +18,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/board/comments")
 @RequiredArgsConstructor
-@Slf4j
 public class BoardCommentController {
 
     private final BoardCommentService boardCommentService;
@@ -68,10 +67,11 @@ public class BoardCommentController {
 
                                 PointHistory ph = new PointHistory();
                                 ph.setMemberPk(t.getT3().getId());
-                                ph.setPointCodePk(t.getT2().getId());
-                                ph.setTableCodePk(t.getT3().getId());
+                                ph.setPointCodePk(t.getT1().getId());
+                                ph.setTableCodePk(t.getT2().getId());
                                 ph.setCreateAt(bc.getCreateAt());
                                 ph.setTableRefPk(bc.getId());
+
                                 pointHistoryService.insert(ph)
                                         .subscribeOn(Schedulers.boundedElastic())
                                         .subscribe();

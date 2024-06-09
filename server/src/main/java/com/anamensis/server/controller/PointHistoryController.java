@@ -51,12 +51,17 @@ public class PointHistoryController {
         return Mono.zip(list, count)
                 .map(t -> {
                     page.setTotal(t.getT2());
-                    return PageResponse.<PointHistoryResponse.List>builder()
-                            .page(page)
-                            .content(t.getT1())
-                            .build();
-                        }
-                );
+                    return new PageResponse<>(page, t.getT1());
+                });
+    }
+
+
+    @GetMapping("summary")
+    public Mono<List<PointHistoryResponse.Summary>> getPointHistoriesSummary(
+            @AuthenticationPrincipal UserDetails user
+    ) {
+        return userService.findUserByUserId(user.getUsername())
+                .flatMap(u -> pointHistoryService.selectSummary(u.getId()));
     }
 
     @PostMapping("")

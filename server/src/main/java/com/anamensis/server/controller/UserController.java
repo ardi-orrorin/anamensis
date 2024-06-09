@@ -16,7 +16,6 @@ import com.anamensis.server.resultMap.MemberResultMap;
 import com.anamensis.server.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,7 +30,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("api/user")
-@Slf4j
 public class UserController {
 
     private final UserService userService;
@@ -116,10 +114,9 @@ public class UserController {
     ) {
 
         return userService.existsUser(data)
-                   .map(exists -> UserResponse.Status
-                           .transToStatus(HttpStatus.OK, exists.toString())
-                   )
-                .log();
+               .map(exists -> UserResponse.Status
+                       .transToStatus(HttpStatus.OK, exists.toString())
+               );
     }
 
     @GetMapping("histories")
@@ -143,10 +140,7 @@ public class UserController {
         return Mono.zip(content, count)
                 .map(t -> {
                     page.setTotal(t.getT2());
-                    return PageResponse.<LoginHistoryResponse.LoginHistory>builder()
-                            .page(page)
-                            .content(t.getT1())
-                            .build();
+                    return new PageResponse<>(page , t.getT1());
                 });
     }
 

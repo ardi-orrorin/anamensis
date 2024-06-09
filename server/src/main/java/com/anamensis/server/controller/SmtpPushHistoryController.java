@@ -49,10 +49,7 @@ public class SmtpPushHistoryController {
         return Mono.zip(content, count)
                 .map(t -> {
                     page.setTotal(t.getT2().intValue());
-                    return PageResponse.<SmtpPushHistoryResponse.ListSmtpPushHistory>builder()
-                            .page(page)
-                            .content(t.getT1())
-                            .build();
+                    return new PageResponse<>(page, t.getT1());
                 });
     }
 

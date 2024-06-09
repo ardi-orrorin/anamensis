@@ -7,6 +7,7 @@ import com.anamensis.server.entity.PointHistory;
 import com.anamensis.server.entity.TableCode;
 import com.anamensis.server.service.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
@@ -55,7 +57,7 @@ public class AttendanceController {
 
         AtomicReference<PointCode> pointCodeAtomic = new AtomicReference<>();
 
-        Mono<TableCode> tableCode = tableCodeService.findByIdByTableName(0, "member")
+        Mono<TableCode> tableCode = tableCodeService.findByIdByTableName(0, "attendance")
                 .subscribeOn(Schedulers.boundedElastic());
 
         return userService.findUserByUserId(user.getUsername())
@@ -78,6 +80,7 @@ public class AttendanceController {
                         ph.setPointCodePk(pointCodeAtomic.get().getId());
                         ph.setTableRefPk(memberAtomic.get().getId());
                         ph.setTableCodePk(tc.getId());
+                        ph.setCreateAt(LocalDateTime.now());
                         pointHistoryService.insert(ph)
                                 .subscribeOn(Schedulers.boundedElastic())
                                 .subscribe();

@@ -42,10 +42,7 @@ public class ShareLinkController {
                 .flatMap(userDetails -> userService.findUserByUserId(userDetails.getUsername()))
                 .zipWith(Mono.just(page))
                 .map(shareLinkService::selectAll)
-                .map(t -> PageResponse.<ShareLink>builder()
-                        .content(t.getT1())
-                        .page(t.getT2())
-                        .build()
+                .map(t -> new PageResponse<>(t.getT2(), t.getT1())
                 );
     }
 

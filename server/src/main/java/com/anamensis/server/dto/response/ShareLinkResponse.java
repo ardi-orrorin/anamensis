@@ -1,6 +1,5 @@
 package com.anamensis.server.dto.response;
 
-import com.anamensis.server.entity.ShareLink;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;

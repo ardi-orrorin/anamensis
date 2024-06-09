@@ -1,18 +1,13 @@
 package com.anamensis.server.dto;
 
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+public record Device(
+    String ip,
 
-@Getter
-@Setter
-@ToString
-public class Device {
+    String Location,
 
-    private String ip;
+    String device
+) {
 
-    private String Location;
 
-    private String device;
 }

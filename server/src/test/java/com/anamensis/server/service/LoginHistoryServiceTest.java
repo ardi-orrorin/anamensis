@@ -122,10 +122,11 @@ class LoginHistoryServiceTest {
     @DisplayName("로그인 기록 저장")
     void save() {
         Member m1 = ms.findUserByUserId("d-member-1").block();
-        Device device = new Device();
-        device.setIp("128.0.0.1");
-        device.setDevice("device");
-        device.setLocation("location");
+        Device device = new Device(
+            "128.0.0.1",
+            "location",
+            "device"
+        );
 
         StepVerifier.create(lhs.save(device, m1))
                     .verifyComplete();

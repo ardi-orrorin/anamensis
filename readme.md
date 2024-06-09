@@ -1,55 +1,5 @@
 # Project Anamensis
 
-## Introduce
-
-## Tech Skills
-
-### Client
-- Language : Typescript
-- PackageManager : NPM
-- Build : TurboPack
-- Framework : NextJS
-- Libraries
-  - Date : momentJs
-  - fetchAPI : axios
-  - 스타일 : tailwind
-  - 문법 및 오류 체크 : ESLint
-- Test
-  - 미정
-
-### Server-Common Info
-- Language : Java 21
-- PackageManager & Build : Gradle
-- Framework : Springboot
-- Libraries
-  - Webflux
-  - SpringSecurity
-  - Mybatis
-  - SpringValidation
-  - Lombok
-  - SpringActuator
-  - SpringMail
-  - AwsSES
-
-### Resource-Server
-- Libraries
-  
-- Test
-  - Junit
-
-### Batch-Server
-- Libraries
-  - SpringBatch
-  - SpringQuartz
-
-### Database
-- RDBMS : Mysql 8.0.36
-- DBMS : Redis
-
-### CI / CD
-- Github Action
-- Docker
-
 
 ## ERD --> [Link](https://www.erdcloud.com/d/kaLkfNKiwKcPe85k4)
 ![](./resource/erd.jpg)
@@ -68,15 +18,14 @@ keytool -genkeypair -alias 'alias' -keyalg RSA \
 
 docker secret create server_anamensis_secret_config application.yml
 docker secret create batch_anamensis_secret_config application.yml
-docker secret create resource_anamensis_secret_config application.yml
-docker secret create gateway_anamensis_secret_keystore anamensis.jks
+docker secret create config_anamensis_secret_config application.yml
+docker secret create config_anamensis_secret_keystore anamensis.jks
 
 ```
 
 ## docker create network
 - anamensis 전용 네트워크 생성
 ```shell
-
 docker network create anamensis --scope swarm
 ```
 

@@ -1,18 +1,14 @@
 version: '3.8'
 
 services:
-  batch-anamensis:
-    build:
-      context: .
-      dockerfile: Batch-Dockerfile
-      args:
-        JAR: batch-anamensis-${TAG}
-    image: batch-anamensis:${TAG}
+  config-anamensis:
+    image: ${DOCKER_ID}/config-anamensis:${TAG}
     networks:
       - anamensis
     ports:
       - "${PORT}:8080"
     deploy:
+      replicas: 2
       update_config:
         parallelism: 1
         failure_action: rollback
@@ -32,13 +28,18 @@ services:
       start_period: 10s
     restart: on-failure
     secrets:
-      - source: batch_anamensis_secret_config
+      - source: config_anamensis_secret_config
         target: /application.yml
+      - source: config_anamensis_secret_keystore
+        target: /anamensis.jks
 
 networks:
   anamensis:
     external: true
 
 secrets:
-  batch_anamensis_secret_config:
+  config_anamensis_secret_config:
+    external: true
+
+  config_anamensis_secret_keystore:
     external: true

@@ -346,11 +346,11 @@ class UserControllerTest {
             .expectBody(PageResponse.class)
             .consumeWith(result -> {
                 if(result.getResponseBody() == null) return;
-                assertTrue(result.getResponseBody().getPage().getTotal() > 4);
-                List loginHistory = result.getResponseBody().getContent();
+                assertTrue(result.getResponseBody().page().getTotal() > 4);
+                List loginHistory = result.getResponseBody().content();
                 assertTrue(loginHistory.size() > 4);
 
-                assertTrue(result.getResponseBody().getPage().getTotal() >= loginHistory.size());
+                assertTrue(result.getResponseBody().page().getTotal() >= loginHistory.size());
             });
     }
 

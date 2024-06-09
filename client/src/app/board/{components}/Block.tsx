@@ -33,9 +33,9 @@ export default function Block(props: BlockProps) {
     const {blockService, setBlockService, commentService, setCommentService, selectedBlock} = useContext(BlockProvider);
     const [isCopy, setIsCopy] = useState<CopyProps>({} as CopyProps);
 
-    const shareLinkText = useMemo(() => {
-        return board.data.isLogin ? '링크 및 댓글 북마크로 복사되었습니다.' : '링크가 복사되었습니다.';
-    },[board.data.isLogin]);
+    // const shareLinkText = useMemo(() => {
+    //     return board.data.isLogin ? '링크 및 댓글 북마크로 복사되었습니다.' : '링크가 복사되었습니다.';
+    // },[board.data.isLogin]);
 
     const onFocusHandler = (e: React.FocusEvent<HtmlElements>) => {
         if(e.currentTarget.ariaRoleDescription !== 'text') {
@@ -151,13 +151,10 @@ export default function Block(props: BlockProps) {
     }
 
     const shareLinkHandler = async (e: React.MouseEvent<HTMLDivElement>) => {
+        if(!board.data.isLogin) return;
+
         e.preventDefault();
         if(typeof window === 'undefined') return ;
-        const bastUrl = window.location.href.split('#')[0];
-
-        const url = bastUrl + `#block-${hash}`;
-
-        await navigator.clipboard.writeText(url);
 
         setIsCopy({isCopy: true, seq: hash});
 
@@ -181,7 +178,7 @@ export default function Block(props: BlockProps) {
                     isCopy.isCopy ? 'opacity-100' : 'opacity-0',
                 ].join(' ')
                 }>
-                    {`block-${isCopy.seq?.split('-')[1]}`} {shareLinkText}
+                    {`block-${isCopy.seq?.split('-')[1]}`} 댓글 북마크로 복사되었습니다.
                 </div>
             }
             {

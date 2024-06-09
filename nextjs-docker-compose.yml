@@ -2,16 +2,13 @@ version: '3.8'
 
 services:
   nextjs-anamensis:
-    build:
-      context: .
-      dockerfile: nextjs.Dockerfile
-    image: nextjs-anamensis:${TAG}
+    image: ${DOCKER_ID}/nextjs-anamensis:${TAG}
     networks:
-      - net
+      - anamensis
     ports:
       - "${PORT}:3000"
     deploy:
-      replicas: 4
+      replicas: 2
       update_config:
         parallelism: 1
         failure_action: rollback
@@ -32,5 +29,5 @@ services:
     restart: on-failure
 
 networks:
-  net:
-    driver: overlay
+  anamensis:
+    external: true

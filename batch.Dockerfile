@@ -5,4 +5,5 @@ VOLUME     /tmp
 ARG        JAR
 ARG        JAR_FILE=batch/build/libs/${JAR}.jar
 COPY       ${JAR_FILE} app.jar
+ENV        SPRING_CONFIG_LOCATION "/application.yml"
 ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=prod", "/app.jar"]

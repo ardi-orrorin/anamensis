@@ -2,14 +2,9 @@ version: '3.8'
 
 services:
   server-anamensis:
-    build:
-      context: .
-      dockerfile: server.Dockerfile
-      args:
-        JAR: server-anamensis-${TAG}
-    image: server-anamensis:${TAG}
+    image: ${DOCKER_ID}/server-anamensis:${TAG}
     networks:
-      - net
+      - anamensis
     ports:
       - "${PORT}:8080"
     deploy:
@@ -33,14 +28,14 @@ services:
       start_period: 10s
     restart: on-failure
     secrets:
-      - source: server-anamensis-secret-config
-        target: /application-prod.yml
+      - source: server_anamensis_secret_config
+        target: /application.yml
 
 networks:
-  net:
-    driver: overlay
+  anamensis:
+    external: true
 
 secrets:
-  server-anamensis-secret-config:
-    file: ${CONFIG_FILE}
+  server_anamensis_secret_config:
+    external: true
 

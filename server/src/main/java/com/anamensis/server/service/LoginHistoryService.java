@@ -33,9 +33,9 @@ public class LoginHistoryService {
 
     public Mono<Void> save(Device device, Member member) {
         LoginHistory loginHistory = LoginHistory.builder()
-                .ip(device.getIp())
-                .device(device.getDevice())
-                .location(device.getLocation())
+                .ip(device.ip())
+                .device(device.device())
+                .location(device.Location())
                 .createAt(LocalDateTime.now())
                 .build();
 

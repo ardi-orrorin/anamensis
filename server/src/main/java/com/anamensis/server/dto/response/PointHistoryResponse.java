@@ -33,4 +33,24 @@ public class PointHistoryResponse {
         }
 
     }
+
+    @Getter
+    @Builder
+    public static class Summary {
+        private long id;
+        private String tableName;
+        private long point;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime createdAt;
+
+        public static Summary fromResultMap(PointHistoryResultMap result) {
+            return PointHistoryResponse.Summary.builder()
+                    .id(result.getId())
+                    .tableName(result.getTableCode().getTableName())
+                    .point(result.getPointCode().getPoint())
+                    .createdAt(result.getPointHistory().getCreateAt())
+                    .build();
+        }
+    }
 }

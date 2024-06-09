@@ -8,16 +8,16 @@
         FROM point_history ph
         JOIN point_code pc
           ON ph.point_code_pk = pc.id
-        <if test="param.pointCodeName != null and param.pointCodeName != ''">
+        <if test="param != null and param.pointCodeName != null and param.pointCodeName != ''">
             AND pc.name = #{param.pointCodeName}
         </if>
         JOIN table_code tc
           ON ph.table_code_pk = tc.id
-        <if test="param.tableName != null and param.tableName != ''">
+        <if test="param != null and param.tableName != null and param.tableName != ''">
             AND tc.table_name = #{param.tableName}
         </if>
        WHERE 1 = 1
-        <if test="param.id != 0">
+        <if test="param != null and param.id != 0">
             AND ph.id = #{param.id}
         </if>
         <if test="memberPk != 0">

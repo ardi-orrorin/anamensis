@@ -1,33 +1,32 @@
 'use client';
 
 import {useEffect, useState} from "react";
-import Link from "next/link";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
+import {Table} from "@/app/user/point-history/{services}/types";
 
-
-export interface BoardSummaryI {
+export interface PointSummaryI {
     id: number;
-    title: string;
-    rate: number;
-    viewCount: number;
+    tableName: string;
+    point: number;
     createdAt: string;
 }
 
-const BoardSummary = () => {
+const PointSummary = () => {
 
-    const [data, setData] = useState<BoardSummaryI[]>([]);
+    const [data, setData] = useState<PointSummaryI[]>([]);
 
     useEffect(() => {
 
         const fetch = async () => {
-            await apiCall<BoardSummaryI[]>({
-                path: "/api/board/summary",
+            const result = await apiCall<PointSummaryI[]>({
+                path: "/api/user/point-history/summary",
                 method: "GET",
-            })
-            .then((res) => {
-                setData(res.data);
+                isReturnData: true,
             });
+
+            setData(result);
+
         }
         const debounce = createDebounce(500);
         debounce(fetch);
@@ -40,30 +39,25 @@ const BoardSummary = () => {
                 <colgroup>
                     <col style={{width: '50%'}} />
                     <col style={{width: '15%'}} />
-                    <col style={{width: '15%'}} />
                     <col style={{width: '20%'}} />
                 </colgroup>
                 <thead className={'bg-blue-300 text-white h-8 align-middle'}>
                     <tr className={'text-sm border-x border-white border-solid'}>
-                        <th className={'border-x border-white border-solid'}>제목</th>
-                        <th className={'border-x border-white border-solid'}>좋아요</th>
-                        <th className={'border-x border-white border-solid'}>조회수</th>
-                        <th className={'border-x border-white border-solid'}>작성일</th>
+                        <th className={'border-x border-white border-solid'}>테이블명</th>
+                        <th className={'border-x border-white border-solid'}>포인트</th>
+                        <th className={'border-x border-white border-solid'}>적립일시</th>
                     </tr>
                 </thead>
                 <tbody>
                 {
                     data.map((e, i) => (
                         <tr key={`summary-${i}`}
-                            className={`h-10 ${i % 2 === 1 ? 'bg-blue-50' : 'bg-white'}`}
+                            className={`h-6 ${i % 2 === 1 ? 'bg-blue-50' : 'bg-white'}`}
                         >
                             <td className={'p-2'}>
-                                <Link href={`/board/${e.id}`}>
-                                    {e.title}
-                                </Link>
+                                {Table.fromString(e.tableName).useWith}
                             </td>
-                            <td className={'p-2'}>{e.rate}</td>
-                            <td className={'p-2'}>{e.viewCount}</td>
+                            <td className={'p-2'}>{e.point}</td>
                             <td className={'p-2'}>{e.createdAt.substring(0, 10)}</td>
                         </tr>
                     ))
@@ -74,4 +68,4 @@ const BoardSummary = () => {
     );
 }
 
-export default BoardSummary;
+export default PointSummary;

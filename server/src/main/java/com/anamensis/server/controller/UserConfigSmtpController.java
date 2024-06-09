@@ -31,11 +31,7 @@ public class UserConfigSmtpController {
         return userService.findUserByUserId(user.getUsername())
                    .flatMapMany(u -> userConfigSmtpService.selectByUserPk(u.getId()))
                    .collectList()
-                   .map(r -> PageResponse.<MemberConfigSmtp>builder()
-                               .page(new Page())
-                               .content(r)
-                               .build()
-                   );
+                   .map(r -> new PageResponse<>(new Page(), r));
     }
 
     @GetMapping("{id}")

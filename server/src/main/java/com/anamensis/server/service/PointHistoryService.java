@@ -7,6 +7,7 @@ import com.anamensis.server.entity.PointHistory;
 import com.anamensis.server.mapper.PointHistoryMapper;
 import com.anamensis.server.resultMap.PointHistoryResultMap;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -36,7 +37,6 @@ public class PointHistoryService {
             long memberPk
     ) {
         return Flux.fromIterable(pointHistoryMapper.selectByPointHistory(page, param, memberPk))
-                .log()
                 .map(PointHistoryResponse.List::fromResultMap)
                 .collectList();
     }
@@ -47,4 +47,12 @@ public class PointHistoryService {
                 .onErrorReturn(false);
     }
 
+    public Mono<List<PointHistoryResponse.Summary>> selectSummary(long memberPk) {
+        Page page = new Page();
+        page.setPage(1);
+        page.setSize(5);
+        return Flux.fromIterable(pointHistoryMapper.selectByPointHistory(page, null , memberPk))
+            .map(PointHistoryResponse.Summary::fromResultMap)
+            .collectList();
+    }
 }

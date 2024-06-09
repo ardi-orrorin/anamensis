@@ -1,18 +1,17 @@
 import PageNavigator from "@/app/{commons}/PageNavigator";
 import {PageResponse} from "@/app/{commons}/types/commons";
-import Row from "@/app/user/smtp-history/{components}/Row";
 import {GetServerSideProps, InferGetServerSidePropsType} from "next";
-import {GetProps} from "@/app/user/history/page";
 import apiCall from "@/app/{commons}/func/api";
+import Row from "@/app/user/point-history/{components}/Row";
+import {GetProps} from "@/app/user/history/page";
 
-export interface SmtpHistoryI {
-    id: number;
-    subject: string;
-    status: string;
-    message: string;
-    createAt: string;
+export interface PointHistoryI {
+    id: number
+    tableName: string
+    pointCodeName: string
+    point: number
+    createdAt: string
 }
-
 
 const getServerSideProps: GetServerSideProps<GetProps> = async (context) => {
     const searchParams = new URLSearchParams(context.query as any);
@@ -67,10 +66,10 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                 <thead className={'bg-blue-300 text-white h-8 align-middle'}>
                     <tr className={'text-sm border-x border-white border-solid'}>
                         <th className={'border-x border-white border-solid'}>#</th>
-                        <th className={'border-x border-white border-solid'}>제목</th>
-                        <th className={'border-x border-white border-solid'}>상태메시지</th>
-                        <th className={'border-x border-white border-solid'}>전송상태</th>
-                        <th className={'border-x border-white border-solid'}>전송일시</th>
+                        <th className={'border-x border-white border-solid'}>테이블명</th>
+                        <th className={'border-x border-white border-solid'}>포인트코드 이름</th>
+                        <th className={'border-x border-white border-solid'}>포인트</th>
+                        <th className={'border-x border-white border-solid'}>적립일시</th>
                     </tr>
                 </thead>
                 <tbody className={''}>
@@ -102,8 +101,8 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
 
 
 const getData = async (req: URLSearchParams) => {
-    return await apiCall<PageResponse<SmtpHistoryI>, URLSearchParams>({
-        path: '/api/smtp-push-history',
+    return await apiCall<PageResponse<PointHistoryI>, URLSearchParams>({
+        path: '/api/point-histories',
         method: 'GET',
         call: 'Server',
         setAuthorization: true,

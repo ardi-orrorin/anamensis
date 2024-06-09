@@ -6,13 +6,12 @@ import com.anamensis.server.dto.StatusType;
 import com.anamensis.server.dto.response.BoardCommentResponse;
 import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.dto.response.StatusResponse;
-import com.anamensis.server.entity.*;
+import com.anamensis.server.entity.Board;
+import com.anamensis.server.entity.PointCode;
+import com.anamensis.server.entity.PointHistory;
+import com.anamensis.server.entity.TableCode;
 import com.anamensis.server.service.*;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.PackagePrivate;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.task.VirtualThreadTaskExecutor;
-import org.springframework.data.redis.connection.zset.Tuple;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -21,12 +20,10 @@ import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
 @RequestMapping("api/boards")
 @RequiredArgsConstructor
-@Slf4j
 public class BoardController {
 
     private final BoardService boardService;
@@ -58,10 +55,7 @@ public class BoardController {
         return Mono.zip(list, count)
                 .map(t -> {
                     page.setTotal(t.getT2().intValue());
-                    return PageResponse.<BoardResponse.List>builder()
-                                    .content(t.getT1())
-                                    .page(page)
-                                    .build();
+                    return new PageResponse<>(page, t.getT1());
                 });
     }
 
@@ -119,6 +113,7 @@ public class BoardController {
                 .subscribeOn(Schedulers.boundedElastic());
 
         return insertBoard
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext(b -> {
                     Mono.zip(pointCode, tableCode)
                         .doOnNext(t -> {
@@ -130,7 +125,7 @@ public class BoardController {
                             ph.setMemberPk(b.getMemberPk());
                             ph.setPointCodePk(t.getT2().getId());
                             ph.setCreateAt(b.getCreateAt());
-                            ph.setTableCodePk(b.getId());
+                            ph.setTableCodePk(t.getT2().getId());
                             ph.setTableRefPk(t.getT1().getId());
 
                             pointHistoryService.insert(ph)
@@ -138,7 +133,7 @@ public class BoardController {
                                     .subscribe();
                         })
                         .subscribe();
-            });
+                });
     }
 
     @PutMapping("/{id}")

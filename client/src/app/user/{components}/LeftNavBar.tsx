@@ -5,7 +5,7 @@ import {
     faAddressCard,
     faCheckToSlot,
     faClockRotateLeft,
-    faEnvelope,
+    faEnvelope, faFilePowerpoint,
     faKey, faRectangleList, fas,
 } from "@fortawesome/free-solid-svg-icons";
 import React from "react";
@@ -34,6 +34,7 @@ const LeftNavBar = ({
         {name: 'OTP', href:'/user/otp', icon:faKey},
         {name: 'EMAIL', href:'/user/email', icon: faEnvelope},
         {name: 'SYSTEM', href:'/user/system', icon: faGear},
+        {name: '포인트 적립 내역', href:'/user/point-history', icon: faFilePowerpoint},
     ]
 
     const openToggle = () => {

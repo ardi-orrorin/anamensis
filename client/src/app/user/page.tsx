@@ -7,13 +7,14 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faWindowMinimize} from "@fortawesome/free-solid-svg-icons/faWindowMinimize";
 import AttendInfo from "@/app/user/{components}/AttendInfo";
 import BoardSummary from "@/app/user/{components}/BoardSummary";
+import PointSummary from "@/app/user/{components}/PointSummary";
 
 export default function Page() {
 
     const [windowList, setWindowList] = useState<UserInfoWindowProps[]>([
         {winKey: 'win1', title: '출석체크', open: true, children: <AttendInfo/>},
         {winKey: 'win2', title: '최근 작성글', open: true, children: <BoardSummary/>},
-        {winKey: 'win3', title: '제목3', open: true, children: "sdf" },
+        {winKey: 'win3', title: '최근 포인트적립 내역', open: true, children: <PointSummary /> },
         {winKey: 'win4', title: '제목4', open: true, children: "test"},
     ]);
 

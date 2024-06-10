@@ -42,8 +42,7 @@ public class UserRequest {
         @Pattern(regexp = "^[a-zA-Z0-9.-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9]+$", message = "Invalid email")
         private String email;
 
-        @NotNull(message = "Phone number is required")
-        @Pattern(regexp = "^01(?:0|1|[6-9])-(?:\\d{3}|\\d{4})-\\d{4}$", message = "Invalid phone number")
+//        @Pattern(regexp = "^01(?:0|1|[6-9])-(?:\\d{3}|\\d{4})-\\d{4}$", message = "Invalid phone number")
         private String phone;
 
         public static Member transToUser(Register reg) {

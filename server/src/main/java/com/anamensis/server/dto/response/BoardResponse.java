@@ -25,6 +25,8 @@ public class BoardResponse {
 
         private String writer;
 
+        private String body;
+
         private String profileImage;
 
         private long viewCount;
@@ -37,6 +39,7 @@ public class BoardResponse {
         private boolean isAdsense;
 
         public static List from(BoardResultMap.Board board) {
+
             List.ListBuilder builder = List.builder()
                     .id(board.getId())
                     .title(board.getBoard().getTitle())
@@ -45,6 +48,9 @@ public class BoardResponse {
                     .createdAt(board.getBoard().getCreateAt())
                     .isAdsense(board.getBoard().isAdsense())
                     .commentCount(board.getCommentCount());
+
+            String body = board.getBoard().getContent().get("list").toString();
+            builder.body(body);
 
 //            if(board.getFile() == null)  return builder.build();
 

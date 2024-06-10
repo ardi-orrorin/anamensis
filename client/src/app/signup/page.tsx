@@ -121,16 +121,16 @@ export default function Page() {
     },[user]);
 
 
-    const setProps = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const setProps = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
 
-        if(name === 'pwd' && value.length < 8) {
+        if (name === 'pwd' && value.length < 8) {
             setUser({
                 ...user,
                 pwd: value,
                 pwdCheck: ''
             })
-            return ;
+            return;
         }
 
         setUser({
@@ -138,48 +138,52 @@ export default function Page() {
             [name]: value
         });
 
-        if(name === 'email') {
+        if (name === 'email') {
             setEmailSelect(false);
             setTimer(-1);
         }
 
-        if(name === 'id' || name === 'email' || name === 'phone') {
-            if(name === 'id' && !idRegex.test(value)) {
-                check.id = 'notCheck';
-                return ;
-            }
-            if(name === 'phone' && !phoneRegex.test(value)) {
-                check.phone = 'notCheck';
-                return ;
-            }
-            if(name === 'email' && !emailRegex.test(value)) {
-                check.email = 'notCheck';
-                return ;
-            }
+        if (name !== 'id' && name !== 'email' && name !== 'phone') return;
 
-            checkHandler({type: name, value})
-                .then((res) => {
-                    setCheck({
-                        ...check,
-                        [name]: res.data.message === 'false' ? 'check' : 'notCheck'
-                    });
-                    if(name === 'id') {
-                        setDescription({
-                            ...description,
-                            id: res.data.message === 'false' ? '사용 가능한 아이디입니다.' : '이미 사용중인 아이디입니다.'
-                        });
-                    }
-                    if(name === 'email') {
-                        setDescription({
-                            ...description,
-                            email: res.data.message === 'false' ? '사용 가능한 이메일입니다.' : '이미 사용중인 이메일입니다.'
-                        });
-                    }
+        if (name === 'id' && !idRegex.test(value)) {
+            check.id = 'notCheck';
+            return;
+        }
+        if (name === 'phone' && name.length > 0 && !phoneRegex.test(value)) {
+            check.phone = 'notCheck';
+            return;
+        }
+        if (name === 'email' && !emailRegex.test(value)) {
+            check.email = 'notCheck';
+            return;
+        }
+
+        try {
+            const res = await checkHandler({type: name, value});
+
+            setCheck({
+                ...check,
+                [name]: res.data.message === 'false' ? 'check' : 'notCheck'
+            });
+
+            if (name === 'id') {
+                setDescription({
+                    ...description,
+                    id: res.data.message === 'false' ? '사용 가능한 아이디입니다.' : '이미 사용중인 아이디입니다.'
                 });
+            }
+            if (name === 'email') {
+                setDescription({
+                    ...description,
+                    email: res.data.message === 'false' ? '사용 가능한 이메일입니다.' : '이미 사용중인 이메일입니다.'
+                });
+            }
+        } catch (e) {
+            console.log(e);
         }
     }
 
-    const emailClickHandler = (value: string) => {
+    const emailClickHandler = async (value: string) => {
         setUser({
             ...user,
             email: value
@@ -187,17 +191,20 @@ export default function Page() {
 
         setEmailSelect(true);
 
-        checkHandler({type: 'email', value})
-            .then((res) => {
-                setCheck({
-                    ...check,
-                    email: res.data.message === 'false' ? 'check' : 'notCheck'
-                });
-                setDescription({
-                    ...description,
-                    email: res.data.message === 'false' ? '사용 가능한 이메일입니다.' : '이미 사용중인 이메일입니다.'
-                });
+        try {
+            const res = await checkHandler({type: 'email', value});
+            setCheck({
+                ...check,
+                email: res.data.message === 'false' ? 'check' : 'notCheck'
             });
+            setDescription({
+                ...description,
+                email: res.data.message === 'false' ? '사용 가능한 이메일입니다.' : '이미 사용중인 이메일입니다.'
+            });
+
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     const inputCheck = (checkType: CheckType) => {
@@ -208,13 +215,14 @@ export default function Page() {
     };
 
     const allCheck = useMemo(() => {
-        const {id, pwd, pwdCheck, name, email, phone} = check;
-        return id === 'check' &&
-               pwd === 'check' &&
-               pwdCheck === 'check' &&
-               name === 'check' &&
-               email === 'check' &&
-               phone === 'check';
+        const {id, pwd, pwdCheck, name, email, phone, emailCheck} = check;
+        return id === 'check'
+               && pwd === 'check'
+               && pwdCheck === 'check'
+               && name === 'check'
+               && email === 'check'
+               && emailCheck === 'check'
+               &&(phone === 'check' || phone === 'uncheck');
     },[check]);
 
     const submitHandler = async () => {
@@ -231,6 +239,10 @@ export default function Page() {
                 alert('회원가입이 완료되었습니다.');
                 router.push('/');
             }
+        })
+        .catch((e) => {
+            console.log(e);
+            alert('회원가입에 실패했습니다.');
         })
         .finally(() => {
             setLoading(false);
@@ -268,13 +280,12 @@ export default function Page() {
             body: {email: user.email, code: user.emailCheck},
             call: 'Proxy'
         }).then((res) => {
-            if(res.status === 200) {
-                alert('인증이 완료되었습니다.');
-                setCheck({
-                    ...check,
-                    emailCheck: 'check'
-                });
-            }
+            if(res.status !== 200) return;
+            alert('인증이 완료되었습니다.');
+            setCheck({
+                ...check,
+                emailCheck: 'check'
+            });
         });
     }
 
@@ -300,8 +311,6 @@ export default function Page() {
         <main className={'flex flex-col min-h-screen justify-center items-center'}>
             <div className={"flex flex-col gap-4 border border-solid b border-blue-300 sm:w-4/5 md:w-1/2 xl:w-1/3 w-full rounded pb-5"}>
                 <div className={'flex flex-col gap-1 bg-blue-300 py-4'}>
-                    {/*<h1 className={'flex justify-center font-bold text-white text-xl'}*/}
-                    {/*>Anamensis</h1>*/}
                     <h3 className={'flex justify-center font-bold text-white text-base'}
                     >Signup</h3>
                 </div>
@@ -389,7 +398,7 @@ export default function Page() {
                     <Row name={'phone'}
                          value={user}
                          check={check}
-                         placeholder={'휴대폰 번호를 입력하세요. ex) 010-1234-5678'}
+                         placeholder={'휴대폰 번호를 입력하세요. ex) 010-1234-5678 (선택사항)'}
                          setProps={setProps}
                          inputCheck={inputCheck}
                          description={description.phone}

@@ -1,0 +1,4 @@
+spring:
+  application:
+#    name: server, aws, mysql, security, redis
+    name: server, aws, security, redis

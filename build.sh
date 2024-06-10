@@ -6,48 +6,37 @@ echo
 service=$1
 version=$2
 docker_id=$3
-base_id=$4
-platform=linux/amd64,linux/arm64
+server_file_name=''$service'-anamensis-'$version''
 
-if [ "$service" == "base" ] && [ "$version" != "" ] && [ "$docker_id" != "" ]
+echo 'build_type: 'service''
+echo 'version: '$version''
+echo 'docker_id: '$docker_id''
+
+if [[ "$service" != "batch" ]] && [[ "$service" != "config" ]] && [[ "$service" != "server" ]] && [[ "$service" != "nextjs" ]]
 then
-    docker buildx build --platform $platform --push -t $docker_id/anamensis-base:latest -f base.Dockerfile  .
-    docker buildx build --platform $platform --push -t $docker_id/anamensis-base:$version -f base.Dockerfile  .
+    echo 'build_type is required'
     exit 1
 fi
 
-if [ "$service" != "batch" ] && [ "$service" != "config" ] && [ "$service" != "site" ]
-then
-    echo 'service is required'
-    exit 1
-fi
-
-if [ "$version" == "" ]
+if [[ "$version" == "" ]]
 then
     echo 'version is required'
     exit 1
 fi
 
-if [ "$docker_id" == "" ]
+if [[ "$docker_id" == "" ]]
 then
     echo 'docker_id is required'
     exit 1
 fi
 
-if [ "$base_id" == "" ]
-then
-    echo 'base_id is required'
-    exit 1
-fi
-
 echo 'start '$service'-anamensis project build start....'
 
-if [ "$service" == "batch" ] || [ "$service" == "config" ]
+if [[ "$service" == "batch" ]] || [[ "$service" == "config" ]] || [[ "$service" == "server" ]]
 then
     gradle build ':'$service':build' -Pversion=$version
-elif [ "$service" == "site" ]; then
-    gradle build ':server:build' -Pversion=$version
 fi
+
 
 echo 'start '$service'-anamensis project build success....'
 
@@ -59,23 +48,9 @@ echo
 
 echo 'docker latest build start....'
 
-if [ "$service" == "site" ]
-then
-    sed "s|__DOCKER_ID__|$base_id|g" site.Dockerfile.template > site.Dockerfile
+docker build --platform linux/amd64 --build-arg='JAR='$server_file_name -t $docker_id/$service-anamensis:latest -f $service.Dockerfile  .
 
-    sed "s|__VERSION__|$version|g" ./client/package.json > package.json.temp
-    sed "s|__VERSION__|$version|g" ./client/package-lock.json > package-lock.temp
-    mv package.json.temp ./client/package.json
-    mv package-lock.temp ./client/package-lock.json
-
-    server_file_name='server-anamensis-'$version''
-
-
-else
-    server_file_name=''$service'-anamensis-'$version''
-fi
-
-docker buildx build --platform $platform --push --build-arg='JAR='$server_file_name -t $docker_id/$service-anamensis:latest  -f $service.Dockerfile  .
+#docker push ${docker_id}/${build_type}-anamensis:latest
 
 echo 'docker latest build success....'
 
@@ -83,13 +58,9 @@ echo
 
 echo ''$service'-docker-compose build start....'
 
-docker buildx build --platform $platform --push --build-arg='JAR='$server_file_name -t $docker_id/$service-anamensis:$version -f $service.Dockerfile  .
+docker build --platform linux/amd64 --build-arg='JAR='$server_file_name -t $docker_id/$service-anamensis:$version -f $service.Dockerfile  .
 
-
-if [ "$service" == "site" ]
-then
-    rm -rf site.Dockerfile
-fi
+#docker push ${docker_id}/${build_type}-anamensis:${version}
 
 echo ''$service'-docker-compose build success....'
 

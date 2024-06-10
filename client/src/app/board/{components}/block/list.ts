@@ -146,17 +146,17 @@ export const blockTypeList: BlockComponentType[] = [
             Component     : FileImage
         }),
     },
-    {
-        code              : '00202',
-        tag               : 'fileUpload',
-        command           : '/file',
-        label             : 'fileUplaod',
-        icon              : faFile,
-        comment           : '파일 업로드',
-        type              : 'object',
-        component         : (props: BlockProps)  => FileBlock({
-            ...props,
-            Component     : FileFile
-        }),
-    },
+    // {
+    //     code              : '00202',
+    //     tag               : 'fileUpload',
+    //     command           : '/file',
+    //     label             : 'fileUplaod',
+    //     icon              : faFile,
+    //     comment           : '파일 업로드',
+    //     type              : 'object',
+    //     component         : (props: BlockProps)  => FileBlock({
+    //         ...props,
+    //         Component     : FileFile
+    //     }),
+    // },
 ]

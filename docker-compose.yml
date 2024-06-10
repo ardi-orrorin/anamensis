@@ -1,0 +1,145 @@
+version: '3.8'
+
+services:
+  config-anamensis:
+    image: ${DOCKER_ID}/config-anamensis:${TAG}
+    networks:
+      - anamensis
+    ports:
+      - "${PORT}:8080"
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        failure_action: rollback
+        monitor: 60s
+        delay: 10s
+        order: start-first
+      rollback_config:
+        delay: 0s
+        parallelism: 1
+        failure_action: continue
+        order: start-first
+    healthcheck:
+      test: "curl http://localhost:8080/actuator/health | grep UP || exit 1"
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: on-failure
+    secrets:
+      - source: config_anamensis_secret_config
+        target: /application.yml
+      - source: config_anamensis_secret_keystore
+        target: /anamensis.jks
+
+  server-anamensis:
+#    depends_on: config-anamensis
+    image: ${DOCKER_ID}/server-anamensis:${TAG}
+    networks:
+      - anamensis
+    ports:
+      - "${PORT}:8080"
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        failure_action: rollback
+        monitor: 60s
+        delay: 10s
+        order: start-first
+      rollback_config:
+        delay: 0s
+        parallelism: 1
+        failure_action: continue
+        order: start-first
+    healthcheck:
+      test: "curl http://localhost:8080/actuator/health | grep UP || exit 1"
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: on-failure
+    secrets:
+      - source: server_anamensis_secret_config
+        target: /application.yml
+
+  batch-anamensis:
+#    depends_on: config-anamensis
+    build:
+      context: .
+      dockerfile: Batch-Dockerfile
+      args:
+        JAR: batch-anamensis-${TAG}
+    image: batch-anamensis:${TAG}
+    networks:
+      - anamensis
+    ports:
+      - "${PORT}:8080"
+    deploy:
+      update_config:
+        parallelism: 1
+        failure_action: rollback
+        monitor: 60s
+        delay: 10s
+        order: start-first
+      rollback_config:
+        delay: 0s
+        parallelism: 1
+        failure_action: continue
+        order: start-first
+    healthcheck:
+      test: "curl http://localhost:8080/actuator/health | grep UP || exit 1"
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: on-failure
+    secrets:
+      - source: batch_anamensis_secret_config
+        target: /application.yml
+
+  nextjs-anamensis:
+#    depends_on: server-anamensis
+    image: ${DOCKER_ID}/nextjs-anamensis:${TAG}
+    networks:
+      - anamensis
+    ports:
+      - "${PORT}:3000"
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        failure_action: rollback
+        monitor: 60s
+        delay: 10s
+        order: start-first
+      rollback_config:
+        delay: 0s
+        parallelism: 1
+        failure_action: continue
+        order: start-first
+    healthcheck:
+      test: "curl http://localhost:3000 || exit 1"
+      interval: 60s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: on-failure
+
+networks:
+  anamensis:
+    external: true
+
+secrets:
+  server_anamensis_secret_config:
+    external: true
+
+  config_anamensis_secret_config:
+    external: true
+
+  config_anamensis_secret_keystore:
+    external: true
+
+  batch_anamensis_secret_config:
+    external: true

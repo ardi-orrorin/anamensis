@@ -49,13 +49,12 @@ public class BoardController {
                 .subscribeOn(Schedulers.boundedElastic())
                 .collectList();
 
-        Mono<Long> count = boardService.count(board)
-                .subscribeOn(Schedulers.boundedElastic());
+//        Mono<Long> count = boardService.count(board)
+//                .subscribeOn(Schedulers.boundedElastic());
 
-        return Mono.zip(list, count)
-                .map(t -> {
-                    page.setTotal(t.getT2().intValue());
-                    return new PageResponse<>(page, t.getT1());
+        return list.map(l -> {
+//                    page.setTotal(t.getT2().intValue());
+                    return new PageResponse<>(page, l);
                 });
     }
 

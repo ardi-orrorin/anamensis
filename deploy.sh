@@ -33,21 +33,21 @@ then
     exit 1
 fi
 
-echo 'build_type: '${build_type}''
-echo 'version: '${version}''
-echo 'port: '${port}''
-echo 'docker_id: '${docker_id}''
+echo 'build_type: '$build_type''
+echo 'version: '$version''
+echo 'port: '$port''
+echo 'docker_id: '$docker_id''
 
 echo 'docker image pull start....'
 
-TAG=${version} PORT=${port} DOCKER_ID=${docker_id} docker-compose -f ${build_type}-docker-compose.yml pull
+TAG=$version PORT=$port DOCKER_ID=$docker_id docker-compose -f docker-compose.yml pull $build_type-anamensis
 
 echo 'docker image pull success....'
 
 
 echo 'docker stack deploy start....'
 
-TAG=${version} PORT=${port} DOCKER_ID=${docker_id} docker stack deploy -c ${build_type}-docker-compose.yml ${build_type}-anamensis
+TAG=$version PORT=$port DOCKER_ID=$docker_id docker stack deploy -c docker-compose.yml $build_type-anamensis
 
 echo 'docker stack deploy success....'
 

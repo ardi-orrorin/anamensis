@@ -1,6 +1,6 @@
 import Link from "next/link";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faRightFromBracket, faUser} from "@fortawesome/free-solid-svg-icons";
+import {faPenToSquare, faRightFromBracket, faUser} from "@fortawesome/free-solid-svg-icons";
 import {cookies} from "next/headers";
 
 type NavItemProps = {
@@ -44,20 +44,25 @@ const NavMain = async () => {
             url: '/user',
             loginRequired: true,
         },
+        {
+            name: <FontAwesomeIcon icon={faPenToSquare} />,
+            url: '/board/new?categoryPk=2',
+            loginRequired: true,
+        },
     ];
 
     return (
         <nav className={'w-full flex justify-between items-center bg-blue-500 text-white h-12'}>
-            <div className={'w-1/3 duration-300'}>
-                <ul className={'hidden md:flex duration-300'}>
-                    {
-                        menuItems.map((item, index) => {
-                            return <NavItem key={index} {...item} />
-                        })
-                    }
-                </ul>
-            </div>
-            <div className={'w-1/3'}>
+            {/*<div className={'w-1/3 duration-300'}>*/}
+            {/*    <ul className={'hidden md:flex duration-300'}>*/}
+            {/*        {*/}
+            {/*            menuItems.map((item, index) => {*/}
+            {/*                return <NavItem key={index} {...item} />*/}
+            {/*            })*/}
+            {/*        }*/}
+            {/*    </ul>*/}
+            {/*</div>*/}
+            <div className={''}>
                 <Link className={'flex justify-center p-3'}
                       href={'/'}
                 >ANAMENSIS</Link>

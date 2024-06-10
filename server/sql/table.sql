@@ -29,7 +29,7 @@ CREATE TABLE member (
 	pwd	        VARCHAR(255)  NOT NULL UNIQUE    	                   COMMENT '패스워드',
     name	    VARCHAR(100)  NOT NULL          	                   COMMENT '이름',
 	email	    VARCHAR(255)  NOT NULL UNIQUE    	                   COMMENT '이메일',
-    phone  	    VARCHAR(20)	  NOT NULL UNIQUE    	                   COMMENT '핸드폰 번호',
+    phone  	    VARCHAR(20)	  NULL              	                   COMMENT '핸드폰 번호',
     point       BIGINT                 DEFAULT      0                  COMMENT '포인트',
 	create_at	TIMESTAMP(6)  NOT NULL                                 COMMENT '생성일자',
 	update_at	TIMESTAMP(6)      NULL                                 COMMENT '정보 수정 일자',

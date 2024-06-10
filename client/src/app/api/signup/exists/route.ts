@@ -4,16 +4,17 @@ import apiCall from "@/app/{commons}/func/api";
 
 export async function POST(req: NextRequest) {
 
-    const data = await req.json() as ExistProps;
+    const body = await req.json() as ExistProps;
 
     try {
         const res = await apiCall<any>({
             path: '/public/api/user/exists',
             method: 'POST',
-            body: data,
+            body,
             call: 'Server',
             isReturnData: true,
         });
+
 
         return new NextResponse(JSON.stringify(res), {
             status: 200,

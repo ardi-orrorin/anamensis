@@ -125,17 +125,19 @@ export default function Page() {
     if(!data || !data?.content) return <GlobalLoadingSpinner />;
 
     return (
-        <div className={'p-5 flex flex-col gap-5'}>
+        <div className={'p-5 flex flex-col gap-10'}>
             <div className={'px-4 sm:px-10 md:px-20 lg:px-44 w-full flex justify-center items-center gap-3'}>
-                <input className={'rounded-full outline-0 border-solid border-gray-200 border text-xs w-full h-10 p-3'}
-                       placeholder={'검색어'}
-                       value={searchValue || ''}
-                       onChange={(e) => setSearchValue(e.target.value)}
-                       onKeyUp={onEnterHandler}
-                />
-                <button onClick={onSearchHandler}>
-                    <FontAwesomeIcon icon={faMagnifyingGlass} className={'h-8 text-gray-400'}/>
-                </button>
+                <div className={'relative w-full'}>
+                    <input className={'rounded-full outline-0 border-solid border-gray-200 border text-xs w-full h-10 py-3 pl-4 pr-16 focus:bg-blue-50 duration-500'}
+                           placeholder={'검색어'}
+                           value={searchValue || ''}
+                           onChange={(e) => setSearchValue(e.target.value)}
+                           onKeyUp={onEnterHandler}
+                    />
+                    <button className={'absolute right-2 top-1 border rounded-full py-1.5 px-3 hover:text-white hover:bg-blue-300 duration-500'} onClick={onSearchHandler}>
+                        <FontAwesomeIcon icon={faMagnifyingGlass} className={'h-4 text-gray-400'}/>
+                    </button>
+                </div>
             </div>
             <div className={'flex flex-wrap gap-5 justify-center px-36'}>
                 {

@@ -26,18 +26,19 @@ docker secret create config_anamensis_secret_keystore anamensis.jks
 ## docker create network
 - anamensis 전용 네트워크 생성
 ```shell
-docker network create anamensis --scope swarm
+docker network create anamensis -d overlay --scope swarm
 ```
 
 ## docker build & deploy
 - docker build & deploy
-- buildtype : server, batch, config, nextjs
+- service : server, batch, config, nextjs
+- port : nextjs만 사용
 ```shell
 #build
-/root/build.sh build_type version docker_hub_id
+/root/build.sh service version docker_hub_id
 
 #deploy
-/root/deploy.sh deploy_type version port docker_hub_id
+/root/deploy.sh service version port docker_hub_id
 ```
 - example build & deploy
 ```shell

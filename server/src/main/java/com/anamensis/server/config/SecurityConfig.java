@@ -2,7 +2,6 @@ package com.anamensis.server.config;
 
 import com.anamensis.server.config.converter.StringToAuthTypeConverter;
 import com.anamensis.server.config.converter.StringToRoleTypeConverter;
-import com.anamensis.server.service.GoogleUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,18 +15,6 @@ import org.springframework.security.config.web.server.ServerHttpSecurity.Authori
 import org.springframework.security.config.web.server.ServerHttpSecurity.CsrfSpec;
 import org.springframework.security.config.web.server.ServerHttpSecurity.FormLoginSpec;
 import org.springframework.security.config.web.server.ServerHttpSecurity.HttpBasicSpec;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
-import org.springframework.security.oauth2.client.oidc.userinfo.OidcReactiveOAuth2UserService;
-import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
-import org.springframework.security.oauth2.client.userinfo.ReactiveOAuth2UserService;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.oidc.OidcIdToken;
-import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
-import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
-import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -35,12 +22,8 @@ import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.result.method.annotation.ArgumentResolverConfigurer;
-import reactor.core.publisher.Mono;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @Configuration
 @EnableWebFlux
@@ -66,8 +49,7 @@ public class SecurityConfig implements WebFluxConfigurer {
                 .cors(corsSpec -> {
                     corsSpec.configurationSource(corsConfigurationSource());
                 })
-                .oauth2Login(Customizer.withDefaults())
-                .addFilterBefore(
+                .addFilterAfter(
                         authenticationWebFilter,
                         SecurityWebFiltersOrder.AUTHENTICATION
                 )

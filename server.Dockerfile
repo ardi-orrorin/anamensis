@@ -6,4 +6,5 @@ ARG        JAR
 ARG        JAR_FILE=server/build/libs/${JAR}.jar
 COPY       ${JAR_FILE} app.jar
 ENV        SPRING_CONFIG_LOCATION "/application.yml"
-ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-Djava.net.preferIPv4Stack=true", "-jar", "/app.jar"]
+ENV        SPRING_PROFILES_ACTIVE "prod"
+ENTRYPOINT ["java", "-Djava.net.preferIPv4Stack=true", "-jar", "/app.jar"]

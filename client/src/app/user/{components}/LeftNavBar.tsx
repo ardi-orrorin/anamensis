@@ -29,11 +29,11 @@ const LeftNavBar = ({
     const menuItems = [
         {name: '유저 정보', href:'/user/info', icon: faCheckToSlot},
         {name: '로그인기록', href:'/user/history', icon: faClockRotateLeft},
-        {name: 'SMTP', href:'/user/smtp', icon: faEnvelope},
-        {name: 'SMTP 발송 내역', href:'/user/smtp-history', icon: faEnvelope},
-        {name: 'OTP', href:'/user/otp', icon:faKey},
+        // {name: 'SMTP', href:'/user/smtp', icon: faEnvelope},
+        // {name: 'SMTP 발송 내역', href:'/user/smtp-history', icon: faEnvelope},
+        // {name: 'OTP', href:'/user/otp', icon:faKey},
         {name: 'EMAIL', href:'/user/email', icon: faEnvelope},
-        {name: 'SYSTEM', href:'/user/system', icon: faGear},
+        // {name: 'SYSTEM', href:'/user/system', icon: faGear},
         {name: '포인트 적립 내역', href:'/user/point-history', icon: faFilePowerpoint},
     ]
 

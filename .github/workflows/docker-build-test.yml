@@ -16,6 +16,6 @@ jobs:
           architecture: x64
       
       - name: print branch
-        run: echo BRANCH_NAME
+        run: echo BRANCH_NAME ${{ github }}
       - name: Build the Docker image
         run: ./build.sh server x.x.1 ${{ secrets.DOCKER_ID }}

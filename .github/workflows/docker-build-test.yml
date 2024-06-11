@@ -16,4 +16,4 @@ jobs:
           architecture: x64
       
       - name: Build the Docker image
-        run: ./build.sh server 2.0.0 {{ secrets.DOCKER_ID }}
+        run: ./build.sh server 2.0.0 ${{ secrets.DOCKER_ID }}

@@ -39,7 +39,7 @@ const BoardComponent = (props: BoardListI) => {
 
 
     return (
-        <Link className={'flex flex-col w-96 min-w-96 bg-white shadow'}
+        <Link className={'flex flex-col w-96 min-w-96 bg-white shadow hover:bg-blue-50 hover:shadow-xl duration-500'}
               href={`/board/${id}`}
         >
             <div className={'flex justify-between p-3 h-auto items-center'}>

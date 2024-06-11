@@ -29,6 +29,7 @@ export default function Page() {
     const [data, setData] = useState<PageResponse<BoardListI>>({} as PageResponse<BoardListI>);
     const footerRef = useRef<HTMLDivElement>(null);
     const [searchValue, setSearchValue] = useState('');
+    const [searchFocus, setSearchFocus] = useState(false);
     const [dynamicPage, setDynamicPage] = useState<DynamicPage>({
         isEndOfList: false,
         isVisible  : false,
@@ -88,6 +89,7 @@ export default function Page() {
     }, [dynamicPage.isVisible])
 
     const fetchApi = async (searchParams: BoardListParams, isAdd: boolean) => {
+        if(!data.content) return;
         await apiCall<PageResponse<BoardListI>, BoardListParams>({
             path: '/api/board',
             method: 'GET',
@@ -123,17 +125,17 @@ export default function Page() {
         }
     }
 
-    if(!data || !data?.content) return <GlobalLoadingSpinner />;
-
     return (
         <div className={'p-5 flex flex-col gap-10'}>
             <div className={'px-4 sm:px-10 md:px-20 lg:px-44 w-full flex justify-center items-center gap-3'}>
-                <div className={'relative w-full'}>
+                <div className={['relative flex justify-center duration-1000', searchFocus ? 'w-[50%]' : 'w-60'].join(' ')}>
                     <input className={'rounded-full outline-0 border-solid border-gray-200 border text-xs w-full h-10 py-3 pl-4 pr-16 focus:bg-blue-50 duration-500'}
                            placeholder={'검색어'}
                            value={searchValue || ''}
                            onChange={(e) => setSearchValue(e.target.value)}
                            onKeyUp={onEnterHandler}
+                           onFocus={() => setSearchFocus(true)}
+                            onBlur={() => setSearchFocus(false)}
                     />
                     <button className={'absolute right-2 top-1 border rounded-full py-1.5 px-3 hover:text-white hover:bg-blue-300 duration-500'} onClick={onSearchHandler}>
                         <FontAwesomeIcon icon={faMagnifyingGlass} className={'h-4 text-gray-400'}/>
@@ -142,11 +144,13 @@ export default function Page() {
             </div>
             <div className={'flex flex-wrap gap-5 justify-center px-36'}>
                 {
-                    data.content.length === 0
+                    data.content
+                    && data.content.length === 0
                     && <div className={'text-center text-2xl w-full py-20 text-gray-600'}>검색 결과가 없습니다.</div>
                 }
                 {
-                    data.content.map((item, index) => {
+                    data.content
+                    && data.content.map((item, index) => {
                         return (
                             <BoardComponent key={'boardsummary' + index} {...item} />
                         )

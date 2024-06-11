@@ -4,6 +4,8 @@ import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.entity.Board;
 import com.anamensis.server.mapper.BoardMapper;
+import com.anamensis.server.resultMap.BoardCommentResultMap;
+import com.anamensis.server.resultMap.BoardResultMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,10 +31,9 @@ public class BoardService {
                 .map(BoardResponse.List::from);
     }
 
-    public Mono<BoardResponse.Content> findByPk(long boardPk) {
+    public Mono<BoardResultMap.Board> findByPk(long boardPk) {
         return Mono.justOrEmpty(boardMapper.findByPk(boardPk))
-                .switchIfEmpty(Mono.error(new RuntimeException("게시글이 없습니다.")))
-                .map(BoardResponse.Content::from);
+                .switchIfEmpty(Mono.error(new RuntimeException("게시글이 없습니다.")));
     }
 
     public Flux<BoardResponse.SummaryList> findByMemberPk(long memberPk) {

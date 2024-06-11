@@ -110,7 +110,7 @@ const CheckBlock = (props: BlockProps) => {
                            onKeyUp={onKeyUpHandler}
                            onKeyDown={onKeyDownHandler}
                            onFocus={onFocusHandler}
-                           ref={e=> blockRef!.current[seq] = e}
+                           ref={e=> {blockRef!.current[seq] = e}}
                            aria-roledescription={'todo'}
                     />
                 }

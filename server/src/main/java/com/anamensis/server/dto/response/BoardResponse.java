@@ -1,6 +1,7 @@
 package com.anamensis.server.dto.response;
 
 
+import com.anamensis.server.entity.Member;
 import com.anamensis.server.resultMap.BoardResultMap;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
@@ -25,7 +26,7 @@ public class BoardResponse {
 
         private String writer;
 
-        private String body;
+        private Object body;
 
         private String profileImage;
 
@@ -49,8 +50,7 @@ public class BoardResponse {
                     .isAdsense(board.getBoard().isAdsense())
                     .commentCount(board.getCommentCount());
 
-            String body = board.getBoard().getContent().get("list").toString();
-            builder.body(body);
+            builder.body(board.getBoard().getContent().get("list"));
 
 //            if(board.getFile() == null)  return builder.build();
 
@@ -82,10 +82,12 @@ public class BoardResponse {
 
         private long rate;
 
+        private Boolean isWriter;
+
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime createdAt;
 
-        public static Content from(BoardResultMap.Board board) {
+        public static Content from(BoardResultMap.Board board, Member member) {
             Content.ContentBuilder builder = Content.builder()
                     .id(board.getId())
                     .title(board.getBoard().getTitle())
@@ -94,6 +96,10 @@ public class BoardResponse {
                     .writer(board.getMember().getName())
                     .viewCount(board.getBoard().getViewCount())
                     .createdAt(board.getBoard().getCreateAt());
+
+            if(member != null) {
+                builder.isWriter(board.getBoard().getMemberPk() == member.getId());
+            }
 
 
 //            if(board.getFile() == null)  return builder.build();

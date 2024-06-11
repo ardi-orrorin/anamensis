@@ -3,6 +3,7 @@ package com.anamensis.server.service;
 import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.entity.Board;
+import com.anamensis.server.resultMap.BoardResultMap;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -135,7 +136,7 @@ class BoardServiceTest {
         StepVerifier.create(bs.findByPk(1))
                 .assertNext(content -> {
                     assertEquals(1, content.getId());
-                    assertEquals("테스트 제목1", content.getTitle());
+                    assertEquals("테스트 제목1", content.getBoard().getTitle());
                 })
                 .verifyComplete();
 
@@ -143,7 +144,7 @@ class BoardServiceTest {
         StepVerifier.create(bs.findByPk(10))
                 .assertNext(content -> {
                     assertEquals(10, content.getId());
-                    assertEquals("테스트 제목10", content.getTitle());
+                    assertEquals("테스트 제목10", content.getBoard().getTitle());
                 })
                 .verifyComplete();
 
@@ -227,10 +228,10 @@ class BoardServiceTest {
 
         StepVerifier.create(bs.findByPk(b.getId()))
                 .assertNext(it -> {
-                    assertEquals("테스트 제목 추가", it.getTitle());
-                    assertEquals(0, it.getRate());
-                    assertEquals(0, it.getViewCount());
-                    assertEquals("d-member-1", it.getWriter());
+                    assertEquals("테스트 제목 추가", it.getBoard().getTitle());
+                    assertEquals(0, it.getBoard().getRate());
+                    assertEquals(0, it.getBoard().getViewCount());
+                    assertEquals("d-member-1", it.getMember().getName());
                 })
                 .verifyComplete();
 
@@ -331,16 +332,16 @@ class BoardServiceTest {
     @Order(8)
     @DisplayName("게시글 수정 테스트")
     void updateByPk() {
-        BoardResponse.Content content = bs.findByPk(1).block();
+        BoardResultMap.Board content = bs.findByPk(1).block();
         Board b = new Board();
         b.setId(content.getId());
         b.setMemberPk(1);
-        b.setCategoryPk(content.getCategoryPk());
+        b.setCategoryPk(content.getBoard().getCategoryPk());
         b.setTitle("테스트 제목 수정");
-        b.setContent(content.getContent());
-        b.setRate(content.getRate());
-        b.setViewCount(content.getViewCount());
-        b.setCreateAt(content.getCreatedAt());
+        b.setContent(content.getBoard().getContent());
+        b.setRate(content.getBoard().getRate());
+        b.setViewCount(content.getBoard().getViewCount());
+        b.setCreateAt(content.getBoard().getCreateAt());
 
         StepVerifier.create(bs.updateByPk(b))
                 .expectNext(true)
@@ -349,10 +350,10 @@ class BoardServiceTest {
         StepVerifier.create(bs.findByPk(1))
                 .assertNext(it -> {
                     assertEquals(1, it.getId());
-                    assertEquals("테스트 제목 수정", it.getTitle());
-                    assertEquals(0, it.getRate());
-                    assertEquals(0, it.getViewCount());
-                    assertEquals("d-member-1", it.getWriter());
+                    assertEquals("테스트 제목 수정", it.getBoard().getTitle());
+                    assertEquals(0, it.getBoard().getRate());
+                    assertEquals(0, it.getBoard().getViewCount());
+                    assertEquals("d-member-1", it.getMember().getName());
                 })
                 .verifyComplete();
 
@@ -366,11 +367,11 @@ class BoardServiceTest {
         StepVerifier.create(bs.findByPk(1))
                 .assertNext(it -> {
                     assertEquals(1, it.getId());
-                    assertEquals("테스트 제목 수정", it.getTitle());
-                    assertEquals(0, it.getRate());
-                    assertEquals(0, it.getViewCount());
-                    assertEquals("d-member-1", it.getWriter());
-                    assertEquals(newContent, it.getContent());
+                    assertEquals("테스트 제목 수정", it.getBoard().getTitle());
+                    assertEquals(0, it.getBoard().getRate());
+                    assertEquals(0, it.getBoard().getViewCount());
+                    assertEquals("d-member-1", it.getMember().getName());
+                    assertEquals(newContent, it.getBoard().getContent());
                 })
                 .verifyComplete();
 
@@ -391,7 +392,7 @@ class BoardServiceTest {
                 .expectNext(false)
                 .verifyComplete();
 
-        b.setCategoryPk(content.getCategoryPk());
+        b.setCategoryPk(content.getBoard().getCategoryPk());
         b.setTitle(null);
         StepVerifier.create(bs.updateByPk(b))
                 .expectNext(true)
@@ -401,11 +402,11 @@ class BoardServiceTest {
         StepVerifier.create(bs.findByPk(1))
                 .assertNext(it -> {
                     assertEquals(1, it.getId());
-                    assertEquals("테스트 제목 수정", it.getTitle());
-                    assertEquals(0, it.getRate());
-                    assertEquals(0, it.getViewCount());
-                    assertEquals("d-member-1", it.getWriter());
-                    assertEquals(newContent, it.getContent());
+                    assertEquals("테스트 제목 수정", it.getBoard().getTitle());
+                    assertEquals(0, it.getBoard().getRate());
+                    assertEquals(0, it.getBoard().getViewCount());
+                    assertEquals("d-member-1", it.getMember().getName());
+                    assertEquals(newContent, it.getBoard().getContent());
                 })
                 .verifyComplete();
 
@@ -419,11 +420,11 @@ class BoardServiceTest {
         StepVerifier.create(bs.findByPk(1))
                 .assertNext(it -> {
                     assertEquals(1, it.getId());
-                    assertEquals("테스트 제목 수정", it.getTitle());
-                    assertEquals(0, it.getRate());
-                    assertEquals(0, it.getViewCount());
-                    assertEquals("d-member-1", it.getWriter());
-                    assertEquals(newContent, it.getContent());
+                    assertEquals("테스트 제목 수정", it.getBoard().getTitle());
+                    assertEquals(0, it.getBoard().getRate());
+                    assertEquals(0, it.getBoard().getViewCount());
+                    assertEquals("d-member-1", it.getMember().getName());
+                    assertEquals(newContent, it.getBoard().getContent());
                 })
                 .verifyComplete();
 
@@ -435,11 +436,11 @@ class BoardServiceTest {
         StepVerifier.create(bs.findByPk(1))
                 .assertNext(it -> {
                     assertEquals(1, it.getId());
-                    assertEquals("테스트 제목 수정", it.getTitle());
-                    assertNotEquals(100, it.getRate());
-                    assertEquals(0, it.getViewCount());
-                    assertEquals("d-member-1", it.getWriter());
-                    assertEquals(newContent, it.getContent());
+                    assertEquals("테스트 제목 수정", it.getBoard().getTitle());
+                    assertNotEquals(100, it.getBoard().getRate());
+                    assertEquals(0, it.getBoard().getViewCount());
+                    assertEquals("d-member-1", it.getMember().getName());
+                    assertEquals(newContent, it.getBoard().getContent());
                 })
                 .verifyComplete();
 
@@ -451,11 +452,11 @@ class BoardServiceTest {
         StepVerifier.create(bs.findByPk(1))
                     .assertNext(it -> {
                         assertEquals(1, it.getId());
-                        assertEquals("테스트 제목 수정", it.getTitle());
-                        assertEquals(0, it.getRate());
-                        assertNotEquals(100, it.getViewCount());
-                        assertEquals("d-member-1", it.getWriter());
-                        assertEquals(newContent, it.getContent());
+                        assertEquals("테스트 제목 수정", it.getBoard().getTitle());
+                        assertEquals(0, it.getBoard().getRate());
+                        assertNotEquals(100, it.getBoard().getViewCount());
+                        assertEquals("d-member-1", it.getMember().getName()) ;
+                        assertEquals(newContent, it.getBoard().getContent());
                     })
                     .verifyComplete();
     }

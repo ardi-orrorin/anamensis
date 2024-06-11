@@ -3,13 +3,10 @@ package com.anamensis.server.controller;
 import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.PageResponse;
 import com.anamensis.server.dto.StatusType;
-import com.anamensis.server.dto.response.BoardCommentResponse;
 import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.dto.response.StatusResponse;
-import com.anamensis.server.entity.Board;
-import com.anamensis.server.entity.PointCode;
-import com.anamensis.server.entity.PointHistory;
-import com.anamensis.server.entity.TableCode;
+import com.anamensis.server.entity.*;
+import com.anamensis.server.resultMap.BoardResultMap;
 import com.anamensis.server.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,7 +26,6 @@ public class BoardController {
     private final BoardService boardService;
     private final UserService userService;
     private final RateService rateService;
-    private final BoardCommentService boardCommentService;
     private final PointHistoryService pointHistoryService;
     private final PointService pointService;
     private final TableCodeService tableCodeService;
@@ -61,23 +57,36 @@ public class BoardController {
     @PublicAPI
     @GetMapping("/{id}")
     public Mono<BoardResponse.Content> findByPk(
-            @PathVariable(name = "id") long boardPk
+            @PathVariable(name = "id") long boardPk,
+            @AuthenticationPrincipal UserDetails user
     ) {
-        Mono<BoardResponse.Content> content = boardService.findByPk(boardPk)
-                .subscribeOn(Schedulers.boundedElastic());
+
+        Mono<Member> member = user == null ? Mono.just(new Member())
+                                           : userService.findUserByUserId(user.getUsername())
+                                                .subscribeOn(Schedulers.boundedElastic());
+
+        Mono<BoardResultMap.Board> content = boardService.findByPk(boardPk)
+            .subscribeOn(Schedulers.boundedElastic());
 
         Mono<Long> count = rateService.countRate(boardPk)
-                .subscribeOn(Schedulers.boundedElastic());
+            .subscribeOn(Schedulers.boundedElastic());
 
-        return Mono.zip(content, count)
-                .doOnNext(t -> t.getT1().setRate(t.getT2()))
-                .map(Tuple2::getT1)
-                .doOnNext($ -> {
-                    boardService.viewUpdateByPk(boardPk)
-                            .subscribeOn(Schedulers.boundedElastic())
-                            .subscribe();
-                });
-}
+        return Mono.zip(content, member)
+            .flatMap(t -> {
+                BoardResultMap.Board board = t.getT1();
+                Member m = t.getT2();
+                return Mono.just(BoardResponse.Content.from(board, m));
+            })
+            .zipWith(count)
+            .doOnNext(t -> t.getT1().setRate(t.getT2()))
+            .map(Tuple2::getT1)
+            .doOnNext($ -> {
+                boardService.viewUpdateByPk(boardPk)
+                    .subscribeOn(Schedulers.boundedElastic())
+                    .subscribe();
+            });
+
+    }
 
     @GetMapping("summary")
     public Mono<List<BoardResponse.SummaryList>> findByMemberPk(
@@ -180,33 +189,33 @@ public class BoardController {
     }
 
 
-    @PublicAPI
-    @GetMapping("test/{id}")
-    public Mono<BoardResponse.ExContent> findByPkTest(
-            @PathVariable(name = "id") long boardPk
-    ) {
-
-        Mono<BoardResponse.Content> content = boardService.findByPk(boardPk)
-                .flatMap(b -> rateService.countRate(b.getId())
-                        .doOnNext(b::setRate)
-                        .map($ -> b)
-                )
-                .subscribeOn(Schedulers.boundedElastic());
-
-        Mono<Boolean> viewUpdate = boardService.viewUpdateByPk(boardPk)
-                .subscribeOn(Schedulers.boundedElastic());
-
-
-        Mono<List<BoardCommentResponse.Comment>> comments = boardCommentService.findAllByBoardPk(boardPk)
-                .map(board -> BoardCommentResponse.Comment.fromResultMap(board, null))
-                .collectList()
-                .subscribeOn(Schedulers.boundedElastic());
-
-        return Mono.zip(content, viewUpdate, comments)
-                .map(tuple ->
-                   BoardResponse.ExContent.from(tuple.getT1(), tuple.getT3())
-                );
-    }
+//    @PublicAPI
+//    @GetMapping("test/{id}")
+//    public Mono<BoardResponse.ExContent> findByPkTest(
+//            @PathVariable(name = "id") long boardPk
+//    ) {
+//
+//        Mono<BoardResponse.Content> content = boardService.findByPk(boardPk)
+//                .flatMap(b -> rateService.countRate(b.getId())
+//                        .doOnNext(b::setRate)
+//                        .map($ -> b)
+//                )
+//                .subscribeOn(Schedulers.boundedElastic());
+//
+//        Mono<Boolean> viewUpdate = boardService.viewUpdateByPk(boardPk)
+//                .subscribeOn(Schedulers.boundedElastic());
+//
+//
+//        Mono<List<BoardCommentResponse.Comment>> comments = boardCommentService.findAllByBoardPk(boardPk)
+//                .map(board -> BoardCommentResponse.Comment.fromResultMap(board, null))
+//                .collectList()
+//                .subscribeOn(Schedulers.boundedElastic());
+//
+//        return Mono.zip(content, viewUpdate, comments)
+//                .map(tuple ->
+//                   BoardResponse.ExContent.from(tuple.getT1(), tuple.getT3())
+//                );
+//    }
 
 
 }

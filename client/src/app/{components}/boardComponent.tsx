@@ -14,9 +14,8 @@ export interface BoardListI {
     profileImage?: string;
     createdAt    : string;
     commentCount : number;
-    body?        : string;
+    body?        : BlockI[];
 }
-
 const BoardComponent = (props: BoardListI) => {
     const {
        id, rate, writer
@@ -25,20 +24,9 @@ const BoardComponent = (props: BoardListI) => {
         , body
     } = props;
 
-    let text = ''
-
+    let text = '';
     try {
-        const jsonString = body!.replaceAll('=', ':')
-            .replaceAll('{', '{"')
-            .replaceAll('}', '"}')
-            .replaceAll(':', '":"')
-            .replaceAll(', ', '", "')
-            .replaceAll('"{""}"', '{}')
-            .replaceAll('"}"', '"}')
-            .replaceAll('"{"', '{"')
-
-        const bodyObj: BlockI[] = JSON.parse(jsonString);
-        bodyObj.forEach((block) => {
+        body!.forEach((block) => {
             const regex = '0{4}'
             if(!block.code.match(regex)) return;
             text += block.value + '\n';
@@ -101,5 +89,4 @@ const BoardComponent = (props: BoardListI) => {
         </Link>
     )
 }
-
 export default BoardComponent;

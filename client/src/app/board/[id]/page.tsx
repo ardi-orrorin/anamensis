@@ -299,6 +299,8 @@ export default function Page({params}: {params : {id: string}}) {
                         {
                             !isNewBoard &&
                             <HeaderBtn isView={board.isView}
+                                       isWriter={board.data.isWriter || false}
+                                       isLogin={board.data.isLogin || false}
                                        submitClickHandler={() => debounce(() => submitHandler(false))}
                                        editClickHandler={editClickHandler}
                                        deleteClickHandler={() => debounce(() => deleteHandler())}

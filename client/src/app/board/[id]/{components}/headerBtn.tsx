@@ -1,12 +1,14 @@
 type HeaderBtnProps = {
-    isView: boolean;
+    isView   : boolean;
+    isWriter : boolean;
+    isLogin  : boolean;
     submitClickHandler: () => void;
     editClickHandler: () => void;
     deleteClickHandler: () => void;
 }
 
 const HeaderBtn = (props: HeaderBtnProps) => {
-    const {isView
+    const {isView, isWriter, isLogin
         , submitClickHandler, editClickHandler
         , deleteClickHandler
     } = props;
@@ -15,18 +17,21 @@ const HeaderBtn = (props: HeaderBtnProps) => {
         <>
         <div className={"w-auto flex gap-1 justify-end"}>
             {
-                !isView &&
+                !isView && isLogin &&
               <button
                 className={"w-16 rounded h-full border-2 border-blue-200 text-blue-400 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300"}
                 onClick={submitClickHandler}
               >저장
               </button>
             }
-            <button
-                className={"w-16 rounded h-full border-2 border-blue-200 text-blue-400 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300"}
-                onClick={editClickHandler}
-            >{isView ? "수정" : "취소"}
-            </button>
+            {
+                isWriter
+                && isLogin
+                && <button className={"w-16 rounded h-full border-2 border-blue-200 text-blue-400 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300"}
+                           onClick={editClickHandler}
+                >{isView ? "수정" : "취소"}
+                </button>
+            }
             {
                 !isView
                 && <button

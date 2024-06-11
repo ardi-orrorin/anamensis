@@ -102,7 +102,7 @@ const LinkBlock = (props: BlockProps) => {
                          onKeyUp={onKeyupChangeHandler}
                          onKeyDown={onKeyDownHandler}
                          onFocus={onFocusHandler}
-                         ref={el => blockRef!.current[seq] = el}
+                         ref={el => {blockRef!.current[seq] = el}}
                 />
                 : <a style={linkPreviewStyle}
                      href={value}

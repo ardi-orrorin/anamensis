@@ -152,6 +152,7 @@ const Login = () => {
                     <input
                         className={'w-full border border-none outline-0 focus:bg-blue-100 duration-300 text-xs rounded my-2 p-2'}
                         placeholder={'비밀번호를 입력하세요.'}
+                        type={'password'}
                         name={'password'}
                         value={user.password}
                         onChange={setProps}

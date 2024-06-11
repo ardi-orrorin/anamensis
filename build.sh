@@ -48,9 +48,9 @@ echo
 
 echo 'docker latest build start....'
 
-docker build --platform linux/amd64 --build-arg='JAR='$server_file_name -t $docker_id/$service-anamensis:latest -f $service.Dockerfile  .
+docker build --platform linux/amd64 --build-arg='JAR='$server_file_name -t $docker_id/$service-anamensis:latest  -f $service.Dockerfile  .
 
-#docker push ${docker_id}/${build_type}-anamensis:latest
+docker push ${docker_id}/${service}-anamensis:latest
 
 echo 'docker latest build success....'
 
@@ -60,7 +60,7 @@ echo ''$service'-docker-compose build start....'
 
 docker build --platform linux/amd64 --build-arg='JAR='$server_file_name -t $docker_id/$service-anamensis:$version -f $service.Dockerfile  .
 
-#docker push ${docker_id}/${build_type}-anamensis:${version}
+docker push ${docker_id}/${service}-anamensis:${version}
 
 echo ''$service'-docker-compose build success....'
 

@@ -9,6 +9,7 @@ import BoardComponent, {BoardListI} from "@/app/{components}/boardComponent";
 import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons/faMagnifyingGlass";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
+import {linkGc} from "next/dist/client/app-link-gc";
 
 
 export type BoardListParams = {
@@ -40,6 +41,7 @@ export default function Page() {
     } as BoardListParams);
 
     const addDebounce = createDebounce(2000);
+    const fetchDebounce = createDebounce(500);
 
     useEffect(() => {
          const fetch = async () => {
@@ -50,41 +52,18 @@ export default function Page() {
                 isReturnData: true,
             }).then(res => {
                 if(res.content.length === 0) {
-                    setDynamicPage({...dynamicPage, isEndOfList: true});
-                } else {
-                    setDynamicPage({...dynamicPage, isVisible: false});
+                    setDynamicPage({ isEndOfList: true, isVisible: false});
                 }
 
-                if(!data?.content) return setData(res);
-                setData({...data, content: [...data?.content, ...res.content]});
+                setData(res);
+                setDynamicPage({ isEndOfList: false, isVisible: false});
             });
         }
 
         const debounce = createDebounce(500);
         debounce(fetch);
 
-    },[searchParams.size, searchParams.page]);
-
-
-    useEffect(() => {
-
-        const fetch = async () => {
-
-            await apiCall<PageResponse<BoardListI>, BoardListParams>({
-                path: '/api/board',
-                method: 'GET',
-                params: searchParams,
-                isReturnData: true,
-            }).then(res => {
-                setData(res);
-                setDynamicPage({...dynamicPage, isEndOfList: false});
-            });
-        }
-
-        const debounce = createDebounce(1000);
-        debounce(fetch);
-
-    },[searchParams.type, searchParams.value, searchParams.categoryPk]);
+    },[]);
 
     useEffect(() => {
         if(!footerRef.current) return;
@@ -102,18 +81,40 @@ export default function Page() {
 
     useEffect(() => {
         if(!dynamicPage.isVisible) return;
-        const add = () => {
-            setSearchParams({...searchParams, page: searchParams.page + 1});
-        }
-        addDebounce(add);
+
+        const params = {...searchParams, page: searchParams.page + 1};
+        fetchDebounce( () => fetchApi(params, true));
+
     }, [dynamicPage.isVisible])
 
+    const fetchApi = async (searchParams: BoardListParams, isAdd: boolean) => {
+        await apiCall<PageResponse<BoardListI>, BoardListParams>({
+            path: '/api/board',
+            method: 'GET',
+            params: searchParams,
+            isReturnData: true,
+        }).then(res => {
+            isAdd
+            ? setData({...data, content: [...data.content, ...res.content]})
+            : setData(res);
+
+            const isEndOfList = res.content.length === 0;
+            const isVisible = false;
+
+            setDynamicPage({...dynamicPage, isVisible, isEndOfList});
+        });
+    }
+
     const onSearchHandler = () => {
-        if(searchValue === '') {
-            setSearchParams({page:1, size: 10} as BoardListParams);
-            return;
-        }
-        setSearchParams({...searchParams, page: 1, size: 10, value: searchValue, type: 'title'});
+        const initPage = {page: 1, size: 10};
+        const params = searchValue === ''
+        ? {...initPage} as BoardListParams
+        : {...searchParams, ...initPage, value: searchValue, type: 'title'};
+
+
+        setSearchParams(params);
+        fetchDebounce( () => fetchApi(params, false));
+
     }
 
     const onEnterHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {

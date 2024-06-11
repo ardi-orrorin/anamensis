@@ -19,6 +19,13 @@
         VALUES (#{email}, #{code}, #{createAt}, #{expireAt})
     </insert>
 
+    <update id="updateDisableByEmail">
+        UPDATE email_verify
+           SET is_use = 0
+         WHERE email  = #{email}
+           AND is_use = 1
+    </update>
+
     <update id="updateIsUse" parameterType="EmailVerify">
         UPDATE email_verify
            SET is_use = #{isUse}

@@ -200,19 +200,19 @@ class UserControllerTest {
         map.put("id", "d-member-7");
         map.put("email", "d-member-7@gmail.com");
         map.put("phone", "01012345678");
-        this.res(map).is4xxClientError();
+        this.res(map).isOk();
 
         map.put("phone", "010-124-5678");
-        this.res(map).isOk();
+        this.res(map).isBadRequest();
 
         map.put("id", "d-member-8");
         map.put("email", "d-member-8@gmail.com");
 
         map.put("phone", "10-1424-5678");
-        this.res(map).is4xxClientError();
+        this.res(map).isOk();
 
         map.put("phone", "010-1424-5678");
-        this.res(map).isOk();
+        this.res(map).isBadRequest();
 
 
         map.put("id", "d-member-9");

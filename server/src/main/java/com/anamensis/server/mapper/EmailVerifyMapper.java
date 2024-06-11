@@ -11,5 +11,7 @@ public interface EmailVerifyMapper {
     Optional<EmailVerify> selectByEmailAndCode(EmailVerify emailVerify);
     int insert(EmailVerify emailVerify);
 
+    int updateDisableByEmail(String email);
+
     int updateIsUse(EmailVerify emailVerify);
 }

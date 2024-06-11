@@ -36,6 +36,8 @@ public class EmailVerifyService {
         emailVerify.setCreateAt(LocalDateTime.now());
         emailVerify.setExpireAt(LocalDateTime.now().plusMinutes(10));
 
+        emailVerifyMapper.updateDisableByEmail(emailVerify.getEmail());
+
 
         int result = emailVerifyMapper.insert(emailVerify);
         if (result == 0) return Mono.error(new RuntimeException("insert failed"));

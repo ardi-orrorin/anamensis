@@ -1,7 +1,8 @@
 import Link from "next/link";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPenToSquare, faRightFromBracket, faUser} from "@fortawesome/free-solid-svg-icons";
+import {faPenToSquare, faRightFromBracket, faUser, faUserPlus} from "@fortawesome/free-solid-svg-icons";
 import {cookies} from "next/headers";
+import {faRightToBracket} from "@fortawesome/free-solid-svg-icons/faRightToBracket";
 
 type NavItemProps = {
     name: string | JSX.Element,
@@ -24,12 +25,12 @@ const NavMain = async () => {
 
     const rightMenuItems : NavItemProps[] = [
         {
-            name: 'Sign Up',
+            name: <FontAwesomeIcon icon={faUserPlus} />,
             url: '/signup',
             loginRequired: false,
         },
         {
-            name: 'Login',
+            name: <FontAwesomeIcon icon={faRightToBracket} />,
             url: '/login',
             loginRequired: false,
         },

@@ -34,8 +34,6 @@ services:
         target: /anamensis.jks
 
   server:
-    depends_on:
-      - config-anamensis
     image: ${DOCKER_ID}/server-anamensis:${TAG}
     ports:
       - "8080:8080"
@@ -106,6 +104,8 @@ services:
       - server-anamensis
     environment:
       - NEXT_PUBLIC_SERVER=http://server:8080
+    env_file:
+      - nextjs.env
     networks:
       - anamensis
     ports:

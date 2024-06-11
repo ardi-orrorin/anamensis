@@ -11,6 +11,7 @@ export interface BoardI {
     viewCount   : number;
     rate        : number;
     isLogin?    : boolean;
+    isWriter?   : boolean;
 }
 
 

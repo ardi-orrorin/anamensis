@@ -40,7 +40,9 @@ echo 'docker_id: '$docker_id''
 
 echo 'docker image pull success....'
 
-#TAG=$version PORT=$port DOCKER_ID=$docker_id docker-compose -f docker-compose.yml pull $service-anamensis
+TAG=$version PORT=$port DOCKER_ID=$docker_id docker-compose -f docker-compose.yml pull $docker_id/config
+TAG=$version PORT=$port DOCKER_ID=$docker_id docker-compose -f docker-compose.yml pull $docker_id/nextjs
+TAG=$version PORT=$port DOCKER_ID=$docker_id docker-compose -f docker-compose.yml pull $docker_id/server
 
 echo 'docker image pull success....'
 

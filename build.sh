@@ -8,7 +8,7 @@ version=$2
 docker_id=$3
 server_file_name=''$service'-anamensis-'$version''
 
-echo 'build_type: 'service''
+echo 'service: '$service''
 echo 'version: '$version''
 echo 'docker_id: '$docker_id''
 

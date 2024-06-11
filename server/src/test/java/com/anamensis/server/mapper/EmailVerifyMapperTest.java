@@ -126,4 +126,13 @@ class EmailVerifyMapperTest {
                 evm.insert(ev)
         );
     }
+
+    @Test
+    @Order(6)
+    @DisplayName("updateDisableByEmail 테스트")
+    void updateDisableByEmail() {
+        assertEquals(2, evm.updateDisableByEmail("d-member-1@gmail.com"));
+        assertEquals(1, evm.updateDisableByEmail("d-member-2@gmail.com"));
+        assertEquals(0, evm.updateDisableByEmail("d-member@gmail.com"));
+    }
 }

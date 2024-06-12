@@ -202,8 +202,43 @@ public class UserController {
                     String message = result ? "Success" : "Failed";
                     return Mono.just(UserResponse.Status.transToStatus(status, message));
                 });
-
     }
+
+
+    @PublicAPI
+    @PostMapping("find-id-email")
+    public Mono<Boolean> findIdByEmail(
+            @RequestBody UserRequest.FindUserId findId
+    ) {
+        return userService.findIdByEmail(findId)
+            .flatMap(b -> {
+                EmailVerify ev = new EmailVerify();
+                ev.setEmail(findId.getEmail());
+
+                return emailVerifyService.insert(ev);
+            })
+            .flatMap(b -> Mono.just(true))
+            .onErrorReturn(false);
+    }
+
+    @PublicAPI
+    @PostMapping("find-id-email-confirm")
+    public Mono<UserResponse.FindUserId> findIdByEmailVerify(
+            @RequestBody UserRequest.FindUserId findId
+    ) {
+
+        EmailVerify ev = new EmailVerify();
+        ev.setEmail(findId.getEmail());
+        ev.setCode(findId.getVerifyCode());
+
+        return emailVerifyService.updateIsUse(ev)
+                .flatMap(b ->
+                    b ? userService.findIdByEmail(findId)
+                            .flatMap(m -> Mono.just(new UserResponse.FindUserId(b, m.getUserId())))
+                      : Mono.just(new UserResponse.FindUserId(b, ""))
+                );
+    }
+
 
     private Mono<UserResponse.Login> notAuth(
             Mono<MemberResultMap> member,

@@ -102,4 +102,9 @@ public class UserResponse {
             return new Status(status, message);
         }
     }
+
+    public static record FindUserId (
+        boolean verified,
+        String userId
+    ) {}
 }

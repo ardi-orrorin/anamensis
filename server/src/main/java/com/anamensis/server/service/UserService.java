@@ -10,6 +10,8 @@ import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.exception.DuplicateUserException;
 import com.anamensis.server.mapper.MemberMapper;
 import com.anamensis.server.mapper.PointCodeMapper;
+import com.anamensis.server.provider.AwsSesMailProvider;
+import com.anamensis.server.provider.EmailVerifyProvider;
 import com.anamensis.server.resultMap.MemberResultMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +25,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +37,10 @@ public class UserService implements ReactiveUserDetailsService {
 
     private final MemberMapper memberMapper;
     private final PointCodeMapper pointCodeMapper;
+    private final EmailVerifyProvider emailVerifyProvider;
+    private final AwsSesMailProvider awsSesMailProvider;
+
+
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -121,13 +128,14 @@ public class UserService implements ReactiveUserDetailsService {
                 .onErrorReturn(false);
     }
 
-//    public Mono<Integer> deleteRole(Tuple2<UserDetails, RoleType> tuple) {
-//        return tuple.mapT1(ud -> findUserByUserId(ud.getUsername()))
-//                .mapT1(user -> user.flatMap(u -> generateRole(u, tuple.getT2())))
-//                .mapT1(user -> user.map(memberMapper::deleteRole))
-//                .getT1();
-//    }
 
+    public Mono<Member> findIdByEmail(UserRequest.FindUserId findId) {
+        return Mono.justOrEmpty(memberMapper.findMemberByEmail(findId.getEmail()))
+            .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
+
+
+
+    }
 
     private Mono<Role> generateRole(Member users, RoleType roleType) {
         Role role = new Role();
@@ -135,5 +143,4 @@ public class UserService implements ReactiveUserDetailsService {
         role.setRole(roleType);
         return Mono.just(role);
     }
-
 }

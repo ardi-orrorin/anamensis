@@ -21,6 +21,8 @@ public interface MemberMapper {
 
     Optional<MemberResultMap> findMemberInfo(String userId);
 
+    Optional<Member> findMemberByEmail(String email);
+
     int editAuth(
             @Param("id") long id,
             @Param("isAuth") boolean isAuth,

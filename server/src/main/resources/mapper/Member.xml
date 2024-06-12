@@ -45,6 +45,11 @@
                  </choose>
              )
     </select>
+    <select id="findMemberByEmail">
+        <include refid="tbl_member"/>
+        WHERE email  = #{email}
+          AND is_use = 1
+    </select>
     <insert id="save" parameterType="Member">
         <selectKey keyProperty="id" resultType="int" order="AFTER">
             SELECT LAST_INSERT_ID()

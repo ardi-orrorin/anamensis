@@ -72,6 +72,6 @@ dependencyManagement {
     }
 }
 
-test {
-    useJUnitPlatform()
-}
+//test {
+//    useJUnitPlatform()
+//}

@@ -9,7 +9,7 @@ port=$3
 docker_id=$4
 
 
-if [[ "$service" != "batch" ]] && [[ "$service" != "config" ]] && [[ "$service" != "server" ]] && [[ "$service" != "nextjs" ]]
+if [[ "$service" != "batch" ]] && [[ "$service" != "config" ]] && [[ "$service" != "site" ]]
 then
     echo 'build_type is required'
     exit 1
@@ -40,15 +40,14 @@ echo 'docker_id: '$docker_id''
 
 echo 'docker image pull success....'
 
-TAG=$version PORT=$port DOCKER_ID=$docker_id docker-compose -f docker-compose.yml pull $docker_id/config
-TAG=$version PORT=$port DOCKER_ID=$docker_id docker-compose -f docker-compose.yml pull $docker_id/nextjs
-TAG=$version PORT=$port DOCKER_ID=$docker_id docker-compose -f docker-compose.yml pull $docker_id/server
+TAG=$version PORT=$port DOCKER_ID=$docker_id docker-compose -f $service-docker-compose.yml pull
+
 
 echo 'docker image pull success....'
 
 echo 'docker stack deploy start....'
 
-TAG=$version PORT=$port DOCKER_ID=$docker_id docker stack deploy -d -c docker-compose.yml anamensis
+TAG=$version PORT=$port DOCKER_ID=$docker_id docker stack deploy -c $service-docker-compose.yml anamensis
 
 echo 'docker stack deploy success....'
 

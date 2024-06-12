@@ -3,17 +3,17 @@ name: Docker Image CI
 on:
   push:
     branches:
-      - server/release/*
-      - nextjs/release/*
+      - site/release/*
       - config/release/*
       - batch/release/*
+
+env:
+  SERVICE: $(echo ${{ github.ref_name }} | cut -f1 -d'/')
+  VERSION: $(echo ${{ github.ref_name }} | cut -f3 -d'/')
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      SERVICE: $(echo ${{ github.ref_name }} | cut -f1 -d'/')
-      VERSION: $(echo ${{ github.ref_name }} | cut -f3 -d'/')
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -21,6 +21,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           architecture: x64
+
       - name: Decode and set .env.local
         run: echo "${{ secrets.NEXTJS_ENV }}" | base64 --decode > ./client/.env.local
 

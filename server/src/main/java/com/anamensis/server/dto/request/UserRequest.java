@@ -1,10 +1,12 @@
 package com.anamensis.server.dto.request;
 
+import com.anamensis.server.dto.ResetPwdProgress;
 import com.anamensis.server.entity.Member;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.validator.constraints.pl.NIP;
 
 import java.time.LocalDateTime;
 
@@ -118,5 +120,37 @@ public class UserRequest {
         private String verifyCode;
 
         private boolean isVerify;
+    }
+
+
+    @Getter
+    @Setter
+    @ToString
+    public static class ResetPwd {
+
+        private ResetPwdProgress progress;
+
+        @NotNull(message = "User ID is required")
+        @Size(min = 5, max = 50, message = "User ID must be between 4 and 50 characters")
+        private String userId;
+
+        @NotNull(message = "Email is required")
+        @Pattern(regexp = "^[a-zA-Z0-9.-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9]+$", message = "Invalid email")
+        private String email;
+
+        private String verifyCode;
+
+        private Boolean isVerified;
+
+        private String pwd;
+
+        public void setProgress(String progress) {
+            this.progress = ResetPwdProgress.valueOf(progress.toUpperCase());
+        }
+
+        public ResetPwdProgress getProgress() {
+            return progress;
+        }
+
     }
 }

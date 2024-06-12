@@ -1,5 +1,6 @@
 package com.anamensis.server.dto.response;
 
+import com.anamensis.server.dto.ResetPwdProgress;
 import com.anamensis.server.entity.AuthType;
 import com.anamensis.server.dto.Token;
 import com.anamensis.server.entity.Member;
@@ -106,5 +107,11 @@ public class UserResponse {
     public static record FindUserId (
         boolean verified,
         String userId
+    ) {}
+
+    public static record ResetPwd (
+        ResetPwdProgress progress,
+
+        boolean verified
     ) {}
 }

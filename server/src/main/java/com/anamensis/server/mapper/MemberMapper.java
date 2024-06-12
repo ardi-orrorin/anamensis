@@ -21,7 +21,7 @@ public interface MemberMapper {
 
     Optional<MemberResultMap> findMemberInfo(String userId);
 
-    Optional<Member> findMemberByEmail(String email);
+    Optional<Member> findMemberByEmailAndUserId(String email, String userId);
 
     int editAuth(
             @Param("id") long id,
@@ -31,6 +31,12 @@ public interface MemberMapper {
     int updatePoint(
             @Param("id") long id,
             @Param("point") int point
+    );
+
+    int updatePwd (
+            @Param("userId") String userId,
+            @Param("pwd") String pwd,
+            @Param("email") String email
     );
 
     boolean existsMember(UserRequest.existsMember existsMember);

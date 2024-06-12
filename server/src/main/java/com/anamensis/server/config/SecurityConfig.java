@@ -1,6 +1,7 @@
 package com.anamensis.server.config;
 
 import com.anamensis.server.config.converter.StringToAuthTypeConverter;
+import com.anamensis.server.config.converter.StringToResetPwdProgress;
 import com.anamensis.server.config.converter.StringToRoleTypeConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -95,8 +96,8 @@ public class SecurityConfig implements WebFluxConfigurer {
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
-        registry.addConverter(new StringToRoleTypeConverter());
         registry.addConverter(new StringToAuthTypeConverter());
+        registry.addConverter(new StringToRoleTypeConverter());
 
     }
 }

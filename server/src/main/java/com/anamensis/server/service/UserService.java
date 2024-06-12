@@ -112,7 +112,6 @@ public class UserService implements ReactiveUserDetailsService {
             return Mono.error(new RuntimeException("User not save"));
         }
 
-
         return generateRole(member, RoleType.USER)
                 .doOnNext(memberMapper::saveRole)
                 .flatMap(u -> Mono.just(member))

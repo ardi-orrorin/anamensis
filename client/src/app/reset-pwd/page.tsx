@@ -101,17 +101,14 @@ export default function Page() {
 
     const result = ({progress, verified}:ResetPwdResponse) => {
         if(progress === ResetPwdProgress.CONFIRMED && !verified){
-
             return alert('계정을 찾을 수 없습니다');
         }
 
         if(progress === ResetPwdProgress.VERIFIED && !verified){
-            console.log(progress, verified)
             return alert('인증번호가 일치하지 않습니다');
         }
 
         if(progress === ResetPwdProgress.RESET && verified){
-            console.log(progress, verified)
             alert('비밀번호가 변경되었습니다');
             return location.href = '/';
         }

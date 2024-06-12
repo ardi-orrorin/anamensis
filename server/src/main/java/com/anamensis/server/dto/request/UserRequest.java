@@ -105,4 +105,18 @@ public class UserRequest {
 //        @Pattern(regexp = "^01(?:0|1|[6-9])-(?:\\d{3}|\\d{4})-\\d{4}$", message = "Invalid phone number")
         private String phone;
     }
+
+    @Getter
+    @Setter
+    public static class FindUserId {
+
+        @NotNull(message = "Name is required")
+        @Size(max = 100, message = "Name must be less than 100 characters")
+        @Pattern(regexp = "^[a-zA-Z0-9.-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9]+$", message = "Invalid email")
+        private String email;
+
+        private String verifyCode;
+
+        private boolean isVerify;
+    }
 }

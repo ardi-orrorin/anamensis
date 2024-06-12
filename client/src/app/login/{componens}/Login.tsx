@@ -52,38 +52,16 @@ const Login = () => {
                 authType: res.data.authType
             });
         }).catch(err => {
+            console.log(err)
             setError({
-                status: err.response.data.status,
-                message: err.response.data.message,
+                status: err.response.status,
+                message: err.response.data,
                 use: true
             });
         }).finally(() => {
             setLoading(false);
         });
 
-        // await axios.post('/api/login', user, {
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     }}
-        // )
-        // .then((res: AxiosResponse<LoginAuth>) => {
-        //     setUser({
-        //         ...user,
-        //         verify: res.data.verity,
-        //         authType: res.data.authType
-        //     });
-        // })
-        // .catch((err)  => {
-        //     setError({
-        //         status: err.response.data.status,
-        //         message: err.response.data.message,
-        //         // use: err.response.data.use
-        //         use: true
-        //     });
-        // })
-        // .finally(() => {
-        //     setLoading(false);
-        // });
     }
 
 
@@ -133,8 +111,6 @@ const Login = () => {
     return (
         <div className={"flex flex-col gap-4 border border-solid b border-blue-300 sm:w-4/5 md:w-1/2 xl:w-1/3 w-full rounded pb-5"}>
             <div className={'flex flex-col gap-1 bg-blue-300 py-4'}>
-                {/*<h1 className={'flex justify-center font-bold text-white text-xl'}*/}
-                {/*>Anamensis</h1>*/}
                 <h3 className={'flex justify-center font-bold text-white text-base'}
                 >LOGIN</h3>
             </div>
@@ -193,9 +169,9 @@ const Login = () => {
                 </div>
             </div>
             <div className={'flex justify-between px-3'}>
-                <a href={'#'}
+                <Link href={'/find-user'}
                    className={'flex justify-center text-xs text-blue-500'}
-                >아이디 찾기</a>
+                >아이디 찾기</Link>
                 <Link href={'/signup'}
                       className={'flex justify-center text-xs text-blue-500'}
                 >회원 가입</Link>

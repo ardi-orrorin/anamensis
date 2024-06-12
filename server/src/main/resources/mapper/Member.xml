@@ -32,22 +32,25 @@
                SELECT *
                  FROM member
                 WHERE 1 = 1
-                 <choose>
-                    <when test="type != null and type == 'id' and value != null and value != ''">
-                        AND user_id = #{value}
-                    </when>
-                    <when test="type != null and type == 'email' and value != null and value != ''">
-                        AND email   = #{value}
-                    </when>
-                    <when test="type != null and type == 'phone' and value != null and value != ''">
-                        AND phone   = #{value}
-                    </when>
-                 </choose>
+             <choose>
+                <when test="type != null and type == 'id' and value != null and value != ''">
+                    AND user_id = #{value}
+                </when>
+                <when test="type != null and type == 'email' and value != null and value != ''">
+                    AND email   = #{value}
+                </when>
+                <when test="type != null and type == 'phone' and value != null and value != ''">
+                    AND phone   = #{value}
+                </when>
+             </choose>
              )
     </select>
-    <select id="findMemberByEmail">
+    <select id="findMemberByEmailAndUserId">
         <include refid="tbl_member"/>
         WHERE email  = #{email}
+        <if test="userId != null and userId != ''">
+            AND user_id = #{userId}
+        </if>
           AND is_use = 1
     </select>
     <insert id="save" parameterType="Member">
@@ -90,6 +93,13 @@
             </if>
         </set>
          WHERE id    = #{id}
+    </update>
+    <update id="updatePwd">
+        UPDATE member
+           SET pwd     = #{pwd}
+         WHERE user_id = #{userId}
+           AND email   = #{email}
+           AND is_use  = 1
     </update>
 
     <delete id="deleteRole" parameterType="Role">

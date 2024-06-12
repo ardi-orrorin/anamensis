@@ -175,9 +175,9 @@ const Login = () => {
                 <Link href={'/signup'}
                       className={'flex justify-center text-xs text-blue-500'}
                 >회원 가입</Link>
-                <a href={'#'}
+                <Link href={'/reset-pwd'}
                    className={'flex justify-center text-xs text-blue-500'}
-                >비밀번호 찾기</a>
+                >비밀번호 찾기</Link>
             </div>
         </div>
     )

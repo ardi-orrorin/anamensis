@@ -129,12 +129,17 @@ public class UserService implements ReactiveUserDetailsService {
     }
 
 
-    public Mono<Member> findIdByEmail(UserRequest.FindUserId findId) {
-        return Mono.justOrEmpty(memberMapper.findMemberByEmail(findId.getEmail()))
+    public Mono<Member> findMemberByEmailAndUserId(String email, String userId) {
+        return Mono.justOrEmpty(memberMapper.findMemberByEmailAndUserId(email, userId))
             .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
+    }
 
+    public Mono<Boolean> resetPwd(UserRequest.ResetPwd resetPwd) {
 
+        String password = bCryptPasswordEncoder.encode(resetPwd.getPwd());
 
+        return Mono.fromCallable(() -> memberMapper.updatePwd(resetPwd.getUserId(), password, resetPwd.getEmail()) > 0)
+                .onErrorReturn(false);
     }
 
     private Mono<Role> generateRole(Member users, RoleType roleType) {

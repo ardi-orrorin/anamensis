@@ -1,10 +1,7 @@
 package com.anamensis.server.controller;
 
 
-import com.anamensis.server.dto.Device;
-import com.anamensis.server.dto.Page;
-import com.anamensis.server.dto.PageResponse;
-import com.anamensis.server.dto.Token;
+import com.anamensis.server.dto.*;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.dto.response.LoginHistoryResponse;
 import com.anamensis.server.dto.response.UserResponse;
@@ -210,7 +207,7 @@ public class UserController {
     public Mono<Boolean> findIdByEmail(
             @RequestBody UserRequest.FindUserId findId
     ) {
-        return userService.findIdByEmail(findId)
+        return userService.findMemberByEmailAndUserId(findId.getEmail(), null)
             .flatMap(b -> {
                 EmailVerify ev = new EmailVerify();
                 ev.setEmail(findId.getEmail());
@@ -224,7 +221,7 @@ public class UserController {
     @PublicAPI
     @PostMapping("find-id-email-confirm")
     public Mono<UserResponse.FindUserId> findIdByEmailVerify(
-            @RequestBody UserRequest.FindUserId findId
+           @Valid @RequestBody UserRequest.FindUserId findId
     ) {
 
         EmailVerify ev = new EmailVerify();
@@ -233,12 +230,59 @@ public class UserController {
 
         return emailVerifyService.updateIsUse(ev)
                 .flatMap(b ->
-                    b ? userService.findIdByEmail(findId)
+                    b ? userService.findMemberByEmailAndUserId(findId.getEmail(), null)
                             .flatMap(m -> Mono.just(new UserResponse.FindUserId(b, m.getUserId())))
                       : Mono.just(new UserResponse.FindUserId(b, ""))
                 );
     }
 
+    @PublicAPI
+    @PostMapping("reset-password")
+    public Mono<UserResponse.ResetPwd> resetPassword(
+        @Valid @RequestBody UserRequest.ResetPwd resetPwd
+    ) {
+        return switch (resetPwd.getProgress()) {
+            case CONFIRMED -> sendVerifyEmail(resetPwd);
+            case VERIFIED -> verifyEmailCode(resetPwd);
+            case RESET -> resetPwd(resetPwd);
+            default -> Mono.just(new UserResponse.ResetPwd(ResetPwdProgress.FAILED, false)).log();
+        };
+    }
+
+    private Mono<UserResponse.ResetPwd> sendVerifyEmail(UserRequest.ResetPwd resetPwd) {
+        if(resetPwd.getPwd() != null || resetPwd.getVerifyCode() != null)
+            return Mono.just(new UserResponse.ResetPwd(ResetPwdProgress.FAILED, false));
+
+        return userService.findMemberByEmailAndUserId(resetPwd.getEmail(), resetPwd.getUserId())
+                .flatMap(m -> {
+                    EmailVerify ev = new EmailVerify();
+                    ev.setEmail(resetPwd.getEmail());
+                    return emailVerifyService.insert(ev);
+                })
+                .flatMap(b -> Mono.just(true))
+                .onErrorReturn(false)
+                .flatMap(b -> Mono.just(new UserResponse.ResetPwd(ResetPwdProgress.CONFIRMED, b)));
+    }
+
+    private Mono<UserResponse.ResetPwd> verifyEmailCode(UserRequest.ResetPwd resetPwd) {
+        if(resetPwd.getIsVerified() == null || resetPwd.getPwd() != null)
+            return Mono.just(new UserResponse.ResetPwd(ResetPwdProgress.FAILED, false));
+
+        EmailVerify ev = new EmailVerify();
+        ev.setEmail(resetPwd.getEmail());
+        ev.setCode(resetPwd.getVerifyCode());
+
+        return emailVerifyService.updateIsUse(ev)
+            .flatMap(b -> Mono.just(new UserResponse.ResetPwd(ResetPwdProgress.VERIFIED, b)));
+    }
+
+    private Mono<UserResponse.ResetPwd> resetPwd(UserRequest.ResetPwd resetPwd) {
+        if(resetPwd.getVerifyCode() == null || resetPwd.getIsVerified() == null || resetPwd.getPwd() == null)
+            return Mono.just(new UserResponse.ResetPwd(ResetPwdProgress.FAILED, false));
+
+        return userService.resetPwd(resetPwd)
+            .flatMap(b -> Mono.just(new UserResponse.ResetPwd(ResetPwdProgress.RESET, b)));
+    }
 
     private Mono<UserResponse.Login> notAuth(
             Mono<MemberResultMap> member,

@@ -3,19 +3,9 @@
 import Link from "next/link";
 import {useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
+import {FindUser, FindUserResponse} from "@/app/reset-pwd/{services}/type";
 
-export type FindUser = {
-    email: string;
-    verifyCode: string;
-    isVerify: boolean;
-}
-
-export type FindUserResponse = {
-    verified: boolean;
-    userId: string;
-}
-
-export default function page() {
+export default function Page() {
 
     const [findUser, setFindUser] = useState<FindUser>({} as FindUser);
     const [sendCode, setSendCode] = useState<boolean>(false);

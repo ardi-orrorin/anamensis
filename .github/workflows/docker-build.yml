@@ -25,5 +25,11 @@ jobs:
       - name: Decode and set .env.local
         run: echo "${{ secrets.NEXTJS_ENV }}" | base64 --decode > ./client/.env.local
 
+      - name: Next.js install
+        run: npm install --prefix ./client
+
+      - name: Build the Next.js
+        run: npm run build --prefix ./client
+
       - name: Build the Docker image
         run: ./build.sh ${{ env.SERVICE }} ${{ env.VERSION }} ${{ secrets.DOCKER_ID }}

@@ -4,7 +4,7 @@ import Link from "next/link";
 import {useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
 
-export enum ResetPwdProgress {
+ enum ResetPwdProgress {
     CONFIRMED = 'CONFIRMED',
     VERIFIED = 'VERIFIED',
     RESET = 'RESET',
@@ -37,7 +37,7 @@ type Password = {
     pwdCheck: string;
 }
 
-export default function page() {
+export default function Page() {
 
     const [resetPwd, setResetPwd] = useState<ResetPwdI>({
         progress: ResetPwdProgress.CONFIRMED,

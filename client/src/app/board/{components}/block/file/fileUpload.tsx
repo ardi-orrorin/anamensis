@@ -18,7 +18,7 @@ export default function FileUpload (props: FileUploadProps) {
 
     const [loading, setLoading] = useState<boolean>(false);
     const [progress, setProgress] = useState<number>(0);
-    const {setTempFiles} = useContext(TempFileProvider);
+    const {setWaitUploadFiles} = useContext(TempFileProvider);
 
     const customStyle: CSSProperties = {
         width            : '100%',
@@ -37,6 +37,8 @@ export default function FileUpload (props: FileUploadProps) {
         const file = e.target.files && e.target.files[0];
 
         if(!file) return ;
+        if(file.size > 1024 * 1024 * 5) return alert('5MB 이하의 파일만 업로드 가능합니다.');
+
 
         isImage
         ? await uploadImage(e, formData, file)
@@ -95,8 +97,9 @@ export default function FileUpload (props: FileUploadProps) {
                 'Content-Type': 'multipart/form-data'
             }
         }).then((res) => {
+            console.log(res.data)
             if(!res.data) return ;
-            setTempFiles(prevState => [
+            setWaitUploadFiles(prevState => [
                 ...prevState,
                 {...res.data}
             ]);
@@ -130,7 +133,17 @@ export default function FileUpload (props: FileUploadProps) {
                     }
                     {
                         !loading &&
-                        <p>파일첨부</p>
+                        <p className={'flex flex-col'}>
+                            <span>
+                              파일첨부
+                            </span>
+                            {
+                                isImage
+                                && <span className={'text-sm text-gray-500'}>
+                                (5MB 미만 업로드 가능)
+                                </span>
+                            }
+                        </p>
                     }
                 </button>
             </div>

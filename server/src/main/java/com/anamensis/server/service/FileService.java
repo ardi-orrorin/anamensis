@@ -4,7 +4,9 @@ import com.anamensis.server.dto.FileHashRecord;
 import com.anamensis.server.dto.FilePathDto;
 import com.anamensis.server.entity.File;
 import com.anamensis.server.entity.Member;
+import com.anamensis.server.entity.TableCode;
 import com.anamensis.server.mapper.FileMapper;
+import com.anamensis.server.mapper.TableCodeMapper;
 import com.anamensis.server.provider.AwsS3Provider;
 import com.anamensis.server.provider.FilePathProvider;
 import com.anamensis.server.provider.FileProvider;
@@ -25,12 +27,13 @@ import reactor.util.function.Tuples;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
+@Transactional
 public class FileService {
 
     private final FileProvider fileProvider;
@@ -40,6 +43,8 @@ public class FileService {
     private final FilePathProvider filePathProvider;
 
     private final AwsS3Provider awsS3Provider;
+
+    private final TableCodeMapper tableCodeMapper;
 
     @Value("${file.upload-dir}")
     private String UPLOAD_DIR;
@@ -68,7 +73,6 @@ public class FileService {
                 .doOnNext(fileMapper::insert);
     }
 
-    @Transactional
     public Mono<File> insert(FilePart filePart, File fileContent) {
         return fileProvider.save(filePart, fileContent)
                 .flatMap(file -> saveBoardImg(filePart, file))
@@ -110,7 +114,6 @@ public class FileService {
                 });
     }
 
-    @Transactional
     public Mono<String> saveProfile(Member users, FilePart filePart) {
 
         int profileWidth = 150;
@@ -148,7 +151,6 @@ public class FileService {
     }
 
 
-    @Transactional
     public Mono<Boolean> deleteFile(File file) {
         return Mono.just(fileMapper.updateIsUseById(file.getId(), 0))
                 .publishOn(Schedulers.boundedElastic())
@@ -156,6 +158,32 @@ public class FileService {
                         .subscribe()
                 )
                 .map(this::response);
+    }
+
+    public Mono<Boolean> updateByTableRefPk(long[] ids, String tableName, long boardPk) {
+        Optional<TableCode> tableCode = tableCodeMapper.findByIdByTableName(0, tableName);
+        if(tableCode.isEmpty()) {
+            return Mono.just(false);
+        }
+
+        return Mono.fromCallable(() -> fileMapper.updateByTableRefPk(ids, boardPk, tableCode.get().getId()) > 0)
+                .onErrorReturn(false);
+    }
+
+    public Mono<Boolean> deleteByPks(long[] ids) {
+        List<File> files = fileMapper.findByIds(ids);
+
+        if(files.isEmpty()) {
+            return Mono.just(false);
+        } else {
+            files.forEach(file ->
+                awsS3Provider.deleteS3(file.getFilePath(), file.getFileName())
+                    .subscribe()
+            );
+        }
+
+        return Mono.fromCallable(()-> fileMapper.deleteByIds(ids) > 0)
+            .onErrorReturn(false);
     }
 
 
@@ -204,6 +232,18 @@ public class FileService {
 
     public boolean deleteFile(String hash) {
         return fileProvider.deleteFile(hash);
+    }
+
+    public Mono<Boolean> deleteByUri(String fileUri) {
+
+        String filePath = fileUri.substring(0, fileUri.lastIndexOf("/") + 1);
+        String fileName = fileUri.substring(fileUri.lastIndexOf("/") + 1);
+
+        return Mono.just(fileMapper.deleteByUri(filePath, fileName) > 0)
+                .publishOn(Schedulers.boundedElastic())
+                .doOnNext(r -> awsS3Provider.deleteS3(filePath, fileName)
+                        .subscribe()
+                );
     }
 }
 

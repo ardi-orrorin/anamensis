@@ -29,7 +29,8 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
     const [blockService, setBlockService] = useState<BlockService>({} as BlockService);
 
-    const [tempFiles, setTempFiles] = useState<TempFileI[]>([]);
+    const [waitUploadFiles, setWaitUploadFiles] = useState<TempFileI[]>([]);
+    const [waitRemoveFiles, setWaitRemoveFiles] = useState<TempFileI[]>([]);
 
     const isNewBoard = useMemo(() => !params.id || params.id === 'new',[params.id]);
 
@@ -47,6 +48,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
         }
 
         const list = [{seq: 0, value: '', code: '00005', textStyle: {}, hash: Date.now().toString() + '-0'}];
+
         setBoard({
             ...board,
             data: {
@@ -145,7 +147,8 @@ export default function Page({children, params} : {children: ReactNode, params: 
                 deleteComment, setDeleteComment
             }}>
                 <TempFileProvider.Provider value={{
-                    tempFiles, setTempFiles
+                    waitUploadFiles, setWaitUploadFiles,
+                    waitRemoveFiles, setWaitRemoveFiles,
                 }}>
                     <BlockProvider.Provider value={{
                         blockService, setBlockService,

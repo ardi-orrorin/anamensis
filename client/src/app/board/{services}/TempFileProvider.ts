@@ -7,8 +7,10 @@ export interface TempFileI {
 }
 
 export interface TempFileProviderI {
-    tempFiles: TempFileI[];
-    setTempFiles: Dispatch<SetStateAction<TempFileI[]>>
+    waitUploadFiles: TempFileI[];
+    setWaitUploadFiles: Dispatch<SetStateAction<TempFileI[]>>
+    waitRemoveFiles: TempFileI[];
+    setWaitRemoveFiles: Dispatch<SetStateAction<TempFileI[]>>
 }
 
 const TempFileProvider = createContext<TempFileProviderI>({} as TempFileProviderI);

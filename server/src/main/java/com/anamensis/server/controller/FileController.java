@@ -18,6 +18,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
@@ -67,6 +68,13 @@ public class FileController {
                 .flatMap(u -> fileService.findByTableNameAndTableRefPk("member", u.getId()))
                 .flatMap(files -> fileService.deleteFile(files.get(0)))
                 .onErrorReturn(false);
+    }
+
+    @PutMapping("delete/filename")
+    public Mono<Boolean> deleteFile(
+        @RequestBody Map<String, String> body
+    ) {
+        return fileService.deleteByUri(body.get("fileUri"));
     }
 
     @PatchMapping("content")
@@ -121,6 +129,5 @@ public class FileController {
                     }
                     return fileService.deleteFile(hash);
                 });
-
     }
 }

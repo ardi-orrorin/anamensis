@@ -56,6 +56,7 @@ export default function Page() {
 
                 setData(res);
                 setDynamicPage({ isEndOfList: false, isVisible: false});
+                setSearchParams({...searchParams, page: searchParams.page + 1});
             });
         }
 
@@ -85,6 +86,7 @@ export default function Page() {
     }, [dynamicPage.isVisible])
 
     const fetchApi = async (searchParams: BoardListParams, isAdd: boolean) => {
+        console.log('fetchApi', searchParams)
         if(!data.content) return;
         await apiCall<PageResponse<BoardListI>, BoardListParams>({
             path: '/api/board',

@@ -15,6 +15,7 @@ ARG        JAR_FILE=server/build/libs/${JAR}.jar
 COPY       ${JAR_FILE} /app.jar
 
 COPY       ./client/.next ./.next
+COPY       ./client/next.config.mjs ./next.config.mjs
 COPY       ./client/package.json ./package.json
 COPY       ./client/package-lock.json ./package-lock.json
 

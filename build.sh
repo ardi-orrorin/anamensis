@@ -7,6 +7,7 @@ service=$1
 version=$2
 docker_id=$3
 base_id=$4
+cdn_server_host=$5
 
 if [[ "$service" == "base" ]] && [[ "$version" != "" ]] && [[ "$docker_id" != "" ]]
 then
@@ -20,6 +21,12 @@ fi
 if [[ "$service" != "batch" ]] && [[ "$service" != "config" ]] && [[ "$service" != "site" ]]
 then
     echo 'service is required'
+    exit 1
+fi
+
+if [[ "$service" == "site" ]] && [[ "$cdn_server_host" == "" ]]
+then
+    echo 'cdn_server_host is required'
     exit 1
 fi
 
@@ -63,12 +70,20 @@ echo 'docker latest build start....'
 if [[ "$service" == "site" ]]
 then
     sed "s|__DOCKER_ID__|$base_id|g" site.Dockerfile.template > site.Dockerfile
+
+    sed "s|__VERSION__|$version|g" ./client/package.json > package.json.temp
+    sed "s|__VERSION__|$version|g" ./client/package-lock.json > package-lock.temp
+    mv package.json.temp ./client/package.json
+    mv package-lock.temp ./client/package-lock.json
+
     server_file_name='server-anamensis-'$version''
+
+
 else
     server_file_name=''$service'-anamensis-'$version''
 fi
 
-docker build --platform linux/amd64 --build-arg='JAR='$server_file_name -t $docker_id/$service-anamensis:latest  -f $service.Dockerfile  .
+docker build --platform linux/amd64 --build-arg='JAR='$server_file_name --build-arg='CDN_SERVER_HOST='$cdn_server_host -t $docker_id/$service-anamensis:latest  -f $service.Dockerfile  .
 
 docker push $docker_id/$service-anamensis:latest
 
@@ -78,7 +93,7 @@ echo
 
 echo ''$service'-docker-compose build start....'
 
-docker build --platform linux/amd64 --build-arg='JAR='$server_file_name -t $docker_id/$service-anamensis:$version -f $service.Dockerfile  .
+docker build --platform linux/amd64 --build-arg='JAR='$server_file_name --build-arg='CDN_SERVER_HOST='$cdn_server_host -t $docker_id/$service-anamensis:$version -f $service.Dockerfile  .
 
 docker push $docker_id/$service-anamensis:$version
 

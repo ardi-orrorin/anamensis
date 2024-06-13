@@ -8,7 +8,6 @@ ARG        CDN_SERVER_HOST
 
 ENV        SPRING_CONFIG_LOCATION "/application.yml"
 ENV        SPRING_PROFILES_ACTIVE "prod"
-ENV        NEXT_PUBLIC_CDN_SERVER_HOST ${CDN_SERVER_HOST}
 
 ARG        JAR_FILE=server/build/libs/${JAR}.jar
 

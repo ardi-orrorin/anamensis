@@ -26,6 +26,9 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_KEY }}
 
+      - name: Decode and set .env.local
+        run: echo "${{ secrets.NEXTJS_ENV }}" | base64 --decode > ./client/.env.local
+
       - name: Next.js install
         run: npm install --prefix ./client
 

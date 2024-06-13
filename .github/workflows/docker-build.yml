@@ -7,12 +7,12 @@ on:
       - config/release/*
       - batch/release/*
 
-env:
-  SERVICE: $(echo ${{ github.ref_name }} | cut -f1 -d'/')
-  VERSION: $(echo ${{ github.ref_name }} | cut -f3 -d'/')
-
 jobs:
   build:
+    env:
+      SERVICE: $(echo ${{ github.ref_name }} | cut -f1 -d'/')
+      VERSION: $(echo ${{ github.ref_name }} | cut -f3 -d'/')
+
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

@@ -20,6 +20,8 @@ public class BoardResponse {
 
         private long id;
 
+        private long categoryPk;
+
         private long commentCount;
 
         private String title;
@@ -48,7 +50,8 @@ public class BoardResponse {
                     .writer(board.getMember().getName())
                     .createdAt(board.getBoard().getCreateAt())
                     .isAdsense(board.getBoard().isAdsense())
-                    .commentCount(board.getCommentCount());
+                    .commentCount(board.getCommentCount())
+                    .categoryPk(board.getBoard().getCategoryPk());
 
             builder.body(board.getBoard().getContent().get("list"));
 

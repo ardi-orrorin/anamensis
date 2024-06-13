@@ -4,12 +4,11 @@ import {useEffect, useRef, useState} from "react";
 import {PageResponse} from "@/app/{commons}/types/commons";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
-import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 import BoardComponent, {BoardListI} from "@/app/{components}/boardComponent";
 import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons/faMagnifyingGlass";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import {linkGc} from "next/dist/client/app-link-gc";
+import LeftMenu from "@/app/{components}/leftMenu";
 
 
 export type BoardListParams = {
@@ -41,7 +40,6 @@ export default function Page() {
         type: 'title',
     } as BoardListParams);
 
-    const addDebounce = createDebounce(2000);
     const fetchDebounce = createDebounce(500);
 
     useEffect(() => {
@@ -83,9 +81,7 @@ export default function Page() {
     useEffect(() => {
         if(!dynamicPage.isVisible) return;
 
-        const params = {...searchParams, page: searchParams.page + 1};
-        fetchDebounce( () => fetchApi(params, true));
-
+        fetchDebounce( () => fetchApi(searchParams, true));
     }, [dynamicPage.isVisible])
 
     const fetchApi = async (searchParams: BoardListParams, isAdd: boolean) => {
@@ -96,14 +92,15 @@ export default function Page() {
             params: searchParams,
             isReturnData: true,
         }).then(res => {
-            isAdd
-            ? setData({...data, content: [...data.content, ...res.content]})
-            : setData(res);
-
             const isEndOfList = res.content.length === 0;
             const isVisible = false;
 
+            isAdd ? setData({...data, content: [...data.content, ...res.content]})
+                  : setData(res);
+
             setDynamicPage({...dynamicPage, isVisible, isEndOfList});
+            setSearchParams({...searchParams, page: searchParams.page + 1});
+            setSearchValue('');
         });
     }
 
@@ -116,7 +113,6 @@ export default function Page() {
 
         setSearchParams(params);
         fetchDebounce( () => fetchApi(params, false));
-
     }
 
     const onEnterHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -125,10 +121,17 @@ export default function Page() {
         }
     }
 
+    const categorySelectHandler = async (categoryPk: string) => {
+        const params = {type: 'categoryPk', value: categoryPk, page: 1, size: 10} as BoardListParams;
+        setSearchParams(params);
+        await fetchApi(params, false);
+
+    }
+
     return (
         <div className={'p-5 flex flex-col gap-10'}>
             <div className={'px-4 sm:px-10 md:px-20 lg:px-44 w-full flex justify-center items-center gap-3'}>
-                <div className={['relative flex justify-center duration-1000', searchFocus ? 'w-[50%]' : 'w-60'].join(' ')}>
+                <div className={['relative flex justify-center duration-700', searchFocus ? 'w-[50%]' : 'w-60'].join(' ')}>
                     <input className={'rounded-full outline-0 border-solid border-gray-200 border text-xs w-full h-10 py-3 pl-4 pr-16 focus:bg-blue-50 duration-500'}
                            placeholder={'검색어'}
                            value={searchValue || ''}
@@ -142,27 +145,34 @@ export default function Page() {
                     </button>
                 </div>
             </div>
-            <div className={'flex flex-wrap gap-5 justify-center px-36'}>
-                {
-                    data.content
-                    && data.content.length === 0
-                    && <div className={'text-center text-2xl w-full py-20 text-gray-600'}>검색 결과가 없습니다.</div>
-                }
-                {
-                    data.content
-                    && data.content.map((item, index) => {
-                        return (
-                            <BoardComponent key={'boardsummary' + index} {...item} />
-                        )
-                    })
-                }
+            <div className={'flex justify-start sm:justify-center'}>
+                <div className={'relative min-w-[300px]'}>
+                    <LeftMenu select={categorySelectHandler}
+                              searchParams={searchParams}
+                    />
+                </div>
+                <div className={'w-[850px] flex flex-wrap gap-5 justify-center items-center px-5'}>
+                    {
+                        data.content
+                        && data.content.length === 0
+                        && <div className={'text-center text-2xl w-full py-20 text-gray-600'}>검색 결과가 없습니다.</div>
+                    }
+                    {
+                        data.content
+                        && data.content.map((item, index) => {
+                            return (
+                                <BoardComponent key={'boardsummary' + index} {...item} />
+                            )
+                        })
+                    }
+                </div>
             </div>
             {
                 dynamicPage.isEndOfList
-                ? <></>
-                : dynamicPage.isVisible
-                ? <div className={'flex justify-center h-20'}><LoadingSpinner size={50} /></div>
-                : <div ref={footerRef} className={'h-2'} />
+                    ? <></>
+                    : dynamicPage.isVisible
+                        ? <div className={'flex justify-center h-20'}><LoadingSpinner size={50} /></div>
+                        : <div ref={footerRef} className={'h-2'} />
             }
         </div>
 

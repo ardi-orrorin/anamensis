@@ -54,3 +54,34 @@ export interface DeleteCommentI {
     id?      : number;
     confirm : boolean;
 }
+
+export class Category {
+    public readonly name: string;
+    public readonly id: string;
+
+    public static readonly list = [
+        new Category("0", "전체보기"),
+        new Category("1", "공지게시판"),
+        new Category("2", "자유게시판"),
+        new Category("3", "Q & A"),
+        new Category("4", "알뜰게시판"),
+    ];
+
+    constructor(id: string, name: string) {
+        this.id   = id;
+        this.name = name;
+    }
+
+
+    public static findById(id: string): Category | undefined {
+        return Category.list.find((e) =>
+            e.id === id.toString()
+        );
+    }
+
+    public static findByName(name: string): Category | undefined {
+        return Category.list.find((e) =>
+            e.name === name
+        );
+    }
+}

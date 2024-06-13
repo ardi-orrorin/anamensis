@@ -4,7 +4,7 @@ import Block from "@/app/board/{components}/Block";
 import {ChangeEvent, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 import {HtmlElements} from "@/app/board/{components}/block/type/Types";
-import {BlockI, BoardI} from "@/app/board/{services}/types";
+import {BlockI, BoardI, Category} from "@/app/board/{services}/types";
 import {blockTypeList} from "@/app/board/{components}/block/list";
 import {faDownLeftAndUpRightToCenter, faUpRightAndDownLeftFromCenter} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -336,6 +336,11 @@ export default function Page({params}: {params : {id: string}}) {
         <>
             <div className={'p-5 flex flex-col gap-5 justify-center items-center'}>
                 <div className={`w-full flex flex-col gap-3 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-1/2'}`}>
+                    <div className={'flex h-8 border-l-8 border-solid border-gray-500 px-2 items-center'}>
+                        <span className={'font-bold'}>
+                            {Category.findById(board.data.categoryPk.toString())?.name}
+                        </span>
+                    </div>
                     <div className={'flex justify-between gap-2 h-auto border-b-2 border-solid border-blue-200 py-3'}>
                         <BoardTitle board={board}
                                     newBoard={isNewBoard}

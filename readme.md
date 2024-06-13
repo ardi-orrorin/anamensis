@@ -31,8 +31,8 @@ docker network create anamensis -d overlay --scope swarm
 
 ## docker build & deploy
 - docker build & deploy
-- service : server, batch, config, nextjs
-- port : nextjs만 사용
+- service : site(nextjs + server), batch, config
+- port : service port
 - docker_hub_id : docker hub id 혹은 docker registry id
 ```shell
 #build

@@ -3,10 +3,11 @@ import Link from "next/link";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faComment, faEye} from "@fortawesome/free-solid-svg-icons";
 import {faHeart} from "@fortawesome/free-solid-svg-icons/faHeart";
-import {BlockI} from "@/app/board/{services}/types";
+import {BlockI, Category} from "@/app/board/{services}/types";
 
 export interface BoardListI {
     id           : string;
+    categoryPk   : string;
     title        : string;
     viewCount    : number;
     rate         : number;
@@ -21,7 +22,7 @@ const BoardComponent = (props: BoardListI) => {
        id, rate, writer
         , createdAt, title, viewCount
         , profileImage, commentCount
-        , body
+        , body, categoryPk
     } = props;
 
     let text = '';
@@ -36,15 +37,18 @@ const BoardComponent = (props: BoardListI) => {
         console.log(e)
     }
 
-
-
     return (
-        <Link className={'flex flex-col w-96 min-w-96 bg-white shadow hover:bg-blue-50 hover:shadow-xl duration-500'}
+        <Link className={'flex flex-col w-[350px] min-w-[350px] h-[150px] bg-white shadow hover:bg-blue-50 hover:shadow-xl duration-500'}
               href={`/board/${id}`}
         >
             <div className={'flex justify-between p-3 h-auto items-center'}>
-                <div className={'h-auto flex items-center'}>
-                    {title}
+                <div className={'h-auto flex flex-col gap-1'}>
+                    <span className={'text-xs text-blue-700'}>
+                        {Category.findById(categoryPk)?.name}
+                    </span>
+                    <span className={'text-sm'}>
+                        {title}
+                    </span>
                 </div>
                 <div className={'flex flex-col gap-1 items-center'}>
                     <div className={'flex items-center gap-1'}>
@@ -62,8 +66,8 @@ const BoardComponent = (props: BoardListI) => {
                 </div>
 
             </div>
-            <div className={'p-3 flex flex-col min-h-20 border-y border-solid border-gray-200'}>
-                <p className={'line-clamp-[4] text-xs'}>
+            <div className={'p-3 flex flex-col min-h-14 border-y border-solid border-gray-200'}>
+                <p className={'line-clamp-[2] text-xs'}>
                     {text}
                 </p>
             </div>

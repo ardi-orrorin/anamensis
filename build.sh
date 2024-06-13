@@ -6,11 +6,7 @@ echo
 service=$1
 version=$2
 docker_id=$3
-
-
-echo 'service: '$service''
-echo 'version: '$version''
-echo 'docker_id: '$docker_id''
+base_id=$4
 
 if [[ "$service" == "base" ]] && [[ "$version" != "" ]] && [[ "$docker_id" != "" ]]
 then
@@ -39,6 +35,12 @@ then
     exit 1
 fi
 
+if [[ "$base_id" == "" ]]
+then
+    echo 'base_id is required'
+    exit 1
+fi
+
 echo 'start '$service'-anamensis project build start....'
 
 if [[ "$service" == "batch" ]] || [[ "$service" == "config" ]]
@@ -60,7 +62,7 @@ echo 'docker latest build start....'
 
 if [[ "$service" == "site" ]]
 then
-    sed "s|__DOCKER_ID__|$docker_id|g" site.Dockerfile.template > site.Dockerfile
+    sed "s|__DOCKER_ID__|$base_id|g" site.Dockerfile.template > site.Dockerfile
     server_file_name='server-anamensis-'$version''
 else
     server_file_name=''$service'-anamensis-'$version''

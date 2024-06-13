@@ -36,5 +36,4 @@ jobs:
         run: npm run build --prefix ./client
 
       - name: Build the Docker image
-        run: ./build.sh ${{ env.SERVICE }} ${{ env.VERSION }} ${{ secrets.DOCKER_ID }}
-
+        run: ./build.sh ${{ env.SERVICE }} ${{ env.VERSION }} ${{ secrets.DOCKER_ID }} ${{ secrets.BASE_ID }}

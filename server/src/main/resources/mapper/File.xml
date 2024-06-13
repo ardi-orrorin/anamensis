@@ -21,6 +21,14 @@
          WHERE file_name = #{fileName}
            AND is_use    = 1
     </select>
+    <select id="findByIds">
+        SELECT *
+          FROM file
+         WHERE id
+            IN <foreach collection="ids" item="id" open="(" separator="," close=")">
+                    #{id}
+               </foreach>
+    </select>
 
     <select id="findByTableNameAndTableRefPk" resultType="File">
         SELECT f.*
@@ -36,5 +44,33 @@
         UPDATE file
            SET is_use = #{isUse}
          WHERE id     = #{id}
+    </update>
+
+    <update id="updateByTableRefPk">
+        UPDATE file
+           SET table_ref_pk = #{tableRefPk}
+         WHERE table_code_pk = #{tableCodePk}
+           AND id
+            IN
+            <foreach collection="ids" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+
+    </update>
+
+    <update id="deleteByIds">
+        UPDATE file
+           SET is_use = 0
+         WHERE id
+            IN <foreach collection="ids" item="id" open="(" separator="," close=")">
+                    #{id}
+               </foreach>
+    </update>
+
+    <update id="deleteByUri">
+        UPDATE file
+           SET is_use     = 0
+         WHERE file_path = #{filePath}
+           AND file_name = #{fileName}
     </update>
 </mapper>

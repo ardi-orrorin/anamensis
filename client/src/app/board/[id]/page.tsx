@@ -4,14 +4,13 @@ import Block from "@/app/board/{components}/Block";
 import {ChangeEvent, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 import {HtmlElements} from "@/app/board/{components}/block/type/Types";
-import {BlockI, BoardI, CommentI} from "@/app/board/{services}/types";
+import {BlockI, BoardI} from "@/app/board/{services}/types";
 import {blockTypeList} from "@/app/board/{components}/block/list";
 import {faDownLeftAndUpRightToCenter, faUpRightAndDownLeftFromCenter} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import SubTextMenu from "@/app/board/{components}/SubTextMenu";
-import {useSearchParams} from "next/navigation";
 import Comment from "@/app/board/[id]/{components}/comment";
 import Rate from "@/app/board/[id]/{components}/rate";
 import BoardTitle from "@/app/board/[id]/{components}/boardTitle";
@@ -20,12 +19,15 @@ import BoardInfo from "@/app/board/[id]/{components}/boardInfo";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
+import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 
 export interface RateInfoI {
     id      : number;
     count   : number;
     status  : boolean;
 }
+
+// fixme: 뒤로가기 등 강제 이동시 파일 삭제 처리 안됨
 
 export default function Page({params}: {params : {id: string}}) {
 
@@ -43,6 +45,11 @@ export default function Page({params}: {params : {id: string}}) {
         loading, setLoading
         , commentLoading, setCommentLoading
     } = useContext(LoadingProvider);
+
+    const {
+        waitUploadFiles, setWaitUploadFiles,
+        waitRemoveFiles, setWaitRemoveFiles
+    } = useContext(TempFileProvider);
 
     const [fullScreen, setFullScreen] = useState<boolean>(false);
 
@@ -104,14 +111,19 @@ export default function Page({params}: {params : {id: string}}) {
             alert('내용을 입력해주세요');
             return ;
         }
+
         setLoading(true);
+
+
         try {
             const bodyContent = board.data.content.list.filter(item => item.value !== '');
-            const body = {
+            const body: BoardI = {
                 ...board.data,
                 content: {
                     list: bodyContent
-                }
+                },
+                uploadFiles: waitUploadFiles.map(item => item.id),
+                removeFiles: waitRemoveFiles.map(item => item.filePath + item.fileName),
             };
 
             const result = await apiCall<BoardI, BoardI>({
@@ -122,6 +134,8 @@ export default function Page({params}: {params : {id: string}}) {
             .then(res => {
                 return res.data;
             });
+
+
 
             if(isSave) {
                 location.href = '/board/' + result?.id;
@@ -191,6 +205,8 @@ export default function Page({params}: {params : {id: string}}) {
     const onClickDeleteHandler = (seq: number) => {
         const list = board.data?.content?.list;
 
+        fileDeleteHandler(list, seq);
+
         let newList = list.filter(item => item.seq !== seq);
         if (newList?.length === 0) {
             newList = [{seq, value: '', code: '00005', textStyle: {}, hash: Date.now() + '-' + seq}];
@@ -209,6 +225,36 @@ export default function Page({params}: {params : {id: string}}) {
         if(newList.length === 0) {
             addBlockHandler(0);
         }
+    }
+
+    const fileDeleteHandler = async (blockList: BlockI[], seq: number) => {
+
+        const fileRegexp = new RegExp('002[0-9]{2}');
+        const fileBlock = blockList.find(item =>
+            item.seq === seq && fileRegexp.test(item.code)
+        );
+
+        if(!fileBlock) return ;
+
+        const fileName = fileBlock.value.split('/')[fileBlock.value.split('/').length - 1];
+        const filePath = fileBlock.value.split('/').slice(0, -1).join('/') + '/';
+
+        setWaitUploadFiles(prevState => {
+            return prevState.filter(item => item.fileName !== fileName);
+        });
+
+        setWaitRemoveFiles(prevState => {
+            return [...prevState, {id: 0, fileName, filePath}];
+        });
+
+        if(!isNewBoard) return;
+
+        await apiCall({
+            path: '/api/file/delete/filename',
+            method: 'PUT',
+            body: {fileUri: fileBlock.value},
+            isReturnData: true
+        });
 
     }
 

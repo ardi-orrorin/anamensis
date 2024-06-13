@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -21,4 +22,6 @@ public class Board {
     private LocalDateTime createAt;
     private boolean isAdsense;
     private boolean isUse;
+    private long[] uploadFiles;
+    private String[] removeFiles;
 }

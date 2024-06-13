@@ -2,7 +2,6 @@ import React, {useContext} from "react";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
 import {faEye, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {TextStylesType} from "@/app/board/{services}/types";
 
 const SubObjectMenu = ({
     onClick,

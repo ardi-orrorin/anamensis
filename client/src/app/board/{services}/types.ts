@@ -1,17 +1,19 @@
 import {CSSProperties} from "react";
 
 export interface BoardI {
-    id          : string;
-    categoryPk  : number;
-    title       : string;
-    content     : BoardContentI;
-    writer      : string;
-    profileImage: string;
-    createdAt   : string;
-    viewCount   : number;
-    rate        : number;
-    isLogin?    : boolean;
-    isWriter?   : boolean;
+    id            : string;
+    categoryPk    : number;
+    title         : string;
+    content       : BoardContentI;
+    writer        : string;
+    profileImage  : string;
+    createdAt     : string;
+    viewCount     : number;
+    rate          : number;
+    isLogin?      : boolean;
+    isWriter?     : boolean;
+    uploadFiles?  : number[];
+    removeFiles?  : string[];
 }
 
 

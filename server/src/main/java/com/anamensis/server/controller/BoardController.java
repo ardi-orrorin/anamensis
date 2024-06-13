@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -29,6 +30,7 @@ public class BoardController {
     private final PointHistoryService pointHistoryService;
     private final PointService pointService;
     private final TableCodeService tableCodeService;
+    private final FileService fileService;
 
     @PublicAPI
     @GetMapping("")
@@ -139,6 +141,13 @@ public class BoardController {
                             pointHistoryService.insert(ph)
                                     .subscribeOn(Schedulers.boundedElastic())
                                     .subscribe();
+
+                            if(b.getUploadFiles() != null && b.getUploadFiles().length > 0) {
+                                fileService.updateByTableRefPk(board.getUploadFiles(), "board", b.getId())
+                                    .subscribeOn(Schedulers.boundedElastic())
+                                    .subscribe();
+                            }
+
                         })
                         .subscribe();
                 });
@@ -164,7 +173,15 @@ public class BoardController {
                                   : sb.status(StatusType.FAIL)
                                       .message("게시글 수정에 실패하였습니다.")
                                       .build();
-                });
+                })
+            .doOnNext(r -> {
+                if(r.getStatus() != StatusType.SUCCESS || board.getRemoveFiles().length == 0) return;
+                Arrays.stream(board.getRemoveFiles())
+                        .forEach(fileUrl -> fileService.deleteByUri(fileUrl)
+                                .subscribeOn(Schedulers.boundedElastic())
+                                .subscribe()
+                        );
+            });
     }
 
 

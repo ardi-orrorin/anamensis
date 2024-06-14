@@ -286,7 +286,7 @@ class BoardMapperTest {
         count = bm.count(new Board());
         assertEquals(11, count);
 
-        bm.disableByPk(board.getId(), member.getId());
+        bm.disableByPk(board.getId(), member.getId(), LocalDateTime.now());
 
         count = bm.count(new Board());
         assertEquals(10, count);
@@ -307,14 +307,14 @@ class BoardMapperTest {
     @DisplayName("게시글 비활성화")
     void disableByPk() {
         assertTrue(bm.findByPk(1).isPresent());
-        bm.disableByPk(1, 1);
+        bm.disableByPk(1, 1, LocalDateTime.now());
         assertFalse(bm.findByPk(1).isPresent());
 
         assertTrue(bm.findByPk(5).isPresent());
-        bm.disableByPk(5, 1);
+        bm.disableByPk(5, 1, LocalDateTime.now());
         assertTrue(bm.findByPk(5).isPresent());
 
-        bm.disableByPk(5, 2);
+        bm.disableByPk(5, 2, LocalDateTime.now());
         assertFalse(bm.findByPk(5).isPresent());
     }
 

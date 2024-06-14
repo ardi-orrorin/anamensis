@@ -2,13 +2,16 @@ import "./init.css"
 import NavMain from "@/app/NavMain";
 import {ErrorBoundary} from "next/dist/client/components/error-boundary";
 import Error from "@/app/error";
-import {Metadata} from "next";
+import {Metadata, Viewport} from "next";
 
 
 export const metadata: Metadata = {
     title: 'anamensis',
     description: 'anamensis',
     twitter: {},
+    icons: {
+        icon: 'https://cdn.anamensis.site/favicon.ico',
+    },
     openGraph: {
         title: 'anamensis',
         description: 'anamensis',
@@ -25,6 +28,14 @@ export const metadata: Metadata = {
         ],
         url: 'https://anamensis.site',
     },
+}
+
+export const viewport: Viewport = {
+    width: 'device-width',
+    initialScale: 1.0,
+    userScalable: false,
+    maximumScale: 1,
+
 }
 
 export default function RootLayout({

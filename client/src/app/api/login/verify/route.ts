@@ -21,12 +21,14 @@ export async function POST(req: NextRequest){
             };
         });
 
+    console.log(geoLocation)
+
     try {
         const resData = await axios.post(url, user, {
             headers: {
                 'Content-Type': 'application/json',
                 'User-Agent': req.headers.get('User-Agent') || '',
-                // 'Location': `select`
+                'Ip': geoLocation.ipv4,
                 'Location': `${geoLocation.countryName}-${geoLocation.state}-${geoLocation.city}`
             },
             withCredentials: true

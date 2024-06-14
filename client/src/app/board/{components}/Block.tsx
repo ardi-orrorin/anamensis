@@ -32,10 +32,7 @@ export default function Block(props: BlockProps) {
 
     const {blockService, setBlockService, commentService, setCommentService, selectedBlock} = useContext(BlockProvider);
     const [isCopy, setIsCopy] = useState<CopyProps>({} as CopyProps);
-
-    // const shareLinkText = useMemo(() => {
-    //     return board.data.isLogin ? '링크 및 댓글 북마크로 복사되었습니다.' : '링크가 복사되었습니다.';
-    // },[board.data.isLogin]);
+    const [touch, setTouch] = useState(setTimeout(() => false, 0));
 
     const onFocusHandler = (e: React.FocusEvent<HtmlElements>) => {
         if(e.currentTarget.ariaRoleDescription !== 'text') {
@@ -150,7 +147,7 @@ export default function Block(props: BlockProps) {
         setBoard({...board, data: {...board.data, content: {list: newList}}});
     }
 
-    const shareLinkHandler = async (e: React.MouseEvent<HTMLDivElement>) => {
+    const shareLinkHandler = async (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
         if(!board.data.isLogin) return;
 
         e.preventDefault();
@@ -163,6 +160,17 @@ export default function Block(props: BlockProps) {
             if(board.data.isLogin) setNewComment({...newComment, blockSeq: hash});
         }, 700);
     }
+    const shareLinkLongTouchHandler = async (e: React.TouchEvent<HTMLDivElement>) => {
+        if(!board.data.isLogin) return;
+
+        e.preventDefault();
+        const touchTime = 400;
+        if(touch) clearTimeout(touch);
+
+        setTouch(setTimeout(() => {
+            shareLinkHandler(e);
+        }, touchTime));
+    }
 
     return (
         <div className={[
@@ -170,11 +178,13 @@ export default function Block(props: BlockProps) {
             selectedBlock === hash && board.isView && 'bg-red-700 border-2 border-dashed border-red-800 border-opacity-20 bg-opacity-20 rounded',
         ].join(' ')}
              onContextMenu={shareLinkHandler}
+             onTouchStart={shareLinkLongTouchHandler}
+             onTouchEnd={() => clearTimeout(touch)}
         >
             {
                 board.isView
                 && <div className={[
-                    'absolute left-1/2 top-1/2 z-50 text-xs w-72 h-14 flex justify-center items-center bg-white rounded shadow border-l-8 border-solid border-blue-300 duration-200',
+                    'absolute z-50 text-xs w-72 h-14 flex justify-center items-center bg-white rounded shadow border-l-8 border-solid border-blue-300 duration-200',
                     isCopy.isCopy ? 'opacity-100' : 'opacity-0',
                 ].join(' ')
                 }>

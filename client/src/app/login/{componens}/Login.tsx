@@ -90,8 +90,8 @@ const Login = () => {
 
         if(!recaptchaRef.current) return;
 
-        setIsReCaptcha(false);
-        recaptchaRef.current.reset();
+        // setIsReCaptcha(false);
+        // recaptchaRef.current.reset();
     }
 
     const onChangeReCaptchaHandler = async (value: string | null) => {

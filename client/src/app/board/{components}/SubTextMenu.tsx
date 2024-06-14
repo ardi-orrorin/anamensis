@@ -65,7 +65,7 @@ const SubTextMenu = ({
         <div className={`fixed bg-gray-100 z-20 w-auto max-h-52 duration-200 rounded shadow-md`}
              style={{top: blockService.screenY, left: blockService.screenX}}
         >
-            <ul className={'flex overflow-hidden rounded text-sm bg-white'}>
+            <ul className={'grid grid-cols-3 md:flex overflow-hidden rounded text-sm bg-white'}>
                 <li>
                     <button className={[
                         'min-w-20 tracking-wider',

@@ -133,7 +133,7 @@ export default function Page() {
     return (
         <div className={'p-5 flex flex-col gap-10'}>
             <div className={'px-4 sm:px-10 md:px-20 lg:px-44 w-full flex justify-center items-center gap-3'}>
-                <div className={['relative flex justify-center duration-700', searchFocus ? 'w-[50%]' : 'w-60'].join(' ')}>
+                <div className={['relative flex justify-center duration-700', searchFocus ? 'w-full sm:w-[70%]' : 'w-40 sm:w-[40%]'].join(' ')}>
                     <input className={'rounded-full outline-0 border-solid border-gray-200 border text-xs w-full h-10 py-3 pl-4 pr-16 focus:bg-blue-50 duration-500'}
                            placeholder={'검색어'}
                            value={searchValue || ''}
@@ -148,12 +148,12 @@ export default function Page() {
                 </div>
             </div>
             <div className={'flex justify-start sm:justify-center'}>
-                <div className={'relative min-w-[300px]'}>
+                <div className={'hidden md:block relative min-w-[300px]'}>
                     <LeftMenu select={categorySelectHandler}
                               searchParams={searchParams}
                     />
                 </div>
-                <div className={'w-[850px] flex flex-wrap gap-5 justify-center items-center px-5'}>
+                <div className={'w-[850px] flex flex-wrap gap-5 justify-center items-center'}>
                     {
                         data.content
                         && data.content.length === 0

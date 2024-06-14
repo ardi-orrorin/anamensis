@@ -48,6 +48,7 @@ public class BoardService {
             return Mono.error(new RuntimeException("내용을 입력해주세요."));
 
         board.setCreateAt(LocalDateTime.now());
+        board.setUpdateAt(LocalDateTime.now());
         return Mono.fromCallable(()-> boardMapper.save(board))
                 .onErrorMap(RuntimeException::new)
                 .flatMap($ -> Mono.just(board));
@@ -59,11 +60,13 @@ public class BoardService {
     }
 
     public Mono<Boolean> disableByPk(long boardPk, long memberPk) {
-        return Mono.just(boardMapper.disableByPk(boardPk, memberPk) == 1)
+
+        return Mono.just(boardMapper.disableByPk(boardPk, memberPk, LocalDateTime.now()) == 1)
                 .onErrorReturn(false);
     }
 
     public Mono<Boolean> updateByPk(Board board) {
+        board.setUpdateAt(LocalDateTime.now());
         return Mono.fromCallable(() -> boardMapper.updateByPk(board) == 1)
                 .onErrorReturn(false);
     }

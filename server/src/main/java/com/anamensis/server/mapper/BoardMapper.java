@@ -6,6 +6,7 @@ import com.anamensis.server.resultMap.BoardResultMap;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +25,11 @@ public interface BoardMapper {
 
     long count(Board board);
 
-    int disableByPk(long boardPk, long memberPk);
+    int disableByPk(
+        long boardPk,
+        long memberPk,
+        LocalDateTime updateAt
+    );
 
     int viewUpdateByPk(long boardPk);
 

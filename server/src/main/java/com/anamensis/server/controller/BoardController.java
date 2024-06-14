@@ -3,6 +3,7 @@ package com.anamensis.server.controller;
 import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.PageResponse;
 import com.anamensis.server.dto.StatusType;
+import com.anamensis.server.dto.request.BoardRequest;
 import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.dto.response.StatusResponse;
 import com.anamensis.server.entity.*;
@@ -36,10 +37,10 @@ public class BoardController {
     @GetMapping("")
     public Mono<PageResponse<BoardResponse.List>> findAll(
         Page page,
-        Board board
+        BoardRequest.Create board
     ) {
 
-        Mono<List<BoardResponse.List>> list = boardService.findAll(page, board)
+        Mono<List<BoardResponse.List>> list = boardService.findAll(page, board.toEntity())
                 .flatMap(b -> rateService.countRate(b.getId())
                         .doOnNext(b::setRate)
                         .map($ -> b)
@@ -105,7 +106,7 @@ public class BoardController {
 
     @PostMapping("")
     public Mono<Board> save(
-        @RequestBody Board board,
+        @RequestBody BoardRequest.Create board,
         @AuthenticationPrincipal UserDetails user
     ) {
 
@@ -117,8 +118,9 @@ public class BoardController {
 
         Mono<Board> insertBoard = userService.findUserByUserId(user.getUsername())
                 .flatMap(u -> {
+
                     board.setMemberPk(u.getId());
-                    return boardService.save(board);
+                    return boardService.save(board.toEntity());
                 })
                 .subscribeOn(Schedulers.boundedElastic());
 
@@ -142,7 +144,7 @@ public class BoardController {
                                     .subscribeOn(Schedulers.boundedElastic())
                                     .subscribe();
 
-                            if(b.getUploadFiles() != null && b.getUploadFiles().length > 0) {
+                            if(board.getUploadFiles() != null && board.getUploadFiles().length > 0) {
                                 fileService.updateByTableRefPk(board.getUploadFiles(), "board", b.getId())
                                     .subscribeOn(Schedulers.boundedElastic())
                                     .subscribe();
@@ -156,7 +158,7 @@ public class BoardController {
     @PutMapping("/{id}")
     public Mono<StatusResponse> updateByPk(
         @PathVariable(name = "id") long boardPk,
-        @RequestBody Board board,
+        @RequestBody BoardRequest.Create board,
         @AuthenticationPrincipal UserDetails user
     ) {
         return userService.findUserByUserId(user.getUsername())
@@ -164,7 +166,7 @@ public class BoardController {
                     board.setMemberPk(u.getId());
                     board.setId(boardPk);
                 })
-                .flatMap(u -> boardService.updateByPk(board))
+                .flatMap(u -> boardService.updateByPk(board.toEntity()))
                 .map(result -> {
                     StatusResponse.StatusResponseBuilder sb = StatusResponse.builder();
                     return result ? sb.status(StatusType.SUCCESS)
@@ -204,35 +206,5 @@ public class BoardController {
                     return sb.build();
                 });
     }
-
-
-//    @PublicAPI
-//    @GetMapping("test/{id}")
-//    public Mono<BoardResponse.ExContent> findByPkTest(
-//            @PathVariable(name = "id") long boardPk
-//    ) {
-//
-//        Mono<BoardResponse.Content> content = boardService.findByPk(boardPk)
-//                .flatMap(b -> rateService.countRate(b.getId())
-//                        .doOnNext(b::setRate)
-//                        .map($ -> b)
-//                )
-//                .subscribeOn(Schedulers.boundedElastic());
-//
-//        Mono<Boolean> viewUpdate = boardService.viewUpdateByPk(boardPk)
-//                .subscribeOn(Schedulers.boundedElastic());
-//
-//
-//        Mono<List<BoardCommentResponse.Comment>> comments = boardCommentService.findAllByBoardPk(boardPk)
-//                .map(board -> BoardCommentResponse.Comment.fromResultMap(board, null))
-//                .collectList()
-//                .subscribeOn(Schedulers.boundedElastic());
-//
-//        return Mono.zip(content, viewUpdate, comments)
-//                .map(tuple ->
-//                   BoardResponse.ExContent.from(tuple.getT1(), tuple.getT3())
-//                );
-//    }
-
 
 }

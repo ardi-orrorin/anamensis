@@ -14,7 +14,7 @@
                 member_pk, isAdsense, update_at)
         VALUES (#{categoryPk}, #{title}, #{content, typeHandler=JsonTypeHandler},
                 #{rate}, #{viewCount}, #{createAt},
-                #{memberPk}, #{isAdsense}, ${updateAt})
+                #{memberPk}, #{isAdsense}, #{updateAt})
     </insert>
     <select id="count" resultType="long">
         SELECT COUNT(*)

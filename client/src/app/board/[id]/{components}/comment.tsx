@@ -111,7 +111,7 @@ const Comment = () => {
                 </button>
               </div>
             }
-            <div className={'w-auto flex flex-col gap-2'}>
+            <div className={'w-auto flex flex-col gap-4'}>
                 {
                     comment.map((item, index) => {
                         return (
@@ -177,43 +177,46 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
     }
 
     return (
-        <div className={['w-full flex justify-start text-sm shadow duration-300', deleteComment.id === id && deleteComment.confirm ? 'bg-red-500 text-white' : 'bg-white text-black'].join(' ')}>
-            {
-                blockSeq
-                ? <Link className={['flex justify-center items-center text-white',existBlock ? 'bg-blue-400 hover:bg-blue-800 duration-300' : 'bg-red-400 line-through'].join(' ')}
-                        style={{width: '40px'}}
-                        href={`${existBlock ? `#block-${blockSeq}` : '' }`}
-                        onClick={()=> setSelectedBlock(blockSeq)}
+        <div className={['flex-col flex  sm:flex-row w-full justify-start text-sm shadow duration-300', deleteComment.id === id && deleteComment.confirm ? 'bg-red-500 text-white' : 'bg-white text-black'].join(' ')}>
+            <div className={'flex w-full'}>
+                {
+                    blockSeq
+                        ? <Link className={['w-[30px] flex justify-center items-center text-white',existBlock ? 'bg-blue-400 hover:bg-blue-800 duration-300' : 'bg-red-400 line-through'].join(' ')}
+                                href={`${existBlock ? `#block-${blockSeq}` : '' }`}
+                                onClick={()=> setSelectedBlock(blockSeq)}
+                        >
+                            {blockSeq.split('-')[1]}
+                        </Link>
+                        : <div className={['w-[30px]'].join(' ')} />
+                }
+                <div className={'flex flex-col sm:flex-row w-full'}>
+                    <div className={'flex flex-row sm:flex-col w-full justify-between sm:justify-start sm:w-48 gap-2 border-b sm:border-x p-3 border-solid border-gray-200'}
+                         onClick={() => {deleteComment.confirm && disabledDeleteConfirm()}}
                     >
-                        {blockSeq.split('-')[1]}
-                    </Link>
-                : <div className={['w-10'].join(' ')} />
-            }
-            <div className={'flex flex-col w-48 gap-2 border-x p-3 border-solid border-gray-200'}
-                 onClick={() => {deleteComment.confirm && disabledDeleteConfirm()}}
-            >
-                <div className={'flex gap-2 items-end'}>
-                    <Image className={'h-6 w-6 rounded-full'}
-                           src={process.env.NEXT_PUBLIC_CDN_SERVER + profileImage}
-                           height={30} width={30}
-                           alt={''}
-                    />
-                    <div className={'flex h-full gap-1 items-end text-xs'}>
-                        <span>{writer}</span>
+                        <div className={'flex gap-2 items-center sm:items-end'}>
+                            <Image className={'h-6 w-6 rounded-full'}
+                                   src={process.env.NEXT_PUBLIC_CDN_SERVER + profileImage}
+                                   height={30} width={30}
+                                   alt={''}
+                            />
+                            <div className={'flex h-full gap-1 items-center sm:items-end text-xs'}>
+                                <span>{writer}</span>
+                            </div>
+                        </div>
+                        <span className={'text-[0.6rem] sm:text-xs'}>{createdAt}</span>
+                    </div>
+                    <div className={'w-full break-all text-xs p-3'}
+                         onClick={() => {deleteComment.confirm && disabledDeleteConfirm()}}
+                    >
+                        <p className={''}>
+                            {content}
+                        </p>
                     </div>
                 </div>
-                <span className={'text-xs'}>{createdAt}</span>
-            </div>
-            <div className={'w-full whitespace-pre-wrap text-xs  p-3'}
-                 onClick={() => {deleteComment.confirm && disabledDeleteConfirm()}}
-            >
-                <p>
-                    {content}
-                </p>
             </div>
             {
                 isWriter
-                && <button className={'w-10 flex justify-center items-center bg-red-400 text-white hover:bg-red-800 duration-300'}
+                && <button className={'w-full h-7 sm:w-[40px] sm:h-auto flex justify-center items-center bg-red-400 text-white hover:bg-red-800 duration-300'}
                            onClick={deleteHandler}
                 >
                     <FontAwesomeIcon icon={faXmark} />

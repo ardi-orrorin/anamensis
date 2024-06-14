@@ -1,5 +1,5 @@
-set global max_connections=1000;
-set wait_timeout=60;
+# set global max_connections=1000;
+# set wait_timeout=60;
 SET foreign_key_checks = 0;
 DROP TABLE IF EXISTS login_history           CASCADE;
 DROP TABLE IF EXISTS log_history             CASCADE;
@@ -164,6 +164,7 @@ CREATE TABLE board (
                        member_pk    BIGINT(255)     NOT NULL                                                         COMMENT '유저 아이디',
                        isAdsense    TINYINT(1)      NOT NULL                DEFAULT             0                    COMMENT '광고 여부 0:안함, 1:광고',
                        is_use       TINYINT(1)      NOT NULL                DEFAULT             1                    COMMENT '사용 여부 0:사용안함, 1:사용',
+                       update_at    TIMESTAMP(6)    NOT NULL                                                         COMMENT '수정일자',
                        FOREIGN KEY  (member_pk)     REFERENCES              member(id),
                        FOREIGN KEY  (category_pk)   REFERENCES              category(id),
                        FULLTEXT     INDEX           title_idx               (title)                  WITH PARSER ngram,

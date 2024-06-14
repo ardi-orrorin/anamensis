@@ -25,9 +25,19 @@ const NavMain = async () => {
 
     const rightMenuItems : NavItemProps[] = [
         {
+            name: <FontAwesomeIcon icon={faPenToSquare} />,
+            url: '/board/new?categoryPk=2',
+            loginRequired: true,
+        },
+        {
             name: <FontAwesomeIcon icon={faUserPlus} />,
             url: '/signup',
             loginRequired: false,
+        },
+        {
+            name: <FontAwesomeIcon className={'w-4'} icon={faUser} />,
+            url: '/user',
+            loginRequired: true,
         },
         {
             name: <FontAwesomeIcon icon={faRightToBracket} />,
@@ -40,36 +50,18 @@ const NavMain = async () => {
             loginRequired: true,
 
         },
-        {
-            name: <FontAwesomeIcon className={'w-4'} icon={faUser} />,
-            url: '/user',
-            loginRequired: true,
-        },
-        {
-            name: <FontAwesomeIcon icon={faPenToSquare} />,
-            url: '/board/new?categoryPk=2',
-            loginRequired: true,
-        },
+
     ];
 
     return (
         <nav className={'w-full flex justify-between items-center bg-blue-500 text-white h-12'}>
-            {/*<div className={'w-1/3 duration-300'}>*/}
-            {/*    <ul className={'hidden md:flex duration-300'}>*/}
-            {/*        {*/}
-            {/*            menuItems.map((item, index) => {*/}
-            {/*                return <NavItem key={index} {...item} />*/}
-            {/*            })*/}
-            {/*        }*/}
-            {/*    </ul>*/}
-            {/*</div>*/}
             <div className={''}>
                 <Link className={'flex justify-center p-3'}
                       href={'/'}
                 >ANAMENSIS</Link>
             </div>
             <div className={'w-1/3'}>
-                <ul className={'hidden md:flex md:flex-row-reverse '}>
+                <ul className={'flex justify-end'}>
                     {
                         rightMenuItems.map((item, index) => {
                             if(!item.loginRequired === isLogged) {

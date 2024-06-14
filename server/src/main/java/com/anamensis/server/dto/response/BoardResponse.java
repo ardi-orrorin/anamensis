@@ -39,6 +39,9 @@ public class BoardResponse {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime createdAt;
 
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime updatedAt;
+
         private boolean isAdsense;
 
         public static List from(BoardResultMap.Board board) {
@@ -51,7 +54,8 @@ public class BoardResponse {
                     .createdAt(board.getBoard().getCreateAt())
                     .isAdsense(board.getBoard().isAdsense())
                     .commentCount(board.getCommentCount())
-                    .categoryPk(board.getBoard().getCategoryPk());
+                    .categoryPk(board.getBoard().getCategoryPk())
+                    .updatedAt(board.getBoard().getUpdateAt());
 
             builder.body(board.getBoard().getContent().get("list"));
 
@@ -90,6 +94,9 @@ public class BoardResponse {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime createdAt;
 
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime updatedAt;
+
         public static Content from(BoardResultMap.Board board, Member member) {
             Content.ContentBuilder builder = Content.builder()
                     .id(board.getId())
@@ -98,7 +105,9 @@ public class BoardResponse {
                     .content(board.getBoard().getContent())
                     .writer(board.getMember().getName())
                     .viewCount(board.getBoard().getViewCount())
-                    .createdAt(board.getBoard().getCreateAt());
+                    .createdAt(board.getBoard().getCreateAt())
+                    .updatedAt(board.getBoard().getUpdateAt());
+
 
             if(member != null) {
                 builder.isWriter(board.getBoard().getMemberPk() == member.getId());
@@ -142,6 +151,9 @@ public class BoardResponse {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime createdAt;
 
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime updatedAt;
+
         public static ExContent from(Content board, java.util.List<BoardCommentResponse.Comment> comments) {
             ExContent.ExContentBuilder builder = ExContent.builder()
                     .id(board.getId())
@@ -152,7 +164,8 @@ public class BoardResponse {
                     .viewCount(board.getViewCount())
                     .createdAt(board.getCreatedAt())
                     .comments(comments)
-                    .profileImage(board.getProfileImage());
+                    .profileImage(board.getProfileImage())
+                    .updatedAt(board.getUpdatedAt());
 
             return builder.build();
         }
@@ -168,6 +181,7 @@ public class BoardResponse {
         private long viewCount;
         private long rate;
         private String createdAt;
+        private String updatedAt;
 
         public static SummaryList from(BoardResultMap.Board board) {
             return SummaryList.builder()
@@ -176,6 +190,7 @@ public class BoardResponse {
                     .viewCount(board.getBoard().getViewCount())
                     .rate(board.getBoard().getRate())
                     .createdAt(board.getBoard().getCreateAt().toString())
+                    .updatedAt(board.getBoard().getUpdateAt().toString())
                     .build();
         }
     }

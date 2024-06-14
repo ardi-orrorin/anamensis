@@ -111,17 +111,17 @@ VALUES (1, 'category-1', NULL, 1)
      , (10, 'category-10', 3, 1);
 
 INSERT INTO board
-       (id, category_pk, title, content, rate, view_count, create_at, member_pk, isAdsense, is_use)
-VALUES (1, 1, '테스트 제목1', '{"content" : "테스트제목"}', 0, 0, current_timestamp, 1, FALSE, TRUE)
-     , (2, 1, '테스트 제목2', '{"content" : "테스트제목"}', 0, 10, current_timestamp, 1, FALSE, TRUE)
-     , (3, 1, '테스트 제목3', '{"content" : "테스트제목"}', 0, 0, current_timestamp, 1, FALSE, TRUE)
-     , (4, 1, '테스트 제목4', '{"content" : "테스트제목"}', 0, 0, current_timestamp, 1, FALSE, TRUE)
-     , (5, 1, '테스트 제목5', '{"content" : "테스트제목"}', 0, 0, current_timestamp, 2, FALSE, TRUE)
-     , (6, 1, '테스트 제목6', '{"content" : "테스트제목"}', 0, 0, current_timestamp, 2, FALSE, TRUE)
-     , (7, 1, '테스트 제목7', '{"content" : "테스트제목"}', 0, 0, current_timestamp, 2, FALSE, TRUE)
-     , (8, 1, '테스트 제목8', '{"content" : "테스트제목"}', 0, 0, current_timestamp, 3, FALSE, TRUE)
-     , (9, 1, '테스트 제목9', '{"content" : "테스트제목"}', 0, 0, current_timestamp, 3, FALSE, TRUE)
-     , (10, 1, '테스트 제목10', '{"content" : "테스트제목"}', 0, 0, current_timestamp, 4, TRUE, TRUE);
+       (id, category_pk, title, content, rate, view_count, create_at, update_at, member_pk, isAdsense, is_use)
+VALUES (1, 1, '테스트 제목1', '{"content" : "테스트제목"}', 0, 0, current_timestamp, current_timestamp, 1, FALSE, TRUE)
+     , (2, 1, '테스트 제목2', '{"content" : "테스트제목"}', 0, 10, current_timestamp, current_timestamp, 1, FALSE, TRUE)
+     , (3, 1, '테스트 제목3', '{"content" : "테스트제목"}', 0, 0, current_timestamp, current_timestamp, 1, FALSE, TRUE)
+     , (4, 1, '테스트 제목4', '{"content" : "테스트제목"}', 0, 0, current_timestamp, current_timestamp, 1, FALSE, TRUE)
+     , (5, 1, '테스트 제목5', '{"content" : "테스트제목"}', 0, 0, current_timestamp, current_timestamp, 2, FALSE, TRUE)
+     , (6, 1, '테스트 제목6', '{"content" : "테스트제목"}', 0, 0, current_timestamp, current_timestamp, 2, FALSE, TRUE)
+     , (7, 1, '테스트 제목7', '{"content" : "테스트제목"}', 0, 0, current_timestamp, current_timestamp, 2, FALSE, TRUE)
+     , (8, 1, '테스트 제목8', '{"content" : "테스트제목"}', 0, 0, current_timestamp, current_timestamp, 3, FALSE, TRUE)
+     , (9, 1, '테스트 제목9', '{"content" : "테스트제목"}', 0, 0, current_timestamp, current_timestamp, 3, FALSE, TRUE)
+     , (10, 1, '테스트 제목10', '{"content" : "테스트제목"}', 0, 0, current_timestamp, current_timestamp, 4, TRUE, TRUE);
 
 INSERT INTO board_comment
        (id, board_pk, content, create_at, user_id, parent_pk, blockSeq)

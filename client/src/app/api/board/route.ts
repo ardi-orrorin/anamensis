@@ -2,6 +2,7 @@ import {NextRequest, NextResponse} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
 import {PageResponse} from "@/app/{commons}/types/commons";
 import {BoardListI} from "@/app/{components}/boardComponent";
+import {headers} from "next/headers";
 
 export async function GET(req: NextRequest) {
 

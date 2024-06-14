@@ -159,6 +159,7 @@ CREATE TABLE board (
      rate         BIGINT          NOT NULL                DEFAULT             0                    COMMENT '좋아요',
      view_count   BIGINT          NOT NULL                DEFAULT             0                    COMMENT '조회수',
      create_at    TIMESTAMP(6)    NOT NULL                                                         COMMENT '생성일자',
+     update_at    TIMESTAMP(6)    NOT NULL                                                         COMMENT '수정일자',
      member_pk    BIGINT(255)     NOT NULL                                                         COMMENT '유저 아이디',
      isAdsense    TINYINT(1)      NOT NULL                DEFAULT             0                    COMMENT '광고 여부 0:안함, 1:광고',
      is_use       TINYINT(1)      NOT NULL                DEFAULT             1                    COMMENT '사용 여부 0:사용안함, 1:사용',

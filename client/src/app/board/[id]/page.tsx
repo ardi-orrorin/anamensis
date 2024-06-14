@@ -341,36 +341,38 @@ export default function Page({params}: {params : {id: string}}) {
                             {Category.findById(board.data.categoryPk.toString())?.name}
                         </span>
                     </div>
-                    <div className={'flex justify-between gap-2 h-auto border-b-2 border-solid border-blue-200 py-3'}>
+                    <div className={'flex flex-col sm:flex-row justify-between gap-3 h-auto border-b-2 border-solid border-blue-200 py-3'}>
                         <BoardTitle board={board}
                                     newBoard={isNewBoard}
                                     onChange={onChangeTitleHandler}
                                     onKeyUp={e => onKeyUpHandler(e, 0)}
                         />
-                        {
-                            !isNewBoard &&
-                            <HeaderBtn isView={board.isView}
-                                       isWriter={board.data.isWriter || false}
-                                       isLogin={board.data.isLogin || false}
-                                       submitClickHandler={() => debounce(() => submitHandler(false))}
-                                       editClickHandler={editClickHandler}
-                                       deleteClickHandler={() => debounce(() => deleteHandler())}
-                            />
-                        }
-                        <div>
-                            <button
-                                className={'w-14 rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
-                                onClick={() => setFullScreen(!fullScreen)}>
-                                {
-                                    fullScreen
-                                    ? <FontAwesomeIcon className={'text-blue-400'}
-                                                       icon={faDownLeftAndUpRightToCenter}
-                                    />
-                                    : <FontAwesomeIcon className={'text-blue-400'}
-                                                       icon={faUpRightAndDownLeftFromCenter}
-                                    />
-                                }
-                            </button>
+                        <div className={'flex justify-end sm:justify-start gap-2 h-10 sm:h-auto'}>
+                            {
+                                !isNewBoard &&
+                                <HeaderBtn isView={board.isView}
+                                           isWriter={board.data.isWriter || false}
+                                           isLogin={board.data.isLogin || false}
+                                           submitClickHandler={() => debounce(() => submitHandler(false))}
+                                           editClickHandler={editClickHandler}
+                                           deleteClickHandler={() => debounce(() => deleteHandler())}
+                                />
+                            }
+                            <div>
+                                <button
+                                    className={'w-14 rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                                    onClick={() => setFullScreen(!fullScreen)}>
+                                    {
+                                        fullScreen
+                                        ? <FontAwesomeIcon className={'text-blue-400'}
+                                                           icon={faDownLeftAndUpRightToCenter}
+                                        />
+                                        : <FontAwesomeIcon className={'text-blue-400'}
+                                                           icon={faUpRightAndDownLeftFromCenter}
+                                        />
+                                    }
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div>
@@ -404,11 +406,22 @@ export default function Page({params}: {params : {id: string}}) {
                     <div>
                         {
                             isNewBoard
-                            && <div className={'flex gap-1 justify-end'}>
+                            && <div className={'flex gap-1 justify-end mt-5'}>
                             <button
                               className={'w-full rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
                               onClick={() => debounce(() => submitHandler(true))}
                             >작성
+                            </button>
+                          </div>
+                        }
+                        {
+                            !isNewBoard
+                            && !board.isView
+                            && <div className={'flex gap-1 justify-end mt-5'}>
+                            <button
+                              className={'w-full rounded h-10 border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                              onClick={() => debounce(() => submitHandler(false))}
+                            >저장
                             </button>
                           </div>
                         }

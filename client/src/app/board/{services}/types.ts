@@ -8,6 +8,7 @@ export interface BoardI {
     writer        : string;
     profileImage  : string;
     createdAt     : string;
+    updatedAt     : string;
     viewCount     : number;
     rate          : number;
     isLogin?      : boolean;

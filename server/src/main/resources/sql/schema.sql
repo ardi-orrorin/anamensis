@@ -1,3 +1,28 @@
+SET foreign_key_checks = 0;
+DROP TABLE IF EXISTS login_history           CASCADE;
+DROP TABLE IF EXISTS log_history             CASCADE;
+DROP TABLE IF EXISTS role                    CASCADE;
+DROP TABLE IF EXISTS board                   CASCADE;
+DROP TABLE IF EXISTS table_code              CASCADE;
+DROP TABLE IF EXISTS file                    CASCADE;
+DROP TABLE IF EXISTS board_history           CASCADE;
+DROP TABLE IF EXISTS change_code             CASCADE;
+DROP TABLE IF EXISTS board_comment           CASCADE;
+DROP TABLE IF EXISTS share_link              CASCADE;
+DROP TABLE IF EXISTS point_code              CASCADE;
+DROP TABLE IF EXISTS point_history           CASCADE;
+DROP TABLE IF EXISTS category                CASCADE;
+DROP TABLE IF EXISTS email_verify            CASCADE;
+DROP TABLE IF EXISTS otp                     CASCADE;
+DROP TABLE IF EXISTS member_config_smtp      CASCADE;
+DROP TABLE IF EXISTS smtp_push_history       CASCADE;
+DROP TABLE IF EXISTS attendance              CASCADE;
+DROP TABLE IF EXISTS member                  CASCADE;
+DROP TABLE IF EXISTS web_sys                 CASCADE;
+DROP TABLE IF EXISTS system_message          CASCADE;
+DROP TABLE IF EXISTS smtp_push_history_count CASCADE;
+SET foreign_key_checks = 1;
+
 CREATE TABLE IF NOT EXISTS member (
     id	        BIGINT	      NOT NULL PRIMARY KEY  AUTO_INCREMENT     COMMENT 'PK'          ,
     user_id	    VARCHAR(50)	  NOT NULL UNIQUE     	                   COMMENT '계정 아이디',
@@ -104,6 +129,7 @@ CREATE TABLE IF NOT EXISTS board (
     rate         BIGINT          NOT NULL                DEFAULT             0                    COMMENT '좋아요',
     view_count   BIGINT          NOT NULL                DEFAULT             0                    COMMENT '조회수',
     create_at    TIMESTAMP(6)        NOT NULL                                                         COMMENT '생성일자',
+    update_at    TIMESTAMP(6)        NOT NULL                                                         COMMENT '생성일자',
     member_pk    BIGINT          NOT NULL                                                         COMMENT '유저 아이디',
     isAdsense    TINYINT(1)      NOT NULL                DEFAULT             0                    COMMENT '광고 여부 0:안함, 1:광고',
     is_use       TINYINT(1)      NOT NULL                DEFAULT             1                    COMMENT '사용 여부 0:사용안함, 1:사용',

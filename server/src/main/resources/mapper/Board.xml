@@ -11,10 +11,10 @@
         INSERT INTO board
                (category_pk, title, content,
                 rate, view_count, create_at,
-                member_pk, isAdsense)
+                member_pk, isAdsense, update_at)
         VALUES (#{categoryPk}, #{title}, #{content, typeHandler=JsonTypeHandler},
                 #{rate}, #{viewCount}, #{createAt},
-                #{memberPk}, #{isAdsense})
+                #{memberPk}, #{isAdsense}, ${updateAt})
     </insert>
     <select id="count" resultType="long">
         SELECT COUNT(*)
@@ -90,16 +90,18 @@
             <if test="content != null and content != ''">
                 content     = #{content, typeHandler=JsonTypeHandler},
             </if>
+                update_at   = #{updateAt}
         </set>
          WHERE id           = #{id}
            AND is_use       = 1
-           AND member_pk      = #{memberPk}
+           AND member_pk    = #{memberPk}
     </update>
     <update id="disableByPk" parameterType="Map">
         UPDATE board
            SET is_use  = 0
-         WHERE id      = #{boardPk}
-           AND is_use  = 1
+           AND update_at = #{updateAt}
+         WHERE id        = #{boardPk}
+           AND is_use    = 1
            AND member_pk = #{memberPk}
     </update>
     <update id="viewUpdateByPk" parameterType="Long">

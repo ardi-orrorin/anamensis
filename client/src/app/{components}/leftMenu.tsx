@@ -62,8 +62,12 @@ const CategorySelect = ({
     }
 
     return (
-        <div className={['relative w-auto text-xs bg-gray-50', selectToggle ? 'rounded-t-sm' : 'rounded-sm'].join(' ')}>
-            <button className={['flex gap-3 w-full justify-between py-2 px-3 border-solid border border-white focus:outline-none'].join(' ')} onClick={onToggleHandler}
+        <div className={[
+            'relative w-auto text-xs bg-gray-50',
+            selectToggle ? 'rounded-t-sm' : 'rounded-sm'
+        ].join(' ')}>
+            <button className={['flex gap-3 w-full justify-between py-2 px-3 border-solid border border-white focus:outline-none'].join(' ')}
+                    onClick={onToggleHandler}
             >
                 <div />
                 <span>{Category.findById(categoryPk)?.name ?? '카테고리'}</span>
@@ -75,7 +79,7 @@ const CategorySelect = ({
             </button>
             <div className={[
                 'absolute z-10 flex flex-col w-full bg-gray-50 overflow-y-hidden duration-500',
-                selectToggle ? 'max-h-80 rounded-b-sm' : 'max-h-0'].join(' ')
+                selectToggle ? 'max-h-80 rounded-b-sm shadow-md' : 'max-h-0'].join(' ')
             }>
                 {
                     Category.list.map((item, index) => {

@@ -26,7 +26,7 @@ public class DeviceResolver implements HandlerMethodArgumentResolver {
             ServerWebExchange exchange
     ) {
         Device device = new Device(
-            Objects.requireNonNull(exchange.getRequest().getRemoteAddress()).getAddress().getHostAddress(),
+            exchange.getRequest().getHeaders().getFirst("Ip"),
             exchange.getRequest().getHeaders().getFirst("Location"),
             exchange.getRequest().getHeaders().getFirst("User-Agent")
         );

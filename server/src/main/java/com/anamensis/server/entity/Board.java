@@ -20,8 +20,7 @@ public class Board {
     private long rate;
     private long viewCount;
     private LocalDateTime createAt;
+    private LocalDateTime updateAt;
     private boolean isAdsense;
     private boolean isUse;
-    private long[] uploadFiles;
-    private String[] removeFiles;
 }

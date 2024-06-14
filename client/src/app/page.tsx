@@ -9,6 +9,7 @@ import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons/faMagnifyingG
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import LeftMenu from "@/app/{components}/leftMenu";
+import TopMenu from "@/app/{components}/topMenu";
 
 
 export type BoardListParams = {
@@ -147,12 +148,18 @@ export default function Page() {
                     </button>
                 </div>
             </div>
-            <div className={'flex justify-start sm:justify-center'}>
-                <div className={'hidden md:block relative min-w-[300px]'}>
+            <div className={'flex sm:hidden justify-center'}>
+                <TopMenu select={categorySelectHandler}
+                         searchParams={searchParams}
+                />
+            </div>
+            <div className={'flex flex-row justify-start sm:justify-center'}>
+                <div className={'hidden sm:block relative min-w-[300px]'}>
                     <LeftMenu select={categorySelectHandler}
                               searchParams={searchParams}
                     />
                 </div>
+
                 <div className={'w-[850px] flex flex-wrap gap-5 justify-center items-center'}>
                     {
                         data.content

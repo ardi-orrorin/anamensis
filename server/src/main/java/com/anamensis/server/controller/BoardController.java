@@ -109,6 +109,11 @@ public class BoardController {
         @RequestBody BoardRequest.Create board,
         @AuthenticationPrincipal UserDetails user
     ) {
+        if(board.getCategoryPk() == 1) {
+            if(!user.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ADMIN")))
+                return Mono.error(new RuntimeException("권한이 없습니다."));
+        }
+
 
         Mono<PointCode> pointCode = pointService.selectByIdOrTableName("board")
                 .subscribeOn(Schedulers.boundedElastic());

@@ -3,11 +3,22 @@ import {faExclamation} from "@fortawesome/free-solid-svg-icons";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import Link from "next/link";
 import {useContext, useEffect, useMemo, useRef, useState} from "react";
-import axios, {AxiosResponse} from "axios";
+import axios from "axios";
 import {ErrorResponse, LoginAuth} from "@/app/login/page";
 import LoginProvider, {LoginI} from "@/app/login/{services}/LoginProvider";
 import ReCAPTCHA from "react-google-recaptcha";
 import apiCall from "@/app/{commons}/func/api";
+import {RoleType} from "@/app/user/system/{services}/types";
+
+
+export type LoginType = {
+    accessToken: string,
+    accessTokenExpiresIn: number,
+    refreshToken: string,
+    refreshTokenExpiresIn: number,
+    username: string,
+    roles: RoleType[]
+}
 
 const Login = () => {
 
@@ -90,8 +101,6 @@ const Login = () => {
 
         if(!recaptchaRef.current) return;
 
-        // setIsReCaptcha(false);
-        // recaptchaRef.current.reset();
     }
 
     const onChangeReCaptchaHandler = async (value: string | null) => {

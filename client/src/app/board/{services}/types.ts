@@ -1,4 +1,5 @@
 import {CSSProperties} from "react";
+import {RoleType} from "@/app/user/system/{services}/types";
 
 export interface BoardI {
     id            : string;
@@ -59,18 +60,20 @@ export interface DeleteCommentI {
 export class Category {
     public readonly name: string;
     public readonly id: string;
+    public readonly roles: RoleType[];
 
     public static readonly list = [
-        new Category("0", "전체보기"),
-        new Category("1", "공지게시판"),
-        new Category("2", "자유게시판"),
-        new Category("3", "Q & A"),
-        new Category("4", "알뜰게시판"),
+        new Category("0", "전체보기", [RoleType.ADMIN, RoleType.USER, RoleType.MASTER, RoleType.GUEST]),
+        new Category("1", "공지게시판", [RoleType.ADMIN, RoleType.MASTER]),
+        new Category("2", "자유게시판", [RoleType.ADMIN, RoleType.USER, RoleType.MASTER]),
+        new Category("3", "Q & A", [RoleType.ADMIN, RoleType.USER, RoleType.MASTER]),
+        new Category("4", "알뜰게시판", [RoleType.ADMIN, RoleType.USER, RoleType.MASTER]),
     ];
 
-    constructor(id: string, name: string) {
-        this.id   = id;
-        this.name = name;
+    constructor(id: string, name: string, roles: RoleType[] = []) {
+        this.id    = id;
+        this.name  = name;
+        this.roles = roles;
     }
 
 

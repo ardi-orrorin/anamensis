@@ -1,8 +1,6 @@
 import {useContext, useEffect, useState} from "react";
 import LoginProvider, {LoginI, LoginProviderI} from "@/app/login/{services}/LoginProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import axios from "axios";
-import api from "@/app/{commons}/func/api";
 import apiCall from "@/app/{commons}/func/api";
 import {LoginType} from "@/app/login/{componens}/Login";
 

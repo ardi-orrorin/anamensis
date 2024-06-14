@@ -4,6 +4,7 @@ import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import axios from "axios";
 import api from "@/app/{commons}/func/api";
 import apiCall from "@/app/{commons}/func/api";
+import {LoginType} from "@/app/login/{componens}/Login";
 
 const EmailAuth = () => {
 
@@ -41,13 +42,14 @@ const EmailAuth = () => {
 
     const verify = async () => {
         setLoading(true);
-        await apiCall<null, LoginI>({
+        await apiCall<LoginType, LoginI>({
             path: '/api/login/verify',
             method: 'POST',
             body: user,
             call: 'Proxy'
         }).then(res => {
-            window.location.replace('/user');
+            localStorage.setItem('roles', JSON.stringify(res.data.roles));
+            window.location.replace('/');
         }).catch(err => {
             console.log(err)
         }).finally(() => {

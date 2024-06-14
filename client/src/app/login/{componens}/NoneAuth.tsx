@@ -5,19 +5,21 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useRouter} from "next/navigation";
 import axios from "axios";
 import apiCall from "@/app/{commons}/func/api";
+import {LoginType} from "@/app/login/{componens}/Login";
 
 
 const NoneAuth = ({}) => {
     const {user} = useContext(LoginProvider);
     useEffect(() => {
-        apiCall<null, LoginI>({
+        apiCall<LoginType, LoginI>({
             path: '/api/login/verify',
             method: 'POST',
             body: user,
             call: 'Proxy'
         }).then(res => {
-            window.location.replace('/user');
-        });
+            localStorage.setItem('roles', JSON.stringify(res.data.roles));
+            window.location.replace('/');
+        })
     },[]);
 
     return (

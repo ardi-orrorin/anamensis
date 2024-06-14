@@ -3,6 +3,7 @@ import LoginProvider, {LoginI, LoginProviderI} from "@/app/login/{services}/Logi
 import axios from "axios";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import apiCall from "@/app/{commons}/func/api";
+import {LoginType} from "@/app/login/{componens}/Login";
 
 const OTPAuth = () => {
     const { user, setUser } = useContext<LoginProviderI>(LoginProvider);
@@ -38,13 +39,14 @@ const OTPAuth = () => {
     const verify = async () => {
         setLoading(true);
 
-        await apiCall<null, LoginI>({
+        await apiCall<LoginType, LoginI>({
             path: '/api/login/verify',
             method: 'POST',
             body: user,
             call: 'Proxy'
         }).then(res => {
-            window.location.replace('/user');
+            localStorage.setItem('roles', JSON.stringify(res.data.roles));
+            window.location.replace('/');
         }).catch(err => {
             console.log(err)
         }).finally(() => {

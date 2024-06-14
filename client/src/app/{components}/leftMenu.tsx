@@ -21,7 +21,7 @@ const LeftMenu = ({
         if(typeof window === 'undefined') return;
         const roles = JSON.parse(localStorage.getItem('roles') ?? '[]') as RoleType[];
         setRoles(roles);
-    }, [roles]);
+    }, [window]);
     useEffect(() => {
         if(searchParams.type !== 'categoryPk') {
             setCategoryPk('');
@@ -68,11 +68,11 @@ const LeftMenu = ({
                                   )
 
                                   if(item.id === '0' || !hasRoleCategory) {
-                                      return <></>
+                                      return null
                                   }
 
                                   return (
-                                      <Link key={'category-write' + index}
+                                      <Link key={'category-write-menu' + index}
                                             href={`/board/new?categoryPk=${item.id}`}
                                             className={'py-2 w-full text-center hover:bg-gray-100 duration-300'}
                                       >
@@ -134,7 +134,7 @@ const CategorySelect = ({
                 {
                     Category.list.map((item, index) => {
                         return (
-                            <button key={'category' + index}
+                            <button key={'category-menu-selectbox' + index}
                                     className={'p-2 border-solid border border-white focus:outline-none'}
                                     onClick={()=>selectHandler(item.id)}
                             >

@@ -21,6 +21,7 @@ import java.util.List;
 public class BoardCommentController {
 
     private final BoardCommentService boardCommentService;
+    private final BoardService boardService;
     private final PointHistoryService pointHistoryService;
     private final UserService userService;
     private final PointService pointService;
@@ -60,6 +61,7 @@ public class BoardCommentController {
         return insertBoardComment
                 .doOnNext($ -> {
                     Mono.zip(pointCode, tableCode, member)
+                        .publishOn(Schedulers.boundedElastic())
                             .doOnNext(t -> {
                                 userService.updatePoint(t.getT3().getId(), (int) t.getT1().getPoint())
                                         .subscribeOn(Schedulers.boundedElastic())

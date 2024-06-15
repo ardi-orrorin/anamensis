@@ -44,7 +44,7 @@ public class BoardController {
 
         Flux<BoardResponse.List> list;
 
-        if(page.getPage() == 1) {
+        if(page.getPage() == 1 && page.getSize() == 20 && board.getCategoryPk() == 0 && board.getTitle() == null) {
             list = boardService.findOnePage();
         } else {
             list = boardService.findAll(page, board.toEntity());
@@ -157,6 +157,8 @@ public class BoardController {
                                     .subscribeOn(Schedulers.boundedElastic())
                                     .subscribe();
                             }
+
+
 
                         })
                         .subscribe();

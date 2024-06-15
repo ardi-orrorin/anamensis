@@ -4,7 +4,6 @@ import com.anamensis.server.dto.FileHashRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.buffer.DataBufferUtils;
-import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FilePartEvent;
 import org.springframework.stereotype.Component;
@@ -25,6 +24,13 @@ public class FileProvider {
     @Value("${file.upload-dir}")
     private String UPLOAD_DIR;
 
+    /**
+     * 파일 저장
+     * @param filePart 파일
+     * @param file 파일 정보
+     * @return 파일 정보
+     * 2024-06-15 사용처 X
+     */
     public Mono<com.anamensis.server.entity.File> save(
             FilePart filePart,
             com.anamensis.server.entity.File file
@@ -47,6 +53,8 @@ public class FileProvider {
 
         return filePart.transferTo(save)
                 .then(Mono.fromCallable(() -> {
+                    file.setTableCodePk(file.getTableCodePk());
+                    file.setTableRefPk(file.getTableRefPk());
                     file.setFileName(filename2);
                     file.setOrgFileName(filename);
                     file.setCreateAt(LocalDateTime.now());

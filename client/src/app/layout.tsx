@@ -2,7 +2,11 @@ import "./init.css"
 import NavMain from "@/app/NavMain";
 import {ErrorBoundary} from "next/dist/client/components/error-boundary";
 import Error from "@/app/error";
-import {Metadata, Viewport} from "next";
+import {GetStaticProps, Metadata, Viewport} from "next";
+import apiCall from "@/app/{commons}/func/api";
+import {PageResponse} from "@/app/{commons}/types/commons";
+import {BoardListI} from "@/app/{components}/boardComponent";
+import {BoardListParams} from "@/app/page";
 
 
 export const metadata: Metadata = {
@@ -35,7 +39,6 @@ export const viewport: Viewport = {
     initialScale: 1.0,
     userScalable: false,
     maximumScale: 1,
-
 }
 
 export default function RootLayout({

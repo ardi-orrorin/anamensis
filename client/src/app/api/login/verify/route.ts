@@ -21,8 +21,6 @@ export async function POST(req: NextRequest){
             };
         });
 
-    console.log(geoLocation)
-
     try {
         const resData = await axios.post(url, user, {
             headers: {
@@ -55,6 +53,11 @@ export async function POST(req: NextRequest){
         next.cookies.set('next.refresh.token', resData.data.refreshToken, {
             ...cookieInit,
             maxAge: resData.data.refreshTokenExpiresIn / 1000
+        });
+
+        next.cookies.set('next.user', JSON.stringify(resData.data.roles), {
+            ...cookieInit,
+            maxAge: resData.data.accessTokenExpiresIn / 1000
         });
 
         return next;

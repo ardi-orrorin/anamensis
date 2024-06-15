@@ -2,7 +2,7 @@ import {NextRequest, NextResponse} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
 import {PageResponse} from "@/app/{commons}/types/commons";
 import {BoardListI} from "@/app/{components}/boardComponent";
-import {headers} from "next/headers";
+import {cookies, headers} from "next/headers";
 
 export async function GET(req: NextRequest) {
 
@@ -14,7 +14,6 @@ export async function GET(req: NextRequest) {
         categoryPk,
         [type]: value
     }
-
 
     const result = await apiCall<PageResponse<BoardListI>, URLSearchParams>({
         path: '/public/api/boards',
@@ -29,6 +28,7 @@ export async function GET(req: NextRequest) {
         status: 200,
         headers: {
             'Content-Type': 'application/json',
+            'roles': cookies().get('next.user')?.value || ''
         }
     });
 }

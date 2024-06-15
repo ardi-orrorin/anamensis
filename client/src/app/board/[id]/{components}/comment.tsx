@@ -1,14 +1,12 @@
-import {Dispatch, SetStateAction, useContext, useEffect, useMemo, useState} from "react";
+import {useContext, useMemo} from "react";
 import {CommentI} from "@/app/board/{services}/types";
 import Image from "next/image";
 import BoardProvider, {BoardService} from "@/app/board/{services}/BoardProvider";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faComment} from "@fortawesome/free-solid-svg-icons";
 import apiCall from "@/app/{commons}/func/api";
-import {useRouter} from "next/navigation";
 import Link from "next/link";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
-import {Node} from "postcss";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
 
 export type SaveComment = {
@@ -177,7 +175,7 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
     }
 
     return (
-        <div className={['flex-col flex  sm:flex-row w-full justify-start text-sm shadow duration-300', deleteComment.id === id && deleteComment.confirm ? 'bg-red-500 text-white' : 'bg-white text-black'].join(' ')}>
+        <div className={['flex-col flex  sm:flex-row w-full justify-start text-sm sm:shadow shadow-md duration-300', deleteComment.id === id && deleteComment.confirm ? 'bg-red-500 text-white' : 'bg-white text-black'].join(' ')}>
             <div className={'flex w-full'}>
                 {
                     blockSeq
@@ -187,7 +185,7 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
                         >
                             {blockSeq.split('-')[1]}
                         </Link>
-                        : <div className={['w-[30px]'].join(' ')} />
+                        : <div className={['w-0 sm:w-[30px]'].join(' ')} />
                 }
                 <div className={'flex flex-col sm:flex-row w-full'}>
                     <div className={'flex flex-row sm:flex-col w-full justify-between sm:justify-start sm:w-48 gap-2 border-b sm:border-x p-3 border-solid border-gray-200'}
@@ -216,7 +214,7 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
             </div>
             {
                 isWriter
-                && <button className={'w-full h-7 sm:w-[40px] sm:h-auto flex justify-center items-center bg-red-400 text-white hover:bg-red-800 duration-300'}
+                && <button className={'w-full h-9 sm:w-[40px] sm:h-auto flex justify-center items-center bg-red-400 text-white hover:bg-red-800 duration-300'}
                            onClick={deleteHandler}
                 >
                     <FontAwesomeIcon icon={faXmark} />

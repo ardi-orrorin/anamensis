@@ -77,19 +77,18 @@ export default function Page({children, params} : {children: ReactNode, params: 
                 method: 'GET',
                 call: 'Proxy'
             })
-                .then(res => {
-                    setBoard({
-                        ...board,
-                        data: res.data,
-                        isView: true
-                    });
-                }).finally(() => {
-                    setLoading(false);
+            .then(res => {
+                setBoard({
+                    ...board,
+                    data: res.data,
+                    isView: true
                 });
+            }).finally(() => {
+                setLoading(false);
+            });
         }
 
-        const debounce = createDebounce(300);
-        debounce(fetch);
+        fetch();
 
     },[params.id]);
 

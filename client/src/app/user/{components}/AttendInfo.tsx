@@ -24,8 +24,8 @@ export default function AttendInfo() {
                 setUser(res.data);
             });
         }
-        const debounce = createDebounce(500);
-        debounce(fetch);
+
+        fetch();
     },[loading]);
 
     const attend = () => {

@@ -21,5 +21,5 @@ export type BlockProps = {
 } & BlockI;
 
 export type HtmlElements = HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | HTMLDataElement;
-export type MouseEnterHTMLElements = HTMLImageElement | HTMLInputElement | HTMLAnchorElement | HTMLDivElement
+export type MouseEnterHTMLElements = HTMLImageElement | HTMLInputElement | HTMLAnchorElement | HTMLDivElement | HTMLButtonElement
 

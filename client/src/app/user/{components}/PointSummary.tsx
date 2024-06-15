@@ -26,10 +26,8 @@ const PointSummary = () => {
             });
 
             setData(result);
-
         }
-        const debounce = createDebounce(500);
-        debounce(fetch);
+        fetch();
 
     }, []);
 

@@ -73,45 +73,36 @@ public class FileService {
                 .doOnNext(fileMapper::insert);
     }
 
-    public Mono<File> insert(FilePart filePart, File fileContent) {
-        return fileProvider.save(filePart, fileContent)
-                .flatMap(file -> saveBoardImg(filePart, file))
-                .doOnNext(t -> fileMapper.insert(t.getT1()))
-                .publishOn(Schedulers.boundedElastic())
-                .flatMap(t -> {
-                    if(!"image".equalsIgnoreCase(filePart.headers().getContentType().getType())) {
-                           return Mono.just(t) ;
-                    }
-                    if (t.getT2().width() == 0 || t.getT2().height() == 0) {
-                        return awsS3Provider.saveOri(filePart, t.getT2().path(), t.getT2().file())
-                                .thenReturn(t);
-                    } else {
-                        return awsS3Provider.saveThumbnail(filePart, t.getT2().path(), t.getT2().file(), t.getT2().width(), t.getT2().height())
-                                .thenReturn(t);
-                    }
-                })
-                .map(Tuple2::getT1)
-                .onErrorMap(RuntimeException::new);
-    }
 
-    public Mono<Tuple2<File, FilePathDto>> saveBoardImg(FilePart filePart, File fileContent) {
+    public Mono<File> insert(FilePart filePart, File fileContent) {
         String ext = filePart.filename().substring(filePart.filename().lastIndexOf(".") + 1);
 
         FilePathDto filepath = filePathProvider.changeContentPath(0, 0, ext);
 
-        return Mono.just(filepath)
-                .map(file -> {
-                    File newFile = new File();
-                    newFile.setTableCodePk(fileContent.getTableCodePk());
-                    newFile.setTableRefPk(fileContent.getTableRefPk());
-                    newFile.setFileName(file.file());
-                    newFile.setFilePath(file.path());
-                    newFile.setOrgFileName(filePart.filename());
-                    newFile.setCreateAt(LocalDateTime.now());
-                    newFile.setUse(true);
+        File newFile = new File();
+        newFile.setTableCodePk(fileContent.getTableCodePk()); // 중복
+        newFile.setTableRefPk(fileContent.getTableRefPk()); // 중복
+        newFile.setFileName(filepath.file()); // 중복
+        newFile.setFilePath(filepath.path());  // 중복
+        newFile.setOrgFileName(filePart.filename()); // 중복
+        newFile.setCreateAt(LocalDateTime.now()); // 중복
+        newFile.setUse(true);
 
-                    return Tuples.of(newFile, file);
-                });
+        int reuslt = fileMapper.insert(newFile);
+        if(reuslt == 0) {
+            return Mono.error(new RuntimeException("File insert failed"));
+        }
+
+        if(!"image".equalsIgnoreCase(filePart.headers().getContentType().getType())) {
+            return Mono.just(fileContent);
+        }
+        if (filepath.width() == 0 || filepath.height() == 0) {
+            return awsS3Provider.saveOri(filePart, filepath.path(), filepath.file())
+                .thenReturn(newFile);
+        } else {
+            return awsS3Provider.saveThumbnail(filePart, filepath.path(), filepath.file(), filepath.width(), filepath.height())
+                .thenReturn(newFile);
+        }
     }
 
     public Mono<String> saveProfile(Member users, FilePart filePart) {

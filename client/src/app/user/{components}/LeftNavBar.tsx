@@ -5,13 +5,25 @@ import {
     faAddressCard,
     faCheckToSlot,
     faClockRotateLeft,
-    faEnvelope, faFilePowerpoint,
-    faKey, faRectangleList, fas,
+    faEnvelope,
+    faFilePowerpoint,
+    faGear,
+    faKey,
+    faRectangleList,
 } from "@fortawesome/free-solid-svg-icons";
-import React from "react";
-import {faGear} from "@fortawesome/free-solid-svg-icons/faGear";
+import React, {useEffect} from "react";
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import {faTableList} from "@fortawesome/free-solid-svg-icons/faTableList";
+import {RoleType} from "@/app/user/system/{services}/types";
+import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
+
+
+type MenuItemType = {
+    name: string,
+    href: string,
+    icon: IconDefinition,
+    role: RoleType
+}
 
 const LeftNavBar = ({
     isOpen,
@@ -26,16 +38,23 @@ const LeftNavBar = ({
 }) => {
 
     const iconSize = 16;
-    const menuItems = [
-        {name: '유저 정보', href:'/user/info', icon: faCheckToSlot},
-        {name: '로그인기록', href:'/user/history', icon: faClockRotateLeft},
-        // {name: 'SMTP', href:'/user/smtp', icon: faEnvelope},
-        // {name: 'SMTP 발송 내역', href:'/user/smtp-history', icon: faEnvelope},
-        // {name: 'OTP', href:'/user/otp', icon:faKey},
-        {name: 'EMAIL', href:'/user/email', icon: faEnvelope},
-        // {name: 'SYSTEM', href:'/user/system', icon: faGear},
-        {name: '포인트 적립 내역', href:'/user/point-history', icon: faFilePowerpoint},
+    const menuItems: MenuItemType[] = [
+        {name: '유저 정보', href:'/user/info', icon: faCheckToSlot, role: RoleType.USER},
+        {name: '로그인기록', href:'/user/history', icon: faClockRotateLeft, role: RoleType.USER},
+        {name: 'SMTP', href:'/user/smtp', icon: faEnvelope, role: RoleType.ADMIN},
+        {name: 'SMTP 발송 내역', href:'/user/smtp-history', icon: faEnvelope, role: RoleType.ADMIN},
+        {name: 'OTP', href:'/user/otp', icon:faKey, role: RoleType.MASTER},
+        {name: 'EMAIL', href:'/user/email', icon: faEnvelope, role: RoleType.USER},
+        {name: 'SYSTEM', href:'/user/system', icon: faGear, role: RoleType.ADMIN},
+        {name: '포인트 적립 내역', href:'/user/point-history', icon: faFilePowerpoint, role: RoleType.USER},
     ]
+
+    const [roles, setRoles] = React.useState<RoleType[]>([]);
+
+    useEffect(() => {
+        const roles = JSON.parse(localStorage.getItem('roles') || '[]') as RoleType[]
+        setRoles(roles);
+    },[]);
 
     const openToggle = () => {
         bodyScrollToggle();
@@ -65,7 +84,6 @@ const LeftNavBar = ({
                         ? <FontAwesomeIcon icon={faRectangleList} />
                         : <FontAwesomeIcon icon={faTableList} />
                     }
-
                 </button>
                 <button onClick={openToggle}>
                     <FontAwesomeIcon icon={faXmark} className={'text-white text-xl'} />
@@ -84,6 +102,10 @@ const LeftNavBar = ({
                 </li>
                 {
                     menuItems.map((item, index) => {
+                        if(!item.role || !roles.find(role => role === item.role)) {
+                            return null;
+                        }
+
                         return (
                             <li key={index}
                                 className={'w-full'}

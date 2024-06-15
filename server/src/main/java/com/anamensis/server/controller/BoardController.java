@@ -140,7 +140,7 @@ public class BoardController {
 
                             PointHistory ph = new PointHistory();
                             ph.setMemberPk(b.getMemberPk());
-                            ph.setPointCodePk(t.getT2().getId());
+                            ph.setPointCodePk(t.getT1().getId());
                             ph.setCreateAt(b.getCreateAt());
                             ph.setTableCodePk(t.getT2().getId());
                             ph.setTableRefPk(t.getT1().getId());

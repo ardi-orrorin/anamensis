@@ -73,10 +73,10 @@ public class BoardService {
 
     private void onePageCache(long id) {
         if(id > 0) {
-            boolean isEmpty = redisTemplate.boundListOps("board:page:1").range(0, -1)
+            boolean isEmpty = redisTemplate.boundSetOps("board:page:1:ids").members()
                 .stream()
-                .map(o -> (BoardResponse.List) o)
-                .filter(b -> b.getId() == id)
+                .map(o -> (Long) o)
+                .filter(b -> b == id)
                 .findFirst().isEmpty();
 
             if(isEmpty) return;
@@ -86,10 +86,12 @@ public class BoardService {
         page.setPage(1);
         page.setSize(20);
 
+        redisTemplate.delete("board:page:1:ids");
         redisTemplate.delete("board:page:1");
 
         this.findAll(page, new Board())
             .doOnNext(list -> {
+                redisTemplate.boundSetOps("board:page:1:ids").add(list.getId());
                 redisTemplate.boundListOps("board:page:1").rightPush(list);
             })
             .subscribe();

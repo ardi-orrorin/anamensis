@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -16,7 +17,7 @@ public class BoardResponse {
     @Getter
     @Builder
     @Setter
-    public static class List {
+    public static class List implements Serializable {
 
         private long id;
 

@@ -13,12 +13,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/boards")
@@ -40,21 +42,22 @@ public class BoardController {
         BoardRequest.Create board
     ) {
 
-        Mono<List<BoardResponse.List>> list = boardService.findAll(page, board.toEntity())
-                .flatMap(b -> rateService.countRate(b.getId())
-                        .doOnNext(b::setRate)
-                        .map($ -> b)
-                )
-                .subscribeOn(Schedulers.boundedElastic())
-                .collectList();
+        Flux<BoardResponse.List> list;
 
-//        Mono<Long> count = boardService.count(board)
-//                .subscribeOn(Schedulers.boundedElastic());
+        if(page.getPage() == 1) {
+            list = boardService.findOnePage();
+        } else {
+            list = boardService.findAll(page, board.toEntity());
+        }
 
-        return list.map(l -> {
-//                    page.setTotal(t.getT2().intValue());
-                    return new PageResponse<>(page, l);
-                });
+        return list
+            .flatMap(b -> rateService.countRate(b.getId())
+                .doOnNext(b::setRate)
+                .map($ -> b)
+            )
+            .subscribeOn(Schedulers.boundedElastic())
+            .collectList()
+            .map(l -> new PageResponse<>(page, l));
     }
 
     @PublicAPI
@@ -209,7 +212,16 @@ public class BoardController {
                           .message("게시글 삭제에 실패하였습니다.");
                     }
                     return sb.build();
+                })
+                .doOnNext(r -> {
+                    if(r.getStatus() != StatusType.SUCCESS) return;
+                    fileService.findByTableNameAndTableRefPk("board", boardPk)
+                            .flatMap(f -> {
+                                long[] ids = f.stream().mapToLong(File::getId).toArray();
+                                return fileService.deleteByPks(ids);
+                            })
+                            .subscribeOn(Schedulers.boundedElastic())
+                            .subscribe();
                 });
     }
-
 }

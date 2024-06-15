@@ -47,10 +47,10 @@ public class PointHistoryService {
                 .onErrorReturn(false);
     }
 
-    public Mono<List<PointHistoryResponse.Summary>> selectSummary(long memberPk) {
-        Page page = new Page();
-        page.setPage(1);
-        page.setSize(5);
+    public Mono<List<PointHistoryResponse.Summary>> selectSummary(long memberPk, Page page) {
+//        Page page = new Page();/
+//        page.setPage(1);
+//        page.setSize(8);
         return Flux.fromIterable(pointHistoryMapper.selectByPointHistory(page, null , memberPk))
             .map(PointHistoryResponse.Summary::fromResultMap)
             .collectList();

@@ -15,7 +15,6 @@ export default function Page() {
         {winKey: 'win1', title: '출석체크', open: true, children: <AttendInfo/>},
         {winKey: 'win2', title: '최근 작성글', open: true, children: <BoardSummary/>},
         {winKey: 'win3', title: '최근 포인트적립 내역', open: true, children: <PointSummary /> },
-        {winKey: 'win4', title: '제목4', open: true, children: "test"},
     ]);
 
     const onClickHandler = (winKey: string, open: boolean) => {

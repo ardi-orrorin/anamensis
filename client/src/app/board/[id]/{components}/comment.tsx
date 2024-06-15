@@ -1,4 +1,4 @@
-import {useContext, useMemo} from "react";
+import {useContext, useMemo, useState} from "react";
 import {CommentI} from "@/app/board/{services}/types";
 import Image from "next/image";
 import BoardProvider, {BoardService} from "@/app/board/{services}/BoardProvider";
@@ -8,6 +8,7 @@ import apiCall from "@/app/{commons}/func/api";
 import Link from "next/link";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
+import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 
 export type SaveComment = {
     boardPk   : string;
@@ -19,6 +20,7 @@ export type SaveComment = {
 const Comment = () => {
     const {comment, setComment, board} = useContext(BoardProvider);
     const {newComment, setNewComment} = useContext(BoardProvider);
+    const [loading, setLoading] = useState(false);
 
     const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setNewComment({...newComment, content: e.target.value});
@@ -32,6 +34,8 @@ const Comment = () => {
 
         try {
             const body: SaveComment = {boardPk: board.data.id, content: newComment.content, blockSeq: newComment.blockSeq};
+
+            setLoading(true);
 
             await apiCall<boolean, SaveComment>({
                 path: '/api/board/comment',
@@ -56,6 +60,8 @@ const Comment = () => {
 
         } catch (err: any) {
             alert(err.response.data.message);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -104,8 +110,13 @@ const Comment = () => {
                 />
                 <button className={'w-20 border border-solid border-gray-200 text-gray-700 hover:bg-gray-700 hover:text-white duration-300'}
                         onClick={submitClickHandler}
+                        disabled={loading}
                 >
-                  등록
+                    {
+                    loading
+                        ? <LoadingSpinner size={20} />
+                        : '등록'
+                    }
                 </button>
               </div>
             }

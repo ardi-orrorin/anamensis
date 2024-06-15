@@ -58,10 +58,11 @@ public class PointHistoryController {
 
     @GetMapping("summary")
     public Mono<List<PointHistoryResponse.Summary>> getPointHistoriesSummary(
+            Page page,
             @AuthenticationPrincipal UserDetails user
     ) {
         return userService.findUserByUserId(user.getUsername())
-                .flatMap(u -> pointHistoryService.selectSummary(u.getId()));
+                .flatMap(u -> pointHistoryService.selectSummary(u.getId(), page));
     }
 
     @PostMapping("")

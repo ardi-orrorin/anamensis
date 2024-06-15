@@ -4,6 +4,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faComment, faEye} from "@fortawesome/free-solid-svg-icons";
 import {faHeart} from "@fortawesome/free-solid-svg-icons/faHeart";
 import {BlockI, Category} from "@/app/board/{services}/types";
+import {RateColor} from "@/app/{commons}/types/rate";
 
 export interface BoardListI {
     id           : string;
@@ -80,11 +81,11 @@ const BoardComponent = (props: BoardListI) => {
                         <FontAwesomeIcon icon={faEye} />
                         {viewCount}
                     </span>
-                    <span className={'flex gap-1 items-center'}>
+                    <span className={`flex gap-1 items-center text-${RateColor.findColor(rate)?.getColor}`}>
                         <FontAwesomeIcon icon={faHeart} />
                         {rate}
                     </span>
-                    <span className={'flex gap-1 items-center'}>
+                    <span className={`flex gap-1 items-center text-${RateColor.findColor(commentCount)?.getColor}`}>
                         <FontAwesomeIcon icon={faComment} />
                         {commentCount}
                     </span>

@@ -40,6 +40,10 @@ public class BoardService {
     public Flux<BoardResponse.List> findOnePage() {
         List<Object> list = redisTemplate.boundListOps("board:page:1").range(0, -1);
 
+        if(list == null || list.isEmpty()) {
+            this.onePageCache(0);
+        }
+
         return Flux.fromIterable(list)
             .cast(BoardResponse.List.class);
 
@@ -71,7 +75,7 @@ public class BoardService {
             .doOnNext($ -> onePageCache(0));
     }
 
-    private void onePageCache(long id) {
+    public void onePageCache(long id) {
         if(id > 0) {
             boolean isEmpty = redisTemplate.boundSetOps("board:page:1:ids").members()
                 .stream()

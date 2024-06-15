@@ -1,8 +1,13 @@
-export const bodyScrollToggle = () => {
-    if(document.body.style.overflow === 'hidden') {
-        document.body.style.overflow = 'auto';
+export const bodyScrollToggle = (auto: boolean, on?: boolean | undefined) => {
+    if(auto) {
+        return document.body.style.overflow === 'hidden'
+             ? document.body.style.overflow = 'auto'
+             : document.body.style.overflow = 'hidden';
     } else {
-        document.body.style.overflow = 'hidden';
+        return on
+             ? document.body.style.overflow = 'auto'
+             : document.body.style.overflow = 'hidden';
     }
+
 }
 

@@ -2,8 +2,6 @@ import React, {useContext, useEffect} from "react";
 import LoginProvider, {LoginI} from "@/app/login/{services}/LoginProvider";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {useRouter} from "next/navigation";
-import axios from "axios";
 import apiCall from "@/app/{commons}/func/api";
 import {LoginType} from "@/app/login/{componens}/Login";
 

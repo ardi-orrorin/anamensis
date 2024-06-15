@@ -17,7 +17,7 @@ const Contents = ({
 }) => {
 
     const openToggle = () => {
-        bodyScrollToggle();
+        bodyScrollToggle(true);
         setIsOpen(!isOpen);
     }
 

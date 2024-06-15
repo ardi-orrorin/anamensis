@@ -17,9 +17,6 @@ export default function FileImage(props: FileImageProps){
         justifyContent: 'center',
         alignItems: 'center',
     }
-    const onLoadingComplete = (e: HTMLImageElement ) => {
-        const multiple = e.srcset.split(',')[1].split(' ')[1];
-    }
 
     return (
         <div style={style}>
@@ -27,10 +24,10 @@ export default function FileImage(props: FileImageProps){
                    alt={''}
                    height={700}
                    width={700}
+                   className={'w-auto h-auto'}
+                   priority={true}
                    onMouseEnter={onMouseEnterHandler}
                    onMouseLeave={onMouseLeaveHandler}
-                   priority={true}
-                   onLoadingComplete={onLoadingComplete}
                    aria-roledescription={'object'}
             />
         </div>

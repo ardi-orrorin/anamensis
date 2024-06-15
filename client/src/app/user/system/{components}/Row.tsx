@@ -67,7 +67,7 @@ const Row = ({
     }
 
     const onMessageHandler = () => {
-        bodyScrollToggle();
+        bodyScrollToggle(true);
         setModal({
             id: webSys.code,
             route: '메시지',

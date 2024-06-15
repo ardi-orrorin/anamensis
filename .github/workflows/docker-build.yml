@@ -42,10 +42,10 @@ jobs:
         run: ./build.sh ${{ env.SERVICE }} ${{ env.VERSION }} ${{ secrets.DOCKER_ID }} ${{ secrets.BASE_ID }}
 
       - name: Compress test report
-        run: tar -czvf ${{ env.VERSION }}-test-report.tar.gz ./server/build/reports/tests
+        run: cd ./server/build/reports/tests && tar -czvf anamensis-server-test-report.tar.gz ./test && cp anamensis-server-test-report.tar.gz ../../../../anamensis-server-test-report.tar.gz
 
       - name: Upload Springboot - test report
         uses: actions/upload-artifact@v4
         with:
-          name: test-report
-          path: ${{ env.VERSION}}-test-report.tar.gz
+          name: anamensis-server-test-report.tar.gz
+          path: anamensis-server-test-report.tar.gz

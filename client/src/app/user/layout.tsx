@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import ModalProvider, {ModalI} from "@/app/user/{services}/modalProvider";
 import LeftNavBar from "@/app/user/{components}/LeftNavBar";
 import Contents from "@/app/user/{components}/Contents";
@@ -12,12 +12,16 @@ export default function Layout({children}: {children: React.ReactNode}) {
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [modal, setModal] = useState<ModalI>({} as ModalI);
-    const [isModalMode, setIsModalMode] = React.useState<boolean>(true);
+    const [isModalMode, setIsModalMode] = React.useState<boolean>(false);
 
-    const modalClose = () => {
-        bodyScrollToggle();
-        setModal({} as ModalI);
-    }
+    useEffect(() => {
+        if(typeof window === 'undefined') return;
+
+        localStorage.getItem('isModalMode') || localStorage.setItem('isModalMode', JSON.stringify(false));
+
+        const isModalMode = JSON.parse(localStorage.getItem('isModalMode')!);
+        setIsModalMode(isModalMode);
+    },[isModalMode]);
 
     return (
         <main className={'flex items-start'}>

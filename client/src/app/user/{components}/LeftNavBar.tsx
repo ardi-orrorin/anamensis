@@ -50,23 +50,22 @@ const LeftNavBar = ({
 
     const [roles, setRoles] = React.useState<RoleType[]>([]);
 
+
     useEffect(() => {
         const roles = JSON.parse(localStorage.getItem('roles') || '[]') as RoleType[]
         setRoles(roles);
     },[]);
 
     const openToggle = () => {
-        bodyScrollToggle();
+        bodyScrollToggle(false, false);
         setIsModalMode(!isModalMode);
         setIsOpen(!isOpen);
+        localStorage.setItem('isModalMode', JSON.stringify(!isModalMode));
     }
 
-    const fixedToggle = () => {
-        bodyScrollToggle();
-        setIsOpen(!isOpen);
-    }
 
     const onChangeDisabledHandler = () => {
+        bodyScrollToggle(false, true);
         setIsOpen(false);
     }
 

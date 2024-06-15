@@ -280,6 +280,14 @@ export default function Page({params}: {params : {id: string}}) {
     }
 
     const onKeyDownHandler = (e: React.KeyboardEvent<HTMLElement>, seq: number) => {
+        if(e.key === 'ArrowUp') {
+            if(seq === 0) return;
+            blockRef.current[seq - 1]?.focus();
+        } else if(e.key === 'ArrowDown') {
+            if(seq === board.data.content.list.length - 1) return;
+            blockRef.current[seq + 1]?.focus();
+        }
+
 
         if(e.key !== 'Backspace') return;
         const list = board.data?.content?.list;
@@ -441,6 +449,10 @@ export default function Page({params}: {params : {id: string}}) {
                         && <SubTextMenu blockRef={blockRef}/>
                     }
                 </div>
+                {
+                    (isNewBoard || !board.isView) && (!isNewBoard || !board.isView)
+                    && <div className={'h-60'} />
+                }
             </div>
         </>
     )

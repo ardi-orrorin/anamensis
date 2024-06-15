@@ -38,7 +38,7 @@ public class UserResponse {
                     .refreshToken(token.getRefreshToken())
                     .accessTokenExpiresIn(token.getAccessTokenExpiresIn())
                     .refreshTokenExpiresIn(token.getRefreshTokenExpiresIn())
-                    .username(member.getMember().getName())
+                    .username(member.getMember().getUserId())
                     .roles(member.getRoles().stream().map(Role::getRole).toList())
                     .build();
         }

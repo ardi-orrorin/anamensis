@@ -3,10 +3,8 @@ import React, {useContext, useEffect, useMemo, useState} from "react";
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import axios from "axios";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import apiCall, {ApiCallProps} from "@/app/{commons}/func/api";
-import api from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 
 export interface SysMessageI {
@@ -93,7 +91,7 @@ const Message = () => {
     },[message.id]);
 
     const modalClose = () => {
-        bodyScrollToggle();
+        bodyScrollToggle(true);
         setModal({} as ModalI);
     }
 

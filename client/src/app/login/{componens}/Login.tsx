@@ -16,6 +16,9 @@ export type LoginType = {
     accessTokenExpiresIn: number,
     refreshToken: string,
     refreshTokenExpiresIn: number,
+} & LoginUserType
+
+export type LoginUserType = {
     username: string,
     roles: RoleType[]
 }

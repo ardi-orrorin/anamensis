@@ -31,6 +31,14 @@ public class FileController {
 
     private final UserService userService;
 
+
+    /**
+     * 파일 업로드
+     * 게시글 이미지 업로드 api
+     * @param filePart 파일
+     * @param fileContent 파일 내용 FileEntity 사용
+     * @return 파일 정보 (fileEntity)
+     */
     @PostMapping("content-img")
     public Mono<File> upload(
             @RequestPart("file") FilePart filePart,

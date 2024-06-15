@@ -31,12 +31,12 @@ export default function Page(){
                 setData(res.data);
             })
             .catch(err => {
-                console.error(err);
+                alert(err.response.data);
+                location.href = '/user/';
             });
         }
 
-        const debounce = createDebounce(500);
-        debounce(fetch);
+        fetch();
     },[add]);
 
     const addHandler = () => {

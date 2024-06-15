@@ -184,7 +184,7 @@ export default function Block(props: BlockProps) {
             {
                 board.isView
                 && <div className={[
-                    'absolute z-50 text-xs w-72 h-14 flex justify-center items-center bg-white rounded shadow border-l-8 border-solid border-blue-300 duration-200',
+                    'absolute z-50 -bottom-14 w-72 h-14 flex justify-center items-center bg-white rounded shadow border-l-8 border-solid border-blue-300 duration-200',
                     isCopy.isCopy ? 'opacity-100' : 'opacity-0',
                 ].join(' ')
                 }>

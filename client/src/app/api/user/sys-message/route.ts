@@ -6,21 +6,36 @@ export async function GET(req: NextRequest) {
     const searchParams = new URLSearchParams(req.nextUrl.search);
     const params = {id : searchParams.get('id')!}
 
-    const res = await apiCall<SysMessageI>({
-        path: `/admin/api/sys-message`,
-        method: 'GET',
-        call: 'Server',
-        params,
-        setAuthorization: true,
-        isReturnData: true,
-    });
+    try {
+        const res = await apiCall<SysMessageI>({
+            path: `/admin/api/sys-message`,
+            method: 'GET',
+            call: 'Server',
+            params,
+            setAuthorization: true,
+            isReturnData: true,
+        });
 
-    return new NextResponse(JSON.stringify(res),{
-        status: 200,
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    });
+        return new NextResponse(JSON.stringify(res),{
+            status: 200,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+
+    } catch (error) {
+        console.log('error:', error)
+        return new NextResponse(null,{
+            status: 404,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+    }
+
+
+
 }
 
 export async function POST(req: NextRequest) {

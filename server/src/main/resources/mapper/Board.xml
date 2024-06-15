@@ -35,7 +35,7 @@
              , (SELECT count(*)
                   FROM board_comment bc
                  WHERE bc.board_pk  = b.id
-                   AND b.is_use     = 1
+                   AND bc.is_use     = 1
              ) AS comment_count
           FROM board b
           JOIN member m

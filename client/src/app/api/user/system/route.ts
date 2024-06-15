@@ -3,17 +3,25 @@ import {WebSysI} from "@/app/user/system/page";
 import apiCall from "@/app/{commons}/func/api";
 
 export async function GET() {
-    const res = await apiCall<WebSysI[]>({
-        path: `/admin/api/web-sys`,
-        method: 'GET',
-        call: 'Server',
-        setAuthorization: true,
-        isReturnData: true,
-    });
+    try {
+        const res = await apiCall<WebSysI[]>({
+            path: `/admin/api/web-sys`,
+            method: 'GET',
+            call: 'Server',
+            setAuthorization: true,
+            isReturnData: true,
+        });
 
-    return new NextResponse(JSON.stringify(res), {
-        status: 200,
-    });
+        return new NextResponse(JSON.stringify(res), {
+            status: 200,
+        });
+    } catch (error) {
+        return new NextResponse('권한이 없습니다.', {
+            status: 404,
+        });
+
+    }
+
 }
 
 export async function POST(req: NextRequest) {

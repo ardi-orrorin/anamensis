@@ -10,7 +10,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import LeftMenu from "@/app/{components}/leftMenu";
 import TopMenu from "@/app/{components}/topMenu";
-
+import {cookies} from "next/headers";
 
 export type BoardListParams = {
     page       : number;
@@ -37,32 +37,28 @@ export default function Page() {
 
     const [searchParams, setSearchParams] = useState<BoardListParams>({
         page: 1,
-        size: 10,
+        size: 20,
         type: 'title',
     } as BoardListParams);
 
     const fetchDebounce = createDebounce(500);
 
     useEffect(() => {
-         const fetch = async () => {
-            await apiCall<PageResponse<BoardListI>, BoardListParams>({
-                path: '/api/board',
-                method: 'GET',
-                params: searchParams,
-                isReturnData: true,
-            }).then(res => {
-                if(res.content.length === 0) {
-                    setDynamicPage({ isEndOfList: true, isVisible: false});
-                }
+         apiCall<PageResponse<BoardListI>, BoardListParams>({
+            path: '/api/board',
+            method: 'GET',
+            params: searchParams,
+            isReturnData: true,
+         })
+         .then(res => {
+            if(res.content.length === 0) {
+                setDynamicPage({ isEndOfList: true, isVisible: false});
+            }
 
-                setData(res);
-                setDynamicPage({ isEndOfList: false, isVisible: false});
-                setSearchParams({...searchParams, page: searchParams.page + 1});
-            });
-        }
-
-        const debounce = createDebounce(500);
-        debounce(fetch);
+            setData(res);
+            setDynamicPage({ isEndOfList: false, isVisible: false});
+            setSearchParams({...searchParams, page: searchParams.page + 1});
+        });
 
     },[]);
 
@@ -107,7 +103,7 @@ export default function Page() {
     }
 
     const onSearchHandler = () => {
-        const initPage = {page: 1, size: 10};
+        const initPage = {page: 1, size: 20};
         const params = searchValue === ''
         ? {...initPage} as BoardListParams
         : {...searchParams, ...initPage, value: searchValue, type: 'title'};
@@ -127,13 +123,12 @@ export default function Page() {
         const params = {type: 'categoryPk', value: categoryPk, page: 1, size: 10} as BoardListParams;
         setSearchParams(params);
         await fetchApi(params, false);
-
     }
 
     return (
         <div className={'p-5 flex flex-col gap-10'}>
             <div className={'px-4 sm:px-10 md:px-20 lg:px-44 w-full flex justify-center items-center gap-3'}>
-                <div className={['relative flex justify-center duration-700', searchFocus ? 'w-full sm:w-[70%]' : 'w-40 sm:w-[40%]'].join(' ')}>
+                <div className={['relative flex justify-center duration-700', searchFocus ? 'w-full sm:w-[70%]' : 'w-70 sm:w-[40%]'].join(' ')}>
                     <input className={'rounded-full outline-0 border-solid border-gray-200 border text-xs w-full h-10 py-3 pl-4 pr-16 focus:bg-blue-50 duration-500'}
                            placeholder={'검색어'}
                            value={searchValue || ''}

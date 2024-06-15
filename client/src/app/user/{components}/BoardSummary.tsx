@@ -29,8 +29,8 @@ const BoardSummary = () => {
                 setData(res.data);
             });
         }
-        const debounce = createDebounce(500);
-        debounce(fetch);
+
+        fetch();
 
     }, []);
 

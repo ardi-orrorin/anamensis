@@ -21,7 +21,7 @@ const LeftMenu = ({
         if(typeof window === 'undefined') return;
         const roles = JSON.parse(localStorage.getItem('roles') ?? '[]') as RoleType[];
         setRoles(roles);
-    }, [window]);
+    }, []);
     useEffect(() => {
         if(searchParams.type !== 'categoryPk') {
             setCategoryPk('');
@@ -37,9 +37,9 @@ const LeftMenu = ({
     return (
         <div className={'fixed left-[5%] xl:left-[13%]'}>
             <div className={'flex flex-col gap-20'}>
-                <div className={'flex flex-col w-60 gap-3 shadow rounded p-3'}>
+                <div className={'flex flex-col w-60 gap-3 shadow rounded p-3 bg-white border border-solid border-gray-100'}>
                     <div className={'flex gap-2 justify-center items-center text-sm py-2 font-bold'}>
-                        <FontAwesomeIcon icon={faBars} />
+                        <FontAwesomeIcon icon={faBars} height={'16'}/>
                         <span>
                             메뉴
                         </span>
@@ -51,9 +51,9 @@ const LeftMenu = ({
 
                 {
                     roles.length > 0
-                    && <div className={'flex flex-col w-60 shadow rounded p-3 gap-3'}>
-                      <div className={'flex gap-2 justify-center items-center text-sm font-bold'}>
-                        <FontAwesomeIcon icon={faPen} />
+                    && <div className={'flex flex-col w-60 shadow rounded p-3 bg-white gap-3 border border-solid border-gray-100'}>
+                      <div className={'flex gap-2 justify-center items-center text-sm font-bold py-2'}>
+                        <FontAwesomeIcon icon={faPen} height={'16'} />
                         <span>
                               글쓰기
                           </span>
@@ -122,7 +122,7 @@ const CategorySelect = ({
                 <div />
                 <span>{Category.findById(categoryPk)?.name ?? '카테고리'}</span>
                 <div>
-                    <div className={['duration-700', selectToggle ? 'rotate-180' : 'rotate-0'].join(' ')}>
+                    <div className={['duration-300', selectToggle ? '-rotate-180' : '-rotate-90'].join(' ')}>
                         ▲
                     </div>
                 </div>

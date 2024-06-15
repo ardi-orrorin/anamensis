@@ -14,7 +14,6 @@ interface LoginHistoriesI {
 export interface GetProps {
     searchParams: URLSearchParams;
 }
-
 const getServerSideProps: GetServerSideProps<GetProps> = async (context) => {
     const searchParams = new URLSearchParams(context.query as any);
     return {

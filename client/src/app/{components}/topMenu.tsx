@@ -31,7 +31,7 @@ const TopMenu = ({
                     return (
                         <button key={'category-write' + index}
                                 className={[
-                                    'py-3 w-[31.5%] text-center border-2 border-solid border-gray-100 shadow hover:bg-gray-100 duration-300',
+                                    'py-3 w-[31.5%] text-sm text-center border border-solid border-gray-100 shadow hover:bg-gray-100 duration-300',
                                     categoryPk === item.id ? 'bg-gray-100' : ''
                                 ].join(' ')}
                                 onClick={() => onSelectCategoryHandler(item.id)}

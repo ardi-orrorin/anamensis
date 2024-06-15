@@ -178,7 +178,7 @@ export default function Page() {
             </div>
             <div className={'flex flex-col gap-3 w-full sm:w-2/3 md:w-[400px] duration-500'}>
                 <div className={'flex gap-3'}>
-                    <span className={'flex items-center w-36'}>이름</span>
+                    <label className={'flex items-center w-36'}>이름</label>
                     <input className={'w-full px-3 py-2 outline-0 bg-blue-50 duration-300 text-sm'}
                            name={'name'}
                            value={profile.name}
@@ -186,7 +186,7 @@ export default function Page() {
                     />
                 </div>
                 <div className={'flex gap-3'}>
-                    <span className={'flex items-center w-36'}>이메일</span>
+                    <label className={'flex items-center w-36'}>이메일</label>
                     <input className={'w-full px-3 py-2 outline-0 focus:bg-blue-50 duration-300 text-sm disabled:bg-white'}
                            name={'email'}
                            value={profile.email}
@@ -195,7 +195,7 @@ export default function Page() {
                     />
                 </div>
                 <div className={'flex gap-3'}>
-                    <span className={'flex items-center w-36'}>연락처</span>
+                    <label className={'flex items-center w-36'}>연락처</label>
                     <input className={'w-full px-3 py-2 outline-0 bg-blue-50 duration-300 text-sm'}
                            name={'phone'}
                            value={profile.phone}

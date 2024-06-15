@@ -5,6 +5,8 @@ import apiCall from "@/app/{commons}/func/api";
 export async function POST(req: NextRequest) {
     const body = await req.formData();
 
+    console.log(body)
+
     const result = await apiCall<UserInfoI>({
         path: '/api/files/content-img',
         method: 'POST',
@@ -14,6 +16,8 @@ export async function POST(req: NextRequest) {
         isReturnData: true,
         body,
     });
+
+
 
     return new NextResponse(JSON.stringify(result), {
         status: 200,

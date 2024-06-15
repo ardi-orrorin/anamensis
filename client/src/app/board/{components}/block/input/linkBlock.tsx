@@ -45,6 +45,7 @@ const LinkBlock = (props: BlockProps) => {
         width           : '100%',
         padding         : '1rem',
         backgroundColor : 'rgba(230,230,230,0.2)',
+        gap             : '0.5rem',
     }
 
     const onKeyupChangeHandler = async (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -116,7 +117,7 @@ const LinkBlock = (props: BlockProps) => {
                         <p style={{fontSize: '0.7rem', wordBreak: 'break-all', color: 'gray'}}
                         >{(extraValue as OGType).description || '내용 없음'}</p>
                     </div>
-                    <img style={{minWidth: '200px', width: '200px', height:'80px', borderRadius: '0.2rem', objectFit: 'cover'}}
+                    <img style={{minWidth: '100px', width: '30%', height:'80px', borderRadius: '0.2rem', objectFit: 'cover'}}
                          src={(extraValue as OGType).image || 'http://' + process.env.NEXT_PUBLIC_DOMAIN + '/noimage.jpg'} alt=""
                     />
                 </a>

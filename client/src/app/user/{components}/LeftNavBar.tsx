@@ -17,7 +17,6 @@ import {faTableList} from "@fortawesome/free-solid-svg-icons/faTableList";
 import {RoleType} from "@/app/user/system/{services}/types";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 
-
 type MenuItemType = {
     name: string,
     href: string,

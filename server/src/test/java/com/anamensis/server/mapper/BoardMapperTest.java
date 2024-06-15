@@ -62,6 +62,9 @@ class BoardMapperTest {
         assertThrowsExactly(DataIntegrityViolationException.class, () -> bm.save(board));
 
         board.setCreateAt(LocalDateTime.now());
+        assertThrowsExactly(DataIntegrityViolationException.class, () -> bm.save(board));
+
+        board.setUpdateAt(LocalDateTime.now());
         assertDoesNotThrow(() -> bm.save(board));
 
         board.setAdsense(false);
@@ -277,6 +280,7 @@ class BoardMapperTest {
         board.setContent(content);
         board.setCategoryPk(category.getId());
         board.setCreateAt(LocalDateTime.now());
+        board.setUpdateAt(LocalDateTime.now());
         board.setAdsense(false);
         board.setViewCount(0);
         board.setRate(0);
@@ -369,6 +373,7 @@ class BoardMapperTest {
         board.setContent(content);
         board.setCategoryPk(category.getId());
         board.setCreateAt(LocalDateTime.now());
+        board.setUpdateAt(LocalDateTime.now());
         board.setAdsense(false);
         board.setViewCount(0);
         board.setRate(0);
@@ -396,6 +401,7 @@ class BoardMapperTest {
         board.setContent(content);
         board.setCategoryPk(category.getId());
         board.setCreateAt(LocalDateTime.now());
+        board.setUpdateAt(LocalDateTime.now());
         board.setAdsense(false);
         board.setRate(0);
 
@@ -421,6 +427,7 @@ class BoardMapperTest {
         board.setContent(content);
         board.setCategoryPk(category.getId());
         board.setCreateAt(LocalDateTime.now());
+        board.setUpdateAt(LocalDateTime.now());
         board.setAdsense(false);
         board.setViewCount(0);
 

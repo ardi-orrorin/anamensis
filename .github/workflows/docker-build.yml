@@ -29,6 +29,9 @@ jobs:
       - name: Decode and set .env.local
         run: echo "${{ secrets.NEXTJS_ENV }}" | base64 --decode > ./client/.env.local
 
+      - name: Decode and set application.yml
+        run: echo "${{ secrets.SITE_TEST_CONFIG }}" | base64 --decode > ./server/src/main/resources/application.yml
+
       - name: Next.js install
         run: npm install --prefix ./client
 

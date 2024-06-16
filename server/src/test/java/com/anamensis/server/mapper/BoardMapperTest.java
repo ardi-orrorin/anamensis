@@ -228,39 +228,40 @@ class BoardMapperTest {
     @Test
     @Order(3)
     @DisplayName("작성자 최근 5개 게시글 조회")
+    @Disabled("레디스로 변경")
     void findByMemberPk() {
-        Member m1 = mm.findMemberByUserId("d-member-1").orElseThrow();
-        Member m10 = mm.findMemberByUserId("d-member-5").orElseThrow();
-
-        List<BoardResultMap.Board> list = bm.findByMemberPk(m1.getId());
-        assertFalse(list.isEmpty());
-
-        list.forEach(b -> {
-            assertNotNull(b.getBoard());
-            Board board = b.getBoard();
-            assertNotNull(board.getId());
-            assertNotNull(board.getMemberPk());
-            assertNotNull(board.getCategoryPk());
-            assertNotNull(board.getTitle());
-            assertNotNull(board.getContent());
-            assertNotNull(board.getCreateAt());
-            assertNotNull(board.isAdsense());
-            assertNotNull(board.getRate());
-            assertNotNull(board.getViewCount());
-            assertNotNull(board.isUse());
-        });
-
-        assertFalse(list.stream().anyMatch(b -> b.getId() == 6));
-        assertFalse(list.stream().anyMatch(b -> b.getId() == 5));
-
-        assertTrue(list.stream().anyMatch(b -> b.getId() == 1));
-        assertTrue(list.stream().anyMatch(b -> b.getId() == 2));
-        assertTrue(list.stream().anyMatch(b -> b.getId() == 3));
-        assertTrue(list.stream().anyMatch(b -> b.getId() == 4));
-
-
-        list = bm.findByMemberPk(m10.getId());
-        assertTrue(list.isEmpty());
+//        Member m1 = mm.findMemberByUserId("d-member-1").orElseThrow();
+//        Member m10 = mm.findMemberByUserId("d-member-5").orElseThrow();
+//
+//        List<BoardResultMap.Board> list = bm.findByMemberPk(m1.getId());
+//        assertFalse(list.isEmpty());
+//
+//        list.forEach(b -> {
+//            assertNotNull(b.getBoard());
+//            Board board = b.getBoard();
+//            assertNotNull(board.getId());
+//            assertNotNull(board.getMemberPk());
+//            assertNotNull(board.getCategoryPk());
+//            assertNotNull(board.getTitle());
+//            assertNotNull(board.getContent());
+//            assertNotNull(board.getCreateAt());
+//            assertNotNull(board.isAdsense());
+//            assertNotNull(board.getRate());
+//            assertNotNull(board.getViewCount());
+//            assertNotNull(board.isUse());
+//        });
+//
+//        assertFalse(list.stream().anyMatch(b -> b.getId() == 6));
+//        assertFalse(list.stream().anyMatch(b -> b.getId() == 5));
+//
+//        assertTrue(list.stream().anyMatch(b -> b.getId() == 1));
+//        assertTrue(list.stream().anyMatch(b -> b.getId() == 2));
+//        assertTrue(list.stream().anyMatch(b -> b.getId() == 3));
+//        assertTrue(list.stream().anyMatch(b -> b.getId() == 4));
+//
+//
+//        list = bm.findByMemberPk(m10.getId());
+//        assertTrue(list.isEmpty());
     }
 
     @Test

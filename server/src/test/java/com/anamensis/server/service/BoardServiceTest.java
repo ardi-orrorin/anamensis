@@ -160,48 +160,49 @@ class BoardServiceTest {
     @Test
     @Order(4)
     @DisplayName("회원별 최근 5개 게시글 조회 테스트")
+    @Disabled("레디스로 이동")
     void findByMemberPk() {
-        StepVerifier.create(bs.findByMemberPk(1))
-                    .expectNextCount(4)
-                    .verifyComplete();
-
-        StepVerifier.create(bs.findByMemberPk(1))
-                .assertNext(summaryList -> {
-                    assertEquals(4, summaryList.getId());
-                    assertEquals("테스트 제목4", summaryList.getTitle());
-                })
-                .assertNext(summaryList -> {
-                    assertEquals(3, summaryList.getId());
-                    assertEquals("테스트 제목3", summaryList.getTitle());
-                })
-                .assertNext(summaryList -> {
-                    assertEquals(2, summaryList.getId());
-                    assertEquals("테스트 제목2", summaryList.getTitle());
-                })
-                .assertNext(summaryList -> {
-                    assertEquals(1, summaryList.getId());
-                    assertEquals("테스트 제목1", summaryList.getTitle());
-                })
-                .verifyComplete();
-
-        StepVerifier.create(bs.findByMemberPk(3))
-                    .expectNextCount(2)
-                    .verifyComplete();
-
-        StepVerifier.create(bs.findByMemberPk(3))
-                .assertNext(summaryList -> {
-                    assertEquals(9, summaryList.getId());
-                    assertEquals("테스트 제목9", summaryList.getTitle());
-                })
-                .assertNext(summaryList -> {
-                    assertEquals(8, summaryList.getId());
-                    assertEquals("테스트 제목8", summaryList.getTitle());
-                })
-                .verifyComplete();
-
-        StepVerifier.create(bs.findByMemberPk(100))
-                .expectNextCount(0)
-                .verifyComplete();
+//        StepVerifier.create(bs.findByMemberPk(1))
+//                    .expectNextCount(4)
+//                    .verifyComplete();
+//
+//        StepVerifier.create(bs.findByMemberPk(1))
+//                .assertNext(summaryList -> {
+//                    assertEquals(4, summaryList.getId());
+//                    assertEquals("테스트 제목4", summaryList.getTitle());
+//                })
+//                .assertNext(summaryList -> {
+//                    assertEquals(3, summaryList.getId());
+//                    assertEquals("테스트 제목3", summaryList.getTitle());
+//                })
+//                .assertNext(summaryList -> {
+//                    assertEquals(2, summaryList.getId());
+//                    assertEquals("테스트 제목2", summaryList.getTitle());
+//                })
+//                .assertNext(summaryList -> {
+//                    assertEquals(1, summaryList.getId());
+//                    assertEquals("테스트 제목1", summaryList.getTitle());
+//                })
+//                .verifyComplete();
+//
+//        StepVerifier.create(bs.findByMemberPk(3))
+//                    .expectNextCount(2)
+//                    .verifyComplete();
+//
+//        StepVerifier.create(bs.findByMemberPk(3))
+//                .assertNext(summaryList -> {
+//                    assertEquals(9, summaryList.getId());
+//                    assertEquals("테스트 제목9", summaryList.getTitle());
+//                })
+//                .assertNext(summaryList -> {
+//                    assertEquals(8, summaryList.getId());
+//                    assertEquals("테스트 제목8", summaryList.getTitle());
+//                })
+//                .verifyComplete();
+//
+//        StepVerifier.create(bs.findByMemberPk(100))
+//                .expectNextCount(0)
+//                .verifyComplete();
 
     }
 

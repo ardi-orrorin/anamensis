@@ -163,8 +163,7 @@ public class UserController {
     public Mono<UserResponse.MyPage> info(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        return userService.findUserByUserId(userDetails.getUsername())
-                .flatMap(u -> Mono.just(UserResponse.MyPage.transToMyPage(u)));
+        return userService.findUserInfoCache(userDetails.getUsername());
     }
 
     @PutMapping("info")
@@ -184,6 +183,11 @@ public class UserController {
                     HttpStatus status = result ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
                     String message = result ? "Success" : "Failed";
                     return UserResponse.Status.transToStatus(status, message);
+                })
+                .publishOn(Schedulers.boundedElastic())
+                .doOnNext(s -> {
+                    if(!s.getStatus().equals(HttpStatus.OK)) return;
+                        userService.addUserInfoCache(userDetails.getUsername());
                 });
     }
 
@@ -198,6 +202,10 @@ public class UserController {
                     HttpStatus status = result ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
                     String message = result ? "Success" : "Failed";
                     return Mono.just(UserResponse.Status.transToStatus(status, message));
+                })
+                .doOnNext(s -> {
+                    if(!s.getStatus().equals(HttpStatus.OK)) return;
+                    userService.addUserInfoCache(userDetails.getUsername());
                 });
     }
 

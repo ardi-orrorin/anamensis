@@ -5,13 +5,15 @@ import com.anamensis.server.entity.Member;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 public class AttendResponse {
 
-    @Getter @Builder
-    public static class AttendInfo {
+    @Getter @Builder @ToString
+    public static class AttendInfo implements Serializable {
 
         private String userId;
 

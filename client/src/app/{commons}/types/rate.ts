@@ -3,12 +3,12 @@ export class RateColor {
     private readonly rate: number;
 
     private static readonly colors = [
-        new RateColor({color: "gray-400", rate: 0}),
-        new RateColor({color: "green-700", rate: 9}),
-        new RateColor({color: "blue-500", rate: 29}),
-        new RateColor({color: "yellow-500", rate: 49}),
-        new RateColor({color: "fuchsia-700", rate: 99}),
-        new RateColor({color: "red-700", rate: 999}),
+        new RateColor({color: "#9ca3af", rate: 0}),
+        new RateColor({color: "#4d7c0f", rate: 9}),
+        new RateColor({color: "#3b82f6", rate: 29}),
+        new RateColor({color: "#eab308", rate: 49}),
+        new RateColor({color: "#a21caf", rate: 99}),
+        new RateColor({color: "#b91c1c", rate: 999}),
     ];
 
     constructor({color, rate}: {color: string, rate: number}) {

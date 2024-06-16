@@ -21,7 +21,10 @@ public interface BoardMapper {
 
     Optional<BoardResultMap.Board> findByPk(long boardPk);
 
-    List<BoardResultMap.Board> findByMemberPk(long memberPk);
+    List<BoardResultMap.Board> findByMemberPk(
+        @Param("memberPk") long memberPk,
+        @Param("page") Page page
+    );
 
     long count(Board board);
 

@@ -96,10 +96,11 @@ public class BoardController {
 
     @GetMapping("summary")
     public Mono<List<BoardResponse.SummaryList>> findByMemberPk(
+        Page page,
         @AuthenticationPrincipal UserDetails user
     ) {
         return userService.findUserByUserId(user.getUsername())
-                .flatMapMany(u -> boardService.findByMemberPk(u.getId()))
+                .flatMapMany(u -> boardService.findByMemberPk(u.getId(), page))
                 .flatMap(b -> rateService.countRate(b.getId())
                     .doOnNext(b::setRate)
                     .map($ -> b)

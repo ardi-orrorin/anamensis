@@ -76,7 +76,7 @@
          WHERE member_pk = #{memberPk}
            AND is_use  = 1
          ORDER BY id DESC
-         LIMIT 0, 5
+         LIMIT #{page.offset}, #{page.size}
     </select>
     <update id="updateByPk" parameterType="Board">
         UPDATE board

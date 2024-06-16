@@ -11,6 +11,7 @@ const nextConfig = {
       },
     ],
     formats : ['image/avif'],
+    unoptimized : true,
   },
 };
 

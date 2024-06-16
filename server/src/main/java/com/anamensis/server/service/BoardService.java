@@ -55,8 +55,8 @@ public class BoardService {
                 .switchIfEmpty(Mono.error(new RuntimeException("게시글이 없습니다.")));
     }
 
-    public Flux<BoardResponse.SummaryList> findByMemberPk(long memberPk) {
-        return Flux.fromIterable(boardMapper.findByMemberPk(memberPk))
+    public Flux<BoardResponse.SummaryList> findByMemberPk(long memberPk, Page page) {
+        return Flux.fromIterable(boardMapper.findByMemberPk(memberPk, page))
                 .map(BoardResponse.SummaryList::from);
     }
 

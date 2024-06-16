@@ -7,12 +7,14 @@ import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.Role;
 import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.resultMap.MemberResultMap;
+import io.jsonwebtoken.io.Serializer;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.http.HttpStatus;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class UserResponse {
@@ -56,7 +58,7 @@ public class UserResponse {
 
     @Getter
     @Setter
-    public static class MyPage {
+    public static class MyPage implements Serializable {
         private String userId;
         private String email;
         private String phone;

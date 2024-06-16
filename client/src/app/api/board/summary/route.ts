@@ -1,18 +1,17 @@
-import {cookies} from "next/headers";
-import axios from "axios";
+import {NextRequest} from "next/server";
+import apiCall from "@/app/{commons}/func/api";
+import {BoardSummaryI} from "@/app/user/{components}/BoardSummary";
 
-export async function GET(){
+export async function GET(req: NextRequest){
+    const params = new URLSearchParams(req.nextUrl.searchParams);
 
-    const url = process.env.NEXT_PUBLIC_SERVER + '/api/boards/summary';
-    const token = cookies().get('next.access.token') || cookies().get('next.refresh.token');
-
-    const result = await axios.get(url, {
-        headers: {
-            'Authorization': 'Bearer ' + token?.value,
-            'Content-Type': 'application/json',
-        }
-    }).then((res) => {
-        return res.data;
+    const result = await apiCall<BoardSummaryI[]>({
+        path: '/api/boards/summary',
+        method: 'GET',
+        params,
+        call: 'Server',
+        setAuthorization: true,
+        isReturnData: true,
     });
 
     return new Response(JSON.stringify(result), {

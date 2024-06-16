@@ -3,6 +3,7 @@ package com.anamensis.server.service;
 
 import com.anamensis.server.dto.UserDto;
 import com.anamensis.server.dto.request.UserRequest;
+import com.anamensis.server.dto.response.UserResponse;
 import com.anamensis.server.entity.AuthType;
 import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.Role;
@@ -15,6 +16,7 @@ import com.anamensis.server.provider.EmailVerifyProvider;
 import com.anamensis.server.resultMap.MemberResultMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,7 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -37,10 +41,7 @@ public class UserService implements ReactiveUserDetailsService {
 
     private final MemberMapper memberMapper;
     private final PointCodeMapper pointCodeMapper;
-    private final EmailVerifyProvider emailVerifyProvider;
-    private final AwsSesMailProvider awsSesMailProvider;
-
-
+    private final RedisTemplate<String, Object> redisTemplate;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -63,6 +64,26 @@ public class UserService implements ReactiveUserDetailsService {
     public Mono<MemberResultMap> findUserInfo(String userId) {
         return Mono.justOrEmpty(memberMapper.findMemberInfo(userId))
                 .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
+    }
+
+    public Mono<UserResponse.MyPage> findUserInfoCache(String userId) {
+
+        Object member = redisTemplate.opsForValue().get("user:" + userId + ":info");
+        if(Objects.isNull(member)) {
+            addUserInfoCache(userId);
+            member = redisTemplate.opsForValue().get("user:" + userId + ":info");
+        }
+
+        return Mono.justOrEmpty((UserResponse.MyPage) member)
+                .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
+    }
+
+    public void addUserInfoCache(String userId) {
+        MemberResultMap member = memberMapper.findMemberInfo(userId).orElseThrow(() ->
+            new RuntimeException("User not found"));
+
+        UserResponse.MyPage myPage = UserResponse.MyPage.transToMyPage(member);
+        redisTemplate.opsForValue().set("user:" + userId + ":info", myPage, Duration.ofDays(1));
     }
 
     @Override

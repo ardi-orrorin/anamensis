@@ -38,14 +38,7 @@ public class AttendanceController {
     public Mono<AttendResponse.AttendInfo> info(
         @AuthenticationPrincipal UserDetails user
     ) {
-        AtomicReference<Member> memberAtomic = new AtomicReference<>();
-        return userService.findUserByUserId(user.getUsername())
-                .doOnNext(memberAtomic::set)
-                .flatMap(u -> attendanceService.findByMemberPk(u.getId())
-                )
-                .flatMap(attend ->
-                    Mono.just(AttendResponse.AttendInfo.mergeUserAndAttendance(memberAtomic.get(), attend))
-                );
+        return attendanceService.findAttendInfo(user.getUsername());
     }
 
 
@@ -72,6 +65,13 @@ public class AttendanceController {
                 .doOnNext(pointCodeAtomic::set)
                 .flatMap(pointCode -> userService.updatePoint(memberAtomic.get().getId(), (int) pointCode.getPoint()))
                 .publishOn(Schedulers.boundedElastic())
+                .flatMap(b -> {
+                    if(b) {
+                        attendanceService.addAttendInfoCache(user.getUsername());
+                        userService.addUserInfoCache(user.getUsername());
+                    }
+                    return Mono.just(b);
+                })
                 .doOnNext(isAttend -> {
                     if(!isAttend) return;
                     tableCode.doOnNext(tc -> {

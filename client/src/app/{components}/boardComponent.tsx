@@ -81,11 +81,15 @@ const BoardComponent = (props: BoardListI) => {
                         <FontAwesomeIcon icon={faEye} />
                         {viewCount}
                     </span>
-                    <span className={`flex gap-1 items-center text-${RateColor.findColor(rate)?.getColor}`}>
+                    <span className={`flex gap-1 items-center`}
+                          style={{color: RateColor.findColor(rate)?.getColor}}
+                    >
                         <FontAwesomeIcon icon={faHeart} />
                         {rate}
                     </span>
-                    <span className={`flex gap-1 items-center text-${RateColor.findColor(commentCount)?.getColor}`}>
+                    <span className={`flex gap-1 items-center`}
+                          style={{color: RateColor.findColor(commentCount)?.getColor}}
+                    >
                         <FontAwesomeIcon icon={faComment} />
                         {commentCount}
                     </span>

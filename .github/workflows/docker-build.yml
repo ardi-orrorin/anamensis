@@ -63,7 +63,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i anamensis.pem ${{ secrets.AWS_EC2_INSTANCE }} << 'EOF'
           cd ./aws-anamensis 
-          sudo ./deploy.sh ${{ env.SERVICE }} ${{ env.VERSION }} ${{ secrets.EC2_INSTANCE_PORT }} ${{ secrets.BASE_ID }}
+          sudo ./deploy.sh ${{ env.SERVICE }} ${{ env.VERSION }} ${{ secrets.EC2_INSTANCE_PORT }} ${{ secrets.DOCKER_ID }}
           EOF
       - name: Clean up
         run: rm -rf anamensis.pem

@@ -145,7 +145,7 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
 
 
     const {setSelectedBlock} = useContext(BlockProvider);
-    const {comment, setComment,deleteComment, setDeleteComment} = useContext(BoardProvider);
+    const {setComment,deleteComment, setDeleteComment} = useContext(BoardProvider);
     const [loading, setLoading] = useState(false);
 
     const existBlock = useMemo(()=> {
@@ -167,7 +167,7 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
                 isReturnData: true,
             })
 
-            setComment(comment.filter(item => item.id !== id));
+            setComment((prevState => prevState.filter(item => item.id !== id)));
 
         } catch (err: any) {
             alert(err.response.data.message);

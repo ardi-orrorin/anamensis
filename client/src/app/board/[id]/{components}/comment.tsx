@@ -9,6 +9,7 @@ import Link from "next/link";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
+import {defaultProfile} from "@/app/{commons}/func/image";
 
 export type SaveComment = {
     boardPk   : string;
@@ -185,6 +186,7 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
         setDeleteComment({confirm: false});
     }
 
+
     return (
         <div className={['flex-col flex  sm:flex-row w-full justify-start text-sm sm:shadow shadow-md duration-300', deleteComment.id === id && deleteComment.confirm ? 'bg-red-500 text-white' : 'bg-white text-black'].join(' ')}>
             <div className={'flex w-full'}>
@@ -204,7 +206,7 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
                     >
                         <div className={'flex gap-2 items-center sm:items-end'}>
                             <Image className={'h-6 w-6 rounded-full'}
-                                   src={process.env.NEXT_PUBLIC_CDN_SERVER + profileImage}
+                                   src={defaultProfile(profileImage)}
                                    height={30} width={30}
                                    alt={''}
                             />

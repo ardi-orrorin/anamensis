@@ -2,9 +2,10 @@ import {NextRequest, NextResponse} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
 import {PageResponse} from "@/app/{commons}/types/commons";
 import {BoardListI} from "@/app/{components}/boardComponent";
-import {cookies, headers} from "next/headers";
+import {cookies} from "next/headers";
 
 export async function GET(req: NextRequest) {
+
 
     const searchParams = new URLSearchParams(req.nextUrl.searchParams);
     const { page, size, type, value, categoryPk } = Object.fromEntries(searchParams.entries());

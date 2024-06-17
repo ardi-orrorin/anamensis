@@ -10,6 +10,7 @@ public class DummyFileConfig {
     @Bean
     public Trigger DummyFileDeleteJobTrigger() {
         SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule();
+        scheduleBuilder.withRepeatCount(1);
 
         return TriggerBuilder.newTrigger()
                 .forJob(dummyFileDeleteJobDetail())

@@ -9,15 +9,24 @@ import {LoginType} from "@/app/login/{componens}/Login";
 const NoneAuth = ({}) => {
     const {user} = useContext(LoginProvider);
     useEffect(() => {
-        apiCall<LoginType, LoginI>({
-            path: '/api/login/verify',
-            method: 'POST',
-            body: user,
-            call: 'Proxy'
-        }).then(res => {
-            localStorage.setItem('roles', JSON.stringify(res.data.roles));
-            window.location.replace('/');
-        })
+        const fetch = async () => {
+            try {
+                await apiCall<LoginType, LoginI>({
+                    path: '/api/login/verify',
+                    method: 'POST',
+                    body: user,
+                    call: 'Proxy'
+                }).then(res => {
+                    localStorage.setItem('roles', JSON.stringify(res.data.roles));
+                    window.location.replace('/');
+                })
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        fetch();
+
     },[]);
 
     return (

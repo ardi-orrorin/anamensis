@@ -11,6 +11,7 @@ import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useSearchParams} from "next/navigation";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
 import useSWR from "swr";
+import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 
 export default function Page({children, params} : {children: ReactNode, params: {id: string}}) {
 
@@ -71,14 +72,15 @@ export default function Page({children, params} : {children: ReactNode, params: 
         if(isNewBoard) return ;
 
         setLoading(true);
-        await fetchBoard();
-        await fetchComment();
+
+        fetchBoard();
+        fetchComment();
 
         if(params.id === 'new') return ;
-        await fetchRate();
+        fetchRate();
 
     },{
-        revalidateOnFocus: false
+        keepPreviousData: true,
     });
 
     const fetchBoard = async () => {
@@ -87,15 +89,15 @@ export default function Page({children, params} : {children: ReactNode, params: 
             method: 'GET',
             call: 'Proxy'
         })
-            .then(res => {
-                setBoard({
-                    ...board,
-                    data: res.data,
-                    isView: true
-                });
-            }).finally(() => {
-                setLoading(false);
+        .then(res => {
+            setBoard({
+                ...board,
+                data: res.data,
+                isView: true
             });
+        }).finally(() => {
+            setLoading(false);
+        });
     }
 
     const fetchComment = async () => {
@@ -118,78 +120,13 @@ export default function Page({children, params} : {children: ReactNode, params: 
             path: '/api/board/rate/' + params.id,
             method: 'GET',
             call: 'Proxy'
-        }).then(res => {
+        })
+        .then(res => {
             setRateInfo(res.data);
         });
     }
 
-
-    // useEffect(() => {
-    //     if(isNewBoard) return ;
-    //
-    //     setLoading(true);
-    //
-    //     const fetch = async () => {
-    //         await apiCall<BoardI & {isLogin : boolean}>({
-    //             path: '/api/board/' + params.id,
-    //             method: 'GET',
-    //             call: 'Proxy'
-    //         })
-    //         .then(res => {
-    //             setBoard({
-    //                 ...board,
-    //                 data: res.data,
-    //                 isView: true
-    //             });
-    //         }).finally(() => {
-    //             setLoading(false);
-    //         });
-    //     }
-    //
-    //     fetch();
-    //
-    // },[params.id]);
-
-    // useEffect(() => {
-    //     if(isNewBoard) return ;
-    //
-    //     setCommentLoading(true);
-    //     const fetch = async () => {
-    //         await apiCall<CommentI[]>({
-    //             path: '/api/board/comment',
-    //             method: 'GET',
-    //             params: {boardPk: params.id},
-    //             call: 'Proxy'
-    //         })
-    //             .then(res => {
-    //                 setComment(res.data);
-    //             })
-    //             .finally(() => {
-    //                 setCommentLoading(false);
-    //             });
-    //     }
-    //
-    //     const debounce = createDebounce(300);
-    //     debounce(fetch);
-    //
-    // },[params.id]);
-
-    // useEffect(() => {
-    //     if(params.id === 'new') return ;
-    //     const fetch = async () => {
-    //         await apiCall<RateInfoI>({
-    //             path: '/api/board/rate/' + params.id,
-    //             method: 'GET',
-    //             call: 'Proxy'
-    //         }).then(res => {
-    //             setRateInfo(res.data);
-    //         });
-    //     }
-    //
-    //     const debounce = createDebounce(300);
-    //     debounce(fetch);
-    // },[params.id]);
-
+    if(initBoard.isLoading) return <GlobalLoadingSpinner />;
 
     return (
         <LoadingProvider.Provider value={{

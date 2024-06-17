@@ -54,6 +54,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - name: Wait
+        run: sleep 30
       - name: Write SSH key
         run: echo "${{ secrets.ANAMENSIS_SSH_KEY }}" > anamensis.pem && chmod 600 anamensis.pem
 

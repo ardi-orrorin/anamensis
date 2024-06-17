@@ -7,6 +7,8 @@ import {UserInfoI} from "@/app/user/email/page";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {defaultProfile} from "@/app/{commons}/func/image";
+import useSWR from "swr";
+import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 
 
 type loadingType = {
@@ -25,29 +27,40 @@ export default function Page() {
 
     const debounce = createDebounce(500);
 
-    useEffect(() => {
-        apiCall<UserInfoI>({
+    const initFetch = useSWR([loading.img, loading.profile], async (loading) => {
+        if(!loading[0]) {
+            profileFetch();
+        }
+        if(!loading[1]) {
+            dataFetch();
+        }
+    }, {
+        revalidateOnFocus: false,
+    });
+
+    const dataFetch = async () => {
+        return await apiCall<UserInfoI>({
             path: '/api/user/info',
             method: 'GET',
+            isReturnData: true,
         })
         .then((res) => {
-            setProfile(res.data)
+            setProfile(res)
         })
-    },[])
+    }
 
-    useEffect(() => {
-        apiCall({
+    const profileFetch = async () => {
+        return await apiCall({
             path: '/api/user/info/profile-img',
             method: 'GET',
+            isReturnData: true,
         }).then((res) => {
-            if(res.data.length === 0) return ;
-            setImg(process.env.NEXT_PUBLIC_CDN_SERVER + res.data)
+            setImg(res.length === 0 ? '' : res)
         })
-    },[]);
+    }
 
     const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files) return;
-
         const formdata = new FormData();
 
         formdata.append('file', e.target.files[0]);
@@ -64,16 +77,13 @@ export default function Page() {
                 body: formdata,
                 contentType: 'multipart/form-data',
             })
-                .then((res) => {
-                    setImg(process.env.NEXT_PUBLIC_CDN_SERVER + res.data)
-                })
-                .finally(() => {
-                    setLoading({
-                        ...loading,
-                        img: false
-                    });
-                    setProfileEnter(false)
-                })
+            .finally(() => {
+                setLoading({
+                    ...loading,
+                    img: false
+                });
+                setProfileEnter(false)
+            })
         }
 
         debounce(fetch);
@@ -105,6 +115,10 @@ export default function Page() {
     }
 
     const onDeleteHandler = async () => {
+        setLoading({
+            ...loading,
+            img: true
+        })
         await apiCall({
             path: '/api/user/info/profile-img',
             method: 'DELETE',
@@ -114,6 +128,12 @@ export default function Page() {
         })
         .catch((err) => {
             console.log(err)
+        })
+        .finally(() => {
+            setLoading({
+                ...loading,
+                img: false
+            });
         })
     }
 
@@ -127,6 +147,7 @@ export default function Page() {
     const onMouseLeave = (e: React.MouseEvent<HTMLImageElement>) => {
         setProfileEnter(false)
     }
+
     return (
         <main className={'flex flex-col gap-7 w-full justify-center items-center'}>
             <div className={'relative'}>
@@ -143,15 +164,11 @@ export default function Page() {
                     !img &&
                     <div className={'flex justify-center items-center absolute border-0 rounded-full left-0 top-0 w-[150px] h-[150px] z-10 bg-gray-200 opacity-70'}>
                         {
-                            loading.img &&
-                            <LoadingSpinner size={20} />
-                        }
-                        {
-                            !loading.img &&
-                            <button className={'w-full h-full text-xs'}
-                                    onClick={()=> {inputRef.current?.click()}}
-                            >
-                              프로필 추가
+                            loading.img
+                            ? <LoadingSpinner size={20} />
+                            : <button className={'w-full h-full text-xs'}
+                                      onClick={()=> {inputRef.current?.click()}}
+                            > 프로필 추가
                             </button>
                         }
                     </div>
@@ -161,11 +178,14 @@ export default function Page() {
                     <div className={'flex justify-center items-center absolute border-0 rounded-full left-0 top-0 w-[150px] h-[150px] z-10 opacity-50 bg-gray-200'}
                          onMouseLeave={onMouseLeave}
                     >
-                      <button className={'w-full h-full text-xs'}
-                              onClick={onDeleteHandler}
-                      >
-                        프로필 삭제
-                      </button>
+                        {
+                            loading.img
+                            ? <LoadingSpinner size={20} />
+                            : <button className={'w-full h-full text-xs'}
+                                      onClick={onDeleteHandler}
+                            >프로필 삭제
+                            </button>
+                        }
                     </div>
                 }
 

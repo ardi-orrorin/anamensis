@@ -6,6 +6,7 @@ import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {UserInfoI} from "@/app/user/email/page";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
+import {defaultProfile} from "@/app/{commons}/func/image";
 
 
 type loadingType = {
@@ -130,7 +131,7 @@ export default function Page() {
         <main className={'flex flex-col gap-7 w-full justify-center items-center'}>
             <div className={'relative'}>
                 <Image className={'rounded-full border-4 border-solid border-blue-200 w-[150px] h-[150px]'}
-                       src={img || '/noimage.jpg'}
+                       src={defaultProfile(img)}
                        alt={''}
                        placeholder={"empty"}
                        width={150}

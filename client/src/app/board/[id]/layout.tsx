@@ -10,6 +10,7 @@ import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useSearchParams} from "next/navigation";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
+import useSWR from "swr";
 
 export default function Page({children, params} : {children: ReactNode, params: {id: string}}) {
 
@@ -66,17 +67,26 @@ export default function Page({children, params} : {children: ReactNode, params: 
         setSelectedBlock(window.location.hash.replace('#block-', '') || '');
     },[]);
 
-    useEffect(() => {
+    const initBoard = useSWR(`/api/board/${params.id}`, async () => {
         if(isNewBoard) return ;
 
         setLoading(true);
+        await fetchBoard();
+        await fetchComment();
 
-        const fetch = async () => {
-            await apiCall<BoardI & {isLogin : boolean}>({
-                path: '/api/board/' + params.id,
-                method: 'GET',
-                call: 'Proxy'
-            })
+        if(params.id === 'new') return ;
+        await fetchRate();
+
+    },{
+        revalidateOnFocus: false
+    });
+
+    const fetchBoard = async () => {
+        return await apiCall<BoardI & {isLogin : boolean}>({
+            path: '/api/board/' + params.id,
+            method: 'GET',
+            call: 'Proxy'
+        })
             .then(res => {
                 setBoard({
                     ...board,
@@ -86,51 +96,99 @@ export default function Page({children, params} : {children: ReactNode, params: 
             }).finally(() => {
                 setLoading(false);
             });
-        }
+    }
 
-        fetch();
+    const fetchComment = async () => {
+        return await apiCall<CommentI[]>({
+            path: '/api/board/comment',
+            method: 'GET',
+            params: {boardPk: params.id},
+            call: 'Proxy'
+        })
+        .then(res => {
+            setComment(res.data);
+        })
+        .finally(() => {
+            setCommentLoading(false);
+        });
+    }
 
-    },[params.id]);
+    const fetchRate = async () => {
+        await apiCall<RateInfoI>({
+            path: '/api/board/rate/' + params.id,
+            method: 'GET',
+            call: 'Proxy'
+        }).then(res => {
+            setRateInfo(res.data);
+        });
+    }
 
-    useEffect(() => {
-        if(isNewBoard) return ;
 
-        setCommentLoading(true);
-        const fetch = async () => {
-            await apiCall<CommentI[]>({
-                path: '/api/board/comment',
-                method: 'GET',
-                params: {boardPk: params.id},
-                call: 'Proxy'
-            })
-                .then(res => {
-                    setComment(res.data);
-                })
-                .finally(() => {
-                    setCommentLoading(false);
-                });
-        }
+    // useEffect(() => {
+    //     if(isNewBoard) return ;
+    //
+    //     setLoading(true);
+    //
+    //     const fetch = async () => {
+    //         await apiCall<BoardI & {isLogin : boolean}>({
+    //             path: '/api/board/' + params.id,
+    //             method: 'GET',
+    //             call: 'Proxy'
+    //         })
+    //         .then(res => {
+    //             setBoard({
+    //                 ...board,
+    //                 data: res.data,
+    //                 isView: true
+    //             });
+    //         }).finally(() => {
+    //             setLoading(false);
+    //         });
+    //     }
+    //
+    //     fetch();
+    //
+    // },[params.id]);
 
-        const debounce = createDebounce(300);
-        debounce(fetch);
+    // useEffect(() => {
+    //     if(isNewBoard) return ;
+    //
+    //     setCommentLoading(true);
+    //     const fetch = async () => {
+    //         await apiCall<CommentI[]>({
+    //             path: '/api/board/comment',
+    //             method: 'GET',
+    //             params: {boardPk: params.id},
+    //             call: 'Proxy'
+    //         })
+    //             .then(res => {
+    //                 setComment(res.data);
+    //             })
+    //             .finally(() => {
+    //                 setCommentLoading(false);
+    //             });
+    //     }
+    //
+    //     const debounce = createDebounce(300);
+    //     debounce(fetch);
+    //
+    // },[params.id]);
 
-    },[params.id]);
-
-    useEffect(() => {
-        if(params.id === 'new') return ;
-        const fetch = async () => {
-            await apiCall<RateInfoI>({
-                path: '/api/board/rate/' + params.id,
-                method: 'GET',
-                call: 'Proxy'
-            }).then(res => {
-                setRateInfo(res.data);
-            });
-        }
-
-        const debounce = createDebounce(300);
-        debounce(fetch);
-    },[params.id]);
+    // useEffect(() => {
+    //     if(params.id === 'new') return ;
+    //     const fetch = async () => {
+    //         await apiCall<RateInfoI>({
+    //             path: '/api/board/rate/' + params.id,
+    //             method: 'GET',
+    //             call: 'Proxy'
+    //         }).then(res => {
+    //             setRateInfo(res.data);
+    //         });
+    //     }
+    //
+    //     const debounce = createDebounce(300);
+    //     debounce(fetch);
+    // },[params.id]);
 
 
     return (

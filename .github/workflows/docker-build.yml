@@ -49,3 +49,21 @@ jobs:
         with:
           name: anamensis-server-test-report.tar.gz
           path: anamensis-server-test-report.tar.gz
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Write SSH key
+        run: echo "${{ secrets.ANAMENSIS_SSH_KEY }}" > anamensis.pem && chmod 600 anamensis.pem
+
+      - name: Docker deploy
+        run: |
+          ssh -o StrictHostKeyChecking=no -i anamensis.pem ${{ secrets.AWS_EC2_INSTANCE }} << 'EOF'
+          cd ./aws-anamensis 
+          sudo ./deploy.sh ${{ env.SERVICE }} ${{ env.VERSION }} ${{ secrets.EC2_INSTANCE_PORT }} ${{ secrets.BASE_ID }}
+          EOF
+      - name: Clean up
+        run: rm -rf anamensis.pem
+
+

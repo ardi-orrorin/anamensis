@@ -3,23 +3,18 @@ import axios from "axios";
 import {LoginI} from "@/app/login/{services}/LoginProvider";
 import {ResponseCookie} from "next/dist/compiled/@edge-runtime/cookies";
 import {ErrorResponse} from "@/app/login/page";
+import {GeoLocationType, getGeoLocation} from "@/app/login/{services}/GeoLocation";
 
 export async function POST(req: NextRequest){
-    const user = await req.json() as LoginI;
+    const user =  await req.json() as LoginI;
     const url = process.env.NEXT_PUBLIC_SERVER + '/public/api/user/verify';
 
-    const geoLocation = await axios.get('https://geolocation-db.com/json')
-        .then((res) => {
-            return {
-                countryCode: res.data.country_code,
-                countryName: res.data.country_name,
-                state: res.data.state,
-                city: res.data.city,
-                ipv4: res.data.IPv4,
-                latitude: res.data.latitude,
-                longitude: res.data.longitude
-            };
-        });
+    const clientIp = req.ip || req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for');
+
+    const ipRegExp = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/;
+    const ipMatch = ipRegExp.exec(clientIp || '');
+
+    const geoLocation: GeoLocationType = await getGeoLocation(ipMatch?.[0]);
 
     try {
         const resData = await axios.post(url, user, {
@@ -56,6 +51,11 @@ export async function POST(req: NextRequest){
         });
 
         next.cookies.set('next.user', JSON.stringify(resData.data.roles), {
+            ...cookieInit,
+            maxAge: resData.data.accessTokenExpiresIn / 1000
+        });
+
+        next.cookies.set('next.user.roles', JSON.stringify(resData.data.roles), {
             ...cookieInit,
             maxAge: resData.data.accessTokenExpiresIn / 1000
         });

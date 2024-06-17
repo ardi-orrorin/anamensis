@@ -1,6 +1,7 @@
 import {BoardService} from "@/app/board/{services}/BoardProvider";
 import Image from "next/image";
 import {useMemo} from "react";
+import {defaultProfile} from "@/app/{commons}/func/image";
 
 const BoardInfo = (props: { board: BoardService }) => {
     const {board} = props;
@@ -20,15 +21,12 @@ const BoardInfo = (props: { board: BoardService }) => {
                 </p>
             </div>
             <div className={"flex gap-2 items-center"}>
-                {
-                    boardInfo.profileImage &&
-                    <Image src={process.env.NEXT_PUBLIC_CDN_SERVER + board.data.profileImage}
-                           className={"rounded-full border-2 border-solid border-blue-300"}
-                           width={35}
-                           height={35}
-                           alt={""}
-                    />
-                }
+                <Image src={defaultProfile(board.data.profileImage)}
+                       className={"rounded-full border-2 border-solid border-blue-300"}
+                       width={35}
+                       height={35}
+                       alt={""}
+                />
                 <p className={"font-bold text-sm"}
                 >{board.data.writer}</p>
             </div>

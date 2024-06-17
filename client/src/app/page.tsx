@@ -10,7 +10,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import LeftMenu from "@/app/{components}/leftMenu";
 import TopMenu from "@/app/{components}/topMenu";
-import {cookies} from "next/headers";
+import useSWR from "swr";
 
 export type BoardListParams = {
     page       : number;
@@ -26,6 +26,7 @@ type DynamicPage = {
 }
 
 export default function Page() {
+
     const [data, setData] = useState<PageResponse<BoardListI>>({} as PageResponse<BoardListI>);
     const footerRef = useRef<HTMLDivElement>(null);
     const [searchValue, setSearchValue] = useState('');
@@ -42,15 +43,14 @@ export default function Page() {
     } as BoardListParams);
 
     const fetchDebounce = createDebounce(500);
-
-    useEffect(() => {
-         apiCall<PageResponse<BoardListI>, BoardListParams>({
+    const initFetch = useSWR('/', async () => {
+        await apiCall<PageResponse<BoardListI>, BoardListParams>({
             path: '/api/board',
             method: 'GET',
             params: searchParams,
             isReturnData: true,
-         })
-         .then(res => {
+        })
+        .then(res => {
             if(res.content.length === 0) {
                 setDynamicPage({ isEndOfList: true, isVisible: false});
             }
@@ -58,9 +58,10 @@ export default function Page() {
             setData(res);
             setDynamicPage({ isEndOfList: false, isVisible: false});
             setSearchParams({...searchParams, page: searchParams.page + 1});
-        });
-
-    },[]);
+        })
+    },{
+        revalidateOnFocus: false
+    });
 
     useEffect(() => {
         if(!footerRef.current) return;
@@ -83,7 +84,7 @@ export default function Page() {
     }, [dynamicPage.isVisible])
 
     const fetchApi = async (searchParams: BoardListParams, isAdd: boolean) => {
-        if(!data.content) return;
+        if(!data?.content) return;
         await apiCall<PageResponse<BoardListI>, BoardListParams>({
             path: '/api/board',
             method: 'GET',
@@ -125,6 +126,8 @@ export default function Page() {
         await fetchApi(params, false);
     }
 
+    if(initFetch.error) return <div>error</div>
+
     return (
         <div className={'p-5 flex flex-col gap-10'}>
             <div className={'px-4 sm:px-10 md:px-20 lg:px-44 w-full flex justify-center items-center gap-3'}>
@@ -156,12 +159,12 @@ export default function Page() {
 
                 <div className={'w-[850px] flex flex-wrap gap-5 justify-center items-center'}>
                     {
-                        data.content
+                        data?.content
                         && data.content.length === 0
                         && <div className={'text-center text-2xl w-full py-20 text-gray-600'}>검색 결과가 없습니다.</div>
                     }
                     {
-                        data.content
+                        data?.content
                         && data.content.map((item, index) => {
                             return (
                                 <BoardComponent key={'boardsummary' + index} {...item} />
@@ -181,3 +184,4 @@ export default function Page() {
 
     )
 }
+

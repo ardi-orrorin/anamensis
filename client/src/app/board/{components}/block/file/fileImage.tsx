@@ -16,6 +16,7 @@ export default function FileImage(props: FileImageProps){
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        objectFit: 'cover',
     }
 
     return (
@@ -29,6 +30,7 @@ export default function FileImage(props: FileImageProps){
                    onMouseEnter={onMouseEnterHandler}
                    onMouseLeave={onMouseLeaveHandler}
                    aria-roledescription={'object'}
+
             />
         </div>
     )

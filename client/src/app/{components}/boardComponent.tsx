@@ -5,6 +5,7 @@ import {faComment, faEye} from "@fortawesome/free-solid-svg-icons";
 import {faHeart} from "@fortawesome/free-solid-svg-icons/faHeart";
 import {BlockI, Category} from "@/app/board/{services}/types";
 import {RateColor} from "@/app/{commons}/types/rate";
+import {defaultProfile} from "@/app/{commons}/func/image";
 
 export interface BoardListI {
     id           : string;
@@ -38,6 +39,7 @@ const BoardComponent = (props: BoardListI) => {
         console.log(e)
     }
 
+
     return (
         <Link className={'flex flex-col w-[350px] min-w-[350px] h-[150px] bg-white shadow hover:bg-blue-50 hover:shadow-xl duration-500'}
               href={`/board/${id}`}
@@ -54,10 +56,10 @@ const BoardComponent = (props: BoardListI) => {
                 <div className={'flex flex-col gap-1 items-center'}>
                     <div className={'flex items-center gap-1'}>
                         <Image className={'rounded-full'}
-                               src={process.env.NEXT_PUBLIC_CDN_SERVER + profileImage!}
-                               width={25}
-                               height={25}
-                               alt={''}
+                                  src={defaultProfile(profileImage)}
+                                  width={25}
+                                  height={25}
+                                  alt={''}
                         />
                         <span className={'text-sm'}>
                             {writer}

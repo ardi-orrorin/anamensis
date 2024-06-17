@@ -29,7 +29,6 @@ async function apiCall <R = any, I = any>(props: ApiCallProps): Promise<R | Axio
     if(!path) Error('path is required');
     if(!method) Error('method is required');
 
-
     const url = ((call && call === 'Server') ? process.env.NEXT_PUBLIC_SERVER : '')  + path;
 
     const headers = new AxiosHeaders();

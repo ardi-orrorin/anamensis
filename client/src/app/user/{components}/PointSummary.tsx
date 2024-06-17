@@ -1,10 +1,12 @@
 'use client';
 
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {Table} from "@/app/user/point-history/{services}/types";
 import {RateColor} from "@/app/{commons}/types/rate";
+import useSWR from "swr";
+import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 
 export interface PointSummaryI {
     id: number;
@@ -17,21 +19,22 @@ const PointSummary = () => {
 
     const [data, setData] = useState<PointSummaryI[]>([]);
 
-    useEffect(() => {
+    const initFetch = useSWR('/api/user/point-history/summary', async () => {
+        await apiCall<PointSummaryI[]>({
+            path: "/api/user/point-history/summary",
+            params: {page:1, size: 8},
+            method: "GET",
+            isReturnData: true,
+        })
+        .then((res) => {
+            setData(res);
+        });
+    },{
+        revalidateOnFocus: false,
+    });
 
-        const fetch = async () => {
-            const result = await apiCall<PointSummaryI[]>({
-                path: "/api/user/point-history/summary",
-                params: {page:1, size: 8},
-                method: "GET",
-                isReturnData: true,
-            });
 
-            setData(result);
-        }
-        fetch();
-
-    }, []);
+    if(initFetch.isLoading) return <LoadingSpinner size={30} />;
 
     return (
         <div className={'w-full h-max flex flex-col gap-2 justify-center items-start'}>

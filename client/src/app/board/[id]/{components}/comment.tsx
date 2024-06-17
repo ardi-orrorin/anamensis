@@ -10,6 +10,7 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {defaultProfile} from "@/app/{commons}/func/image";
+import {useRouter} from "next/navigation";
 
 export type SaveComment = {
     boardPk   : string;
@@ -87,7 +88,6 @@ const Comment = () => {
                         ({comment.length})
                     </span>
                 </div>
-
             </div>
             {
                 board.isView
@@ -109,7 +109,7 @@ const Comment = () => {
                           value={newComment.content}
                           onChange={onChange}
                 />
-                <button className={'w-20 border border-solid border-gray-200 text-gray-700 hover:bg-gray-700 hover:text-white duration-300'}
+                <button className={'w-20 border border-solid border-gray-200 text-gray-700 hover:bg-gray-700 hover:text-white duration-300 focus:outline-none focus:bg-gray-700 focus:text-white'}
                         onClick={submitClickHandler}
                         disabled={loading}
                 >
@@ -145,7 +145,8 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
 
 
     const {setSelectedBlock} = useContext(BlockProvider);
-    const {setComment,deleteComment, setDeleteComment} = useContext(BoardProvider);
+    const {comment, setComment,deleteComment, setDeleteComment} = useContext(BoardProvider);
+    const [loading, setLoading] = useState(false);
 
     const existBlock = useMemo(()=> {
         return board.data.content.list.find(item => item.hash === blockSeq) !== undefined;
@@ -157,6 +158,8 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
             return;
         }
 
+        setLoading(true);
+
         try {
             const deleteRes = await apiCall({
                 path: '/api/board/comment/' + id,
@@ -164,20 +167,12 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
                 isReturnData: true,
             })
 
-            alert(deleteRes ? '삭제 완료 했습니다.' : '삭제에 실패했습니다.');
-
-            const commentRes = await apiCall<CommentI[], {boardPk: string}>({
-                path: '/api/board/comment',
-                method: 'GET',
-                params: {boardPk: board.data.id},
-                isReturnData: true,
-            });
-
-            setComment(commentRes);
+            setComment(comment.filter(item => item.id !== id));
 
         } catch (err: any) {
             alert(err.response.data.message);
         } finally {
+            setLoading(false);
             setDeleteComment({confirm: false});
         }
     }
@@ -186,9 +181,15 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
         setDeleteComment({confirm: false});
     }
 
-
     return (
-        <div className={['flex-col flex  sm:flex-row w-full justify-start text-sm sm:shadow shadow-md duration-300', deleteComment.id === id && deleteComment.confirm ? 'bg-red-500 text-white' : 'bg-white text-black'].join(' ')}>
+        <div className={['relative flex-col flex sm:flex-row w-full justify-start text-sm sm:shadow shadow-md duration-300', deleteComment.id === id && deleteComment.confirm ? 'bg-red-500 text-white' : 'bg-white text-black'].join(' ')}>
+            {
+                loading
+                && <div className={'absolute flex justify-center items-center w-full h-full bg-gray-100 opacity-60'}>
+                    <LoadingSpinner size={20} />
+                </div>
+            }
+
             <div className={'flex w-full'}>
                 {
                     blockSeq

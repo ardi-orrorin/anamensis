@@ -6,6 +6,8 @@ import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {Table} from "@/app/user/point-history/{services}/types";
 import {RateColor} from "@/app/{commons}/types/rate";
+import useSWR from "swr";
+import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 
 
 export interface BoardSummaryI {
@@ -20,22 +22,20 @@ const BoardSummary = () => {
 
     const [data, setData] = useState<BoardSummaryI[]>([]);
 
-    useEffect(() => {
-        const fetch = async () => {
-            await apiCall<BoardSummaryI[]>({
-                path: "/api/board/summary",
-                params: {page:1, size: 8},
-                method: "GET",
-            })
-            .then((res) => {
-                console.log(res)
-                setData(res.data);
-            });
-        }
+    const initFetch = useSWR('/api/board/summary', async () => {
+        await apiCall<BoardSummaryI[]>({
+            path: "/api/board/summary",
+            params: {page:1, size: 8},
+            method: "GET",
+        })
+        .then((res) => {
+            setData(res.data);
+        });
+    },{
+        revalidateOnFocus: false,
+    });
 
-        fetch();
-
-    }, []);
+    if(initFetch.isLoading) return <LoadingSpinner size={30} />;
 
     return (
         <div className={'w-full h-max flex justify-center items-start'}>

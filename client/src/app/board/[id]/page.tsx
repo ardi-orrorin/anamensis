@@ -20,6 +20,8 @@ import BoardProvider from "@/app/board/{services}/BoardProvider";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
+import KeyDownEvent from "@/app/board/{services}/keyDownEvent";
+import KeyUpEvent from "@/app/board/{services}/keyUpEvent";
 
 export interface RateInfoI {
     id      : number;
@@ -66,15 +68,20 @@ export default function Page({params}: {params : {id: string}}) {
     ), []);
 
     useEffect(() => {
+        if(!isNewBoard) return ;
         const list = board.data?.content?.list;
         if (!list) return ;
-        blockRef.current[list.length - 1]?.focus();
+        const lastRef = blockRef.current[list.length - 1] as HTMLInputElement;
+        lastRef.focus();
     },[board.data?.content?.list.length])
 
-    const addBlock = (seq: number, init: boolean) => {
-        const block = {...defaultBlock};
+    const addBlock = (seq: number, init: boolean, value?: string) => {
+        const block: BlockI = {...defaultBlock};
         if(!init) {
             block.seq = seq + 0.1;
+        }
+        if(value) {
+            block.value = value;
         }
         return block;
     };
@@ -135,8 +142,6 @@ export default function Page({params}: {params : {id: string}}) {
                 return res.data;
             });
 
-
-
             if(isSave) {
                 location.href = '/board/' + result?.id;
             } else {
@@ -162,7 +167,7 @@ export default function Page({params}: {params : {id: string}}) {
         }
     };
 
-    const addBlockHandler = (seq: number) => {
+    const addBlockHandler = (seq: number, value?: string) => {
         const list = board.data?.content?.list;
         if (!list) return ;
 
@@ -170,7 +175,7 @@ export default function Page({params}: {params : {id: string}}) {
 
         if(currentBlock.value === '') return ;
 
-        list.push(addBlock(seq, false));
+        list.push(addBlock(seq, false, value));
 
         list.sort((a, b) => a.seq - b.seq)
             .map((item, index) => {
@@ -248,6 +253,7 @@ export default function Page({params}: {params : {id: string}}) {
         });
 
         if(!isNewBoard) return;
+        if(!fileBlock.value) return;
 
         await apiCall({
             path: '/api/file/delete/filename',
@@ -264,62 +270,25 @@ export default function Page({params}: {params : {id: string}}) {
     }
 
     const onKeyUpHandler = (e: React.KeyboardEvent<HTMLElement>, seq: number) => {
-        if(e.key !== 'Enter') return;
-
-        seq === 0 && e?.currentTarget?.getAttribute('name') === 'title' && blockRef.current[0]?.focus();
-
-        const list = board.data?.content?.list;
-
-        if (!list) return ;
-
-        if(!list[seq + 1]) {
-            addBlockHandler(seq);
+        switch (e.key) {
+            case 'Enter':
+                KeyUpEvent.enter({seq, board, blockRef, addBlockHandler, event: e});
+                break;
         }
-
-        blockRef.current[seq + 1]?.focus();
     }
 
     const onKeyDownHandler = (e: React.KeyboardEvent<HTMLElement>, seq: number) => {
-        if(e.key === 'ArrowUp') {
-            if(seq === 0) return;
-            blockRef.current[seq - 1]?.focus();
-        } else if(e.key === 'ArrowDown') {
-            if(seq === board.data.content.list.length - 1) return;
-            blockRef.current[seq + 1]?.focus();
+        switch (e.key) {
+            case 'ArrowUp':
+                KeyDownEvent.arrowUp({seq, blockRef, event: e});
+                break;
+            case 'ArrowDown':
+                KeyDownEvent.arrowDown({seq, blockRef, event: e, board});
+                break;
+            case 'Backspace':
+                KeyDownEvent.backspace({board, seq, blockRef, setBoard, addBlock});
+                break;
         }
-
-
-        if(e.key !== 'Backspace') return;
-        const list = board.data?.content?.list;
-        if (!list) return ;
-
-        const currentBlock = list.find(item => item.seq === seq)!;
-
-        if(seq === 0 && currentBlock.value === '') {
-            const newList = list.map((item, index) => {
-                if (item.seq !== 0) return item;
-                return addBlock(0, true);
-            });
-            setBoard({...board, data: {...board.data, content: {list: newList}}});
-        }
-
-        if(currentBlock.value !== '') return ;
-        if(seq === 0) {
-            setTimeout(() => {
-                blockRef.current[0]?.focus();
-            },100);
-            return;
-        }
-
-        const newList = list.filter(item => item.seq !== seq)
-            .sort((a, b) => a.seq - b.seq)
-            .map((item, index) => {
-                item.seq = index;
-                return item;
-            });
-
-        setBoard({...board, data: {...board.data, content: {list: newList}}});
-        blockRef.current[seq - 1]?.focus();
     }
 
     const onChangeRateHandler = async () => {

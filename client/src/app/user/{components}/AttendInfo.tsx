@@ -1,10 +1,10 @@
 'use client';
-import axios, {AxiosResponse} from "axios";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {useRouter} from "next/navigation";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
+import useSWR from "swr";
 
 export default function AttendInfo() {
 
@@ -14,19 +14,18 @@ export default function AttendInfo() {
     const [loading, setLoading] = useState<boolean>(false);
     const debounce = createDebounce(500);
 
-    useEffect(()=> {
-        const fetch = async () => {
-            await apiCall<AttendInfoI>({
-                path: "/api/user/attend",
-                method: "GET",
-            })
+    const initFetch = useSWR([loading], async () => {
+        if(loading) return;
+        await apiCall<AttendInfoI>({
+            path: "/api/user/attend",
+            method: "GET",
+        })
             .then((res) => {
                 setUser(res.data);
             });
-        }
-
-        fetch();
-    },[loading]);
+    },{
+        revalidateOnFocus: false,
+    });
 
     const attend = () => {
         setLoading(true);
@@ -50,6 +49,8 @@ export default function AttendInfo() {
         }
         debounce(fetch);
     }
+
+    if(initFetch.isLoading) return <LoadingSpinner size={30} />;
 
     return (
         <div className={'w-full h-full flex flex-col gap-5 justify-center items-start'}>

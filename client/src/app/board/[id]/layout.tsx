@@ -69,15 +69,8 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
     const initBoard = useSWR(`/api/board/${params.id}`, async () => {
         if(isNewBoard) return ;
-
-        setLoading(true);
-
-        fetchBoard();
-
-
         if(params.id === 'new') return ;
         fetchRate();
-
     },{
         keepPreviousData: true,
         revalidateOnMount: true,
@@ -89,8 +82,22 @@ export default function Page({children, params} : {children: ReactNode, params: 
         fetchComment();
     },{
         keepPreviousData: true,
-        revalidateOnMount: true,
+        revalidateOnMount: false,
     });
+
+    useEffect(()=> {
+        if(isNewBoard) return ;
+
+        setLoading(true);
+
+        fetchBoard();
+
+
+        // if(params.id === 'new') return ;
+        // fetchRate();
+
+    },[params.id])
+
 
     const fetchBoard = async () => {
         return await apiCall<BoardI & {isLogin : boolean}>({
@@ -135,7 +142,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
         });
     }
 
-    if(initBoard.isLoading) return <GlobalLoadingSpinner />;
+    // if(initBoard.isLoading) return <GlobalLoadingSpinner />;
 
     return (
         <LoadingProvider.Provider value={{

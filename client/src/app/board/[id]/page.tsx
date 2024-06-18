@@ -73,8 +73,11 @@ export default function Page({params}: {params : {id: string}}) {
     useEffect(() => {
         if(!isNewBoard) return ;
         const list = board.data?.content?.list;
+
         if (!list) return ;
         const lastRef = blockRef.current[list.length - 1] as HTMLInputElement;
+
+        if(!lastRef) return ;
         lastRef.focus();
     },[board.data?.content?.list.length])
 
@@ -275,6 +278,7 @@ export default function Page({params}: {params : {id: string}}) {
     }
 
     const onKeyUpHandler = (e: React.KeyboardEvent<HTMLElement>, seq: number) => {
+
         switch (e.key) {
             case 'Enter':
                 KeyUpEvent.enter({seq, board, blockRef, addBlockHandler, event: e});

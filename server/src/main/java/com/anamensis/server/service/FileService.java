@@ -98,6 +98,10 @@ public class FileService {
         }
         if (filepath.width() == 0 || filepath.height() == 0) {
             return awsS3Provider.saveOri(filePart, filepath.path(), filepath.file())
+                .then(Mono.defer(() -> {
+                    String filename = filepath.file().substring(0, filepath.file().lastIndexOf(".")) + "_thumb" + filepath.file().substring(filepath.file().lastIndexOf("."));
+                    return awsS3Provider.saveThumbnail(filePart, filepath.path(), filename, 600, 600);
+                }))
                 .thenReturn(newFile);
         } else {
             return awsS3Provider.saveThumbnail(filePart, filepath.path(), filepath.file(), filepath.width(), filepath.height())
@@ -146,7 +150,14 @@ public class FileService {
         return Mono.just(fileMapper.updateIsUseById(file.getId(), 0))
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(r -> awsS3Provider.deleteS3(file.getFilePath(), file.getFileName())
-                        .subscribe()
+                    .then(Mono.defer(() -> {
+                        String filename =
+                            file.getFileName().substring(0, file.getFileName().lastIndexOf("."))
+                            + "_thumb"
+                            + file.getFileName().substring(file.getFileName().lastIndexOf("."));
+                        return awsS3Provider.deleteS3(file.getFilePath(), filename);
+                    }))
+                    .subscribe()
                 )
                 .map(this::response);
     }

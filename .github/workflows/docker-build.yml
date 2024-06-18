@@ -54,18 +54,27 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Wait
-        run: sleep 30
+      - uses: actions/checkout@v4
+        with:
+          repository: ardi-orrorin/aws-anamensis
+          ref: main
+          token: ${{ secrets.ANAMENSIS_REPO_TOKEN }}
+
       - name: Write SSH key
         run: echo "${{ secrets.ANAMENSIS_SSH_KEY }}" > anamensis.pem && chmod 600 anamensis.pem
+
+      - name: Copy Depoly Config
+        run: |
+          scp -o StrictHostKeyChecking=no -i anamensis.pem -r * ${{ secrets.AWS_EC2_INSTANCE }}:
 
       - name: Docker deploy
         run: |
           ssh -o StrictHostKeyChecking=no -i anamensis.pem ${{ secrets.AWS_EC2_INSTANCE }} << 'EOF'
-          cd ./aws-anamensis 
-          sudo ./deploy.sh ${{ env.SERVICE }} ${{ env.VERSION }} ${{ secrets.EC2_INSTANCE_PORT }} ${{ secrets.BASE_ID }}
+          sudo ./deploy.sh ${{ env.SERVICE }} ${{ env.VERSION }} ${{ secrets.EC2_INSTANCE_PORT }} ${{ secrets.DOCKER_ID }}
+          rm -rf *
           EOF
+
       - name: Clean up
-        run: rm -rf anamensis.pem
+        run: rm -rf *
 
 

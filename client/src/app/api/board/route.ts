@@ -1,12 +1,10 @@
-import {NextRequest, NextResponse} from "next/server";
+import {NextRequest} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
 import {PageResponse} from "@/app/{commons}/types/commons";
 import {BoardListI} from "@/app/{components}/boardComponent";
-import {cookies} from "next/headers";
+import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
 
 export async function GET(req: NextRequest) {
-
-
     const searchParams = new URLSearchParams(req.nextUrl.searchParams);
     const { page, size, type, value, categoryPk } = Object.fromEntries(searchParams.entries());
     const params = {
@@ -25,11 +23,9 @@ export async function GET(req: NextRequest) {
         isReturnData: true,
     })
 
-    return new NextResponse(JSON.stringify(result), {
+    return ExNextResponse({
+        body: JSON.stringify(result),
         status: 200,
-        headers: {
-            'Content-Type': 'application/json',
-            'roles': cookies().get('next.user')?.value || ''
-        }
-    });
+        isRoles: page === '1',
+    })
 }

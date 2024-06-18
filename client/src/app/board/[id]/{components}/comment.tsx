@@ -11,6 +11,7 @@ import BlockProvider from "@/app/board/{services}/BlockProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {defaultProfile} from "@/app/{commons}/func/image";
 import {useRouter} from "next/navigation";
+import {mutate} from "swr";
 
 export type SaveComment = {
     boardPk   : string;
@@ -145,7 +146,7 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
 
 
     const {setSelectedBlock} = useContext(BlockProvider);
-    const {comment, setComment,deleteComment, setDeleteComment} = useContext(BoardProvider);
+    const {setComment,deleteComment, setDeleteComment} = useContext(BoardProvider);
     const [loading, setLoading] = useState(false);
 
     const existBlock = useMemo(()=> {
@@ -167,12 +168,11 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
                 isReturnData: true,
             })
 
-            setComment(comment.filter(item => item.id !== id));
-
         } catch (err: any) {
             alert(err.response.data.message);
         } finally {
             setLoading(false);
+            await mutate(`/api/board/comment/${board.data.id}`);
             setDeleteComment({confirm: false});
         }
     }

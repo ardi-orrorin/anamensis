@@ -8,12 +8,14 @@ import com.anamensis.server.dto.response.UserResponse;
 import com.anamensis.server.entity.AuthType;
 import com.anamensis.server.entity.EmailVerify;
 import com.anamensis.server.entity.Member;
+import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.provider.TokenProvider;
 import com.anamensis.server.resultMap.MemberResultMap;
 import com.anamensis.server.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -157,6 +159,18 @@ public class UserController {
                     file.isEmpty() ? ""
                                    : file.get(0).getFilePath() + file.get(0).getFileName()
                 );
+    }
+
+    @GetMapping("roles")
+    public Mono<List<RoleType>> roles(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        return Mono.just(userDetails.getAuthorities())
+            .map(authorities -> authorities.stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .map(RoleType::valueOf)
+                    .toList()
+            );
     }
 
     @GetMapping("info")

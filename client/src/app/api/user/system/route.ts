@@ -17,9 +17,8 @@ export async function GET() {
         });
     } catch (error) {
         return new NextResponse('권한이 없습니다.', {
-            status: 404,
+            status: 403,
         });
-
     }
 
 }

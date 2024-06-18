@@ -97,7 +97,6 @@ export default function FileUpload (props: FileUploadProps) {
                 'Content-Type': 'multipart/form-data'
             }
         }).then((res) => {
-            console.log(res.data)
             if(!res.data) return ;
             setWaitUploadFiles(prevState => [
                 ...prevState,

@@ -96,17 +96,14 @@ public class FileService {
         if(!"image".equalsIgnoreCase(filePart.headers().getContentType().getType())) {
             return Mono.just(fileContent);
         }
-        if (filepath.width() == 0 || filepath.height() == 0) {
-            return awsS3Provider.saveOri(filePart, filepath.path(), filepath.file())
-                .then(Mono.defer(() -> {
-                    String filename = filepath.file().substring(0, filepath.file().lastIndexOf(".")) + "_thumb" + filepath.file().substring(filepath.file().lastIndexOf("."));
-                    return awsS3Provider.saveThumbnail(filePart, filepath.path(), filename, 600, 600);
-                }))
-                .thenReturn(newFile);
-        } else {
-            return awsS3Provider.saveThumbnail(filePart, filepath.path(), filepath.file(), filepath.width(), filepath.height())
-                .thenReturn(newFile);
-        }
+
+        awsS3Provider.saveOri(filePart, filepath.path(), filepath.file())
+            .subscribeOn(Schedulers.boundedElastic())
+            .subscribe();
+        String filename = filepath.file().substring(0, filepath.file().lastIndexOf(".")) + "_thumb" + filepath.file().substring(filepath.file().lastIndexOf("."));
+
+        return awsS3Provider.saveThumbnail(filePart, filepath.path(), filename, 600, 600)
+            .thenReturn(newFile);
     }
 
     public Mono<String> saveProfile(Member users, FilePart filePart) {

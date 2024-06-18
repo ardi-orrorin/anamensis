@@ -1,4 +1,4 @@
-import axios, {AxiosHeaders, AxiosRequestConfig, AxiosResponse} from "axios";
+import axios, {AxiosError, AxiosHeaders, AxiosRequestConfig, AxiosResponse} from "axios";
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export type Call = 'Proxy' | 'Server';

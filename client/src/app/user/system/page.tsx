@@ -30,7 +30,7 @@ export default function Page(){
             .then(res => {
                 setData(res.data);
             })
-            .catch(err => {
+            .catch(async (err) => {
                 alert(err.response.data);
                 location.href = '/user/';
             });
@@ -64,7 +64,8 @@ export default function Page(){
                 </thead>
                 <tbody>
                 {
-                    data.map((item, index) => {
+                    data?.length > 0 &&
+                    data?.map((item, index) => {
                         return (
                             <Row key={index} props={item} setData={setData} />
                         )

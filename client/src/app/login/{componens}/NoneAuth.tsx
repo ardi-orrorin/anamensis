@@ -17,7 +17,6 @@ const NoneAuth = ({}) => {
                     body: user,
                     call: 'Proxy'
                 }).then(res => {
-                    localStorage.setItem('roles', JSON.stringify(res.data.roles));
                     window.location.replace('/');
                 })
             } catch (e) {

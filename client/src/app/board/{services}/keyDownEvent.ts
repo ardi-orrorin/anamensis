@@ -16,9 +16,10 @@ const backspace = (args: KeyEventType) => {
     const {
         board, seq, blockRef
         , setBoard, addBlock
+        , event
     } = args
 
-    if(seq === 0 || !board || !addBlock || !setBoard || !blockRef) return;
+    if(seq === 0 || !board || !addBlock || !setBoard || !blockRef || !event) return;
 
     const list = board.data?.content?.list as BlockI[];
     if (!list) return ;
@@ -33,7 +34,7 @@ const backspace = (args: KeyEventType) => {
         setBoard({...board, data: {...board.data, content: {list: newList}}});
     }
 
-    if(currentBlock.value !== '') return ;
+
     if(seq === 0) {
         setTimeout(() => {
             blockRef.current[0]?.focus();
@@ -41,7 +42,19 @@ const backspace = (args: KeyEventType) => {
         return;
     }
 
-    const newList = list.filter(item => item.seq !== seq)
+    const curRef = blockRef.current[seq] as HTMLInputElement;
+    if(curRef.selectionStart !== 0) return;
+    event.preventDefault();
+    const afterText = curRef.value.substring(curRef.selectionStart!);
+
+    const newList = list
+        .map((item, index) => {
+            if (item.seq !== 0 && item.seq === seq - 1 && afterText !== '') {
+                item.value += afterText;
+            }
+            return item;
+        })
+        .filter(item => item.seq !== seq)
         .sort((a, b) => a.seq - b.seq)
         .map((item, index) => {
             item.seq = index;
@@ -52,7 +65,8 @@ const backspace = (args: KeyEventType) => {
 
     setTimeout(() => {
         const prevRef = blockRef.current[seq - 1] as HTMLInputElement;
-        prevRef.selectionStart = prevRef.value.length;
+        const position = prevRef.value.length - afterText.length;
+        prevRef.setSelectionRange(position, position);
         prevRef?.focus();
     },50);
 }

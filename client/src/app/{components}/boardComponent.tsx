@@ -41,8 +41,9 @@ const BoardComponent = (props: BoardListI) => {
 
 
     return (
-        <Link className={'flex flex-col w-[350px] min-w-[350px] h-[150px] bg-white shadow hover:bg-blue-50 hover:shadow-xl duration-500'}
+        <Link className={'flex flex-col w-[350px] min-w-[350px] h-[150px] bg-white shadow active:bg-blue-50 hover:shadow-xl active:shadow-xl duration-300'}
               href={`/board/${id}`}
+              prefetch={true}
         >
             <div className={'flex justify-between p-3 h-auto items-center'}>
                 <div className={'h-auto flex flex-col gap-1'}>

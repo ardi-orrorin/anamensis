@@ -22,7 +22,6 @@ const ExNextResponse = async (props: ExNextResponseType): Promise<NextResponse> 
     }
 
     if(props.isRoles && cookies().get('next.access.token')?.value) {
-        console.log('isRoles')
         const res = await apiCall({
             path: '/api/user/roles',
             method: 'GET',

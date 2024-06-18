@@ -36,6 +36,7 @@ const MenuItem = ({
         const newList = board.data?.content?.list.map((item, index) => {
             if (item.seq === seq) {
                 if(item.code.slice(0, 3) !== code.slice(0, 3)) {
+                    item.value = '';
                     item.extraValue = {};
                     item.textStyle = {};
                 }

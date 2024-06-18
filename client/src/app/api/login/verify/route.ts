@@ -50,16 +50,6 @@ export async function POST(req: NextRequest){
             maxAge: resData.data.refreshTokenExpiresIn / 1000
         });
 
-        next.cookies.set('next.user', JSON.stringify(resData.data.roles), {
-            ...cookieInit,
-            maxAge: resData.data.accessTokenExpiresIn / 1000
-        });
-
-        next.cookies.set('next.user.roles', JSON.stringify(resData.data.roles), {
-            ...cookieInit,
-            maxAge: resData.data.accessTokenExpiresIn / 1000
-        });
-
         return next;
 
     } catch (err: any) {

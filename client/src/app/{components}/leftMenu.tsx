@@ -10,18 +10,14 @@ import {RoleType} from "@/app/user/system/{services}/types";
 const LeftMenu = ({
     select,
     searchParams,
+    roles,
 }:{
+    roles: RoleType[],
     searchParams: BoardListParams,
     select: (categoryPk: string) => void
 }) => {
     const [categoryPk, setCategoryPk] = useState('');
-    const [roles, setRoles] = useState<RoleType[]>([]);
 
-    useEffect(() => {
-        if(typeof window === 'undefined') return;
-        const roles = JSON.parse(localStorage.getItem('roles') ?? '[]') as RoleType[];
-        setRoles(roles);
-    }, []);
     useEffect(() => {
         if(searchParams.type !== 'categoryPk') {
             setCategoryPk('');

@@ -29,6 +29,9 @@ export interface RateInfoI {
     status  : boolean;
 }
 
+
+
+
 // fixme: 뒤로가기 등 강제 이동시 파일 삭제 처리 안됨
 
 export default function Page({params}: {params : {id: string}}) {
@@ -123,11 +126,13 @@ export default function Page({params}: {params : {id: string}}) {
 
 
         try {
+            // todo: 저장시 빈 라인 제거 할 것인가?
+            // 현재 : 빈 라인 포함 저장
             const bodyContent = board.data.content.list.filter(item => item.value !== '');
             const body: BoardI = {
                 ...board.data,
                 content: {
-                    list: bodyContent
+                    list: board.data.content.list
                 },
                 uploadFiles: waitUploadFiles.map(item => item.id),
                 removeFiles: waitRemoveFiles.map(item => item.filePath + item.fileName),
@@ -286,7 +291,7 @@ export default function Page({params}: {params : {id: string}}) {
                 KeyDownEvent.arrowDown({seq, blockRef, event: e, board});
                 break;
             case 'Backspace':
-                KeyDownEvent.backspace({board, seq, blockRef, setBoard, addBlock});
+                KeyDownEvent.backspace({board, seq, blockRef, setBoard, addBlock, event: e});
                 break;
         }
     }

@@ -2,11 +2,7 @@ import "./init.css"
 import NavMain from "@/app/NavMain";
 import {ErrorBoundary} from "next/dist/client/components/error-boundary";
 import Error from "@/app/error";
-import {GetStaticProps, Metadata, Viewport} from "next";
-import apiCall from "@/app/{commons}/func/api";
-import {PageResponse} from "@/app/{commons}/types/commons";
-import {BoardListI} from "@/app/{components}/boardComponent";
-import {BoardListParams} from "@/app/page";
+import {Metadata, Viewport} from "next";
 
 
 export const metadata: Metadata = {

@@ -11,6 +11,8 @@ import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import LeftMenu from "@/app/{components}/leftMenu";
 import TopMenu from "@/app/{components}/topMenu";
 import useSWR from "swr";
+import {cookies} from "next/headers";
+import {RoleType} from "@/app/user/system/{services}/types";
 
 export type BoardListParams = {
     page       : number;
@@ -28,6 +30,7 @@ type DynamicPage = {
 export default function Page() {
 
     const [data, setData] = useState<PageResponse<BoardListI>>({} as PageResponse<BoardListI>);
+    const [roles, setRoles] = useState<RoleType[]>([]);
     const footerRef = useRef<HTMLDivElement>(null);
     const [searchValue, setSearchValue] = useState('');
     const [searchFocus, setSearchFocus] = useState(false);
@@ -47,10 +50,17 @@ export default function Page() {
         await apiCall<PageResponse<BoardListI>, BoardListParams>({
             path: '/api/board',
             method: 'GET',
-            params: searchParams,
-            isReturnData: true,
+            params: {page: 1, size: 20} as BoardListParams,
         })
         .then(res => {
+            const roles = res.headers['next.user.roles'] || ''
+
+            if(roles) setRoles(JSON.parse(roles));
+
+            return res.data
+        })
+        .then(res => {
+            if(!res) return;
             if(res.content.length === 0) {
                 setDynamicPage({ isEndOfList: true, isVisible: false});
             }
@@ -60,8 +70,12 @@ export default function Page() {
             setSearchParams({...searchParams, page: searchParams.page + 1});
         })
     },{
-        revalidateOnFocus: false
+        keepPreviousData: true,
+        revalidateOnMount: true,
+        revalidateOnFocus: true
     });
+
+
 
     useEffect(() => {
         if(!footerRef.current) return;
@@ -154,6 +168,7 @@ export default function Page() {
                 <div className={'hidden sm:block relative min-w-[300px]'}>
                     <LeftMenu select={categorySelectHandler}
                               searchParams={searchParams}
+                              roles={roles}
                     />
                 </div>
 

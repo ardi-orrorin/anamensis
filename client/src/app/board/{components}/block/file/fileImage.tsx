@@ -1,10 +1,11 @@
 import {CSSProperties} from "react";
 import Image from "next/image";
+import {MouseLeaveHTMLElements} from "@/app/board/{components}/block/type/Types";
 
 export type FileImageProps = {
     value: string;
-    onMouseEnterHandler: (e: React.MouseEvent<HTMLImageElement | HTMLInputElement | HTMLDivElement>) => void;
-    onMouseLeaveHandler: (e: React.MouseEvent<HTMLImageElement | HTMLInputElement | HTMLDivElement>) => void;
+    onMouseEnterHandler: (e: React.MouseEvent<MouseLeaveHTMLElements>) => void;
+    onMouseLeaveHandler: (e: React.MouseEvent<MouseLeaveHTMLElements>) => void;
 }
 
 export default function FileImage(props: FileImageProps){

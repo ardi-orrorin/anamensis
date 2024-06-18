@@ -47,7 +47,6 @@ const EmailAuth = () => {
             body: user,
             call: 'Proxy'
         }).then(res => {
-            localStorage.setItem('roles', JSON.stringify(res.data.roles));
             window.location.replace('/');
         }).catch(err => {
             console.log(err)

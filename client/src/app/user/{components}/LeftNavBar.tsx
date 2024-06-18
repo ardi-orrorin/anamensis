@@ -16,6 +16,8 @@ import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import {faTableList} from "@fortawesome/free-solid-svg-icons/faTableList";
 import {RoleType} from "@/app/user/system/{services}/types";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
+import useSWR from "swr";
+import apiCall from "@/app/{commons}/func/api";
 
 type MenuItemType = {
     name: string,
@@ -36,6 +38,8 @@ const LeftNavBar = ({
     setIsModalMode: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
 
+    const [roles, setRoles] = React.useState<RoleType[]>([]);
+
     const iconSize = 16;
     const menuItems: MenuItemType[] = [
         {name: '유저 정보', href:'/user/info', icon: faCheckToSlot, role: RoleType.USER},
@@ -48,13 +52,18 @@ const LeftNavBar = ({
         {name: '포인트 적립 내역', href:'/user/point-history', icon: faFilePowerpoint, role: RoleType.USER},
     ]
 
-    const [roles, setRoles] = React.useState<RoleType[]>([]);
-
-
-    useEffect(() => {
-        const roles = JSON.parse(localStorage.getItem('roles') || '[]') as RoleType[]
-        setRoles(roles);
-    },[]);
+    const initFetch = useSWR('/user/navBar', async () => {
+        await apiCall({
+            path: '/api/user/roles',
+            method: 'GET',
+        })
+        .then(res => {
+            const roles = res.headers['next.user.roles'] || ''
+            if(roles) {
+                setRoles(JSON.parse(res.headers['next.user.roles']));
+            }
+        });
+    });
 
     const openToggle = () => {
         bodyScrollToggle(false, false);

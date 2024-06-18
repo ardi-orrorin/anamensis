@@ -3,6 +3,7 @@ import {BoardI} from "@/app/board/{services}/types";
 import apiCall from "@/app/{commons}/func/api";
 import {StatusResponse} from "@/app/{commons}/types/commons";
 import {cookies} from "next/headers";
+import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
 
 export async function GET(req: NextRequest) {
     const id = req.nextUrl.pathname.split('/')[req.nextUrl.pathname.split('/').length - 1];
@@ -17,14 +18,11 @@ export async function GET(req: NextRequest) {
         isReturnData: true,
     });
 
-
-
-    return new NextResponse(JSON.stringify({...data, isLogin: getCookies}),{
+    return ExNextResponse({
+        body: JSON.stringify({...data, isLogin: getCookies}),
         status: 200,
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    });
+        isRoles: false,
+    })
 }
 
 export async function PUT(req:NextRequest) {
@@ -41,11 +39,10 @@ export async function PUT(req:NextRequest) {
         isReturnData: true,
     });
 
-    return new NextResponse(JSON.stringify(result), {
+    return ExNextResponse({
+        body: JSON.stringify(result),
         status: 200,
-        headers: {
-            'Content-Type': 'application/json',
-        }
+        isRoles: false,
     });
 }
 
@@ -60,10 +57,9 @@ export async function DELETE(req:NextRequest) {
         isReturnData: true,
     });
 
-    return new NextResponse(JSON.stringify(result), {
+    return ExNextResponse({
+        body: JSON.stringify(result),
         status: 200,
-        headers: {
-            'Content-Type': 'application/json',
-        }
+        isRoles: false,
     });
 }

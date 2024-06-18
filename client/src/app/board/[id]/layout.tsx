@@ -10,7 +10,7 @@ import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useSearchParams} from "next/navigation";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
-import useSWR from "swr";
+import useSWR, {preload} from "swr";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 
 export default function Page({children, params} : {children: ReactNode, params: {id: string}}) {
@@ -40,7 +40,6 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
     const [loading, setLoading] = useState<boolean>(false);
     const [commentLoading, setCommentLoading] = useState<boolean>(false);
-
 
     useEffect(() => {
         if(!isNewBoard) return ;
@@ -74,13 +73,23 @@ export default function Page({children, params} : {children: ReactNode, params: 
         setLoading(true);
 
         fetchBoard();
-        fetchComment();
+
 
         if(params.id === 'new') return ;
         fetchRate();
 
     },{
         keepPreviousData: true,
+        revalidateOnMount: true,
+    });
+
+    const initComment = useSWR(`/api/board/comment/${params.id}`, async () => {
+        if(isNewBoard) return ;
+
+        fetchComment();
+    },{
+        keepPreviousData: true,
+        revalidateOnMount: true,
     });
 
     const fetchBoard = async () => {

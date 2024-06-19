@@ -16,10 +16,18 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
 
 @Component
 @RequiredArgsConstructor
 public class AwsS3Provider {
+
+    enum ThumbnailType {
+        PROFILE,
+        THUMBNAIL,
+        ORI
+    }
+    private ThumbnailType thumbnailType;
 
     private final S3Client s3Client;
 
@@ -29,17 +37,23 @@ public class AwsS3Provider {
     private Thumbnails.Builder<? extends InputStream> builder;
 
     public Mono<Boolean> saveProfileThumbnail(FilePart filePart, String path, String filename, int width, int height) {
-        return this.saveS3(filePart, path, filename, width, height, true);
+        return this.saveS3(filePart, path, filename, width, height, true, ThumbnailType.PROFILE);
     }
 
     public Mono<Boolean> saveThumbnail(FilePart filePart, String path, String filename, int width, int height) {
-        return this.saveS3(filePart, path, filename, width, height, false);
+        return this.saveS3(filePart, path, filename, width, height, false, ThumbnailType.THUMBNAIL);
     }
     public Mono<Boolean> saveOri(FilePart filePart, String path, String filename) {
-        return this.saveS3(filePart, path, filename, 0, 0, false);
+        return this.saveS3(filePart, path, filename, 0, 0, false, ThumbnailType.ORI);
     }
 
-    private Mono<Boolean> saveS3(FilePart filePart, String path, String filename, int width, int height, boolean isCrop) {
+    private Mono<Boolean> saveS3(
+        FilePart filePart,
+        String path, String filename,
+        int width, int height,
+        boolean isCrop,
+        ThumbnailType thumbnailType
+    ) {
 
         PutObjectRequest.Builder reqBuilder = PutObjectRequest.builder()
                 .bucket(bucket)
@@ -50,37 +64,32 @@ public class AwsS3Provider {
 
         return DataBufferUtils.join(filePart.content())
                 .flatMap(data -> {
-                    boolean condition = width != 0 && height != 0;
-                    ByteArrayOutputStream os = new ByteArrayOutputStream();
-                    if(condition) {
-                        try {
-                            builder = Thumbnails.of(data.asInputStream())
-                                .size(width, height)
-                                .outputQuality(0.4);
+                    if(width == 0 && height == 0) {
+                        s3Client.putObject(req, RequestBody.fromInputStream(data.asInputStream(), data.readableByteCount()));
+                        return Mono.just(true);
+                    }
 
-                            if (isCrop) {
-                                builder.crop(Positions.CENTER);
-                            }
 
-                            builder.toOutputStream(os);
+                    try(ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+                        builder = Thumbnails.of(data.asInputStream())
+                            .size(width, height)
+                            .outputQuality(0.4);
 
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
+                        if (isCrop) {
+                            builder.crop(Positions.CENTER);
                         }
-                    }
 
-                    RequestBody requestBody = condition
-                        ? RequestBody.fromBytes(os.toByteArray())
-                        : RequestBody.fromInputStream(data.asInputStream(), data.readableByteCount());
+                        builder.toOutputStream(os);
+                        s3Client.putObject(req, RequestBody.fromBytes(os.toByteArray()));
 
-                    s3Client.putObject(req, requestBody);
-
-                    try {
-                        os.close();
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        return Mono.error(new RuntimeException(e));
                     }
+
                     return Mono.just(true);
+
+
+
                 });
     }
 

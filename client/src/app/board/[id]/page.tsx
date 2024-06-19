@@ -71,6 +71,10 @@ export default function Page({params}: {params : {id: string}}) {
     ), []);
 
     useEffect(() => {
+        window.scrollTo(0, 0);
+    },[]);
+
+    useEffect(() => {
         if(!isNewBoard) return ;
         const list = board.data?.content?.list;
 

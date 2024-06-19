@@ -1,11 +1,10 @@
 import {BoardService} from "@/app/board/{services}/BoardProvider";
 import Image from "next/image";
-import {useMemo} from "react";
+import {useEffect, useMemo} from "react";
 import {defaultProfile} from "@/app/{commons}/func/image";
 
 const BoardInfo = (props: { board: BoardService }) => {
     const {board} = props;
-
     const boardInfo = useMemo(() => {
         return board.data
     }, [board.data]);

@@ -78,10 +78,10 @@ const LinkBlock = (props: BlockProps) => {
             };
 
             onChangeExtraValueHandler!(data);
-
             onKeyUpHandler!(e);
 
         } catch (e) {
+            console.log(e)
             alert('링크를 가져오는데 실패했습니다.');
         }
     }
@@ -103,12 +103,14 @@ const LinkBlock = (props: BlockProps) => {
                          onKeyUp={onKeyupChangeHandler}
                          onKeyDown={onKeyDownHandler}
                          onFocus={onFocusHandler}
+
                          ref={el => {blockRef!.current[seq] = el}}
                 />
                 : <a style={linkPreviewStyle}
                      href={value}
                      target={'_blank'}
                      onMouseEnter={onMouseEnterHandler}
+                     aria-roledescription={'object'}
                 >
                     <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'space-between', padding:'0.6rem'}}>
                         <p style={{fontSize: '1.3rem'}}

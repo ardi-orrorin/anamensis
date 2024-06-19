@@ -10,7 +10,6 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {defaultProfile} from "@/app/{commons}/func/image";
-import {useRouter} from "next/navigation";
 import {mutate} from "swr";
 
 export type SaveComment = {
@@ -47,14 +46,7 @@ const Comment = () => {
                 isReturnData: true,
             })
 
-            const commentRes = await apiCall<CommentI[], {boardPk: string}>({
-                path: '/api/board/comment',
-                method: 'GET',
-                params: {boardPk: board.data.id},
-                isReturnData: true,
-            });
-
-            setComment(commentRes);
+            mutate(`/api/board/comment/${board.data.id}`);
 
             setNewComment({
                 boardPk: board.data.id,

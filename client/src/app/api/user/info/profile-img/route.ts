@@ -1,6 +1,4 @@
 import {NextRequest, NextResponse} from "next/server";
-import {cookies} from "next/headers";
-import axios, {AxiosResponse} from "axios";
 import {UserInfoI} from "@/app/user/email/page";
 import apiCall from "@/app/{commons}/func/api";
 

@@ -44,8 +44,6 @@ public class FileService {
 
     private final TableCodeMapper tableCodeMapper;
 
-    private final VirtualThreadTaskExecutor taskExecutor;
-
     @Value("${file.upload-dir}")
     private String UPLOAD_DIR;
 
@@ -102,7 +100,7 @@ public class FileService {
         Mono<Boolean> thumbnail = awsS3Provider.saveThumbnail(filePart, filepath.path(), filename, 600, 600);
         Mono<Boolean> ori = awsS3Provider.saveOri(filePart, filepath.path(), filepath.file());
         return Mono.zip(thumbnail, ori)
-            .subscribeOn(Schedulers.fromExecutor(taskExecutor))
+            .subscribeOn(Schedulers.boundedElastic())
             .map(r -> fileContent);
     }
 
@@ -147,15 +145,7 @@ public class FileService {
         return Mono.just(fileMapper.updateIsUseById(file.getId(), 0))
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(r -> awsS3Provider.deleteS3(file.getFilePath(), file.getFileName())
-                    .then(Mono.defer(() -> {
-                        // fixme: 작동안함
-                        String filename =
-                            file.getFileName().substring(0, file.getFileName().lastIndexOf("."))
-                            + "_thumb"
-                            + file.getFileName().substring(file.getFileName().lastIndexOf("."));
-                        return awsS3Provider.deleteS3(file.getFilePath(), filename);
-                    }))
-                    .subscribe()
+                        .subscribe()
                 )
                 .map(this::response);
     }
@@ -239,10 +229,18 @@ public class FileService {
         String filePath = fileUri.substring(0, fileUri.lastIndexOf("/") + 1);
         String fileName = fileUri.substring(fileUri.lastIndexOf("/") + 1);
 
+        String thumbnail = fileName.substring(0, fileName.lastIndexOf("."))
+            + "_thumb"
+            + fileName.substring(fileName.lastIndexOf("."));
+
         return Mono.just(fileMapper.deleteByUri(filePath, fileName) > 0)
                 .publishOn(Schedulers.boundedElastic())
-                .doOnNext(r -> awsS3Provider.deleteS3(filePath, fileName)
-                        .subscribe()
+                .doOnNext(r -> {
+                    awsS3Provider.deleteS3(filePath, fileName)
+                            .subscribe();
+                    awsS3Provider.deleteS3(filePath, thumbnail)
+                            .subscribe();
+                    }
                 );
     }
 }

@@ -26,7 +26,6 @@ public class RateController {
             @PathVariable(name = "id") long boardPk,
             @AuthenticationPrincipal UserDetails user
     ) {
-        log.info("hasRate: {}", boardPk);
         return userService.findUserByUserId(user.getUsername())
                 .flatMap(u -> rateService.hasRate(boardPk, u.getId()))
                 .map(hasRate -> {

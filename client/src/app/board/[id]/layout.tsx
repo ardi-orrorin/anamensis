@@ -7,11 +7,9 @@ import {SaveComment} from "@/app/board/[id]/{components}/comment";
 import {RateInfoI} from "@/app/board/[id]/page";
 import TempFileProvider, {TempFileI} from "@/app/board/{services}/TempFileProvider";
 import apiCall from "@/app/{commons}/func/api";
-import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useSearchParams} from "next/navigation";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
-import useSWR, {preload} from "swr";
-import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
+import useSWR from "swr";
 
 export default function Page({children, params} : {children: ReactNode, params: {id: string}}) {
 
@@ -69,15 +67,8 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
     const initBoard = useSWR(`/api/board/${params.id}`, async () => {
         if(isNewBoard) return ;
-
-        setLoading(true);
-
-        fetchBoard();
-
-
         if(params.id === 'new') return ;
-        fetchRate();
-
+        await fetchRate();
     },{
         keepPreviousData: true,
         revalidateOnMount: true,
@@ -91,6 +82,21 @@ export default function Page({children, params} : {children: ReactNode, params: 
         keepPreviousData: true,
         revalidateOnMount: true,
     });
+
+    useEffect(()=> {
+        if(isNewBoard) return ;
+
+        setLoading(true);
+
+        fetchBoard();
+
+
+        // if(params.id === 'new') return ;
+        // fetchRate();
+
+    },[params.id])
+
+
 
     const fetchBoard = async () => {
         return await apiCall<BoardI & {isLogin : boolean}>({
@@ -135,7 +141,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
         });
     }
 
-    if(initBoard.isLoading) return <GlobalLoadingSpinner />;
+    // if(initBoard.isLoading) return <GlobalLoadingSpinner />;
 
     return (
         <LoadingProvider.Provider value={{

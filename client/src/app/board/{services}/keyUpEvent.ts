@@ -17,10 +17,9 @@ const enter = (args: KeyEventType) => {
 
     if (!list) return ;
 
-
     const curRef = event.currentTarget as HTMLInputElement;
-    const afterText = curRef.value.substring(curRef.selectionStart!);
-    const beforeText = curRef.value.substring(0, curRef.selectionStart!);
+    const afterText = curRef?.value?.substring(curRef.selectionStart!);
+    const beforeText = curRef?.value?.substring(0, curRef.selectionStart!);
 
     addBlockHandler(seq, afterText);
 
@@ -34,6 +33,8 @@ const enter = (args: KeyEventType) => {
 
     setTimeout(() => {
         const nextCur = blockRef?.current[seq + 1] as HTMLInputElement;
+        if(!nextCur) return;
+
         nextCur.focus();
         nextCur.setSelectionRange(0, 0);
     },50);

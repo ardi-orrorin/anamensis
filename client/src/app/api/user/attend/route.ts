@@ -12,7 +12,6 @@ export async function GET(){
     .catch(err => {
         return err?.response?.data?.message;
     });
-    console.log(result);
 
     return new NextResponse(JSON.stringify(result), {
         status: 200,

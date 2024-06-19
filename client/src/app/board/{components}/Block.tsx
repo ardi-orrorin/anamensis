@@ -4,7 +4,12 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
 import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
 import {blockTypeList} from "@/app/board/{components}/block/list";
-import {BlockProps, HtmlElements, MouseEnterHTMLElements} from "@/app/board/{components}/block/type/Types";
+import {
+    BlockProps,
+    HtmlElements,
+    MouseEnterHTMLElements,
+    MouseLeaveHTMLElements
+} from "@/app/board/{components}/block/type/Types";
 import React, {useContext, useMemo, useState} from "react";
 import MenuItem from "@/app/board/{components}/MenuItem";
 import BlockProvider, {BlockMenu, BlockService} from "@/app/board/{services}/BlockProvider";
@@ -80,7 +85,7 @@ export default function Block(props: BlockProps) {
         })
     }
 
-    const onMouseLeaveHandler = (e: React.MouseEvent<HTMLImageElement | HTMLInputElement> ) => {
+    const onMouseLeaveHandler = (e: React.MouseEvent<MouseLeaveHTMLElements> ) => {
         setBlockService({blockMenu: '', block: {} as BlockI, screenX: 0, screenY: 0});
         setCommentService({commentMenu: false, screenX: 0, screenY: 0, blockSeq: '', comments: []});
     }

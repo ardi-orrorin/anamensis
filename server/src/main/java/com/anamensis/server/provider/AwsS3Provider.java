@@ -8,36 +8,52 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
 
 @Component
 @RequiredArgsConstructor
 public class AwsS3Provider {
+
+    enum ThumbnailType {
+        PROFILE,
+        THUMBNAIL,
+        ORI
+    }
+    private ThumbnailType thumbnailType;
 
     private final S3Client s3Client;
 
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucket;
 
-    public Mono<Void> saveProfileThumbnail(FilePart filePart, String path, String filename, int width, int height) {
-        return this.saveS3(filePart, path, filename, width, height, true);
+    private Thumbnails.Builder<? extends InputStream> builder;
+
+    public Mono<Boolean> saveProfileThumbnail(FilePart filePart, String path, String filename, int width, int height) {
+        return this.saveS3(filePart, path, filename, width, height, true, ThumbnailType.PROFILE);
     }
 
-    public Mono<Void> saveThumbnail(FilePart filePart, String path, String filename, int width, int height) {
-        return this.saveS3(filePart, path, filename, width, height, false);
+    public Mono<Boolean> saveThumbnail(FilePart filePart, String path, String filename, int width, int height) {
+        return this.saveS3(filePart, path, filename, width, height, false, ThumbnailType.THUMBNAIL);
     }
-    public Mono<Void> saveOri(FilePart filePart, String path, String filename) {
-        return this.saveS3(filePart, path, filename, 0, 0, false);
+    public Mono<Boolean> saveOri(FilePart filePart, String path, String filename) {
+        return this.saveS3(filePart, path, filename, 0, 0, false, ThumbnailType.ORI);
     }
 
-    private Mono<Void> saveS3(FilePart filePart, String path, String filename, int width, int height, boolean isCrop) {
+    private Mono<Boolean> saveS3(
+        FilePart filePart,
+        String path, String filename,
+        int width, int height,
+        boolean isCrop,
+        ThumbnailType thumbnailType
+    ) {
 
         PutObjectRequest.Builder reqBuilder = PutObjectRequest.builder()
                 .bucket(bucket)
@@ -47,32 +63,33 @@ public class AwsS3Provider {
                 .build();
 
         return DataBufferUtils.join(filePart.content())
-                .publishOn(Schedulers.boundedElastic())
                 .flatMap(data -> {
-                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    if(width == 0 && height == 0) {
+                        s3Client.putObject(req, RequestBody.fromInputStream(data.asInputStream(), data.readableByteCount()));
+                        return Mono.just(true);
+                    }
 
-                    try {
-                        if (width == 0 || height == 0) {
-                            data.asInputStream().transferTo(outputStream);
-                        } else {
 
-                            // todo: 이미지가 섬네일보다 작을 경우 리사이징하지 않도록 수정
-                            Thumbnails.Builder<? extends InputStream> builder = Thumbnails.of(data.asInputStream())
-                                    .size(width, height)
-                                    .outputQuality(0.4);
+                    try(ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+                        builder = Thumbnails.of(data.asInputStream())
+                            .size(width, height)
+                            .outputQuality(0.4);
 
-                            if (isCrop) {
-                                builder.crop(Positions.CENTER);
-                            }
-
-                            builder.toOutputStream(outputStream);
+                        if (isCrop) {
+                            builder.crop(Positions.CENTER);
                         }
-                    } catch (Exception e) {
+
+                        builder.toOutputStream(os);
+                        s3Client.putObject(req, RequestBody.fromBytes(os.toByteArray()));
+
+                    } catch (IOException e) {
                         return Mono.error(new RuntimeException(e));
                     }
 
-                    s3Client.putObject(req, RequestBody.fromBytes(outputStream.toByteArray()));
-                    return Mono.empty();
+                    return Mono.just(true);
+
+
+
                 });
     }
 

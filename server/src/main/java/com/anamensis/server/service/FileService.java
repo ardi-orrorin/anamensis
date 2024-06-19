@@ -11,8 +11,8 @@ import com.anamensis.server.provider.AwsS3Provider;
 import com.anamensis.server.provider.FilePathProvider;
 import com.anamensis.server.provider.FileProvider;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FilePartEvent;
 import org.springframework.stereotype.Service;
@@ -21,8 +21,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 import reactor.core.scheduler.Schedulers;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -45,6 +43,8 @@ public class FileService {
     private final AwsS3Provider awsS3Provider;
 
     private final TableCodeMapper tableCodeMapper;
+
+    private final VirtualThreadTaskExecutor taskExecutor;
 
     @Value("${file.upload-dir}")
     private String UPLOAD_DIR;
@@ -79,16 +79,14 @@ public class FileService {
 
         FilePathDto filepath = filePathProvider.changeContentPath(0, 0, ext);
 
-        File newFile = new File();
-        newFile.setTableCodePk(fileContent.getTableCodePk()); // 중복
-        newFile.setTableRefPk(fileContent.getTableRefPk()); // 중복
-        newFile.setFileName(filepath.file()); // 중복
-        newFile.setFilePath(filepath.path());  // 중복
-        newFile.setOrgFileName(filePart.filename()); // 중복
-        newFile.setCreateAt(LocalDateTime.now()); // 중복
-        newFile.setUse(true);
+        fileContent.setFilePath(filepath.path());
+        fileContent.setFileName(filepath.file());
+        fileContent.setOrgFileName(filePart.filename());
+        fileContent.setCreateAt(LocalDateTime.now());
+        fileContent.setUse(true);
 
-        int reuslt = fileMapper.insert(newFile);
+        int reuslt = fileMapper.insert(fileContent);
+
         if(reuslt == 0) {
             return Mono.error(new RuntimeException("File insert failed"));
         }
@@ -97,13 +95,15 @@ public class FileService {
             return Mono.just(fileContent);
         }
 
-        awsS3Provider.saveOri(filePart, filepath.path(), filepath.file())
-            .subscribeOn(Schedulers.boundedElastic())
-            .subscribe();
-        String filename = filepath.file().substring(0, filepath.file().lastIndexOf(".")) + "_thumb" + filepath.file().substring(filepath.file().lastIndexOf("."));
+        String filename = filepath.file().substring(0, filepath.file().lastIndexOf("."))
+            + "_thumb"
+            + filepath.file().substring(filepath.file().lastIndexOf("."));
 
-        return awsS3Provider.saveThumbnail(filePart, filepath.path(), filename, 600, 600)
-            .thenReturn(newFile);
+        Mono<Boolean> thumbnail = awsS3Provider.saveThumbnail(filePart, filepath.path(), filename, 600, 600);
+        Mono<Boolean> ori = awsS3Provider.saveOri(filePart, filepath.path(), filepath.file());
+        return Mono.zip(thumbnail, ori)
+            .subscribeOn(Schedulers.fromExecutor(taskExecutor))
+            .map(r -> fileContent);
     }
 
     public Mono<String> saveProfile(Member users, FilePart filePart) {
@@ -148,6 +148,7 @@ public class FileService {
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(r -> awsS3Provider.deleteS3(file.getFilePath(), file.getFileName())
                     .then(Mono.defer(() -> {
+                        // fixme: 작동안함
                         String filename =
                             file.getFileName().substring(0, file.getFileName().lastIndexOf("."))
                             + "_thumb"

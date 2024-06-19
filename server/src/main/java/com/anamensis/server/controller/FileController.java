@@ -7,6 +7,7 @@ import com.anamensis.server.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.datasource.DataSourceException;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FilePartEvent;
@@ -44,13 +45,13 @@ public class FileController {
             @RequestPart("file") FilePart filePart,
             @RequestPart("fileContent") File fileContent
     ) {
-        return Mono.just(filePart)
-                .doOnNext(part -> {
-                    if(!part.headers().getContentType().getType().equalsIgnoreCase("image")){
-                        throw new RuntimeException("Invalid file type");
-                    }
-                })
-                .flatMap($-> fileService.insert(filePart, fileContent));
+        if(!filePart.headers().getContentType().getType().equalsIgnoreCase("image")){
+            return Mono.error(new RuntimeException("이미지 파일만 업로드 가능합니다."));
+        }
+
+        return fileService.insert(filePart, fileContent);
+
+
     }
 
     @GetMapping("/{fileName}")

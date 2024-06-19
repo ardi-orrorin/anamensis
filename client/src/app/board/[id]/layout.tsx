@@ -10,8 +10,6 @@ import apiCall from "@/app/{commons}/func/api";
 import {useSearchParams} from "next/navigation";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
 import useSWR from "swr";
-import {Router} from "next/router";
-import {unmountComponentAtNode} from "react-dom";
 
 export default function Page({children, params} : {children: ReactNode, params: {id: string}}) {
 
@@ -97,9 +95,6 @@ export default function Page({children, params} : {children: ReactNode, params: 
         // fetchRate();
 
     },[params.id])
-
-
-
 
 
 

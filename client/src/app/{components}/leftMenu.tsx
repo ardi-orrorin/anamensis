@@ -41,18 +41,19 @@ const LeftMenu = ({
                             메뉴
                         </span>
                     </div>
-                    <div className={'w-auto text-sm'}>
-                        <CategorySelect onClick={onChangeParamsHandler} />
-                    </div>
                     <div>
                         {
                             roles.length > 0
                             && <button className={'flex w-full justify-center text-xs'}
                                        onClick={() => onChangeParamsHandler({type: 'isSelf', value: true})}
-                            >내 글 보기
-                            </button>
+                          >내 글 보기
+                          </button>
                         }
                     </div>
+                    <div className={'w-auto text-sm'}>
+                        <CategorySelect onClick={onChangeParamsHandler} />
+                    </div>
+
                 </div>
                 {
                     roles.length > 0

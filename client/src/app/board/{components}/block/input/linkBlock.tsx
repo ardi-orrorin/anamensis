@@ -34,7 +34,7 @@ const LinkBlock = (props: BlockProps) => {
         wordBreak       : 'break-all',
         color           : 'blue',
         padding         : '0.5rem',
-        backgroundColor : 'rgba(230,230,230,0.2)',
+        backgroundColor : isView? "white" : 'rgba(230,230,230,0.2)',
         letterSpacing   : '0.03rem',
     };
 
@@ -44,14 +44,14 @@ const LinkBlock = (props: BlockProps) => {
         justifyContent  : 'space-between',
         width           : '100%',
         padding         : '1rem',
-        backgroundColor : 'rgba(230,230,230,0.2)',
+        backgroundColor : isView? "white" : 'rgba(230,230,230,0.2)',
         gap             : '0.5rem',
     }
 
     const onKeyupChangeHandler = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if(e.key !== 'Enter') return ;
 
-        const urlRegex = new RegExp(/(http(s)?:\/\/)([a-z0-9\w]+\.*)+[a-z0-9]{2,4}/gi);
+        const urlRegex = new RegExp(/(http(s)?:\/\/)([a-z0-9\w]+\.*)+[a-z0-9]{2,5}/gi);
 
         try {
             if(!urlRegex.test(value)) return alert('링크 형식이 올바르지 않습니다.');
@@ -77,8 +77,9 @@ const LinkBlock = (props: BlockProps) => {
                 image: ogImage || '',
             };
 
+            console.log(data)
             onChangeExtraValueHandler!(data);
-            onKeyUpHandler!(e);
+            // onKeyUpHandler!(e);
 
         } catch (e) {
             console.log(e)
@@ -93,6 +94,7 @@ const LinkBlock = (props: BlockProps) => {
     return (
         <div id={`block-${hash}`}
              className={['w-full'].join(' ')}
+
         >
             {
                 !extraValue || !(extraValue as OGType).title
@@ -103,14 +105,16 @@ const LinkBlock = (props: BlockProps) => {
                          onKeyUp={onKeyupChangeHandler}
                          onKeyDown={onKeyDownHandler}
                          onFocus={onFocusHandler}
-
+                         disabled={isView}
                          ref={el => {blockRef!.current[seq] = el}}
+
                 />
                 : <a style={linkPreviewStyle}
                      href={value}
                      target={'_blank'}
                      onMouseEnter={onMouseEnterHandler}
                      aria-roledescription={'object'}
+                     ref={el => {blockRef!.current[seq] = el}}
                 >
                     <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'space-between', padding:'0.6rem'}}>
                         <p style={{fontSize: '1.3rem'}}

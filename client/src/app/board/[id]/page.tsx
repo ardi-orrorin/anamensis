@@ -21,7 +21,7 @@ import BlockProvider from "@/app/board/{services}/BlockProvider";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import KeyDownEvent from "@/app/board/{services}/keyDownEvent";
-import KeyUpEvent from "@/app/board/{services}/keyUpEvent";
+import {listSort} from "@/app/board/{services}/funcs";
 
 export interface RateInfoI {
     id      : number;
@@ -61,6 +61,8 @@ export default function Page({params}: {params : {id: string}}) {
 
     const debounce = createDebounce(300);
 
+    const inputDebounce = createDebounce(100);
+
     const defaultBlock:BlockI = {seq: 0, value: '', code: '00005', textStyle: {}, hash: Date.now().toString() + '-0'};
 
     const shortList = useMemo(()=> (
@@ -70,17 +72,6 @@ export default function Page({params}: {params : {id: string}}) {
     useEffect(() => {
         window.scrollTo(0, 0);
     },[]);
-
-    useEffect(() => {
-        if(!isNewBoard) return ;
-        const list = board.data?.content?.list;
-
-        if (!list) return ;
-        const lastRef = blockRef.current[list.length - 1] as HTMLInputElement;
-
-        if(!lastRef) return ;
-        lastRef.focus();
-    },[board.data?.content?.list.length])
 
     const addBlock = (seq: number, init: boolean, value?: string) => {
         const block: BlockI = {...defaultBlock};
@@ -113,7 +104,7 @@ export default function Page({params}: {params : {id: string}}) {
 
         setTimeout(() => {
             blockRef.current[seq]?.focus();
-        },100);
+        },0);
 
         return true;
     };
@@ -128,11 +119,19 @@ export default function Page({params}: {params : {id: string}}) {
 
         setLoading(true);
 
-
         try {
             // todo: 저장시 빈 라인 제거 할 것인가?
             // 현재 : 빈 라인 포함 저장
             const bodyContent = board.data.content.list.filter(item => item.value !== '');
+
+
+            const textRegex = /^0000\d{1}$/;
+
+            const text = board.data.title + ' '
+                + bodyContent.filter(item => textRegex.test(item.code))
+                    .map(item => item.value).join(' ');
+
+
             const body: BoardI = {
                 ...board.data,
                 content: {
@@ -141,6 +140,7 @@ export default function Page({params}: {params : {id: string}}) {
                 isPublic: board.data.isPublic,
                 uploadFiles: waitUploadFiles.map(item => item.id),
                 removeFiles: waitRemoveFiles.map(item => item.filePath + item.fileName),
+                searchText: text
             };
 
             const result = await apiCall<BoardI, BoardI>({
@@ -181,18 +181,11 @@ export default function Page({params}: {params : {id: string}}) {
         const list = board.data?.content?.list;
         if (!list) return ;
 
-        const currentBlock = list.find(item => item.seq === seq)!;
-
-        if(currentBlock.value === '') return ;
+        // const currentBlock = list.find(item => item.seq === seq)!;
 
         list.push(addBlock(seq, false, value));
 
-        list.sort((a, b) => a.seq - b.seq)
-            .map((item, index) => {
-                item.seq = index;
-                item.hash = item.hash.split('-')[0] + '-' + index;
-                return item;
-        });
+        listSort(list);
 
         setBoard({...board, data: {...board.data, content: {list: list}}});
     };
@@ -214,15 +207,22 @@ export default function Page({params}: {params : {id: string}}) {
     };
 
     const editClickHandler = () => {
-        setBoard({...board, isView: !board.isView});
+        if(!isNewBoard && !board.isView) {
+            location.reload();
+        } else {
+            setBoard({...board, isView: !board.isView});
+        }
     }
 
-    const onClickDeleteHandler = (seq: number) => {
+    const onClickDeleteHandler = async (seq: number) => {
         const list = board.data?.content?.list;
 
-        fileDeleteHandler(list, seq);
+        await fileDeleteHandler(list, seq);
 
         let newList = list.filter(item => item.seq !== seq);
+
+        listSort(newList);
+
         if (newList?.length === 0) {
             newList = [{seq, value: '', code: '00005', textStyle: {}, hash: Date.now() + '-' + seq}];
         }
@@ -248,6 +248,7 @@ export default function Page({params}: {params : {id: string}}) {
         const fileBlock = blockList.find(item =>
             item.seq === seq && fileRegexp.test(item.code)
         );
+
 
         if(!fileBlock) return ;
 
@@ -281,15 +282,15 @@ export default function Page({params}: {params : {id: string}}) {
 
     const onKeyUpHandler = (e: React.KeyboardEvent<HTMLElement>, seq: number) => {
 
-        switch (e.key) {
-            case 'Enter':
-                KeyUpEvent.enter({seq, board, blockRef, addBlockHandler, event: e});
-                break;
-        }
     }
 
     const onKeyDownHandler = (e: React.KeyboardEvent<HTMLElement>, seq: number) => {
+        if(e.nativeEvent.isComposing) return;
+
         switch (e.key) {
+            case 'Enter':
+                KeyDownEvent.enter({seq, board, blockRef, addBlockHandler, event: e});
+                break;
             case 'ArrowUp':
                 KeyDownEvent.arrowUp({seq, blockRef, event: e});
                 break;

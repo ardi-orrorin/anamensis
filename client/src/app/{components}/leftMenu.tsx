@@ -1,33 +1,34 @@
-import React, {useEffect, useState} from "react";
-import {BoardListParams} from "@/app/page";
+import React, {useContext, useEffect, useState} from "react";
 import {Category} from "@/app/board/{services}/types";
 import Link from "next/link";
 import {faPen} from "@fortawesome/free-solid-svg-icons/faPen";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBars} from "@fortawesome/free-solid-svg-icons";
 import {RoleType} from "@/app/user/system/{services}/types";
+import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
 
 const LeftMenu = ({
-    select,
-    searchParams,
     roles,
 }:{
     roles: RoleType[],
-    searchParams: BoardListParams,
-    select: (categoryPk: string) => void
 }) => {
-    const [categoryPk, setCategoryPk] = useState('');
+    const {setSearchParams} = useContext(SearchParamsProvider);
+    const onChangeParamsHandler = ({type, value}: {type: string, value: string | number | boolean}) => {
+        const search =
+            type === 'categoryPk'
+                ? {[type]: Number(value)}
+                : type === 'isSelf'
+                    ? {[type]: value === value}
+                    : {type: value};
 
-    useEffect(() => {
-        if(searchParams.type !== 'categoryPk') {
-            setCategoryPk('');
-            return;
-        }
-        setCategoryPk(searchParams.value);
-    }, [searchParams.value]);
+        const params = {
+            ...search,
+            page: 1, size: 20,
+            add: false
+        } as BoardListParamsI;
 
-    const onSelectCategoryHandler = (categoryPk: string) => {
-        select(categoryPk);
+        setSearchParams(params);
+        scrollTo(0, 0);
     }
 
     return (
@@ -41,10 +42,18 @@ const LeftMenu = ({
                         </span>
                     </div>
                     <div className={'w-auto text-sm'}>
-                        <CategorySelect onClick={onSelectCategoryHandler} categoryPk={categoryPk} />
+                        <CategorySelect onClick={onChangeParamsHandler} />
+                    </div>
+                    <div>
+                        {
+                            roles.length > 0
+                            && <button className={'flex w-full justify-center text-xs'}
+                                       onClick={() => onChangeParamsHandler({type: 'isSelf', value: true})}
+                            >내 글 보기
+                            </button>
+                        }
                     </div>
                 </div>
-
                 {
                     roles.length > 0
                     && <div className={'flex flex-col w-60 shadow rounded p-3 bg-white gap-3 border border-solid border-gray-100'}>
@@ -87,23 +96,22 @@ const LeftMenu = ({
 }
 
 const CategorySelect = ({
-    categoryPk,
     onClick
 }: {
-    categoryPk: string,
-    onClick: (categoryPk: string) => void
+    onClick: ({type, value}: {type: string, value: string}) => void
 }) => {
     
     const [selectToggle, setSelectToggle] = useState(false);
+    const {searchParams} = useContext(SearchParamsProvider);
 
     const onToggleHandler = () => {
         setSelectToggle(!selectToggle);
     }
 
     const selectHandler = (pk: string) => {
-        if(categoryPk === pk) return;
+        if(searchParams.categoryPk === pk) return;
 
-        onClick(pk);
+        onClick({type: 'categoryPk', value: pk});
         setSelectToggle(false);
     }
 
@@ -116,7 +124,7 @@ const CategorySelect = ({
                     onClick={onToggleHandler}
             >
                 <div />
-                <span>{Category.findById(categoryPk)?.name ?? '카테고리'}</span>
+                <span>{Category.findById(searchParams.categoryPk || '0')?.name ?? '카테고리'}</span>
                 <div>
                     <div className={['duration-300', selectToggle ? '-rotate-180' : '-rotate-90'].join(' ')}>
                         ▲

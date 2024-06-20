@@ -1,7 +1,9 @@
 package com.anamensis.server.mapper;
 
 import com.anamensis.server.dto.Page;
+import com.anamensis.server.dto.request.BoardRequest;
 import com.anamensis.server.entity.Board;
+import com.anamensis.server.entity.Member;
 import com.anamensis.server.resultMap.BoardResultMap;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -16,10 +18,14 @@ public interface BoardMapper {
 
     List<BoardResultMap.Board> findList(
         @Param("page") Page page,
-        @Param("board") Board board
+        @Param("params") BoardRequest.Params params,
+        @Param("member") Member member
     );
 
-    Optional<BoardResultMap.Board> findByPk(long boardPk);
+    Optional<BoardResultMap.Board> findByPk(
+        long boardPk,
+        long memberPk
+    );
 
     List<BoardResultMap.Board> findByMemberPk(
         @Param("memberPk") long memberPk,

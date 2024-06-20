@@ -45,6 +45,8 @@ public class BoardResponse {
 
         private boolean isAdsense;
 
+        private Boolean isPublic;
+
         public static List from(BoardResultMap.Board board) {
 
             List.ListBuilder builder = List.builder()
@@ -56,7 +58,8 @@ public class BoardResponse {
                     .isAdsense(board.getBoard().isAdsense())
                     .commentCount(board.getCommentCount())
                     .categoryPk(board.getBoard().getCategoryPk())
-                    .updatedAt(board.getBoard().getUpdateAt());
+                    .updatedAt(board.getBoard().getUpdateAt())
+                    .isPublic(board.getBoard().isPublic());
 
             builder.body(board.getBoard().getContent().get("list"));
 
@@ -98,6 +101,8 @@ public class BoardResponse {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime updatedAt;
 
+        private Boolean isPublic;
+
         public static Content from(BoardResultMap.Board board, Member member) {
             Content.ContentBuilder builder = Content.builder()
                     .id(board.getId())
@@ -107,8 +112,8 @@ public class BoardResponse {
                     .writer(board.getMember().getName())
                     .viewCount(board.getBoard().getViewCount())
                     .createdAt(board.getBoard().getCreateAt())
-                    .updatedAt(board.getBoard().getUpdateAt());
-
+                    .updatedAt(board.getBoard().getUpdateAt())
+                    .isPublic(board.getBoard().isPublic());
 
             if(member != null) {
                 builder.isWriter(board.getBoard().getMemberPk() == member.getId());
@@ -155,6 +160,8 @@ public class BoardResponse {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime updatedAt;
 
+        private Boolean isPublic;
+
         public static ExContent from(Content board, java.util.List<BoardCommentResponse.Comment> comments) {
             ExContent.ExContentBuilder builder = ExContent.builder()
                     .id(board.getId())
@@ -166,7 +173,8 @@ public class BoardResponse {
                     .createdAt(board.getCreatedAt())
                     .comments(comments)
                     .profileImage(board.getProfileImage())
-                    .updatedAt(board.getUpdatedAt());
+                    .updatedAt(board.getUpdatedAt())
+                    .isPublic(board.getIsPublic());
 
             return builder.build();
         }

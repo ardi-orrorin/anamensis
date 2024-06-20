@@ -18,6 +18,13 @@ const BoardInfo = (props: { board: BoardService }) => {
                 <p>
                     조회수: {boardInfo.viewCount}
                 </p>
+
+                <p>
+                    공개 여부 : &nbsp;
+                    <span className={`font-bold ${boardInfo.isPublic ? "text-blue-500" : "text-red-500"}`}
+                    >{boardInfo.isPublic ? "공개" : "비공개"}
+                    </span>
+                </p>
             </div>
             <div className={"flex gap-2 items-center"}>
                 <Image src={defaultProfile(board.data.profileImage)}
@@ -29,6 +36,7 @@ const BoardInfo = (props: { board: BoardService }) => {
                 <p className={"font-bold text-sm"}
                 >{board.data.writer}</p>
             </div>
+
         </div>
     );
 }

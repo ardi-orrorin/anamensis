@@ -16,6 +16,7 @@ export interface BoardI {
     isWriter?     : boolean;
     uploadFiles?  : number[];
     removeFiles?  : string[];
+    isPublic?     : boolean;
 }
 
 

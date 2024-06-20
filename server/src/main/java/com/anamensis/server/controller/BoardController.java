@@ -39,15 +39,27 @@ public class BoardController {
     @GetMapping("")
     public Mono<PageResponse<BoardResponse.List>> findAll(
         Page page,
-        BoardRequest.Create board
+        BoardRequest.Params params,
+        @AuthenticationPrincipal UserDetails user
     ) {
 
         Flux<BoardResponse.List> list;
 
-        if(page.getPage() == 1 && page.getSize() == 20 && board.getCategoryPk() == 0 && board.getTitle() == null) {
+        boolean condition = user == null
+            && page.getPage() == 1
+            && page.getSize() == 20
+            && params.getCategoryPk() == 0
+            && params.getType() == null
+            && params.getValue() == null
+            && !params.getIsSelf();
+
+        if(condition) {
             list = boardService.findOnePage();
         } else {
-            list = boardService.findAll(page, board.toEntity());
+            list = (user != null)
+                ? userService.findUserByUserId(user.getUsername())
+                    .flatMapMany(u -> boardService.findAll(page, params, u))
+                : boardService.findAll(page, params, new Member());
         }
 
         return list
@@ -67,12 +79,15 @@ public class BoardController {
             @AuthenticationPrincipal UserDetails user
     ) {
 
-        Mono<Member> member = user == null ? Mono.just(new Member())
-                                           : userService.findUserByUserId(user.getUsername())
-                                                .subscribeOn(Schedulers.boundedElastic());
+        Mono<Member> member = user == null
+            ? Mono.just(new Member())
+            : userService.findUserByUserId(user.getUsername())
+                .subscribeOn(Schedulers.boundedElastic())
+                .share();
 
-        Mono<BoardResultMap.Board> content = boardService.findByPk(boardPk)
-            .subscribeOn(Schedulers.boundedElastic());
+        Mono<BoardResultMap.Board> content = (user == null)
+            ? boardService.findByPk(boardPk, 0)
+            : member.flatMap(u -> boardService.findByPk(boardPk, u.getId()));
 
         Mono<Long> count = rateService.countRate(boardPk)
             .subscribeOn(Schedulers.boundedElastic());

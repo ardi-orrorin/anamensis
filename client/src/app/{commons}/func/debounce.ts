@@ -3,9 +3,8 @@ export const createDebounce = function (wait: number) {
     return function (func: Function) {
         if(timeout) clearTimeout(timeout);
         timeout = setTimeout(()=> {
-            timeout = null;
             func();
-        }, !timeout ? 0 : wait);
+        }, wait);
     }
 }
 

@@ -52,7 +52,7 @@ const BoardComponent = (props: BoardListI) => {
                             {Category.findById(categoryPk)?.name}
                         </span>
                         <span className={'text-red-600'}>
-                            {isPublic ? '' : '비공개'} {id}
+                            {isPublic ? '' : '비공개'}
                         </span>
                     </span>
                     <span className={'text-sm'}>

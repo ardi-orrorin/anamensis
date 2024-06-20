@@ -3,15 +3,18 @@ import apiCall from "@/app/{commons}/func/api";
 import {PageResponse} from "@/app/{commons}/types/commons";
 import {BoardListI} from "@/app/{components}/boardComponent";
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
+import {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
 
 export async function GET(req: NextRequest) {
     const searchParams = new URLSearchParams(req.nextUrl.searchParams);
-    const { page, size, type, value, categoryPk } = Object.fromEntries(searchParams.entries());
+    const { page, size, type, value, categoryPk, isSelf } = Object.fromEntries(searchParams.entries()) as BoardListParamsI;
     const params = {
         page,
         size,
+        type,
+        value,
         categoryPk,
-        [type]: value
+        isSelf : Boolean(isSelf),
     }
 
     const result = await apiCall<PageResponse<BoardListI>, URLSearchParams>({
@@ -22,10 +25,11 @@ export async function GET(req: NextRequest) {
         setAuthorization: true,
         isReturnData: true,
     })
+    console.log(params)
 
     return ExNextResponse({
         body: JSON.stringify(result),
         status: 200,
-        isRoles: page === '1',
+        isRoles: String(page) === '1',
     })
 }

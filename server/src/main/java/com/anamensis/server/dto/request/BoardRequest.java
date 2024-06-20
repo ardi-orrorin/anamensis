@@ -11,6 +11,15 @@ public class BoardRequest {
 
     @Getter
     @Setter
+    public static class Params {
+        private String type;
+        private String value;
+        private long categoryPk;
+        private Boolean isSelf;
+    }
+
+    @Getter
+    @Setter
     public static class Create {
         private long id;
         private long categoryPk;
@@ -25,6 +34,7 @@ public class BoardRequest {
         private boolean isUse;
         private long[] uploadFiles;
         private String[] removeFiles;
+        private Boolean isPublic = false;
 
         public Board toEntity() {
             Board board = new Board();
@@ -39,6 +49,7 @@ public class BoardRequest {
             board.setUpdateAt(updateAt);
             board.setAdsense(isAdsense);
             board.setUse(isUse);
+            board.setPublic(isPublic);
             return board;
         }
     }

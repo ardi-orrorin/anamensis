@@ -1,4 +1,4 @@
-FROM       openjdk:21-slim
+FROM       openjdk:24-slim
 LABEL      author="ARDI"
 RUN        apt-get update
 RUN        apt-get install -y curl

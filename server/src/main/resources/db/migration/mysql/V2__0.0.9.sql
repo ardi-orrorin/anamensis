@@ -1,0 +1,3 @@
+ALTER TABLE board ADD COLUMN isPublic TINYINT(1) DEFAULT 0;
+
+UPDATE board SET isPublic = 1;

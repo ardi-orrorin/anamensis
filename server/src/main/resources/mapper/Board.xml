@@ -11,10 +11,10 @@
         INSERT INTO board
                (category_pk, title, content,
                 rate, view_count, create_at,
-                member_pk, isAdsense, update_at)
+                member_pk, isAdsense, update_at, isPublic)
         VALUES (#{categoryPk}, #{title}, #{content, typeHandler=JsonTypeHandler},
                 #{rate}, #{viewCount}, #{createAt},
-                #{memberPk}, #{isAdsense}, #{updateAt})
+                #{memberPk}, #{isAdsense}, #{updateAt}, #{isPublic})
     </insert>
     <select id="count" resultType="long">
         SELECT COUNT(*)
@@ -47,11 +47,42 @@
                                     FROM table_code t
                                    WHERE t.table_name = 'member')
          WHERE b.is_use = 1
-           <if test="board.categoryPk != 0">
-               AND b.category_pk = #{board.categoryPk}
+           <if test="params != null and params.isSelf != null and params.isSelf">
+               AND b.member_pk = #{member.id}
            </if>
-           <if test="board.title != null and board.title != ''">
-               AND b.title LIKE CONCAT('%', #{board.title}, '%')
+           <if test="params != null and params.categoryPk != 0">
+               AND b.category_pk = #{params.categoryPk}
+           </if>
+           <if test="params != null and params.type != null and params.type != '' and params.value != null and params.value != ''">
+               <choose>
+                   <when test="params != null and params.type == 'title'">
+                       AND b.title LIKE CONCAT('%', #{params.value}, '%')
+                  </when>
+                    <when test="params != null and params.type == 'memberId'">
+                         AND m.user_id LIKE CONCAT('%', #{params.value}, '%')
+                    </when>
+               </choose>
+           </if>
+           <if test="params != null and params.isSelf == null or params.isSelf == false">
+               AND b.isPublic = 1
+               <if test="member != null and member.id != null and member.id > 0">
+                   OR b.id IN (SELECT b2.id
+                                 FROM board b2
+                                WHERE b2.member_pk = #{member.id}
+                                   <if test="params != null and params.categoryPk != 0">
+                                       AND b2.category_pk = #{params.categoryPk}
+                                   </if>
+                                   <if test="params != null
+                                         and params.type != null
+                                         and params.type != ''
+                                         and params.value != null
+                                         and params.value != ''
+                                         and params.type == 'title'"
+                                   >
+                                       AND b.title LIKE CONCAT('%', #{params.value}, '%')
+                                   </if>
+                                  AND b2.is_use = 1)
+               </if>
            </if>
          ORDER BY b.id DESC
          LIMIT #{page.offset}, #{page.size}
@@ -89,6 +120,9 @@
             </if>
             <if test="content != null and content != ''">
                 content     = #{content, typeHandler=JsonTypeHandler},
+            </if>
+            <if test="isPublic != null">
+                isPublic    = #{isPublic},
             </if>
                 update_at   = #{updateAt}
         </set>

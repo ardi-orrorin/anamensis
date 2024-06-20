@@ -1,27 +1,13 @@
 import {Category} from "@/app/board/{services}/types";
-import Link from "next/link";
-import {BoardListParams} from "@/app/page";
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
+import SearchParamsProvider from "@/app/{services}/SearchParamsProvider";
 
-const TopMenu = ({
-    select,
-    searchParams,
-}:{
-    searchParams: BoardListParams,
-    select: (categoryPk: string) => void
-}) => {
-    const [categoryPk, setCategoryPk] = useState('');
+const TopMenu = () => {
 
-    useEffect(() => {
-        if(searchParams.type !== 'categoryPk') {
-            setCategoryPk('');
-            return;
-        }
-        setCategoryPk(searchParams.value);
-    }, [searchParams.value]);
+    const {searchParams, setSearchParams} = useContext(SearchParamsProvider);
 
-    const onSelectCategoryHandler = (categoryPk: string) => {
-        select(categoryPk);
+    const onChangeCategory = (value: string) => {
+        setSearchParams({...searchParams, categoryPk: value});
     }
 
     return (
@@ -32,10 +18,10 @@ const TopMenu = ({
                         <button key={'category-write' + index}
                                 className={[
                                     'py-3 w-[31.5%] text-sm text-center border border-solid border-gray-100 shadow hover:bg-gray-100 duration-300',
-                                    categoryPk === item.id ? 'bg-gray-100' : ''
+                                    searchParams.categoryPk === item.id ? 'bg-gray-100' : ''
                                 ].join(' ')}
-                                onClick={() => onSelectCategoryHandler(item.id)}
-                                disabled={categoryPk === item.id}
+                                onClick={() => onChangeCategory(item.id)}
+                                disabled={searchParams.categoryPk === item.id}
                         >
                             {item.name}
                         </button>

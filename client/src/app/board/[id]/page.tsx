@@ -29,9 +29,6 @@ export interface RateInfoI {
     status  : boolean;
 }
 
-
-
-
 // fixme: 뒤로가기 등 강제 이동시 파일 삭제 처리 안됨
 
 export default function Page({params}: {params : {id: string}}) {
@@ -141,6 +138,7 @@ export default function Page({params}: {params : {id: string}}) {
                 content: {
                     list: board.data.content.list
                 },
+                isPublic: board.data.isPublic,
                 uploadFiles: waitUploadFiles.map(item => item.id),
                 removeFiles: waitRemoveFiles.map(item => item.filePath + item.fileName),
             };
@@ -348,7 +346,22 @@ export default function Page({params}: {params : {id: string}}) {
                                            deleteClickHandler={() => debounce(() => deleteHandler())}
                                 />
                             }
-                            <div>
+                            <div className={'flex gap-1'}>
+                                {
+                                    (isNewBoard || !board.isView)
+                                    && <button
+                                        className={[
+                                            'w-16 rounded h-full border-2 py-1 px-3 text-xs duration-300',
+                                            board.data.isPublic
+                                                ? 'text-blue-600 border-blue-200 hover:bg-blue-200 hover:text-white'
+                                                : 'text-red-600 border-red-200 hover:bg-red-200 hover:text-white'
+                                        ].join(' ')}
+                                        onClick={() => {
+                                            setBoard({...board, data: {...board.data, isPublic: !board.data.isPublic}});
+                                        }}
+                                    > { board.data.isPublic ? '공개' : '비공개' }
+                                  </button>
+                                }
                                 <button
                                     className={'w-14 rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
                                     onClick={() => setFullScreen(!fullScreen)}>

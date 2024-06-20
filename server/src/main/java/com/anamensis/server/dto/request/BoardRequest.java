@@ -35,6 +35,7 @@ public class BoardRequest {
         private long[] uploadFiles;
         private String[] removeFiles;
         private Boolean isPublic = false;
+        private String searchText;
 
         public Board toEntity() {
             Board board = new Board();

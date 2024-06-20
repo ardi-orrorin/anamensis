@@ -38,6 +38,11 @@
                    AND bc.is_use     = 1
              ) AS comment_count
           FROM board b
+            <if test="params != null and params.type != null and params.type == 'content' and params.value != null and params.value != ''">
+                JOIN board_index bi
+                  ON bi.board_id = b.id
+                 AND bi.content LIKE CONCAT('%', #{params.value}, '%')
+            </if>
           JOIN member m
             ON m.id            = b.member_pk
           LEFT OUTER JOIN file f
@@ -55,9 +60,6 @@
            </if>
            <if test="params != null and params.type != null and params.type != '' and params.value != null and params.value != ''">
                <choose>
-                   <when test="params != null and params.type == 'title'">
-                       AND b.title LIKE CONCAT('%', #{params.value}, '%')
-                  </when>
                     <when test="params != null and params.type == 'memberId'">
                          AND m.user_id LIKE CONCAT('%', #{params.value}, '%')
                     </when>

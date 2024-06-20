@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ExceptionAdvisor {
 
-
     @ExceptionHandler(NotUserException.class)
     public ResponseEntity<String> notUserException(NotUserException e) {
         return ResponseEntity.status(e.getStatus()).body(e.getMessage());
@@ -23,7 +22,5 @@ public class ExceptionAdvisor {
         System.out.println(e.getMessage());
         return ResponseEntity.status(400).body(e.getMessage());
     }
-
-
 
 }

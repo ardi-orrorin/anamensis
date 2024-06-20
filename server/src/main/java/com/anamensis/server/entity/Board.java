@@ -23,4 +23,5 @@ public class Board {
     private LocalDateTime updateAt;
     private boolean isAdsense;
     private boolean isUse;
+    private boolean isPublic;
 }

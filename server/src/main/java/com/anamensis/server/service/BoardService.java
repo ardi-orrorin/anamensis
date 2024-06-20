@@ -1,8 +1,10 @@
 package com.anamensis.server.service;
 
 import com.anamensis.server.dto.Page;
+import com.anamensis.server.dto.request.BoardRequest;
 import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.entity.Board;
+import com.anamensis.server.entity.Member;
 import com.anamensis.server.mapper.BoardMapper;
 import com.anamensis.server.resultMap.BoardCommentResultMap;
 import com.anamensis.server.resultMap.BoardResultMap;
@@ -14,6 +16,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,34 +27,44 @@ import java.util.List;
 public class BoardService {
     private final BoardMapper boardMapper;
 
-//    private final RedisTemplate<String, BoardResponse.List> redisTemplate;
     private final RedisTemplate<String, Object> redisTemplate;
 
     public Mono<Long> count(Board board) {
         return Mono.fromCallable(() -> boardMapper.count(board));
     }
 
-    public Flux<BoardResponse.List> findAll(Page page, Board board) {
-        return Flux.fromIterable(boardMapper.findList(page, board))
+    public Flux<BoardResponse.List> findAll(
+        Page page,
+        BoardRequest.Params params,
+        Member member
+    ) {
+        return Flux.fromIterable(boardMapper.findList(page, params, member))
                 .publishOn(Schedulers.boundedElastic())
                 .map(BoardResponse.List::from);
     }
 
     public Flux<BoardResponse.List> findOnePage() {
-        List<Object> list = redisTemplate.boundListOps("board:page:1").range(0, -1);
+        List<Object> list;
 
-        if(list == null || list.isEmpty()) {
+        if(!redisTemplate.hasKey("board:page:1")) {
             this.onePageCache(0);
         }
 
+        try {
+            list = redisTemplate.boundListOps("board:page:1").range(0, -1);
+        } catch (Exception e) {
+            this.onePageCache(0);
+        }
+
+        list = redisTemplate.boundListOps("board:page:1").range(0, -1);
         return Flux.fromIterable(list)
             .cast(BoardResponse.List.class);
 
     }
 
 
-    public Mono<BoardResultMap.Board> findByPk(long boardPk) {
-        return Mono.justOrEmpty(boardMapper.findByPk(boardPk))
+    public Mono<BoardResultMap.Board> findByPk(long boardPk, long memberPk) {
+        return Mono.justOrEmpty(boardMapper.findByPk(boardPk, memberPk))
                 .switchIfEmpty(Mono.error(new RuntimeException("게시글이 없습니다.")));
     }
 
@@ -93,13 +106,12 @@ public class BoardService {
         redisTemplate.delete("board:page:1:ids");
         redisTemplate.delete("board:page:1");
 
-        this.findAll(page, new Board())
+        this.findAll(page, new BoardRequest.Params(), new Member())
             .doOnNext(list -> {
                 redisTemplate.boundSetOps("board:page:1:ids").add(list.getId());
                 redisTemplate.boundListOps("board:page:1").rightPush(list);
             })
             .subscribe();
-
     }
 
     public Mono<Boolean> viewUpdateByPk(long boardPk) {

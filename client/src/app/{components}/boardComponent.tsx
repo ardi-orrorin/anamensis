@@ -18,13 +18,14 @@ export interface BoardListI {
     createdAt    : string;
     commentCount : number;
     body?        : BlockI[];
+    isPublic     : boolean;
 }
 const BoardComponent = (props: BoardListI) => {
     const {
        id, rate, writer
         , createdAt, title, viewCount
         , profileImage, commentCount
-        , body, categoryPk
+        , body, categoryPk, isPublic
     } = props;
 
     let text = '';
@@ -39,7 +40,6 @@ const BoardComponent = (props: BoardListI) => {
         console.log(e)
     }
 
-
     return (
         <Link className={'flex flex-col w-[350px] min-w-[350px] h-[150px] bg-white shadow active:bg-blue-50 hover:shadow-xl active:shadow-xl duration-300'}
               href={`/board/${id}`}
@@ -47,8 +47,13 @@ const BoardComponent = (props: BoardListI) => {
         >
             <div className={'flex justify-between p-3 h-auto items-center'}>
                 <div className={'h-auto flex flex-col gap-1'}>
-                    <span className={'text-xs text-blue-700'}>
-                        {Category.findById(categoryPk)?.name}
+                    <span className={'flex gap-2 text-xs text-blue-700'}>
+                        <span>
+                            {Category.findById(categoryPk)?.name}
+                        </span>
+                        <span className={'text-red-600'}>
+                            {isPublic ? '' : '비공개'} {id}
+                        </span>
                     </span>
                     <span className={'text-sm'}>
                         {title}

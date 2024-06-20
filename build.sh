@@ -7,35 +7,34 @@ service=$1
 version=$2
 docker_id=$3
 base_id=$4
+platform=linux/amd64,linux/arm64
 
-if [[ "$service" == "base" ]] && [[ "$version" != "" ]] && [[ "$docker_id" != "" ]]
+if [ "$service" == "base" ] && [ "$version" != "" ] && [ "$docker_id" != "" ]
 then
-    docker build --platform linux/amd64 -t $docker_id/anamensis-base:latest -f base.Dockerfile  .
-    docker build --platform linux/amd64 -t $docker_id/anamensis-base:$version -f base.Dockerfile  .
-    docker push $docker_id/anamensis-base:latest
-    docker push $docker_id/anamensis-base:$version
+    docker buildx build --platform $platform --push -t $docker_id/anamensis-base:latest -f base.Dockerfile  .
+    docker buildx build --platform $platform --push -t $docker_id/anamensis-base:$version -f base.Dockerfile  .
     exit 1
 fi
 
-if [[ "$service" != "batch" ]] && [[ "$service" != "config" ]] && [[ "$service" != "site" ]]
+if [ "$service" != "batch" ] && [ "$service" != "config" ] && [ "$service" != "site" ]
 then
     echo 'service is required'
     exit 1
 fi
 
-if [[ "$version" == "" ]]
+if [ "$version" == "" ]
 then
     echo 'version is required'
     exit 1
 fi
 
-if [[ "$docker_id" == "" ]]
+if [ "$docker_id" == "" ]
 then
     echo 'docker_id is required'
     exit 1
 fi
 
-if [[ "$base_id" == "" ]]
+if [ "$base_id" == "" ]
 then
     echo 'base_id is required'
     exit 1
@@ -43,7 +42,7 @@ fi
 
 echo 'start '$service'-anamensis project build start....'
 
-if [[ "$service" == "batch" ]] || [[ "$service" == "config" ]]
+if [ "$service" == "batch" ] || [ "$service" == "config" ]
 then
     gradle build ':'$service':build' -Pversion=$version
 elif [ "$service" == "site" ]; then
@@ -60,7 +59,7 @@ echo
 
 echo 'docker latest build start....'
 
-if [[ "$service" == "site" ]]
+if [ "$service" == "site" ]
 then
     sed "s|__DOCKER_ID__|$base_id|g" site.Dockerfile.template > site.Dockerfile
 
@@ -76,9 +75,7 @@ else
     server_file_name=''$service'-anamensis-'$version''
 fi
 
-docker build --platform linux/amd64 --build-arg='JAR='$server_file_name -t $docker_id/$service-anamensis:latest  -f $service.Dockerfile  .
-
-docker push $docker_id/$service-anamensis:latest
+docker buildx build --platform $platform --push --build-arg='JAR='$server_file_name -t $docker_id/$service-anamensis:latest  -f $service.Dockerfile  .
 
 echo 'docker latest build success....'
 
@@ -86,9 +83,8 @@ echo
 
 echo ''$service'-docker-compose build start....'
 
-docker build --platform linux/amd64 --build-arg='JAR='$server_file_name -t $docker_id/$service-anamensis:$version -f $service.Dockerfile  .
+docker buildx build --platform $platform --push --build-arg='JAR='$server_file_name -t $docker_id/$service-anamensis:$version -f $service.Dockerfile  .
 
-docker push $docker_id/$service-anamensis:$version
 
 if [ "$service" == "site" ]
 then

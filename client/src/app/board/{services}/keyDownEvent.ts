@@ -12,6 +12,46 @@ export type KeyEventType = {
     addBlockHandler?: (seq: number, value?: string) => void;
 }
 
+
+const enter = (args: KeyEventType) => {
+    const {
+        seq, board,
+        blockRef, addBlockHandler,
+        event,
+    } = args;
+
+    if(!board || !addBlockHandler || !blockRef || !event) return;
+
+    event.preventDefault();
+
+    seq === 0 && event?.currentTarget?.getAttribute('name') === 'title' && blockRef.current[0]?.focus();
+
+    const list = board.data?.content?.list;
+
+    if (!list) return ;
+
+    const curRef = event.currentTarget as HTMLInputElement;
+    const afterText = curRef?.value?.substring(curRef.selectionStart!);
+    const beforeText = curRef?.value?.substring(0, curRef.selectionStart!);
+
+    addBlockHandler(seq, afterText);
+
+    list.map((item, index) => {
+        if (item.seq === seq) {
+            item.value = beforeText;
+        }
+        return item;
+    });
+
+    setTimeout(() => {
+        const nextCur = blockRef?.current[seq + 1] as HTMLInputElement;
+        if(!nextCur) return;
+        nextCur.focus();
+        nextCur.setSelectionRange(0, 0);
+    }, 0);
+}
+
+
 const backspace = (args: KeyEventType) => {
     const {
         board, seq, blockRef
@@ -34,16 +74,17 @@ const backspace = (args: KeyEventType) => {
         setBoard({...board, data: {...board.data, content: {list: newList}}});
     }
 
-
     if(seq === 0) {
         setTimeout(() => {
             blockRef.current[0]?.focus();
-        },100);
+        },0);
         return;
     }
 
     const curRef = blockRef.current[seq] as HTMLInputElement;
+
     if(curRef.selectionStart !== 0) return;
+
     event.preventDefault();
     const afterText = curRef.value.substring(curRef.selectionStart!);
 
@@ -68,7 +109,7 @@ const backspace = (args: KeyEventType) => {
         const position = prevRef.value.length - afterText.length;
         prevRef.setSelectionRange(position, position);
         prevRef?.focus();
-    },50);
+    },0);
 }
 
 const arrowUp = (args: KeyEventType) => {
@@ -80,9 +121,13 @@ const arrowUp = (args: KeyEventType) => {
     event.preventDefault();
 
     const curRef = event.currentTarget as HTMLInputElement;
-    const prevRef = blockRef.current[seq - 1] as HTMLInputElement;
-    const prevPosition = curRef.selectionStart! > prevRef.value.length ? prevRef.value.length : curRef.selectionStart;
+    const prevRef = blockRef.current[seq - 1]?.ariaRoleDescription === 'object'
+        ? seq - 2 >= 0 && blockRef.current[seq - 2] as HTMLInputElement
+        : blockRef.current[seq - 1] as HTMLInputElement;
 
+    if(!prevRef) return;
+
+    const prevPosition = curRef.selectionStart! > prevRef.value.length ? prevRef.value.length : curRef.selectionStart;
     prevRef.setSelectionRange(prevPosition, prevPosition);
     prevRef.focus();
 }
@@ -92,10 +137,23 @@ const arrowDown = (args: any) => {
 
     if(seq === board.data.content.list.length - 1) return;
     event.preventDefault();
-    blockRef.current[seq + 1]?.focus();
+
+    const curRef = event.currentTarget as HTMLInputElement;
+    const nextRef = blockRef.current[seq + 1]?.ariaRoleDescription === 'object'
+        ? seq + 2 < board.data.content.list.length && blockRef.current[seq + 2] as HTMLInputElement
+        : blockRef.current[seq + 1] as HTMLInputElement;
+
+
+
+    if(!nextRef) return;
+
+    const nextPosition = curRef.selectionStart! > nextRef.value.length ? nextRef.value.length : curRef.selectionStart;
+    nextRef.setSelectionRange(nextPosition, nextPosition);
+    nextRef.focus();
 }
 
 const KeyDownEvent = {
+    enter,
     backspace,
     arrowDown,
     arrowUp,

@@ -16,42 +16,28 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Duration;
+import java.util.Arrays;
 
 @Component
 @RequiredArgsConstructor
 public class AwsS3Provider {
 
-    enum ThumbnailType {
-        PROFILE,
-        THUMBNAIL,
-        ORI
-    }
-    private ThumbnailType thumbnailType;
-
-    private final S3Client s3Client;
-
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucket;
 
-    private Thumbnails.Builder<? extends InputStream> builder;
+    private final S3Client s3Client;
 
-    public Mono<Boolean> saveProfileThumbnail(FilePart filePart, String path, String filename, int width, int height) {
-        return this.saveS3(filePart, path, filename, width, height, true, ThumbnailType.PROFILE);
-    }
+    private enum ThumbnailType { PROFILE, CONTENT_THUMBNAIL, ORI }
 
-    public Mono<Boolean> saveThumbnail(FilePart filePart, String path, String filename, int width, int height) {
-        return this.saveS3(filePart, path, filename, width, height, false, ThumbnailType.THUMBNAIL);
-    }
-    public Mono<Boolean> saveOri(FilePart filePart, String path, String filename) {
-        return this.saveS3(filePart, path, filename, 0, 0, false, ThumbnailType.ORI);
-    }
+    private static final float PROFILE = 0.4f;
+    private static final float CONTENT_THUMBNAIL = 0.6f;
+
+    private static final ThumbnailType[] CROP_LIST = { ThumbnailType.PROFILE, ThumbnailType.CONTENT_THUMBNAIL };
 
     private Mono<Boolean> saveS3(
         FilePart filePart,
         String path, String filename,
         int width, int height,
-        boolean isCrop,
         ThumbnailType thumbnailType
     ) {
 
@@ -64,22 +50,15 @@ public class AwsS3Provider {
 
         return DataBufferUtils.join(filePart.content())
                 .flatMap(data -> {
-                    if(width == 0 && height == 0) {
+                    if(thumbnailType == ThumbnailType.ORI) {
                         s3Client.putObject(req, RequestBody.fromInputStream(data.asInputStream(), data.readableByteCount()));
                         return Mono.just(true);
                     }
 
-
                     try(ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-                        builder = Thumbnails.of(data.asInputStream())
-                            .size(width, height)
-                            .outputQuality(0.4);
+                        buildThumbnail(data.asInputStream(), width, height, thumbnailType)
+                            .toOutputStream(os);
 
-                        if (isCrop) {
-                            builder.crop(Positions.CENTER);
-                        }
-
-                        builder.toOutputStream(os);
                         s3Client.putObject(req, RequestBody.fromBytes(os.toByteArray()));
 
                     } catch (IOException e) {
@@ -88,19 +67,57 @@ public class AwsS3Provider {
 
                     return Mono.just(true);
 
-
-
                 });
     }
 
-    public Mono<Void> deleteS3(String filePath, String filename) {
+    private Thumbnails.Builder<? extends InputStream> buildThumbnail(
+        InputStream is, int width, int height, ThumbnailType thumbnailType
+    ) {
+        Thumbnails.Builder<? extends InputStream> builder = Thumbnails.of(is).size(width, height);
 
+        switch (thumbnailType) {
+            case PROFILE -> builder.outputQuality(PROFILE);
+            case CONTENT_THUMBNAIL -> builder.outputQuality(CONTENT_THUMBNAIL);
+        }
+
+        if(Arrays.stream(CROP_LIST).anyMatch(crop -> crop == thumbnailType))
+            builder.crop(Positions.CENTER);
+
+        return builder;
+    }
+
+    public Mono<Boolean> saveProfileThumbnail(FilePart filePart, String path, String filename) {
+        return this.saveS3(filePart, path, filename, 150, 150, ThumbnailType.PROFILE);
+    }
+
+    public Mono<Boolean> saveThumbnail(FilePart filePart, String path, String filename) {
+        return this.saveS3(filePart, path, filename, 700, 700,ThumbnailType.CONTENT_THUMBNAIL);
+    }
+    public Mono<Boolean> saveOriginal(FilePart filePart, String path, String filename) {
+        return this.saveS3(filePart, path, filename, 0, 0, ThumbnailType.ORI);
+    }
+
+    public Mono<Void> deleteS3(String filePath, String filename) {
         s3Client.deleteObject(
-                DeleteObjectRequest.builder()
-                        .bucket(bucket)
-                        .key(filePath.substring(1) + filename)
-                        .build()
+            DeleteObjectRequest.builder()
+                .bucket(bucket)
+                .key(filePath.substring(1) + filename)
+                .build()
         );
         return Mono.empty();
     }
+
+    public void aws3ImgDelete(String filePath, String fileName) {
+        String thumbnail = fileName.substring(0, fileName.lastIndexOf("."))
+            + "_thumb"
+            + fileName.substring(fileName.lastIndexOf("."));
+
+        this.deleteS3(filePath, fileName)
+            .subscribe();
+
+        this.deleteS3(filePath, thumbnail)
+            .subscribe();
+    }
+
+
 }

@@ -12,36 +12,30 @@ import java.util.UUID;
 @Component
 public class FilePathProvider {
 
-    public FilePathDto changeContentPath(int width, int height, String ext) {
+    public FilePathDto getBoardContent(String filename) {
         String path = "/resource/board/";
-        String filename = UUID.randomUUID().toString();
-        String oriFilename = String.format("%s.%s", filename, ext);
-//        String thumbFilename = String.format("%s_%sx%s.%s", filename, width, height, ext);
-
-        return new FilePathDto(path, oriFilename, width, height);
+        return new FilePathDto(path, getFilename(getExt(filename)));
     }
 
 
-    public FilePathDto changeUserPath(RootType root, String userPk, int width, int height, String ext) {
-        String result = "";
-        String filename = String.format("%s_%sx%s.%s",UUID.randomUUID(), width, height, ext);
-
-        String profile = String.format("/user/%s/profile/%s/", userPk,
+    public FilePathDto getProfile(String memberPk, String filepath) {
+        String path = String.format("/user/%s/profile/%s/", memberPk,
                 LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))
         );
 
-        String resource = String.format("/user/%s/resource/%s/%s", userPk, width, height);
-
-        switch (root) {
-            case PROFILE -> result = profile;
-            case RESOURCE -> result = resource;
-        }
-
-        return new FilePathDto(result, filename, width, height);
+        return new FilePathDto(path, getFilename(getExt(filepath)));
     }
 
-    public enum RootType {
-        PROFILE,
-        RESOURCE
+    public FilePathDto getResource(String memberPk, String filepath) {
+        String path = String.format("/user/%s/resource/", memberPk);
+        return new FilePathDto(path, getFilename(getExt(filepath)));
+    }
+
+    private String getExt(String filename) {
+        return filename.substring(filename.lastIndexOf(".") + 1);
+    }
+
+    private String getFilename(String ext) {
+        return String.format("%s.%s",UUID.randomUUID(), ext);
     }
 }

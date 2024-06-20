@@ -11,6 +11,7 @@ import TopMenu from "@/app/{components}/topMenu";
 import {RoleType} from "@/app/user/system/{services}/types";
 import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
+import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 
 
 type DynamicPage = {
@@ -65,19 +66,25 @@ export default function Page() {
         fetch();
     },[searchParams])
 
-    const onSearchHandler = () => {
+    const onSearchHandler = (init: boolean) => {
         const initPage = {page: 1, size: 20};
+
+        if(init) {
+            setSearchValue('')
+            setSearchParams(initPage as BoardListParamsI);
+            return;
+        }
+
         const params = searchValue === ''
         ? {...initPage} as BoardListParamsI
-        : {...searchParams, ...initPage, value: searchValue, type: 'title'};
-
+        : {...searchParams, ...initPage, value: searchValue, type: 'content'};
 
         setSearchParams(params);
     }
 
     const onEnterHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if(e.key === 'Enter') {
-            onSearchHandler();
+            onSearchHandler(false);
         }
     }
 
@@ -90,16 +97,28 @@ export default function Page() {
             <div className={'p-5 flex flex-col gap-10'}>
                 <div className={'px-4 sm:px-10 md:px-20 lg:px-44 w-full flex justify-center items-center gap-3'}>
                     <div className={['relative flex justify-center duration-700', searchFocus ? 'w-full sm:w-[70%]' : 'w-70 sm:w-[40%]'].join(' ')}>
-                        <input className={'rounded-full outline-0 border-solid border-gray-200 border text-xs w-full h-10 py-3 pl-4 pr-16 focus:bg-blue-50 duration-500'}
+                        <input className={'rounded-full outline-0 border-solid border-gray-200 border text-xs w-full h-10 py-3 pl-4 pr-20 focus:bg-blue-50 duration-500'}
                                placeholder={'검색어'}
                                value={searchValue || ''}
                                onChange={(e) => setSearchValue(e.target.value)}
                                onKeyUp={onEnterHandler}
                                onFocus={() => setSearchFocus(true)}
-                                onBlur={() => setSearchFocus(false)}
+                               onBlur={() => setSearchFocus(false)}
                         />
-                        <button className={'absolute right-2 top-1 border rounded-full py-1.5 px-3 hover:text-white hover:bg-blue-300 duration-500'} onClick={onSearchHandler}>
-                            <FontAwesomeIcon icon={faMagnifyingGlass} className={'h-4 text-gray-400'}/>
+                        {
+                            searchValue.length > 0
+                            && <button className={'absolute right-12 top-1 duration-500'}
+                                       onClick={()=> onSearchHandler(true)}
+                            ><FontAwesomeIcon className={'h-4 py-1.5 px-2 text-gray-400 hover:text-red-300 duration-300'}
+                                              icon={faXmark}
+                            />
+                            </button>
+                        }
+                        <button className={'absolute right-2 top-1 duration-500'}
+                                onClick={()=> onSearchHandler(false)}
+                        ><FontAwesomeIcon className={'h-4 py-1.5 px-2 text-gray-400 hover:text-blue-300 duration-300'}
+                                          icon={faMagnifyingGlass}
+                        />
                         </button>
                     </div>
                 </div>

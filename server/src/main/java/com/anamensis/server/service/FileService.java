@@ -144,9 +144,9 @@ public class FileService {
     public Mono<Boolean> deleteFile(File file) {
         return Mono.just(fileMapper.updateIsUseById(file.getId(), 0))
                 .publishOn(Schedulers.boundedElastic())
-                .doOnNext(r -> awsS3Provider.deleteS3(file.getFilePath(), file.getFileName())
-                        .subscribe()
-                )
+                .doOnNext(r -> {
+                    awsS3Provider.deleteS3(file.getFilePath(), file.getFileName());
+                })
                 .map(this::response);
     }
 
@@ -166,10 +166,7 @@ public class FileService {
         if(files.isEmpty()) {
             return Mono.just(false);
         } else {
-            files.forEach(file ->
-                awsS3Provider.deleteS3(file.getFilePath(), file.getFileName())
-                    .subscribe()
-            );
+            files.forEach(file -> awsS3Provider.aws3ImgDelete(file.getFilePath(), file.getFileName()));
         }
 
         return Mono.fromCallable(()-> fileMapper.deleteByIds(ids) > 0)
@@ -178,6 +175,8 @@ public class FileService {
 
 
     // -----------------------------------------------------------------------------
+
+
 
 
     public Mono<String> getAddr() {
@@ -229,20 +228,13 @@ public class FileService {
         String filePath = fileUri.substring(0, fileUri.lastIndexOf("/") + 1);
         String fileName = fileUri.substring(fileUri.lastIndexOf("/") + 1);
 
-        String thumbnail = fileName.substring(0, fileName.lastIndexOf("."))
-            + "_thumb"
-            + fileName.substring(fileName.lastIndexOf("."));
-
         return Mono.just(fileMapper.deleteByUri(filePath, fileName) > 0)
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(r -> {
-                    awsS3Provider.deleteS3(filePath, fileName)
-                            .subscribe();
-                    awsS3Provider.deleteS3(filePath, thumbnail)
-                            .subscribe();
-                    }
-                );
+                    awsS3Provider.aws3ImgDelete(filePath, fileName);
+                });
     }
+
 }
 
 

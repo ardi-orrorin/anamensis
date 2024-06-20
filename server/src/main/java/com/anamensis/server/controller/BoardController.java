@@ -7,9 +7,11 @@ import com.anamensis.server.dto.request.BoardRequest;
 import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.dto.response.StatusResponse;
 import com.anamensis.server.entity.*;
+import com.anamensis.server.exception.AuthorizationException;
 import com.anamensis.server.resultMap.BoardResultMap;
 import com.anamensis.server.service.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -96,6 +98,10 @@ public class BoardController {
             .flatMap(t -> {
                 BoardResultMap.Board board = t.getT1();
                 Member m = t.getT2();
+                System.out.println("sdfdsfdsf" + m);
+                if(!board.getBoard().getIsPublic() && m.getId() != board.getBoard().getMemberPk()) {
+                    return Mono.error(new AuthorizationException("비공개 게시글입니다.", HttpStatus.FORBIDDEN));
+                }
                 return Mono.just(BoardResponse.Content.from(board, m));
             })
             .zipWith(count)

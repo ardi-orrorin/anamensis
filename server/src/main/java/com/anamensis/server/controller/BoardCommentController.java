@@ -6,7 +6,6 @@ import com.anamensis.server.entity.*;
 import com.anamensis.server.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +20,6 @@ import java.util.List;
 public class BoardCommentController {
 
     private final BoardCommentService boardCommentService;
-    private final BoardService boardService;
     private final PointHistoryService pointHistoryService;
     private final UserService userService;
     private final PointService pointService;

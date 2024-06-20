@@ -49,7 +49,7 @@ public class BoardRequest {
             board.setUpdateAt(updateAt);
             board.setAdsense(isAdsense);
             board.setUse(isUse);
-            board.setPublic(isPublic);
+            board.setIsPublic(isPublic);
             return board;
         }
     }

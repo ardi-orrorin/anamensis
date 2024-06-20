@@ -1,6 +1,7 @@
 package com.anamensis.server.mapper;
 
 import com.anamensis.server.dto.Page;
+import com.anamensis.server.dto.request.BoardRequest;
 import com.anamensis.server.entity.Board;
 import com.anamensis.server.entity.Category;
 import com.anamensis.server.entity.Member;
@@ -85,7 +86,7 @@ class BoardMapperTest {
         page.setPage(1);
         page.setSize(4);
 
-        List<BoardResultMap.Board> list = bm.findList(page, new Board());
+        List<BoardResultMap.Board> list = bm.findList(page, new BoardRequest.Params(), new Member());
         assertEquals(4, list.size());
 
 
@@ -125,7 +126,7 @@ class BoardMapperTest {
 
 
         page.setPage(2);
-        list = bm.findList(page, new Board());
+        list = bm.findList(page, new BoardRequest.Params(), new Member());
 
         list.forEach(b -> {
             assertNotNull(b.getBoard());
@@ -162,7 +163,7 @@ class BoardMapperTest {
 
 
         page.setPage(3);
-        list = bm.findList(page, new Board());
+        list = bm.findList(page, new BoardRequest.Params(), new Member());
 
         list.forEach(b -> {
             assertNotNull(b.getBoard());
@@ -201,15 +202,15 @@ class BoardMapperTest {
     @Order(2)
     @DisplayName("게시글 조회")
     void findByPk() {
-        assertFalse(bm.findByPk(111).isPresent());
+        assertFalse(bm.findByPk(111, 0).isPresent());
 
         assertThrowsExactly(NoSuchElementException.class, () ->
-            bm.findByPk(111).get()
+            bm.findByPk(111, 0).get()
         );
 
-        assertTrue(bm.findByPk(1).isPresent());
-        assertDoesNotThrow(()-> bm.findByPk(1).get());
-        BoardResultMap.Board board = bm.findByPk(1).get();
+        assertTrue(bm.findByPk(1, 0).isPresent());
+        assertDoesNotThrow(()-> bm.findByPk(1, 0).get());
+        BoardResultMap.Board board = bm.findByPk(1, 0).get();
         assertNotNull(board.getBoard());
         assertNotNull(board.getBoard().getId());
         assertNotNull(board.getBoard().getMemberPk());
@@ -311,35 +312,35 @@ class BoardMapperTest {
     @Order(5)
     @DisplayName("게시글 비활성화")
     void disableByPk() {
-        assertTrue(bm.findByPk(1).isPresent());
+        assertTrue(bm.findByPk(1, 0).isPresent());
         bm.disableByPk(1, 1, LocalDateTime.now());
-        assertFalse(bm.findByPk(1).isPresent());
+        assertFalse(bm.findByPk(1, 0).isPresent());
 
-        assertTrue(bm.findByPk(5).isPresent());
+        assertTrue(bm.findByPk(5, 0).isPresent());
         bm.disableByPk(5, 1, LocalDateTime.now());
-        assertTrue(bm.findByPk(5).isPresent());
+        assertTrue(bm.findByPk(5, 0).isPresent());
 
         bm.disableByPk(5, 2, LocalDateTime.now());
-        assertFalse(bm.findByPk(5).isPresent());
+        assertFalse(bm.findByPk(5, 0).isPresent());
     }
 
     @Test
     @Order(6)
     @DisplayName("조회수 증가")
     void viewUpdateByPk() {
-        long v1 = bm.findByPk(1).orElseThrow().getBoard().getViewCount();
+        long v1 = bm.findByPk(1, 0).orElseThrow().getBoard().getViewCount();
         bm.viewUpdateByPk(1);
-        long v2 = bm.findByPk(1).orElseThrow().getBoard().getViewCount();
+        long v2 = bm.findByPk(1, 0).orElseThrow().getBoard().getViewCount();
         assertEquals(v1 + 1, v2);
 
         bm.viewUpdateByPk(1);
-        long v3 = bm.findByPk(1).orElseThrow().getBoard().getViewCount();
+        long v3 = bm.findByPk(1, 0).orElseThrow().getBoard().getViewCount();
 
         assertEquals(v1 + 2, v3);
         assertEquals(v2 + 1, v3);
 
         bm.viewUpdateByPk(2);
-        long v4 = bm.findByPk(2).orElseThrow().getBoard().getViewCount();
+        long v4 = bm.findByPk(2, 0).orElseThrow().getBoard().getViewCount();
 
         assertNotEquals(v2, v4);
     }
@@ -348,13 +349,13 @@ class BoardMapperTest {
     @Order(7)
     @DisplayName("게시글 수정")
     void updateByPk() {
-        Board b1 = bm.findByPk(1).orElseThrow().getBoard();
+        Board b1 = bm.findByPk(1, 0).orElseThrow().getBoard();
         b1.setId(1);
         b1.setTitle("수정된 제목");
         b1.getContent().put("content", "수정된 내용");
 
         assertEquals(1, bm.updateByPk(b1));
-        Board b2 = bm.findByPk(1).orElseThrow().getBoard();
+        Board b2 = bm.findByPk(1, 0).orElseThrow().getBoard();
 
         assertEquals(b1.getTitle(), b2.getTitle());
         assertEquals(b1.getContent(), b2.getContent());

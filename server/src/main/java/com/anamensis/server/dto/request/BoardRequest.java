@@ -35,6 +35,7 @@ public class BoardRequest {
         private long[] uploadFiles;
         private String[] removeFiles;
         private Boolean isPublic = false;
+        private String searchText;
 
         public Board toEntity() {
             Board board = new Board();
@@ -49,7 +50,7 @@ public class BoardRequest {
             board.setUpdateAt(updateAt);
             board.setAdsense(isAdsense);
             board.setUse(isUse);
-            board.setPublic(isPublic);
+            board.setIsPublic(isPublic);
             return board;
         }
     }

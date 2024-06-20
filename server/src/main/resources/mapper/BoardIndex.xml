@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.server.mapper.BoardIndexMapper">
+    <insert id="save">
+        INSERT INTO board_index
+               (board_id, content, created_at, updated_at)
+        VALUES (#{boardId}, #{content}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="update">
+        UPDATE board_index
+           SET content    = #{content},
+               updated_at = #{updatedAt}
+         WHERE board_id   = #{boardId}
+    </update>
+    <delete id="delete">
+        DELETE
+          FROM board_index
+         WHERE board_id = #{boardId}
+    </delete>
+</mapper>

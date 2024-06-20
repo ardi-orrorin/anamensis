@@ -7,9 +7,11 @@ import com.anamensis.server.dto.request.BoardRequest;
 import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.dto.response.StatusResponse;
 import com.anamensis.server.entity.*;
+import com.anamensis.server.exception.AuthorizationException;
 import com.anamensis.server.resultMap.BoardResultMap;
 import com.anamensis.server.service.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -96,6 +98,9 @@ public class BoardController {
             .flatMap(t -> {
                 BoardResultMap.Board board = t.getT1();
                 Member m = t.getT2();
+                if(!board.getBoard().getIsPublic() && m.getId() != board.getBoard().getMemberPk()) {
+                    return Mono.error(new AuthorizationException("비공개 게시글입니다.", HttpStatus.FORBIDDEN));
+                }
                 return Mono.just(BoardResponse.Content.from(board, m));
             })
             .zipWith(count)
@@ -152,6 +157,7 @@ public class BoardController {
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(b -> {
                     Mono.zip(pointCode, tableCode)
+                        .publishOn(Schedulers.boundedElastic())
                         .doOnNext(t -> {
                             userService.updatePoint(b.getMemberPk(), (int) t.getT1().getPoint())
                                     .subscribeOn(Schedulers.boundedElastic())
@@ -174,8 +180,7 @@ public class BoardController {
                                     .subscribe();
                             }
 
-
-
+                            boardService.saveIndex(b.getId(), board.getSearchText());
                         })
                         .subscribe();
                 });
@@ -202,13 +207,20 @@ public class BoardController {
                                       .message("게시글 수정에 실패하였습니다.")
                                       .build();
                 })
+            .publishOn(Schedulers.boundedElastic())
             .doOnNext(r -> {
-                if(r.getStatus() != StatusType.SUCCESS || board.getRemoveFiles().length == 0) return;
+                if(r.getStatus() != StatusType.SUCCESS) return;
+
+                boardService.updateIndex(boardPk, board.getSearchText());
+
+                if(board.getRemoveFiles().length == 0) return;
+
                 Arrays.stream(board.getRemoveFiles())
                         .forEach(fileUrl -> fileService.deleteByUri(fileUrl)
                                 .subscribeOn(Schedulers.boundedElastic())
                                 .subscribe()
                         );
+
             });
     }
 
@@ -231,6 +243,7 @@ public class BoardController {
                     }
                     return sb.build();
                 })
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext(r -> {
                     if(r.getStatus() != StatusType.SUCCESS) return;
                     fileService.findByTableNameAndTableRefPk("board", boardPk)
@@ -240,6 +253,8 @@ public class BoardController {
                             })
                             .subscribeOn(Schedulers.boundedElastic())
                             .subscribe();
+
+                    boardService.deleteIndex(boardPk);
                 });
     }
 }

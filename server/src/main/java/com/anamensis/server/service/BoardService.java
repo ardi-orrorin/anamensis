@@ -4,7 +4,9 @@ import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.request.BoardRequest;
 import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.entity.Board;
+import com.anamensis.server.entity.BoardIndex;
 import com.anamensis.server.entity.Member;
+import com.anamensis.server.mapper.BoardIndexMapper;
 import com.anamensis.server.mapper.BoardMapper;
 import com.anamensis.server.resultMap.BoardCommentResultMap;
 import com.anamensis.server.resultMap.BoardResultMap;
@@ -26,6 +28,8 @@ import java.util.List;
 @Transactional
 public class BoardService {
     private final BoardMapper boardMapper;
+
+    private final BoardIndexMapper boardIndexMapper;
 
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -86,6 +90,35 @@ public class BoardService {
                 .flatMap($ -> Mono.just(board))
             .publishOn(Schedulers.boundedElastic())
             .doOnNext($ -> onePageCache(0));
+    }
+
+    public void saveIndex(long boardPk, String content) {
+        BoardIndex boardIndex = new BoardIndex();
+        boardIndex.setBoardId(boardPk);
+        boardIndex.setContent(content);
+        boardIndex.setCreatedAt(LocalDateTime.now());
+        boardIndex.setUpdatedAt(LocalDateTime.now());
+        boardIndexMapper.save(boardIndex);
+    }
+
+    public void updateIndex(long boardPk, String content) {
+        BoardIndex boardIndex = new BoardIndex();
+        boardIndex.setBoardId(boardPk);
+        boardIndex.setContent(content);
+        boardIndex.setUpdatedAt(LocalDateTime.now());
+
+        try {
+            int result = boardIndexMapper.update(boardIndex);
+            if(result == 0) {
+                saveIndex(boardPk, content);
+            }
+        } catch (Exception e) {
+            saveIndex(boardPk, content);
+        }
+    }
+
+    public void deleteIndex(long boardPk) {
+        boardIndexMapper.delete(boardPk);
     }
 
     public void onePageCache(long id) {

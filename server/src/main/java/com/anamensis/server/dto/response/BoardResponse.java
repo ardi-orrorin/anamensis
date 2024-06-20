@@ -59,7 +59,7 @@ public class BoardResponse {
                     .commentCount(board.getCommentCount())
                     .categoryPk(board.getBoard().getCategoryPk())
                     .updatedAt(board.getBoard().getUpdateAt())
-                    .isPublic(board.getBoard().isPublic());
+                    .isPublic(board.getBoard().getIsPublic());
 
             builder.body(board.getBoard().getContent().get("list"));
 
@@ -113,7 +113,7 @@ public class BoardResponse {
                     .viewCount(board.getBoard().getViewCount())
                     .createdAt(board.getBoard().getCreateAt())
                     .updatedAt(board.getBoard().getUpdateAt())
-                    .isPublic(board.getBoard().isPublic());
+                    .isPublic(board.getBoard().getIsPublic());
 
             if(member != null) {
                 builder.isWriter(board.getBoard().getMemberPk() == member.getId());

@@ -73,12 +73,10 @@ public class FileService {
 
 
     public Mono<File> insert(FilePart filePart, File fileContent) {
-        String ext = filePart.filename().substring(filePart.filename().lastIndexOf(".") + 1);
+        FilePathDto filepath = filePathProvider.getBoardContent(filePart.filename());
 
-        FilePathDto filepath = filePathProvider.changeContentPath(0, 0, ext);
-
-        fileContent.setFilePath(filepath.path());
-        fileContent.setFileName(filepath.file());
+        fileContent.setFilePath(filepath.filepath());
+        fileContent.setFileName(filepath.filename());
         fileContent.setOrgFileName(filePart.filename());
         fileContent.setCreateAt(LocalDateTime.now());
         fileContent.setUse(true);
@@ -93,33 +91,26 @@ public class FileService {
             return Mono.just(fileContent);
         }
 
-        String filename = filepath.file().substring(0, filepath.file().lastIndexOf("."))
+        String filename = filepath.filename().substring(0, filepath.filename().lastIndexOf("."))
             + "_thumb"
-            + filepath.file().substring(filepath.file().lastIndexOf("."));
+            + filepath.filename().substring(filepath.filename().lastIndexOf("."));
 
-        Mono<Boolean> thumbnail = awsS3Provider.saveThumbnail(filePart, filepath.path(), filename, 600, 600);
-        Mono<Boolean> ori = awsS3Provider.saveOri(filePart, filepath.path(), filepath.file());
+        Mono<Boolean> thumbnail = awsS3Provider.saveThumbnail(filePart, filepath.filepath(), filename);
+        Mono<Boolean> ori = awsS3Provider.saveOriginal(filePart, filepath.filepath(), filepath.filename());
         return Mono.zip(thumbnail, ori)
             .subscribeOn(Schedulers.boundedElastic())
             .map(r -> fileContent);
     }
 
     public Mono<String> saveProfile(Member users, FilePart filePart) {
-
-        int profileWidth = 150;
-        int profileHeight = 150;
-
-        String ext = filePart.filename().substring(filePart.filename().lastIndexOf(".") + 1);
-
-        FilePathDto filepath = filePathProvider.changeUserPath(
-                FilePathProvider.RootType.PROFILE,
+        FilePathDto filepath = filePathProvider.getProfile(
                 String.valueOf(users.getId()),
-                profileWidth,profileHeight, ext
+                filePart.filename()
         );
 
         File fileEntity = new File();
-        fileEntity.setFileName(filepath.file());
-        fileEntity.setFilePath(filepath.path());
+        fileEntity.setFileName(filepath.filename());
+        fileEntity.setFilePath(filepath.filepath());
         fileEntity.setOrgFileName(filePart.filename());
         fileEntity.setTableCodePk(1);
         fileEntity.setTableRefPk(users.getId());
@@ -136,17 +127,17 @@ public class FileService {
                     }
                 })
                 .doOnNext($ -> fileMapper.insert(fileEntity))
-                .flatMap(r -> awsS3Provider.saveProfileThumbnail(filePart, filepath.path(), filepath.file(), profileWidth, profileHeight))
-                .then(Mono.defer(() -> Mono.just(filepath.path() + filepath.file())));
+                .flatMap(r -> awsS3Provider.saveProfileThumbnail(filePart, filepath.filepath(), filepath.filename()))
+                .then(Mono.defer(() -> Mono.just(filepath.filepath() + filepath.filename())));
     }
 
 
     public Mono<Boolean> deleteFile(File file) {
         return Mono.just(fileMapper.updateIsUseById(file.getId(), 0))
                 .publishOn(Schedulers.boundedElastic())
-                .doOnNext(r -> awsS3Provider.deleteS3(file.getFilePath(), file.getFileName())
-                        .subscribe()
-                )
+                .doOnNext(r -> {
+                    awsS3Provider.aws3ImgDelete(file.getFilePath(), file.getFileName());
+                })
                 .map(this::response);
     }
 
@@ -166,10 +157,7 @@ public class FileService {
         if(files.isEmpty()) {
             return Mono.just(false);
         } else {
-            files.forEach(file ->
-                awsS3Provider.deleteS3(file.getFilePath(), file.getFileName())
-                    .subscribe()
-            );
+            files.forEach(file -> awsS3Provider.aws3ImgDelete(file.getFilePath(), file.getFileName()));
         }
 
         return Mono.fromCallable(()-> fileMapper.deleteByIds(ids) > 0)
@@ -229,20 +217,14 @@ public class FileService {
         String filePath = fileUri.substring(0, fileUri.lastIndexOf("/") + 1);
         String fileName = fileUri.substring(fileUri.lastIndexOf("/") + 1);
 
-        String thumbnail = fileName.substring(0, fileName.lastIndexOf("."))
-            + "_thumb"
-            + fileName.substring(fileName.lastIndexOf("."));
-
         return Mono.just(fileMapper.deleteByUri(filePath, fileName) > 0)
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(r -> {
-                    awsS3Provider.deleteS3(filePath, fileName)
-                            .subscribe();
-                    awsS3Provider.deleteS3(filePath, thumbnail)
-                            .subscribe();
-                    }
-                );
+
+                    awsS3Provider.aws3ImgDelete(filePath, fileName);
+                });
     }
+
 }
 
 

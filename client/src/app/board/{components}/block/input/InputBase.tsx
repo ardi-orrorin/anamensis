@@ -19,8 +19,8 @@ export default function InputBase({
     } = data;
 
     const defaultBg = {
-        input: 'rgba(230,230,230,0.2)',
-        p    : ''
+        input : 'rgba(230,230,230,0.2)',
+        p     : ''
     }
 
     const customStyle: CSSProperties = {
@@ -38,7 +38,6 @@ export default function InputBase({
         textDecoration  : textStyle?.textDecoration ? textStyle.textDecoration : style.textDecoration,
         padding         : style.padding,
         letterSpacing   : style.letterSpacing,
-
     };
 
     const props: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> = {
@@ -60,7 +59,6 @@ export default function InputBase({
                      {...props}
                 >{value}</p>
                 : <input style={{...customStyle, backgroundColor: textStyle?.backgroundColor || defaultBg.input, padding: '0.5rem'}}
-                         placeholder={'내용을 입력하세요'}
                          aria-roledescription={'text'}
                          {...props}
                 />

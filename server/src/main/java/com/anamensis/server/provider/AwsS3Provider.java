@@ -103,4 +103,17 @@ public class AwsS3Provider {
         );
         return Mono.empty();
     }
+
+    public void aws3ImgDelete(String filePath, String fileName) {
+        String thumbnail = fileName.substring(0, fileName.lastIndexOf("."))
+            + "_thumb"
+            + fileName.substring(fileName.lastIndexOf("."));
+        this.deleteS3(filePath, fileName)
+            .subscribe();
+
+        this.deleteS3(filePath, thumbnail)
+            .subscribe();
+    }
+
+
 }

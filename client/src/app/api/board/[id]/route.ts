@@ -10,19 +10,28 @@ export async function GET(req: NextRequest) {
 
     const getCookies = (cookies().get('next.access.token') || cookies().get('next.refresh.token'))?.value !== undefined;
 
-    const data = await apiCall<BoardI>({
-        path: '/public/api/boards/' + id,
-        method: 'GET',
-        call: 'Server',
-        setAuthorization: true,
-        isReturnData: true,
-    });
+    try{
+       const data = await apiCall<BoardI>({
+            path: '/public/api/boards/' + id,
+            method: 'GET',
+            call: 'Server',
+            setAuthorization: true,
+            isReturnData: true,
+        });
 
-    return ExNextResponse({
-        body: JSON.stringify({...data, isLogin: getCookies}),
-        status: 200,
-        isRoles: false,
-    })
+        return ExNextResponse({
+            body: JSON.stringify({...data, isLogin: getCookies}),
+            status: 200,
+            isRoles: false,
+        })
+    } catch (e: any) {
+        return ExNextResponse({
+            body: JSON.stringify(e.response.data),
+            status: e.response.status,
+            isRoles: false,
+        })
+    }
+
 }
 
 export async function PUT(req:NextRequest) {

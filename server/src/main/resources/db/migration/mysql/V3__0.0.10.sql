@@ -1,0 +1,1 @@
+ALTER TABLE board CHANGE isPublic is_public TINYINT(1) DEFAULT 0 NULL;

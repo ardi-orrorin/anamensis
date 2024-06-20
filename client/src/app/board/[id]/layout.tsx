@@ -110,8 +110,12 @@ export default function Page({children, params} : {children: ReactNode, params: 
                 data: res.data,
                 isView: true
             });
-        }).finally(() => {
-            setLoading(false);
+        }).catch(e => {
+            alert(e.response.data);
+            location.href = '/';
+        })
+        .finally(() => {
+        setLoading(false);
         });
     }
 

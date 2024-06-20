@@ -23,4 +23,10 @@ public class ExceptionAdvisor {
         return ResponseEntity.status(400).body(e.getMessage());
     }
 
+    @ExceptionHandler(AuthorizationException.class)
+    public ResponseEntity<String> authorizationException(AuthorizationException e) {
+        return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+    }
+
+
 }

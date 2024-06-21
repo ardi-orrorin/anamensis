@@ -30,13 +30,13 @@ export interface BlockI {
     seq         : number;
     hash        : string;
     value       : string;
-    extraValue? : ExtraValueI | string | number | boolean ;
+    extraValue? : ExtraValueI | string | string[] | number | boolean ;
     textStyle?  : TextStylesType;
     code        : string;
 }
 
 export interface ExtraValueI {
-    [key: string] : string | number | boolean | ExtraValueI;
+    [key: string] : string | number | boolean | ExtraValueI | string[] | number[] | boolean[];
 }
 
 export type TextStylesType = {

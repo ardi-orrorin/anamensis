@@ -4,7 +4,6 @@ import {ErrorBoundary} from "next/dist/client/components/error-boundary";
 import Error from "@/app/error";
 import {Metadata, Viewport} from "next";
 
-
 export const metadata: Metadata = {
     title: 'anamensis',
     description: 'anamensis',

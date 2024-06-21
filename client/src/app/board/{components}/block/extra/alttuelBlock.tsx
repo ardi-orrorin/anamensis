@@ -1,18 +1,38 @@
 import {BlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
-import {ChangeEvent, CSSProperties, useContext, useMemo, useRef, useState} from "react";
+import React, {
+    ChangeEvent,
+    CSSProperties,
+    KeyboardEventHandler,
+    useContext,
+    useEffect,
+    useMemo,
+    useRef,
+    useState
+} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import axios from "axios";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
+import {defaultNoImg} from "@/app/{commons}/func/image";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
+import {TAG} from "postcss-selector-parser";
 
 
-type AlttuelBlockProps = {
+export type AlttuelBlockProps = {
     img           : string;
     url           : string;
     price         : number;
     discountCode  : string;
     deliveryFee   : number;
+    tags?         : string[];
+}
+
+type ImgViewProps = {
+    imgLoading : boolean;
+    imgModal   : boolean;
+    viewImg    : boolean;
 }
 
 const AlttuelBlock = (props: BlockProps) => {
@@ -26,20 +46,27 @@ const AlttuelBlock = (props: BlockProps) => {
     const {setWaitUploadFiles} = useContext(TempFileProvider);
 
     const imageRef = useRef<HTMLInputElement>(null);
-    const [imgLoading, setImgLoading] = useState<boolean>(false);
-    const [imgModal, setImgModal] = useState<boolean>(false);
-    const [viewImg, setViewImg] = useState<boolean>(false);
+    const [imgViewProps, setImgViewProps] = useState<ImgViewProps>({
+        imgLoading: false,
+        imgModal: false,
+        viewImg: false,
+    } as ImgViewProps);
+
+    useEffect(() => {
+        if(!extraValue) {
+            if(!onChangeExtraValueHandler) return;
+            onChangeExtraValueHandler({
+                tags: [],
+            });
+        }
+    },[]);
 
     const thumb = useMemo(()=>{
-        return extraValue?.img
-            ? process.env.NEXT_PUBLIC_CDN_SERVER + extraValue.img.replace(/(\.[^.]+)$/, '_thumb$1')
-            : '/noimage.jpg';
+        return defaultNoImg(extraValue?.img?.replace(/(\.[^.]+)$/, '_thumb$1'));
     }, [extraValue?.img])
 
     const oriImg = useMemo(()=>{
-        return extraValue?.img
-            ? process.env.NEXT_PUBLIC_CDN_SERVER + extraValue.img
-            : '/noimage.jpg';
+        return defaultNoImg(extraValue?.img);
     }, [extraValue?.img])
 
     const addCommasToNumber = (number: number)  => {
@@ -78,7 +105,10 @@ const AlttuelBlock = (props: BlockProps) => {
         formData.append('file', file);
         formData.append('fileContent', blob);
 
-        setImgLoading(true);
+        setImgViewProps(prevState => ({
+            ...prevState,
+            imgLoading: true,
+        }));
 
         await axios.post('/api/file/img', formData, {
             headers: {
@@ -96,7 +126,10 @@ const AlttuelBlock = (props: BlockProps) => {
             if(!onChangeExtraValueHandler) return;
             onChangeExtraValueHandler({...extraValue, img: url});
         }).finally(() => {
-            setImgLoading(false);
+            setImgViewProps(prevState => ({
+                ...prevState,
+                imgLoading: false,
+            }));
         });
     }
 
@@ -109,29 +142,51 @@ const AlttuelBlock = (props: BlockProps) => {
             props.onChangeValueHandler(value);
             return;
         }
-        const newValue = {...extraValue, [name]: value};
+
+
+        const condition = value.startsWith('0') && value !== '0';
+        const money = condition ? value.replace(/^0+/, '') : value;
+
+        const newValue = {...extraValue, [name]: money};
 
         if(!onChangeExtraValueHandler) return;
         onChangeExtraValueHandler(newValue);
-
-        // onChangeExtraValueHandler()
     }
 
-    const onImgOriginalClickHandler = () => {
-        if(!extraValue?.img) return;
-        window.open(process.env.NEXT_PUBLIC_CDN_SERVER + extraValue.img);
+    const addTagHandler = (e:  React.KeyboardEvent<HTMLInputElement>) => {
+        if(e.code !== 'Space') return;
+        if(e.nativeEvent.isComposing) return;
+        if(e.currentTarget.value.trim().length <= 2) {
+            e.currentTarget.value = ''
+            return;
+        }
+
+        if(extraValue!.tags!.length >= 3) {
+            return alert('태그는 최대 3개까지 가능합니다.');
+        }
+
+        const tagReg = /#[^\s]+/g;
+
+        const tag = e.currentTarget.value.match(tagReg)?.[0];
+
+        if(!tag) return;
+        if(!onChangeExtraValueHandler) return;
+        const tags = Array.from(new Set(extraValue?.tags ?? []).add(tag));
+
+        const newValue = {...extraValue, tags};
+
+        onChangeExtraValueHandler(newValue);
+
+        if(tag) e.currentTarget.value = '';
     }
 
-    const containerStyle: CSSProperties = {
-        display: 'flex',
-        alignItems: 'center',
-        gap: '1rem',
-        width: '100%',
-        border: 'none',
-        outline: 'none',
-        wordBreak: 'break-all',
-        padding: '1rem',
-        backgroundColor: isView ? '' : 'rgba(230,230,230,0.2)',
+    const deleteTagHandler = (tag: string) => {
+        if(!onChangeExtraValueHandler) return;
+        const tags = extraValue?.tags?.filter(t => t !== tag);
+
+        const newValue = {...extraValue, tags} as AlttuelBlockProps;
+
+        onChangeExtraValueHandler(newValue);
     }
 
     return (
@@ -139,130 +194,65 @@ const AlttuelBlock = (props: BlockProps) => {
              className={'w-full'}
              aria-roledescription={'object'}
         >
-            <div style={containerStyle}>
-                {
-                    isView
-                    ? <div style={{position: 'relative'}}>
-                        <Image style={imageStyle}
-                               width={100}
-                               height={100}
-                               src={thumb}
-                               alt={'대표 이미지'}
-                               onMouseEnter={()=> setImgModal(true)}
-                        />
-                        {
-                            imgModal
-                            && <div style={isViewModalStyle}
-                                    onMouseLeave={()=> setImgModal(false)}
-                                    onClick={() => setViewImg(true)}
-                          >
-                                큰 이미지 보기
-                            </div>
-                        }
-                        {
-                            viewImg
-                            && <div style={originImgStyle}>
-                                <Image src={oriImg}
-                                       alt={'원본 이미지'}
-                                       width={700}
-                                       height={700}
-                                       onClick={() => setViewImg(false)}
-                                />
-                            </div>
-
-                        }
-                    </div>
-
-                    : <div style={{position: 'relative'}}>
-                        <img style={imageStyle}
-                           src={thumb}
-                           alt={'대표 이미지'}
-                           onClick={onChangeImageHandler}
-                        />
-                        {
-                            imgLoading
-                            && <div style={loadingStyle}>
-                                <LoadingSpinner size={20}/>
-                            </div>
-                        }
-                    </div>
-                }
-                {
-                    !isView
-                    && <input ref={imageRef}
-                              type={'file'}
-                              multiple={false}
-                              accept={'image/*'}
-                              hidden={true}
-                              disabled={isView || imgLoading}
-                              onChange={onChangeFileHandler}
-                    />
-                }
-
+            <div style={containerStyle(isView ?? false)}>
+               <ImageThumb thumb={thumb}
+                           extraValue={extraValue}
+                           imgViewProps={imgViewProps}
+                           setImgViewProps={setImgViewProps}
+                           oriImg={oriImg}
+                           onChangeImageHandler={onChangeImageHandler}
+                           isView={isView ?? false}
+                           imageRef={imageRef}
+                           onChangeFileHandler={onChangeFileHandler}
+               />
                 <div style={infoContainerStyle}>
-                    {
-                        isView
-                        ? <p style={{...viewCommonPTagStyle , ...titleStyle}}>
-                            상품명 : &nbsp; {value}
-                        </p>
-                        : <input style={inputCommonStyle}
-                                 name={'title'}
-                                 value={value}
-                                 placeholder={'상품 이름'}
-                                 onChange={onChangeHandler}
-                        />
-                    }
-                    {
-                        isView
-                        ? <Link style={{...viewCommonPTagStyle, ...linkStyle}}
-                                href={'https://www.naver.com'}>
-                            링크 : &nbsp; {extraValue?.url ?? '주소없음' }
-                        </Link>
-                        : <input style={inputCommonStyle}
-                                 name={'url'}
-                                 value={extraValue?.url ?? ''}
-                                 onChange={onChangeHandler}
-                                 placeholder={'url 주소를 입력하세요 (ex: https://www.naver.com)'}
-                        />
-                    }
-
+                    <Title isView={isView ?? false}
+                           value={value}
+                           onChangeHandler={onChangeHandler}
+                    />
+                    <SiteLink isView={isView ?? false}
+                              extraValue={extraValue}
+                              onChangeHandler={onChangeHandler}
+                    />
                     <div style={infoDetailContainerStyle}>
+                        <Price isView={isView ?? false}
+                               extraValue={extraValue}
+                               onChangeHandler={onChangeHandler}
+                               addCommasToNumber={addCommasToNumber}
+                        />
+                        <DiscountCode isView={isView ?? false}
+                                      extraValue={extraValue}
+                                      onChangeHandler={onChangeHandler}
+                        />
+                        <DeliveryFee isView={isView ?? false}
+                                        extraValue={extraValue}
+                                        onChangeHandler={onChangeHandler}
+                                        addCommasToNumber={addCommasToNumber}
+                        />
+                    </div>
+                    <div style={tagsContainerStyle}>
                         {
-                            isView
-                            ? <p style={{...viewCommonPTagStyle, ...moneyStyle}}>
-                                가격 : &nbsp; {addCommasToNumber(extraValue?.price ?? 0)}
-                            </p>
-                            : <input style={inputCommonStyle}
-                                     type={'number'}
-                                     name={'price'}
-                                     value={extraValue?.price ?? 0}
-                                     onChange={onChangeHandler}
-                                     placeholder={'금액'}
-                            />
+                            extraValue
+                            && extraValue?.tags
+                            && extraValue?.tags?.length > 0
+                            && <div style={tagsStyle}>
+                                {
+                                    Array.from(extraValue?.tags ?? [])
+                                        .map((tag, index) =>
+                                            <Tag key={index}
+                                                 tag={tag}
+                                                 isView={isView ?? false}
+                                                 onClick={deleteTagHandler}
+                                            />
+                                        )
+                                }
+                          </div>
                         }
                         {
-                            isView
-                            ? <p style={{...viewCommonPTagStyle, ...feeStyle}}>
-                                할인코드 : &nbsp; {extraValue?.discountCode ?? 0}
-                            </p>
-                            : <input style={inputCommonStyle}
-                                     name={'discountCode'}
-                                     value={extraValue?.discountCode ?? 0}
-                                     onChange={onChangeHandler}
-                                     placeholder={'할인코드'}
-                            />
-                        }
-                        {
-                            isView
-                            ? <p style={{...viewCommonPTagStyle, ...feeStyle}}>
-                                배송비 : &nbsp; {addCommasToNumber(extraValue?.deliveryFee ?? 0)}
-                            </p>
-                            : <input style={inputCommonStyle}
-                                     type={'number'}
-                                     name={'deliveryFee'}
-                                     value={extraValue?.deliveryFee ?? 0}
-                                     onChange={onChangeHandler}
-                                     placeholder={'배송비'}
+                            !isView
+                            && <input style={inputCommonStyle}
+                                      placeholder={'최소 2글자, 태그 최대 3개 가능'}
+                                      onKeyUp={addTagHandler}
                             />
                         }
                     </div>
@@ -272,9 +262,307 @@ const AlttuelBlock = (props: BlockProps) => {
     );
 };
 
+const DeliveryFee = ({
+    isView,
+    extraValue,
+    onChangeHandler,
+    addCommasToNumber,
+} : {
+    isView: boolean,
+    extraValue: AlttuelBlockProps,
+    onChangeHandler: (e: ChangeEvent<HTMLInputElement>) => void,
+    addCommasToNumber: (number: number) => string,
+}) => {
+    if(isView) return (
+        <p style={{...viewCommonPTagStyle, ...feeStyle}}>
+            배송비 : &nbsp; {addCommasToNumber(extraValue?.deliveryFee ?? 0)}
+        </p>
+    )
+
+    return (
+        <input style={inputCommonStyle}
+               type={'number'}
+               name={'deliveryFee'}
+               value={extraValue?.deliveryFee ?? 0}
+               onChange={onChangeHandler}
+               placeholder={'배송비'}
+        />
+    )
+}
+
+const DiscountCode = ({
+    isView,
+    extraValue,
+    onChangeHandler,
+} : {
+    isView: boolean,
+    extraValue: AlttuelBlockProps,
+    onChangeHandler: (e: ChangeEvent<HTMLInputElement>) => void,
+}) => {
+    if(isView) return (
+        <p style={{...viewCommonPTagStyle, ...feeStyle}}>
+            할인코드 : &nbsp; {extraValue?.discountCode ?? ''}
+        </p>
+    )
+
+    return (
+        <input style={inputCommonStyle}
+               name={'discountCode'}
+               value={extraValue?.discountCode ?? ''}
+               onChange={onChangeHandler}
+               placeholder={'할인코드'}
+        />
+    )
+}
 
 
+const Price = ({
+    isView,
+    extraValue,
+    onChangeHandler,
+    addCommasToNumber,
+}: {
+    isView: boolean,
+    extraValue: AlttuelBlockProps,
+    onChangeHandler: (e: ChangeEvent<HTMLInputElement>) => void,
+    addCommasToNumber: (number: number) => string,
+}) => {
 
+    if(isView) return (
+        <p style={{...viewCommonPTagStyle, ...moneyStyle}}>
+            가격 : &nbsp; {addCommasToNumber(extraValue?.price ?? 0)}
+        </p>
+    )
+
+    return (
+        <input style={inputCommonStyle}
+               type={'number'}
+               name={'price'}
+               value={extraValue?.price ?? 0}
+               onChange={onChangeHandler}
+               placeholder={'금액'}
+        />
+    )
+}
+
+
+const SiteLink = ({
+    isView,
+    extraValue,
+    onChangeHandler,
+} : {
+    isView: boolean,
+    extraValue: AlttuelBlockProps,
+    onChangeHandler: (e: ChangeEvent<HTMLInputElement>) => void,
+}) => {
+    if(isView) return (
+        <Link style={{...viewCommonPTagStyle, ...linkStyle}}
+              href={extraValue?.url ?? ''}>
+            링크 : &nbsp; {extraValue?.url ?? '주소없음' }
+        </Link>
+    )
+    return (
+        <input style={inputCommonStyle}
+               name={'url'}
+               value={extraValue?.url ?? ''}
+               onChange={onChangeHandler}
+               placeholder={'url 주소를 입력하세요 (ex: https://www.naver.com)'}
+        />
+    )
+}
+
+const Title = ({
+    isView,
+    value,
+    onChangeHandler,
+}: {
+    isView: boolean,
+    value: string,
+    onChangeHandler: (e: ChangeEvent<HTMLInputElement>) => void,
+}) => {
+
+    if(isView) return (
+        <p style={{...viewCommonPTagStyle , ...titleStyle}}>
+            상품명 : &nbsp; {value}
+        </p>
+    )
+
+    return (
+        <input style={inputCommonStyle}
+               name={'title'}
+               value={value}
+               placeholder={'상품 이름'}
+               onChange={onChangeHandler}
+        />
+    )
+
+}
+
+const ImageThumb = ({
+    thumb,
+    extraValue,
+    setImgViewProps,
+    imgViewProps,
+    onChangeImageHandler,
+    oriImg,
+    isView,
+    imageRef,
+    onChangeFileHandler,
+}: {
+    oriImg: string,
+    isView: boolean,
+    thumb: string,
+    extraValue: AlttuelBlockProps,
+    imgViewProps: ImgViewProps,
+    imageRef: React.RefObject<HTMLInputElement>,
+    onChangeImageHandler: () => void
+    setImgViewProps: React.Dispatch<React.SetStateAction<ImgViewProps>>
+    onChangeFileHandler: (e: ChangeEvent<HTMLInputElement>) => void,
+}) => {
+
+    if(!isView)
+        return (
+            <>
+                <div style={{position: 'relative'}}>
+                    <img style={imageStyle}
+                         src={thumb}
+                         alt={'대표 이미지'}
+                         onClick={onChangeImageHandler}
+                    />
+                    {
+                        imgViewProps.imgLoading
+                        && <div style={loadingStyle}>
+                        <LoadingSpinner size={20}/>
+                      </div>
+                    }
+                </div>
+                <input ref={imageRef}
+                       type={'file'}
+                       multiple={false}
+                       accept={'image/*'}
+                       hidden={true}
+                       disabled={isView || imgViewProps.imgLoading}
+                       onChange={onChangeFileHandler}
+                />
+            </>
+        )
+    return (
+        <>
+            <div style={{position: 'relative'}}>
+                <Image style={imageStyle}
+                       width={150}
+                       height={150}
+                       src={thumb}
+                       alt={'대표 이미지'}
+                       onMouseEnter={()=> setImgViewProps(prevState => ({
+                           ...prevState,
+                           imgModal: true
+                       }))}
+                />
+                {
+                    extraValue?.img && imgViewProps.imgModal
+                    && <div style={isViewModalStyle}
+                            onMouseLeave={()=> setImgViewProps(prevState => ({
+                                ...prevState,
+                                imgModal: false
+                            }))}
+                            onClick={() => setImgViewProps(prevState => ({
+                                ...prevState,
+                                viewImg: true
+                            }))}
+                  >
+                    큰 이미지 보기
+                  </div>
+                }
+                {
+                    imgViewProps.viewImg
+                    && <div style={originImgStyle}>
+                    <Image src={oriImg}
+                           alt={'원본 이미지'}
+                           width={700}
+                           height={700}
+                           onClick={()=> setImgViewProps(prevState => ({
+                               ...prevState,
+                               viewImg: false
+                           }))}
+                           onMouseLeave={() => setImgViewProps(prevState => ({
+                               ...prevState,
+                               viewImg: false
+                           }))}
+                    />
+                  </div>
+                }
+            </div>
+        </>
+    )
+}
+
+const Tag = (
+    props
+: {
+    tag: string,
+    isView: boolean,
+    onClick: (tag: string) => void
+}) => {
+    const {tag, isView, onClick} = props;
+    return (
+        <button style={tagStyle}
+                disabled={isView}
+                onClick={()=> onClick(tag)}
+        >
+            {tag}
+            {
+                !isView && <FontAwesomeIcon icon={faXmark}/>
+            }
+        </button>
+    )
+
+}
+
+const tagsContainerStyle: CSSProperties = {
+    display: 'flex',
+    gap: '0.8rem',
+    width: '100%',
+}
+
+const tagsStyle: CSSProperties = {
+    display: 'flex',
+    gap: '0.8rem',
+    fontSize: '0.8rem',
+}
+
+const tagStyle: CSSProperties = {
+    backgroundColor: 'gray',
+    color: 'white',
+    padding: '0.2rem 0.5rem',
+    fontSize: '0.8rem',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.5rem',
+    height: '1.5rem',
+    lineHeight: '1.5rem',
+    fontWeight: '600',
+    letterSpacing: '0.03rem',
+    wordBreak: 'break-all',
+    wordWrap: 'break-word',
+    whiteSpace: 'nowrap',
+    maxWidth: '100%',
+}
+
+
+const containerStyle = (isView: boolean) : CSSProperties => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1rem',
+    width: '100%',
+    border: 'none',
+    outline: 'none',
+    wordBreak: 'break-all',
+    padding: isView ? '' : '1rem',
+    backgroundColor: isView ? '' : 'rgba(230,230,230,0.2)',
+});
 
 const infoContainerStyle: CSSProperties = {
     display: 'flex',
@@ -292,10 +580,10 @@ const infoDetailContainerStyle: CSSProperties = {
 }
 
 const imageStyle: CSSProperties = {
-    width: '100px',
-    minWidth: '100px',
-    height: '100px',
-    minHeight: '100px',
+    width: 150,
+    minWidth: 150,
+    height: 150,
+    minHeight: 150,
     borderRadius: '0.5rem',
     objectFit: 'cover',
 }
@@ -371,17 +659,17 @@ const isViewModalStyle: CSSProperties = {
 }
 
 const originImgStyle: CSSProperties = {
+    alignItems: 'center',
     position: 'absolute',
     left: 0,
     top: 0,
     zIndex: 99,
-    width: 600,
-    height: 600,
+    width: 700,
+    height: 'auto',
     padding: '0.6rem',
     backgroundColor: 'white',
     borderRadius: '0.5rem',
     border: '1px solid rgba(100,100,100,0.2)',
-    animation: 'fadeIn 0.5s',
     boxShadow: '0 0 10px rgba(0,0,0,0.2)',
 }
 

@@ -1,6 +1,7 @@
 package com.anamensis.server.controller;
 
 import com.anamensis.server.dto.FileHashRecord;
+import com.anamensis.server.dto.request.FileRequest;
 import com.anamensis.server.entity.File;
 import com.anamensis.server.service.FileService;
 import com.anamensis.server.service.UserService;
@@ -43,15 +44,13 @@ public class FileController {
     @PostMapping("content-img")
     public Mono<File> upload(
             @RequestPart("file") FilePart filePart,
-            @RequestPart("fileContent") File fileContent
+            @RequestPart("fileContent") FileRequest.Upload fileContent
     ) {
         if(!filePart.headers().getContentType().getType().equalsIgnoreCase("image")){
             return Mono.error(new RuntimeException("이미지 파일만 업로드 가능합니다."));
         }
 
         return fileService.insert(filePart, fileContent);
-
-
     }
 
     @GetMapping("/{fileName}")

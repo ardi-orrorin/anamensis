@@ -5,10 +5,7 @@ import com.anamensis.server.dto.*;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.dto.response.LoginHistoryResponse;
 import com.anamensis.server.dto.response.UserResponse;
-import com.anamensis.server.entity.AuthType;
-import com.anamensis.server.entity.EmailVerify;
-import com.anamensis.server.entity.Member;
-import com.anamensis.server.entity.RoleType;
+import com.anamensis.server.entity.*;
 import com.anamensis.server.provider.TokenProvider;
 import com.anamensis.server.resultMap.MemberResultMap;
 import com.anamensis.server.service.*;
@@ -24,6 +21,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 @RequiredArgsConstructor
@@ -38,6 +36,9 @@ public class UserController {
     private final EmailVerifyService emailVerifyService;
     private final TokenProvider tokenProvider;
     private final FileService fileService;
+    private final PointService ps;
+    private final PointHistoryService phs;
+    private final TableCodeService tableCodeService;
 
     @PublicAPI
     @PostMapping("login")
@@ -99,11 +100,46 @@ public class UserController {
             @Valid @RequestBody
             UserRequest.Register user
     ) {
+
+        AtomicReference<Member> member = new AtomicReference<>();
+
         return userService.saveUser(user)
+                .doOnNext(member::set)
                 .flatMap(u -> attendanceService.init(u.getId()))
+                .publishOn(Schedulers.boundedElastic())
                 .then(Mono.fromCallable(() -> UserResponse.Status
                           .transToStatus(HttpStatus.CREATED, "User created"))
-                );
+                )
+                .publishOn(Schedulers.boundedElastic())
+                .doOnNext(s -> {
+                    if(!s.getStatus().equals(HttpStatus.CREATED)) return;
+                    ps.selectByIdOrName("1")
+                        .publishOn(Schedulers.boundedElastic())
+                        .doOnNext(p -> {
+                            userService.updatePoint(member.get().getId(), p.getPoint())
+                                .subscribe();
+                        })
+                        .publishOn(Schedulers.boundedElastic())
+                        .doOnNext(p -> {
+                            tableCodeService.findByIdByTableName(0, "attendance")
+                                .flatMap(t -> {
+                                    PointHistory ph = new PointHistory();
+                                    ph.setMemberPk(member.get().getId());
+                                    ph.setPointCodePk(p.getId());
+                                    ph.setTableCodePk(t.getId());
+                                    ph.setTableRefPk(member.get().getId());
+                                    ph.setCreateAt(LocalDateTime.now());
+                                    return phs.insert(ph);
+                                })
+                                .subscribe();
+                        })
+                        .publishOn(Schedulers.boundedElastic())
+                        .doOnNext(b -> {
+                            userService.findUserInfoCache(member.get().getUserId())
+                                .subscribe();
+                        })
+                        .subscribe();
+                });
     }
 
     @PublicAPI

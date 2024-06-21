@@ -25,7 +25,6 @@ export async function GET(req: NextRequest) {
         setAuthorization: true,
         isReturnData: true,
     })
-    console.log(params)
 
     return ExNextResponse({
         body: JSON.stringify(result),

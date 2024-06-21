@@ -269,6 +269,8 @@ export default function Page() {
                 alert('인증번호가 전송되었습니다.');
             }
             checkTimer();
+        }).catch((e: any) => {
+            alert(e.response.data);
         });
     }
 

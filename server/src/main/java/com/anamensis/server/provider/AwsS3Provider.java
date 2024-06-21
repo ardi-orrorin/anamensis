@@ -27,12 +27,17 @@ public class AwsS3Provider {
 
     private final S3Client s3Client;
 
-    private enum ThumbnailType { PROFILE, CONTENT_THUMBNAIL, ORI }
+    private enum ThumbnailType { PROFILE, CONTENT_THUMBNAIL, ALTTUEL_THUMBNAIL, ORI }
 
     private static final float PROFILE = 0.4f;
     private static final float CONTENT_THUMBNAIL = 0.6f;
+    private static final float ALTTUEL_THUMBNAIL = 0.3f;
 
-    private static final ThumbnailType[] CROP_LIST = { ThumbnailType.PROFILE, ThumbnailType.CONTENT_THUMBNAIL };
+    private static final ThumbnailType[] CROP_LIST = {
+        ThumbnailType.PROFILE,
+        ThumbnailType.CONTENT_THUMBNAIL,
+        ThumbnailType.ALTTUEL_THUMBNAIL
+    };
 
     private Mono<Boolean> saveS3(
         FilePart filePart,
@@ -95,6 +100,10 @@ public class AwsS3Provider {
     }
     public Mono<Boolean> saveOriginal(FilePart filePart, String path, String filename) {
         return this.saveS3(filePart, path, filename, 0, 0, ThumbnailType.ORI);
+    }
+
+    public Mono<Boolean> saveAlttuelThumbnail(FilePart filePart, String path, String filename) {
+        return this.saveS3(filePart, path, filename, 100, 100, ThumbnailType.ALTTUEL_THUMBNAIL);
     }
 
     public Mono<Void> deleteS3(String filePath, String filename) {

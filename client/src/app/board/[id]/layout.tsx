@@ -46,7 +46,12 @@ export default function Page({children, params} : {children: ReactNode, params: 
             location.href = '/board/';
         }
 
-        const list = [{seq: 0, value: '', code: '00005', textStyle: {}, hash: Date.now().toString() + '-0'}];
+
+        const categoryPk = Number(searchParams.get('categoryPk') || 0);
+
+        const code = categoryPk === 4 ? '00301' : '00001';
+
+        const list = [{seq: 0, value: '', code: code, textStyle: {}, hash: Date.now().toString() + '-0'}];
 
         setBoard({
             ...board,

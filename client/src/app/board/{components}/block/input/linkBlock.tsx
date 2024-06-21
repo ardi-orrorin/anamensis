@@ -16,12 +16,14 @@ type OGType = {
 const LinkBlock = (props: BlockProps) => {
     const {
         seq, blockRef,
-        value, extraValue,
+        value,
         isView, hash,
         onChangeValueHandler, onKeyUpHandler,
         onKeyDownHandler, onMouseEnterHandler,
         onFocusHandler, onChangeExtraValueHandler,
     } = props;
+
+    const extraValue = props.extraValue as OGType;
 
     useEffect(() => {
         if(!value?.includes('https://')) onChangeValueHandler!('https://' + value);
@@ -48,7 +50,7 @@ const LinkBlock = (props: BlockProps) => {
         gap             : '0.5rem',
     }
 
-    const onKeyupChangeHandler = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const onKeyDownChangeHandler = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if(e.key !== 'Enter') return ;
 
         const urlRegex = new RegExp(/(http(s)?:\/\/)([a-z0-9\w]+\.*)+[a-z0-9]{2,5}/gi);
@@ -77,12 +79,10 @@ const LinkBlock = (props: BlockProps) => {
                 image: ogImage || '',
             };
 
-            console.log(data)
             onChangeExtraValueHandler!(data);
             // onKeyUpHandler!(e);
 
         } catch (e) {
-            console.log(e)
             alert('링크를 가져오는데 실패했습니다.');
         }
     }
@@ -94,20 +94,18 @@ const LinkBlock = (props: BlockProps) => {
     return (
         <div id={`block-${hash}`}
              className={['w-full'].join(' ')}
-
         >
             {
-                !extraValue || !(extraValue as OGType).title
+                !extraValue || !extraValue.title
                 ? <input style={customInputStyle}
                          value={value}
                          placeholder={'링크를 입력해주세요(https, http 포함). https://www.example.com'}
                          onChange={onChangeHandler}
-                         onKeyUp={onKeyupChangeHandler}
-                         onKeyDown={onKeyDownHandler}
+                         onKeyUp={onKeyUpHandler}
+                         onKeyDown={onKeyDownChangeHandler}
                          onFocus={onFocusHandler}
                          disabled={isView}
                          ref={el => {blockRef!.current[seq] = el}}
-
                 />
                 : <a style={linkPreviewStyle}
                      href={value}
@@ -118,13 +116,13 @@ const LinkBlock = (props: BlockProps) => {
                 >
                     <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'space-between', padding:'0.6rem'}}>
                         <p style={{fontSize: '1.3rem'}}
-                        >{(extraValue as OGType).title || value.split('/')[2]}
+                        >{extraValue.title || value.split('/')[2]}
                         </p>
                         <p style={{fontSize: '0.7rem', wordBreak: 'break-all', color: 'gray'}}
-                        >{(extraValue as OGType).description || '내용 없음'}</p>
+                        >{extraValue.description || '내용 없음'}</p>
                     </div>
                     <img style={{minWidth: '100px', width: '30%', height:'80px', borderRadius: '0.2rem', objectFit: 'cover'}}
-                         src={(extraValue as OGType).image || 'http://' + process.env.NEXT_PUBLIC_DOMAIN + '/noimage.jpg'} alt=""
+                         src={extraValue.image || 'http://' + process.env.NEXT_PUBLIC_DOMAIN + '/noimage.jpg'} alt=""
                     />
                 </a>
             }

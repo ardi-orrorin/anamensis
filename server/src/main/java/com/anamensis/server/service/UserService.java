@@ -97,7 +97,7 @@ public class UserService implements ReactiveUserDetailsService {
                 ));
     }
 
-    public Mono<Boolean> updatePoint(long memberPk, int point) {
+    public Mono<Boolean> updatePoint(long memberPk, long point) {
         if(memberPk == 0) return Mono.error(new RuntimeException("User not found"));
         if(point <= 0) return Mono.error(new RuntimeException("Point must be greater than 0"));
         return Mono.fromCallable(() -> memberMapper.updatePoint(memberPk, point) > 0)

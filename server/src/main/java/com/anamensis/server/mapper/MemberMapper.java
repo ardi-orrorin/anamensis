@@ -30,7 +30,7 @@ public interface MemberMapper {
 
     int updatePoint(
             @Param("id") long id,
-            @Param("point") int point
+            @Param("point") long point
     );
 
     int updatePwd (

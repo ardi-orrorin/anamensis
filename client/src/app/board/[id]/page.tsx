@@ -36,7 +36,6 @@ export default function Page({params}: {params : {id: string}}) {
     const {
         board, setBoard
         , rateInfo, setRateInfo
-        , setComment
     } = useContext(BoardProvider);
 
     const {
@@ -45,7 +44,7 @@ export default function Page({params}: {params : {id: string}}) {
 
     const {
         loading, setLoading
-        , commentLoading, setCommentLoading
+        , commentLoading
     } = useContext(LoadingProvider);
 
     const {
@@ -60,8 +59,6 @@ export default function Page({params}: {params : {id: string}}) {
     const isNewBoard = useMemo(() => !params.id || params.id === 'new',[params.id]);
 
     const debounce = createDebounce(300);
-
-    const inputDebounce = createDebounce(100);
 
     const defaultBlock:BlockI = {seq: 0, value: '', code: '00005', textStyle: {}, hash: Date.now().toString() + '-0'};
 

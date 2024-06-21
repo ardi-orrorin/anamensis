@@ -17,6 +17,16 @@ const AlttuelBoardComponent = (props: BoardListI) => {
 
     const value = alttuelBlock?.value;
 
+    const money = (value: number) => {
+        if(!value || value === 0) return '무료';
+
+        const money = value
+            .toString()
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        return money + '원';
+    }
+
     return (
         <>
             <HeaderComponent {...props} />
@@ -47,10 +57,10 @@ const AlttuelBoardComponent = (props: BoardListI) => {
                             상품명 : &nbsp; {value}
                         </p>
                         <p className={'text-xs text-red-600'}>
-                            가격: &nbsp; {extraValue?.price ? extraValue?.price + '원' : '무료'}
+                            가격: &nbsp; {money(extraValue?.price)}
                         </p>
                         <p className={'text-xs text-gray-600'}>
-                            배송비: &nbsp; {extraValue?.deliveryFee ? extraValue?.deliveryFee + '원' : '무료'}
+                            배송비: &nbsp; {money(extraValue?.deliveryFee)}
                         </p>
                     </div>
                 </div>

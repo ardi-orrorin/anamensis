@@ -1,12 +1,12 @@
 import InputBlock from "@/app/board/{components}/block/input/InputBlock";
 import {BlockProps} from "@/app/board/{components}/block/type/Types";
-import {faFile, faHeading, faImage, faLink, faList, faQuoteLeft} from "@fortawesome/free-solid-svg-icons";
+import {faHeading, faImage, faLink, faList, faPercent, faQuoteLeft} from "@fortawesome/free-solid-svg-icons";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import FileBlock from "@/app/board/{components}/block/file/fileBlock";
 import LinkBlock from "@/app/board/{components}/block/input/linkBlock";
-import FileFile from "@/app/board/{components}/block/file/fileFile";
 import FileImage from "@/app/board/{components}/block/file/fileImage";
 import CheckBlock from "@/app/board/{components}/block/input/CheckBlock";
+import AlttuelBlock from "@/app/board/{components}/block/extra/alttuelBlock";
 
 export type BlockType = {
     code       : string;
@@ -145,6 +145,16 @@ export const blockTypeList: BlockComponentType[] = [
             ...props,
             Component     : FileImage
         }),
+    },
+    {
+        code              : '00301',
+        tag               : 'alttuel',
+        command           : '/alttuel',
+        label             : 'alttuel',
+        icon              : faPercent,
+        comment           : '알뜰구매',
+        type              : 'object',
+        component         : (props: BlockProps)  => AlttuelBlock(props),
     },
     // {
     //     code              : '00202',

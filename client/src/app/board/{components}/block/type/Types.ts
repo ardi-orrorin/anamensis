@@ -23,3 +23,9 @@ export type BlockProps = {
 export type HtmlElements = HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | HTMLDataElement;
 export type MouseEnterHTMLElements = HTMLImageElement | HTMLInputElement | HTMLAnchorElement | HTMLDivElement | HTMLButtonElement
 export type MouseLeaveHTMLElements = HTMLImageElement | HTMLInputElement | HTMLDivElement
+
+
+export type FileContentType = {
+    tableCodePk: number;
+    categoryPk: number;
+}

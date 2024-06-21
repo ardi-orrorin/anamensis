@@ -2,6 +2,7 @@ package com.anamensis.server.service;
 
 import com.anamensis.server.dto.FileHashRecord;
 import com.anamensis.server.dto.FilePathDto;
+import com.anamensis.server.dto.request.FileRequest;
 import com.anamensis.server.entity.File;
 import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.TableCode;
@@ -72,34 +73,44 @@ public class FileService {
     }
 
 
-    public Mono<File> insert(FilePart filePart, File fileContent) {
+    public Mono<File> insert(FilePart filePart, FileRequest.Upload fileContent) {
         FilePathDto filepath = filePathProvider.getBoardContent(filePart.filename());
 
-        fileContent.setFilePath(filepath.filepath());
-        fileContent.setFileName(filepath.filename());
-        fileContent.setOrgFileName(filePart.filename());
-        fileContent.setCreateAt(LocalDateTime.now());
-        fileContent.setUse(true);
+        File fileEntity = new File();
+        fileEntity.setTableCodePk(fileContent.tableCodePk());
+        fileEntity.setFilePath(filepath.filepath());
+        fileEntity.setFileName(filepath.filename());
+        fileEntity.setOrgFileName(filePart.filename());
+        fileEntity.setCreateAt(LocalDateTime.now());
+        fileEntity.setUse(true);
 
-        int reuslt = fileMapper.insert(fileContent);
+        int reuslt = fileMapper.insert(fileEntity);
 
         if(reuslt == 0) {
             return Mono.error(new RuntimeException("File insert failed"));
         }
 
         if(!"image".equalsIgnoreCase(filePart.headers().getContentType().getType())) {
-            return Mono.just(fileContent);
+            return Mono.just(fileEntity);
         }
 
         String filename = filepath.filename().substring(0, filepath.filename().lastIndexOf("."))
             + "_thumb"
             + filepath.filename().substring(filepath.filename().lastIndexOf("."));
 
-        Mono<Boolean> thumbnail = awsS3Provider.saveThumbnail(filePart, filepath.filepath(), filename);
+        Mono<Boolean> thumbnail;
+
+        switch ((int) fileContent.categoryPk()) {
+            case 4 -> thumbnail = awsS3Provider.saveAlttuelThumbnail(filePart, filepath.filepath(), filename);
+            case 2 -> thumbnail = awsS3Provider.saveThumbnail(filePart, filepath.filepath(), filename);
+            default -> thumbnail = awsS3Provider.saveThumbnail(filePart, filepath.filepath(), filename);
+        }
+
+
         Mono<Boolean> ori = awsS3Provider.saveOriginal(filePart, filepath.filepath(), filepath.filename());
         return Mono.zip(thumbnail, ori)
             .subscribeOn(Schedulers.boundedElastic())
-            .map(r -> fileContent);
+            .map(r -> fileEntity);
     }
 
     public Mono<String> saveProfile(Member users, FilePart filePart) {

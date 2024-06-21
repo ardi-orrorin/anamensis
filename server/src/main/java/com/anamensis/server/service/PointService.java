@@ -24,10 +24,6 @@ public class PointService {
         return Mono.just(pointCodeMapper.selectAll());
     }
 
-//    public Mono<List<PointCode>> selectByIdOrName(PointCode pointCode) {
-//        return Mono.just(pointCodeMapper.selectByIdOrName(pointCode));
-//    }
-
     public Mono<PointCode> selectByIdOrName(String seq) {
         return Mono.justOrEmpty(pointCodeMapper.selectByIdOrName(0, ATTENDANCE_POINT_CODE_PREFIX + seq))
                 .switchIfEmpty(Mono.error(new RuntimeException("not found")));

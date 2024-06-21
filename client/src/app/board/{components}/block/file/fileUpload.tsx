@@ -3,7 +3,7 @@
 import {CSSProperties, useContext, useRef, useState} from "react";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import axios from "axios";
-import {BlockProps} from "@/app/board/{components}/block/type/Types";
+import {BlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 
 export type FileUploadProps = {
@@ -81,8 +81,9 @@ export default function FileUpload (props: FileUploadProps) {
     }
 
     const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>, formData: FormData, file: File) => {
-        const fileContent = {
-            tableCodePk: 2
+        const fileContent: FileContentType = {
+            tableCodePk: 2,
+            categoryPk: 0,
         }
 
         const blob = new Blob([JSON.stringify(fileContent)], {type: 'application/json'})

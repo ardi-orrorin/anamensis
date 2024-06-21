@@ -5,6 +5,9 @@ import Link from "next/link";
 import axios from "axios";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
+import {defaultNoImg} from "@/app/{commons}/func/image";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 
 
 type AlttuelBlockProps = {
@@ -29,17 +32,14 @@ const AlttuelBlock = (props: BlockProps) => {
     const [imgLoading, setImgLoading] = useState<boolean>(false);
     const [imgModal, setImgModal] = useState<boolean>(false);
     const [viewImg, setViewImg] = useState<boolean>(false);
+    const [viewImgModal, setViewImgModal] = useState<boolean>(false);
 
     const thumb = useMemo(()=>{
-        return extraValue?.img
-            ? process.env.NEXT_PUBLIC_CDN_SERVER + extraValue.img.replace(/(\.[^.]+)$/, '_thumb$1')
-            : '/noimage.jpg';
+        return defaultNoImg(extraValue?.img?.replace(/(\.[^.]+)$/, '_thumb$1'));
     }, [extraValue?.img])
 
     const oriImg = useMemo(()=>{
-        return extraValue?.img
-            ? process.env.NEXT_PUBLIC_CDN_SERVER + extraValue.img
-            : '/noimage.jpg';
+        return defaultNoImg(extraValue?.img);
     }, [extraValue?.img])
 
     const addCommasToNumber = (number: number)  => {
@@ -117,29 +117,14 @@ const AlttuelBlock = (props: BlockProps) => {
         // onChangeExtraValueHandler()
     }
 
-    const onImgOriginalClickHandler = () => {
-        if(!extraValue?.img) return;
-        window.open(process.env.NEXT_PUBLIC_CDN_SERVER + extraValue.img);
-    }
 
-    const containerStyle: CSSProperties = {
-        display: 'flex',
-        alignItems: 'center',
-        gap: '1rem',
-        width: '100%',
-        border: 'none',
-        outline: 'none',
-        wordBreak: 'break-all',
-        padding: '1rem',
-        backgroundColor: isView ? '' : 'rgba(230,230,230,0.2)',
-    }
 
     return (
         <div id={`block-${hash}`}
              className={'w-full'}
              aria-roledescription={'object'}
         >
-            <div style={containerStyle}>
+            <div style={containerStyle(isView ?? false)}>
                 {
                     isView
                     ? <div style={{position: 'relative'}}>
@@ -151,7 +136,7 @@ const AlttuelBlock = (props: BlockProps) => {
                                onMouseEnter={()=> setImgModal(true)}
                         />
                         {
-                            imgModal
+                            extraValue?.img && imgModal
                             && <div style={isViewModalStyle}
                                     onMouseLeave={()=> setImgModal(false)}
                                     onClick={() => setViewImg(true)}
@@ -166,10 +151,10 @@ const AlttuelBlock = (props: BlockProps) => {
                                        alt={'원본 이미지'}
                                        width={700}
                                        height={700}
-                                       onClick={() => setViewImg(false)}
+                                       onClick={()=> setViewImg(false)}
+                                       onMouseLeave={()=> setViewImg(false)}
                                 />
                             </div>
-
                         }
                     </div>
 
@@ -273,8 +258,17 @@ const AlttuelBlock = (props: BlockProps) => {
 };
 
 
-
-
+const containerStyle = (isView: boolean) : CSSProperties => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1rem',
+    width: '100%',
+    border: 'none',
+    outline: 'none',
+    wordBreak: 'break-all',
+    padding: isView ? '' : '1rem',
+    backgroundColor: isView ? '' : 'rgba(230,230,230,0.2)',
+});
 
 const infoContainerStyle: CSSProperties = {
     display: 'flex',
@@ -371,6 +365,7 @@ const isViewModalStyle: CSSProperties = {
 }
 
 const originImgStyle: CSSProperties = {
+    alignItems: 'center',
     position: 'absolute',
     left: 0,
     top: 0,
@@ -381,7 +376,6 @@ const originImgStyle: CSSProperties = {
     backgroundColor: 'white',
     borderRadius: '0.5rem',
     border: '1px solid rgba(100,100,100,0.2)',
-    animation: 'fadeIn 0.5s',
     boxShadow: '0 0 10px rgba(0,0,0,0.2)',
 }
 

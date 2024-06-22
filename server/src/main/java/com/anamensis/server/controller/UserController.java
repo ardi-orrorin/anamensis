@@ -253,6 +253,7 @@ public class UserController {
                     String message = result ? "Success" : "Failed";
                     return Mono.just(UserResponse.Status.transToStatus(status, message));
                 })
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext(s -> {
                     if(!s.getStatus().equals(HttpStatus.OK)) return;
                     userService.addUserInfoCache(userDetails.getUsername());

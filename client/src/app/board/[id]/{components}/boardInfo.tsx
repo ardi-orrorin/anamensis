@@ -18,22 +18,27 @@ const BoardInfo = (props: { board: BoardService }) => {
                 <p>
                     조회수: {boardInfo.viewCount}
                 </p>
-
                 <p>
                     공개 여부 : &nbsp;
                     <span className={`font-bold ${boardInfo.isPublic ? "text-blue-500" : "text-red-500"}`}
                     >{boardInfo.isPublic ? "공개" : "비공개"}
                     </span>
                 </p>
+                <p>
+                    회원 전용 여부 : &nbsp;
+                    <span className={`font-bold ${boardInfo.membersOnly ? "text-yellow-600" : "text-blue-500"}`}
+                    >{boardInfo.membersOnly ? "회원 전용" : "모두"}
+                    </span>
+                </p>
             </div>
-            <div className={"flex gap-2 items-center"}>
+            <div className={"flex flex-col gap-2 justify-between"}>
                 <Image src={defaultProfile(board.data.profileImage)}
                        className={"rounded-full border-2 border-solid border-blue-300"}
-                       width={35}
-                       height={35}
+                       width={50}
+                       height={50}
                        alt={""}
                 />
-                <p className={"font-bold text-sm"}
+                <p className={"font-bold"}
                 >{board.data.writer}</p>
             </div>
 

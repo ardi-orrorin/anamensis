@@ -98,9 +98,15 @@ public class BoardController {
             .flatMap(t -> {
                 BoardResultMap.Board board = t.getT1();
                 Member m = t.getT2();
+
                 if(!board.getBoard().getIsPublic() && m.getId() != board.getBoard().getMemberPk()) {
                     return Mono.error(new AuthorizationException("비공개 게시글입니다.", HttpStatus.FORBIDDEN));
                 }
+
+                if(m.getName() == null &&  board.getBoard().isMembersOnly()) {
+                    return Mono.error(new AuthorizationException("로그인이 필요한 게시글입니다.", HttpStatus.UNAUTHORIZED));
+                }
+
                 return Mono.just(BoardResponse.Content.from(board, m));
             })
             .zipWith(count)

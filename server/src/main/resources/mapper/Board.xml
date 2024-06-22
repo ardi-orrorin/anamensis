@@ -11,10 +11,11 @@
         INSERT INTO board
                (category_pk, title, content,
                 rate, view_count, create_at,
-                member_pk, isAdsense, update_at, is_public)
+                member_pk, isAdsense, update_at,
+                is_public, members_only)
         VALUES (#{categoryPk}, #{title}, #{content, typeHandler=JsonTypeHandler},
                 #{rate}, #{viewCount}, #{createAt},
-                #{memberPk}, #{isAdsense}, #{updateAt}, #{isPublic})
+                #{memberPk}, #{isAdsense}, #{updateAt}, #{isPublic}, #{membersOnly})
     </insert>
     <select id="count" resultType="long">
         SELECT COUNT(*)
@@ -125,6 +126,9 @@
             </if>
             <if test="isPublic != null">
                 is_public    = #{isPublic},
+            </if>
+            <if test="membersOnly != null">
+                members_only = #{membersOnly},
             </if>
                 update_at   = #{updateAt}
         </set>

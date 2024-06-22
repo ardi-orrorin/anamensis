@@ -56,7 +56,7 @@ const AlttuelBoardComponent = (props: BoardListI) => {
                         <p className={'text-sm'}>
                             상품명 : &nbsp; {value}
                         </p>
-                        <p className={'text-xs text-red-600'}>
+                        <p className={'text-xs text-red-600 font-bold'}>
                             가격: &nbsp; {money(extraValue?.price)}
                         </p>
                         <p className={'text-xs text-gray-600'}>

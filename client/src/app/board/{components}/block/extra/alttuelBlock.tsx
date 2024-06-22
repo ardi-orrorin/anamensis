@@ -44,7 +44,7 @@ const AlttuelBlock = (props: BlockProps) => {
         , isView
     }: BlockProps = props;
     const extraValue = props.extraValue as AlttuelBlockProps;
-    const {setWaitUploadFiles, waitUploadFiles, setWaitRemoveFiles} = useContext(TempFileProvider);
+    const {setWaitUploadFiles, setWaitRemoveFiles} = useContext(TempFileProvider);
 
     const imageRef = useRef<HTMLInputElement>(null);
     const [imgViewProps, setImgViewProps] = useState<ImgViewProps>({

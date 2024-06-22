@@ -18,6 +18,7 @@ import {defaultNoImg} from "@/app/{commons}/func/image";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {TAG} from "postcss-selector-parser";
+import apiCall from "@/app/{commons}/func/api";
 
 
 export type AlttuelBlockProps = {
@@ -43,7 +44,7 @@ const AlttuelBlock = (props: BlockProps) => {
         , isView
     }: BlockProps = props;
     const extraValue = props.extraValue as AlttuelBlockProps;
-    const {setWaitUploadFiles} = useContext(TempFileProvider);
+    const {setWaitUploadFiles, waitUploadFiles, setWaitRemoveFiles} = useContext(TempFileProvider);
 
     const imageRef = useRef<HTMLInputElement>(null);
     const [imgViewProps, setImgViewProps] = useState<ImgViewProps>({
@@ -110,27 +111,50 @@ const AlttuelBlock = (props: BlockProps) => {
             imgLoading: true,
         }));
 
-        await axios.post('/api/file/img', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        }).then((res) => {
+        try {
+            const res = await axios.post('/api/file/img', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+
             if(!res.data) return ;
-            setWaitUploadFiles(prevState => [
-                ...prevState,
-                {...res.data}
-            ]);
+
+            if(extraValue?.img) {
+                const filename = extraValue.img.substring(extraValue.img.lastIndexOf('/') + 1);
+
+                await apiCall({
+                    path: '/api/file/delete/filename',
+                    method: 'PUT',
+                    body: {fileUri: extraValue.img},
+                    isReturnData: false,
+                })
+                .then(() => {
+                    setWaitRemoveFiles(prevState =>
+                        [...prevState.filter(file => file.fileName !== filename)]
+                    );
+                })
+
+            } else {
+                setWaitUploadFiles(prevState => [
+                    ...prevState,
+                    {...res.data}
+                ]);
+            }
 
             const url = res.data.filePath + res.data.fileName;
 
             if(!onChangeExtraValueHandler) return;
             onChangeExtraValueHandler({...extraValue, img: url});
-        }).finally(() => {
+
+        } catch (e) {
+            console.error(e);
+        } finally {
             setImgViewProps(prevState => ({
                 ...prevState,
                 imgLoading: false,
             }));
-        });
+        }
     }
 
     const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
@@ -398,6 +422,7 @@ const Title = ({
 
 }
 
+// todo: 이미지 삭제 로직 추가
 const ImageThumb = ({
     thumb,
     extraValue,

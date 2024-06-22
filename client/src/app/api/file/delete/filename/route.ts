@@ -1,8 +1,12 @@
 import {NextRequest, NextResponse} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
 
+type BodyI = {
+    fileUri: string;
+}
+
 export async function PUT(req: NextRequest) {
-    const body = await req.json();
+    const body = await req.json() as BodyI;
 
     const result = await apiCall({
         path: '/api/files/delete/filename',

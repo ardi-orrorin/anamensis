@@ -57,7 +57,7 @@ export default function Page() {
 
             if(roles) setRoles(JSON.parse(roles));
 
-            const condition = res.data.content.length === 0
+            const condition = res.data.content.length < searchParams.size;
 
             condition ? setDynamicPage({...dynamicPage, isEndOfList: true})
                 : setDynamicPage({...dynamicPage, isVisible:false}) ;

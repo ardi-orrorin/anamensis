@@ -86,8 +86,11 @@ const MenuItem = ({
                                 const {
                                     label, code,
                                     comment, command,
-                                    icon
+                                    icon, notAvailDup
                                 } = block;
+
+                                if(notAvailDupCheck(code, board.data?.content)) return;
+
                                 return (
                                     <li key={'blockList'+ index} className={'w-full'}>
                                         <button className={[

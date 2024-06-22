@@ -17,6 +17,7 @@ export interface BoardI {
     uploadFiles?  : number[];
     removeFiles?  : string[];
     isPublic?     : boolean;
+    membersOnly   : boolean;
     searchText?   : string;
 }
 

@@ -18,7 +18,6 @@ import {BlockI, CommentI, ExtraValueI} from "@/app/board/{services}/types";
 import SubObjectMenu from "@/app/board/{components}/SubObjectMenu";
 import {findElement} from "@/app/board/{services}/funcs";
 
-
 type CopyProps = {
     isCopy: boolean;
     seq: string;

@@ -366,6 +366,21 @@ export default function Page({params}: {params : {id: string}}) {
                                     > { board.data.isPublic ? '공개' : '비공개' }
                                   </button>
                                 }
+                                {
+                                    (isNewBoard || !board.isView)
+                                    && <button
+                                    className={[
+                                        'w-16 rounded h-full border-2 py-1 px-3 text-xs duration-300 whitespace-pre',
+                                        board.data.membersOnly
+                                            ? 'text-red-600 border-red-200 hover:bg-red-200 hover:text-white'
+                                            : 'text-blue-600 border-blue-200 hover:bg-blue-200 hover:text-white'
+                                    ].join(' ')}
+                                    onClick={() => {
+                                        setBoard({...board, data: {...board.data, membersOnly: !board.data.membersOnly}});
+                                    }}
+                                  > { board.data.membersOnly ? '회원\n 전용' : '모두' }
+                                  </button>
+                                }
                                 <button
                                     className={'w-14 rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
                                     onClick={() => setFullScreen(!fullScreen)}>

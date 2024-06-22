@@ -16,6 +16,7 @@ export interface BoardListI {
     commentCount : number;
     body?        : BlockI[];
     isPublic     : boolean;
+    membersOnly  : boolean;
 }
 const BoardComponent = (props: BoardListI) => {
     const {

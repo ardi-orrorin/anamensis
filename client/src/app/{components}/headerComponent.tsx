@@ -8,18 +8,27 @@ const HeaderComponent = (props: BoardListI) => {
     const {
         title, categoryPk
         , isPublic, profileImage
-        , writer
+        , writer, membersOnly
     } = props;
     return (
         <div className={'flex h-[55px] min-h[55px] max-h-[55px] border-b border-solid border-gray-200 justify-between px-3 items-center'}>
             <div className={'h-auto flex flex-col gap-1'}>
                 <span className={'flex gap-2 text-xs text-blue-700'}>
-                    <span>
+                    <span className={''}>
                         {Category.findById(categoryPk)?.name}
                     </span>
-                    <span className={'text-red-600'}>
-                        {isPublic ? '' : '비공개'}
-                    </span>
+                    {
+                        membersOnly
+                        && <span className={'font-bold text-yellow-600'}>
+                           회원
+                        </span>
+                    }
+                    {
+                        !isPublic
+                        && <span className={'font-bold text-red-600'}>
+                           비공개
+                        </span>
+                    }
                 </span>
                 <span className={'text-sm'}>
                     {title}

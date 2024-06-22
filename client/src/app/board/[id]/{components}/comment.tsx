@@ -185,12 +185,16 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
             <div className={'flex w-full'}>
                 {
                     blockSeq
-                        ? <Link className={['w-[30px] flex justify-center items-center text-white',existBlock ? 'bg-blue-400 hover:bg-blue-800 duration-300' : 'bg-red-400 line-through'].join(' ')}
+                        ? existBlock
+                            ? <Link className={'w-[30px] flex justify-center items-center text-white bg-blue-400 hover:bg-blue-800 duration-300'}
                                 href={`${existBlock ? `#block-${blockSeq}` : '' }`}
                                 onClick={()=> setSelectedBlock(blockSeq)}
-                        >
-                            {blockSeq.split('-')[1]}
-                        </Link>
+                            >
+                                {blockSeq.split('-')[1]}
+                            </Link>
+                            : <div className={'w-[30px] flex justify-center items-center text-white bg-red-400 line-through'}>
+                                {blockSeq.split('-')[1]}
+                            </div>
                         : <div className={['w-0 sm:w-[30px]'].join(' ')} />
                 }
                 <div className={'flex flex-col sm:flex-row w-full'}>

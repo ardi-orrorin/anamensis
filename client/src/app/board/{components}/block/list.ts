@@ -7,6 +7,8 @@ import LinkBlock from "@/app/board/{components}/block/input/linkBlock";
 import FileImage from "@/app/board/{components}/block/file/fileImage";
 import CheckBlock from "@/app/board/{components}/block/input/CheckBlock";
 import AlttuelBlock from "@/app/board/{components}/block/extra/alttuelBlock";
+import {faImages} from "@fortawesome/free-solid-svg-icons/faImages";
+import AlbumBlock from "@/app/board/{components}/block/extra/albumBlock";
 
 export type BlockType = {
     code         : string;
@@ -179,5 +181,16 @@ export const blockTypeList: BlockComponentType[] = [
         type              : 'object',
         notAvailDup       : true,
         component         : (props: BlockProps)  => AlttuelBlock(props),
+    },
+    {
+        code              : '00302',
+        tag               : 'album',
+        command           : '/album',
+        label             : 'album',
+        icon              : faImages,
+        comment           : '앨범',
+        type              : 'object',
+        notAvailDup       : true,
+        component         : (props: BlockProps)  => AlbumBlock(props),
     },
 ]

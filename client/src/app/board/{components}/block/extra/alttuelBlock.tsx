@@ -272,6 +272,7 @@ const AlttuelBlock = (props: BlockProps) => {
                                 }
                           </div>
                         }
+
                         {
                             !isView
                             && <input style={inputCommonStyle}

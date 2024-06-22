@@ -37,7 +37,7 @@ export interface BlockI {
 }
 
 export interface ExtraValueI {
-    [key: string] : string | number | boolean | ExtraValueI | string[] | number[] | boolean[];
+    [key: string] : string | number | boolean | ExtraValueI | string[] | number[] | boolean[] | File[];
 }
 
 export type TextStylesType = {

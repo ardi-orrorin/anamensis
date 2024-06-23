@@ -4,6 +4,7 @@ import React, {MutableRefObject, useCallback, useContext, useMemo} from "react";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
 import {ToggleEnum} from "@/app/board/{components}/SubTextMenu";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
+import {notAvailDupCheck} from "@/app/board/{services}/funcs";
 
 const MenuItem = ({
     seq,
@@ -32,6 +33,11 @@ const MenuItem = ({
 
     const openMenuClick = (code: string) => {
         if(!code || code === '') return ;
+
+        if(notAvailDupCheck(code, board.data?.content)) {
+            alert('중복 사용할 수 없는 블록입니다.');
+            return;
+        }
 
         const newList = board.data?.content?.list.map((item, index) => {
             if (item.seq === seq) {
@@ -80,8 +86,11 @@ const MenuItem = ({
                                 const {
                                     label, code,
                                     comment, command,
-                                    icon
+                                    icon, notAvailDup
                                 } = block;
+
+                                if(notAvailDupCheck(code, board.data?.content)) return;
+
                                 return (
                                     <li key={'blockList'+ index} className={'w-full'}>
                                         <button className={[

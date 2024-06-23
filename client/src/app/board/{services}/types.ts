@@ -17,6 +17,7 @@ export interface BoardI {
     uploadFiles?  : number[];
     removeFiles?  : string[];
     isPublic?     : boolean;
+    membersOnly   : boolean;
     searchText?   : string;
 }
 
@@ -36,7 +37,7 @@ export interface BlockI {
 }
 
 export interface ExtraValueI {
-    [key: string] : string | number | boolean | ExtraValueI | string[] | number[] | boolean[];
+    [key: string] : string | number | boolean | ExtraValueI | string[] | number[] | boolean[] | File[];
 }
 
 export type TextStylesType = {
@@ -65,11 +66,12 @@ export class Category {
     public readonly roles: RoleType[];
 
     public static readonly list = [
-        new Category("0", "전체보기", [RoleType.ADMIN, RoleType.USER, RoleType.MASTER, RoleType.GUEST]),
-        new Category("1", "공지게시판", [RoleType.ADMIN, RoleType.MASTER]),
-        new Category("2", "자유게시판", [RoleType.ADMIN, RoleType.USER, RoleType.MASTER]),
+        new Category("0", "전체 보기", [RoleType.ADMIN, RoleType.USER, RoleType.MASTER, RoleType.GUEST]),
+        new Category("1", "공지 게시판", [RoleType.ADMIN, RoleType.MASTER]),
+        new Category("2", "자유 게시판", [RoleType.ADMIN, RoleType.USER, RoleType.MASTER]),
         new Category("3", "Q & A", [RoleType.ADMIN, RoleType.USER, RoleType.MASTER]),
-        new Category("4", "알뜰게시판", [RoleType.ADMIN, RoleType.USER, RoleType.MASTER]),
+        new Category("4", "알뜰 게시판", [RoleType.ADMIN, RoleType.USER, RoleType.MASTER]),
+        new Category("5", "이미지 게시판", [RoleType.ADMIN, RoleType.USER, RoleType.MASTER]),
     ];
 
     constructor(id: string, name: string, roles: RoleType[] = []) {

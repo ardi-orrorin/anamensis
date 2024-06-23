@@ -36,6 +36,7 @@ public class BoardRequest {
         private String[] removeFiles;
         private Boolean isPublic = false;
         private String searchText;
+        private boolean membersOnly;
 
         public Board toEntity() {
             Board board = new Board();
@@ -51,6 +52,7 @@ public class BoardRequest {
             board.setAdsense(isAdsense);
             board.setUse(isUse);
             board.setIsPublic(isPublic);
+            board.setMembersOnly(membersOnly);
             return board;
         }
     }

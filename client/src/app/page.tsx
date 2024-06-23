@@ -12,6 +12,7 @@ import {RoleType} from "@/app/user/system/{services}/types";
 import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
+import {log} from "util";
 
 
 type DynamicPage = {
@@ -37,6 +38,9 @@ export default function Page() {
         size: 20,
     } as BoardListParamsI);
 
+    const moreRef = React.useRef<HTMLDivElement>(null);
+
+
     useEffect(() => {
         setLoading(true);
         !searchParams.add && setData([]);
@@ -53,7 +57,7 @@ export default function Page() {
 
             if(roles) setRoles(JSON.parse(roles));
 
-            const condition = res.data.content.length === 0
+            const condition = res.data.content.length < searchParams.size;
 
             condition ? setDynamicPage({...dynamicPage, isEndOfList: true})
                 : setDynamicPage({...dynamicPage, isVisible:false}) ;
@@ -61,10 +65,32 @@ export default function Page() {
             searchParams.add
              ? setData([...data, ...res.data.content])
              : setData(res.data.content);
+
         })
 
         fetch();
     },[searchParams])
+
+
+    useEffect(()=>{
+        if(!moreRef.current) return;
+
+        const ob = new IntersectionObserver((entries) => {
+            const target = entries[0];
+            if(target.isIntersecting) {
+                setDynamicPage({...dynamicPage, isVisible: true});
+            }
+        });
+
+        ob.observe(moreRef.current as Element);
+        return () => ob.disconnect();
+    },[dynamicPage.isVisible])
+
+    useEffect(() => {
+        if(!dynamicPage.isVisible) return;
+
+        setSearchParams({...searchParams, page: searchParams.page + 1, add: true});
+    },[dynamicPage.isVisible])
 
     const onSearchHandler = (init: boolean) => {
         const initPage = {page: 1, size: 20};
@@ -155,9 +181,8 @@ export default function Page() {
                             loading
                             ? <LoadingSpinner size={20} />
                             : !dynamicPage.isEndOfList
-                                && <button className={'border rounded-full py-2 px-6 hover:text-white hover:bg-blue-300 duration-500'}
-                                           onClick={moreHandler}
-                                >더보기</button>
+                            && !dynamicPage.isVisible
+                            && <div ref={moreRef} className={'w-10 h-10'} />
                         }
                     </div>
                 </div>

@@ -47,6 +47,8 @@ public class BoardResponse {
 
         private Boolean isPublic;
 
+        private boolean membersOnly;
+
         public static List from(BoardResultMap.Board board) {
 
             List.ListBuilder builder = List.builder()
@@ -59,11 +61,10 @@ public class BoardResponse {
                     .commentCount(board.getCommentCount())
                     .categoryPk(board.getBoard().getCategoryPk())
                     .updatedAt(board.getBoard().getUpdateAt())
-                    .isPublic(board.getBoard().getIsPublic());
+                    .isPublic(board.getBoard().getIsPublic())
+                    .membersOnly(board.getBoard().isMembersOnly());
 
             builder.body(board.getBoard().getContent().get("list"));
-
-//            if(board.getFile() == null)  return builder.build();
 
             if (board.getFile().getFilePath() != null) {
                 builder.profileImage(board.getFile().getFilePath() + board.getFile().getFileName());
@@ -103,6 +104,8 @@ public class BoardResponse {
 
         private Boolean isPublic;
 
+        private boolean membersOnly;
+
         public static Content from(BoardResultMap.Board board, Member member) {
             Content.ContentBuilder builder = Content.builder()
                     .id(board.getId())
@@ -113,14 +116,13 @@ public class BoardResponse {
                     .viewCount(board.getBoard().getViewCount())
                     .createdAt(board.getBoard().getCreateAt())
                     .updatedAt(board.getBoard().getUpdateAt())
-                    .isPublic(board.getBoard().getIsPublic());
+                    .isPublic(board.getBoard().getIsPublic())
+                    .membersOnly(board.getBoard().isMembersOnly());
 
             if(member != null) {
                 builder.isWriter(board.getBoard().getMemberPk() == member.getId());
             }
 
-
-//            if(board.getFile() == null)  return builder.build();
 
             if (board.getFile().getFilePath() != null) {
                 builder.profileImage(board.getFile().getFilePath() + board.getFile().getFileName());
@@ -162,6 +164,8 @@ public class BoardResponse {
 
         private Boolean isPublic;
 
+        private boolean membersOnly;
+
         public static ExContent from(Content board, java.util.List<BoardCommentResponse.Comment> comments) {
             ExContent.ExContentBuilder builder = ExContent.builder()
                     .id(board.getId())
@@ -174,7 +178,8 @@ public class BoardResponse {
                     .comments(comments)
                     .profileImage(board.getProfileImage())
                     .updatedAt(board.getUpdatedAt())
-                    .isPublic(board.getIsPublic());
+                    .isPublic(board.getIsPublic())
+                    .membersOnly(board.isMembersOnly());
 
             return builder.build();
         }

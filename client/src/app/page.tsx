@@ -12,7 +12,6 @@ import {RoleType} from "@/app/user/system/{services}/types";
 import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
-import {log} from "util";
 
 
 type DynamicPage = {
@@ -39,7 +38,6 @@ export default function Page() {
     } as BoardListParamsI);
 
     const moreRef = React.useRef<HTMLDivElement>(null);
-
 
     useEffect(() => {
         setLoading(true);
@@ -76,17 +74,20 @@ export default function Page() {
         if(!moreRef.current) return;
 
         const ob = new IntersectionObserver((entries) => {
+
             const target = entries[0];
             if(target.isIntersecting) {
                 setDynamicPage({...dynamicPage, isVisible: true});
             }
         });
 
+
         ob.observe(moreRef.current as Element);
         return () => ob.disconnect();
-    },[dynamicPage.isVisible])
+    },[moreRef?.current]);
 
     useEffect(() => {
+        if(initLoading) return;
         if(!dynamicPage.isVisible) return;
 
         setSearchParams({...searchParams, page: searchParams.page + 1, add: true});

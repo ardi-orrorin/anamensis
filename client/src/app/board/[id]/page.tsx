@@ -21,7 +21,7 @@ import BlockProvider from "@/app/board/{services}/BlockProvider";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import KeyDownEvent from "@/app/board/{services}/keyDownEvent";
-import {listSort} from "@/app/board/{services}/funcs";
+import {deleteImage, listSort, notAvailDupCheck} from "@/app/board/{services}/funcs";
 
 export interface RateInfoI {
     id      : number;
@@ -63,7 +63,7 @@ export default function Page({params}: {params : {id: string}}) {
     const defaultBlock:BlockI = {seq: 0, value: '', code: '00005', textStyle: {}, hash: Date.now().toString() + '-0'};
 
     const shortList = useMemo(()=> (
-        blockTypeList.map(item => ({ command: item.command, code: item.code}))
+        blockTypeList.map(item => ({ command: item.command, code: item.code, notAvailDup : item.notAvailDup}))
     ), []);
 
     useEffect(() => {
@@ -78,6 +78,7 @@ export default function Page({params}: {params : {id: string}}) {
         if(value) {
             block.value = value;
         }
+
         return block;
     };
 
@@ -89,7 +90,14 @@ export default function Page({params}: {params : {id: string}}) {
 
     const onChangeBlockHandler = (e: ChangeEvent<HtmlElements>, seq: number) => {
         const block = shortList.find(item => item.command + ' ' === e.target?.value);
-        if(!block) return false;
+
+        if(!block) return;
+
+        if(notAvailDupCheck(block?.code, board.data?.content)) {
+            alert('중복 사용할 수 없는 블록입니다.');
+            return;
+        }
+
         const newList = board.data?.content?.list.map((item, index) => {
             if (item.seq === seq) {
                 item.code = block.code;
@@ -121,13 +129,11 @@ export default function Page({params}: {params : {id: string}}) {
             // 현재 : 빈 라인 포함 저장
             const bodyContent = board.data.content.list.filter(item => item.value !== '');
 
-
             const textRegex = /^0000\d{1}$/;
 
             const text = board.data.title + ' '
                 + bodyContent.filter(item => textRegex.test(item.code))
                     .map(item => item.value).join(' ');
-
 
             const body: BoardI = {
                 ...board.data,
@@ -249,15 +255,11 @@ export default function Page({params}: {params : {id: string}}) {
 
         if(!fileBlock) return ;
 
-        const fileName = fileBlock.value.split('/')[fileBlock.value.split('/').length - 1];
-        const filePath = fileBlock.value.split('/').slice(0, -1).join('/') + '/';
 
-        setWaitUploadFiles(prevState => {
-            return prevState.filter(item => item.fileName !== fileName);
-        });
-
-        setWaitRemoveFiles(prevState => {
-            return [...prevState, {id: 0, fileName, filePath}];
+        deleteImage({
+            absolutePath: fileBlock.value,
+            setWaitUploadFiles,
+            setWaitRemoveFiles
         });
 
         if(!isNewBoard) return;
@@ -358,6 +360,21 @@ export default function Page({params}: {params : {id: string}}) {
                                             setBoard({...board, data: {...board.data, isPublic: !board.data.isPublic}});
                                         }}
                                     > { board.data.isPublic ? '공개' : '비공개' }
+                                  </button>
+                                }
+                                {
+                                    (isNewBoard || !board.isView)
+                                    && <button
+                                    className={[
+                                        'w-16 rounded h-full border-2 py-1 px-3 text-xs duration-300 whitespace-pre',
+                                        board.data.membersOnly
+                                            ? 'text-red-600 border-red-200 hover:bg-red-200 hover:text-white'
+                                            : 'text-blue-600 border-blue-200 hover:bg-blue-200 hover:text-white'
+                                    ].join(' ')}
+                                    onClick={() => {
+                                        setBoard({...board, data: {...board.data, membersOnly: !board.data.membersOnly}});
+                                    }}
+                                  > { board.data.membersOnly ? '회원\n 전용' : '모두' }
                                   </button>
                                 }
                                 <button

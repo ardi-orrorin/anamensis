@@ -102,7 +102,7 @@ public class FileService {
 
         switch ((int) fileContent.categoryPk()) {
             case 4 -> thumbnail = awsS3Provider.saveAlttuelThumbnail(filePart, filepath.filepath(), filename);
-            case 2 -> thumbnail = awsS3Provider.saveThumbnail(filePart, filepath.filepath(), filename);
+            case 5 -> thumbnail = awsS3Provider.saveAlbumThumbnail(filePart, filepath.filepath(), filename);
             default -> thumbnail = awsS3Provider.saveThumbnail(filePart, filepath.filepath(), filename);
         }
 

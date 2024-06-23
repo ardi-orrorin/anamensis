@@ -7,15 +7,18 @@ import LinkBlock from "@/app/board/{components}/block/input/linkBlock";
 import FileImage from "@/app/board/{components}/block/file/fileImage";
 import CheckBlock from "@/app/board/{components}/block/input/CheckBlock";
 import AlttuelBlock from "@/app/board/{components}/block/extra/alttuelBlock";
+import {faImages} from "@fortawesome/free-solid-svg-icons/faImages";
+import AlbumBlock from "@/app/board/{components}/block/extra/albumBlock";
 
 export type BlockType = {
-    code       : string;
-    tag        : string;
-    command    : string;
-    icon       : IconDefinition;
-    label      : string;
-    comment    : string;
-    type       : 'text' | 'object';
+    code         : string;
+    tag          : string;
+    command      : string;
+    icon         : IconDefinition;
+    label        : string;
+    comment      : string;
+    notAvailDup  : boolean;
+    type         : 'text' | 'object';
 }
 
 export type BlockComponentType = BlockType & {
@@ -31,6 +34,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '세션 제목',
         command           : '/h1',
         type              : 'text',
+        notAvailDup       : false,
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '2.4rem',
             fontWeight    : '700',
@@ -46,6 +50,7 @@ export const blockTypeList: BlockComponentType[] = [
         icon              : faHeading,
         comment           : '세션 부제목',
         type              : 'text',
+        notAvailDup       : false,
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '1.8rem',
             fontWeight    : '600',
@@ -61,6 +66,7 @@ export const blockTypeList: BlockComponentType[] = [
         icon              : faHeading,
         comment           : '세션 본문 제목',
         type              : 'text',
+        notAvailDup       : false,
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '1.2rem',
             fontWeight    : '500',
@@ -77,6 +83,7 @@ export const blockTypeList: BlockComponentType[] = [
         icon              : faHeading,
         comment           : '세션 본문 내용',
         type              : 'text',
+        notAvailDup       : false,
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '1rem',
             letterSpacing : '0.03rem',
@@ -91,6 +98,7 @@ export const blockTypeList: BlockComponentType[] = [
         icon              : faHeading,
         comment           : '세션 본문 작은 내용',
         type              : 'text',
+        notAvailDup       : false,
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '0.8rem',
             letterSpacing : '0.03rem',
@@ -105,6 +113,7 @@ export const blockTypeList: BlockComponentType[] = [
         icon              : faQuoteLeft,
         comment           : '인용',
         type              : 'text',
+        notAvailDup       : false,
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '1rem',
             padding       : '1rem 0.5rem 1rem 1.3rem',
@@ -121,6 +130,7 @@ export const blockTypeList: BlockComponentType[] = [
         icon              : faLink,
         comment           : '링크',
         type              : 'object',
+        notAvailDup       : false,
         component         : (props: BlockProps)  => LinkBlock(props),
     },
     {
@@ -131,6 +141,7 @@ export const blockTypeList: BlockComponentType[] = [
         icon              : faList,
         comment           : '할일',
         type              : 'object',
+        notAvailDup       : false,
         component         : (props: BlockProps)  => CheckBlock(props),
     },
     {
@@ -141,20 +152,11 @@ export const blockTypeList: BlockComponentType[] = [
         icon              : faImage,
         comment           : '이미지',
         type              : 'object',
+        notAvailDup       : false,
         component         : (props: BlockProps)  => FileBlock({
             ...props,
             Component     : FileImage
         }),
-    },
-    {
-        code              : '00301',
-        tag               : 'alttuel',
-        command           : '/alttuel',
-        label             : 'alttuel',
-        icon              : faPercent,
-        comment           : '알뜰구매',
-        type              : 'object',
-        component         : (props: BlockProps)  => AlttuelBlock(props),
     },
     // {
     //     code              : '00202',
@@ -169,4 +171,26 @@ export const blockTypeList: BlockComponentType[] = [
     //         Component     : FileFile
     //     }),
     // },
+    {
+        code              : '00301',
+        tag               : 'alttuel',
+        command           : '/alttuel',
+        label             : 'alttuel',
+        icon              : faPercent,
+        comment           : '판매정보',
+        type              : 'object',
+        notAvailDup       : true,
+        component         : (props: BlockProps)  => AlttuelBlock(props),
+    },
+    {
+        code              : '00302',
+        tag               : 'album',
+        command           : '/album',
+        label             : 'album',
+        icon              : faImages,
+        comment           : '앨범',
+        type              : 'object',
+        notAvailDup       : true,
+        component         : (props: BlockProps)  => AlbumBlock(props),
+    },
 ]

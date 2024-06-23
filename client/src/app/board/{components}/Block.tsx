@@ -18,7 +18,6 @@ import {BlockI, CommentI, ExtraValueI} from "@/app/board/{services}/types";
 import SubObjectMenu from "@/app/board/{components}/SubObjectMenu";
 import {findElement} from "@/app/board/{services}/funcs";
 
-
 type CopyProps = {
     isCopy: boolean;
     seq: string;
@@ -153,10 +152,12 @@ export default function Block(props: BlockProps) {
     }
 
     const shareLinkHandler = async (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+        e.preventDefault();
         if(!board.data.isLogin) return;
 
-        e.preventDefault();
+
         if(typeof window === 'undefined') return ;
+        if(!e.currentTarget.textContent) return ;
 
         setIsCopy({isCopy: true, seq: hash});
 
@@ -188,10 +189,8 @@ export default function Block(props: BlockProps) {
         >
             {
                 board.isView
-                && <div className={[
-                    'absolute z-50 -bottom-14 w-72 h-14 flex justify-center items-center bg-white rounded shadow border-l-8 border-solid border-blue-300 duration-200',
-                    isCopy.isCopy ? 'opacity-100' : 'opacity-0',
-                ].join(' ')
+                && isCopy.isCopy
+                && <div className={'absolute z-50 -bottom-14 w-72 h-14 flex justify-center items-center bg-white rounded shadow border-l-8 border-solid border-blue-300 duration-200'
                 }>
                     {`block-${isCopy.seq?.split('-')[1]}`} 댓글 북마크로 복사되었습니다.
                 </div>

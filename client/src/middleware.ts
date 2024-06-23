@@ -12,7 +12,6 @@ export async function middleware(req: NextRequest) {
 
     if(!accessToken && refreshToken) {
         const result = await generateRefreshToken(refreshToken, req.headers.get('User-Agent') || '');
-        const ssl = process.env.NEXT_PUBLIC_SSL === 'TRUE';
 
         const next = NextResponse.next();
 

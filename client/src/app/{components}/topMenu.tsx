@@ -1,13 +1,13 @@
 import {Category} from "@/app/board/{services}/types";
 import {useContext, useEffect, useState} from "react";
-import SearchParamsProvider from "@/app/{services}/SearchParamsProvider";
+import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
 
 const TopMenu = () => {
 
     const {searchParams, setSearchParams} = useContext(SearchParamsProvider);
 
     const onChangeCategory = (value: string) => {
-        setSearchParams({...searchParams, categoryPk: value});
+        setSearchParams({page: 1, size: 20, categoryPk: value} as BoardListParamsI);
     }
 
     return (

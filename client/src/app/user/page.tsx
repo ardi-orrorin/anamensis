@@ -36,7 +36,7 @@ export default function Page() {
                         .filter(e=> !e.open)
                         .map((e, i ) => (
                             <button key={'btn'+i}
-                                    className={'w-[100px] h-10 bg-gray-400 text-white rounded'}
+                                    className={'w-auto px-4 h-10 bg-gray-400 text-sm whitespace-pre-wrap text-white rounded'}
                                     onClick={() => onClickHandler(e.winKey, true)}
                             >
                                 {e.title}
@@ -47,10 +47,10 @@ export default function Page() {
                     windowList.filter(e => !e.open).length > 0
                     ? <button className={'w-[50px] h-10 bg-blue-400 text-white rounded'} onClick={()=> windowToggle(true)}>
                           <FontAwesomeIcon icon={faWindowRestore} />
-                      </button>
+                    </button>
                     : <button className={'w-[50px] h-10 bg-blue-400 text-white rounded'} onClick={()=> windowToggle(false)}>
                           <FontAwesomeIcon icon={faWindowMinimize} />
-                      </button>
+                    </button>
                 }
             </div>
             <div className={'h-full flex gap-4 flex-wrap duration-300'}>

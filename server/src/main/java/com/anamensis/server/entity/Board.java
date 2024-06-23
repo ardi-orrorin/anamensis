@@ -24,4 +24,6 @@ public class Board {
     private boolean isAdsense;
     private boolean isUse;
     private Boolean isPublic;
+    private boolean membersOnly;
+
 }

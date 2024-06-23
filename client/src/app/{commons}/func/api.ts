@@ -14,17 +14,28 @@ export type ApiCallProps = {
     contentType?      : ContentType;
     cookie?           : string;
     isReturnData?     : boolean;
+    timeout?          : number;
 }
 
 async function apiCall<R = any, I = any>(props: ApiCallProps & { isReturnData: true }): Promise<R>;
 async function apiCall<R = any, I = any>(props: ApiCallProps & { isReturnData: false}): Promise<AxiosResponse<R>>;
 async function apiCall<R = any, I = any>(props: ApiCallProps): Promise<AxiosResponse<R>>;
 
+
+/**
+ * apiCall
+ * @param path : url주소
+ *
+ *
+ *
+ */
+
 async function apiCall <R = any, I = any>(props: ApiCallProps): Promise<R | AxiosResponse<R>> {
     const {path, method
         , body, params, call
         , setAuthorization, contentType, cookie
-        , isReturnData} = props;
+        , isReturnData, timeout
+    } = props;
 
     if(!path) Error('path is required');
     if(!method) Error('method is required');
@@ -65,6 +76,11 @@ async function apiCall <R = any, I = any>(props: ApiCallProps): Promise<R | Axio
     } if(method === 'GET' || method === 'DELETE') {
         config.params = params;
     }
+
+    if(timeout) {
+        config.timeout = timeout;
+    }
+
 
     const res = await Axios.request<I, AxiosResponse<R>, I>(config);
     if (isReturnData) return res.data;

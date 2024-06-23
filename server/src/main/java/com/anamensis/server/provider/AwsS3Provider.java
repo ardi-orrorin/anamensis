@@ -27,16 +27,19 @@ public class AwsS3Provider {
 
     private final S3Client s3Client;
 
-    private enum ThumbnailType { PROFILE, CONTENT_THUMBNAIL, ALTTUEL_THUMBNAIL, ORI }
+    private enum ThumbnailType { PROFILE, CONTENT_THUMBNAIL, ALTTUEL_THUMBNAIL, ALBUM_THUMBNAIL, ORI }
 
     private static final float PROFILE = 0.4f;
     private static final float CONTENT_THUMBNAIL = 0.6f;
     private static final float ALTTUEL_THUMBNAIL = 0.3f;
 
+    private static final float ALBUM_THUMBNAIL = 0.7f;
+
     private static final ThumbnailType[] CROP_LIST = {
         ThumbnailType.PROFILE,
         ThumbnailType.CONTENT_THUMBNAIL,
-        ThumbnailType.ALTTUEL_THUMBNAIL
+        ThumbnailType.ALTTUEL_THUMBNAIL,
+        ThumbnailType.ALBUM_THUMBNAIL
     };
 
     private Mono<Boolean> saveS3(
@@ -83,6 +86,8 @@ public class AwsS3Provider {
         switch (thumbnailType) {
             case PROFILE -> builder.outputQuality(PROFILE);
             case CONTENT_THUMBNAIL -> builder.outputQuality(CONTENT_THUMBNAIL);
+            case ALTTUEL_THUMBNAIL -> builder.outputQuality(ALTTUEL_THUMBNAIL);
+            case ALBUM_THUMBNAIL -> builder.outputQuality(ALBUM_THUMBNAIL);
         }
 
         if(Arrays.stream(CROP_LIST).anyMatch(crop -> crop == thumbnailType))
@@ -104,6 +109,10 @@ public class AwsS3Provider {
 
     public Mono<Boolean> saveAlttuelThumbnail(FilePart filePart, String path, String filename) {
         return this.saveS3(filePart, path, filename, 100, 100, ThumbnailType.ALTTUEL_THUMBNAIL);
+    }
+
+    public Mono<Boolean> saveAlbumThumbnail(FilePart filePart, String path, String filename) {
+        return this.saveS3(filePart, path, filename, 500, 500, ThumbnailType.ALBUM_THUMBNAIL);
     }
 
     public Mono<Void> deleteS3(String filePath, String filename) {

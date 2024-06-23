@@ -6,6 +6,5 @@ public class FileRequest {
         long tableCodePk,
 
         long categoryPk
-
     ) {}
 }

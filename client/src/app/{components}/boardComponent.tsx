@@ -3,6 +3,7 @@ import {BlockI} from "@/app/board/{services}/types";
 import React from "react";
 import DefaultBoardComponent from "@/app/{components}/boards/default";
 import AlttuelBoardComponent from "@/app/{components}/boards/alttuel";
+import AlbumBoardComponent from "@/app/{components}/boards/album";
 
 export interface BoardListI {
     id           : string;
@@ -28,6 +29,7 @@ const BoardComponent = (props: BoardListI) => {
         {categoryPk: 2, component: DefaultBoardComponent},
         {categoryPk: 3, component: DefaultBoardComponent},
         {categoryPk: 4, component: AlttuelBoardComponent},
+        {categoryPk: 5, component: AlbumBoardComponent},
     ]
 
     return (

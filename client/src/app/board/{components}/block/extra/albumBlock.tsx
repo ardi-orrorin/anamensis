@@ -2,12 +2,14 @@ import {BlockProps, FileContentType} from "@/app/board/{components}/block/type/T
 import React, {CSSProperties, useContext, useEffect, useRef, useState} from "react";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
-import {faBorderAll, faChevronLeft, faChevronRight, faImage} from "@fortawesome/free-solid-svg-icons";
+import {faBorderAll, faImage} from "@fortawesome/free-solid-svg-icons";
 import AlbumProvider, {AlbumToggleType} from "@/app/board/{components}/block/extra/providers/albumProvier";
 import apiCall from "@/app/{commons}/func/api";
 import {FileContentI} from "@/app/api/file/img/route";
-import {defaultNoImg} from "@/app/{commons}/func/image";
+import ImageView from "@/app/board/{components}/block/extra/{components}/ImageView";
+import Thumbnail from "@/app/board/{components}/block/extra/{components}/thumbnail";
+import Slide from "@/app/board/{components}/block/extra/{components}/slide";
+import {deleteImage} from "@/app/board/{services}/funcs";
 
 export type ImageShowProps = {
     defaultIndex: number;
@@ -71,7 +73,7 @@ const AlbumBlock = (props: BlockProps) => {
 
         const fileContent: FileContentType = {
             tableCodePk: 2,
-            categoryPk: 4,
+            categoryPk: 5,
         }
 
         const uploadedImages: string[] = [];
@@ -88,8 +90,9 @@ const AlbumBlock = (props: BlockProps) => {
 
         for(const file of files) {
             upload(file, fileContent, uploadedImages, size, progress);
-
         }
+
+        e.target.value = '';
     }
 
     const upload = async (file: File, fileContent: FileContentType, uploadedImages: string[], size: number, progress: number[]) => {
@@ -150,16 +153,73 @@ const AlbumBlock = (props: BlockProps) => {
         } as ImageShowProps);
     }
 
-    const containerStyle: CSSProperties = {
-        display: 'flex',
-        width: '100%',
-        flexDirection: 'column',
-        gap: '0.8rem',
+
+    const onChaneDefaultIndexHandler = (index: number) => {
+        if(!onChangeExtraValueHandler) return;
+        onChangeExtraValueHandler({
+            ...extraValue,
+            defaultIndex: index,
+        } as ImageShowProps);
     }
 
+    const deleteImageHandler = async  (absolutePath: string) => {
+        // todo: 오브젝트로 삭제한 내용 수정 저장시 삭제 안됨
+
+        try {
+            const res = await apiCall({
+                path: '/api/file/delete/filename',
+                method: 'PUT',
+                body: {fileUri: absolutePath},
+                contentType: 'application/json',
+            });
+
+            if(!res) return;
+
+            if(!onChangeExtraValueHandler) return;
+
+            const fileName = absolutePath.substring(absolutePath.lastIndexOf('/') + 1);
+            const filePath = absolutePath.substring(0, absolutePath.lastIndexOf('/') + 1);
+
+            onChangeExtraValueHandler({
+                ...extraValue,
+                images: extraValue.images.filter(image => image !== absolutePath),
+            } as ImageShowProps);
+
+
+
+            deleteImage({
+                absolutePath,
+                setWaitUploadFiles,
+                setWaitRemoveFiles,
+            });
+
+
+            setWaitUploadFiles(prevState => {
+                return prevState.filter(item => item.fileName !== fileName);
+            });
+
+
+            setWaitRemoveFiles(prevState => {
+                return [...prevState, {id: 0, fileName, filePath}];
+            });
+
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    const componentProps = {
+        images       : extraValue?.images || [],
+        isView       : isView || false,
+        defaultIndex : extraValue?.defaultIndex ?? 0,
+        deleteImageHandler,
+        onChaneDefaultIndexHandler,
+    }
+
+
     const modes = [
-        {icon: faBorderAll, mode: 'thumbnail', component: <Thumbnail {...extraValue} />},
-        {icon: faImage, mode: 'slide', component: <Slide {...extraValue} />},
+        {icon: faBorderAll, mode: 'thumbnail', component: <Thumbnail {...componentProps}/>},
+        {icon: faImage, mode: 'slide', component: <Slide {...componentProps} />},
     ]
 
     return (
@@ -177,32 +237,32 @@ const AlbumBlock = (props: BlockProps) => {
                     >
                         <p>
                             {
-                                extraValue?.images?.length >= maxImage
-                                ? '이미지 업로드(최대 30개)'
-                                : '이미지 업로드 완료'
+                                uploadProgress.size === uploadProgress.progress
+                                ? '이미지 업로드 완료'
+                                : '이미지 업로드 진행중 (최대 30개)'
                             }
                         </p>
                         {
                             uploadProgress.size > 0
                             && extraValue?.images?.length < maxImage
-                            && <div className={'fled flex-col w-full gap-2'}>
-                            <div className={'w-full h-2 bg-gray-200'}>
-                              <div className={'h-2 bg-blue-400 duration-500 rounded-xl'}
-                                   style={{width: `${(uploadProgress.progress / uploadProgress.size) * 100}%`}}
-                              />
+                            && <div className={'flex flex-col w-full gap-3'}>
+                                <div className={'w-full h-2 bg-gray-200'}>
+                                  <div className={'h-2 bg-blue-400 duration-500 rounded-xl'}
+                                       style={{width: `${(uploadProgress.progress / uploadProgress.size) * 100}%`}}
+                                  />
+                                </div>
+                                <div className={'flex justify-center text-sm'}>
+                                  <span>업로드 중 : {uploadProgress.progress} / {uploadProgress.size}</span>
+                                </div>
+                                <div className={'flex justify-center text-sm'}>
+                                  <span>이미지 개수 : &nbsp;
+                                    <span className={extraValue.images.length < 10 ? 'text-yellow-700' : extraValue.images.length < 20 ? 'text-blue-700' : 'text-red-600'}>
+                                      {extraValue.images.length}
+                                    </span>
+                                    &nbsp; / {maxImage}
+                                  </span>
+                                </div>
                             </div>
-                            <div className={'flex justify-center text-sm'}>
-                              <span>업로드 중 : {uploadProgress.progress} / {uploadProgress.size}</span>
-                            </div>
-                            <div className={'flex justify-center text-sm'}>
-                              <span>이미지 개수 : &nbsp;
-                                <span className={extraValue.images.length < 10 ? 'text-yellow-700' : extraValue.images.length < 20 ? 'text-blue-700' : 'text-red-600'}>
-                                  {extraValue.images.length}
-                                </span>
-                                &nbsp; / {maxImage}
-                              </span>
-                            </div>
-                          </div>
                         }
                     </button>
                     <input type={'file'}
@@ -254,363 +314,13 @@ const AlbumBlock = (props: BlockProps) => {
     )
 }
 
-const Slide = ({
-    images,
-    defaultIndex,
-} : {
-    defaultIndex: number;
-    images: string[];
-}) => {
 
-    const [mouseDownX, setMouseDownX] = useState<number>(0);
-
-    const { setAlbumToggle } = useContext(AlbumProvider);
-    const [selectedIndex, setSelectedIndex] = useState<number>(defaultIndex);
-
-    const containerRef = useRef<HTMLDivElement>(null);
-
-    const [containerPosition, setContainerPosition] = useState<number>(0);
-    const slideWidth = 100;
-    const totalWidth = images.length * slideWidth ;
-
-    const prevSlide = () => {
-
-        if(!containerRef?.current) return;
-
-        const containerWidth = containerRef.current.clientWidth - (containerRef.current.clientWidth % slideWidth);
-        const containerMaxWidth = totalWidth - containerWidth
-        const result =
-        containerPosition + slideWidth <= 0
-        ? containerPosition + slideWidth
-        : -containerMaxWidth;
-
-        setContainerPosition(result);
-    }
-
-    const nextSlide = () => {
-
-        if(!containerRef?.current) return;
-
-        const containerWidth = containerRef.current.clientWidth - (containerRef.current.clientWidth % slideWidth);
-        const containerMaxWidth = totalWidth - containerWidth;
-
-        const result = containerPosition <= -containerMaxWidth
-        ? 0
-        : containerPosition - slideWidth;
-
-        setContainerPosition(result);
-    }
-
-    const prevImage = () => {
-        if(selectedIndex === 0) {
-            setSelectedIndex(images.length - 1);
-        } else {
-            setSelectedIndex(selectedIndex - 1);
-        }
-    }
-
-    const nextImage = () => {
-        if(selectedIndex === images.length - 1) {
-            setSelectedIndex(0);
-        } else {
-            setSelectedIndex(selectedIndex + 1);
-        }
-    }
-
-    const onMouseUpHandler = (e: React.MouseEvent) => {
-
-        if(!containerRef?.current) return;
-        const containerWidth = containerRef.current.clientWidth - (containerRef.current.clientWidth % slideWidth);
-        const containerMaxWidth = totalWidth - containerWidth;
-
-        const cur = containerPosition - (mouseDownX - e.clientX) * 2;
-
-
-        if(cur >= 0) {
-            setContainerPosition(0);
-        } else if(cur < -containerMaxWidth) {
-            setContainerPosition(-containerMaxWidth);
-        } else {
-            setContainerPosition(cur);
-        }
-
-        setMouseDownX(0);
-
-    }
-    const onImageClick = () => {
-        setAlbumToggle({
-            viewImage: images[selectedIndex],
-            viewToggle: true,
-        });
-    }
-
-
-    return (
-        <div className={'flex flex-col gap-2 w-full px-4'}>
-            <div className={'relative flex w-auto justify-center items-center'}>
-                <button className={'absolute left-5 z-10 w-10 h-10 bg-white rounded border border-solid border-gray-200'}
-                        onClick={prevImage}
-                >
-
-                    <FontAwesomeIcon icon={faChevronLeft} />
-                </button>
-                <img className={'h-[400px] sm:h-[800px] rounded-xl object-contain'}
-                     src={process.env.NEXT_PUBLIC_CDN_SERVER + images[selectedIndex]} alt={''}
-                     onClick={onImageClick}
-                />
-                <button className={'absolute right-5 z-10 w-10 h-10 bg-white rounded border border-solid border-gray-200'}
-                        onClick={nextImage}
-                >
-                    <FontAwesomeIcon icon={faChevronRight} />
-                </button>
-            </div>
-            <div className={'relative flex items-center justify-between overflow-hidden duration-500 bg-white rounded-xl'}
-                 ref={containerRef}
-            >
-                <button className={'absolute left-5 z-10 w-10 h-10 bg-white rounded border border-solid border-gray-200'}
-                        onClick={prevSlide}
-                >
-                    <FontAwesomeIcon icon={faChevronLeft} />
-                </button>
-                <div className={'flex duration-500'}
-                     style={{transform: `translateX(${containerPosition}px)`}}
-                     onMouseDown={(e) => {
-                         e.preventDefault();
-                         setMouseDownX(e.clientX);
-                     }}
-                     onMouseUp={onMouseUpHandler}
-                >
-                    {
-                        images?.length > 0
-                        && images?.map((image, index) => {
-                            return (
-                                <img key={'slide' + index}
-                                     className={[
-                                         `w-[${slideWidth}px] max-w-[${slideWidth}px] h-[${slideWidth}px] max-h-[${slideWidth}px] object-cover  border-solid `,
-                                            index === selectedIndex ? 'border-4 border-blue-400' : 'border border-white'
-                                     ].join(' ')}
-                                     src={defaultNoImg(image.replace(/(\.[^.]+)$/, '_thumb$1'))}
-                                     alt={'slide'}
-                                     onClick={() => {
-                                        setSelectedIndex(index);
-                                     }}
-                                     onMouseEnter={() => {
-                                         mouseDownX === 0 && setSelectedIndex(index);
-                                     }}
-                                />
-                            )
-                        })
-                    }
-                </div>
-                <button className={'absolute right-5 z-10 w-10 h-10 bg-white rounded border border-solid border-gray-200'}
-                        onClick={nextSlide}
-                >
-                    <FontAwesomeIcon icon={faChevronRight} />
-                </button>
-            </div>
-        </div>
-    )
+const containerStyle: CSSProperties = {
+    display: 'flex',
+    width: '100%',
+    flexDirection: 'column',
+    gap: '0.8rem',
 }
 
-const Thumbnail = ({
-    images,
-} : {
-    images: string[];
-}) => {
-    const [columns, setColumns] = useState<number>(5);
-    const [columnToggle, setColumnToggle] = useState<boolean>(false);
-    const divRef = useRef<HTMLDivElement>(null);
-    const [divWidth, setDivWidth] = useState<number>(500);
-
-    const { albumToggle, setAlbumToggle } = useContext(AlbumProvider);
-
-    useEffect(()=> {
-        const test = setTimeout(() => {
-            setDivWidth(Number(divRef?.current?.clientWidth));
-        },900);
-
-        return () => {
-            clearTimeout(test);
-        }
-    })
-
-
-    const containerStyle: CSSProperties = {
-        display: 'flex',
-        width: '100%',
-        flexDirection: 'column',
-        position: 'relative',
-    }
-
-    const imagesContainerStyle: CSSProperties = {
-        display: 'grid',
-        gridTemplateColumns: `repeat(${columns}, 1fr)`,
-        border: '2px solid #BFDBFE',
-        width: '100%',
-    }
-
-    const imageStyle = (height: number) : CSSProperties => ({
-        border: '2px solid #BFDBFE',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '100%',
-        objectFit: 'cover',
-        height: `${height}px`,
-    });
-
-    const selectStyle: CSSProperties = {
-        display: 'flex',
-        justifyContent: 'flex-end',
-        width: '100%',
-    }
-
-    return (
-        <div style={containerStyle}
-             ref={divRef}
-        >
-            <div style={selectStyle}>
-                <div className={'relative flex flex-col py-2 text-sm'}>
-                    <button className={'w-24 h-10 bg-white rounded border border-solid border-gray-200'}
-                            onClick={() => setColumnToggle(!columnToggle)}
-                    >크기 : {columns}개</button>
-                    <div className={['absolute flex flex-col top-10 left-0 z-30 w-24  overflow-y-hidden duration-500',
-                        columnToggle ? 'max-h-52 rounded-b-sm shadow-md' : 'max-h-0'
-                    ].join(' ')}>
-                        {
-                            Array.from({length: 4}, (_, index) => {
-                                return (
-                                    <button key={'column' + index}
-                                            className={'w-full bg-white border-y border border-solid border-gray-200 h-10'}
-                                            onClick={() => {
-                                                setColumns(index + 2);
-                                                setColumnToggle(false);
-                                            }}
-                                    >
-                                        {index + 2}
-                                    </button>
-                                )
-                            })
-                        }
-                    </div>
-                </div>
-            </div>
-            <div style={imagesContainerStyle}
-                 className={'transform-gpu'}
-            >
-                {
-                    images?.length > 0
-                    && images?.map((image, index) => {
-                        return (
-                            <img style={imageStyle(divWidth / columns)}
-                                   key={'thumbnail' + index}
-                                   className={'transform-gpu'}
-                                   src={defaultNoImg(image.replace(/(\.[^.]+)$/, '_thumb$1'))}
-                                   alt={'thumbnail'}
-                                   onClick={() => {
-                                       setAlbumToggle({
-                                          viewImage: image,
-                                          viewToggle: true,
-                                       });
-                                   }}
-                            />
-                        )
-                    })
-                }
-            </div>
-
-        </div>
-    )
-}
-
-const ImageView = ({
-    images,
-} : {
-    images: string[];
-}) => {
-
-    const {albumToggle, setAlbumToggle} = useContext(AlbumProvider);
-
-    const prevImage = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-        const index = images.indexOf(albumToggle.viewImage);
-        if(index === 0) {
-            setAlbumToggle({
-                viewImage: images[images.length - 1],
-                viewToggle: true,
-            });
-        } else {
-            setAlbumToggle({
-                viewImage: images[index - 1],
-                viewToggle: true,
-            });
-        }
-    }
-
-    const nextImage = (e: React.MouseEvent) => {
-
-        e.stopPropagation();
-        e.preventDefault();
-
-        const index = images.indexOf(albumToggle.viewImage);
-        if(index === images.length - 1) {
-            setAlbumToggle({
-                viewImage: images[0],
-                viewToggle: true,
-            });
-        } else {
-            setAlbumToggle({
-                viewImage: images[index + 1],
-                viewToggle: true,
-            });
-        }
-    }
-
-    const disableToggleHandler = () => {
-        setAlbumToggle({
-            viewImage: '',
-            viewToggle: false,
-        });
-    }
-
-    return (
-        <>
-            <div className={'z-30 flex justify-center items-center fixed top-0 left-0 w-full h-full'}
-                onClick={disableToggleHandler}
-            >
-                <button className={'z-50 absolute top-5 right-5 w-[40px] h-[40px] bg-white rounded-full'}
-                        onClick={disableToggleHandler}
-                >
-                  <FontAwesomeIcon icon={faXmark} />
-                </button>
-                <img src={process.env.NEXT_PUBLIC_CDN_SERVER + albumToggle.viewImage}
-                     className={'w-auto max-w-[90%] h-auto max-h-[90%] bg-white'}
-                     alt={'view'}
-                     onClick={disableToggleHandler}
-                />
-                <button className={'z-40 fixed top-0 left-0 w-[20%] h-full flex items-center pl-10'}
-                        onClick={prevImage}
-                >
-                  <button className={'z-50 w-[40px] h-[40px] bg-white rounded-full'}
-                          onClick={prevImage}
-                  >
-                    <FontAwesomeIcon icon={faChevronLeft} />
-                  </button>
-                </button>
-                <button className={'z-40 fixed top-0 right-0 w-[20%] h-full flex justify-end items-center pr-10'}
-                        onClick={nextImage}
-                >
-                  <button className={'z-50 w-[40px] h-[40px] bg-white rounded-full'}
-                          onClick={nextImage}
-                  >
-                    <FontAwesomeIcon icon={faChevronRight} />
-                  </button>
-                </button>
-            </div>
-            <div className={'z-10 fixed left-0 top-0 w-full h-full bg-gray-800 opacity-40'} />
-        </>
-    )
-}
 
 export default AlbumBlock;

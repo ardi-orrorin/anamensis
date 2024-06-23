@@ -48,10 +48,16 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
         const categoryPk = Number(searchParams.get('categoryPk') || 0);
 
-        const code = categoryPk === 4 ? '00301' : '00005';
+        const blockCode = (): {code: string, addBlock : boolean} => {
+            switch(categoryPk) {
+                case 4  : return {code: '00301', addBlock: true};
+                case 5  : return {code: '00302', addBlock: true};
+                default : return {code: '00005', addBlock: false};
+            }
+        }
 
-        const list = [{seq: 0, value: '', code: code, textStyle: {}, hash: Date.now().toString() + '-0'}];
-        if(categoryPk === 4) list.push({seq: 1, value: '', code: '00005', textStyle: {}, hash: Date.now().toString() + '-1'});
+        const list = [{seq: 0, value: '', code: blockCode().code, textStyle: {}, hash: Date.now().toString() + '-0'}];
+        blockCode().addBlock && list.push({seq: 1, value: '', code: '00005', textStyle: {}, hash: Date.now().toString() + '-1'});
 
         setBoard({
             ...board,

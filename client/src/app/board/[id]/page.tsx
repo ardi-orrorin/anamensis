@@ -21,7 +21,7 @@ import BlockProvider from "@/app/board/{services}/BlockProvider";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import KeyDownEvent from "@/app/board/{services}/keyDownEvent";
-import {listSort, notAvailDupCheck} from "@/app/board/{services}/funcs";
+import {deleteImage, listSort, notAvailDupCheck} from "@/app/board/{services}/funcs";
 
 export interface RateInfoI {
     id      : number;
@@ -255,15 +255,11 @@ export default function Page({params}: {params : {id: string}}) {
 
         if(!fileBlock) return ;
 
-        const fileName = fileBlock.value.split('/')[fileBlock.value.split('/').length - 1];
-        const filePath = fileBlock.value.split('/').slice(0, -1).join('/') + '/';
 
-        setWaitUploadFiles(prevState => {
-            return prevState.filter(item => item.fileName !== fileName);
-        });
-
-        setWaitRemoveFiles(prevState => {
-            return [...prevState, {id: 0, fileName, filePath}];
+        deleteImage({
+            absolutePath: fileBlock.value,
+            setWaitUploadFiles,
+            setWaitRemoveFiles
         });
 
         if(!isNewBoard) return;

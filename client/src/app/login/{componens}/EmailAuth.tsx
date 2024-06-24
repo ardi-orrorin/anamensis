@@ -3,7 +3,6 @@ import LoginProvider, {LoginI, LoginProviderI} from "@/app/login/{services}/Logi
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import apiCall from "@/app/{commons}/func/api";
 import {LoginType} from "@/app/login/{componens}/Login";
-import {GeoLocationType, getGeoLocation} from "@/app/login/{services}/GeoLocation";
 
 const EmailAuth = () => {
 

@@ -11,7 +11,6 @@ export type GeoLocationType = {
     longitude: number;
 }
 export const getGeoLocation = async (clientIp: string | undefined | null): Promise<GeoLocationType> => {
-    console.log('clientIp:', clientIp)
     const res = await axios.get('https://geolocation-db.com/json/' + (clientIp ?? ''))
         .then((res) => res.data);
 

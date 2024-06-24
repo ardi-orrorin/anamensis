@@ -10,7 +10,7 @@ const DeleteOverlay = ({
 } : {
     index: number;
     image: string;
-    deleteImageHandler: (filename: string) => void;
+    deleteImageHandler: (filename: string, index: number) => void;
     setAlbumToggle: Dispatch<SetStateAction<AlbumToggleType>>;
     onChaneDefaultIndexHandler: (index: number) => void;
 }) => {
@@ -44,7 +44,7 @@ const DeleteOverlay = ({
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        deleteImageHandler(image)
+                        deleteImageHandler(image, index);
                     }}
             >
                 삭제

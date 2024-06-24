@@ -14,7 +14,7 @@ const Thumbnail = ({
     images: string[];
     isView: boolean;
     defaultIndex: number;
-    deleteImageHandler: (filename: string) => void;
+    deleteImageHandler: (filename: string, index: number) => void;
     onChaneDefaultIndexHandler: (index: number) => void;
 }) => {
     const [columns, setColumns] = useState<number>(5);

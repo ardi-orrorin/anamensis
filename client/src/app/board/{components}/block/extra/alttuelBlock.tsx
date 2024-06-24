@@ -1,14 +1,5 @@
 import {BlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
-import React, {
-    ChangeEvent,
-    CSSProperties,
-    KeyboardEventHandler,
-    useContext,
-    useEffect,
-    useMemo,
-    useRef,
-    useState
-} from "react";
+import React, {ChangeEvent, CSSProperties, useContext, useEffect, useMemo, useRef, useState} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import axios from "axios";
@@ -17,7 +8,6 @@ import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {defaultNoImg} from "@/app/{commons}/func/image";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
-import {TAG} from "postcss-selector-parser";
 import apiCall from "@/app/{commons}/func/api";
 
 

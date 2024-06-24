@@ -18,7 +18,7 @@ const AlbumBoardComponent = (props: BoardListI) => {
             <HeaderComponent {...props} />
             <div className={'flex h-auto'}>
                 <img className={'w-full h-[150px] object-cover'}
-                     src={defaultNoImg(extraValue.images[extraValue.defaultIndex])}
+                     src={defaultNoImg(extraValue?.images[extraValue.defaultIndex])}
                      alt={''}
                      onError={(e) => {
                         (e.target as HTMLImageElement).src = process.env.NEXT_PUBLIC_CDN_SERVER + '/noimage.jpg'

@@ -162,9 +162,7 @@ const AlbumBlock = (props: BlockProps) => {
         } as ImageShowProps);
     }
 
-    const deleteImageHandler = async  (absolutePath: string) => {
-        // todo: 오브젝트로 삭제한 내용 수정 저장시 삭제 안됨
-
+    const deleteImageHandler = async  (absolutePath: string, index: number) => {
         try {
             const res = await apiCall({
                 path: '/api/file/delete/filename',
@@ -183,6 +181,7 @@ const AlbumBlock = (props: BlockProps) => {
             onChangeExtraValueHandler({
                 ...extraValue,
                 images: extraValue.images.filter(image => image !== absolutePath),
+                defaultIndex: extraValue.defaultIndex === index ? 0 : extraValue.defaultIndex,
             } as ImageShowProps);
 
 
@@ -215,7 +214,6 @@ const AlbumBlock = (props: BlockProps) => {
         deleteImageHandler,
         onChaneDefaultIndexHandler,
     }
-
 
     const modes = [
         {icon: faBorderAll, mode: 'thumbnail', component: <Thumbnail {...componentProps}/>},

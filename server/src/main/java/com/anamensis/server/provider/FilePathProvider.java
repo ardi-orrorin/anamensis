@@ -6,14 +6,13 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.UUID;
 
 @Component
 public class FilePathProvider {
 
     public FilePathDto getBoardContent(String filename) {
-        String path = "/resource/board/";
+        String path = "/resource/board/" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "/";
         return new FilePathDto(path, getFilename(getExt(filename)));
     }
 

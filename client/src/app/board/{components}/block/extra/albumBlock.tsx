@@ -223,7 +223,10 @@ const AlbumBlock = (props: BlockProps) => {
     return (
         <div id={`block_${hash}`}
              style={containerStyle}
-             aria-roledescription={'object'}
+             aria-roledescription={'extra'}
+             ref={el => {
+                 props!.blockRef!.current[props.seq] = el
+             }}
         >
         <AlbumProvider.Provider value={{albumToggle, setAlbumToggle}}>
             {

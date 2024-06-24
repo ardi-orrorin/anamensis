@@ -330,6 +330,8 @@ export default function Page({params}: {params : {id: string}}) {
         return <GlobalLoadingSpinner />
     }
 
+
+
     return (
         <>
             <div className={'p-5 flex flex-col gap-5 justify-center items-center'}>

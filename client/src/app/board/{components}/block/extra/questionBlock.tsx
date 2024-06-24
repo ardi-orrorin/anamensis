@@ -46,10 +46,11 @@ const QuestionBlock = (props: BlockProps) => {
     return (
         <div className={'flex flex-col gap-2'}
              id={`block_${hash}`}
-             aria-roledescription={'object'}
+             aria-roledescription={'extra'}
+             ref={el => {props!.blockRef!.current[props.seq] = el}}
         >
             {
-                extraValue.state === 'wait'
+                extraValue?.state === 'wait'
                 ? <QWait {...{...extraValue, onChangeHandler}} />
                 : <QCompleted {...{...extraValue, onChangeHandler}}/>
             }

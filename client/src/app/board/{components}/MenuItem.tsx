@@ -90,6 +90,7 @@ const MenuItem = ({
                                 } = block;
 
                                 if(notAvailDupCheck(code, board.data?.content)) return;
+                                if(block.type === 'extra') return;
 
                                 return (
                                     <li key={'blockList'+ index} className={'w-full'}>

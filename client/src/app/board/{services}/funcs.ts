@@ -27,6 +27,8 @@ export const notAvailDupCheck = (code: string, content: BoardContentI) : boolean
     return false;
 }
 
+
+
 export const deleteImage = (props: {
     absolutePath: string,
     setWaitUploadFiles: Dispatch<SetStateAction<TempFileI[]>>,

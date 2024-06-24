@@ -22,6 +22,7 @@ import LoadingProvider from "@/app/board/{services}/LoadingProvider";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import KeyDownEvent from "@/app/board/{services}/keyDownEvent";
 import {deleteImage, listSort, notAvailDupCheck} from "@/app/board/{services}/funcs";
+import {object} from "prop-types";
 
 export interface RateInfoI {
     id      : number;
@@ -247,7 +248,7 @@ export default function Page({params}: {params : {id: string}}) {
 
     const fileDeleteHandler = async (blockList: BlockI[], seq: number) => {
 
-        const fileRegexp = new RegExp('002[0-9]{2}');
+        const fileRegexp = new RegExp('00[2-3][0-9]{2}');
         const fileBlock = blockList.find(item =>
             item.seq === seq && fileRegexp.test(item.code)
         );
@@ -255,23 +256,32 @@ export default function Page({params}: {params : {id: string}}) {
 
         if(!fileBlock) return ;
 
+        const fileRootPath = '/resource/board/'
 
-        deleteImage({
-            absolutePath: fileBlock.value,
-            setWaitUploadFiles,
-            setWaitRemoveFiles
+        const files = Object.keys(fileBlock?.extraValue!).filter(key =>
+            fileBlock.extraValue![key].toString().includes(fileRootPath)
+        ).map(key =>
+            fileBlock.extraValue![key]
+        );
+
+        fileBlock.value.includes('/resource/board/') && files.push(fileBlock.value);
+
+        files.flat().forEach(file => {
+            if(isNewBoard) {
+                apiCall({
+                    path: '/api/file/delete/filename',
+                    method: 'PUT',
+                    body: {fileUri: file as string},
+                    isReturnData: true
+                });
+            } else {
+                deleteImage({
+                    absolutePath: file as string,
+                    setWaitUploadFiles,
+                    setWaitRemoveFiles
+                });
+            }
         });
-
-        if(!isNewBoard) return;
-        if(!fileBlock.value) return;
-
-        await apiCall({
-            path: '/api/file/delete/filename',
-            method: 'PUT',
-            body: {fileUri: fileBlock.value},
-            isReturnData: true
-        });
-
     }
 
     const onChangeTitleHandler = (e: ChangeEvent<HTMLInputElement>) => {

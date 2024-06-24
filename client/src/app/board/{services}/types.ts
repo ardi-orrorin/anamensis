@@ -31,7 +31,8 @@ export interface BlockI {
     seq         : number;
     hash        : string;
     value       : string;
-    extraValue? : ExtraValueI | string | string[] | number | boolean ;
+    // extraValue? : ExtraValueI | string | string[] | number | boolean ;
+    extraValue? : ExtraValueI;
     textStyle?  : TextStylesType;
     code        : string;
 }

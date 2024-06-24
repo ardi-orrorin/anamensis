@@ -40,34 +40,36 @@ export default function Page() {
 
     const moreRef = React.useRef<HTMLDivElement>(null);
 
-    const fetchDebounce = createDebounce(300);
+    const fetchDebounce = createDebounce(500);
 
     useEffect(() => {
         setLoading(true);
         !searchParams.add && setData([]);
-        const fetch = async() => await apiCall<PageResponse<BoardListI>, BoardListParamsI>({
-            path: '/api/board',
-            method: 'GET',
-            params: searchParams
-        })
-        .then(res => {
-            setLoading(false);
-            setInitLoading(false);
+        const fetch = async () => {
+            await apiCall<PageResponse<BoardListI>, BoardListParamsI>({
+                path: '/api/board',
+                method: 'GET',
+                params: searchParams
+            })
+            .then(res => {
+                setLoading(false);
+                setInitLoading(false);
 
-            const roles = res.headers['next.user.roles'] || ''
+                const roles = res.headers['next.user.roles'] || ''
 
-            if(roles) setRoles(JSON.parse(roles));
+                if(roles) setRoles(JSON.parse(roles));
 
-            const condition = res.data.content.length < searchParams.size;
+                const condition = res.data.content.length < searchParams.size;
 
-            condition ? setDynamicPage({...dynamicPage, isEndOfList: true})
-                : setDynamicPage({...dynamicPage, isVisible:false}) ;
+                condition ? setDynamicPage({...dynamicPage, isEndOfList: true})
+                    : setDynamicPage({...dynamicPage, isVisible:false}) ;
 
-            searchParams.add
-             ? setData([...data, ...res.data.content])
-             : setData(res.data.content);
+                searchParams.add
+                    ? setData([...data, ...res.data.content])
+                    : setData(res.data.content);
 
-        })
+            })
+        }
 
         fetch();
     },[searchParams])
@@ -77,7 +79,6 @@ export default function Page() {
         if(!moreRef.current) return;
 
         const ob = new IntersectionObserver((entries) => {
-            console.log(entries)
             const target = entries[0];
             if(target.isIntersecting) {
                 if(initLoading || loading) return;

@@ -12,6 +12,7 @@ import {RoleType} from "@/app/user/system/{services}/types";
 import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
+import {createDebounce} from "@/app/{commons}/func/debounce";
 
 
 type DynamicPage = {
@@ -38,6 +39,8 @@ export default function Page() {
     } as BoardListParamsI);
 
     const moreRef = React.useRef<HTMLDivElement>(null);
+
+    const fetchDebounce = createDebounce(300);
 
     useEffect(() => {
         setLoading(true);
@@ -74,10 +77,14 @@ export default function Page() {
         if(!moreRef.current) return;
 
         const ob = new IntersectionObserver((entries) => {
-
+            console.log(entries)
             const target = entries[0];
             if(target.isIntersecting) {
-                setDynamicPage({...dynamicPage, isVisible: true});
+                if(initLoading || loading) return;
+
+                fetchDebounce(() => {
+                    setSearchParams({...searchParams, page: searchParams.page + 1, add: true});
+                });
             }
         });
 
@@ -86,12 +93,6 @@ export default function Page() {
         return () => ob.disconnect();
     },[moreRef?.current]);
 
-    useEffect(() => {
-        if(initLoading) return;
-        if(!dynamicPage.isVisible) return;
-
-        setSearchParams({...searchParams, page: searchParams.page + 1, add: true});
-    },[dynamicPage.isVisible])
 
     const onSearchHandler = (init: boolean) => {
         const initPage = {page: 1, size: 20};

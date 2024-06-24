@@ -20,7 +20,7 @@ export type BlockType = {
     label        : string;
     comment      : string;
     notAvailDup  : boolean;
-    type         : 'text' | 'object';
+    type         : 'text' | 'object' | 'extra';
 }
 
 export type BlockComponentType = BlockType & {
@@ -180,7 +180,7 @@ export const blockTypeList: BlockComponentType[] = [
         label             : 'alttuel',
         icon              : faPercent,
         comment           : '판매정보',
-        type              : 'object',
+        type              : 'extra',
         notAvailDup       : true,
         component         : (props: BlockProps)  => AlttuelBlock(props),
     },
@@ -191,7 +191,7 @@ export const blockTypeList: BlockComponentType[] = [
         label             : 'album',
         icon              : faImages,
         comment           : '앨범',
-        type              : 'object',
+        type              : 'extra',
         notAvailDup       : true,
         component         : (props: BlockProps)  => AlbumBlock(props),
     },
@@ -202,7 +202,7 @@ export const blockTypeList: BlockComponentType[] = [
         label             : 'question',
         icon              : faCircleQuestion,
         comment           : 'Q/A',
-        type              : 'object',
+        type              : 'extra',
         notAvailDup       : true,
         component         : (props: BlockProps)  => QuestionBlock(props),
     },

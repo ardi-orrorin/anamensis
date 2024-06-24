@@ -84,6 +84,7 @@ const backspace = (args: KeyEventType) => {
     const curRef = blockRef.current[seq] as HTMLInputElement;
 
     if(curRef.selectionStart !== 0) return;
+    if(blockRef?.current[seq - 1]?.ariaRoleDescription === 'extra') return;
 
     event.preventDefault();
     const afterText = curRef.value.substring(curRef.selectionStart!);

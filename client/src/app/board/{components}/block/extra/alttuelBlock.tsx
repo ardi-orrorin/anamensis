@@ -206,7 +206,8 @@ const AlttuelBlock = (props: BlockProps) => {
     return (
         <div id={`block-${hash}`}
              className={'w-full'}
-             aria-roledescription={'object'}
+             aria-roledescription={'extra'}
+             ref={el => {props!.blockRef!.current[props.seq] = el}}
         >
             <div style={containerStyle(isView ?? false)}>
                <ImageThumb thumb={thumb}

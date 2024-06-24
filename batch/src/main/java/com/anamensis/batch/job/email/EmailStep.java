@@ -2,7 +2,7 @@ package com.anamensis.batch.job.email;
 
 import com.anamensis.batch.entity.SmtpPushHistory;
 import com.anamensis.batch.entity.SystemMessage;
-import com.anamensis.batch.entity.UserConfigSmtp;
+import com.anamensis.batch.entity.MemberConfigSmtp;
 import com.anamensis.batch.provider.MailProvider;
 import com.anamensis.batch.service.SystemMessageService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 @Component
@@ -47,7 +46,7 @@ public class EmailStep {
         SystemMessage sm = smService.findByWebSysPk(DEFAULT_WEB_SYS_PK);
 
         return new StepBuilder("email-send-step", jobRepository)
-                .<UserConfigSmtp, Future<SmtpPushHistory>>chunk(1, tm)
+                .<MemberConfigSmtp, Future<SmtpPushHistory>>chunk(1, tm)
                 .reader(myBatisCursorItemReader(null))
                 .processor(userConfigSmtp -> asyncEmailSendProcessor(userConfigSmtp, sm))
                 .writer(this::saveHistory)
@@ -56,9 +55,9 @@ public class EmailStep {
     }
 
     @StepScope
-    private MyBatisCursorItemReader<UserConfigSmtp> myBatisCursorItemReader(@Value("#{jobParameters['ids']}") String ids) {
+    private MyBatisCursorItemReader<MemberConfigSmtp> myBatisCursorItemReader(@Value("#{jobParameters['ids']}") String ids) {
 
-        MyBatisCursorItemReaderBuilder<UserConfigSmtp> builder = new MyBatisCursorItemReaderBuilder<UserConfigSmtp>()
+        MyBatisCursorItemReaderBuilder<MemberConfigSmtp> builder = new MyBatisCursorItemReaderBuilder<MemberConfigSmtp>()
                 .sqlSessionFactory(sqlSessionFactory);
 
         if (ids != null && !ids.equals("")) {
@@ -75,14 +74,14 @@ public class EmailStep {
         return builder.build();
     }
 
-    private Future<SmtpPushHistory> asyncEmailSendProcessor(UserConfigSmtp item, SystemMessage sm) throws Exception {
-        AsyncItemProcessor<UserConfigSmtp, SmtpPushHistory> asyncItemProcessor = new AsyncItemProcessor<>();
+    private Future<SmtpPushHistory> asyncEmailSendProcessor(MemberConfigSmtp item, SystemMessage sm) throws Exception {
+        AsyncItemProcessor<MemberConfigSmtp, SmtpPushHistory> asyncItemProcessor = new AsyncItemProcessor<>();
         asyncItemProcessor.setDelegate(userConfigSmtp -> sendMail(userConfigSmtp, sm));
         asyncItemProcessor.setTaskExecutor(taskExecutor);
         return asyncItemProcessor.process(item);
     }
 
-    private  SmtpPushHistory sendMail(UserConfigSmtp item, SystemMessage sm) {
+    private  SmtpPushHistory sendMail(MemberConfigSmtp item, SystemMessage sm) {
         String subject = sm.getSubject();
         String content = sm.getContent();
 
@@ -94,7 +93,7 @@ public class EmailStep {
 
         SmtpPushHistory smtpPushHistory = new SmtpPushHistory();
         try {
-            smtpPushHistory.setUserPk(item.getUserPk());
+            smtpPushHistory.setUserPk(item.getMemberPk());
             smtpPushHistory.setUserConfigSmtpPk(item.getId());
             smtpPushHistory.setSubject(subject);
             smtpPushHistory.setContent(content);

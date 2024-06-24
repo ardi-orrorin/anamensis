@@ -7,7 +7,7 @@
 
     <insert id="save" parameterType="SmtpPushHistory">
         INSERT INTO smtp_push_history
-               (user_pk, user_config_smtp_pk, subject, content, create_at, status, message)
-        VALUES (#{userPk}, #{userConfigSmtpPk}, #{subject}, #{content}, #{createAt}, #{status}, #{message})
+               (member_pk, member_config_smtp_pk, subject, content, create_at, status, message)
+        VALUES (#{memberPk}, #{memberConfigSmtpPk}, #{subject}, #{content}, #{createAt}, #{status}, #{message})
     </insert>
 </mapper>

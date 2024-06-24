@@ -11,6 +11,8 @@ public interface FileMapper {
 
     List<File> selectDummyFile(LocalDate from, LocalDate to);
 
+    int disabledDummyFile(long id);
+
     int deleteDummyFile(long id);
 
 }

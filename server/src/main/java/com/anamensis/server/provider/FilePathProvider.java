@@ -13,7 +13,7 @@ import java.util.UUID;
 public class FilePathProvider {
 
     public FilePathDto getBoardContent(String filename) {
-        String path = "/resource/board/";
+        String path = "/resource/board/" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "/";
         return new FilePathDto(path, getFilename(getExt(filename)));
     }
 

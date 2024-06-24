@@ -12,9 +12,13 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.integration.async.AsyncItemProcessor;
 import org.springframework.batch.item.Chunk;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -26,9 +30,16 @@ import java.util.concurrent.Future;
 @Slf4j
 public class DummyFileStep {
 
+    @Value("${spring.cloud.aws.s3.bucket}")
+    private String bucket;
+
+    private final S3Client s3Client;
+
     private final SqlSessionFactory sqlSessionFactory;
 
     private final VirtualThreadTaskExecutor taskExecutor;
+
+
 
     public Step dummyFileDeleteStep(JobRepository jobRepository, PlatformTransactionManager tm) {
         return new StepBuilder("dummy-file-delete-step", jobRepository)
@@ -45,7 +56,7 @@ public class DummyFileStep {
                 .sqlSessionFactory(sqlSessionFactory);
 
         Map<String , Object> parameterValues = new HashMap<>();
-        LocalDate to = LocalDate.now().minusDays(1);
+        LocalDate to = LocalDate.now().minusDays(2);
         LocalDate from = to.minusDays(5);
         parameterValues.put("from", from);
         parameterValues.put("to", to);
@@ -59,7 +70,7 @@ public class DummyFileStep {
     private void dummyFileDeleteWriter(Chunk<? extends Future<File>> items) {
         new MyBatisBatchItemWriterBuilder<Future<File>>()
                 .sqlSessionFactory(sqlSessionFactory)
-                .statementId("com.anamensis.batch.mapper.FileMapper.deleteDummyFile")
+                .statementId("com.anamensis.batch.mapper.FileMapper.disabledDummyFile")
                 .itemToParameterConverter(file -> {
                     Map<String, Object> parameter = new HashMap<>();
                     try {
@@ -83,20 +94,23 @@ public class DummyFileStep {
 
     private File dummyFileDelete(File file) {
 
-        java.io.File fileToDelete = new java.io.File(file.filePath() + file.fileName());
+        ObjectIdentifier.Builder image = ObjectIdentifier.builder()
+                .key(file.filePath().substring(1) + file.fileName());
 
-        boolean result = false;
+        String thumbnailFilename = file.fileName().substring(0, file.fileName().lastIndexOf("."))
+            + "_thumb"
+            + file.fileName().substring(file.fileName().lastIndexOf("."));
 
-        if(fileToDelete.exists()) {
-            result = fileToDelete.delete();
-            result = fileToDelete.getParentFile().delete();
-        }
+        ObjectIdentifier.Builder thumbnail = ObjectIdentifier.builder()
+                .key(file.filePath().substring(1) + thumbnailFilename);
 
-//        if(result) {
-//            log.info("DummyFileService.dummyFileDeleteProcessor: fileToDelete.delete() success");
-//        } else {
-//            log.info("DummyFileService.dummyFileDeleteProcessor: fileToDelete.delete() failed");
-//        }
+
+        s3Client.deleteObjects(builder -> builder
+                .bucket(bucket)
+                .delete(delete -> delete
+                    .objects(image.build(), thumbnail.build())
+                )
+        );
 
         return file;
     }

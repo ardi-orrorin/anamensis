@@ -9,6 +9,8 @@ import CheckBlock from "@/app/board/{components}/block/input/CheckBlock";
 import AlttuelBlock from "@/app/board/{components}/block/extra/alttuelBlock";
 import {faImages} from "@fortawesome/free-solid-svg-icons/faImages";
 import AlbumBlock from "@/app/board/{components}/block/extra/albumBlock";
+import {faCircleQuestion} from "@fortawesome/free-solid-svg-icons/faCircleQuestion";
+import QuestionBlock from "@/app/board/{components}/block/extra/questionBlock";
 
 export type BlockType = {
     code         : string;
@@ -192,5 +194,16 @@ export const blockTypeList: BlockComponentType[] = [
         type              : 'object',
         notAvailDup       : true,
         component         : (props: BlockProps)  => AlbumBlock(props),
+    },
+    {
+        code              : '00303',
+        tag               : 'question',
+        command           : '/question',
+        label             : 'question',
+        icon              : faCircleQuestion,
+        comment           : 'Q/A',
+        type              : 'object',
+        notAvailDup       : true,
+        component         : (props: BlockProps)  => QuestionBlock(props),
     },
 ]

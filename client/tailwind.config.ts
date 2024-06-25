@@ -17,7 +17,7 @@ const config: Config = {
         "outset-lg": "0px 1px 8px 0px rgba(0,0,0,0.23)",
       },
       fontSize: {
-        "xs2" : "0.4rem",
+        "xs2" : "0.7rem",
       }
     },
 

@@ -3,7 +3,7 @@ import apiCall from "@/app/{commons}/func/api";
 import {cookies} from "next/headers";
 
 type ExNextResponseType = {
-    body: string,
+    body: any,
     status: number,
     headers?: Headers,
     contentType?: string,

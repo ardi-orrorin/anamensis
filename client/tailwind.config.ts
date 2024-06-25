@@ -20,7 +20,6 @@ const config: Config = {
         "xs2" : "0.7rem",
       }
     },
-
   },
   plugins: [],
 };

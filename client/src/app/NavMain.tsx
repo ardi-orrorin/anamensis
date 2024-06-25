@@ -48,9 +48,7 @@ const NavMain = async () => {
             name: <FontAwesomeIcon className={'w-4'} icon={faRightFromBracket} />,
             url: '/api/logout',
             loginRequired: true,
-
         },
-
     ];
 
     return (

@@ -17,8 +17,6 @@ const QuestionBlock = (props: BlockProps) => {
         , onChangeExtraValueHandler
         , isView,
     }: BlockProps = props;
-    const {board} = useContext(BoardProvider);
-
     const extraValue = props.extraValue as QuestionBlockExtraValueType;
 
     useEffect(()=> {
@@ -35,7 +33,6 @@ const QuestionBlock = (props: BlockProps) => {
     },[])
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // if(!extraValue) return;
         const {name, value} = e.target;
 
         if(!onChangeExtraValueHandler) return;

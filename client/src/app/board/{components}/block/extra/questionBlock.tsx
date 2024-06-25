@@ -1,10 +1,10 @@
 import {BlockProps} from "@/app/board/{components}/block/type/Types";
-import {useContext, useEffect} from "react";
+import {useContext, useEffect, useMemo} from "react";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import moment from "moment";
 
 export type QuestionBlockExtraValueType = {
-    selectId   : number;
+    selectId   : string;
     selectDate : string;
     endDate    : string;
     point      : number;
@@ -22,9 +22,10 @@ const QuestionBlock = (props: BlockProps) => {
     const extraValue = props.extraValue as QuestionBlockExtraValueType;
 
     useEffect(()=> {
+        if(extraValue) return;
         if(!onChangeExtraValueHandler) return;
         onChangeExtraValueHandler({
-            selectId: 0,
+            selectId: '',
             selectDate: '0',
             endDate: moment().add(10,'days').format('YYYY-MM-DD'),
             point: 0,
@@ -32,7 +33,6 @@ const QuestionBlock = (props: BlockProps) => {
         } as QuestionBlockExtraValueType);
 
     },[])
-
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         // if(!extraValue) return;
@@ -133,38 +133,52 @@ const QWait = ({
 const QCompleted = ({
     selectId,
     selectDate,
-    endDate,
-    state,
 } : QuestionBlockExtraValueType
 ) => {
+    const { comment } = useContext(BoardProvider);
+
+    const selectWriter = useMemo(()=>
+        comment.find(item => Number(item.id) === Number(selectId))
+    ,[]);
+
     return (
         <div className={'flex flex-col gap-1 text-sm'}>
-            <div>
-                <label>질문 중</label>
+            <div className={'flex'}>
+                <label className={'flex items-center border-solid border-l-4 border-gray-600 p-2'}>
+                    답변 완료
+                </label>
             </div>
-            <div>
-                <div>
-                    <span>
+            <div className={'flex flex-col gap-1'}>
+                <div className={'flex'}>
+                    <span className={'flex items-center border-solid border-l-4 border-gray-600 px-2'}>
                         답변자 : &nbsp;
                     </span>
-                    <span>
-                        홍길동
+                    <span className={'text-blue-700 font-bold'}>
+                        { selectWriter?.writer ? selectWriter.writer : '미정' }
                     </span>
                 </div>
-                <div>
-                    <span>
+                <div className={'flex'}>
+                    <span className={'flex items-center border-solid border-l-4 border-gray-600 px-2'}>
                         답변일 : &nbsp;
                     </span>
-                    <span>
-                        2021-07-15
+                    <span className={'text-blue-700 font-bold'}>
+                        { moment(selectWriter?.createdAt).format('YYYY년 MM월 DD일') }
                     </span>
                 </div>
-                <div>
-                    <span>
+                <div className={'flex'}>
+                    <span className={'flex items-center border-solid border-l-4 border-gray-600 px-2'}>
                         채택일 : &nbsp;
                     </span>
-                    <span>
-                        2021-07-15
+                    <span className={'text-blue-700 font-bold'}>
+                        { selectDate === '0' ? '미정' : moment(selectDate).format('YYYY년 MM월 DD일') }
+                    </span>
+                </div>
+                <div className={'flex'}>
+                    <span className={'flex items-center border-solid border-l-4 border-gray-600 pl-2'}>
+                        답변내용 : &nbsp;
+                    </span>
+                    <span className={'flex justify-start w-10/12 text-gray-600 line-clamp-1'}>
+                        { selectWriter?.content }
                     </span>
                 </div>
             </div>

@@ -4,6 +4,7 @@ import React from "react";
 import DefaultBoardComponent from "@/app/{components}/boards/default";
 import AlttuelBoardComponent from "@/app/{components}/boards/alttuel";
 import AlbumBoardComponent from "@/app/{components}/boards/album";
+import QuestionBoardComponent from "@/app/{components}/boards/question";
 
 export interface BoardListI {
     id           : string;
@@ -27,7 +28,7 @@ const BoardComponent = (props: BoardListI) => {
     const Components = [
         {categoryPk: 1, component: DefaultBoardComponent},
         {categoryPk: 2, component: DefaultBoardComponent},
-        {categoryPk: 3, component: DefaultBoardComponent},
+        {categoryPk: 3, component: QuestionBoardComponent},
         {categoryPk: 4, component: AlttuelBoardComponent},
         {categoryPk: 5, component: AlbumBoardComponent},
     ]

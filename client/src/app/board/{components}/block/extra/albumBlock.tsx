@@ -30,6 +30,7 @@ const AlbumBlock = (props: BlockProps) => {
     }: BlockProps = props;
 
     const maxImage = 30;
+    const oneFileLength = 5;
     const maxFileSize = 5 * 1024 * 1024;
 
     const extraValue = props.extraValue as ImageShowProps;
@@ -59,13 +60,13 @@ const AlbumBlock = (props: BlockProps) => {
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if(!files) return;
-        if(files.length > 10) {
-            alert('한번에 최대 10개까지 업로드 가능합니다.');
+        if(files.length > oneFileLength) {
+            alert(`한번에 최대 ${oneFileLength}개까지 업로드 가능합니다.`);
             e.currentTarget.value = '';
             return;
         }
         if(files.length + extraValue.images.length > maxImage) {
-            alert('이미지는 최대 30개까지 가능합니다.');
+            alert(`이미지는 최대 ${maxImage}개까지 가능합니다.`);
             return;
         }
 

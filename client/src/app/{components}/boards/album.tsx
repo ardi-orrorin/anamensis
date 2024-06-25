@@ -13,6 +13,7 @@ const AlbumBoardComponent = (props: BoardListI) => {
 
     const extraValue = albumBlock?.extraValue as ImageShowProps;
 
+
     return (
         <>
             <HeaderComponent {...props} />

@@ -10,6 +10,7 @@ export async function GET(req: NextRequest) {
 
     const getCookies = (cookies().get('next.access.token') || cookies().get('next.refresh.token'))?.value !== undefined;
 
+
     try{
        const data = await apiCall<BoardI>({
             path: '/public/api/boards/' + id,
@@ -38,6 +39,9 @@ export async function PUT(req:NextRequest) {
     const data: BoardI = await req.json();
 
     const id = req.nextUrl.pathname.split('/')[req.nextUrl.pathname.split('/').length - 1];
+
+    console.log(data);
+    console.log(id)
 
     const result = await apiCall<StatusResponse, BoardI>({
         path: '/api/boards/' + id,

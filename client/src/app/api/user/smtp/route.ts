@@ -1,7 +1,5 @@
 import {NextRequest, NextResponse} from "next/server";
 import {SmtpI} from "@/app/user/smtp/page";
-import {cookies} from "next/headers";
-import axios from "axios";
 import apiCall from "@/app/{commons}/func/api";
 
 export async function GET(req: NextRequest) {

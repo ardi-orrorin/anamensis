@@ -60,7 +60,7 @@ export default function Block(props: BlockProps) {
         setBlockService({
             ...blockService,
             block,
-            blockMenu: blockMenu,
+            blockMenu,
             screenX: positionX,
             screenY: positionY,
         })
@@ -70,7 +70,10 @@ export default function Block(props: BlockProps) {
         if(e.currentTarget.ariaRoleDescription === 'object') {
             const blockMenu: BlockMenu = 'openObjectMenu';
 
-            const block: BlockI = {seq, code, value, textStyle, hash};
+            const block: BlockI = {
+                seq, code, value
+                , textStyle, hash
+            };
             setBlockService({
                 block,
                 blockMenu: blockMenu,

@@ -52,7 +52,9 @@ export default function InputBase({
     }
 
     return (
-        <div id={`block-${hash}`} style={{display: 'flex', width: '100%'}}>
+        <div id={`block-${hash}`}
+             style={{display: 'flex', width: '100%'}}
+        >
             {
                 isView
                 ? <p style={{...customStyle, backgroundColor: textStyle?.backgroundColor || defaultBg.p}}

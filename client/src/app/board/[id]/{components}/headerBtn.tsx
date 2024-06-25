@@ -8,7 +8,8 @@ type HeaderBtnProps = {
 }
 
 const HeaderBtn = (props: HeaderBtnProps) => {
-    const {isView, isWriter, isLogin
+    const {
+        isView, isWriter, isLogin
         , submitClickHandler, editClickHandler
         , deleteClickHandler
     } = props;
@@ -17,12 +18,12 @@ const HeaderBtn = (props: HeaderBtnProps) => {
         <>
         <div className={"w-auto flex gap-1 justify-end"}>
             {
-                !isView && isLogin &&
-              <button
-                className={"w-16 rounded h-full border-2 border-blue-200 text-blue-400 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300"}
-                onClick={submitClickHandler}
-              >저장
-              </button>
+                !isView
+                && isLogin
+                && <button className={"w-16 rounded h-full border-2 border-blue-200 text-blue-400 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300"}
+                           onClick={submitClickHandler}
+                >저장
+                </button>
             }
             {
                 isWriter

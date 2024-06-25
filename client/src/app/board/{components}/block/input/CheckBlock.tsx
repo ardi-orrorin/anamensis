@@ -1,20 +1,21 @@
 'use client'
 
 import React, {CSSProperties, useMemo} from "react";
-import {BlockProps} from "@/app/board/{components}/block/type/Types";
+import {ExpendBlockProps} from "@/app/board/{components}/block/type/Types";
 
 type TodoType = {
     check : boolean;
 }
-const CheckBlock = (props: BlockProps) => {
+const CheckBlock = (props: ExpendBlockProps) => {
     const {
         seq, blockRef,
         value, extraValue,
         isView, hash,
+        type,
         onChangeValueHandler, onChangeExtraValueHandler,
         onKeyUpHandler, onKeyDownHandler,
         onFocusHandler
-    } = props;
+    }: ExpendBlockProps = props;
 
     const checked = useMemo(()=>(extraValue as TodoType)?.check || false,[extraValue])
 
@@ -83,16 +84,19 @@ const CheckBlock = (props: BlockProps) => {
     }
 
     return (
-        <div id={`block-${hash}`} className={'w-full'}>
+        <div id={`block-${hash}`}
+             className={'w-full'}
+             aria-roledescription={type}
+        >
             <div style={containerStyle}>
                 {
                     !isView
                     ? <input style={{...commonStyle, ...checkBoxStyle}}
-                              type={'checkbox'}
-                              name={'check'}
-                              value={''}
-                              checked={checked || false}
-                              onChange={onCheckChangeHandler}
+                             type={'checkbox'}
+                             name={'check'}
+                             value={''}
+                             checked={checked || false}
+                             onChange={onCheckChangeHandler}
                     />
                     : <p style={{...commonStyle, ...checkBoxViewStyle}}>
                         {checked ? '완료' : '진행중'}
@@ -105,13 +109,13 @@ const CheckBlock = (props: BlockProps) => {
                         {value || ''}
                     </p>
                     : <input style={{...commonStyle, ...inputStyle}}
-                           value={value || ''}
-                           onChange={onChangeHandler}
-                           onKeyUp={onKeyUpHandler}
-                           onKeyDown={onKeyDownHandler}
-                           onFocus={onFocusHandler}
-                           ref={e=> {blockRef!.current[seq] = e}}
-                           aria-roledescription={'todo'}
+                             value={value || ''}
+                             onChange={onChangeHandler}
+                             onKeyUp={onKeyUpHandler}
+                             onKeyDown={onKeyDownHandler}
+                             onFocus={onFocusHandler}
+                             ref={e=> {blockRef!.current[seq] = e}}
+                             aria-roledescription={'todo'}
                     />
                 }
             </div>

@@ -22,13 +22,6 @@ async function apiCall<R = any, I = any>(props: ApiCallProps & { isReturnData: f
 async function apiCall<R = any, I = any>(props: ApiCallProps): Promise<AxiosResponse<R>>;
 
 
-/**
- * apiCall
- * @param path : url주소
- *
- *
- *
- */
 
 async function apiCall <R = any, I = any>(props: ApiCallProps): Promise<R | AxiosResponse<R>> {
     const {path, method

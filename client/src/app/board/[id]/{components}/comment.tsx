@@ -140,7 +140,7 @@ const CommentItem = (props: CommentI) => {
 
     const {board, setBoard} = useContext(BoardProvider);
     const {setSelectedBlock} = useContext(BlockProvider);
-    const {setComment,deleteComment, setDeleteComment} = useContext(BoardProvider);
+    const {deleteComment, setDeleteComment} = useContext(BoardProvider);
     const [loading, setLoading] = useState(false);
     const extraValue = useMemo(()=> {
         return board.data.content.list.find(item => item.code === '00303')?.extraValue as QuestionBlockExtraValueType;
@@ -303,7 +303,6 @@ const CommentItem = (props: CommentI) => {
                     <FontAwesomeIcon icon={faXmark} />
                 </button>
             }
-
         </div>
     )
 

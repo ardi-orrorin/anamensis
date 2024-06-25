@@ -13,9 +13,7 @@ export type QuestionBlockExtraValueType = {
 
 const QuestionBlock = (props: BlockProps) => {
     const {
-        hash, value
-        , onChangeExtraValueHandler
-        , isView,
+        hash, onChangeExtraValueHandler
     }: BlockProps = props;
     const extraValue = props.extraValue as QuestionBlockExtraValueType;
 
@@ -59,8 +57,7 @@ const QWait = ({
     endDate,
     point,
     onChangeHandler,
-} : QuestionBlockExtraValueType
-& {
+} : QuestionBlockExtraValueType & {
     onChangeHandler: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
     const {board} = useContext(BoardProvider);

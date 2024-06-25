@@ -258,9 +258,11 @@ export default function Page({params}: {params : {id: string}}) {
 
         const fileRootPath = '/resource/board/'
 
-        const files = Object.keys(fileBlock?.extraValue!).filter(key =>
+        if(!fileBlock?.extraValue) return ;
+
+        const files = Object?.keys(fileBlock?.extraValue!).filter(key =>
             fileBlock.extraValue![key].toString().includes(fileRootPath)
-        ).map(key =>
+        )?.map(key =>
             fileBlock.extraValue![key]
         );
 

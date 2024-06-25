@@ -99,6 +99,12 @@ export default function Page({params}: {params : {id: string}}) {
             return;
         }
 
+        const findExtraBlock = blockTypeList.filter(item =>
+            item.type === 'extra' && item.code === block.code
+        )
+
+        if(findExtraBlock.length > 0) return ;
+
         const newList = board.data?.content?.list.map((item, index) => {
             if (item.seq === seq) {
                 item.code = block.code;

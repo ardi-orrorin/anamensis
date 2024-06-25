@@ -9,6 +9,8 @@ import CheckBlock from "@/app/board/{components}/block/input/CheckBlock";
 import AlttuelBlock from "@/app/board/{components}/block/extra/alttuelBlock";
 import {faImages} from "@fortawesome/free-solid-svg-icons/faImages";
 import AlbumBlock from "@/app/board/{components}/block/extra/albumBlock";
+import {faCircleQuestion} from "@fortawesome/free-solid-svg-icons/faCircleQuestion";
+import QuestionBlock from "@/app/board/{components}/block/extra/questionBlock";
 
 export type BlockType = {
     code         : string;
@@ -18,7 +20,7 @@ export type BlockType = {
     label        : string;
     comment      : string;
     notAvailDup  : boolean;
-    type         : 'text' | 'object';
+    type         : 'text' | 'object' | 'extra';
 }
 
 export type BlockComponentType = BlockType & {
@@ -178,7 +180,7 @@ export const blockTypeList: BlockComponentType[] = [
         label             : 'alttuel',
         icon              : faPercent,
         comment           : '판매정보',
-        type              : 'object',
+        type              : 'extra',
         notAvailDup       : true,
         component         : (props: BlockProps)  => AlttuelBlock(props),
     },
@@ -189,8 +191,19 @@ export const blockTypeList: BlockComponentType[] = [
         label             : 'album',
         icon              : faImages,
         comment           : '앨범',
-        type              : 'object',
+        type              : 'extra',
         notAvailDup       : true,
         component         : (props: BlockProps)  => AlbumBlock(props),
+    },
+    {
+        code              : '00303',
+        tag               : 'question',
+        command           : '/question',
+        label             : 'question',
+        icon              : faCircleQuestion,
+        comment           : 'Q/A',
+        type              : 'extra',
+        notAvailDup       : true,
+        component         : (props: BlockProps)  => QuestionBlock(props),
     },
 ]

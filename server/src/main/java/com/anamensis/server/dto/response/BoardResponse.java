@@ -112,7 +112,7 @@ public class BoardResponse {
                     .title(board.getBoard().getTitle())
                     .categoryPk(board.getBoard().getCategoryPk())
                     .content(board.getBoard().getContent())
-                    .writer(board.getMember().getName())
+                    .writer(board.getMember().getUserId())
                     .viewCount(board.getBoard().getViewCount())
                     .createdAt(board.getBoard().getCreateAt())
                     .updatedAt(board.getBoard().getUpdateAt())

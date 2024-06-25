@@ -38,6 +38,14 @@ export default function Block(props: BlockProps) {
     const [isCopy, setIsCopy] = useState<CopyProps>({} as CopyProps);
     const [touch, setTouch] = useState(setTimeout(() => false, 0));
 
+    const block = useMemo(() => {
+        return blockTypeList.find(b=> b.code === props.code);
+    },[blockService])
+
+    const Component = useMemo(() => {
+        return block?.component!;
+    },[blockService]);
+
     const onFocusHandler = (e: React.FocusEvent<HtmlElements>) => {
         if(e.currentTarget.ariaRoleDescription !== 'text') {
             return setBlockService({} as BlockService);
@@ -198,47 +206,42 @@ export default function Block(props: BlockProps) {
             {
                 !board.isView
                 && <button className={'w-8 h-full flex justify-center items-center text-gray-600 hover:text-gray-950'}
-                        onClick={onClickAddHandler}
+                           onClick={onClickAddHandler}
                 >
                   <FontAwesomeIcon icon={faPlus} height={20} />
                 </button>
             }
             {
                 !board.isView
+                && block?.type !== 'extra'
                 && <button className={'w-8 h-full flex justify-center items-center text-gray-600 hover:text-gray-950'}
-                        onClick={()=> openMenuToggle()}
+                           onClick={()=> openMenuToggle()}
                 >
                   <FontAwesomeIcon icon={faEllipsisVertical} height={20} />
                 </button>
             }
             <div className={`relative w-full h-full flex items-center rounded`}>
-                {
-                    blockTypeList.filter(b=> b.code === props.code)?.map(c => {
-                        const Component = c.component;
-                        return (
-                            <div key={'blockContainer' + seq} className={'flex flex-col w-full'}>
-                                {
-                                    blockService?.block?.seq === seq
-                                    && c.type === 'object'
-                                    && <SubObjectMenu key={'subMenu' + seq}
-                                                      isView={board.isView}
-                                                      value={value}
-                                                      onClick={onClickObjectMenu}
-                                    />
-                                }
-                                <Component key={'block' + seq}
-                                           isView={board.isView}
-                                           onMouseEnterHandler={onMouseEnterHandler}
-                                           onMouseLeaveHandler={onMouseLeaveHandler}
-                                           onChangeValueHandler={onChangeValueHandler}
-                                           onFocusHandler={onFocusHandler}
-                                           onChangeExtraValueHandler={onChangeExtraValueHandler}
-                                           {...props}
-                                />
-                            </div>
-                        )
-                    })
-                }
+                <div key={'blockContainer' + seq} className={'flex flex-col w-full'}>
+                    {
+                        blockService?.block?.seq === seq
+                        && block?.type === 'object'
+                        && <SubObjectMenu key={'subMenu' + seq}
+                                          isView={board.isView}
+                                          value={value}
+                                          onClick={onClickObjectMenu}
+                        />
+                    }
+                    <Component key={'block' + seq}
+                               isView={board.isView}
+                               onMouseEnterHandler={onMouseEnterHandler}
+                               onMouseLeaveHandler={onMouseLeaveHandler}
+                               onChangeValueHandler={onChangeValueHandler}
+                               onFocusHandler={onFocusHandler}
+                               onChangeExtraValueHandler={onChangeExtraValueHandler}
+                               {...props}
+                    />
+                </div>
+
             </div>
             {
                 !board.isView

@@ -30,6 +30,7 @@ const AlbumBlock = (props: BlockProps) => {
     }: BlockProps = props;
 
     const maxImage = 30;
+    const oneFileLength = 5;
     const maxFileSize = 5 * 1024 * 1024;
 
     const extraValue = props.extraValue as ImageShowProps;
@@ -59,13 +60,13 @@ const AlbumBlock = (props: BlockProps) => {
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if(!files) return;
-        if(files.length > 10) {
-            alert('한번에 최대 10개까지 업로드 가능합니다.');
+        if(files.length > oneFileLength) {
+            alert(`한번에 최대 ${oneFileLength}개까지 업로드 가능합니다.`);
             e.currentTarget.value = '';
             return;
         }
         if(files.length + extraValue.images.length > maxImage) {
-            alert('이미지는 최대 30개까지 가능합니다.');
+            alert(`이미지는 최대 ${maxImage}개까지 가능합니다.`);
             return;
         }
 
@@ -162,9 +163,7 @@ const AlbumBlock = (props: BlockProps) => {
         } as ImageShowProps);
     }
 
-    const deleteImageHandler = async  (absolutePath: string) => {
-        // todo: 오브젝트로 삭제한 내용 수정 저장시 삭제 안됨
-
+    const deleteImageHandler = async  (absolutePath: string, index: number) => {
         try {
             const res = await apiCall({
                 path: '/api/file/delete/filename',
@@ -183,6 +182,7 @@ const AlbumBlock = (props: BlockProps) => {
             onChangeExtraValueHandler({
                 ...extraValue,
                 images: extraValue.images.filter(image => image !== absolutePath),
+                defaultIndex: extraValue.defaultIndex === index ? 0 : extraValue.defaultIndex,
             } as ImageShowProps);
 
 
@@ -216,7 +216,6 @@ const AlbumBlock = (props: BlockProps) => {
         onChaneDefaultIndexHandler,
     }
 
-
     const modes = [
         {icon: faBorderAll, mode: 'thumbnail', component: <Thumbnail {...componentProps}/>},
         {icon: faImage, mode: 'slide', component: <Slide {...componentProps} />},
@@ -225,7 +224,10 @@ const AlbumBlock = (props: BlockProps) => {
     return (
         <div id={`block_${hash}`}
              style={containerStyle}
-             aria-roledescription={'object'}
+             aria-roledescription={'extra'}
+             ref={el => {
+                 props!.blockRef!.current[props.seq] = el
+             }}
         >
         <AlbumProvider.Provider value={{albumToggle, setAlbumToggle}}>
             {

@@ -1,7 +1,7 @@
 import {useContext, useMemo, useState} from "react";
-import {CommentI} from "@/app/board/{services}/types";
+import {BoardI, CommentI} from "@/app/board/{services}/types";
 import Image from "next/image";
-import BoardProvider, {BoardService} from "@/app/board/{services}/BoardProvider";
+import BoardProvider from "@/app/board/{services}/BoardProvider";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faComment} from "@fortawesome/free-solid-svg-icons";
 import apiCall from "@/app/{commons}/func/api";
@@ -11,6 +11,8 @@ import BlockProvider from "@/app/board/{services}/BlockProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {defaultProfile} from "@/app/{commons}/func/image";
 import {mutate} from "swr";
+import {QuestionBlockExtraValueType} from "@/app/board/{components}/block/extra/questionBlock";
+import moment from "moment";
 
 export type SaveComment = {
     boardPk   : string;
@@ -118,7 +120,7 @@ const Comment = () => {
                 {
                     comment.map((item, index) => {
                         return (
-                            <CommentItem key={index} {...item} board={board} />
+                            <CommentItem key={index} {...item} />
                         )
                     })
                 }
@@ -128,18 +130,21 @@ const Comment = () => {
     )
 }
 
-const CommentItem = (props: CommentI & {board: BoardService}) => {
+const CommentItem = (props: CommentI) => {
     const {blockSeq, content
         , writer, profileImage
         , createdAt, children
-        , board , isWriter
+        , isWriter
         , id
     } = props;
 
-
+    const {board, setBoard} = useContext(BoardProvider);
     const {setSelectedBlock} = useContext(BlockProvider);
     const {setComment,deleteComment, setDeleteComment} = useContext(BoardProvider);
     const [loading, setLoading] = useState(false);
+    const extraValue = useMemo(()=> {
+        return board.data.content.list.find(item => item.code === '00303')?.extraValue as QuestionBlockExtraValueType;
+    },[]);
 
     const existBlock = useMemo(()=> {
         return board.data.content.list.find(item => item.hash === blockSeq) !== undefined;
@@ -173,8 +178,75 @@ const CommentItem = (props: CommentI & {board: BoardService}) => {
         setDeleteComment({confirm: false});
     }
 
+    const selectedAnswerHandler = async () => {
+        if(!extraValue) return;
+
+        const bodyContent = board.data.content.list.filter(item => item.value !== '');
+
+        const textRegex = /^0000\d{1}$/;
+
+        const text = board.data.title + ' '
+            + bodyContent.filter(item => textRegex.test(item.code))
+                .map(item => item.value).join(' ');
+
+        const updateBoard : BoardI = {
+            ...board.data,
+            content: {
+                ...board.data.content,
+                list: board.data.content.list.map(item => {
+                    if(item.code === '00303') {
+                        return {
+                            ...item,
+                            extraValue: {
+                                ...extraValue,
+                                selectId: id,
+                                selectDate: moment().format('YYYY-MM-DD HH:mm:ss'),
+                                state: 'completed',
+                            }
+                        }
+                    }
+                    return item;
+                })
+            },
+            searchText: text,
+            removeFiles: [],
+        }
+
+
+        await apiCall<BoardI, BoardI>({
+            path: '/api/board/' + board.data.id,
+            method: 'PUT',
+            body: updateBoard,
+            isReturnData: true,
+        })
+        .then(res => {
+            location.href = '/board/' + board.data.id;
+        })
+    }
+
     return (
         <div className={['relative flex-col flex sm:flex-row w-full justify-start text-sm sm:shadow shadow-md duration-300', deleteComment.id === id && deleteComment.confirm ? 'bg-red-500 text-white' : 'bg-white text-black'].join(' ')}>
+            {
+                board?.data?.categoryPk === 3
+                && board?.data?.isWriter
+                && board.data.writer !== writer
+                && extraValue?.state === 'wait'
+                && <button className={'w-full h-9 sm:w-[40px] sm:h-auto flex justify-center items-center bg-green-400 text-white hover:bg-green-800 duration-300'}
+                           onClick={selectedAnswerHandler}
+              >
+                채택 하기
+              </button>
+            }
+            {
+                board?.data?.categoryPk === 3
+                && extraValue?.state === 'completed'
+                && extraValue?.selectId.toString() === id.toString()
+                && <button className={'w-full h-9 sm:w-[30px] sm:h-auto px-1 flex justify-center items-center bg-yellow-600 text-white duration-300'}
+                           onClick={selectedAnswerHandler}
+              >
+                채택
+              </button>
+            }
             {
                 loading
                 && <div className={'absolute flex justify-center items-center w-full h-full bg-gray-100 opacity-60'}>

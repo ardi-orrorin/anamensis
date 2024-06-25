@@ -1,4 +1,4 @@
-import {BlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
+import {ExpendBlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
 import React, {ChangeEvent, CSSProperties, useContext, useEffect, useMemo, useRef, useState} from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,6 +9,7 @@ import {defaultNoImg} from "@/app/{commons}/func/image";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import apiCall from "@/app/{commons}/func/api";
+import {NO_IMAGE} from "@/app/{services}/constants";
 
 
 export type AlttuelBlockProps = {
@@ -26,13 +27,13 @@ type ImgViewProps = {
     viewImg    : boolean;
 }
 
-const AlttuelBlock = (props: BlockProps) => {
+const AlttuelBlock = (props: ExpendBlockProps) => {
 
     const {
         hash, value
         , onChangeExtraValueHandler
-        , isView
-    }: BlockProps = props;
+        , isView, type
+    }: ExpendBlockProps = props;
     const extraValue = props.extraValue as AlttuelBlockProps;
     const {setWaitUploadFiles, setWaitRemoveFiles} = useContext(TempFileProvider);
 
@@ -206,7 +207,7 @@ const AlttuelBlock = (props: BlockProps) => {
     return (
         <div id={`block-${hash}`}
              className={'w-full'}
-             aria-roledescription={'extra'}
+             aria-roledescription={type}
              ref={el => {props!.blockRef!.current[props.seq] = el}}
         >
             <div style={containerStyle(isView ?? false)}>
@@ -442,9 +443,12 @@ const ImageThumb = ({
             <>
                 <div style={{position: 'relative'}}>
                     <img style={imageStyle}
-                         src={thumb}
+                         src={defaultNoImg(thumb)}
                          alt={'대표 이미지'}
                          onClick={onChangeImageHandler}
+                         onError={e => {
+                             e.currentTarget.src = NO_IMAGE;
+                         }}
                     />
                     {
                         imgViewProps.imgLoading
@@ -469,8 +473,11 @@ const ImageThumb = ({
                 <Image style={imageStyle}
                        width={150}
                        height={150}
-                       src={thumb}
+                       src={defaultNoImg(thumb)}
                        alt={'대표 이미지'}
+                       onError={e => {
+                           e.currentTarget.src = NO_IMAGE;
+                       }}
                        onMouseEnter={()=> setImgViewProps(prevState => ({
                            ...prevState,
                            imgModal: true
@@ -494,7 +501,7 @@ const ImageThumb = ({
                 {
                     imgViewProps.viewImg
                     && <div style={originImgStyle}>
-                    <Image src={oriImg}
+                    <Image src={defaultNoImg(oriImg)}
                            alt={'원본 이미지'}
                            width={700}
                            height={700}
@@ -506,6 +513,9 @@ const ImageThumb = ({
                                ...prevState,
                                viewImg: false
                            }))}
+                           onError={e => {
+                               e.currentTarget.src = NO_IMAGE;
+                           }}
                     />
                   </div>
                 }

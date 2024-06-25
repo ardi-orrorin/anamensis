@@ -2,7 +2,7 @@
 import {ReactNode, useEffect, useMemo, useState} from "react";
 import BoardProvider, {BoardService} from "@/app/board/{services}/BoardProvider";
 import BlockProvider, {BlockService, CommentService} from "@/app/board/{services}/BlockProvider";
-import {BoardI, CommentI, DeleteCommentI} from "@/app/board/{services}/types";
+import {BlockI, BoardI, CommentI, DeleteCommentI} from "@/app/board/{services}/types";
 import {SaveComment} from "@/app/board/[id]/{components}/comment";
 import {RateInfoI} from "@/app/board/[id]/page";
 import TempFileProvider, {TempFileI} from "@/app/board/{services}/TempFileProvider";
@@ -10,6 +10,7 @@ import apiCall from "@/app/{commons}/func/api";
 import {useSearchParams} from "next/navigation";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
 import useSWR from "swr";
+import {initBlock} from "@/app/board/{services}/funcs";
 
 export default function Page({children, params} : {children: ReactNode, params: {id: string}}) {
 
@@ -57,8 +58,12 @@ export default function Page({children, params} : {children: ReactNode, params: 
             }
         }
 
-        const list = [{seq: 0, value: '', code: blockCode().code, textStyle: {}, hash: Date.now().toString() + '-0'}];
-        blockCode().addBlock && list.push({seq: 1, value: '', code: '00005', textStyle: {}, hash: Date.now().toString() + '-1'});
+        const list: BlockI[] = [
+            initBlock({seq: 0, code: blockCode().code})
+        ];
+
+        blockCode().addBlock
+        && list.push(initBlock({seq: 1}));
 
         setBoard({
             ...board,
@@ -77,24 +82,6 @@ export default function Page({children, params} : {children: ReactNode, params: 
         setSelectedBlock(window.location.hash.replace('#block-', '') || '');
     },[]);
 
-    const initBoard = useSWR(`/api/board/${params.id}`, async () => {
-        if(isNewBoard) return ;
-        if(params.id === 'new') return ;
-        await fetchRate();
-    },{
-        keepPreviousData: true,
-        revalidateOnMount: true,
-    });
-
-    const initComment = useSWR(`/api/board/comment/${params.id}`, async () => {
-        if(isNewBoard) return ;
-
-        fetchComment();
-    },{
-        keepPreviousData: true,
-        revalidateOnMount: true,
-    });
-
     useEffect(()=> {
         if(isNewBoard) return ;
 
@@ -102,12 +89,16 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
         fetchBoard();
 
-
-        // if(params.id === 'new') return ;
-        // fetchRate();
-
     },[params.id])
 
+    useSWR(`/api/board/comment/${params.id}`, async () => {
+        if(isNewBoard) return ;
+
+        fetchComment();
+    },{
+        keepPreviousData: true,
+        revalidateOnMount: true,
+    });
 
 
     const fetchBoard = async () => {
@@ -127,7 +118,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
             location.href = '/';
         })
         .finally(() => {
-        setLoading(false);
+            setLoading(false);
         });
     }
 
@@ -156,8 +147,6 @@ export default function Page({children, params} : {children: ReactNode, params: 
             setRateInfo(res.data);
         });
     }
-
-    // if(initBoard.isLoading) return <GlobalLoadingSpinner />;
 
     return (
         <LoadingProvider.Provider value={{

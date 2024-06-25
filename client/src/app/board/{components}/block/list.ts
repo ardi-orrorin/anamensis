@@ -133,7 +133,8 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '링크',
         type              : 'object',
         notAvailDup       : false,
-        component         : (props: BlockProps)  => LinkBlock(props),
+        component         : (props: BlockProps)  =>
+            LinkBlock({...props, type: 'object'}),
     },
     {
         code              : '00111',
@@ -144,7 +145,8 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '할일',
         type              : 'object',
         notAvailDup       : false,
-        component         : (props: BlockProps)  => CheckBlock(props),
+        component         : (props: BlockProps)  =>
+            CheckBlock({...props, type: 'object'}),
     },
     {
         code              : '00201',
@@ -155,10 +157,12 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '이미지',
         type              : 'object',
         notAvailDup       : false,
-        component         : (props: BlockProps)  => FileBlock({
-            ...props,
-            Component     : FileImage
-        }),
+        component         : (props: BlockProps)  =>
+            FileBlock({
+                ...props,
+                type          : 'object',
+                Component     : FileImage
+            }),
     },
     // {
     //     code              : '00202',
@@ -170,7 +174,8 @@ export const blockTypeList: BlockComponentType[] = [
     //     type              : 'object',
     //     component         : (props: BlockProps)  => FileBlock({
     //         ...props,
-    //         Component     : FileFile
+    //         type          : 'object',
+    //         Component     : FileFile,
     //     }),
     // },
     {
@@ -182,7 +187,8 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '판매정보',
         type              : 'extra',
         notAvailDup       : true,
-        component         : (props: BlockProps)  => AlttuelBlock(props),
+        component         : (props: BlockProps)  =>
+            AlttuelBlock({...props, type: 'extra'}),
     },
     {
         code              : '00302',
@@ -193,7 +199,8 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '앨범',
         type              : 'extra',
         notAvailDup       : true,
-        component         : (props: BlockProps)  => AlbumBlock(props),
+        component         : (props: BlockProps)  =>
+            AlbumBlock({...props, type: 'extra'}),
     },
     {
         code              : '00303',
@@ -204,6 +211,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : 'Q/A',
         type              : 'extra',
         notAvailDup       : true,
-        component         : (props: BlockProps)  => QuestionBlock(props),
+        component         : (props: BlockProps)  =>
+            QuestionBlock({...props, type: 'extra'}),
     },
 ]

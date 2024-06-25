@@ -1,5 +1,5 @@
 import {useContext, useMemo, useState} from "react";
-import {BoardI, CommentI} from "@/app/board/{services}/types";
+import {BlockI, BoardI, CommentI} from "@/app/board/{services}/types";
 import Image from "next/image";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -13,6 +13,7 @@ import {defaultProfile} from "@/app/{commons}/func/image";
 import {mutate} from "swr";
 import moment from "moment";
 import {QuestionBlockExtraValueType} from "@/app/board/{components}/block/extra/questionBlock";
+import {updateBoard} from "@/app/board/{services}/funcs";
 
 export type SaveComment = {
     boardPk   : string;
@@ -131,17 +132,19 @@ const Comment = () => {
 }
 
 const CommentItem = (props: CommentI) => {
-    const {blockSeq, content
+    const {
+        blockSeq, content
         , writer, profileImage
         , createdAt, children
         , isWriter
         , id
     } = props;
 
-    const {board, setBoard} = useContext(BoardProvider);
+    const {board} = useContext(BoardProvider);
     const {setSelectedBlock} = useContext(BlockProvider);
     const {deleteComment, setDeleteComment} = useContext(BoardProvider);
     const [loading, setLoading] = useState(false);
+
     const extraValue = useMemo(()=> {
         return board.data.content.list.find(item => item.code === '00303')?.extraValue as QuestionBlockExtraValueType;
     },[]);
@@ -159,7 +162,7 @@ const CommentItem = (props: CommentI) => {
         setLoading(true);
 
         try {
-            const deleteRes = await apiCall({
+            await apiCall({
                 path: '/api/board/comment/' + id,
                 method: 'DELETE',
                 isReturnData: true,
@@ -181,42 +184,35 @@ const CommentItem = (props: CommentI) => {
     const selectedAnswerHandler = async () => {
         if(!extraValue) return;
 
-        const bodyContent = board.data.content.list.filter(item => item.value !== '');
+        const newExtraValue  = {
+            ...extraValue,
+            selectId: id + '',
+            selectDate: moment().format('YYYY-MM-DD HH:mm:ss'),
+            state: 'completed',
+        } as QuestionBlockExtraValueType;
 
-        const textRegex = /^0000\d{1}$/;
+        const list = board.data.content.list.map(item => {
+            if(item.code === '00303') {
+                return {
+                    ...item,
+                    extraValue: newExtraValue
+                }
+            }
+            return item;
+        }) as BlockI[];
 
-        const text = board.data.title + ' '
-            + bodyContent.filter(item => textRegex.test(item.code))
-                .map(item => item.value).join(' ');
-
-        const updateBoard : BoardI = {
-            ...board.data,
-            content: {
-                ...board.data.content,
-                list: board.data.content.list.map(item => {
-                    if(item.code === '00303') {
-                        return {
-                            ...item,
-                            extraValue: {
-                                ...extraValue,
-                                selectId: id,
-                                selectDate: moment().format('YYYY-MM-DD HH:mm:ss'),
-                                state: 'completed',
-                            }
-                        }
-                    }
-                    return item;
-                })
-            },
-            searchText: text,
-            removeFiles: [],
-        }
+        const body = updateBoard({
+            board: board.data,
+            list,
+            waitUploadFiles: [],
+            waitRemoveFiles: [],
+        });
 
 
         await apiCall<BoardI, BoardI>({
             path: '/api/board/' + board.data.id,
             method: 'PUT',
-            body: updateBoard,
+            body,
             isReturnData: true,
         })
         .then(res => {

@@ -40,11 +40,11 @@ export default function Block(props: BlockProps) {
 
     const block = useMemo(() => {
         return blockTypeList.find(b=> b.code === props.code);
-    },[blockService])
+    },[blockService, code])
 
     const Component = useMemo(() => {
         return block?.component!;
-    },[blockService]);
+    },[blockService, code]);
 
     const onFocusHandler = (e: React.FocusEvent<HtmlElements>) => {
         if(e.currentTarget.ariaRoleDescription !== 'text') {

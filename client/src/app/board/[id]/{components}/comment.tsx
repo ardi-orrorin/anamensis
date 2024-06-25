@@ -11,8 +11,8 @@ import BlockProvider from "@/app/board/{services}/BlockProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {defaultProfile} from "@/app/{commons}/func/image";
 import {mutate} from "swr";
-import {QuestionBlockExtraValueType} from "@/app/board/{components}/block/extra/questionBlock";
 import moment from "moment";
+import {QuestionBlockExtraValueType} from "@/app/board/{components}/block/extra/questionBlock";
 
 export type SaveComment = {
     boardPk   : string;
@@ -296,6 +296,7 @@ const CommentItem = (props: CommentI) => {
             </div>
             {
                 isWriter
+                && extraValue.selectId.toString() !== id.toString()
                 && <button className={'w-full h-9 sm:w-[40px] sm:h-auto flex justify-center items-center bg-red-400 text-white hover:bg-red-800 duration-300'}
                            onClick={deleteHandler}
                 >

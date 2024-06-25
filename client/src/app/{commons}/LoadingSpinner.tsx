@@ -4,10 +4,7 @@ import React from "react";
 
 const LoadingSpinner = ({size}:{size : number}) => {
     return (
-        <div className={'w-full h-screen justify-center items-center'}>
-            <FontAwesomeIcon width={size} height={size} className={`animate-spin h-[${size}px] w-[${size}px]`} icon={faSpinner} />
-        </div>
-
+        <FontAwesomeIcon width={size} height={size} className={`animate-spin h-[${size}px] w-[${size}px]`} icon={faSpinner} />
     );
 }
 

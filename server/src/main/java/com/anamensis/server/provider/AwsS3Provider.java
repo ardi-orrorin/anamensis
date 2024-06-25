@@ -37,7 +37,7 @@ public class AwsS3Provider {
 
     private static final ThumbnailType[] CROP_LIST = {
         ThumbnailType.PROFILE,
-        ThumbnailType.CONTENT_THUMBNAIL,
+//        ThumbnailType.CONTENT_THUMBNAIL,
         ThumbnailType.ALTTUEL_THUMBNAIL,
         ThumbnailType.ALBUM_THUMBNAIL
     };

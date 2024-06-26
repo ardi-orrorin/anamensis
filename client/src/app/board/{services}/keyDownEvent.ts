@@ -59,32 +59,36 @@ const backspace = (args: KeyEventType) => {
         , event
     } = args
 
-    if(seq === 0 || !board || !addBlock || !setBoard || !blockRef || !event) return;
+    if(seq < 0 || !board || !addBlock || !setBoard || !blockRef || !event) return;
 
     const list = board.data?.content?.list as BlockI[];
     if (!list) return ;
 
-    const currentBlock = list.find(item => item.seq === seq)!;
+    const curRef = blockRef.current[seq] as HTMLInputElement;
 
-    if(seq === 0 && currentBlock.value === '') {
+
+    const initCondition = seq === 1 && blockRef?.current[seq - 1]?.ariaRoleDescription === 'extra';
+    const initSeq =  initCondition ? 1 : 0;
+
+    const initBlockRef = blockRef.current[initSeq] as HTMLInputElement;
+
+    if(seq === initSeq && initBlockRef.value === '') {
         const newList = list.map((item, index) => {
-            if (item.seq !== 0) return item;
-            return addBlock(0, true);
+            if (item.seq !== initSeq) return item;
+            return addBlock(initSeq, true);
         });
         setBoard({...board, data: {...board.data, content: {list: newList}}});
     }
 
-    if(seq === 0) {
+    if(seq === initSeq) {
         setTimeout(() => {
-            blockRef.current[0]?.focus();
+            blockRef.current[initSeq]?.focus();
         },0);
         return;
     }
 
-    const curRef = blockRef.current[seq] as HTMLInputElement;
-
     if(curRef.selectionStart !== 0) return;
-    if(blockRef?.current[seq - 1]?.ariaRoleDescription === 'extra') return;
+    if(blockRef?.current[seq - 1]?.ariaRoleDescription === 'extra') return ;
 
     event.preventDefault();
     const afterText = curRef.value.substring(curRef.selectionStart!);

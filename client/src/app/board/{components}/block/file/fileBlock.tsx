@@ -1,32 +1,34 @@
 'use client';
 
 import React, {ReactNode} from "react";
-import {BlockProps} from "@/app/board/{components}/block/type/Types";
+import {ExpendBlockProps} from "@/app/board/{components}/block/type/Types";
 import FileUpload from "@/app/board/{components}/block/file/fileUpload";
 import FileImage, {FileImageProps} from "@/app/board/{components}/block/file/fileImage";
 
-export type FileBlockProps = BlockProps & {
+export type FileBlockProps = ExpendBlockProps & {
     Component: (props: FileImageProps) => ReactNode;
 }
 
-export default function FileBlock (data: FileBlockProps) {
-    const {seq, value, code, hash,
+export default function FileBlock (props: FileBlockProps) {
+    const {
+        seq, value,
+        code, hash,
+        type,
         onChangeValueHandler,
         onMouseEnterHandler,
         onMouseLeaveHandler,
         Component
-    } = data;
+    } = props;
 
     return (
-        <div id={`block-${hash}`} className={'w-full'} aria-roledescription={'object'}>
+        <div id={`block-${hash}`}
+             className={'w-full'}
+             aria-roledescription={type}
+        >
             {
                 !value &&
-                <FileUpload seq={seq}
-                            code={code}
-                            value={value}
-                            hash={hash}
+                <FileUpload {...{seq, code, value,hash, onMouseEnterHandler}}
                             onUploadFileUrl={onChangeValueHandler!}
-                            onMouseEnterHandler={onMouseEnterHandler!}
                             isImage={Component === FileImage}
                 />
             }

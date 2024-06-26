@@ -3,6 +3,7 @@ import AlbumProvider from "@/app/board/{components}/block/extra/providers/albumP
 import {defaultNoImg} from "@/app/{commons}/func/image";
 import DeleteOverlay from "@/app/board/{components}/block/extra/{components}/deleteOverlay";
 import DefaultLabel from "@/app/board/{components}/block/extra/{components}/defaultLabel";
+import {NO_IMAGE} from "@/app/{services}/constants";
 
 const Thumbnail = ({
     images,
@@ -22,15 +23,15 @@ const Thumbnail = ({
     const divRef = useRef<HTMLDivElement>(null);
     const [divWidth, setDivWidth] = useState<number>(500);
 
-    const { albumToggle, setAlbumToggle } = useContext(AlbumProvider);
+    const { setAlbumToggle } = useContext(AlbumProvider);
 
     useEffect(()=> {
-        const test = setTimeout(() => {
+        const reSize = setTimeout(() => {
             setDivWidth(Number(divRef?.current?.clientWidth));
         },900);
 
         return () => {
-            clearTimeout(test);
+            clearTimeout(reSize);
         }
     })
 
@@ -74,12 +75,11 @@ const Thumbnail = ({
                             <div key={'thumbnail' + index}
                                  className={'relative flex'}>
                                 <img style={imageStyle(divWidth / columns)}
-
                                      className={'transform-gpu'}
                                      src={defaultNoImg(image.replace(/(\.[^.]+)$/, '_thumb$1'))}
                                      alt={'thumbnail'}
                                      onError={(e) => {
-                                         (e.target as HTMLImageElement).src = process.env.NEXT_PUBLIC_CDN_SERVER + '/noimage.jpg'
+                                         e.currentTarget.src = NO_IMAGE;
                                      }}
                                      onClick={() => {
                                          setAlbumToggle({

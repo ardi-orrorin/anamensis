@@ -1,4 +1,4 @@
-import {BlockProps} from "@/app/board/{components}/block/type/Types";
+import {ExpendBlockProps} from "@/app/board/{components}/block/type/Types";
 import {useContext, useEffect, useMemo} from "react";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import moment from "moment";
@@ -11,12 +11,11 @@ export type QuestionBlockExtraValueType = {
     state      : 'wait' | 'completed';
 }
 
-const QuestionBlock = (props: BlockProps) => {
+const QuestionBlock = (props: ExpendBlockProps) => {
     const {
-        hash, value
-        , onChangeExtraValueHandler
-        , isView,
-    }: BlockProps = props;
+        hash, onChangeExtraValueHandler, type
+    }: ExpendBlockProps = props;
+
     const extraValue = props.extraValue as QuestionBlockExtraValueType;
 
     useEffect(()=> {
@@ -43,7 +42,7 @@ const QuestionBlock = (props: BlockProps) => {
     return (
         <div className={'flex flex-col gap-2'}
              id={`block_${hash}`}
-             aria-roledescription={'extra'}
+             aria-roledescription={type}
              ref={el => {props!.blockRef!.current[props.seq] = el}}
         >
             {
@@ -59,8 +58,7 @@ const QWait = ({
     endDate,
     point,
     onChangeHandler,
-} : QuestionBlockExtraValueType
-& {
+} : QuestionBlockExtraValueType & {
     onChangeHandler: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
     const {board} = useContext(BoardProvider);

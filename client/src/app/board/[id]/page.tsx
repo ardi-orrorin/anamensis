@@ -21,8 +21,7 @@ import BlockProvider from "@/app/board/{services}/BlockProvider";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import KeyDownEvent from "@/app/board/{services}/keyDownEvent";
-import {deleteImage, listSort, notAvailDupCheck} from "@/app/board/{services}/funcs";
-import {object} from "prop-types";
+import {deleteImage, initBlock, listSort, notAvailDupCheck, updateBoard} from "@/app/board/{services}/funcs";
 
 export interface RateInfoI {
     id      : number;
@@ -61,8 +60,6 @@ export default function Page({params}: {params : {id: string}}) {
 
     const debounce = createDebounce(300);
 
-    const defaultBlock:BlockI = {seq: 0, value: '', code: '00005', textStyle: {}, hash: Date.now().toString() + '-0'};
-
     const shortList = useMemo(()=> (
         blockTypeList.map(item => ({ command: item.command, code: item.code, notAvailDup : item.notAvailDup}))
     ), []);
@@ -72,7 +69,7 @@ export default function Page({params}: {params : {id: string}}) {
     },[]);
 
     const addBlock = (seq: number, init: boolean, value?: string) => {
-        const block: BlockI = {...defaultBlock};
+        const block: BlockI = initBlock({seq: 0});
         if(!init) {
             block.seq = seq + 0.1;
         }
@@ -89,15 +86,18 @@ export default function Page({params}: {params : {id: string}}) {
         return title && content;
     },[board.data]);
 
-    const onChangeBlockHandler = (e: ChangeEvent<HtmlElements>, seq: number) => {
-        const block = shortList.find(item => item.command + ' ' === e.target?.value);
+    const onChangeBlockHandler = (seq: number, e: ChangeEvent<HtmlElements> ) => {
+        const block = shortList.find(item =>
+            item.command + ' ' === e.target?.value
+        );
 
         if(!block) return;
 
         if(notAvailDupCheck(block?.code, board.data?.content)) {
-            alert('중복 사용할 수 없는 블록입니다.');
-            return;
+            return alert('중복 사용할 수 없는 블록입니다.');
         }
+
+        if(block.notAvailDup) return ;
 
         const newList = board.data?.content?.list.map((item, index) => {
             if (item.seq === seq) {
@@ -106,6 +106,7 @@ export default function Page({params}: {params : {id: string}}) {
             }
             return item;
         });
+
         setBoard({...board, data: {...board.data,  content: {list: newList}}});
 
         setTimeout(() => {
@@ -126,26 +127,13 @@ export default function Page({params}: {params : {id: string}}) {
         setLoading(true);
 
         try {
-            // todo: 저장시 빈 라인 제거 할 것인가?
-            // 현재 : 빈 라인 포함 저장
-            const bodyContent = board.data.content.list.filter(item => item.value !== '');
 
-            const textRegex = /^0000\d{1}$/;
-
-            const text = board.data.title + ' '
-                + bodyContent.filter(item => textRegex.test(item.code))
-                    .map(item => item.value).join(' ');
-
-            const body: BoardI = {
-                ...board.data,
-                content: {
-                    list: board.data.content.list
-                },
-                isPublic: board.data.isPublic,
-                uploadFiles: waitUploadFiles.map(item => item.id),
-                removeFiles: waitRemoveFiles.map(item => item.filePath + item.fileName),
-                searchText: text
-            };
+            const body = updateBoard({
+                board: board.data,
+                list: board.data.content.list,
+                waitUploadFiles,
+                waitRemoveFiles
+            });
 
             const result = await apiCall<BoardI, BoardI>({
                 path: '/api/board/' + (isSave ? 'new' : params.id),
@@ -185,8 +173,6 @@ export default function Page({params}: {params : {id: string}}) {
         const list = board.data?.content?.list;
         if (!list) return ;
 
-        // const currentBlock = list.find(item => item.seq === seq)!;
-
         list.push(addBlock(seq, false, value));
 
         listSort(list);
@@ -198,7 +184,7 @@ export default function Page({params}: {params : {id: string}}) {
         const list = board.data?.content?.list;
         if (!list) return ;
 
-        if(onChangeBlockHandler(e, seq)) return ;
+        if(onChangeBlockHandler(seq, e)) return ;
 
         list.map((item, index) => {
             if (item.seq === seq) {
@@ -228,7 +214,7 @@ export default function Page({params}: {params : {id: string}}) {
         listSort(newList);
 
         if (newList?.length === 0) {
-            newList = [{seq, value: '', code: '00005', textStyle: {}, hash: Date.now() + '-' + seq}];
+            newList = [initBlock({seq: 0})];
         }
 
         setBoard({
@@ -258,9 +244,11 @@ export default function Page({params}: {params : {id: string}}) {
 
         const fileRootPath = '/resource/board/'
 
-        const files = Object.keys(fileBlock?.extraValue!).filter(key =>
+        if(!fileBlock?.extraValue) return ;
+
+        const files = Object?.keys(fileBlock?.extraValue!).filter(key =>
             fileBlock.extraValue![key].toString().includes(fileRootPath)
-        ).map(key =>
+        )?.map(key =>
             fileBlock.extraValue![key]
         );
 
@@ -329,8 +317,6 @@ export default function Page({params}: {params : {id: string}}) {
     if(!board?.data?.content || board.data?.content?.list?.length === 0) {
         return <GlobalLoadingSpinner />
     }
-
-
 
     return (
         <>
@@ -409,7 +395,7 @@ export default function Page({params}: {params : {id: string}}) {
                         {
                             !isNewBoard
                             && board.isView
-                            && <BoardInfo board={board}/>
+                            && <BoardInfo {...board}/>
                         }
                     </div>
                     <div className={['flex flex-col', board.isView ? 'gap-2' : 'gap-4'].join(' ')}>

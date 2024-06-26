@@ -7,6 +7,7 @@ const Rate = (props: {
     newBoard: boolean,
     onClick: () => void,
 }) => {
+
     const {newBoard, onClick} = props;
 
     const {board, rateInfo} = useContext(BoardProvider);
@@ -28,10 +29,10 @@ const Rate = (props: {
                     className={"px-6 py-3 flex gap-2 justify-center items-center border border-blue-400 text-xl rounded hover:bg-blue-400 hover:text-white duration-300"}
                     onClick={onClick}
                 >
-                <FontAwesomeIcon icon={faHeart} className={`${rateInfo.status ? "text-blue-600" : ""}`}/>
-                <span>
-                  {rateCount}
-                </span>
+                    <FontAwesomeIcon icon={faHeart} className={`${rateInfo.status ? "text-blue-600" : ""}`}/>
+                    <span>
+                      {rateCount}
+                    </span>
               </button>
             }
         </div>

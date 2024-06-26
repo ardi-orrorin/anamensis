@@ -3,37 +3,14 @@ import LoginProvider, {LoginI, LoginProviderI} from "@/app/login/{services}/Logi
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import apiCall from "@/app/{commons}/func/api";
 import {LoginType} from "@/app/login/{componens}/Login";
+import useTimer from "@/app/login/{services}/useTimer";
+import {onChange} from "@/app/login/{services}/funcs";
 
 const OTPAuth = () => {
     const { user, setUser } = useContext<LoginProviderI>(LoginProvider);
     const [loading, setLoading] = useState<boolean>(false);
-    const [timer, setTimer] = useState<number>(300);
 
-    useEffect(() => {
-        let it = timer;
-
-        const interval = setInterval(() => {
-            it--
-            setTimer(it);
-
-            if(it === 0) {
-                alert('인증 시간이 만료되었습니다.');
-                window.location.reload();
-            }
-        }, 1000);
-
-        return () => {
-            clearInterval(interval);
-        }
-
-    },[]);
-
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setUser({
-            ...user,
-            [e.target.name]: e.target.value
-        })
-    }
+    const timer = useTimer(300);
 
     const verify = async () => {
         setLoading(true);
@@ -71,7 +48,7 @@ const OTPAuth = () => {
                         placeholder={'인증번호를 입력하세요'}
                         name={'code'}
                         value={user.code}
-                        onChange={onChange}
+                        onChange={(e) => onChange(e, setUser)}
                     />
                 </div>
                 <div>
@@ -82,8 +59,7 @@ const OTPAuth = () => {
                     >{
                         loading ?
                             <LoadingSpinner size={12}/> :
-                            //
-                            `인증 ${transMinSec(timer)}`
+                            `인증 ${transMinSec(timer.timer)}`
                     }
                     </button>
                 </div>

@@ -10,6 +10,8 @@ const OTPAuth = () => {
     const { user, setUser } = useContext<LoginProviderI>(LoginProvider);
     const [loading, setLoading] = useState<boolean>(false);
 
+    const timer = useTimer(300);
+
     const verify = async () => {
         setLoading(true);
 
@@ -57,7 +59,7 @@ const OTPAuth = () => {
                     >{
                         loading ?
                             <LoadingSpinner size={12}/> :
-                            `인증 ${transMinSec(useTimer(600).timer)}`
+                            `인증 ${transMinSec(timer.timer)}`
                     }
                     </button>
                 </div>

@@ -1,4 +1,4 @@
-import {BlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
+import {ExpendBlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
 import React, {CSSProperties, useContext, useEffect, useRef, useState} from "react";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -22,12 +22,13 @@ export type ProgressType = {
     progress: number;
 }
 
-const AlbumBlock = (props: BlockProps) => {
+const AlbumBlock = (props: ExpendBlockProps) => {
     const {
         hash, value
         , onChangeExtraValueHandler
         , isView
-    }: BlockProps = props;
+        , type
+    }: ExpendBlockProps = props;
 
     const maxImage = 30;
     const oneFileLength = 5;
@@ -224,7 +225,7 @@ const AlbumBlock = (props: BlockProps) => {
     return (
         <div id={`block_${hash}`}
              style={containerStyle}
-             aria-roledescription={'extra'}
+             aria-roledescription={type}
              ref={el => {
                  props!.blockRef!.current[props.seq] = el
              }}

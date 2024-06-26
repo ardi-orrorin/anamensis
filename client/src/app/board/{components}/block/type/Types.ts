@@ -1,5 +1,5 @@
 import {ChangeEvent, MutableRefObject} from "react";
-import {BlockI, ExtraValueI, TextStylesType} from "@/app/board/{services}/types";
+import {BlockI, ExtraValueI} from "@/app/board/{services}/types";
 
 export type BlockProps = {
     isView?                      : boolean;
@@ -19,6 +19,10 @@ export type BlockProps = {
     onClickSubTextMenu?          : (e: React.MouseEvent<HTMLButtonElement>, code: string) => void;
     onClickDeleteHandler?        : (seq: number) => void;
 } & BlockI;
+
+export type ExpendBlockProps = BlockProps & {
+    type: string;
+}
 
 export type HtmlElements = HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | HTMLDataElement;
 export type MouseEnterHTMLElements = HTMLImageElement | HTMLInputElement | HTMLAnchorElement | HTMLDivElement | HTMLButtonElement

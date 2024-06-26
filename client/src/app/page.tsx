@@ -117,9 +117,6 @@ export default function Page() {
         }
     }
 
-    const moreHandler = () => {
-        setSearchParams({...searchParams, page: searchParams.page + 1, add: true});
-    }
 
     return (
         <SearchParamsProvider.Provider value={{searchParams, setSearchParams}}>

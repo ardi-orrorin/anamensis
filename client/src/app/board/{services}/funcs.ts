@@ -1,4 +1,4 @@
-import {BlockI, BoardContentI} from "@/app/board/{services}/types";
+import {BlockI, BoardContentI, BoardI} from "@/app/board/{services}/types";
 import {blockTypeList} from "@/app/board/{components}/block/list";
 import {ImageShowProps} from "@/app/board/{components}/block/extra/albumBlock";
 import {Dispatch, SetStateAction} from "react";
@@ -27,7 +27,59 @@ export const notAvailDupCheck = (code: string, content: BoardContentI) : boolean
     return false;
 }
 
+export const initBlock = ({
+    seq,
+    code,
+} :{
+    seq   : number;
+    code? : string;
+}) => ({
+    seq, value: '', code: code ?? '00005', textStyle: {}, hash: Date.now() + '-' + seq
+})
 
+export const updateBoard = ({
+    board,
+    list,
+    waitUploadFiles,
+    waitRemoveFiles,
+}: {
+    board: BoardI;
+    list?: BlockI[];
+    waitUploadFiles?: TempFileI[];
+    waitRemoveFiles?: TempFileI[];
+}) : BoardI => {
+    // todo: 저장시 빈 라인 제거 할 것인가?
+    // 현재 : 빈 라인 포함 저장
+
+    const {content, isPublic, title} = board;
+
+    const bodyContent = content.list.filter(item => item.value !== '');
+
+    const textRegex = /^0000\d{1}$/;
+
+    const searchText = title + ' '
+        + bodyContent.filter(item => textRegex.test(item.code))
+            .map(item => item.value).join(' ');
+
+    const uploadFiles = waitUploadFiles
+        ? waitUploadFiles.map(item => item.id)
+        : [];
+    const removeFiles = waitRemoveFiles
+        ? waitRemoveFiles.map(item => item.filePath + item.fileName)
+        : [];
+
+    return {
+        ...board,
+        content: {
+            ...content,
+            list: list ?? content.list
+        },
+        isPublic,
+        uploadFiles,
+        removeFiles,
+        searchText
+    };
+}
 
 export const deleteImage = (props: {
     absolutePath: string,

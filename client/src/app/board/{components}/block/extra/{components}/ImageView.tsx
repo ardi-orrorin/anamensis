@@ -3,6 +3,8 @@ import AlbumProvider from "@/app/board/{components}/block/extra/providers/albumP
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {faChevronLeft, faChevronRight} from "@fortawesome/free-solid-svg-icons";
+import {defaultNoImg} from "@/app/{commons}/func/image";
+import {NO_IMAGE} from "@/app/{services}/constants";
 
 const ImageView = ({
     images,
@@ -64,12 +66,12 @@ const ImageView = ({
                 >
                     <FontAwesomeIcon icon={faXmark} />
                 </button>
-                <img src={process.env.NEXT_PUBLIC_CDN_SERVER + albumToggle.viewImage}
+                <img src={defaultNoImg(albumToggle.viewImage)}
                      className={'w-auto max-w-[90%] h-auto max-h-[90%] bg-white'}
                      alt={'view'}
                      onClick={disableToggleHandler}
                      onError={(e) => {
-                         (e.target as HTMLImageElement).src = process.env.NEXT_PUBLIC_CDN_SERVER + '/noimage.jpg'
+                         e.currentTarget.src = NO_IMAGE;
                      }}
                 />
                 <button className={'z-40 fixed top-0 left-0 w-[20%] h-full flex items-center pl-10'}

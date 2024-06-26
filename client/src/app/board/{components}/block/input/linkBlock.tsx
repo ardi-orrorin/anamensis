@@ -1,9 +1,7 @@
 'use client'
 
-import React, {CSSProperties, useEffect, useMemo} from "react";
-import {BlockProps} from "@/app/board/{components}/block/type/Types";
-import axios from "axios";
-import localFont from "next/dist/compiled/@next/font/dist/local";
+import React, {CSSProperties, useEffect} from "react";
+import {ExpendBlockProps} from "@/app/board/{components}/block/type/Types";
 import apiCall from "@/app/{commons}/func/api";
 
 type OGType = {
@@ -13,15 +11,15 @@ type OGType = {
     url         : string;
 }
 
-const LinkBlock = (props: BlockProps) => {
+const LinkBlock = (props: ExpendBlockProps) => {
     const {
         seq, blockRef,
-        value,
+        value, type,
         isView, hash,
         onChangeValueHandler, onKeyUpHandler,
         onKeyDownHandler, onMouseEnterHandler,
         onFocusHandler, onChangeExtraValueHandler,
-    } = props;
+    }: ExpendBlockProps = props;
 
     const extraValue = props.extraValue as OGType;
 
@@ -94,6 +92,7 @@ const LinkBlock = (props: BlockProps) => {
     return (
         <div id={`block-${hash}`}
              className={['w-full'].join(' ')}
+             aria-roledescription={type}
         >
             {
                 !extraValue || !extraValue.title

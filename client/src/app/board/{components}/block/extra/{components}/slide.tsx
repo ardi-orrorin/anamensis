@@ -1,10 +1,11 @@
 import React, {useContext, useMemo, useRef, useState} from "react";
 import AlbumProvider from "@/app/board/{components}/block/extra/providers/albumProvier";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faChevronDown, faChevronLeft, faChevronRight} from "@fortawesome/free-solid-svg-icons";
+import {faChevronLeft, faChevronRight} from "@fortawesome/free-solid-svg-icons";
 import {defaultNoImg} from "@/app/{commons}/func/image";
 import DeleteOverlay from "@/app/board/{components}/block/extra/{components}/deleteOverlay";
 import DefaultLabel from "@/app/board/{components}/block/extra/{components}/defaultLabel";
+import {NO_IMAGE} from "@/app/{services}/constants";
 
 const Slide = ({
     images,
@@ -20,6 +21,9 @@ const Slide = ({
     onChaneDefaultIndexHandler: (index: number) => void;
 }) => {
 
+    const slideWidth = 150;
+    const totalWidth = images.length * slideWidth ;
+
     const [mouseDownX, setMouseDownX] = useState<number>(0);
 
     const {setAlbumToggle } = useContext(AlbumProvider);
@@ -28,9 +32,6 @@ const Slide = ({
     const containerRef = useRef<HTMLDivElement>(null);
 
     const [containerPosition, setContainerPosition] = useState<number>(0);
-
-    const slideWidth = 150;
-    const totalWidth = images.length * slideWidth ;
 
     const containerMaxWidth = useMemo(()=> {
         if(!containerRef?.current) return 0;
@@ -106,7 +107,7 @@ const Slide = ({
                      src={process.env.NEXT_PUBLIC_CDN_SERVER + images[selectedIndex]} alt={''}
                      onClick={onImageClick}
                      onError={(e) => {
-                         (e.target as HTMLImageElement).src = process.env.NEXT_PUBLIC_CDN_SERVER + '/noimage.jpg'
+                         e.currentTarget.src = NO_IMAGE;
                      }}
                 />
                 <button className={'absolute right-5 z-10 w-10 h-10 bg-white rounded border border-solid border-gray-200'}
@@ -153,7 +154,7 @@ const Slide = ({
                                          src={defaultNoImg(image.replace(/(\.[^.]+)$/, '_thumb$1'))}
                                          alt={'slide'}
                                          onError={(e) => {
-                                             (e.target as HTMLImageElement).src = process.env.NEXT_PUBLIC_CDN_SERVER + '/noimage.jpg'
+                                             e.currentTarget.src = NO_IMAGE;
                                          }}
                                          onClick={() => {
                                              setSelectedIndex(index);

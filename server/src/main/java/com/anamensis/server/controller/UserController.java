@@ -237,7 +237,8 @@ public class UserController {
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(s -> {
                     if(!s.getStatus().equals(HttpStatus.OK)) return;
-                        userService.addUserInfoCache(userDetails.getUsername());
+                        userService.addUserInfoCache(userDetails.getUsername())
+                            .subscribe();
                 });
     }
 
@@ -256,7 +257,8 @@ public class UserController {
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(s -> {
                     if(!s.getStatus().equals(HttpStatus.OK)) return;
-                    userService.addUserInfoCache(userDetails.getUsername());
+                    userService.addUserInfoCache(userDetails.getUsername())
+                        .subscribe();
                 });
     }
 

@@ -292,7 +292,7 @@ const CommentItem = (props: CommentI) => {
             </div>
             {
                 isWriter
-                && extraValue.selectId.toString() !== id.toString()
+                && extraValue?.selectId.toString() !== id.toString()
                 && <button className={'w-full h-9 sm:w-[40px] sm:h-auto flex justify-center items-center bg-red-400 text-white hover:bg-red-800 duration-300'}
                            onClick={deleteHandler}
                 >

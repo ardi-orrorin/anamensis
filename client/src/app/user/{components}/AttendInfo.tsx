@@ -4,7 +4,7 @@ import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {useRouter} from "next/navigation";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
-import useSWR from "swr";
+import useSWR, {mutate} from "swr";
 
 export default function AttendInfo() {
 
@@ -14,7 +14,7 @@ export default function AttendInfo() {
     const [loading, setLoading] = useState<boolean>(false);
     const debounce = createDebounce(500);
 
-    const initFetch = useSWR([loading], async () => {
+    const initFetch = useSWR('/user/attend', async () => {
         if(loading) return;
         await apiCall<AttendInfoI>({
             path: "/api/user/attend",
@@ -24,7 +24,7 @@ export default function AttendInfo() {
                 setUser(res.data);
             });
     },{
-        revalidateOnFocus: false,
+        revalidateOnFocus: true,
     });
 
     const attend = () => {
@@ -41,7 +41,6 @@ export default function AttendInfo() {
                     : '이미 출석하셨습니다. 내일 다시 시도해주세요.';
 
                 alert(message);
-                router.refresh();
             })
             .finally(() => {
                 setLoading(false);

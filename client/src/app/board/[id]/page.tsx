@@ -401,7 +401,7 @@ export default function Page({params}: {params : {id: string}}) {
                     <div className={['flex flex-col', board.isView ? 'gap-2' : 'gap-4'].join(' ')}>
                         {
                             board.data.content.list.map((item, index) => {
-                                return <Block key={'block' + index}
+                              return <Block key={'block' + index}
                                               blockRef={blockRef}
                                               onChangeHandler={e => {
                                                   onChangeHandler(e, item.seq)

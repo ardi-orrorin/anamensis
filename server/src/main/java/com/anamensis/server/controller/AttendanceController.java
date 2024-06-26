@@ -65,12 +65,12 @@ public class AttendanceController {
                 .doOnNext(pointCodeAtomic::set)
                 .flatMap(pointCode -> userService.updatePoint(memberAtomic.get().getId(), (int) pointCode.getPoint()))
                 .publishOn(Schedulers.boundedElastic())
-                .flatMap(b -> {
-                    if(b) {
-                        attendanceService.addAttendInfoCache(user.getUsername());
-                        userService.addUserInfoCache(user.getUsername());
-                    }
-                    return Mono.just(b);
+                .doOnNext(b -> {
+                    if(!b) return;
+                    attendanceService.addAttendInfoCache(user.getUsername())
+                            .subscribe();
+                    userService.addUserInfoCache(user.getUsername())
+                        .subscribe();
                 })
                 .doOnNext(isAttend -> {
                     if(!isAttend) return;

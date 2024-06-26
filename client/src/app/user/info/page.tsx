@@ -27,7 +27,7 @@ export default function Page() {
 
     const debounce = createDebounce(500);
 
-    const initFetch = useSWR([loading.img, loading.profile], async (loading) => {
+    useSWR([loading.img, loading.profile], async (loading) => {
         if(!loading[0]) {
             profileFetch();
         }

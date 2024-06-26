@@ -1,10 +1,10 @@
 import {BoardService} from "@/app/board/{services}/BoardProvider";
 
 const BoardTitle = (props: {
-    board: BoardService,
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
-    onKeyUp: (e: any) => void,
-    newBoard: boolean
+    board     : BoardService,
+    onChange  : (e: React.ChangeEvent<HTMLInputElement>) => void,
+    onKeyUp   : (e: any) => void,
+    newBoard  : boolean
 }) => {
 
     const {

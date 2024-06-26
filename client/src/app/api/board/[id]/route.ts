@@ -40,9 +40,6 @@ export async function PUT(req:NextRequest) {
 
     const id = req.nextUrl.pathname.split('/')[req.nextUrl.pathname.split('/').length - 1];
 
-    console.log(data);
-    console.log(id)
-
     const result = await apiCall<StatusResponse, BoardI>({
         path: '/api/boards/' + id,
         method: 'PUT',

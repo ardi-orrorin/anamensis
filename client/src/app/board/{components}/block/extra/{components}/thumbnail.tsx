@@ -23,15 +23,15 @@ const Thumbnail = ({
     const divRef = useRef<HTMLDivElement>(null);
     const [divWidth, setDivWidth] = useState<number>(500);
 
-    const { albumToggle, setAlbumToggle } = useContext(AlbumProvider);
+    const { setAlbumToggle } = useContext(AlbumProvider);
 
     useEffect(()=> {
-        const test = setTimeout(() => {
+        const reSize = setTimeout(() => {
             setDivWidth(Number(divRef?.current?.clientWidth));
         },900);
 
         return () => {
-            clearTimeout(test);
+            clearTimeout(reSize);
         }
     })
 

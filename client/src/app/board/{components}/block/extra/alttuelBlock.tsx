@@ -420,7 +420,7 @@ const ImageThumb = ({
             <>
                 <div style={{position: 'relative'}}>
                     <img style={imageStyle}
-                         src={defaultNoImg(thumb)}
+                         src={thumb}
                          alt={'대표 이미지'}
                          onClick={onChangeImageHandler}
                          onError={e => {

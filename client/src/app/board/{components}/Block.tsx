@@ -38,13 +38,9 @@ export default function Block(props: BlockProps) {
     const [isCopy, setIsCopy] = useState<CopyProps>({} as CopyProps);
     const [touch, setTouch] = useState(setTimeout(() => false, 0));
 
-    const block = useMemo(() => {
-        return blockTypeList.find(b=> b.code === props.code);
-    },[blockService, code])
+    const block = blockTypeList.find(b=> b.code === props.code);
 
-    const Component = useMemo(() => {
-        return block?.component!;
-    },[blockService, code]);
+    const Component = block?.component!;
 
     const onFocusHandler = (e: React.FocusEvent<HtmlElements>) => {
         if(e.currentTarget.ariaRoleDescription !== 'text') {

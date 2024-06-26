@@ -91,6 +91,7 @@ const QWait = ({
                 </span>
                 {
                     board?.data?.isWriter
+                    || board.isView
                     ? <span className={'flex justify-center items-center font-bold'}>
                         {moment(endDate).format('YYYY년 MM월 DD일')}
                     </span>
@@ -109,6 +110,7 @@ const QWait = ({
                 </span>
                 {
                     board?.data?.isWriter
+                    || board.isView
                     ? <span className={'flex justify-center items-center font-bold'}>
                         {point}
                     </span>

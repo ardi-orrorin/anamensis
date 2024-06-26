@@ -67,23 +67,28 @@ public class UserService implements ReactiveUserDetailsService {
     }
 
     public Mono<UserResponse.MyPage> findUserInfoCache(String userId) {
+        String key =  "user:" + userId + ":info";
 
-        Object member = redisTemplate.opsForValue().get("user:" + userId + ":info");
-        if(Objects.isNull(member)) {
-            addUserInfoCache(userId);
-            member = redisTemplate.opsForValue().get("user:" + userId + ":info");
-        }
+        return Mono.fromCallable(()-> redisTemplate.opsForValue().get(key))
+            .flatMap(attendInfo -> {
+                if(!Objects.isNull(attendInfo)) {
+                    return Mono.just(attendInfo);
+                }
 
-        return Mono.justOrEmpty((UserResponse.MyPage) member)
-                .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
+                return addUserInfoCache(userId)
+                    .thenReturn(redisTemplate.opsForValue().get(key));
+            })
+            .flatMap(attendInfo -> Mono.justOrEmpty((UserResponse.MyPage) attendInfo))
+            .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
     }
 
-    public void addUserInfoCache(String userId) {
+    public Mono<Void> addUserInfoCache(String userId) {
         MemberResultMap member = memberMapper.findMemberInfo(userId).orElseThrow(() ->
             new RuntimeException("User not found"));
 
         UserResponse.MyPage myPage = UserResponse.MyPage.transToMyPage(member);
         redisTemplate.opsForValue().set("user:" + userId + ":info", myPage, Duration.ofDays(1));
+        return Mono.empty();
     }
 
     @Override

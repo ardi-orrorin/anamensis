@@ -2,7 +2,6 @@ package com.anamensis.server.service;
 
 import com.anamensis.server.dto.response.AttendResponse;
 import com.anamensis.server.entity.Attendance;
-import com.anamensis.server.entity.LogHistory;
 import com.anamensis.server.entity.Member;
 import com.anamensis.server.mapper.AttendanceMapper;
 import com.anamensis.server.mapper.MemberMapper;
@@ -16,6 +15,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @RequiredArgsConstructor
@@ -48,37 +48,47 @@ public class AttendanceService {
 
     public Mono<Attendance> update(long memberPk) {
         return findByMemberPk(memberPk)
-                .doOnNext(this::updateAttendance)
+                .flatMap(this::updateAttendance)
                 .doOnNext(attendanceMapper::update);
     }
 
     public Mono<AttendResponse.AttendInfo> findAttendInfo(String userId) {
         String key = "attend:" + userId + ":info";
-        Object attendInfo = redisTemplate.opsForValue().get(key);
 
-        if(Objects.isNull(attendInfo)) {
-            addAttendInfoCache(userId);
-            attendInfo = redisTemplate.opsForValue().get(key);
-        }
+        return Mono.fromCallable(() -> redisTemplate.opsForValue().get(key))
+            .flatMap(attendInfo -> {
+                if(!Objects.isNull(attendInfo)) {
+                    return Mono.just(attendInfo);
+                }
 
-        return Mono.justOrEmpty((AttendResponse.AttendInfo) attendInfo)
-                .switchIfEmpty(Mono.error(new RuntimeException("출석 정보 조회 실패")));
+                return addAttendInfoCache(userId)
+                    .thenReturn(redisTemplate.opsForValue().get(key));
+
+            })
+            .flatMap(attendInfo -> Mono.justOrEmpty((AttendResponse.AttendInfo) attendInfo))
+            .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
     }
 
-    public void addAttendInfoCache(String userId) {
-        Member member = memberMapper.findMemberByUserId(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-        Attendance attendance = attendanceMapper.findByMemberPk(member.getId())
-            .orElseThrow(() -> new RuntimeException("출석 정보 조회 실패"));
-        AttendResponse.AttendInfo attendInfo = AttendResponse.AttendInfo.mergeUserAndAttendance(member, attendance);
-
-        String key = "attend:" + member.getUserId() + ":info";
-        redisTemplate.opsForValue().set(key, attendInfo, Duration.ofDays(1));
+    public Mono<Void> addAttendInfoCache(String userId) {
+        AtomicReference<Member> memberAtomic = new AtomicReference<>();
+        return Mono.justOrEmpty(memberMapper.findMemberByUserId(userId))
+            .switchIfEmpty(Mono.error(new RuntimeException("User not found")))
+            .doOnNext(memberAtomic::set)
+            .flatMap(m -> Mono.justOrEmpty(attendanceMapper.findByMemberPk(m.getId())))
+            .switchIfEmpty(Mono.error(new RuntimeException("User not found")))
+            .flatMap(attendance -> Mono.fromCallable(() ->
+                AttendResponse.AttendInfo.mergeUserAndAttendance(memberAtomic.get(), attendance)
+            ))
+            .doOnNext(attendInfo1 -> {
+                String key = "attend:" + memberAtomic.get().getUserId() + ":info";
+                redisTemplate.opsForValue().set(key, attendInfo1, Duration.ofDays(1));
+            })
+            .then();
     }
 
-    private void updateAttendance(Attendance attendance) {
+    private Mono<Attendance> updateAttendance(Attendance attendance) {
         if (attendance.getLastDate().isEqual(LocalDate.now())) {
-            throw new RuntimeException("오늘은 이미 출석 했습니다.");
+            return Mono.error(new RuntimeException("오늘은 이미 출석 했습니다."));
         }
 
         if (attendance.getLastDate().plusDays(1).isEqual(LocalDate.now())) {
@@ -88,5 +98,7 @@ public class AttendanceService {
         }
 
         attendance.setLastDate(LocalDate.now());
+
+        return Mono.just(attendance);
     }
 }

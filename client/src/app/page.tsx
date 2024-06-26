@@ -89,7 +89,6 @@ export default function Page() {
             }
         });
 
-
         ob.observe(moreRef.current as Element);
         return () => ob.disconnect();
     },[moreRef?.current]);

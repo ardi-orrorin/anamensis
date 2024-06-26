@@ -9,7 +9,7 @@ import TempFileProvider, {TempFileI} from "@/app/board/{services}/TempFileProvid
 import apiCall from "@/app/{commons}/func/api";
 import {useSearchParams} from "next/navigation";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
-import useSWR from "swr";
+import useSWR, {preload} from "swr";
 import {initBlock} from "@/app/board/{services}/funcs";
 
 export default function Page({children, params} : {children: ReactNode, params: {id: string}}) {
@@ -82,14 +82,41 @@ export default function Page({children, params} : {children: ReactNode, params: 
         setSelectedBlock(window.location.hash.replace('#block-', '') || '');
     },[]);
 
-    useEffect(()=> {
+    useEffect(() => {
         if(isNewBoard) return ;
 
         setLoading(true);
 
         fetchBoard();
 
-    },[params.id])
+    },[params.id]);
+
+
+    const fetchBoard = () => {
+      preload(`/api/board/${params.id}`, async () => {
+            return await apiCall<BoardI & {isLogin : boolean}>({
+                path: '/api/board/' + params.id,
+                method: 'GET',
+                call: 'Proxy'
+            })
+        })
+            .then(res => {
+                setBoard({
+                    ...board,
+                    data: res.data,
+                    isView: true
+                });
+            }).catch(e => {
+            alert(e.response.data);
+            location.href = '/';
+        })
+        .finally(() => {
+            setLoading(false);
+        });
+    }
+
+
+
 
     useSWR(`/api/board/comment/${params.id}`, async () => {
         if(isNewBoard) return ;
@@ -98,29 +125,30 @@ export default function Page({children, params} : {children: ReactNode, params: 
     },{
         keepPreviousData: true,
         revalidateOnMount: true,
+        revalidateOnFocus: true,
     });
 
 
-    const fetchBoard = async () => {
-        return await apiCall<BoardI & {isLogin : boolean}>({
-            path: '/api/board/' + params.id,
-            method: 'GET',
-            call: 'Proxy'
-        })
-        .then(res => {
-            setBoard({
-                ...board,
-                data: res.data,
-                isView: true
-            });
-        }).catch(e => {
-            alert(e.response.data);
-            location.href = '/';
-        })
-        .finally(() => {
-            setLoading(false);
-        });
-    }
+    // const fetchBoard = async () => {
+    //     return await apiCall<BoardI & {isLogin : boolean}>({
+    //         path: '/api/board/' + params.id,
+    //         method: 'GET',
+    //         call: 'Proxy'
+    //     })
+    //     .then(res => {
+    //         setBoard({
+    //             ...board,
+    //             data: res.data,
+    //             isView: true
+    //         });
+    //     }).catch(e => {
+    //         alert(e.response.data);
+    //         location.href = '/';
+    //     })
+    //     .finally(() => {
+    //         setLoading(false);
+    //     });
+    // }
 
     const fetchComment = async () => {
         return await apiCall<CommentI[]>({

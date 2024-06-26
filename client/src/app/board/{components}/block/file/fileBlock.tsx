@@ -27,12 +27,8 @@ export default function FileBlock (props: FileBlockProps) {
         >
             {
                 !value &&
-                <FileUpload seq={seq}
-                            code={code}
-                            value={value}
-                            hash={hash}
+                <FileUpload {...{seq, code, value,hash, onMouseEnterHandler}}
                             onUploadFileUrl={onChangeValueHandler!}
-                            onMouseEnterHandler={onMouseEnterHandler!}
                             isImage={Component === FileImage}
                 />
             }

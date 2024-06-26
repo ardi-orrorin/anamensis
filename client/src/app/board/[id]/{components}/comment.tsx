@@ -23,7 +23,7 @@ export type SaveComment = {
 }
 
 const Comment = () => {
-    const {comment, setComment, board} = useContext(BoardProvider);
+    const {comment, board} = useContext(BoardProvider);
     const {newComment, setNewComment} = useContext(BoardProvider);
     const [loading, setLoading] = useState(false);
 
@@ -89,33 +89,33 @@ const Comment = () => {
                 board.isView
                 && board.data.isLogin
                 && <div className={'w-full flex gap-1'}>
-                <button className={[
-                    'absolute h-16 flex flex-col justify-center items-center text-xs text-white bg-blue-400 hover:bg-red-600 duration-300'
-                ].join(' ')}
-                        style={{width: newComment.blockSeq !== undefined && newComment.blockSeq !== null ? '29px' : '0'}}
-                        onClick={onDeleteHandler}
-                >
-                  <span>{newComment.blockSeq?.split('-')[1]}</span>
-                </button>
-                <textarea className={[
-                    'w-full h-16 border border-solid border-gray-200  resize-none text-sm outline-0 duration-300',
-                    newComment.blockSeq !== undefined && newComment.blockSeq !== null ? 'pl-10 pr-2 py-2' : 'p-2'
-                ].join(' ')}
-                          placeholder={'댓글을 입력하세요'}
-                          value={newComment.content}
-                          onChange={onChange}
-                />
-                <button className={'w-20 border border-solid border-gray-200 text-gray-700 hover:bg-gray-700 hover:text-white duration-300 focus:outline-none focus:bg-gray-700 focus:text-white'}
-                        onClick={submitClickHandler}
-                        disabled={loading}
-                >
-                    {
-                    loading
-                        ? <LoadingSpinner size={20} />
-                        : '등록'
-                    }
-                </button>
-              </div>
+                    <button className={[
+                        'absolute h-16 flex flex-col justify-center items-center text-xs text-white bg-blue-400 hover:bg-red-600 duration-300'
+                    ].join(' ')}
+                            style={{width: newComment.blockSeq !== undefined && newComment.blockSeq !== null ? '29px' : '0'}}
+                            onClick={onDeleteHandler}
+                    >
+                      <span>{newComment.blockSeq?.split('-')[1]}</span>
+                    </button>
+                    <textarea className={[
+                        'w-full h-16 border border-solid border-gray-200  resize-none text-sm outline-0 duration-300',
+                        newComment.blockSeq !== undefined && newComment.blockSeq !== null ? 'pl-10 pr-2 py-2' : 'p-2'
+                    ].join(' ')}
+                              placeholder={'댓글을 입력하세요'}
+                              value={newComment.content}
+                              onChange={onChange}
+                    />
+                    <button className={'w-20 border border-solid border-gray-200 text-gray-700 hover:bg-gray-700 hover:text-white duration-300 focus:outline-none focus:bg-gray-700 focus:text-white'}
+                            onClick={submitClickHandler}
+                            disabled={loading}
+                    >
+                        {
+                        loading
+                            ? <LoadingSpinner size={20} />
+                            : '등록'
+                        }
+                    </button>
+                </div>
             }
             <div className={'w-auto flex flex-col gap-4'}>
                 {

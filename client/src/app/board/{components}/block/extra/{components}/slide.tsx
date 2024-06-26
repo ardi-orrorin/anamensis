@@ -21,6 +21,9 @@ const Slide = ({
     onChaneDefaultIndexHandler: (index: number) => void;
 }) => {
 
+    const slideWidth = 150;
+    const totalWidth = images.length * slideWidth ;
+
     const [mouseDownX, setMouseDownX] = useState<number>(0);
 
     const {setAlbumToggle } = useContext(AlbumProvider);
@@ -29,9 +32,6 @@ const Slide = ({
     const containerRef = useRef<HTMLDivElement>(null);
 
     const [containerPosition, setContainerPosition] = useState<number>(0);
-
-    const slideWidth = 150;
-    const totalWidth = images.length * slideWidth ;
 
     const containerMaxWidth = useMemo(()=> {
         if(!containerRef?.current) return 0;

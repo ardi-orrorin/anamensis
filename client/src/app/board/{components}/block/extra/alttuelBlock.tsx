@@ -28,12 +28,14 @@ type ImgViewProps = {
 }
 
 const AlttuelBlock = (props: ExpendBlockProps) => {
-
     const {
         hash, value
         , onChangeExtraValueHandler
         , isView, type
     }: ExpendBlockProps = props;
+
+    const maxFileSize = 5 * 1024 * 1024;
+
     const extraValue = props.extraValue as AlttuelBlockProps;
     const {setWaitUploadFiles, setWaitRemoveFiles} = useContext(TempFileProvider);
 
@@ -84,7 +86,7 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
 
     const uploadImage = async (file: File) => {
         if(!file) return ;
-        if(file.size > 1024 * 1024 * 5) return alert('5MB 이하의 파일만 업로드 가능합니다.');
+        if(file.size > maxFileSize) return alert('5MB 이하의 파일만 업로드 가능합니다.');
 
         const fileContent: FileContentType = {
             tableCodePk: 2,
@@ -204,6 +206,7 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
         onChangeExtraValueHandler(newValue);
     }
 
+
     return (
         <div id={`block-${hash}`}
              className={'w-full'}
@@ -211,40 +214,16 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
              ref={el => {props!.blockRef!.current[props.seq] = el}}
         >
             <div style={containerStyle(isView ?? false)}>
-               <ImageThumb thumb={thumb}
-                           extraValue={extraValue}
-                           imgViewProps={imgViewProps}
-                           setImgViewProps={setImgViewProps}
-                           oriImg={oriImg}
-                           onChangeImageHandler={onChangeImageHandler}
-                           isView={isView ?? false}
-                           imageRef={imageRef}
-                           onChangeFileHandler={onChangeFileHandler}
+               <ImageThumb {...{thumb, extraValue, imgViewProps, oriImg, imageRef,
+                   setImgViewProps, onChangeImageHandler, onChangeFileHandler, isView: isView!}}
                />
                 <div style={infoContainerStyle}>
-                    <Title isView={isView ?? false}
-                           value={value}
-                           onChangeHandler={onChangeHandler}
-                    />
-                    <SiteLink isView={isView ?? false}
-                              extraValue={extraValue}
-                              onChangeHandler={onChangeHandler}
-                    />
+                    <Title {...{value, onChangeHandler, isView: isView!}} />
+                    <SiteLink {...{extraValue, onChangeHandler, isView: isView!}} />
                     <div style={infoDetailContainerStyle}>
-                        <Price isView={isView ?? false}
-                               extraValue={extraValue}
-                               onChangeHandler={onChangeHandler}
-                               addCommasToNumber={addCommasToNumber}
-                        />
-                        <DiscountCode isView={isView ?? false}
-                                      extraValue={extraValue}
-                                      onChangeHandler={onChangeHandler}
-                        />
-                        <DeliveryFee isView={isView ?? false}
-                                        extraValue={extraValue}
-                                        onChangeHandler={onChangeHandler}
-                                        addCommasToNumber={addCommasToNumber}
-                        />
+                        <Price {...{extraValue, onChangeHandler, addCommasToNumber, isView: isView!}} />
+                        <DiscountCode {...{extraValue, onChangeHandler, isView: isView!}} />
+                        <DeliveryFee {...{extraValue, onChangeHandler, addCommasToNumber, isView: isView!}} />
                     </div>
                     <div style={tagsContainerStyle}>
                         {
@@ -256,9 +235,7 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
                                     Array.from(extraValue?.tags ?? [])
                                         .map((tag, index) =>
                                             <Tag key={index}
-                                                 tag={tag}
-                                                 isView={isView ?? false}
-                                                 onClick={deleteTagHandler}
+                                                 {...{tag, deleteTagHandler, isView: isView!}}
                                             />
                                         )
                                 }
@@ -529,13 +506,13 @@ const Tag = (
 : {
     tag: string,
     isView: boolean,
-    onClick: (tag: string) => void
+    deleteTagHandler: (tag: string) => void
 }) => {
-    const {tag, isView, onClick} = props;
+    const {tag, isView, deleteTagHandler} = props;
     return (
         <button style={tagStyle}
                 disabled={isView}
-                onClick={()=> onClick(tag)}
+                onClick={()=> deleteTagHandler(tag)}
         >
             {tag}
             {

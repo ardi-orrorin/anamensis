@@ -15,14 +15,6 @@ const NavMain = async () => {
 
     const isLogged = (cookies().get('next.access.token')  || cookies().get('next.refresh.token')) !== undefined;
 
-    const menuItems : NavItemProps[] = [
-        {
-            name: 'Board',
-            url: '/board',
-            loginRequired: false
-        },
-    ];
-
     const rightMenuItems : NavItemProps[] = [
         {
             name: <FontAwesomeIcon icon={faPenToSquare} />,

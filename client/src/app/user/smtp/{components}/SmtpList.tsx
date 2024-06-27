@@ -10,8 +10,6 @@ import {preload} from "swr";
 const SmtpList = () => {
     const [data, setData] = useState<PageResponse<SmtpCardProps>>({} as PageResponse<SmtpCardProps>);
 
-    const [loading, setLoading] = useState(true);
-
     preload('/api/user/smtp/list', async () => {
         return await apiCall<PageResponse<SmtpCardProps>>({
             path: '/api/user/smtp/list',
@@ -22,22 +20,21 @@ const SmtpList = () => {
     .then(res => {
         setData(res);
     })
-    .finally(() => {
-        setLoading(false);
-    });
 
     return (
         <div className={'w-full lg:w-1/2 flex flex-col gap-3'}>
             {
-                loading
-                    ? <LoadingSpinner size={20} />
-                    : data?.content
-                        ?.sort((a, b) =>  b.id - a.id)
-                        .map((smtp, index) => {
-                            return (
-                                <SmtpCard key={index} {...smtp} />
-                            )
-                        })
+                data?.content?.length > 0
+                ? data?.content?.sort((a, b) =>  b.id - a.id)
+                    .map((smtp, index) => {
+                        return (
+                            <SmtpCard key={index} {...smtp} />
+                        )
+                    })
+                : <div className={'flex justify-center items-center h-full'}>
+                    등록된 Smtp가 없습니다.
+                </div>
+
             }
         </div>
     )

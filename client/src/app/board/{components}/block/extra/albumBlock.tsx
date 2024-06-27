@@ -50,7 +50,9 @@ const AlbumBlock = (props: ExpendBlockProps) => {
 
     useEffect(() => {
         if(!onChangeExtraValueHandler) return;
+
         if(extraValue?.images?.length > 0) return;
+
         onChangeExtraValueHandler({
             defaultIndex: 0,
             images: [],
@@ -89,6 +91,10 @@ const AlbumBlock = (props: ExpendBlockProps) => {
             file.size > maxFileSize || size++;
         }
 
+        setUploadProgress({
+            size,
+            progress: 0,
+        });
 
         for(const file of files) {
             upload(file, fileContent, uploadedImages, size, progress);
@@ -102,6 +108,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         if(file.size > maxFileSize) return;
 
         const blob = new Blob([JSON.stringify(fileContent)], {type: 'application/json'})
+
         const formData = new FormData();
         formData.append('file', file);
         formData.append('fileContent', blob);
@@ -126,6 +133,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         if(!res) return;
 
         const {id, filePath, fileName} = res;
+
         setWaitUploadFiles((prev) => {
             return [...prev, {id, filePath, fileName}];
         });
@@ -186,19 +194,15 @@ const AlbumBlock = (props: ExpendBlockProps) => {
                 defaultIndex: extraValue.defaultIndex === index ? 0 : extraValue.defaultIndex,
             } as ImageShowProps);
 
-
-
             deleteImage({
                 absolutePath,
                 setWaitUploadFiles,
                 setWaitRemoveFiles,
             });
 
-
             setWaitUploadFiles(prevState => {
                 return prevState.filter(item => item.fileName !== fileName);
             });
-
 
             setWaitRemoveFiles(prevState => {
                 return [...prevState, {id: 0, fileName, filePath}];
@@ -223,6 +227,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
     ]
 
     return (
+        <AlbumProvider.Provider value={{albumToggle, setAlbumToggle}}>
         <div id={`block_${hash}`}
              style={containerStyle}
              aria-roledescription={type}
@@ -230,7 +235,6 @@ const AlbumBlock = (props: ExpendBlockProps) => {
                  props!.blockRef!.current[props.seq] = el
              }}
         >
-        <AlbumProvider.Provider value={{albumToggle, setAlbumToggle}}>
             {
                 !isView
                 && extraValue?.images?.length < maxImage
@@ -247,6 +251,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
                         </p>
                         {
                             uploadProgress.size > 0
+                            && extraValue?.images?.length > 0
                             && extraValue?.images?.length < maxImage
                             && <div className={'flex flex-col w-full gap-3'}>
                                 <div className={'w-full h-2 bg-gray-200'}>
@@ -312,8 +317,8 @@ const AlbumBlock = (props: ExpendBlockProps) => {
                 && albumToggle?.viewToggle
                 && <ImageView images={extraValue.images} />
             }
-        </AlbumProvider.Provider>
         </div>
+        </AlbumProvider.Provider>
     )
 }
 

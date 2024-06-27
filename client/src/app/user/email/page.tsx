@@ -1,11 +1,12 @@
 'use client';
 
-import axios from "axios";
 import React, {useEffect, useMemo, useState} from "react";
-import {faSpinner} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {AuthType} from "@/app/login/{services}/types";
 import apiCall from "@/app/{commons}/func/api";
+import {mutate, preload} from "swr";
+import {createDebounce} from "@/app/{commons}/func/debounce";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 
 export interface UserInfoI {
     userId: string;
@@ -23,49 +24,56 @@ export interface AuthPropsI {
     sauth: boolean;
 }
 
+const fetchData = apiCall<UserInfoI>({
+    path: '/api/user/email',
+    method: 'GET',
+    isReturnData: true,
+})
+
+
 export default function Page() {
 
     const [userInfo, setUserInfo] = useState<UserInfoI>({} as UserInfoI);
-
     const [loading, setLoading] = useState<boolean>(false);
 
-    useEffect(() => {
-        apiCall<UserInfoI>({
+    preload('/user/email', async () => {
+        return await apiCall<UserInfoI>({
             path: '/api/user/email',
             method: 'GET',
-        }).then(res => {
-            setUserInfo(res.data);
-        });
-    },[loading]);
+            isReturnData: true,
+        })
+    })
+    .then(res => {
+        setUserInfo(res);
+    })
 
-
-    const isSAuthEamil = useMemo(() => {
+    const isSAuthEmail = useMemo(() => {
         return userInfo.sauthType === AuthType.EMAIL && userInfo.sauth;
     },[userInfo]);
 
+
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+
         const data: AuthPropsI = {
             sauth: e.target.checked,
             sauthType: userInfo.sauthType !== AuthType.EMAIL ? AuthType.EMAIL : AuthType.NONE
         };
-        updateSAuth(data);
-    }
 
-    const updateSAuth = async (data: AuthPropsI) => {
         setLoading(true);
-
-        await apiCall<UserInfoI, AuthPropsI>({
+        apiCall<UserInfoI, AuthPropsI>({
             path: '/api/user/email',
             method: 'PUT',
             body: data,
-        }).then(res => {
-            setUserInfo(res.data);
+            isReturnData: true,
+        }).then(async (res) => {
+            await mutate('/user/email', fetchData);
         }).catch(err => {
             console.log(err);
         }).finally(() => {
             setLoading(false);
         });
     }
+
     return (
         <div>
             <div className={'flex flex-col gap-5 w-full'}>
@@ -85,7 +93,7 @@ export default function Page() {
                     <label className="inline-flex items-center cursor-pointer">
                         <input type="checkbox"
                                className={"sr-only peer hidden"}
-                               checked={isSAuthEamil}
+                               checked={isSAuthEmail}
                                onChange={onChangeHandler}
                         />
                         <div className="relative w-11 h-6 ray-200 peer-focus:outline-none peer-focus:ring-4
@@ -95,7 +103,7 @@ export default function Page() {
                                         after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5
                                         after:transition-all dark:border-gray-600 peer-checked:bg-blue-300"></div>
                         <span className="ms-3 text-sm fontclassNameum text-blue-7000 items-center">
-                            {isSAuthEamil ? '사용 중' : '사용 안함'}
+                            {isSAuthEmail ? '사용 중' : '사용 안함'}
                         </span>
                     </label>
                 </div>

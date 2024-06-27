@@ -415,12 +415,13 @@ const ImageThumb = ({
     onChangeFileHandler: (e: ChangeEvent<HTMLInputElement>) => void,
 }) => {
 
+    console.log(thumb)
     if(!isView)
         return (
             <>
                 <div style={{position: 'relative'}}>
                     <img style={imageStyle}
-                         src={defaultNoImg(thumb)}
+                         src={thumb}
                          alt={'대표 이미지'}
                          onClick={onChangeImageHandler}
                          onError={e => {
@@ -450,7 +451,7 @@ const ImageThumb = ({
                 <Image style={imageStyle}
                        width={150}
                        height={150}
-                       src={defaultNoImg(thumb)}
+                       src={thumb}
                        alt={'대표 이미지'}
                        onError={e => {
                            e.currentTarget.src = NO_IMAGE;
@@ -478,7 +479,7 @@ const ImageThumb = ({
                 {
                     imgViewProps.viewImg
                     && <div style={originImgStyle}>
-                    <Image src={defaultNoImg(oriImg)}
+                    <Image src={oriImg}
                            alt={'원본 이미지'}
                            width={700}
                            height={700}

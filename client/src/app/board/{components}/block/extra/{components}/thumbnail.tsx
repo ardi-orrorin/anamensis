@@ -28,7 +28,7 @@ const Thumbnail = ({
     useEffect(()=> {
         const reSize = setTimeout(() => {
             setDivWidth(Number(divRef?.current?.clientWidth));
-        },900);
+        },700);
 
         return () => {
             clearTimeout(reSize);

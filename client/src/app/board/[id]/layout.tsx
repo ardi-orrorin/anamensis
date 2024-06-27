@@ -117,18 +117,19 @@ export default function Page({children, params} : {children: ReactNode, params: 
     }
 
     const fetchComment = useSWR(`/api/board/comment/${params.id}`, async () => {
+        if(isNewBoard) return;
         return await apiCall<CommentI[]>({
             path: '/api/board/comment',
             method: 'GET',
             params: {boardPk: params.id},
             call: 'Proxy'
         })
-            .then(res => {
-                setComment(res.data);
-            })
-            .finally(() => {
-                setCommentLoading(false);
-            });
+        .then(res => {
+            setComment(res.data);
+        })
+        .finally(() => {
+            setCommentLoading(false);
+        });
     })
 
     const fetchRate = () => {

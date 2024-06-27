@@ -29,7 +29,7 @@ public class AwsS3Provider {
 
     private enum ThumbnailType { PROFILE, CONTENT_THUMBNAIL, ALTTUEL_THUMBNAIL, ALBUM_THUMBNAIL, ORI }
 
-    private final String CACHE_CONTROL = "public, max-age=864000";
+    private final String CACHE_CONTROL = "public, max-age=" + (60 * 60 * 24 * 365);
 
     private static final float PROFILE = 0.4f;
     private static final float CONTENT_THUMBNAIL = 0.6f;
@@ -39,7 +39,6 @@ public class AwsS3Provider {
 
     private static final ThumbnailType[] CROP_LIST = {
         ThumbnailType.PROFILE,
-//        ThumbnailType.CONTENT_THUMBNAIL,
         ThumbnailType.ALTTUEL_THUMBNAIL,
         ThumbnailType.ALBUM_THUMBNAIL
     };
@@ -78,7 +77,6 @@ public class AwsS3Provider {
                     }
 
                     return Mono.just(true);
-
                 });
     }
 

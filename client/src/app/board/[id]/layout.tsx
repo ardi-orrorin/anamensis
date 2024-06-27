@@ -89,6 +89,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
         fetchBoard();
 
+        fetchRate();
     },[params.id]);
 
 
@@ -100,13 +101,13 @@ export default function Page({children, params} : {children: ReactNode, params: 
                 call: 'Proxy'
             })
         })
-            .then(res => {
-                setBoard({
-                    ...board,
-                    data: res.data,
-                    isView: true
-                });
-            }).catch(e => {
+        .then(res => {
+            setBoard({
+                ...board,
+                data: res.data,
+                isView: true
+            });
+        }).catch(e => {
             alert(e.response.data);
             location.href = '/';
         })
@@ -115,61 +116,28 @@ export default function Page({children, params} : {children: ReactNode, params: 
         });
     }
 
-
-
-
-    useSWR(`/api/board/comment/${params.id}`, async () => {
-        if(isNewBoard) return ;
-
-        fetchComment();
-    },{
-        keepPreviousData: true,
-        revalidateOnMount: true,
-        revalidateOnFocus: true,
-    });
-
-
-    // const fetchBoard = async () => {
-    //     return await apiCall<BoardI & {isLogin : boolean}>({
-    //         path: '/api/board/' + params.id,
-    //         method: 'GET',
-    //         call: 'Proxy'
-    //     })
-    //     .then(res => {
-    //         setBoard({
-    //             ...board,
-    //             data: res.data,
-    //             isView: true
-    //         });
-    //     }).catch(e => {
-    //         alert(e.response.data);
-    //         location.href = '/';
-    //     })
-    //     .finally(() => {
-    //         setLoading(false);
-    //     });
-    // }
-
-    const fetchComment = async () => {
+    const fetchComment = useSWR(`/api/board/comment/${params.id}`, async () => {
         return await apiCall<CommentI[]>({
             path: '/api/board/comment',
             method: 'GET',
             params: {boardPk: params.id},
             call: 'Proxy'
         })
-        .then(res => {
-            setComment(res.data);
-        })
-        .finally(() => {
-            setCommentLoading(false);
-        });
-    }
+            .then(res => {
+                setComment(res.data);
+            })
+            .finally(() => {
+                setCommentLoading(false);
+            });
+    })
 
-    const fetchRate = async () => {
-        await apiCall<RateInfoI>({
-            path: '/api/board/rate/' + params.id,
-            method: 'GET',
-            call: 'Proxy'
+    const fetchRate = () => {
+        preload(`/api/board/rate/${params.id}`, async () => {
+            return await apiCall<RateInfoI>({
+                path: '/api/board/rate/' + params.id,
+                method: 'GET',
+                call: 'Proxy'
+            })
         })
         .then(res => {
             setRateInfo(res.data);

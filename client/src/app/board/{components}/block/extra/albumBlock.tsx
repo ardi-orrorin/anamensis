@@ -89,6 +89,10 @@ const AlbumBlock = (props: ExpendBlockProps) => {
             file.size > maxFileSize || size++;
         }
 
+        setUploadProgress({
+            size,
+            progress: 0,
+        });
 
         for(const file of files) {
             upload(file, fileContent, uploadedImages, size, progress);

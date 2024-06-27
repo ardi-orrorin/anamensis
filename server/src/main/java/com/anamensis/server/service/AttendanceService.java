@@ -55,14 +55,15 @@ public class AttendanceService {
     public Mono<AttendResponse.AttendInfo> findAttendInfo(String userId) {
         String key = "attend:" + userId + ":info";
 
-        return Mono.fromCallable(() -> redisTemplate.opsForValue().get(key))
-            .flatMap(attendInfo -> {
-                if(!Objects.isNull(attendInfo)) {
-                    return Mono.just(attendInfo);
-                }
+        return Mono.fromCallable(() -> redisTemplate.hasKey(key))
+            .flatMap(hasKey -> {
+                if(hasKey) {
+                    return Mono.fromCallable(() -> redisTemplate.opsForValue().get(key));
 
-                return addAttendInfoCache(userId)
-                    .thenReturn(redisTemplate.opsForValue().get(key));
+                } else {
+                    return addAttendInfoCache(userId)
+                            .then(Mono.fromCallable(() -> redisTemplate.opsForValue().get(key)));
+                }
 
             })
             .flatMap(attendInfo -> Mono.justOrEmpty((AttendResponse.AttendInfo) attendInfo))

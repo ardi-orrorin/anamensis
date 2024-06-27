@@ -69,14 +69,14 @@ public class UserService implements ReactiveUserDetailsService {
     public Mono<UserResponse.MyPage> findUserInfoCache(String userId) {
         String key =  "user:" + userId + ":info";
 
-        return Mono.fromCallable(()-> redisTemplate.opsForValue().get(key))
-            .flatMap(attendInfo -> {
-                if(!Objects.isNull(attendInfo)) {
-                    return Mono.just(attendInfo);
+        return Mono.fromCallable(()-> redisTemplate.hasKey(key))
+            .flatMap(hasKey -> {
+                if(hasKey) {
+                    return Mono.fromCallable(() -> redisTemplate.opsForValue().get(key));
+                } else {
+                    return addUserInfoCache(userId)
+                        .thenReturn(redisTemplate.opsForValue().get(key));
                 }
-
-                return addUserInfoCache(userId)
-                    .thenReturn(redisTemplate.opsForValue().get(key));
             })
             .flatMap(attendInfo -> Mono.justOrEmpty((UserResponse.MyPage) attendInfo))
             .switchIfEmpty(Mono.error(new RuntimeException("User not found")));

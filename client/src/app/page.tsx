@@ -13,6 +13,7 @@ import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchPar
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {createDebounce} from "@/app/{commons}/func/debounce";
+import {preload} from "swr";
 
 
 type DynamicPage = {
@@ -22,6 +23,7 @@ type DynamicPage = {
 
 export default function Page() {
 
+    const pageSize = 20;
     const [initLoading, setInitLoading] = useState(true);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState<BoardListI[]>([]);
@@ -35,7 +37,7 @@ export default function Page() {
 
     const [searchParams, setSearchParams] = useState<BoardListParamsI>({
         page: 1,
-        size: 20,
+        size: pageSize,
     } as BoardListParamsI);
 
     const moreRef = React.useRef<HTMLDivElement>(null);
@@ -45,33 +47,32 @@ export default function Page() {
     useEffect(() => {
         setLoading(true);
         !searchParams.add && setData([]);
-        const fetch = async () => {
-            await apiCall<PageResponse<BoardListI>, BoardListParamsI>({
+        preload([`/api/board`,searchParams], async (args) => {
+            return await apiCall<PageResponse<BoardListI>, BoardListParamsI>({
                 path: '/api/board',
                 method: 'GET',
-                params: searchParams
+                params: args[1]
             })
-            .then(res => {
-                setLoading(false);
-                setInitLoading(false);
+        })
+        .then(res => {
+            if(!res) return;
+            setLoading(false);
+            setInitLoading(false);
 
-                const roles = res.headers['next.user.roles'] || ''
+            const roles = res.headers['next.user.roles'] || ''
 
-                if(roles) setRoles(JSON.parse(roles));
+            if(roles) setRoles(JSON.parse(roles));
 
-                const condition = res.data.content.length < searchParams.size;
+            const condition = res.data.content.length < searchParams.size;
 
-                condition ? setDynamicPage({...dynamicPage, isEndOfList: true})
-                    : setDynamicPage({...dynamicPage, isVisible:false}) ;
+            condition ? setDynamicPage({...dynamicPage, isEndOfList: true})
+                : setDynamicPage({...dynamicPage, isVisible:false}) ;
 
-                searchParams.add
-                    ? setData([...data, ...res.data.content])
-                    : setData(res.data.content);
+            searchParams.add
+                ? setData([...data, ...res.data.content])
+                : setData(res.data.content);
 
-            })
-        }
-
-        fetch();
+        })
     },[searchParams])
 
 
@@ -95,7 +96,7 @@ export default function Page() {
 
 
     const onSearchHandler = (init: boolean) => {
-        const initPage = {page: 1, size: 20};
+        const initPage = {page: 1, size: pageSize};
 
         if(init) {
             setSearchValue('')

@@ -4,28 +4,31 @@ import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {useRouter} from "next/navigation";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
-import useSWR, {mutate} from "swr";
+import useSWR, {mutate, preload} from "swr";
+
 
 export default function AttendInfo() {
-
-    const router = useRouter();
 
     const [user, setUser] = useState<AttendInfoI>({} as AttendInfoI);
     const [loading, setLoading] = useState<boolean>(false);
     const debounce = createDebounce(500);
 
-    const initFetch = useSWR('/user/attend', async () => {
-        if(loading) return;
-        await apiCall<AttendInfoI>({
+    preload('/user/attend', async () => {
+        return await apiCall<AttendInfoI>({
             path: "/api/user/attend",
             method: "GET",
-        })
-            .then((res) => {
-                setUser(res.data);
-            });
-    },{
-        revalidateOnFocus: true,
+            isReturnData: true,
+        });
+    }).then((res) => {
+        setUser(res);
     });
+
+    const fetchData = apiCall<AttendInfoI>({
+        path: "/api/user/attend",
+        method: "GET",
+        isReturnData: true,
+    })
+
 
     const attend = () => {
         setLoading(true);
@@ -35,12 +38,13 @@ export default function AttendInfo() {
                 path: "/api/user/attend/check",
                 method: "GET",
             })
-            .then((res) => {
+            .then(async (res) => {
                 const message = res.data === 'success'
                     ? '출석체크 성공!'
                     : '이미 출석하셨습니다. 내일 다시 시도해주세요.';
 
                 alert(message);
+                await mutate('/user/attend', fetchData);
             })
             .finally(() => {
                 setLoading(false);
@@ -48,8 +52,6 @@ export default function AttendInfo() {
         }
         debounce(fetch);
     }
-
-    if(initFetch.isLoading) return <LoadingSpinner size={30} />;
 
     return (
         <div className={'w-full h-full flex flex-col gap-5 justify-center items-start'}>

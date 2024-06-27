@@ -1,13 +1,21 @@
 import {Category} from "@/app/board/{services}/types";
 import {useContext, useEffect, useState} from "react";
 import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
+import {useSearchParams} from "next/navigation";
+import {mutate} from "swr";
+import apiCall from "@/app/{commons}/func/api";
+import {PageResponse} from "@/app/{commons}/types/commons";
+import {BoardListI} from "@/app/{components}/boardComponent";
+
+
 
 const TopMenu = () => {
-
-    const {searchParams, setSearchParams} = useContext(SearchParamsProvider);
+    const {
+        searchParams, setSearchParams,
+    } = useContext(SearchParamsProvider);
 
     const onChangeCategory = (value: string) => {
-        setSearchParams({page: 1, size: 20, categoryPk: value} as BoardListParamsI);
+        setSearchParams({ categoryPk: value, page: 1, size: 20 } as BoardListParamsI);
     }
 
     return (

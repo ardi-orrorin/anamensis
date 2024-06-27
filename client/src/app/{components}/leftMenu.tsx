@@ -12,7 +12,7 @@ const LeftMenu = ({
 }:{
     roles: RoleType[],
 }) => {
-    const {setSearchParams} = useContext(SearchParamsProvider);
+    const { setSearchParams} = useContext(SearchParamsProvider);
     const onChangeParamsHandler = ({type, value}: {type: string, value: string | number | boolean}) => {
         const search =
             type === 'categoryPk'
@@ -20,6 +20,7 @@ const LeftMenu = ({
                 : type === 'isSelf'
                     ? {[type]: value === value}
                     : {type: value};
+
 
         const params = {
             ...search,

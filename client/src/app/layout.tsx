@@ -47,11 +47,10 @@ export default function RootLayout({
     const gId = process.env.NEXT_PUBLIC_GID;
   return (
 	<html lang="ko">
-    <Head>
-        <Script async
+        <Script id={'google-analytics'} async
                 src={`https://www.googletagmanager.com/gtag/js?id=G-${gId}`}
         />
-        <Script dangerouslySetInnerHTML={{
+        <Script id={'google-analytics'} dangerouslySetInnerHTML={{
             __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -60,7 +59,6 @@ export default function RootLayout({
             gtag('config', 'G-${gId}');
             `
         }} />
-    </Head>
         <body>
             <NavMain />
             <div>

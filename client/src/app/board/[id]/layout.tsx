@@ -17,6 +17,8 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
     const [board, setBoard] = useState<BoardService>({} as BoardService);
 
+    const [myPoint, setMyPoint] = useState<number>(0);
+
     const [summary, setSummary] = useState<BoardSummaryI[]>([]);
 
     const [selectedBlock, setSelectedBlock] = useState<String>('');
@@ -96,6 +98,23 @@ export default function Page({children, params} : {children: ReactNode, params: 
     },[params.id]);
 
 
+    useEffect(()=> {
+        if(searchParams.get('categoryPk') !== '3') return;
+        if(!isNewBoard || board?.isView) return ;
+
+        preload(`/api/user/get-point`, async () => {
+            return await apiCall({
+                path: '/api/user/get-point',
+                method: 'GET',
+                isReturnData: true
+            })
+        })
+        .then(res => {
+            setMyPoint(res.point);
+        })
+    },[])
+
+
     const fetchBoard = async () => {
         try {
             const res = await preload(`/api/board/${params.id}`, async () => {
@@ -171,7 +190,8 @@ export default function Page({children, params} : {children: ReactNode, params: 
                 rateInfo, setRateInfo,
                 newComment, setNewComment,
                 deleteComment, setDeleteComment,
-                summary, setSummary
+                summary, setSummary,
+                myPoint, setMyPoint
             }}>
                 <TempFileProvider.Provider value={{
                     waitUploadFiles, setWaitUploadFiles,

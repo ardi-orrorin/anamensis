@@ -79,6 +79,12 @@
          WHERE id    = #{id}
     </update>
 
+    <update id="subtractPoint" parameterType="Map">
+        UPDATE member
+           SET point = point - #{point}
+         WHERE id    = #{id}
+    </update>
+
     <update id="update" parameterType="Member">
         UPDATE member
         <set>

@@ -22,7 +22,9 @@ export interface BoardProviderI {
     deleteComment: DeleteCommentI;
     setDeleteComment: Dispatch<SetStateAction<DeleteCommentI>>;
     summary: BoardSummaryI[];
-    setSummary: Dispatch<SetStateAction<BoardSummaryI[]>>
+    setSummary: Dispatch<SetStateAction<BoardSummaryI[]>>;
+    myPoint: number;
+    setMyPoint: Dispatch<SetStateAction<number>>;
 }
 
 const BoardProvider = createContext<BoardProviderI>({} as BoardProviderI);

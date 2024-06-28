@@ -13,14 +13,14 @@ import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchPar
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {createDebounce} from "@/app/{commons}/func/debounce";
-import {preload} from "swr";
 
 
-type DynamicPage = {
+export type DynamicPage = {
     isEndOfList: boolean;
     isVisible  : boolean;
 }
 
+// fixme: searchParams 불안정
 export default function Page() {
 
     const pageSize = 20;
@@ -46,13 +46,10 @@ export default function Page() {
 
     useEffect(() => {
         setLoading(true);
-        !searchParams.add && setData([]);
-        preload([`/api/board`,searchParams], async (args) => {
-            return await apiCall<PageResponse<BoardListI>, BoardListParamsI>({
-                path: '/api/board',
-                method: 'GET',
-                params: args[1]
-            })
+        apiCall<PageResponse<BoardListI>, BoardListParamsI>({
+            path: '/api/board',
+            method: 'GET',
+            params: searchParams
         })
         .then(res => {
             if(!res) return;
@@ -66,17 +63,17 @@ export default function Page() {
             const condition = res.data.content.length < searchParams.size;
 
             condition ? setDynamicPage({...dynamicPage, isEndOfList: true})
-                : setDynamicPage({...dynamicPage, isVisible:false}) ;
+                : setDynamicPage({isEndOfList: false, isVisible: false}) ;
+
+
 
             searchParams.add
                 ? setData([...data, ...res.data.content])
                 : setData(res.data.content);
-
         })
     },[searchParams])
 
-
-    useEffect(()=>{
+    useEffect(()=> {
         if(!moreRef.current) return;
 
         const ob = new IntersectionObserver((entries) => {
@@ -92,7 +89,7 @@ export default function Page() {
 
         ob.observe(moreRef.current as Element);
         return () => ob.disconnect();
-    },[moreRef?.current]);
+    },[moreRef?.current, loading]);
 
 
     const onSearchHandler = (init: boolean) => {
@@ -119,7 +116,9 @@ export default function Page() {
 
 
     return (
-        <SearchParamsProvider.Provider value={{searchParams, setSearchParams}}>
+        <SearchParamsProvider.Provider value={{
+            searchParams, setSearchParams,
+        }}>
             <div className={'p-5 flex flex-col gap-10'}>
                 <div className={'px-4 sm:px-10 md:px-20 lg:px-44 w-full flex justify-center items-center gap-3'}>
                     <div className={['relative flex justify-center duration-700', searchFocus ? 'w-full sm:w-[70%]' : 'w-70 sm:w-[40%]'].join(' ')}>

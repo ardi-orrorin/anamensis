@@ -8,6 +8,7 @@ type NavItemProps = {
     name: string | JSX.Element,
     url: string
     loginRequired?: boolean,
+    prefetch: boolean
     onClick?: () => void
 }
 
@@ -20,26 +21,31 @@ const NavMain = async () => {
             name: <FontAwesomeIcon icon={faPenToSquare} />,
             url: '/board/new?categoryPk=2',
             loginRequired: true,
+            prefetch: true,
         },
         {
             name: <FontAwesomeIcon icon={faUserPlus} />,
             url: '/signup',
             loginRequired: false,
+            prefetch: true,
         },
         {
             name: <FontAwesomeIcon className={'w-4'} icon={faUser} />,
             url: '/user',
             loginRequired: true,
+            prefetch: true,
         },
         {
             name: <FontAwesomeIcon icon={faRightToBracket} />,
             url: '/login',
             loginRequired: false,
+            prefetch: true,
         },
         {
             name: <FontAwesomeIcon className={'w-4'} icon={faRightFromBracket} />,
             url: '/api/logout',
             loginRequired: true,
+            prefetch: false,
         },
     ];
 
@@ -66,10 +72,14 @@ const NavMain = async () => {
     );
 }
 
-const NavItem = ({name, url}: NavItemProps) => {
+const NavItem = ({name, url, prefetch}: NavItemProps) => {
     return (
         <li className={'p-3'}>
-            <Link className={'flex'} href={url} prefetch={false}>{name}</Link>
+            <Link className={'flex'}
+                  href={url}
+                  prefetch={prefetch}
+            >{name}
+            </Link>
         </li>
     );
 }

@@ -22,7 +22,7 @@ import reactor.util.function.Tuple2;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/boards")
@@ -36,6 +36,7 @@ public class BoardController {
     private final PointService pointService;
     private final TableCodeService tableCodeService;
     private final FileService fileService;
+    private final BoardCommentService boardCommentService;
 
     @PublicAPI
     @GetMapping("")
@@ -243,6 +244,46 @@ public class BoardController {
 
             });
     }
+
+    @PutMapping("select-answer/{id}")
+    public Mono<StatusResponse> selectAnswer (
+        @PathVariable(name = "id") long boardPk,
+        @RequestBody BoardRequest.Create board,
+        @AuthenticationPrincipal UserDetails user
+    ) {
+        return userService.findUserByUserId(user.getUsername())
+            .doOnNext(u -> {
+                board.setMemberPk(u.getId());
+                board.setId(boardPk);
+            })
+            .flatMap(u -> boardService.updateByPk(board.toEntity()))
+            .map(result -> {
+                StatusResponse.StatusResponseBuilder sb = StatusResponse.builder();
+                return result ? sb.status(StatusType.SUCCESS)
+                    .message("답변이 선택되었습니다.")
+                    .build()
+                    : sb.status(StatusType.FAIL)
+                    .message("답변 선택에 실패하였습니다.")
+                    .build();
+            })
+            .publishOn(Schedulers.boundedElastic())
+            .doOnNext(r -> {
+                if(r.getStatus() != StatusType.SUCCESS) return;
+                List<Map<String, Object>> list = (List<Map<String, Object>>) board.getContent().get("list");
+                Map<String, Object> extraValue = (Map<String, Object>) list.get(0).get("extraValue");
+
+                long selectCommentId = Long.parseLong(extraValue.get("selectId").toString());
+                long point = Long.parseLong(extraValue.get("point").toString());
+
+                boardCommentService.findById(selectCommentId)
+                    .flatMap(bc -> userService.findUserByUserId(bc.getUserId()))
+                    .flatMap(m ->
+                        userService.exchangePoint(board.getMemberPk(), m.getId() , point)
+                    )
+                    .subscribe();
+            });
+    }
+
 
 
     @DeleteMapping("/{id}")

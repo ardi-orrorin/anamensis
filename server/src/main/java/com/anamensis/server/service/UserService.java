@@ -91,6 +91,15 @@ public class UserService implements ReactiveUserDetailsService {
         return Mono.empty();
     }
 
+    public Mono<Boolean> exchangePoint(long from, long to, long point) {
+        if(from == 0 || to == 0) return Mono.error(new RuntimeException("User not found"));
+        if(point <= 0) return Mono.error(new RuntimeException("Point must be greater than 0"));
+        return Mono.fromCallable(() ->
+                memberMapper.subtractPoint(from, point) > 0
+                && memberMapper.updatePoint(to, point) > 0
+            ).onErrorReturn(false);
+    }
+
     @Override
     public Mono<UserDetails> findByUsername(String username) {
         return Mono.justOrEmpty(memberMapper.findMemberInfo(username))

@@ -33,6 +33,11 @@ public interface MemberMapper {
             @Param("point") long point
     );
 
+    int subtractPoint(
+            @Param("id") long id,
+            @Param("point") long point
+    );
+
     int updatePwd (
             @Param("userId") String userId,
             @Param("pwd") String pwd,

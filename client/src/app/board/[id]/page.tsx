@@ -22,6 +22,7 @@ import LoadingProvider from "@/app/board/{services}/LoadingProvider";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import KeyDownEvent from "@/app/board/{services}/keyDownEvent";
 import {deleteImage, initBlock, listSort, notAvailDupCheck, updateBoard} from "@/app/board/{services}/funcs";
+import WriterInfo from "@/app/board/[id]/{components}/writerInfo";
 
 export interface RateInfoI {
     id      : number;
@@ -445,6 +446,11 @@ export default function Page({params}: {params : {id: string}}) {
                     <Rate newBoard={isNewBoard}
                           onClick={() => debounce(onChangeRateHandler)}
                     />
+                    {
+                        !isNewBoard
+                        && board.isView
+                        && <WriterInfo />
+                    }
                     {
                         !commentLoading
                         && <Comment />

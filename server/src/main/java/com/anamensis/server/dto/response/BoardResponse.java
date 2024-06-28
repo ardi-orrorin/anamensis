@@ -106,6 +106,9 @@ public class BoardResponse {
 
         private boolean membersOnly;
 
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime writerCreatedAt;
+
         public static Content from(BoardResultMap.Board board, Member member) {
             Content.ContentBuilder builder = Content.builder()
                     .id(board.getId())
@@ -117,7 +120,8 @@ public class BoardResponse {
                     .createdAt(board.getBoard().getCreateAt())
                     .updatedAt(board.getBoard().getUpdateAt())
                     .isPublic(board.getBoard().getIsPublic())
-                    .membersOnly(board.getBoard().isMembersOnly());
+                    .membersOnly(board.getBoard().isMembersOnly())
+                    .writerCreatedAt(board.getMember().getCreateAt());
 
             if(member != null) {
                 builder.isWriter(board.getBoard().getMemberPk() == member.getId());
@@ -191,6 +195,7 @@ public class BoardResponse {
     @Setter
     public static class SummaryList {
         private long id;
+        private long categoryPk;
         private String title;
         private long viewCount;
         private long rate;
@@ -205,6 +210,7 @@ public class BoardResponse {
                     .rate(board.getBoard().getRate())
                     .createdAt(board.getBoard().getCreateAt().toString())
                     .updatedAt(board.getBoard().getUpdateAt().toString())
+                    .categoryPk(board.getBoard().getCategoryPk())
                     .build();
         }
     }

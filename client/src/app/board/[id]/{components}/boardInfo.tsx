@@ -19,6 +19,11 @@ const data = (props: BoardService) => {
                 <p>
                     조회수: {viewCount}
                 </p>
+                <p className={"font-bold"}>
+                    작성자: {writer}
+                </p>
+            </div>
+            <div className={"flex flex-col items-end text-sm"}>
                 <p>
                     공개 여부 : &nbsp;
                     <span className={`font-bold ${isPublic ? "text-blue-500" : "text-red-500"}`}
@@ -31,16 +36,6 @@ const data = (props: BoardService) => {
                     >{membersOnly ? "회원 전용" : "모두"}
                     </span>
                 </p>
-            </div>
-            <div className={"flex flex-col gap-2 justify-between"}>
-                <Image src={defaultProfile(profileImage)}
-                       className={"rounded-full border-2 border-solid border-blue-300"}
-                       width={50}
-                       height={50}
-                       alt={""}
-                />
-                <p className={"font-bold"}
-                >{writer}</p>
             </div>
         </div>
     );

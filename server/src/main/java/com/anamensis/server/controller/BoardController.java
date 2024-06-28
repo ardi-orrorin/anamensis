@@ -134,6 +134,20 @@ public class BoardController {
                 .collectList();
     }
 
+
+    @PublicAPI
+    @GetMapping("summary/{userId}")
+    public Mono<List<BoardResponse.SummaryList>> findByMemberId(
+        @PathVariable(name = "userId") String userId
+    ) {
+        Page page = new Page();
+        page.setPage(1);
+        page.setSize(5);
+        return userService.findUserByUserId(userId)
+            .flatMapMany(u -> boardService.findByMemberPk(u.getId(), page))
+            .collectList();
+    }
+
     @PostMapping("")
     public Mono<Board> save(
         @RequestBody BoardRequest.Create board,

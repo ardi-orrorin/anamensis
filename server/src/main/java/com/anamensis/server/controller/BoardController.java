@@ -23,6 +23,8 @@ import reactor.util.function.Tuple2;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
 @RequestMapping("api/boards")
@@ -89,8 +91,8 @@ public class BoardController {
                 .share();
 
         Mono<BoardResultMap.Board> content = (user == null)
-            ? boardService.findByPk(boardPk, 0)
-            : member.flatMap(u -> boardService.findByPk(boardPk, u.getId()));
+            ? boardService.findByPk(boardPk)
+            : member.flatMap(u -> boardService.findByPk(boardPk));
 
         Mono<Long> count = rateService.countRate(boardPk)
             .subscribeOn(Schedulers.boundedElastic());
@@ -118,7 +120,6 @@ public class BoardController {
                     .subscribeOn(Schedulers.boundedElastic())
                     .subscribe();
             });
-
     }
 
     @GetMapping("summary")
@@ -204,30 +205,26 @@ public class BoardController {
                             boardService.saveIndex(b.getId(), board.getSearchText());
                         })
                         .subscribe();
-                });
+                })
+                .doOnNext(b -> {
+                    if(b.getCategoryPk() != 3) return;
+                    findPoint(board.getContent())
+                        .flatMap(p ->
+                            userService.subtractPoint(b.getMemberPk(), p.point)
+                        )
+                        .subscribeOn(Schedulers.boundedElastic())
+                        .subscribe();
+                })
+            ;
     }
 
     @PutMapping("/{id}")
-    public Mono<StatusResponse> updateByPk(
+    public Mono<StatusResponse> update(
         @PathVariable(name = "id") long boardPk,
         @RequestBody BoardRequest.Create board,
         @AuthenticationPrincipal UserDetails user
     ) {
-        return userService.findUserByUserId(user.getUsername())
-                .doOnNext(u -> {
-                    board.setMemberPk(u.getId());
-                    board.setId(boardPk);
-                })
-                .flatMap(u -> boardService.updateByPk(board.toEntity()))
-                .map(result -> {
-                    StatusResponse.StatusResponseBuilder sb = StatusResponse.builder();
-                    return result ? sb.status(StatusType.SUCCESS)
-                                      .message("게시글이 수정 되었습니다.")
-                                      .build()
-                                  : sb.status(StatusType.FAIL)
-                                      .message("게시글 수정에 실패하였습니다.")
-                                      .build();
-                })
+        return updateByPk(boardPk, board, user)
             .publishOn(Schedulers.boundedElastic())
             .doOnNext(r -> {
                 if(r.getStatus() != StatusType.SUCCESS) return;
@@ -241,7 +238,6 @@ public class BoardController {
                                 .subscribeOn(Schedulers.boundedElastic())
                                 .subscribe()
                         );
-
             });
     }
 
@@ -251,47 +247,36 @@ public class BoardController {
         @RequestBody BoardRequest.Create board,
         @AuthenticationPrincipal UserDetails user
     ) {
-        return userService.findUserByUserId(user.getUsername())
-            .doOnNext(u -> {
-                board.setMemberPk(u.getId());
-                board.setId(boardPk);
-            })
-            .flatMap(u -> boardService.updateByPk(board.toEntity()))
-            .map(result -> {
-                StatusResponse.StatusResponseBuilder sb = StatusResponse.builder();
-                return result ? sb.status(StatusType.SUCCESS)
-                    .message("답변이 선택되었습니다.")
-                    .build()
-                    : sb.status(StatusType.FAIL)
-                    .message("답변 선택에 실패하였습니다.")
-                    .build();
-            })
+        return updateByPk(boardPk, board, user)
             .publishOn(Schedulers.boundedElastic())
             .doOnNext(r -> {
                 if(r.getStatus() != StatusType.SUCCESS) return;
-                List<Map<String, Object>> list = (List<Map<String, Object>>) board.getContent().get("list");
-                Map<String, Object> extraValue = (Map<String, Object>) list.get(0).get("extraValue");
 
-                long selectCommentId = Long.parseLong(extraValue.get("selectId").toString());
-                long point = Long.parseLong(extraValue.get("point").toString());
+                AtomicReference<PointComment> pointCommentAtomic = new AtomicReference<>();
 
-                boardCommentService.findById(selectCommentId)
-                    .flatMap(bc -> userService.findUserByUserId(bc.getUserId()))
-                    .flatMap(m ->
-                        userService.exchangePoint(board.getMemberPk(), m.getId() , point)
+                findPoint(board.getContent())
+                    .doOnNext(pointCommentAtomic::set)
+                    .flatMap(point ->
+                        boardCommentService.findById(point.selectCommentId)
+                            .flatMap(bc -> userService.findUserByUserId(bc.getUserId()))
+                            .flatMap(m ->
+                                userService.updatePoint(m.getId() , pointCommentAtomic.get().point)
+                            )
                     )
                     .subscribe();
             });
     }
-
-
 
     @DeleteMapping("/{id}")
     public Mono<StatusResponse> disableByPk(
         @PathVariable(name = "id") long boardPk,
         @AuthenticationPrincipal UserDetails user
     ) {
-        return userService.findUserByUserId(user.getUsername())
+        AtomicReference<Board> boardAtomic = new AtomicReference<>();
+
+        return boardService.findByPk(boardPk)
+                .doOnNext(b -> boardAtomic.set(b.getBoard()))
+                .flatMap($ -> userService.findUserByUserId(user.getUsername()))
                 .flatMap(u -> boardService.disableByPk(boardPk, u.getId()))
                 .map(result -> {
                     StatusResponse.StatusResponseBuilder sb = StatusResponse.builder();
@@ -316,6 +301,58 @@ public class BoardController {
                             .subscribe();
 
                     boardService.deleteIndex(boardPk);
+                })
+                .doOnNext(r -> {
+                    if(r.getStatus() != StatusType.SUCCESS) return;
+                    if(boardAtomic.get().getCategoryPk() != 3) return;
+                    findPoint(boardAtomic.get().getContent())
+                        .flatMap(p ->
+                            userService.updatePoint(boardAtomic.get().getMemberPk(), p.point)
+                        )
+                        .subscribe();
                 });
     }
+    
+    private Mono<StatusResponse> updateByPk(
+        long boardPk,
+        BoardRequest.Create board,
+        UserDetails user
+    ) {
+        return userService.findUserByUserId(user.getUsername())
+            .doOnNext(u -> {
+                board.setMemberPk(u.getId());
+                board.setId(boardPk);
+            })
+            .flatMap(u -> boardService.updateByPk(board.toEntity()))
+            .map(result -> {
+                StatusResponse.StatusResponseBuilder sb = StatusResponse.builder();
+                return result ? sb.status(StatusType.SUCCESS)
+                    .message("게시글이 수정 되었습니다.")
+                    .build()
+                    : sb.status(StatusType.FAIL)
+                    .message("게시글 수정에 실패하였습니다.")
+                    .build();
+            });
+    }
+
+    private Mono<PointComment> findPoint(Map<String, Object> content) {
+        List<Map<String, Object>> list = (List<Map<String, Object>>) content.get("list");
+        if(Objects.isNull(list)) return Mono.error(new RuntimeException("객체를 찾을 수 없습니다."));
+
+        Map<String, Object> extraValue = (Map<String, Object>) list.get(0).get("extraValue");
+        if(Objects.isNull(extraValue)) return Mono.error(new RuntimeException("객체를 찾을 수 없습니다."));
+
+        long selectCommentId = extraValue.get("selectId") == ""
+            ? 0
+            : Long.parseLong(extraValue.get("selectId").toString());
+
+        long point = Long.parseLong(extraValue.get("point").toString());
+
+        return Mono.just(new PointComment(selectCommentId, point));
+    }
+
+    private record PointComment(
+        long selectCommentId,
+        long point
+    ) {}
 }

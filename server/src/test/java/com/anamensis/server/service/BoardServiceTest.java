@@ -136,7 +136,7 @@ class BoardServiceTest {
     @Order(3)
     @DisplayName("게시글 조회 테스트")
     void findByPk() {
-        StepVerifier.create(bs.findByPk(1, 0))
+        StepVerifier.create(bs.findByPk(1))
                 .assertNext(content -> {
                     assertEquals(1, content.getId());
                     assertEquals("테스트 제목1", content.getBoard().getTitle());
@@ -144,18 +144,18 @@ class BoardServiceTest {
                 .verifyComplete();
 
 
-        StepVerifier.create(bs.findByPk(10, 0))
+        StepVerifier.create(bs.findByPk(10))
                 .assertNext(content -> {
                     assertEquals(10, content.getId());
                     assertEquals("테스트 제목10", content.getBoard().getTitle());
                 })
                 .verifyComplete();
 
-        StepVerifier.create(bs.findByPk(11, 0))
+        StepVerifier.create(bs.findByPk(11))
                 .verifyErrorMessage("게시글이 없습니다.");
 
 
-        StepVerifier.create(bs.findByPk(0, 0))
+        StepVerifier.create(bs.findByPk(0))
                 .expectError(RuntimeException.class)
                 .verify();
     }
@@ -230,7 +230,7 @@ class BoardServiceTest {
                 })
                 .verifyComplete();
 
-        StepVerifier.create(bs.findByPk(b.getId(), 0))
+        StepVerifier.create(bs.findByPk(b.getId()))
                 .assertNext(it -> {
                     assertEquals("테스트 제목 추가", it.getBoard().getTitle());
                     assertEquals(0, it.getBoard().getRate());
@@ -336,7 +336,7 @@ class BoardServiceTest {
     @Order(8)
     @DisplayName("게시글 수정 테스트")
     void updateByPk() {
-        BoardResultMap.Board content = bs.findByPk(1, 0).block();
+        BoardResultMap.Board content = bs.findByPk(1).block();
         Board b = new Board();
         b.setId(content.getId());
         b.setMemberPk(1);
@@ -351,7 +351,7 @@ class BoardServiceTest {
                 .expectNext(true)
                 .verifyComplete();
 
-        StepVerifier.create(bs.findByPk(1, 0))
+        StepVerifier.create(bs.findByPk(1))
                 .assertNext(it -> {
                     assertEquals(1, it.getId());
                     assertEquals("테스트 제목 수정", it.getBoard().getTitle());
@@ -368,7 +368,7 @@ class BoardServiceTest {
                 .expectNext(true)
                 .verifyComplete();
 
-        StepVerifier.create(bs.findByPk(1, 0))
+        StepVerifier.create(bs.findByPk(1))
                 .assertNext(it -> {
                     assertEquals(1, it.getId());
                     assertEquals("테스트 제목 수정", it.getBoard().getTitle());
@@ -403,7 +403,7 @@ class BoardServiceTest {
                 .verifyComplete();
 
 
-        StepVerifier.create(bs.findByPk(1, 0))
+        StepVerifier.create(bs.findByPk(1))
                 .assertNext(it -> {
                     assertEquals(1, it.getId());
                     assertEquals("테스트 제목 수정", it.getBoard().getTitle());
@@ -421,7 +421,7 @@ class BoardServiceTest {
                 .expectNext(true)
                 .verifyComplete();
 
-        StepVerifier.create(bs.findByPk(1, 0))
+        StepVerifier.create(bs.findByPk(1))
                 .assertNext(it -> {
                     assertEquals(1, it.getId());
                     assertEquals("테스트 제목 수정", it.getBoard().getTitle());
@@ -437,7 +437,7 @@ class BoardServiceTest {
                 .expectNext(true)
                 .verifyComplete();
 
-        StepVerifier.create(bs.findByPk(1, 0))
+        StepVerifier.create(bs.findByPk(1))
                 .assertNext(it -> {
                     assertEquals(1, it.getId());
                     assertEquals("테스트 제목 수정", it.getBoard().getTitle());
@@ -453,7 +453,7 @@ class BoardServiceTest {
                 .expectNext(true)
                 .verifyComplete();
 
-        StepVerifier.create(bs.findByPk(1, 0))
+        StepVerifier.create(bs.findByPk(1))
                     .assertNext(it -> {
                         assertEquals(1, it.getId());
                         assertEquals("테스트 제목 수정", it.getBoard().getTitle());

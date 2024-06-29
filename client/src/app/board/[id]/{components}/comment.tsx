@@ -210,7 +210,7 @@ const CommentItem = (props: CommentI) => {
 
 
         await apiCall<BoardI, BoardI>({
-            path: '/api/board/' + board.data.id,
+            path: '/api/board/select-answer/' + board.data.id,
             method: 'PUT',
             body,
             isReturnData: true,

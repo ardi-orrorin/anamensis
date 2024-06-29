@@ -109,6 +109,13 @@ public class UserService implements ReactiveUserDetailsService {
                 .onErrorReturn(false);
     }
 
+    public Mono<Boolean> subtractPoint(long memberPk, long point) {
+        if(memberPk == 0) return Mono.error(new RuntimeException("User not found"));
+        if(point <= 0) return Mono.error(new RuntimeException("Point must be greater than 0"));
+        return Mono.fromCallable(() -> memberMapper.subtractPoint(memberPk, point) > 0)
+                .onErrorReturn(false);
+    }
+
     public Mono<Boolean> existsUser(UserRequest.existsMember existsMember) {
         return Mono.fromCallable(() -> memberMapper.existsMember(existsMember));
     }

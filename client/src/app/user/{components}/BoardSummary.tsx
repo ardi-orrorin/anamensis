@@ -11,11 +11,12 @@ import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 
 
 export interface BoardSummaryI {
-    id: number;
-    title: string;
-    rate: number;
-    viewCount: number;
-    createdAt: string;
+    id          : number;
+    categoryPk  : number;
+    title       : string;
+    rate        : number;
+    viewCount   : number;
+    createdAt   : string;
 }
 
 const BoardSummary = () => {

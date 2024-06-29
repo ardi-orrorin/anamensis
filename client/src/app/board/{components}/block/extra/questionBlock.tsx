@@ -61,7 +61,7 @@ const QWait = ({
 } : QuestionBlockExtraValueType & {
     onChangeHandler: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
-    const {board} = useContext(BoardProvider);
+    const {board, myPoint, setMyPoint} = useContext(BoardProvider);
 
     const onChangeDateHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         if(moment(e.target.value).isAfter(moment().add(9, 'days'))) {
@@ -72,10 +72,18 @@ const QWait = ({
     }
 
     const onChangePointHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if(Number(e.target.value) > 0) {
-            onChangeHandler(e);
+        const integerRegex = /^[0-9]+$/;
+        if(!integerRegex.test(e.target.value)) return ;
+
+        if(parseInt(e.target.value) > myPoint) {
+            alert('보유한 포인트보다 높게 설정할 수 없습니다.');
+            e.target.value = String(myPoint);
         }
-        e.target.value = '0';
+        if(parseInt(e.target.value) < 0) {
+            alert('0보다 작을 수 없습니다.');
+            e.target.value = '0';
+        }
+        onChangeHandler(e);
     }
 
     return (
@@ -115,12 +123,25 @@ const QWait = ({
                         {point}
                     </span>
                     : <input className={'flex justify-center items-center p-2 outline-0'}
-                             type={'number'}
+                             type={'text'}
                              name={'point'}
                              value={point}
+                             max={myPoint}
                              disabled={board?.data?.isWriter}
                              onChange={onChangePointHandler}
                     />
+                }
+                {
+                    !board?.data?.isWriter
+                    && !board.isView
+                    && <div className={'flex gap-1 justify-center items-center'}>
+                        <span>
+                          최대 가능한 포인트 :
+                        </span>
+                        <span className={'font-bold'}>
+                          {myPoint}
+                        </span>
+                    </div>
                 }
             </div>
         </div>

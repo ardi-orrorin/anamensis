@@ -11,10 +11,15 @@ import {useSearchParams} from "next/navigation";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
 import useSWR, {preload} from "swr";
 import {initBlock} from "@/app/board/{services}/funcs";
+import {BoardSummaryI} from "@/app/user/{components}/BoardSummary";
 
 export default function Page({children, params} : {children: ReactNode, params: {id: string}}) {
 
     const [board, setBoard] = useState<BoardService>({} as BoardService);
+
+    const [myPoint, setMyPoint] = useState<number>(0);
+
+    const [summary, setSummary] = useState<BoardSummaryI[]>([]);
 
     const [selectedBlock, setSelectedBlock] = useState<String>('');
 
@@ -93,27 +98,56 @@ export default function Page({children, params} : {children: ReactNode, params: 
     },[params.id]);
 
 
-    const fetchBoard = () => {
-      preload(`/api/board/${params.id}`, async () => {
-            return await apiCall<BoardI & {isLogin : boolean}>({
-                path: '/api/board/' + params.id,
+    useEffect(()=> {
+        if(searchParams.get('categoryPk') !== '3') return;
+        if(!isNewBoard || board?.isView) return ;
+
+        preload(`/api/user/get-point`, async () => {
+            return await apiCall({
+                path: '/api/user/get-point',
                 method: 'GET',
-                call: 'Proxy'
+                isReturnData: true
             })
         })
         .then(res => {
+            setMyPoint(res.point);
+        })
+    },[])
+
+
+    const fetchBoard = async () => {
+        try {
+            const res = await preload(`/api/board/${params.id}`, async () => {
+                return await apiCall<BoardI & {isLogin : boolean}>({
+                    path: '/api/board/' + params.id,
+                    method: 'GET',
+                    call: 'Proxy'
+                })
+            })
+
             setBoard({
                 ...board,
                 data: res.data,
                 isView: true
             });
-        }).catch(e => {
+
+            const summaryRes = await preload(`/api/board/summary/${params.id}`, async () => {
+                return await apiCall<BoardSummaryI[]>({
+                    path: '/api/board/user/summary/' + res.data.writer,
+                    method: 'GET',
+                    call: 'Proxy',
+                    isReturnData: true
+                })
+            })
+
+            setSummary(summaryRes);
+
+        } catch (e: any) {
             alert(e.response.data);
             location.href = '/';
-        })
-        .finally(() => {
+        } finally {
             setLoading(false);
-        });
+        }
     }
 
     const fetchComment = useSWR(`/api/board/comment/${params.id}`, async () => {
@@ -155,7 +189,9 @@ export default function Page({children, params} : {children: ReactNode, params: 
                 comment, setComment,
                 rateInfo, setRateInfo,
                 newComment, setNewComment,
-                deleteComment, setDeleteComment
+                deleteComment, setDeleteComment,
+                summary, setSummary,
+                myPoint, setMyPoint
             }}>
                 <TempFileProvider.Provider value={{
                     waitUploadFiles, setWaitUploadFiles,

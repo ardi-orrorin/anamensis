@@ -23,6 +23,13 @@
           AND  bc.is_use   = 1
          ORDER BY bc.id
     </select>
+    
+    <select id="findById">
+        SELECT *
+          FROM board_comment
+         WHERE id = #{id}
+    </select>
+
     <insert id="save" parameterType="BoardComment">
         <selectKey keyProperty="id" resultType="int" order="AFTER">
             SELECT LAST_INSERT_ID()

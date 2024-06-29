@@ -116,4 +116,8 @@ public class UserResponse {
 
         boolean verified
     ) {}
+
+    public record GetPoint (
+        long point
+    ) {}
 }

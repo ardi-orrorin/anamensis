@@ -92,6 +92,7 @@
     </select>
     <select id="findByPk" resultMap="BoardResultMapBoard" parameterType="Long">
         SELECT *
+             , m.create_at as member_create_at
           FROM board b
           JOIN member m
             ON m.id = b.member_pk
@@ -165,6 +166,7 @@
     </resultMap>
     <resultMap id="MemberEntity" type="Member" autoMapping="true">
         <id property="id" column="member_pk"/>
+        <result property="createAt" column="member_create_at" />
     </resultMap>
     <resultMap id="FileEntity" type="File" autoMapping="true">
         <id property="id" column="file_pk"/>

@@ -22,10 +22,7 @@ public interface BoardMapper {
         @Param("member") Member member
     );
 
-    Optional<BoardResultMap.Board> findByPk(
-        long boardPk,
-        long memberPk
-    );
+    Optional<BoardResultMap.Board> findByPk(long boardPk);
 
     List<BoardResultMap.Board> findByMemberPk(
         @Param("memberPk") long memberPk,

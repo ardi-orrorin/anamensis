@@ -3,16 +3,22 @@ import {faComment, faEye} from "@fortawesome/free-solid-svg-icons";
 import {RateColor} from "@/app/{commons}/types/rate";
 import {faHeart} from "@fortawesome/free-solid-svg-icons/faHeart";
 import {BoardListI} from "@/app/{components}/boardComponent";
+import moment from "moment";
 
 const FooterComponent = (props: BoardListI) => {
     const {
         rate , commentCount
         , createdAt, viewCount
     } = props;
+
+    const createAt = moment(createdAt).diff(moment(), 'days') === 0
+        ? moment(createdAt).format('HH:mm')
+        : moment(createdAt).format('YYYY-MM-DD HH:mm');
+
     return (
-        <div className={'px-3 h-[30px] min-h[30px] max-h-[30px] border-t border-solid border-gray-200 flex justify-between items-center text-xs text-gray-500 '}>
+        <div className={'px-3 h-[30px] min-h[30px] max-h-[30px] border-t border-solid border-gray-200 flex justify-between items-center text-xs text-gray-500'}>
             <span>
-                {createdAt}
+                {createAt}
             </span>
             <div className={'flex gap-3 items-center'}>
                 <span className={'flex gap-1 items-center'}>

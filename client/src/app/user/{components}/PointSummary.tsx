@@ -38,7 +38,9 @@ const PointSummary = () => {
                     <div key={`summary-${i}`}
                         className={`flex gap-3 text-sm w-full`}
                     >
-                        <span className={`py-0.5 w-12 bg-blue-400 text-white rounded text-xs flex justify-center items-center`}>{e.point}</span>
+                        <span className={['py-0.5 w-12 text-white rounded text-xs flex justify-center items-center', e.point >=0 ? 'bg-blue-400' : 'bg-red-400'].join(' ')}>
+                            {e.point}
+                        </span>
                         <div className={'flex justify-between w-full'}>
                             <span className={'py-0.5 '}>
                                 {Table.fromString(e.tableName).useWith}

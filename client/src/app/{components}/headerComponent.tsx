@@ -30,7 +30,7 @@ const HeaderComponent = (props: BoardListI) => {
                         </span>
                     }
                 </span>
-                <span className={'text-sm'}>
+                <span className={'w-60 text-sm line-clamp-1'}>
                     {title}
                 </span>
             </div>

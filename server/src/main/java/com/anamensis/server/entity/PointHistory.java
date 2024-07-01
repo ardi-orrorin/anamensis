@@ -1,6 +1,5 @@
 package com.anamensis.server.entity;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -16,5 +15,6 @@ public class PointHistory {
     private long tableRefPk;
     private long memberPk;
     private long pointCodePk;
+    private int value = 0;
     private LocalDateTime createAt;
 }

@@ -45,14 +45,14 @@ const WriterInfo = () => {
 
                         return (
                             <Link key={'board_summary' + index}
-                                  className={'flex justify-between py-1'}
+                                  className={'flex justify-between py-0.5 h-8'}
                                   href={'/board/' + item.id}
                             >
                                 <div className={'flex gap-2 items-center'}>
-                                    <span className={'text-xs2 py-1 px-2 bg-blue-400 rounded text-white'}>
+                                    <span className={'text-xs2 py-0.5 px-2 bg-blue-400 rounded text-white'}>
                                         {category?.substring(0, category?.indexOf(' '))}
                                     </span>
-                                    <span>
+                                    <span className={'line-clamp-1 w-20 sm:w-40'}>
                                         {item.title}
                                     </span>
                                 </div>

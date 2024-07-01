@@ -27,7 +27,7 @@ public class PointHistoryResponse {
                     .id(result.getId())
                     .tableName(result.getTableCode().getTableName())
                     .pointCodeName(result.getPointCode().getName())
-                    .point(result.getPointCode().getPoint())
+                    .point(result.getPointCode().getPoint() == 0 ? result.getPointHistory().getValue() : result.getPointCode().getPoint())
                     .createdAt(result.getPointHistory().getCreateAt())
                     .build();
         }
@@ -48,7 +48,7 @@ public class PointHistoryResponse {
             return PointHistoryResponse.Summary.builder()
                     .id(result.getId())
                     .tableName(result.getTableCode().getTableName())
-                    .point(result.getPointCode().getPoint())
+                    .point(result.getPointCode().getPoint() == 0 ? result.getPointHistory().getValue() : result.getPointCode().getPoint())
                     .createdAt(result.getPointHistory().getCreateAt())
                     .build();
         }

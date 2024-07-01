@@ -38,8 +38,8 @@
 
     <insert id="insert" parameterType="PointHistory">
         INSERT INTO point_history
-               (table_code_pk, table_ref_pk, member_pk, point_code_pk, create_at)
-        VALUES (#{tableCodePk}, #{tableRefPk}, #{memberPk}, #{pointCodePk}, #{createAt})
+               (table_code_pk, table_ref_pk, member_pk, point_code_pk, create_at, value)
+        VALUES (#{tableCodePk}, #{tableRefPk}, #{memberPk}, #{pointCodePk}, #{createAt}, #{value})
     </insert>
 
     <resultMap id="pointHistoryResultMap" type="PointHistoryResultMap">

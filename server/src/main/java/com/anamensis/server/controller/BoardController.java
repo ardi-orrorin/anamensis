@@ -20,6 +20,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -160,11 +161,14 @@ public class BoardController {
                 return Mono.error(new RuntimeException("권한이 없습니다."));
         }
 
-
         Mono<PointCode> pointCode = pointService.selectByIdOrTableName("board")
                 .subscribeOn(Schedulers.boundedElastic());
 
+        Mono<PointCode> qnaPointCode = pointService.selectByIdOrTableName("q&a")
+                .subscribeOn(Schedulers.boundedElastic());
+
         Mono<TableCode> tableCode = tableCodeService.findByIdByTableName(0, "board")
+                .share()
                 .subscribeOn(Schedulers.boundedElastic());
 
         Mono<Board> insertBoard = userService.findUserByUserId(user.getUsername())
@@ -209,9 +213,14 @@ public class BoardController {
                 .doOnNext(b -> {
                     if(b.getCategoryPk() != 3) return;
                     findPoint(board.getContent())
-                        .flatMap(p ->
+                        .doOnNext(p ->
                             userService.subtractPoint(b.getMemberPk(), p.point)
+                                .subscribe()
                         )
+                        .doOnNext(p -> {
+                            insertQnAPointHistory(b.getMemberPk(),(int) -p.point)
+                                .subscribe();
+                        })
                         .subscribeOn(Schedulers.boundedElastic())
                         .subscribe();
                 })
@@ -253,17 +262,48 @@ public class BoardController {
                 if(r.getStatus() != StatusType.SUCCESS) return;
 
                 AtomicReference<PointComment> pointCommentAtomic = new AtomicReference<>();
+                AtomicReference<Member> commentMemberAtomic = new AtomicReference<>();
 
                 findPoint(board.getContent())
                     .doOnNext(pointCommentAtomic::set)
                     .flatMap(point ->
                         boardCommentService.findById(point.selectCommentId)
                             .flatMap(bc -> userService.findUserByUserId(bc.getUserId()))
+                            .doOnNext(commentMemberAtomic::set)
                             .flatMap(m ->
                                 userService.updatePoint(m.getId() , pointCommentAtomic.get().point)
                             )
                     )
+                    .flatMap(p ->
+                        insertQnAPointHistory(commentMemberAtomic.get().getId(),(int) pointCommentAtomic.get().point)
+                    )
                     .subscribe();
+
+            });
+    }
+
+    private Mono<Tuple2<PointCode, TableCode>> insertQnAPointHistory(long memberPk, int point) {
+        Mono<PointCode> qnaPointCode = pointService.selectByIdOrTableName("q&a")
+            .share()
+            .subscribeOn(Schedulers.boundedElastic());
+
+        Mono<TableCode> tableCode = tableCodeService.findByIdByTableName(0, "board")
+            .share()
+            .subscribeOn(Schedulers.boundedElastic());
+
+        return Mono.zip(qnaPointCode, tableCode)
+            .publishOn(Schedulers.boundedElastic())
+            .flatMap(t -> {
+                PointHistory ph = new PointHistory();
+                ph.setMemberPk(memberPk);
+                ph.setPointCodePk(t.getT1().getId());
+                ph.setCreateAt(LocalDateTime.now());
+                ph.setTableCodePk(t.getT2().getId());
+                ph.setTableRefPk(t.getT1().getId());
+                ph.setValue(point);
+
+                return pointHistoryService.insert(ph)
+                    .flatMap($ -> Mono.just(t));
             });
     }
 
@@ -306,9 +346,11 @@ public class BoardController {
                     if(r.getStatus() != StatusType.SUCCESS) return;
                     if(boardAtomic.get().getCategoryPk() != 3) return;
                     findPoint(boardAtomic.get().getContent())
-                        .flatMap(p ->
-                            userService.updatePoint(boardAtomic.get().getMemberPk(), p.point)
-                        )
+                        .flatMap(p -> {
+                            if(p.state == PointCommentExtraValueStatus.COMPLETED) return Mono.just(p);
+                            return userService.updatePoint(boardAtomic.get().getMemberPk(), p.point)
+                                .flatMap($ -> insertQnAPointHistory(boardAtomic.get().getMemberPk(),(int) p.point));
+                        })
                         .subscribe();
                 });
     }
@@ -348,11 +390,19 @@ public class BoardController {
 
         long point = Long.parseLong(extraValue.get("point").toString());
 
-        return Mono.just(new PointComment(selectCommentId, point));
+        PointCommentExtraValueStatus state = PointCommentExtraValueStatus.valueOf(extraValue.get("state").toString().toUpperCase());
+
+        return Mono.just(new PointComment(selectCommentId, point, state));
     }
 
     private record PointComment(
         long selectCommentId,
-        long point
+        long point,
+
+        PointCommentExtraValueStatus state
     ) {}
+
+    private enum PointCommentExtraValueStatus {
+        WAIT, COMPLETED
+    }
 }

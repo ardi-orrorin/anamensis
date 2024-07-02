@@ -50,6 +50,7 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
         if(!extraValue) {
             if(!onChangeExtraValueHandler) return;
             onChangeExtraValueHandler({
+                url: 'https://',
                 tags: [],
             });
         }
@@ -354,10 +355,12 @@ const SiteLink = ({
     onChangeHandler: (e: ChangeEvent<HTMLInputElement>) => void,
 }) => {
     if(isView) return (
-        <Link className={'w-full p-1 text-md break-all text-blue-700'}
-              href={extraValue?.url ?? ''}>
+        <a className={'w-full p-1 text-md break-all text-blue-700'}
+           href={extraValue?.url ?? ''}
+           target={'_blank'}
+        >
             링크 : &nbsp; {extraValue?.url ?? '주소없음' }
-        </Link>
+        </a>
     )
     return (
         <input className={'w-full break-all text-sm px-2 py-1 outline-0'}

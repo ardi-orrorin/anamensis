@@ -34,8 +34,6 @@ const BoardSummary = () => {
         setData(res.data);
     });
 
-    // if(initFetch.isLoading) return <LoadingSpinner size={30} />;
-
     return (
         <div className={'w-full h-max flex justify-center items-start overflow-y-hidden'}>
             <div className={'w-full flex flex-col text-sm'}>

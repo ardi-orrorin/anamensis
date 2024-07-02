@@ -213,24 +213,36 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
              aria-roledescription={type}
              ref={el => {props!.blockRef!.current[props.seq] = el}}
         >
-            <div style={containerStyle(isView ?? false)}>
+            <div className={[
+                'flex w-full items-center gap-4 outline-0 break-all',
+                isView || 'p-4',
+            ].join(' ')}
+                 style={{backgroundColor: isView ? '' : 'rgba(230,230,230,0.2)'}}
+            >
                <ImageThumb {...{thumb, extraValue, imgViewProps, oriImg, imageRef,
                    setImgViewProps, onChangeImageHandler, onChangeFileHandler, isView: isView!}}
                />
-                <div style={infoContainerStyle}>
+               <div className={'flex flex-col gap-2 w-full pl-4 border-l border-solid border-gray-300'}>
                     <Title {...{value, onChangeHandler, isView: isView!}} />
                     <SiteLink {...{extraValue, onChangeHandler, isView: isView!}} />
-                    <div style={infoDetailContainerStyle}>
+                    <div className={'flex gap-2'}>
                         <Price {...{extraValue, onChangeHandler, addCommasToNumber, isView: isView!}} />
                         <DiscountCode {...{extraValue, onChangeHandler, isView: isView!}} />
                         <DeliveryFee {...{extraValue, onChangeHandler, addCommasToNumber, isView: isView!}} />
                     </div>
-                    <div style={tagsContainerStyle}>
+                    <div className={'flex flex-col w-full'}>
+                        {
+                            !isView
+                            && <input className={'w-full break-all text-sm px-2 py-1 outline-0'}
+                                      placeholder={'최소 2글자, 태그 최대 3개 가능'}
+                                      onKeyUp={addTagHandler}
+                            />
+                        }
                         {
                             extraValue
                             && extraValue?.tags
                             && extraValue?.tags?.length > 0
-                            && <div style={tagsStyle}>
+                            && <div className={'flex py-2 gap-2 text-sm text-blue-700'}>
                                 {
                                     Array.from(extraValue?.tags ?? [])
                                         .map((tag, index) =>
@@ -240,14 +252,6 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
                                         )
                                 }
                           </div>
-                        }
-
-                        {
-                            !isView
-                            && <input style={inputCommonStyle}
-                                      placeholder={'최소 2글자, 태그 최대 3개 가능'}
-                                      onKeyUp={addTagHandler}
-                            />
                         }
                     </div>
                 </div>
@@ -268,13 +272,13 @@ const DeliveryFee = ({
     addCommasToNumber: (number: number) => string,
 }) => {
     if(isView) return (
-        <p style={{...viewCommonPTagStyle, ...feeStyle}}>
+        <p className={'w-full p-1 text-md break-all text-sm text-gray-800 font-light'}>
             배송비 : &nbsp; {addCommasToNumber(extraValue?.deliveryFee ?? 0)}
         </p>
     )
 
     return (
-        <input style={inputCommonStyle}
+        <input className={'w-full break-all text-sm px-2 py-1 outline-0'}
                type={'number'}
                name={'deliveryFee'}
                value={extraValue?.deliveryFee ?? 0}
@@ -294,13 +298,13 @@ const DiscountCode = ({
     onChangeHandler: (e: ChangeEvent<HTMLInputElement>) => void,
 }) => {
     if(isView) return (
-        <p style={{...viewCommonPTagStyle, ...feeStyle}}>
+        <p className={'w-full p-1 text-md break-all text-sm text-gray-800 font-light'}>
             할인코드 : &nbsp; {extraValue?.discountCode ?? ''}
         </p>
     )
 
     return (
-        <input style={inputCommonStyle}
+        <input className={'w-full break-all text-sm px-2 py-1 outline-0'}
                name={'discountCode'}
                value={extraValue?.discountCode ?? ''}
                onChange={onChangeHandler}
@@ -323,13 +327,13 @@ const Price = ({
 }) => {
 
     if(isView) return (
-        <p style={{...viewCommonPTagStyle, ...moneyStyle}}>
+        <p className={'w-full p-1 text-md break-all text-sm text-red-600 font-bold'}>
             가격 : &nbsp; {addCommasToNumber(extraValue?.price ?? 0)}
         </p>
     )
 
     return (
-        <input style={inputCommonStyle}
+        <input className={'w-full break-all text-sm px-2 py-1 outline-0'}
                type={'number'}
                name={'price'}
                value={extraValue?.price ?? 0}
@@ -350,13 +354,13 @@ const SiteLink = ({
     onChangeHandler: (e: ChangeEvent<HTMLInputElement>) => void,
 }) => {
     if(isView) return (
-        <Link style={{...viewCommonPTagStyle, ...linkStyle}}
+        <Link className={'w-full p-1 text-md break-all text-blue-700'}
               href={extraValue?.url ?? ''}>
             링크 : &nbsp; {extraValue?.url ?? '주소없음' }
         </Link>
     )
     return (
-        <input style={inputCommonStyle}
+        <input className={'w-full break-all text-sm px-2 py-1 outline-0'}
                name={'url'}
                value={extraValue?.url ?? ''}
                onChange={onChangeHandler}
@@ -376,13 +380,13 @@ const Title = ({
 }) => {
 
     if(isView) return (
-        <p style={{...viewCommonPTagStyle , ...titleStyle}}>
+        <p className={'w-full p-1 text-md break-all font-bold'}>
             상품명 : &nbsp; {value}
         </p>
     )
 
     return (
-        <input style={inputCommonStyle}
+        <input className={'w-full break-all text-sm px-2 py-1 outline-0'}
                name={'title'}
                value={value}
                placeholder={'상품 이름'}
@@ -415,12 +419,11 @@ const ImageThumb = ({
     onChangeFileHandler: (e: ChangeEvent<HTMLInputElement>) => void,
 }) => {
 
-    console.log(thumb)
     if(!isView)
         return (
             <>
                 <div style={{position: 'relative'}}>
-                    <img style={imageStyle}
+                    <img className={'w-[150px] h-[150px] min-w-[150px] min-h-[150px] object-cover rounded'}
                          src={thumb}
                          alt={'대표 이미지'}
                          onClick={onChangeImageHandler}
@@ -430,7 +433,7 @@ const ImageThumb = ({
                     />
                     {
                         imgViewProps.imgLoading
-                        && <div style={loadingStyle}>
+                        && <div className={'absolute z-10 flex justify-center items-center left-0 top-0 w-full h-full rounded bg-black bg-opacity-25'}>
                         <LoadingSpinner size={20}/>
                       </div>
                     }
@@ -448,7 +451,7 @@ const ImageThumb = ({
     return (
         <>
             <div style={{position: 'relative'}}>
-                <Image style={imageStyle}
+                <Image className={'w-[150px] h-[150px] min-w-[150px] min-h-[150px] object-cover rounded'}
                        width={150}
                        height={150}
                        src={thumb}
@@ -463,7 +466,7 @@ const ImageThumb = ({
                 />
                 {
                     extraValue?.img && imgViewProps.imgModal
-                    && <div style={isViewModalStyle}
+                    && <div className={'absolute z-10 flex justify-center items-center top-0 left-0 w-full h-full text-sm text-white bg-opacity-40 bg-black rounded'}
                             onMouseLeave={()=> setImgViewProps(prevState => ({
                                 ...prevState,
                                 imgModal: false
@@ -478,7 +481,7 @@ const ImageThumb = ({
                 }
                 {
                     imgViewProps.viewImg
-                    && <div style={originImgStyle}>
+                    && <div className={'absolute z-[99] w-[700px] h-auto left-0 top-0 p-2 bg-white rounded border border-solid border-gray-200 shadow-md'}>
                     <Image src={oriImg}
                            alt={'원본 이미지'}
                            width={700}
@@ -502,180 +505,30 @@ const ImageThumb = ({
     )
 }
 
-const Tag = (
-    props
-: {
+const Tag = ({
+    tag,
+    isView,
+    deleteTagHandler
+} : {
     tag: string,
     isView: boolean,
     deleteTagHandler: (tag: string) => void
 }) => {
-    const {tag, isView, deleteTagHandler} = props;
     return (
-        <button style={tagStyle}
+        <button className={'flex px-2 items-center text-sm'}
                 disabled={isView}
                 onClick={()=> deleteTagHandler(tag)}
         >
             {tag}
             {
-                !isView && <FontAwesomeIcon icon={faXmark}/>
+                !isView
+                && <FontAwesomeIcon className={'text-sm'}
+                                    icon={faXmark}
+                />
             }
         </button>
     )
 
-}
-
-const tagsContainerStyle: CSSProperties = {
-    display: 'flex',
-    gap: '0.8rem',
-    width: '100%',
-}
-
-const tagsStyle: CSSProperties = {
-    display: 'flex',
-    gap: '0.8rem',
-    fontSize: '0.8rem',
-}
-
-const tagStyle: CSSProperties = {
-    backgroundColor: 'gray',
-    color: 'white',
-    padding: '0.2rem 0.5rem',
-    fontSize: '0.8rem',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '0.5rem',
-    height: '1.5rem',
-    lineHeight: '1.5rem',
-    fontWeight: '600',
-    letterSpacing: '0.03rem',
-    wordBreak: 'break-all',
-    wordWrap: 'break-word',
-    whiteSpace: 'nowrap',
-    maxWidth: '100%',
-}
-
-
-const containerStyle = (isView: boolean) : CSSProperties => ({
-    display: 'flex',
-    alignItems: 'center',
-    gap: '1rem',
-    width: '100%',
-    border: 'none',
-    outline: 'none',
-    wordBreak: 'break-all',
-    padding: isView ? '' : '1rem',
-    backgroundColor: isView ? '' : 'rgba(230,230,230,0.2)',
-});
-
-const infoContainerStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.8rem',
-    width: '100%',
-    paddingLeft: '1rem',
-    borderLeft: '1px solid rgba(100, 100, 100, 0.2)',
-}
-
-const infoDetailContainerStyle: CSSProperties = {
-    display: 'flex',
-    gap: '0.8rem',
-    width: '100%',
-}
-
-const imageStyle: CSSProperties = {
-    width: 150,
-    minWidth: 150,
-    height: 150,
-    minHeight: 150,
-    borderRadius: '0.5rem',
-    objectFit: 'cover',
-}
-
-const inputCommonStyle: CSSProperties = {
-    outline: 'none',
-    border: 'none',
-    width: '100%',
-    wordBreak: 'break-all',
-    wordWrap: 'break-word',
-    height: '1.5rem',
-    padding: '0.5rem',
-    letterSpacing: '0.03rem',
-    fontSize: '0.9rem',
-}
-
-const viewCommonPTagStyle: CSSProperties = {
-    width: '100%',
-    height: '1.5rem',
-    padding: '0.5rem',
-    letterSpacing: '0.03rem',
-    fontSize: '0.9rem',
-    wordBreak: 'break-all',
-    wordWrap: 'break-word',
-}
-
-const titleStyle: CSSProperties = {
-    fontWeight: '600',
-}
-
-const linkStyle: CSSProperties = {
-    color: 'blue',
-}
-
-const moneyStyle: CSSProperties = {
-    color: 'red',
-    fontWeight: '700',
-}
-
-const feeStyle: CSSProperties = {
-    color: 'gray',
-    fontWeight: '400',
-}
-
-const loadingStyle: CSSProperties = {
-    position: 'absolute',
-    zIndex: 10,
-    left: 0,
-    top: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0,0,0,0.2)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: '0.5rem',
-}
-
-const isViewModalStyle: CSSProperties = {
-    borderRadius: '0.5rem',
-    fontSize: '0.7rem',
-    color: 'white',
-    position: 'absolute',
-    zIndex: 10,
-    left: 0,
-    top: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0,0,0,0.2)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-}
-
-const originImgStyle: CSSProperties = {
-    alignItems: 'center',
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    zIndex: 99,
-    width: 700,
-    height: 'auto',
-    padding: '0.6rem',
-    backgroundColor: 'white',
-    borderRadius: '0.5rem',
-    border: '1px solid rgba(100,100,100,0.2)',
-    boxShadow: '0 0 10px rgba(0,0,0,0.2)',
 }
 
 export default AlttuelBlock;

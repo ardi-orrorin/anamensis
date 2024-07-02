@@ -7,7 +7,7 @@ const data = (props: BoardService) => {
     const {
         updatedAt, viewCount,
         isPublic, membersOnly,
-        writer, profileImage
+        writer
     }: BoardI = props.data;
 
     return (

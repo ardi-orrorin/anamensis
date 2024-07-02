@@ -229,7 +229,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
     return (
         <AlbumProvider.Provider value={{albumToggle, setAlbumToggle}}>
         <div id={`block_${hash}`}
-             style={containerStyle}
+             className={'flex w-full flex-col gap-5'}
              aria-roledescription={type}
              ref={el => {
                  props!.blockRef!.current[props.seq] = el
@@ -321,14 +321,5 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         </AlbumProvider.Provider>
     )
 }
-
-
-const containerStyle: CSSProperties = {
-    display: 'flex',
-    width: '100%',
-    flexDirection: 'column',
-    gap: '0.8rem',
-}
-
 
 export default AlbumBlock;

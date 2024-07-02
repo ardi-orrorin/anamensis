@@ -15,16 +15,8 @@ export default function FileImage(props: FileImageProps){
 
     const url = process.env.NEXT_PUBLIC_CDN_SERVER + thumb;
 
-    const style: CSSProperties = {
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        objectFit: 'cover',
-    }
-
     return (
-        <div style={style}
+        <div className={'w-full flex justify-center items-center object-cover'}
              onMouseEnter={onMouseEnterHandler}
              onMouseLeave={onMouseLeaveHandler}
              aria-roledescription={'object'}

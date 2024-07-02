@@ -23,6 +23,7 @@ import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import KeyDownEvent from "@/app/board/{services}/keyDownEvent";
 import {deleteImage, initBlock, listSort, notAvailDupCheck, updateBoard} from "@/app/board/{services}/funcs";
 import WriterInfo from "@/app/board/[id]/{components}/writerInfo";
+import {useRouter} from "next/navigation";
 
 export interface RateInfoI {
     id      : number;
@@ -64,6 +65,8 @@ export default function Page({params}: {params : {id: string}}) {
     const shortList = useMemo(()=> (
         blockTypeList.map(item => ({ command: item.command, code: item.code, notAvailDup : item.notAvailDup}))
     ), []);
+
+    const router = useRouter();
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -146,7 +149,7 @@ export default function Page({params}: {params : {id: string}}) {
             });
 
             if(isSave) {
-                location.href = '/board/' + result?.id;
+                router.push('/board/' + result?.id);
             } else {
                location.reload();
             }
@@ -166,7 +169,7 @@ export default function Page({params}: {params : {id: string}}) {
         } catch (e) {
             console.log(e);
         } finally {
-            location.href = '../';
+            router.push('../');
         }
     };
 
@@ -322,7 +325,7 @@ export default function Page({params}: {params : {id: string}}) {
     return (
         <>
             <div className={'p-5 flex flex-col gap-5 justify-center items-center'}>
-                <div className={`w-full flex flex-col gap-3 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-1/2'}`}>
+                <div className={`w-full flex flex-col gap-6 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-3/5'}`}>
                     <div className={'flex h-8 border-l-8 border-solid border-gray-500 px-2 items-center'}>
                         <span className={'font-bold'}>
                             {Category.findById(board.data.categoryPk.toString())?.name}
@@ -459,6 +462,7 @@ export default function Page({params}: {params : {id: string}}) {
                 <div>
                     {
                         !board.isView
+
                         && blockService.blockMenu === 'openTextMenu'
                         && <SubTextMenu blockRef={blockRef}/>
                     }

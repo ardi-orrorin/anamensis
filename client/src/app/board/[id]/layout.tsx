@@ -1,5 +1,5 @@
 'use client';
-import {ReactNode, useEffect, useMemo, useState} from "react";
+import {ReactNode, useCallback, useEffect, useMemo, useState} from "react";
 import BoardProvider, {BoardService} from "@/app/board/{services}/BoardProvider";
 import BlockProvider, {BlockService, CommentService} from "@/app/board/{services}/BlockProvider";
 import {BlockI, BoardI, CommentI, DeleteCommentI} from "@/app/board/{services}/types";
@@ -10,8 +10,10 @@ import apiCall from "@/app/{commons}/func/api";
 import {useSearchParams} from "next/navigation";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
 import useSWR, {preload} from "swr";
-import {initBlock} from "@/app/board/{services}/funcs";
+import {deleteImage, initBlock} from "@/app/board/{services}/funcs";
 import {BoardSummaryI} from "@/app/user/{components}/BoardSummary";
+
+
 
 export default function Page({children, params} : {children: ReactNode, params: {id: string}}) {
 
@@ -44,6 +46,33 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
     const [loading, setLoading] = useState<boolean>(false);
     const [commentLoading, setCommentLoading] = useState<boolean>(false);
+
+    useEffect(() => {
+        if(!isNewBoard && !board?.isView || board.isView) return;
+
+        const beforeunload = (e: BeforeUnloadEvent) => {
+            e.preventDefault();
+            deleteDummyFiles(waitUploadFiles);
+        }
+
+        window.addEventListener('beforeunload', beforeunload)
+
+        return () => {
+            window.removeEventListener('beforeunload', beforeunload);
+        }
+    },[waitUploadFiles])
+
+    const deleteDummyFiles = useCallback((waitUploadFiles: TempFileI[]) =>  {
+        waitUploadFiles.forEach(file => {
+            const fileUri = file.filePath + file.fileName;
+            apiCall({
+                path: '/api/file/delete/filename',
+                method: 'PUT',
+                body: {fileUri},
+                isReturnData: true
+            });
+        })
+    },[]);
 
     useEffect(() => {
         if(!isNewBoard) return ;

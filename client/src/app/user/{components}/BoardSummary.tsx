@@ -34,26 +34,24 @@ const BoardSummary = () => {
         setData(res.data);
     });
 
-    // if(initFetch.isLoading) return <LoadingSpinner size={30} />;
-
     return (
-        <div className={'w-full h-max flex justify-center items-start'}>
+        <div className={'w-full h-max flex justify-center items-start overflow-y-hidden'}>
             <div className={'w-full flex flex-col text-sm'}>
                 {
                     data.map((e, i) => {
                         return (
                             <Link key={`summary-${i}`}
                                   href={`/board/${e.id}`}
-                                  className={`flex gap-3 text-sm w-full hover:bg-gray-100 cursor-pointer rounded py-1`}
+                                  className={`flex gap-3 text-sm w-full hover:bg-gray-100 cursor-pointer rounded py-1 h-8`}
                             >
                                 <span className={`py-0.5 w-12 rounded text-xs text-white flex justify-center items-center`}
                                       style={{backgroundColor: RateColor.findColor(e.rate)?.getColor}}
                                 >{e.rate}</span>
 
                                 <div className={'flex justify-between w-full'}>
-                                <span className={'py-0.5 '}>
+                                <div className={'py-0.5 w-40 line-clamp-1'}>
                                     { e.title }
-                                </span>
+                                </div>
                                     <div className={'flex '}>
                                         <span className={'py-0.5 px-4 flex justify-center items-center'}>{e.viewCount}</span>
                                         <span className={'py-0.5 px-4 flex justify-center items-center'}>{e.createdAt.substring(0, 10)}</span>

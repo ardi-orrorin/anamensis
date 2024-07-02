@@ -14,23 +14,23 @@ const WriterInfo = () => {
         <div className={'flex p-2 border border-solid border-blue-300 rounded'}>
             <div className={'flex w-1/2 items-center p-2 gap-3 text-sm'}>
                 <Image className={'border-solid border-2 border-blue-200 rounded-full'}
-                       height={100}
-                       width={100}
+                       height={70}
+                       width={70}
                        alt={'profile'}
                        src={defaultNoImg(board.data.profileImage)}
                 />
-                <div className={'flex flex-col'}>
-                    <div className={'flex flex-col gap-1'}>
+                <div className={'flex flex-col gap-2'}>
+                    <div className={'flex gap-1'}>
                         <label>
-                            작성자
+                            작성자 : &nbsp;
                         </label>
                         <span className={'font-bold'}>
                             {board.data.writer}
                         </span>
                     </div>
-                    <div className={'flex flex-col gap-1'}>
+                    <div className={'flex gap-1'}>
                         <label>
-                            회원가입일
+                            회원가입일 : &nbsp;
                         </label>
                         <span className={'font-bold'}>
                             { board.data.writerCreatedAt.substring(0, 10) }
@@ -38,25 +38,25 @@ const WriterInfo = () => {
                     </div>
                 </div>
             </div>
-            <div className={'flex flex-col w-1/2 max-h-32 p-2 border-solid border-l border-blue-200 text-sm overflow-y-scroll'}>
+            <div className={'flex flex-col w-2/3 max-h-20 px-2 border-solid border-l border-blue-200 text-sm overflow-y-scroll'}>
                 {
                     summary.map((item, index) => {
                         const category = Category.findById(item.categoryPk.toString())?.name;
 
                         return (
                             <Link key={'board_summary' + index}
-                                  className={'flex justify-between py-1'}
+                                  className={'flex justify-between py-0.5 h-8'}
                                   href={'/board/' + item.id}
                             >
                                 <div className={'flex gap-2 items-center'}>
-                                    <span className={'text-xs2 py-1 px-2 bg-blue-400 rounded text-white'}>
+                                    <span className={'text-xss py-0.5 px-2 bg-blue-400 text-white'}>
                                         {category?.substring(0, category?.indexOf(' '))}
                                     </span>
-                                    <span>
+                                    <span className={'text-xs line-clamp-1 w-20 sm:w-40'}>
                                         {item.title}
                                     </span>
                                 </div>
-                                <span>
+                                <span className={'text-xs'}>
                                     {moment(item.createdAt).format('YYYY-MM-DD')}
                                 </span>
                             </Link>

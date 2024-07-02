@@ -155,9 +155,7 @@ const QCompleted = ({
 ) => {
     const { comment } = useContext(BoardProvider);
 
-    const selectWriter = useMemo(()=>
-        comment.find(item => Number(item.id) === Number(selectId))
-    ,[]);
+    const selectWriter = comment.find(item => Number(item.id) === Number(selectId));
 
     return (
         <div className={'flex flex-col gap-1 text-sm'}>

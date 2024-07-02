@@ -23,6 +23,7 @@ import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import KeyDownEvent from "@/app/board/{services}/keyDownEvent";
 import {deleteImage, initBlock, listSort, notAvailDupCheck, updateBoard} from "@/app/board/{services}/funcs";
 import WriterInfo from "@/app/board/[id]/{components}/writerInfo";
+import {useRouter} from "next/navigation";
 
 export interface RateInfoI {
     id      : number;
@@ -64,6 +65,8 @@ export default function Page({params}: {params : {id: string}}) {
     const shortList = useMemo(()=> (
         blockTypeList.map(item => ({ command: item.command, code: item.code, notAvailDup : item.notAvailDup}))
     ), []);
+
+    const router = useRouter();
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -146,7 +149,7 @@ export default function Page({params}: {params : {id: string}}) {
             });
 
             if(isSave) {
-                location.href = '/board/' + result?.id;
+                router.push('/board/' + result?.id);
             } else {
                location.reload();
             }
@@ -166,7 +169,7 @@ export default function Page({params}: {params : {id: string}}) {
         } catch (e) {
             console.log(e);
         } finally {
-            location.href = '../';
+            router.push('../');
         }
     };
 

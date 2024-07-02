@@ -11,7 +11,8 @@ const FooterComponent = (props: BoardListI) => {
         , createdAt, viewCount
     } = props;
 
-    const createAt = moment(createdAt).diff(moment(), 'days') === 0
+
+    const createAt = moment().isSame(createdAt, 'day')
         ? moment(createdAt).format('HH:mm')
         : moment(createdAt).format('YYYY-MM-DD HH:mm');
 

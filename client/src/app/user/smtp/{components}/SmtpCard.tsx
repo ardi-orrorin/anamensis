@@ -5,6 +5,7 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import axios from "axios";
 import Link from "next/link";
 import apiCall from "@/app/{commons}/func/api";
+import {useRouter} from "next/navigation";
 
 export interface SmtpCardProps {
     id: number;
@@ -19,6 +20,8 @@ export interface SmtpCardProps {
 }
 const SmtpCard = (smtpCardProps: SmtpCardProps) => {
 
+    const router = useRouter();
+
     const disabledHandler = async () => {
         if(!confirm('정말로 삭제하시겠습니까?')) return;
         await apiCall({
@@ -26,7 +29,8 @@ const SmtpCard = (smtpCardProps: SmtpCardProps) => {
             method: 'GET'
         })
         .then(res => {
-            window.location.replace('/user/smtp');
+            router.push('/user/smtp');
+            // window.location.replace('/user/smtp');
         });
     }
 

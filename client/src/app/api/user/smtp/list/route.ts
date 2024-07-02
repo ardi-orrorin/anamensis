@@ -1,5 +1,3 @@
-import {NextRequest, NextResponse} from "next/server";
-import {SmtpI} from "@/app/user/smtp/page";
 import apiCall from "@/app/{commons}/func/api";
 import {PageResponse} from "@/app/{commons}/types/commons";
 import {SmtpCardProps} from "@/app/user/smtp/{components}/SmtpCard";
@@ -16,7 +14,7 @@ export async function GET() {
     })
 
     return ExNextResponse({
-        body: result,
+        body: JSON.stringify(result),
         status: 200,
     })
 }

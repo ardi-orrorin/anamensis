@@ -53,7 +53,7 @@ export default function InputBase({
 
     return (
         <div id={`block-${hash}`}
-             style={{display: 'flex', width: '100%'}}
+             className={'flex w-full'}
         >
             {
                 isView

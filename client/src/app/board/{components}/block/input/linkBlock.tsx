@@ -27,26 +27,6 @@ const LinkBlock = (props: ExpendBlockProps) => {
         if(!value?.includes('https://')) onChangeValueHandler!('https://' + value);
     },[])
 
-    const customInputStyle: CSSProperties = {
-        outline         : 'none',
-        border          : 'none',
-        width           : '100%',
-        wordBreak       : 'break-all',
-        color           : 'blue',
-        padding         : '0.5rem',
-        backgroundColor : isView? "white" : 'rgba(230,230,230,0.2)',
-        letterSpacing   : '0.03rem',
-    };
-
-    const linkPreviewStyle: CSSProperties = {
-        display         : 'flex',
-        flex            : '1 1',
-        justifyContent  : 'space-between',
-        width           : '100%',
-        padding         : '1rem',
-        backgroundColor : isView? "white" : 'rgba(230,230,230,0.2)',
-        gap             : '0.5rem',
-    }
 
     const onKeyDownChangeHandler = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if(e.key !== 'Enter') return ;
@@ -78,7 +58,6 @@ const LinkBlock = (props: ExpendBlockProps) => {
             };
 
             onChangeExtraValueHandler!(data);
-            // onKeyUpHandler!(e);
 
         } catch (e) {
             alert('링크를 가져오는데 실패했습니다.');
@@ -96,7 +75,8 @@ const LinkBlock = (props: ExpendBlockProps) => {
         >
             {
                 !extraValue || !extraValue.title
-                ? <input style={customInputStyle}
+                ? <input className={'w-full p-2 break-all text-blue-700 outline-0'}
+                         style={{backgroundColor: isView? "white" : 'rgba(230,230,230,0.2)'}}
                          value={value}
                          placeholder={'링크를 입력해주세요(https, http 포함). https://www.example.com'}
                          onChange={onChangeHandler}
@@ -106,21 +86,24 @@ const LinkBlock = (props: ExpendBlockProps) => {
                          disabled={isView}
                          ref={el => {blockRef!.current[seq] = el}}
                 />
-                : <a style={linkPreviewStyle}
+                : <a className={'flex justify-between w-full p-4 gap-2'}
+                     style={{backgroundColor: isView? "white" : 'rgba(230,230,230,0.2)'}}
                      href={value}
                      target={'_blank'}
                      onMouseEnter={onMouseEnterHandler}
                      aria-roledescription={'object'}
                      ref={el => {blockRef!.current[seq] = el}}
                 >
-                    <div style={{display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'space-between', padding:'0.6rem'}}>
+                    <div className={'flex flex-col gap-1 justify-between p-1'}
+                    >
                         <p style={{fontSize: '1.3rem'}}
                         >{extraValue.title || value.split('/')[2]}
                         </p>
-                        <p style={{fontSize: '0.7rem', wordBreak: 'break-all', color: 'gray'}}
+                        <p className={'text-gray-600 break-all'}
+                           style={{fontSize: '0.7rem'}}
                         >{extraValue.description || '내용 없음'}</p>
                     </div>
-                    <img style={{minWidth: '100px', width: '30%', height:'80px', borderRadius: '0.2rem', objectFit: 'cover'}}
+                    <img className={'min-w-[100px] w-[30%] h-[80px] rounded object-cover'}
                          src={extraValue.image || 'http://' + process.env.NEXT_PUBLIC_DOMAIN + '/noimage.jpg'} alt=""
                     />
                 </a>

@@ -20,12 +20,7 @@ export default function FileUpload (props: FileUploadProps) {
     const [progress, setProgress] = useState<number>(0);
     const {setWaitUploadFiles} = useContext(TempFileProvider);
 
-    const customStyle: CSSProperties = {
-        width            : '100%',
-        height           : '4rem',
-        outline          : 'none',
-        backgroundColor  : 'rgba(250,250,250, 0.3)',
-    }
+
 
     const onClick = () => {
         if(!useFileInputRef.current) return ;
@@ -117,7 +112,9 @@ export default function FileUpload (props: FileUploadProps) {
                  onMouseEnter={onMouseEnterHandler}
                  aria-roledescription={'object'}
             >
-                <button style={customStyle}
+                <button style={{backgroundColor: 'rgba(250,250,250, 0.3)'}}
+                        className={'w-full h-30 outline-0'}
+
                         onClick={onClick}
                 >
                     {

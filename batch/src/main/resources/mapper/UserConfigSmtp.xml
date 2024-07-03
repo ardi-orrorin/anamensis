@@ -8,11 +8,11 @@
         SELECT *
           FROM member_config_smtp
     </sql>
-    <select id="findAll" resultType="UserConfigSmtp">
+    <select id="findAll" resultType="MemberConfigSmtp">
         <include refid="tbl_member_config_smtp"/>
         WHERE is_use = 1
     </select>
-    <select id="findByIds" resultType="UserConfigSmtp">
+    <select id="findByIds" resultType="MemberConfigSmtp">
         <include refid="tbl_member_config_smtp"/>
         WHERE is_use = 1
           AND id IN

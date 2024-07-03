@@ -2,23 +2,24 @@ import {CSSProperties} from "react";
 import {RoleType} from "@/app/user/system/{services}/types";
 
 export interface BoardI {
-    id            : string;
-    categoryPk    : number;
-    title         : string;
-    content       : BoardContentI;
-    writer        : string;
-    profileImage  : string;
-    createdAt     : string;
-    updatedAt     : string;
-    viewCount     : number;
-    rate          : number;
-    isLogin?      : boolean;
-    isWriter?     : boolean;
-    uploadFiles?  : number[];
-    removeFiles?  : string[];
-    isPublic?     : boolean;
-    membersOnly   : boolean;
-    searchText?   : string;
+    id              : string;
+    categoryPk      : number;
+    title           : string;
+    content         : BoardContentI;
+    writer          : string;
+    profileImage    : string;
+    createdAt       : string;
+    updatedAt       : string;
+    viewCount       : number;
+    rate            : number;
+    isLogin?        : boolean;
+    isWriter?       : boolean;
+    uploadFiles?    : number[];
+    removeFiles?    : string[];
+    isPublic?       : boolean;
+    membersOnly     : boolean;
+    searchText?     : string;
+    writerCreatedAt : string;
 }
 
 
@@ -31,7 +32,6 @@ export interface BlockI {
     seq         : number;
     hash        : string;
     value       : string;
-    // extraValue? : ExtraValueI | string | string[] | number | boolean ;
     extraValue? : ExtraValueI;
     textStyle?  : TextStylesType;
     code        : string;

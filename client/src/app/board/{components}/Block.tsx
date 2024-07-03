@@ -38,13 +38,9 @@ export default function Block(props: BlockProps) {
     const [isCopy, setIsCopy] = useState<CopyProps>({} as CopyProps);
     const [touch, setTouch] = useState(setTimeout(() => false, 0));
 
-    const block = useMemo(() => {
-        return blockTypeList.find(b=> b.code === props.code);
-    },[blockService])
+    const block = blockTypeList.find(b=> b.code === props.code);
 
-    const Component = useMemo(() => {
-        return block?.component!;
-    },[blockService]);
+    const Component = block?.component!;
 
     const onFocusHandler = (e: React.FocusEvent<HtmlElements>) => {
         if(e.currentTarget.ariaRoleDescription !== 'text') {
@@ -60,7 +56,7 @@ export default function Block(props: BlockProps) {
         setBlockService({
             ...blockService,
             block,
-            blockMenu: blockMenu,
+            blockMenu,
             screenX: positionX,
             screenY: positionY,
         })
@@ -70,7 +66,10 @@ export default function Block(props: BlockProps) {
         if(e.currentTarget.ariaRoleDescription === 'object') {
             const blockMenu: BlockMenu = 'openObjectMenu';
 
-            const block: BlockI = {seq, code, value, textStyle, hash};
+            const block: BlockI = {
+                seq, code, value
+                , textStyle, hash
+            };
             setBlockService({
                 block,
                 blockMenu: blockMenu,

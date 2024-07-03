@@ -1,6 +1,7 @@
 package com.anamensis.server.service;
 
 import com.anamensis.server.entity.BoardComment;
+import com.anamensis.server.exception.AuthorizationException;
 import com.anamensis.server.mapper.BoardCommentMapper;
 import com.anamensis.server.resultMap.BoardCommentResultMap;
 import lombok.RequiredArgsConstructor;
@@ -28,4 +29,9 @@ public class BoardCommentService {
                 .onErrorReturn(false);
     }
 
+    public Mono<BoardComment> findById(long id) {
+        return Mono.justOrEmpty(boardCommentMapper.findById(id))
+            .switchIfEmpty(Mono.error(() -> new RuntimeException("board comment not found")));
+
+    }
 }

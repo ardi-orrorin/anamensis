@@ -5,43 +5,36 @@ import SmtpCard, {SmtpCardProps} from "@/app/user/smtp/{components}/SmtpCard";
 import React, {useEffect, useState} from "react";
 import {PageResponse} from "@/app/{commons}/types/commons";
 import apiCall from "@/app/{commons}/func/api";
+import {preload} from "swr";
 
 const SmtpList = () => {
     const [data, setData] = useState<PageResponse<SmtpCardProps>>({} as PageResponse<SmtpCardProps>);
 
-    const [loading, setLoading] = useState(true);
-
-
-    useEffect(()=> {
-        const fetch = async () => {
-            return await apiCall<PageResponse<SmtpCardProps>>({
-                path: '/api/user/smtp/list',
-                method: 'GET',
-                isReturnData: true,
-            })
-                .then(res => {
-                    setData(res);
-                })
-                .finally(() => {
-                    setLoading(false);
-                });
-        }
-
-        fetch();
-    },[]);
+    preload('/api/user/smtp/list', async () => {
+        return await apiCall<PageResponse<SmtpCardProps>>({
+            path: '/api/user/smtp/list',
+            method: 'GET',
+            isReturnData: true,
+        })
+    })
+    .then(res => {
+        setData(res);
+    })
 
     return (
         <div className={'w-full lg:w-1/2 flex flex-col gap-3'}>
             {
-                loading
-                    ? <LoadingSpinner size={20} />
-                    : data?.content
-                        ?.sort((a, b) =>  b.id - a.id)
-                        .map((smtp, index) => {
-                            return (
-                                <SmtpCard key={index} {...smtp} />
-                            )
-                        })
+                data?.content?.length > 0
+                ? data?.content?.sort((a, b) =>  b.id - a.id)
+                    .map((smtp, index) => {
+                        return (
+                            <SmtpCard key={index} {...smtp} />
+                        )
+                    })
+                : <div className={'flex justify-center items-center h-full'}>
+                    등록된 Smtp가 없습니다.
+                </div>
+
             }
         </div>
     )

@@ -12,7 +12,7 @@ const LeftMenu = ({
 }:{
     roles: RoleType[],
 }) => {
-    const {setSearchParams} = useContext(SearchParamsProvider);
+    const { setSearchParams} = useContext(SearchParamsProvider);
     const onChangeParamsHandler = ({type, value}: {type: string, value: string | number | boolean}) => {
         const search =
             type === 'categoryPk'
@@ -20,6 +20,7 @@ const LeftMenu = ({
                 : type === 'isSelf'
                     ? {[type]: value === value}
                     : {type: value};
+
 
         const params = {
             ...search,
@@ -46,8 +47,8 @@ const LeftMenu = ({
                             roles.length > 0
                             && <button className={'flex w-full justify-center text-xs'}
                                        onClick={() => onChangeParamsHandler({type: 'isSelf', value: true})}
-                          >내 글 보기
-                          </button>
+                            >내 글 보기
+                            </button>
                         }
                     </div>
                     <div className={'w-auto text-sm'}>

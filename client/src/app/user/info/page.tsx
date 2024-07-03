@@ -7,7 +7,7 @@ import {UserInfoI} from "@/app/user/email/page";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {defaultProfile} from "@/app/{commons}/func/image";
-import useSWR from "swr";
+import useSWR, {mutate, preload} from "swr";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 
 
@@ -16,6 +16,18 @@ type loadingType = {
     img     : boolean
 }
 
+const dataFetch = apiCall<UserInfoI>({
+    path: '/api/user/info',
+    method: 'GET',
+    isReturnData: true,
+});
+
+
+const profileFetch = apiCall({
+    path: '/api/user/info/profile-img',
+    method: 'GET',
+    isReturnData: true,
+})
 export default function Page() {
 
     const [img, setImg] = useState<string>('');
@@ -27,37 +39,28 @@ export default function Page() {
 
     const debounce = createDebounce(500);
 
-    const initFetch = useSWR([loading.img, loading.profile], async (loading) => {
-        if(!loading[0]) {
-            profileFetch();
-        }
-        if(!loading[1]) {
-            dataFetch();
-        }
-    }, {
-        revalidateOnFocus: false,
-    });
-
-    const dataFetch = async () => {
-        return await apiCall<UserInfoI>({
-            path: '/api/user/info',
-            method: 'GET',
-            isReturnData: true,
-        })
-        .then((res) => {
+    useEffect(() => {
+        preload('/user/info', async () => {
+            return await apiCall<UserInfoI>({
+                path: '/api/user/info',
+                method: 'GET',
+                isReturnData: true,
+            })
+        }).then((res) => {
             setProfile(res)
-        })
-    }
+        });
+    }, []);
 
-    const profileFetch = async () => {
+    preload('/user/info/profile-img', async () => {
         return await apiCall({
             path: '/api/user/info/profile-img',
             method: 'GET',
             isReturnData: true,
-        }).then((res) => {
-            setImg(res.length === 0 ? '' : res)
         })
-    }
+    }).then((res) => {
+        setImg(res.length === 0 ? '' : res)
+    });
+
 
     const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files) return;
@@ -77,12 +80,13 @@ export default function Page() {
                 body: formdata,
                 contentType: 'multipart/form-data',
             })
-            .finally(() => {
+            .finally(async () => {
                 setLoading({
                     ...loading,
                     img: false
                 });
                 setProfileEnter(false)
+                await mutate('/user/info/profile-img', profileFetch);
             })
         }
 
@@ -108,6 +112,7 @@ export default function Page() {
                     ...loading,
                     profile: false
                 });
+                mutate('/user/info', dataFetch);
             });
         }
 
@@ -125,6 +130,7 @@ export default function Page() {
         })
         .then((res) => {
             setImg('')
+            mutate('/user/info/profile-img', profileFetch);
         })
         .catch((err) => {
             console.log(err)
@@ -134,6 +140,7 @@ export default function Page() {
                 ...loading,
                 img: false
             });
+
         })
     }
 

@@ -1,19 +1,27 @@
 'use client';
-import {ReactNode, useEffect, useMemo, useState} from "react";
+import {ReactNode, useCallback, useEffect, useMemo, useState} from "react";
 import BoardProvider, {BoardService} from "@/app/board/{services}/BoardProvider";
 import BlockProvider, {BlockService, CommentService} from "@/app/board/{services}/BlockProvider";
-import {BoardI, CommentI, DeleteCommentI} from "@/app/board/{services}/types";
+import {BlockI, BoardI, CommentI, DeleteCommentI} from "@/app/board/{services}/types";
 import {SaveComment} from "@/app/board/[id]/{components}/comment";
 import {RateInfoI} from "@/app/board/[id]/page";
 import TempFileProvider, {TempFileI} from "@/app/board/{services}/TempFileProvider";
 import apiCall from "@/app/{commons}/func/api";
 import {useSearchParams} from "next/navigation";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
-import useSWR from "swr";
+import useSWR, {preload} from "swr";
+import {deleteImage, initBlock} from "@/app/board/{services}/funcs";
+import {BoardSummaryI} from "@/app/user/{components}/BoardSummary";
+
+
 
 export default function Page({children, params} : {children: ReactNode, params: {id: string}}) {
 
     const [board, setBoard] = useState<BoardService>({} as BoardService);
+
+    const [myPoint, setMyPoint] = useState<number>(0);
+
+    const [summary, setSummary] = useState<BoardSummaryI[]>([]);
 
     const [selectedBlock, setSelectedBlock] = useState<String>('');
 
@@ -40,6 +48,33 @@ export default function Page({children, params} : {children: ReactNode, params: 
     const [commentLoading, setCommentLoading] = useState<boolean>(false);
 
     useEffect(() => {
+        if(!isNewBoard && !board?.isView || board.isView) return;
+
+        const beforeunload = (e: BeforeUnloadEvent) => {
+            e.preventDefault();
+            deleteDummyFiles(waitUploadFiles);
+        }
+
+        window.addEventListener('beforeunload', beforeunload)
+
+        return () => {
+            window.removeEventListener('beforeunload', beforeunload);
+        }
+    },[waitUploadFiles])
+
+    const deleteDummyFiles = useCallback((waitUploadFiles: TempFileI[]) =>  {
+        waitUploadFiles.forEach(file => {
+            const fileUri = file.filePath + file.fileName;
+            apiCall({
+                path: '/api/file/delete/filename',
+                method: 'PUT',
+                body: {fileUri},
+                isReturnData: true
+            });
+        })
+    },[]);
+
+    useEffect(() => {
         if(!isNewBoard) return ;
         if(!searchParams?.get('categoryPk') || searchParams.get('categoryPk') === 'undefined') {
             alert('잘못된 접근입니다.');
@@ -57,8 +92,12 @@ export default function Page({children, params} : {children: ReactNode, params: 
             }
         }
 
-        const list = [{seq: 0, value: '', code: blockCode().code, textStyle: {}, hash: Date.now().toString() + '-0'}];
-        blockCode().addBlock && list.push({seq: 1, value: '', code: '00005', textStyle: {}, hash: Date.now().toString() + '-1'});
+        const list: BlockI[] = [
+            initBlock({seq: 0, code: blockCode().code})
+        ];
+
+        blockCode().addBlock
+        && list.push(initBlock({seq: 1}));
 
         setBoard({
             ...board,
@@ -77,61 +116,71 @@ export default function Page({children, params} : {children: ReactNode, params: 
         setSelectedBlock(window.location.hash.replace('#block-', '') || '');
     },[]);
 
-    const initBoard = useSWR(`/api/board/${params.id}`, async () => {
-        if(isNewBoard) return ;
-        if(params.id === 'new') return ;
-        await fetchRate();
-    },{
-        keepPreviousData: true,
-        revalidateOnMount: true,
-    });
-
-    const initComment = useSWR(`/api/board/comment/${params.id}`, async () => {
-        if(isNewBoard) return ;
-
-        fetchComment();
-    },{
-        keepPreviousData: true,
-        revalidateOnMount: true,
-    });
-
-    useEffect(()=> {
+    useEffect(() => {
         if(isNewBoard) return ;
 
         setLoading(true);
 
         fetchBoard();
 
+        fetchRate();
+    },[params.id]);
 
-        // if(params.id === 'new') return ;
-        // fetchRate();
 
-    },[params.id])
+    useEffect(()=> {
+        if(searchParams.get('categoryPk') !== '3') return;
+        if(!isNewBoard || board?.isView) return ;
 
+        preload(`/api/user/get-point`, async () => {
+            return await apiCall({
+                path: '/api/user/get-point',
+                method: 'GET',
+                isReturnData: true
+            })
+        })
+        .then(res => {
+            setMyPoint(res.point);
+        })
+    },[])
 
 
     const fetchBoard = async () => {
-        return await apiCall<BoardI & {isLogin : boolean}>({
-            path: '/api/board/' + params.id,
-            method: 'GET',
-            call: 'Proxy'
-        })
-        .then(res => {
+        try {
+            const res = await preload(`/api/board/${params.id}`, async () => {
+                return await apiCall<BoardI & {isLogin : boolean}>({
+                    path: '/api/board/' + params.id,
+                    method: 'GET',
+                    call: 'Proxy'
+                })
+            })
+
             setBoard({
                 ...board,
                 data: res.data,
                 isView: true
             });
-        }).catch(e => {
+
+            const summaryRes = await preload(`/api/board/summary/${params.id}`, async () => {
+                return await apiCall<BoardSummaryI[]>({
+                    path: '/api/board/user/summary/' + res.data.writer,
+                    method: 'GET',
+                    call: 'Proxy',
+                    isReturnData: true
+                })
+            })
+
+            setSummary(summaryRes);
+
+        } catch (e: any) {
             alert(e.response.data);
             location.href = '/';
-        })
-        .finally(() => {
-        setLoading(false);
-        });
+        } finally {
+            setLoading(false);
+        }
     }
 
-    const fetchComment = async () => {
+    const fetchComment = useSWR(`/api/board/comment/${params.id}`, async () => {
+        if(isNewBoard) return;
         return await apiCall<CommentI[]>({
             path: '/api/board/comment',
             method: 'GET',
@@ -144,20 +193,20 @@ export default function Page({children, params} : {children: ReactNode, params: 
         .finally(() => {
             setCommentLoading(false);
         });
-    }
+    })
 
-    const fetchRate = async () => {
-        await apiCall<RateInfoI>({
-            path: '/api/board/rate/' + params.id,
-            method: 'GET',
-            call: 'Proxy'
+    const fetchRate = () => {
+        preload(`/api/board/rate/${params.id}`, async () => {
+            return await apiCall<RateInfoI>({
+                path: '/api/board/rate/' + params.id,
+                method: 'GET',
+                call: 'Proxy'
+            })
         })
         .then(res => {
             setRateInfo(res.data);
         });
     }
-
-    // if(initBoard.isLoading) return <GlobalLoadingSpinner />;
 
     return (
         <LoadingProvider.Provider value={{
@@ -169,7 +218,9 @@ export default function Page({children, params} : {children: ReactNode, params: 
                 comment, setComment,
                 rateInfo, setRateInfo,
                 newComment, setNewComment,
-                deleteComment, setDeleteComment
+                deleteComment, setDeleteComment,
+                summary, setSummary,
+                myPoint, setMyPoint
             }}>
                 <TempFileProvider.Provider value={{
                     waitUploadFiles, setWaitUploadFiles,

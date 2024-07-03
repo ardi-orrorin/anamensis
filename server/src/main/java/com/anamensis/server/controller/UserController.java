@@ -237,9 +237,21 @@ public class UserController {
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(s -> {
                     if(!s.getStatus().equals(HttpStatus.OK)) return;
-                        userService.addUserInfoCache(userDetails.getUsername());
+                        userService.addUserInfoCache(userDetails.getUsername())
+                            .subscribe();
                 });
     }
+
+    @GetMapping("get-point")
+    public Mono<UserResponse.GetPoint> getPoint(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        return userService.findUserByUserId(userDetails.getUsername())
+            .flatMap(m ->
+                Mono.just(new UserResponse.GetPoint(m.getPoint()))
+            );
+    }
+
 
     @PutMapping("s-auth")
     public Mono<UserResponse.Status> sAuth(
@@ -256,7 +268,8 @@ public class UserController {
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(s -> {
                     if(!s.getStatus().equals(HttpStatus.OK)) return;
-                    userService.addUserInfoCache(userDetails.getUsername());
+                    userService.addUserInfoCache(userDetails.getUsername())
+                        .subscribe();
                 });
     }
 

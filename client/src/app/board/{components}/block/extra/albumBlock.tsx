@@ -1,4 +1,4 @@
-import {BlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
+import {ExpendBlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
 import React, {CSSProperties, useContext, useEffect, useRef, useState} from "react";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -22,12 +22,13 @@ export type ProgressType = {
     progress: number;
 }
 
-const AlbumBlock = (props: BlockProps) => {
+const AlbumBlock = (props: ExpendBlockProps) => {
     const {
         hash, value
         , onChangeExtraValueHandler
         , isView
-    }: BlockProps = props;
+        , type
+    }: ExpendBlockProps = props;
 
     const maxImage = 30;
     const oneFileLength = 5;
@@ -49,7 +50,9 @@ const AlbumBlock = (props: BlockProps) => {
 
     useEffect(() => {
         if(!onChangeExtraValueHandler) return;
+
         if(extraValue?.images?.length > 0) return;
+
         onChangeExtraValueHandler({
             defaultIndex: 0,
             images: [],
@@ -88,6 +91,10 @@ const AlbumBlock = (props: BlockProps) => {
             file.size > maxFileSize || size++;
         }
 
+        setUploadProgress({
+            size,
+            progress: 0,
+        });
 
         for(const file of files) {
             upload(file, fileContent, uploadedImages, size, progress);
@@ -101,6 +108,7 @@ const AlbumBlock = (props: BlockProps) => {
         if(file.size > maxFileSize) return;
 
         const blob = new Blob([JSON.stringify(fileContent)], {type: 'application/json'})
+
         const formData = new FormData();
         formData.append('file', file);
         formData.append('fileContent', blob);
@@ -125,6 +133,7 @@ const AlbumBlock = (props: BlockProps) => {
         if(!res) return;
 
         const {id, filePath, fileName} = res;
+
         setWaitUploadFiles((prev) => {
             return [...prev, {id, filePath, fileName}];
         });
@@ -185,19 +194,15 @@ const AlbumBlock = (props: BlockProps) => {
                 defaultIndex: extraValue.defaultIndex === index ? 0 : extraValue.defaultIndex,
             } as ImageShowProps);
 
-
-
             deleteImage({
                 absolutePath,
                 setWaitUploadFiles,
                 setWaitRemoveFiles,
             });
 
-
             setWaitUploadFiles(prevState => {
                 return prevState.filter(item => item.fileName !== fileName);
             });
-
 
             setWaitRemoveFiles(prevState => {
                 return [...prevState, {id: 0, fileName, filePath}];
@@ -222,14 +227,14 @@ const AlbumBlock = (props: BlockProps) => {
     ]
 
     return (
+        <AlbumProvider.Provider value={{albumToggle, setAlbumToggle}}>
         <div id={`block_${hash}`}
-             style={containerStyle}
-             aria-roledescription={'extra'}
+             className={'flex w-full flex-col gap-5'}
+             aria-roledescription={type}
              ref={el => {
                  props!.blockRef!.current[props.seq] = el
              }}
         >
-        <AlbumProvider.Provider value={{albumToggle, setAlbumToggle}}>
             {
                 !isView
                 && extraValue?.images?.length < maxImage
@@ -246,6 +251,7 @@ const AlbumBlock = (props: BlockProps) => {
                         </p>
                         {
                             uploadProgress.size > 0
+                            && extraValue?.images?.length > 0
                             && extraValue?.images?.length < maxImage
                             && <div className={'flex flex-col w-full gap-3'}>
                                 <div className={'w-full h-2 bg-gray-200'}>
@@ -311,18 +317,9 @@ const AlbumBlock = (props: BlockProps) => {
                 && albumToggle?.viewToggle
                 && <ImageView images={extraValue.images} />
             }
-        </AlbumProvider.Provider>
         </div>
+        </AlbumProvider.Provider>
     )
 }
-
-
-const containerStyle: CSSProperties = {
-    display: 'flex',
-    width: '100%',
-    flexDirection: 'column',
-    gap: '0.8rem',
-}
-
 
 export default AlbumBlock;

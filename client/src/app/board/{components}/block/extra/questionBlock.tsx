@@ -1,4 +1,4 @@
-import {BlockProps} from "@/app/board/{components}/block/type/Types";
+import {ExpendBlockProps} from "@/app/board/{components}/block/type/Types";
 import {useContext, useEffect, useMemo} from "react";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import moment from "moment";
@@ -11,12 +11,11 @@ export type QuestionBlockExtraValueType = {
     state      : 'wait' | 'completed';
 }
 
-const QuestionBlock = (props: BlockProps) => {
+const QuestionBlock = (props: ExpendBlockProps) => {
     const {
-        hash, value
-        , onChangeExtraValueHandler
-        , isView,
-    }: BlockProps = props;
+        hash, onChangeExtraValueHandler, type
+    }: ExpendBlockProps = props;
+
     const extraValue = props.extraValue as QuestionBlockExtraValueType;
 
     useEffect(()=> {
@@ -43,7 +42,7 @@ const QuestionBlock = (props: BlockProps) => {
     return (
         <div className={'flex flex-col gap-2'}
              id={`block_${hash}`}
-             aria-roledescription={'extra'}
+             aria-roledescription={type}
              ref={el => {props!.blockRef!.current[props.seq] = el}}
         >
             {
@@ -59,11 +58,10 @@ const QWait = ({
     endDate,
     point,
     onChangeHandler,
-} : QuestionBlockExtraValueType
-& {
+} : QuestionBlockExtraValueType & {
     onChangeHandler: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
-    const {board} = useContext(BoardProvider);
+    const {board, myPoint, setMyPoint} = useContext(BoardProvider);
 
     const onChangeDateHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         if(moment(e.target.value).isAfter(moment().add(9, 'days'))) {
@@ -74,10 +72,18 @@ const QWait = ({
     }
 
     const onChangePointHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if(Number(e.target.value) > 0) {
-            onChangeHandler(e);
+        const integerRegex = /^[0-9]+$/;
+        if(!integerRegex.test(e.target.value)) return ;
+
+        if(parseInt(e.target.value) > myPoint) {
+            alert('보유한 포인트보다 높게 설정할 수 없습니다.');
+            e.target.value = String(myPoint);
         }
-        e.target.value = '0';
+        if(parseInt(e.target.value) < 0) {
+            alert('0보다 작을 수 없습니다.');
+            e.target.value = '0';
+        }
+        onChangeHandler(e);
     }
 
     return (
@@ -93,6 +99,7 @@ const QWait = ({
                 </span>
                 {
                     board?.data?.isWriter
+                    || board.isView
                     ? <span className={'flex justify-center items-center font-bold'}>
                         {moment(endDate).format('YYYY년 MM월 DD일')}
                     </span>
@@ -111,16 +118,30 @@ const QWait = ({
                 </span>
                 {
                     board?.data?.isWriter
+                    || board.isView
                     ? <span className={'flex justify-center items-center font-bold'}>
                         {point}
                     </span>
                     : <input className={'flex justify-center items-center p-2 outline-0'}
-                             type={'number'}
+                             type={'text'}
                              name={'point'}
                              value={point}
+                             max={myPoint}
                              disabled={board?.data?.isWriter}
                              onChange={onChangePointHandler}
                     />
+                }
+                {
+                    !board?.data?.isWriter
+                    && !board.isView
+                    && <div className={'flex gap-1 justify-center items-center'}>
+                        <span>
+                          최대 가능한 포인트 :
+                        </span>
+                        <span className={'font-bold'}>
+                          {myPoint}
+                        </span>
+                    </div>
                 }
             </div>
         </div>
@@ -134,9 +155,7 @@ const QCompleted = ({
 ) => {
     const { comment } = useContext(BoardProvider);
 
-    const selectWriter = useMemo(()=>
-        comment.find(item => Number(item.id) === Number(selectId))
-    ,[]);
+    const selectWriter = comment.find(item => Number(item.id) === Number(selectId));
 
     return (
         <div className={'flex flex-col gap-1 text-sm'}>

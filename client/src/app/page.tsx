@@ -15,13 +15,15 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 
 
-type DynamicPage = {
+export type DynamicPage = {
     isEndOfList: boolean;
     isVisible  : boolean;
 }
 
+// fixme: searchParams 불안정
 export default function Page() {
 
+    const pageSize = 20;
     const [initLoading, setInitLoading] = useState(true);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState<BoardListI[]>([]);
@@ -35,7 +37,7 @@ export default function Page() {
 
     const [searchParams, setSearchParams] = useState<BoardListParamsI>({
         page: 1,
-        size: 20,
+        size: pageSize,
     } as BoardListParamsI);
 
     const moreRef = React.useRef<HTMLDivElement>(null);
@@ -44,38 +46,34 @@ export default function Page() {
 
     useEffect(() => {
         setLoading(true);
-        !searchParams.add && setData([]);
-        const fetch = async () => {
-            await apiCall<PageResponse<BoardListI>, BoardListParamsI>({
-                path: '/api/board',
-                method: 'GET',
-                params: searchParams
-            })
-            .then(res => {
-                setLoading(false);
-                setInitLoading(false);
+        apiCall<PageResponse<BoardListI>, BoardListParamsI>({
+            path: '/api/board',
+            method: 'GET',
+            params: searchParams
+        })
+        .then(res => {
+            if(!res) return;
+            setLoading(false);
+            setInitLoading(false);
 
-                const roles = res.headers['next.user.roles'] || ''
+            const roles = res.headers['next.user.roles'] || ''
 
-                if(roles) setRoles(JSON.parse(roles));
+            if(roles) setRoles(JSON.parse(roles));
 
-                const condition = res.data.content.length < searchParams.size;
+            const condition = res.data.content.length < searchParams.size;
 
-                condition ? setDynamicPage({...dynamicPage, isEndOfList: true})
-                    : setDynamicPage({...dynamicPage, isVisible:false}) ;
+            condition ? setDynamicPage({...dynamicPage, isEndOfList: true})
+                : setDynamicPage({isEndOfList: false, isVisible: false}) ;
 
-                searchParams.add
-                    ? setData([...data, ...res.data.content])
-                    : setData(res.data.content);
 
-            })
-        }
 
-        fetch();
+            searchParams.add
+                ? setData([...data, ...res.data.content])
+                : setData(res.data.content);
+        })
     },[searchParams])
 
-
-    useEffect(()=>{
+    useEffect(()=> {
         if(!moreRef.current) return;
 
         const ob = new IntersectionObserver((entries) => {
@@ -89,14 +87,13 @@ export default function Page() {
             }
         });
 
-
         ob.observe(moreRef.current as Element);
         return () => ob.disconnect();
-    },[moreRef?.current]);
+    },[moreRef?.current, loading]);
 
 
     const onSearchHandler = (init: boolean) => {
-        const initPage = {page: 1, size: 20};
+        const initPage = {page: 1, size: pageSize};
 
         if(init) {
             setSearchValue('')
@@ -117,12 +114,11 @@ export default function Page() {
         }
     }
 
-    const moreHandler = () => {
-        setSearchParams({...searchParams, page: searchParams.page + 1, add: true});
-    }
 
     return (
-        <SearchParamsProvider.Provider value={{searchParams, setSearchParams}}>
+        <SearchParamsProvider.Provider value={{
+            searchParams, setSearchParams,
+        }}>
             <div className={'p-5 flex flex-col gap-10'}>
                 <div className={'px-4 sm:px-10 md:px-20 lg:px-44 w-full flex justify-center items-center gap-3'}>
                     <div className={['relative flex justify-center duration-700', searchFocus ? 'w-full sm:w-[70%]' : 'w-70 sm:w-[40%]'].join(' ')}>

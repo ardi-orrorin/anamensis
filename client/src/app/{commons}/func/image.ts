@@ -11,3 +11,4 @@ export const defaultNoImg = (img: string | undefined | null) => {
     const profile =  condition ? img : '/noimage.jpg';
     return process.env.NEXT_PUBLIC_CDN_SERVER + profile;
 }
+

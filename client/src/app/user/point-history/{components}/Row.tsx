@@ -7,7 +7,7 @@ const Row = ({
 ) => {
     const tdStyle = 'p-2';
     return (
-        <tr className={['border-b border-gray-200 border-solid text-sm', props.index % 2 === 1 ? 'bg-blue-50': ''].join(' ')}>
+        <tr className={['border-b border-gray-200 border-solid text-sm', props.index % 2 === 1 ? 'bg-blue-50': '',  props.point >= 0 ? 'text-blue-500' : 'text-red-500'].join(' ')}>
             <td className={tdStyle}
             >{props.rowNum.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</td>
             <td className={tdStyle}

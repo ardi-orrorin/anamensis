@@ -23,11 +23,10 @@ const SubTextMenu = ({
     const {blockService, setBlockService} = useContext(BlockProvider);
     const {board, setBoard} = useContext(BoardProvider);
 
-    if(!blockService.block) return <></>
+    if(!blockService.block) return;
     const {seq, code, textStyle} = blockService.block;
 
-    if(!textStyle) return <></>
-    const buttonStyle = 'py-2 px-3 h-full hover:bg-blue-50 hover:text-black duration-300 outline-0 '
+    if(!textStyle) return;
 
 
     const selectFontStyle = (type: string, value:string) => {
@@ -60,6 +59,8 @@ const SubTextMenu = ({
             blockRef.current[seq]?.focus();
         },100);
     }
+
+    const buttonStyle = 'py-2 px-3 h-full hover:bg-blue-50 hover:text-black duration-300 outline-0 '
 
     return (
         <div className={`fixed bg-gray-100 z-20 w-auto max-h-52 duration-200 rounded shadow-md`}

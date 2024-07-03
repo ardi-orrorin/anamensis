@@ -67,23 +67,28 @@ public class UserService implements ReactiveUserDetailsService {
     }
 
     public Mono<UserResponse.MyPage> findUserInfoCache(String userId) {
+        String key =  "user:" + userId + ":info";
 
-        Object member = redisTemplate.opsForValue().get("user:" + userId + ":info");
-        if(Objects.isNull(member)) {
-            addUserInfoCache(userId);
-            member = redisTemplate.opsForValue().get("user:" + userId + ":info");
-        }
-
-        return Mono.justOrEmpty((UserResponse.MyPage) member)
-                .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
+        return Mono.fromCallable(()-> redisTemplate.hasKey(key))
+            .flatMap(hasKey -> {
+                if(hasKey) {
+                    return Mono.fromCallable(() -> redisTemplate.opsForValue().get(key));
+                } else {
+                    return addUserInfoCache(userId)
+                        .thenReturn(redisTemplate.opsForValue().get(key));
+                }
+            })
+            .flatMap(attendInfo -> Mono.justOrEmpty((UserResponse.MyPage) attendInfo))
+            .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
     }
 
-    public void addUserInfoCache(String userId) {
+    public Mono<Void> addUserInfoCache(String userId) {
         MemberResultMap member = memberMapper.findMemberInfo(userId).orElseThrow(() ->
             new RuntimeException("User not found"));
 
         UserResponse.MyPage myPage = UserResponse.MyPage.transToMyPage(member);
         redisTemplate.opsForValue().set("user:" + userId + ":info", myPage, Duration.ofDays(1));
+        return Mono.empty();
     }
 
     @Override
@@ -101,6 +106,13 @@ public class UserService implements ReactiveUserDetailsService {
         if(memberPk == 0) return Mono.error(new RuntimeException("User not found"));
         if(point <= 0) return Mono.error(new RuntimeException("Point must be greater than 0"));
         return Mono.fromCallable(() -> memberMapper.updatePoint(memberPk, point) > 0)
+                .onErrorReturn(false);
+    }
+
+    public Mono<Boolean> subtractPoint(long memberPk, long point) {
+        if(memberPk == 0) return Mono.error(new RuntimeException("User not found"));
+        if(point <= 0) return Mono.error(new RuntimeException("Point must be greater than 0"));
+        return Mono.fromCallable(() -> memberMapper.subtractPoint(memberPk, point) > 0)
                 .onErrorReturn(false);
     }
 

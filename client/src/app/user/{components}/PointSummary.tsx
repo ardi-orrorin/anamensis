@@ -5,7 +5,7 @@ import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {Table} from "@/app/user/point-history/{services}/types";
 import {RateColor} from "@/app/{commons}/types/rate";
-import useSWR from "swr";
+import useSWR, {preload} from "swr";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 
 export interface PointSummaryI {
@@ -19,22 +19,17 @@ const PointSummary = () => {
 
     const [data, setData] = useState<PointSummaryI[]>([]);
 
-    const initFetch = useSWR('/api/user/point-history/summary', async () => {
-        await apiCall<PointSummaryI[]>({
+    preload('/api/user/point-history/summary', async () => {
+        return await apiCall<PointSummaryI[]>({
             path: "/api/user/point-history/summary",
             params: {page:1, size: 8},
             method: "GET",
             isReturnData: true,
         })
-        .then((res) => {
-            setData(res);
-        });
-    },{
-        revalidateOnFocus: false,
+    })
+    .then((res) => {
+        setData(res);
     });
-
-
-    if(initFetch.isLoading) return <LoadingSpinner size={30} />;
 
     return (
         <div className={'w-full h-max flex flex-col gap-2 justify-center items-start'}>
@@ -43,7 +38,9 @@ const PointSummary = () => {
                     <div key={`summary-${i}`}
                         className={`flex gap-3 text-sm w-full`}
                     >
-                        <span className={`py-0.5 w-12 bg-blue-400 text-white rounded text-xs flex justify-center items-center`}>{e.point}</span>
+                        <span className={['py-0.5 w-12 text-white rounded text-xs flex justify-center items-center', e.point >=0 ? 'bg-blue-400' : 'bg-red-400'].join(' ')}>
+                            {e.point}
+                        </span>
                         <div className={'flex justify-between w-full'}>
                             <span className={'py-0.5 '}>
                                 {Table.fromString(e.tableName).useWith}

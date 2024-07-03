@@ -1,4 +1,5 @@
 import {createContext, Dispatch, SetStateAction} from "react";
+import {DynamicPage} from "@/app/page";
 
 export interface BoardListParamsI {
     page        : number;
@@ -13,7 +14,7 @@ export interface BoardListParamsI {
 
 export interface TempFileProviderI {
     searchParams: BoardListParamsI;
-    setSearchParams: Dispatch<SetStateAction<BoardListParamsI>>
+    setSearchParams: Dispatch<SetStateAction<BoardListParamsI>>;
 }
 
 const SearchParamsProvider = createContext<TempFileProviderI>({} as TempFileProviderI);

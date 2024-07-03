@@ -63,12 +63,12 @@ public class BoardService {
         list = redisTemplate.boundListOps("board:page:1").range(0, -1);
         return Flux.fromIterable(list)
             .cast(BoardResponse.List.class);
-
     }
 
 
-    public Mono<BoardResultMap.Board> findByPk(long boardPk, long memberPk) {
-        return Mono.justOrEmpty(boardMapper.findByPk(boardPk, memberPk))
+    public Mono<BoardResultMap.Board> findByPk(long boardPk) {
+        return Mono.justOrEmpty(boardMapper.findByPk(boardPk))
+                .log("boardMapper.findByPk")
                 .switchIfEmpty(Mono.error(new RuntimeException("게시글이 없습니다.")));
     }
 

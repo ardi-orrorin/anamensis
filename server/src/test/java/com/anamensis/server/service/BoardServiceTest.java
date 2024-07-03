@@ -1,6 +1,7 @@
 package com.anamensis.server.service;
 
 import com.anamensis.server.dto.Page;
+import com.anamensis.server.dto.SelectAnswerQueueDto;
 import com.anamensis.server.dto.request.BoardRequest;
 import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.entity.Board;
@@ -19,7 +20,8 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles("test")
+//@ActiveProfiles("test")
+@ActiveProfiles("dev")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Transactional
@@ -463,5 +465,21 @@ class BoardServiceTest {
                         assertEquals(newContent, it.getBoard().getContent());
                     })
                     .verifyComplete();
+    }
+
+    @Test
+    void addSelectAnswerQueue() {
+        SelectAnswerQueueDto saqdto = new SelectAnswerQueueDto();
+        saqdto.setBoardPk(1);
+        saqdto.setBoardTitle("테스트 제목");
+        saqdto.setPoint(500);
+        saqdto.setSmtpHost("smtp.gmail.com");
+        saqdto.setSmtpPort("587");
+        saqdto.setSmtpUser("d-member-1");
+        saqdto.setSmtpPassword("password");
+
+        StepVerifier.create(bs.addSelectAnswerQueue(saqdto))
+                .expectNext(false)
+                .verifyComplete();
     }
 }

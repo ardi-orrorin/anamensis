@@ -2,6 +2,7 @@ package com.anamensis.server.controller;
 
 import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.PageResponse;
+import com.anamensis.server.dto.SelectAnswerQueueDto;
 import com.anamensis.server.dto.StatusType;
 import com.anamensis.server.dto.request.BoardRequest;
 import com.anamensis.server.dto.response.BoardResponse;
@@ -40,6 +41,7 @@ public class BoardController {
     private final TableCodeService tableCodeService;
     private final FileService fileService;
     private final BoardCommentService boardCommentService;
+    private final MemberConfigSmtpService memberConfigSmtpService;
 
     @PublicAPI
     @GetMapping("")
@@ -276,6 +278,24 @@ public class BoardController {
                     )
                     .flatMap(p ->
                         insertQnAPointHistory(commentMemberAtomic.get().getId(),(int) pointCommentAtomic.get().point)
+                    )
+                    .flatMap(t ->
+                        memberConfigSmtpService.selectByUserPk(commentMemberAtomic.get().getId())
+                            .next()
+                            .flatMap(mcs -> {
+                                if(mcs == null) return Mono.just(false);
+                                SelectAnswerQueueDto saqdto = new SelectAnswerQueueDto();
+                                saqdto.setBoardPk(boardPk);
+                                saqdto.setBoardTitle(board.getTitle());
+                                saqdto.setPoint((int) pointCommentAtomic.get().point);
+                                saqdto.setSmtpHost(mcs.getHost());
+                                saqdto.setSmtpPort(mcs.getPort());
+                                saqdto.setSmtpUser(mcs.getUsername());
+                                saqdto.setSmtpPassword(mcs.getPassword());
+                                return boardService.addSelectAnswerQueue(saqdto);
+                            })
+                            .onErrorReturn(false)
+
                     )
                     .subscribe();
 

@@ -1,6 +1,7 @@
 package com.anamensis.server.service;
 
 import com.anamensis.server.dto.Page;
+import com.anamensis.server.dto.SelectAnswerQueueDto;
 import com.anamensis.server.dto.request.BoardRequest;
 import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.entity.Board;
@@ -8,7 +9,6 @@ import com.anamensis.server.entity.BoardIndex;
 import com.anamensis.server.entity.Member;
 import com.anamensis.server.mapper.BoardIndexMapper;
 import com.anamensis.server.mapper.BoardMapper;
-import com.anamensis.server.resultMap.BoardCommentResultMap;
 import com.anamensis.server.resultMap.BoardResultMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,9 +18,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.lang.reflect.Type;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -32,6 +30,7 @@ public class BoardService {
     private final BoardIndexMapper boardIndexMapper;
 
     private final RedisTemplate<String, Object> redisTemplate;
+
 
     public Mono<Long> count(Board board) {
         return Mono.fromCallable(() -> boardMapper.count(board));
@@ -167,5 +166,12 @@ public class BoardService {
                 .onErrorReturn(false)
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext($ -> onePageCache(board.getId()));
+    }
+
+    public Mono<Boolean> addSelectAnswerQueue(SelectAnswerQueueDto saqdto) {
+        return Mono.fromCallable(()-> redisTemplate.boundSetOps("select:answer:queue").add(saqdto))
+                .flatMap($ -> Mono.just(true))
+                .onErrorReturn(false)
+                .publishOn(Schedulers.boundedElastic());
     }
 }

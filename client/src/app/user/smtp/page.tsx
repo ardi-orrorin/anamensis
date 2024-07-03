@@ -2,7 +2,6 @@
 
 import {useEffect, useState} from "react";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import axios from "axios";
 import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import {useRouter} from "next/navigation";
 import apiCall from "@/app/{commons}/func/api";
@@ -55,6 +54,7 @@ const getServerSideProps: GetServerSideProps<SmtpPropsI> = async (context) => {
 
 export default function Page(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const {searchParams} = props;
+    const router = useRouter();
 
     const [hasTest, setHasTest] = useState<boolean>(false)
     const [smtp, setSmtp] = useState<SmtpProps>({} as SmtpProps);
@@ -72,11 +72,11 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
                 call: 'Proxy',
                 params: {
                     id: searchParams.id
-                }
+                },
+                isReturnData: true
             })
             .then(res => {
-                const data = res.data;
-                setSmtp(data);
+                setSmtp(res);
             })
         }
         debounce(fetch);
@@ -97,7 +97,7 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
     }
 
     const testSmtp = () => {
-        const data = transformSmtp(smtp);
+        const body = transformSmtp(smtp);
         setLoading(true);
 
         const fetch = async () => {
@@ -105,13 +105,14 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
                 path: '/api/user/smtp/test',
                 method: 'POST',
                 call: 'Proxy',
-                body: data,
+                body,
+                isReturnData: true
             })
-            .then((res) => {
+            .then((data) => {
                 setHasTest(true);
                 setTestResult({
-                    result: res.data as boolean,
-                    message: res.data ? '연결 성공' : '연결 실패'
+                    result: data as boolean,
+                    message: data ? '연결 성공' : '연결 실패'
                 })
             }).finally(() => {
                 setLoading(false);
@@ -133,17 +134,8 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
                 body: data,
             })
             .then(res => {
-                setSmtp({
-                    host: '',
-                    port: '',
-                    username: '',
-                    password: '',
-                    fromEmail: '',
-                    fromName: '',
-                    options: []
-                })
-                window.location.reload();
-
+                setSmtp({} as SmtpProps);
+                router.refresh();
             })
             .finally(() => {
                 setLoading(false);
@@ -158,7 +150,8 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
     }
 
     const init = () => {
-        window.location.search = '';
+        router.push('./smtp');
+        setSmtp({} as SmtpProps);
     }
 
     const inputStyle = 'w-full outline-0 focus:bg-blue-50 p-2 text-sm rounded duration-500';
@@ -170,45 +163,45 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
             <input className={inputStyle}
                    placeholder={'host을 입력하세요'}
                    name={'host'}
-                   value={smtp.host}
+                   value={smtp?.host ?? ''}
                    onChange={setSmtpHandler}
 
             />
             <input className={inputStyle}
                    placeholder={'port를 입력하세요'}
                    name={'port'}
-                   value={smtp.port}
+                   value={smtp?.port ?? ''}
                    onChange={setSmtpHandler}
             />
             <input className={inputStyle}
                    placeholder={'username을 입력하세요'}
                    name={'username'}
-                   value={smtp.username}
+                   value={smtp?.username ?? ''}
                    onChange={setSmtpHandler}
             />
             <input className={inputStyle}
                    placeholder={'password을 입력하세요'}
                    name={'password'}
-                   value={smtp.password}
+                   value={smtp?.password ?? ''}
                    onChange={setSmtpHandler}
             />
             <input className={inputStyle}
                    placeholder={'fromEmail을 입력하세요'}
                    name={'fromEmail'}
-                   value={smtp.fromEmail}
+                   value={smtp?.fromEmail ?? ''}
                    onChange={setSmtpHandler}
             />
             <input className={inputStyle}
                    placeholder={'fromName을 입력하세요'}
                    name={'fromName'}
-                   value={smtp.fromName}
+                   value={smtp?.fromName ?? ''}
                    onChange={setSmtpHandler}
             />
             <div className={'flex gap-3'}>
                 <input type={'checkbox'}
                        id={'isSSL'}
                        name={'isSSL'}
-                       value={smtp.options}
+                       value={smtp?.options ?? ''}
                        checked={smtp.options?.includes('isSSL')}
                        onChange={setSmtpHandler}
                 />
@@ -220,7 +213,7 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
                 <input type={'checkbox'}
                        id={'isDefault'}
                        name={'isDefault'}
-                       value={smtp.options}
+                       value={smtp?.options ?? ''}
                        checked={smtp.options?.includes('isDefault')}
                        onChange={setSmtpHandler}
                 />

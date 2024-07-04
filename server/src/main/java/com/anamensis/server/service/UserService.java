@@ -183,7 +183,7 @@ public class UserService implements ReactiveUserDetailsService {
         AuthType authType
     ) {
 
-        String subject = authType == AuthType.NONE ? "anamensis 2차 인증이 비활성화 되었습니다." : "2차 인증이 활성화 되었습니다.";
+        String subject = authType == AuthType.NONE ? "2차 인증이 비활성화 되었습니다." : "2차 인증이 활성화 되었습니다.";
 
         String bodyTemplate = """
             %s님의 2차 인증 설정이 변경되었습니다.

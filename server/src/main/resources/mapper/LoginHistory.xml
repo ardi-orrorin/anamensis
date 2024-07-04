@@ -21,10 +21,16 @@
     <select id="exist">
         SELECT EXISTS(SELECT *
                         FROM login_history
-                       WHERE member_pk = #{memberPk}
-                         AND ip        = #{ip}
-                          OR member_pk = #{memberPk}
-                         AND device    = #{device}
+                       WHERE member_pk   = #{memberPk}
+                             AND ip      = #{ip}
+                             AND create_at
+                         BETWEEN current_timestamp() - INTERVAL 1 YEAR
+                             AND current_timestamp()
+                          OR member_pk   = #{memberPk}
+                             AND device  = #{device}
+                             AND create_at
+                         BETWEEN current_timestamp() - INTERVAL 1 YEAR
+                             AND current_timestamp()
                      )
     </select>
 

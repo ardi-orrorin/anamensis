@@ -22,4 +22,11 @@ public interface LoginHistoryMapper {
         @Param("history") LoginHistory loginHistory,
         @Param("member") Member member
     );
+
+    boolean exist(
+        @Param("memberPk") long memberPk,
+        @Param("ip") String ip,
+        @Param("device") String device
+    );
+
 }

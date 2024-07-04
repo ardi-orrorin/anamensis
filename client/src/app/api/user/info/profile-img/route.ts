@@ -1,6 +1,6 @@
 import {NextRequest, NextResponse} from "next/server";
-import {UserInfoI} from "@/app/user/email/page";
 import apiCall from "@/app/{commons}/func/api";
+import {UserInfoI} from "@/app/user/email/{services}/userInfoProvider";
 
 export async function POST(req: NextRequest) {
     const data = await req.formData();

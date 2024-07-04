@@ -1,23 +1,13 @@
 'use client';
 
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useContext, useMemo, useState} from "react";
 import {AuthType} from "@/app/login/{services}/types";
 import apiCall from "@/app/{commons}/func/api";
 import {mutate, preload} from "swr";
-import {createDebounce} from "@/app/{commons}/func/debounce";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
+import UserInfoProvider, {UserInfoI} from "@/app/user/email/{services}/userInfoProvider";
 
-export interface UserInfoI {
-    userId: string;
-    email: string;
-    phone: string;
-    name: string;
-    point: number;
-    sauthType: AuthType;
-    sauth: boolean;
-    [key: string]: any;
-}
 
 export interface AuthPropsI {
     sauthType: AuthType;
@@ -30,10 +20,8 @@ const fetchData = apiCall<UserInfoI>({
     isReturnData: true,
 })
 
-
 export default function Page() {
-
-    const [userInfo, setUserInfo] = useState<UserInfoI>({} as UserInfoI);
+    const {userInfo, setUserInfo} = useContext(UserInfoProvider);
     const [loading, setLoading] = useState<boolean>(false);
 
     preload('/user/email', async () => {

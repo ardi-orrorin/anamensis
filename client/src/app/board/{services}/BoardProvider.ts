@@ -1,13 +1,12 @@
 import {BoardI, CommentI, DeleteCommentI} from "@/app/board/{services}/types";
-import {createContext, Dispatch, SetStateAction, useState} from "react";
+import {createContext, Dispatch, SetStateAction} from "react";
 import {RateInfoI} from "@/app/board/[id]/page";
 import {SaveComment} from "@/app/board/[id]/{components}/comment";
-import {BoardSummaryI} from "@/app/user/{components}/BoardSummary";
+import {BoardSummaryI} from "@/app/user/{services}/userProvider";
 
 export interface BoardService {
     data: BoardI;
     isView: boolean;
-
 }
 
 export interface BoardProviderI {

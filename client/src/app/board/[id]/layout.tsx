@@ -10,9 +10,8 @@ import apiCall from "@/app/{commons}/func/api";
 import {useSearchParams} from "next/navigation";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
 import useSWR, {preload} from "swr";
-import {deleteImage, initBlock} from "@/app/board/{services}/funcs";
-import {BoardSummaryI} from "@/app/user/{components}/BoardSummary";
-
+import {initBlock} from "@/app/board/{services}/funcs";
+import {BoardSummaryI} from "@/app/user/{services}/userProvider";
 
 
 export default function Page({children, params} : {children: ReactNode, params: {id: string}}) {

@@ -39,7 +39,6 @@ public class UserController {
     private final PointService ps;
     private final PointHistoryService phs;
     private final TableCodeService tableCodeService;
-    private final MemberConfigSmtpService memberConfigSmtpService;
 
     @PublicAPI
     @PostMapping("login")

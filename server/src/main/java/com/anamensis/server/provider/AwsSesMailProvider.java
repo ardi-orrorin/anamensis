@@ -23,6 +23,10 @@ public class AwsSesMailProvider {
         sendEmail("Verify your email", "Your verification code is: " + code, to, from);
     }
 
+    public void systemEmail(String subject, String content, String to) throws MessagingException {
+        sendEmail(subject, content, to, from);
+    }
+
     public void sendEmail(String subject, String content, String to, String from) throws MessagingException {
         SimpleEmailServiceJavaMailSender mailSender = new SimpleEmailServiceJavaMailSender(sesClient);
 

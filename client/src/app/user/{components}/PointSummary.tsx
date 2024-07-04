@@ -1,40 +1,24 @@
 'use client';
 
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {Table} from "@/app/user/point-history/{services}/types";
 import {RateColor} from "@/app/{commons}/types/rate";
 import useSWR, {preload} from "swr";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
+import UserProvider from "@/app/user/{services}/userProvider";
 
-export interface PointSummaryI {
-    id: number;
-    tableName: string;
-    point: number;
-    createdAt: string;
-}
+
 
 const PointSummary = () => {
 
-    const [data, setData] = useState<PointSummaryI[]>([]);
-
-    preload('/api/user/point-history/summary', async () => {
-        return await apiCall<PointSummaryI[]>({
-            path: "/api/user/point-history/summary",
-            params: {page:1, size: 8},
-            method: "GET",
-            isReturnData: true,
-        })
-    })
-    .then((res) => {
-        setData(res);
-    });
+    const {pointSummary} = useContext(UserProvider);
 
     return (
         <div className={'w-full h-max flex flex-col gap-2 justify-center items-start'}>
             {
-                data.map((e, i) => (
+                pointSummary.map((e, i) => (
                     <div key={`summary-${i}`}
                         className={`flex gap-3 text-sm w-full`}
                     >

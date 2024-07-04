@@ -29,6 +29,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -186,13 +187,14 @@ public class UserService implements ReactiveUserDetailsService {
         String subject = authType == AuthType.NONE ? "2차 인증이 비활성화 되었습니다." : "2차 인증이 활성화 되었습니다.";
 
         String bodyTemplate = """
-            %s님의 2차 인증 설정이 변경되었습니다.
+            %s님의 2차 인증 설정이 변경되었습니다. \n
+            변경 시간 : %s
             """;
 
         try {
             awsSesMailProvider.systemEmail(
                 subject,
-                String.format(bodyTemplate, member.getUserId()),
+                String.format(bodyTemplate, member.getUserId(), LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))),
                 member.getEmail()
             );
         } catch (MessagingException e) {
@@ -208,10 +210,11 @@ public class UserService implements ReactiveUserDetailsService {
             ip : %s </br>
             device : %s </br>
             location : %s </br>
+            dateTime : %s </br>
             에서 로그인이 발생했습니다.
             """;
 
-        String body = String.format(bodyTemplate, device.ip(), device.device(), device.Location());
+        String body = String.format(bodyTemplate, device.ip(), device.device(), device.Location(), LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         try {
             awsSesMailProvider.systemEmail(subject, body, member.getEmail());
         } catch (MessagingException e) {

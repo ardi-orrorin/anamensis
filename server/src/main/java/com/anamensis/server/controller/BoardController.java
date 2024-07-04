@@ -388,12 +388,13 @@ public class BoardController {
             .flatMap(u -> boardService.updateByPk(board.toEntity()))
             .map(result -> {
                 StatusResponse.StatusResponseBuilder sb = StatusResponse.builder();
-                return result ? sb.status(StatusType.SUCCESS)
-                    .message("게시글이 수정 되었습니다.")
-                    .build()
+                return result
+                    ? sb.status(StatusType.SUCCESS)
+                        .message("게시글이 수정 되었습니다.")
+                        .build()
                     : sb.status(StatusType.FAIL)
-                    .message("게시글 수정에 실패하였습니다.")
-                    .build();
+                        .message("게시글 수정에 실패하였습니다.")
+                        .build();
             });
     }
 

@@ -18,6 +18,16 @@
          LIMIT #{page.offset}, #{page.size}
     </select>
 
+    <select id="exist">
+        SELECT EXISTS(SELECT *
+                        FROM login_history
+                       WHERE member_pk = #{memberPk}
+                         AND ip        = #{ip}
+                          OR member_pk = #{memberPk}
+                         AND device    = #{device}
+                     )
+    </select>
+
     <insert id="save" parameterType="map">
         INSERT INTO login_history
                (member_pk, ip, location, device, create_at)

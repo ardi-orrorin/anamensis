@@ -23,12 +23,18 @@ public class LoginHistoryService {
     private final LoginHistoryMapper loginHistoryMapper;
 
 
+
+
     public Mono<Integer> count(long memberPk) {
         return Mono.just(loginHistoryMapper.count(memberPk));
     }
 
     public Flux<LoginHistory> selectAll(Member users, Page page) {
         return Flux.fromIterable(loginHistoryMapper.selectAll(users, page));
+    }
+
+    public Mono<Boolean> confirmedLogin(Member member, Device device) {
+        return Mono.fromCallable(() -> loginHistoryMapper.exist(member.getId(), device.ip(), device.device()));
     }
 
     public Mono<Void> save(Device device, Member member) {

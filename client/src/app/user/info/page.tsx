@@ -1,20 +1,25 @@
 'use client'
-import React, {useEffect, useRef, useState} from "react";
+import React, {useContext, useRef, useState} from "react";
 import Image from "next/image";
-import axios from "axios";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import {UserInfoI} from "@/app/user/email/page";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {defaultProfile} from "@/app/{commons}/func/image";
-import useSWR, {mutate, preload} from "swr";
-import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
+import {mutate, preload} from "swr";
+import UserinfoProvider from "@/app/user/info/{services}/userinfoProvider";
+import {UserInfoI} from "@/app/user/email/{services}/userInfoProvider";
 
 
 type loadingType = {
     profile : boolean,
     img     : boolean
 }
+
+const profileFetch = apiCall({
+    path: '/api/user/info/profile-img',
+    method: 'GET',
+    isReturnData: true,
+})
 
 const dataFetch = apiCall<UserInfoI>({
     path: '/api/user/info',
@@ -23,33 +28,16 @@ const dataFetch = apiCall<UserInfoI>({
 });
 
 
-const profileFetch = apiCall({
-    path: '/api/user/info/profile-img',
-    method: 'GET',
-    isReturnData: true,
-})
 export default function Page() {
 
-    const [img, setImg] = useState<string>('');
+    const {img, setImg, profile, setProfile} = useContext(UserinfoProvider);
+
     const inputRef = useRef<HTMLInputElement>(null);
     const [loading, setLoading] = useState<loadingType>({} as loadingType);
-    const [profile, setProfile] = useState<UserInfoI>({} as UserInfoI);
 
     const [profileEnter, setProfileEnter] = useState<boolean>(false);
 
     const debounce = createDebounce(500);
-
-    useEffect(() => {
-        preload('/user/info', async () => {
-            return await apiCall<UserInfoI>({
-                path: '/api/user/info',
-                method: 'GET',
-                isReturnData: true,
-            })
-        }).then((res) => {
-            setProfile(res)
-        });
-    }, []);
 
     preload('/user/info/profile-img', async () => {
         return await apiCall({
@@ -60,6 +48,8 @@ export default function Page() {
     }).then((res) => {
         setImg(res.length === 0 ? '' : res)
     });
+
+
 
 
     const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,15 +69,13 @@ export default function Page() {
                 method: 'POST',
                 body: formdata,
                 contentType: 'multipart/form-data',
-            })
-            .finally(async () => {
-                setLoading({
-                    ...loading,
-                    img: false
-                });
-                setProfileEnter(false)
-                await mutate('/user/info/profile-img', profileFetch);
-            })
+            });
+
+            await mutate('/user/info/profile-img', profileFetch);
+            setLoading({
+                ...loading,
+                img: false
+            });
         }
 
         debounce(fetch);

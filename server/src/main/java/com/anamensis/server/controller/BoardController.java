@@ -127,11 +127,10 @@ public class BoardController {
 
     @GetMapping("summary")
     public Mono<List<BoardResponse.SummaryList>> findByMemberPk(
-        Page page,
         @AuthenticationPrincipal UserDetails user
     ) {
         return userService.findUserByUserId(user.getUsername())
-                .flatMapMany(u -> boardService.findByMemberPk(u.getId(), page))
+                .flatMapMany(u -> boardService.findSummaryList(u.getId()))
                 .flatMap(b -> rateService.countRate(b.getId())
                     .doOnNext(b::setRate)
                     .map($ -> b)
@@ -145,11 +144,8 @@ public class BoardController {
     public Mono<List<BoardResponse.SummaryList>> findByMemberId(
         @PathVariable(name = "userId") String userId
     ) {
-        Page page = new Page();
-        page.setPage(1);
-        page.setSize(5);
         return userService.findUserByUserId(userId)
-            .flatMapMany(u -> boardService.findByMemberPk(u.getId(), page))
+            .flatMapMany(u -> boardService.findSummaryList(u.getId()))
             .collectList();
     }
 
@@ -164,9 +160,6 @@ public class BoardController {
         }
 
         Mono<PointCode> pointCode = pointService.selectByIdOrTableName("board")
-                .subscribeOn(Schedulers.boundedElastic());
-
-        Mono<PointCode> qnaPointCode = pointService.selectByIdOrTableName("q&a")
                 .subscribeOn(Schedulers.boundedElastic());
 
         Mono<TableCode> tableCode = tableCodeService.findByIdByTableName(0, "board")

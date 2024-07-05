@@ -51,7 +51,7 @@ export default function Page() {
             method: 'GET',
             params: searchParams
         })
-        .then(res => {
+        .then(res=> {
             if(!res) return;
             setLoading(false);
             setInitLoading(false);
@@ -65,7 +65,10 @@ export default function Page() {
             condition ? setDynamicPage({...dynamicPage, isEndOfList: true})
                 : setDynamicPage({isEndOfList: false, isVisible: false}) ;
 
-
+            if(searchParams.page === 1) {
+                setData(res.data.content);
+                return;
+            }
 
             searchParams.add
                 ? setData([...data, ...res.data.content])

@@ -103,7 +103,7 @@ const Slide = ({
                     <FontAwesomeIcon icon={faChevronLeft} />
                 </button>
 
-                <img className={'h-[400px] sm:h-[800px] rounded-xl object-contain'}
+                <img className={'w-full h-[600px] sm:h-[800px] rounded-xl object-cover sm:object-contain'}
                      src={process.env.NEXT_PUBLIC_CDN_SERVER + images[selectedIndex]} alt={''}
                      onClick={onImageClick}
                      onError={(e) => {
@@ -179,7 +179,6 @@ const Slide = ({
                         })
                     }
                 </div>
-
                 {
                     containerRef?.current
                     && containerRef?.current?.clientWidth < totalWidth

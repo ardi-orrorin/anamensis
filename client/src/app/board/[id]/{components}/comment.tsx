@@ -270,9 +270,9 @@ const CommentItem = (props: CommentI) => {
                          onClick={() => {deleteComment.confirm && disabledDeleteConfirm()}}
                     >
                         <div className={'flex gap-2 items-center sm:items-end'}>
-                            <Image className={'h-6 w-6 rounded-full'}
+                            <Image className={'h-10 w-10 rounded-full'}
                                    src={defaultProfile(profileImage)}
-                                   height={30} width={30}
+                                   height={50} width={530}
                                    alt={''}
                             />
                             <div className={'flex h-full gap-1 items-center sm:items-end text-xs'}>

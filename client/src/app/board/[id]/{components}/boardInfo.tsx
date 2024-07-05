@@ -11,10 +11,15 @@ const data = (props: BoardService) => {
     }: BoardI = props.data;
 
     return (
-        <div className={"flex gap-2 justify-between px-2"}>
+        <div className={"flex justify-between px-2"}>
             <div className={"flex flex-col justify-between text-sm"}>
-                <p>
-                    마지막 수정일: {updatedAt}
+                <p className={'flex flex-col sm:flex-row'}>
+                    <span>
+                        마지막 수정일: &nbsp;
+                    </span>
+                    <span>
+                        {updatedAt}
+                    </span>
                 </p>
                 <p>
                     조회수: {viewCount}

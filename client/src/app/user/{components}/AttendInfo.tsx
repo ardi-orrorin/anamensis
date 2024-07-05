@@ -8,18 +8,23 @@ import useSWR, {mutate, preload} from "swr";
 import UserProvider, {AttendInfoI} from "@/app/user/{services}/userProvider";
 
 
+const fetchData = apiCall<AttendInfoI>({
+    path: "/api/user/attend",
+    method: "GET",
+    isReturnData: true,
+})
+
 export default function AttendInfo() {
 
-    const {attendInfo} = useContext(UserProvider)
+    const {attendInfo, setAttendInfo} = useContext(UserProvider)
 
     const [loading, setLoading] = useState<boolean>(false);
     const debounce = createDebounce(500);
 
-    const fetchData = apiCall<AttendInfoI>({
-        path: "/api/user/attend",
-        method: "GET",
-        isReturnData: true,
-    })
+    preload('/user/attend', async () => fetchData)
+        .then((data) => {
+            setAttendInfo(data);
+        });
 
     const attend = () => {
         setLoading(true);

@@ -29,7 +29,7 @@ const BoardTitle = (props: {
         {
             board.isView
             && !newBoard
-            && <span className={"w-full text-lg py-1"}
+            && <span className={"flex w-full text-lg py-1 line-clamp-1"}
             >{props.board.data.title}
             </span>
         }

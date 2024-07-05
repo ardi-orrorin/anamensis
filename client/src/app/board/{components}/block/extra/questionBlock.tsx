@@ -193,7 +193,7 @@ const QCompleted = ({
                     <span className={'flex items-center border-solid border-l-4 border-gray-600 pl-2'}>
                         답변내용 : &nbsp;
                     </span>
-                    <span className={'flex justify-start w-10/12 text-gray-600 line-clamp-1'}>
+                    <span className={'flex justify-start w-auto sm:w-10/12 text-gray-600 line-clamp-1'}>
                         { selectWriter?.content }
                     </span>
                 </div>

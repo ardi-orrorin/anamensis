@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-public class BoardResponse {
+public class BoardResponse implements Serializable {
 
     @Getter
     @Builder
@@ -193,7 +193,7 @@ public class BoardResponse {
     @Getter
     @Builder
     @Setter
-    public static class SummaryList {
+    public static class SummaryList implements Serializable {
         private long id;
         private long categoryPk;
         private String title;

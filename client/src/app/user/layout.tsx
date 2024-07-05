@@ -42,15 +42,7 @@ export default function Layout({children}: {children: React.ReactNode}) {
     });
 
 
-    preload('/user/attend', async () => {
-        return await apiCall<AttendInfoI>({
-            path: "/api/user/attend",
-            method: "GET",
-            isReturnData: true,
-        });
-    }).then((data) => {
-        setAttendInfo(data);
-    });
+
 
     preload('/api/user/point-history/summary', async () => {
         return await apiCall<PointSummaryI[]>({

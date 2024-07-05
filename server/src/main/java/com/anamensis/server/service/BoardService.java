@@ -20,6 +20,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -71,10 +72,23 @@ public class BoardService {
                 .switchIfEmpty(Mono.error(new RuntimeException("게시글이 없습니다.")));
     }
 
-    public Flux<BoardResponse.SummaryList> findByMemberPk(long memberPk, Page page) {
-        return Flux.fromIterable(boardMapper.findByMemberPk(memberPk, page))
-                .map(BoardResponse.SummaryList::from);
+    public Flux<BoardResponse.SummaryList> findSummaryList(long memberPk) {
+
+         return Mono.fromCallable(() -> redisTemplate.boundListOps("board:summary:member:" + memberPk)
+             .range(0, -1))
+             .flatMap(list -> {
+                 if(list == null || list.isEmpty()) {
+                     return updateSummaryList(memberPk)
+                         .mapNotNull(b -> redisTemplate.boundListOps("board:summary:member:" + memberPk).range(0, -1));
+                 }
+
+                 return Mono.just(list);
+             })
+             .flatMapMany(Flux::fromIterable)
+             .cast(BoardResponse.SummaryList.class)
+             .publishOn(Schedulers.boundedElastic());
     }
+
 
     public Mono<Board> save(Board board) {
         if(board.getTitle() == null || board.getTitle().isEmpty())
@@ -88,7 +102,8 @@ public class BoardService {
                 .onErrorMap(RuntimeException::new)
                 .flatMap($ -> Mono.just(board))
             .publishOn(Schedulers.boundedElastic())
-            .doOnNext($ -> onePageCache(0));
+            .doOnNext($ -> onePageCache(0))
+            .doOnNext($ -> updateSummaryList(board.getMemberPk()).subscribe());
     }
 
     public void saveIndex(long boardPk, String content) {
@@ -157,7 +172,8 @@ public class BoardService {
         return Mono.just(boardMapper.disableByPk(boardPk, memberPk, LocalDateTime.now()) == 1)
                 .onErrorReturn(false)
                 .publishOn(Schedulers.boundedElastic())
-                .doOnNext($ -> onePageCache(boardPk));
+                .doOnNext($ -> onePageCache(boardPk))
+                .doOnNext($ -> updateSummaryList(memberPk).subscribe());
     }
 
     public Mono<Boolean> updateByPk(Board board) {
@@ -165,7 +181,8 @@ public class BoardService {
         return Mono.fromCallable(() -> boardMapper.updateByPk(board) == 1)
                 .onErrorReturn(false)
                 .publishOn(Schedulers.boundedElastic())
-                .doOnNext($ -> onePageCache(board.getId()));
+                .doOnNext($ -> onePageCache(board.getId()))
+                .doOnNext($ -> updateSummaryList(board.getMemberPk()).subscribe());
     }
 
     public Mono<Boolean> addSelectAnswerQueue(SelectAnswerQueueDto saqdto) {
@@ -173,5 +190,26 @@ public class BoardService {
                 .flatMap($ -> Mono.just(true))
                 .onErrorReturn(false)
                 .publishOn(Schedulers.boundedElastic());
+    }
+
+    private Mono<Boolean> updateSummaryList(long memberPk) {
+        Page page = new Page();
+        page.setPage(1);
+        page.setSize(8);
+
+        return Mono.fromCallable(() -> boardMapper.findByMemberPk(memberPk, page))
+            .doOnNext($ -> redisTemplate.delete("board:summary:member:" + memberPk))
+            .flatMapMany(Flux::fromIterable)
+            .map(BoardResponse.SummaryList::from)
+            .doOnNext(list -> {
+                redisTemplate.boundListOps("board:summary:member:" + memberPk)
+                    .rightPush(list);
+            })
+            .last()
+            .flatMap($ -> {
+                redisTemplate.boundListOps("board:summary:member:" + memberPk)
+                    .expire(30, TimeUnit.DAYS);
+                return Mono.just(redisTemplate.hasKey("board:summary:member:" + memberPk));
+            });
     }
 }

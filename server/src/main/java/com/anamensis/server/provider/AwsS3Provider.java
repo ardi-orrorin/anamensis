@@ -74,11 +74,14 @@ public class AwsS3Provider {
 
                     } catch (IOException e) {
                         return Mono.error(new RuntimeException(e));
+                    } finally {
+                        DataBufferUtils.release(data);
                     }
 
                     return Mono.just(true);
                 });
     }
+
 
     private Thumbnails.Builder<? extends InputStream> buildThumbnail(
         InputStream is, int width, int height, ThumbnailType thumbnailType

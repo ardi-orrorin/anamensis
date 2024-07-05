@@ -204,7 +204,7 @@ export default function Block(props: BlockProps) {
             }
             {
                 !board.isView
-                && <button className={'w-8 h-full flex justify-center items-center text-gray-600 hover:text-gray-950'}
+                && <button className={'min-w-8 w-8 h-full flex justify-center items-center text-gray-600 hover:text-gray-950'}
                            onClick={onClickAddHandler}
                 >
                   <FontAwesomeIcon icon={faPlus} height={20} />
@@ -213,7 +213,7 @@ export default function Block(props: BlockProps) {
             {
                 !board.isView
                 && block?.type !== 'extra'
-                && <button className={'w-8 h-full flex justify-center items-center text-gray-600 hover:text-gray-950'}
+                && <button className={'min-w-8 w-8 h-full flex justify-center items-center text-gray-600 hover:text-gray-950'}
                            onClick={()=> openMenuToggle()}
                 >
                   <FontAwesomeIcon icon={faEllipsisVertical} height={20} />

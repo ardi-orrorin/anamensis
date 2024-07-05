@@ -399,7 +399,6 @@ const Title = ({
 
 }
 
-// todo: 이미지 삭제 로직 추가
 const ImageThumb = ({
     thumb,
     extraValue,
@@ -484,16 +483,17 @@ const ImageThumb = ({
                 }
                 {
                     imgViewProps.viewImg
-                    && <div className={'fixed sm:absolute z-[99] w-full sm:w-[700px] sm:h-auto left-0 top-0 p-2 bg-white rounded border border-solid border-gray-200 shadow-md duration-500'}>
+                    && <div className={'fixed z-[99] w-full h-full flex justify-center items-center left-0 top-0 p-2 bg-gray-600 bg-opacity-40 duration-500'}
+                            onClick={()=> setImgViewProps(prevState => ({
+                                ...prevState,
+                                viewImg: false
+                            }))}
+                    >
                     <Image src={oriImg}
                            alt={'원본 이미지'}
                            width={700}
                            height={700}
                            onClick={()=> setImgViewProps(prevState => ({
-                               ...prevState,
-                               viewImg: false
-                           }))}
-                           onMouseLeave={() => setImgViewProps(prevState => ({
                                ...prevState,
                                viewImg: false
                            }))}

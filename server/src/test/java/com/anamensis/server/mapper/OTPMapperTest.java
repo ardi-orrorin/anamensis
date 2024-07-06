@@ -101,7 +101,7 @@ class OTPMapperTest {
         assertTrue(otpMapper.selectByUserId("otpmt1").isPresent());
         assertDoesNotThrow(() -> otpMapper.selectByUserId("otpmt1").get());
 
-        OTP otp = otpMapper.selectByUserId("otpmt1").get();
+        OTP otp = otpMapper.selectByUserId("otpmt1").get().getOtp();
         assertNotNull(otp.getHash());
         assertEquals("hash", otp.getHash());
     }

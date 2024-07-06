@@ -87,7 +87,7 @@ const LinkBlock = (props: ExpendBlockProps) => {
                          ref={el => {blockRef!.current[seq] = el}}
                 />
                 : <a className={'flex justify-between w-full p-4 gap-2'}
-                     style={{backgroundColor: isView? "white" : 'rgba(230,230,230,0.2)'}}
+                     style={{backgroundColor: 'rgba(230,230,230,0.2)'}}
                      href={value}
                      target={'_blank'}
                      onMouseEnter={onMouseEnterHandler}

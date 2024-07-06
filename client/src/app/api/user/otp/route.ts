@@ -23,7 +23,6 @@ export async function GET() {
         const res = {
             id: 0,
             sAuth: false,
-            sAuthType: '',
             createAt: '',
         } as OtpInfoI;
 

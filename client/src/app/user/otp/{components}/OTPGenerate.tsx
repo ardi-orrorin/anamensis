@@ -4,6 +4,7 @@ import axios from "axios";
 import {useRouter} from "next/navigation";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import apiCall from "@/app/{commons}/func/api";
+import Image from "next/image";
 
 const OTPGenerate = () => {
 
@@ -21,14 +22,15 @@ const OTPGenerate = () => {
         });
 
         await apiCall({
-            path: '/api/user/otp',
+            path: '/api/user/otp/generate',
             method: 'GET'
         })
         .then((res) => {
             setOtp({
                 ...otp,
                 callApiReq: true,
-                otpQRLink: res.data
+                otpQRLink: res.data,
+                isViewOtpQRCode: true
             });
             router.push('?step=verify');
         })
@@ -37,33 +39,19 @@ const OTPGenerate = () => {
         });
     }
 
-    const qrcode = () => {
-        setOtp({
-            ...otp,
-            isViewOtpQRCode: true
-        });
-        window.open(otp.otpQRLink, '_blank');
-    }
-
     return (
         <div className={'flex flex-col gap-3'}>
             <button className={[
                 'w-full py-3 text-white rounded duration-500',
-                (loading || otp.callApiReq)     ?
-                'bg-gray-400 hover:bg-gray-600' :
-                'bg-blue-300 hover:bg-blue-600'
+                (loading || otp.callApiReq || otp.existOtp)
+                    ? 'bg-gray-400 hover:bg-gray-600'
+                    : 'bg-blue-300 hover:bg-blue-600'
             ].join(' ')}
-                    disabled={loading || otp.callApiReq}
+                    disabled={loading || otp.callApiReq || otp.existOtp}
                     onClick={generateOTP}
             >{
                 loading ? <LoadingSpinner size={12}/> : 'OTP 생성'
             }</button>
-            {
-                otp.callApiReq &&
-                <button className={'w-full bg-blue-300 py-3 hover:bg-blue-600 text-white rounded duration-500'}
-                        onClick={qrcode}
-                >QR 코드 보기</button>
-            }
         </div>
     )
 }

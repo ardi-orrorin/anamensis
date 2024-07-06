@@ -3,6 +3,7 @@ import {useContext, useState} from "react";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {useRouter} from "next/navigation";
 import apiCall from "@/app/{commons}/func/api";
+import Image from "next/image";
 
 const OTPVerify = () => {
 
@@ -21,13 +22,22 @@ const OTPVerify = () => {
         await apiCall({
             path: '/api/user/otp',
             method: 'POST',
-            body: {code: otp.verifyCode}
+            body: {code: otp.verifyCode},
+            isReturnData: true
         })
         .then(res => {
             setOtp({
                 ...otp,
-                verifyState: res.data
+                verifyState: res
             });
+
+            res && setTimeout(()=> {
+                router.push('/user/otp');
+            }, 1500)
+
+        })
+        .catch(err => {
+            console.log(err)
         })
         .finally(() => {
             setLoading(false);
@@ -36,6 +46,13 @@ const OTPVerify = () => {
 
     return (
         <div className={'flex flex-col gap-6'}>
+            <div className={'flex justify-center items-center'}>
+                <Image src={otp.otpQRLink}
+                       alt={''}
+                       width={200}
+                       height={200}
+                />
+            </div>
             <input className={'w-full border border-gray-300 p-3 rounded outline-0 focus:bg-blue-50 duration-300'}
                    type="text"
                    placeholder={'OTP 코드를 입력해주세요'}
@@ -51,10 +68,19 @@ const OTPVerify = () => {
                 loading ? <LoadingSpinner size={12}/> : '확인'
             }
             </button>
+
             {
-                otp.verifyState &&
-                <p className={otp?.verifyState ? 'text-blue-700' : 'text-red-600'}>{otp.verifyState ? '성공' : '실패'}</p>
+                typeof otp?.verifyState !== 'undefined'
+                && <div className={'flex w-full justify-center items-center'}>
+                <p className={[
+                    'w-full py-3 text-center text-white rounded',
+                    otp?.verifyState ? 'bg-blue-700' : 'bg-red-600'].join(' ')}
+                >{otp?.verifyState ? '성공' : '실패'}
+                </p>
+              </div>
+
             }
+
         </div>
     )
 }

@@ -34,7 +34,7 @@ export default function Page() {
             <OTPProvider.Provider value={{otp, setOtp}}>
                 <OTPStep step={step} />
                 <OTPMain step={step} />
-                <OTPFooter cur={step} />
+                {/*<OTPFooter cur={step} />*/}
             </OTPProvider.Provider>
         </div>
     )

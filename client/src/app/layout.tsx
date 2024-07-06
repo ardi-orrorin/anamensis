@@ -5,6 +5,7 @@ import Error from "@/app/error";
 import {Metadata, Viewport} from "next";
 import Head from "next/head";
 import Script from "next/script";
+import Footer from "@/app/{components}/mainFooter";
 
 export const metadata: Metadata = {
     title: 'anamensis',
@@ -62,12 +63,14 @@ export default function RootLayout({
             }} />
             <body>
                 <NavMain />
-                <div>
+                <div className={'min-h-screen'}>
                     <ErrorBoundary errorComponent={Error}>
                         {children}
                     </ErrorBoundary>
                 </div>
+                <Footer />
             </body>
+
         </html>
     )
 }

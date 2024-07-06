@@ -14,13 +14,11 @@ import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 
-
 export type DynamicPage = {
     isEndOfList: boolean;
     isVisible  : boolean;
 }
 
-// fixme: searchParams 불안정
 export default function Page() {
 
     const pageSize = 20;
@@ -137,16 +135,18 @@ export default function Page() {
                             searchValue.length > 0
                             && <button className={'absolute right-12 top-1 duration-500'}
                                        onClick={()=> onSearchHandler(true)}
-                            ><FontAwesomeIcon className={'h-4 py-1.5 px-2 text-gray-400 hover:text-red-300 duration-300'}
-                                              icon={faXmark}
-                            />
+                            >
+                                <FontAwesomeIcon className={'h-4 py-1.5 px-2 text-gray-400 hover:text-red-300 duration-300'}
+                                                 icon={faXmark}
+                                />
                             </button>
                         }
                         <button className={'absolute right-2 top-1 duration-500'}
                                 onClick={()=> onSearchHandler(false)}
-                        ><FontAwesomeIcon className={'h-4 py-1.5 px-2 text-gray-400 hover:text-blue-300 duration-300'}
-                                          icon={faMagnifyingGlass}
-                        />
+                        >
+                            <FontAwesomeIcon className={'h-4 py-1.5 px-2 text-gray-400 hover:text-blue-300 duration-300'}
+                                             icon={faMagnifyingGlass}
+                            />
                         </button>
                     </div>
                 </div>

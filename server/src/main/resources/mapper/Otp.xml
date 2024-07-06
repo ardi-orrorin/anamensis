@@ -4,8 +4,10 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.anamensis.server.mapper.OTPMapper">
-    <select id="selectByUserId" resultType="OTP">
-        SELECT o.*
+    <select id="selectByUserId" resultMap="otpResultMap">
+        SELECT *
+             , o.id as otp_pk
+             , m.id as member_pk
           FROM otp o
           JOIN member m
             ON o.member_pk = m.id
@@ -51,5 +53,17 @@
            SET is_use    = 0
          WHERE member_pk = #{memberPk}
     </update>
+    
+    <resultMap id="otpResultMap" type="OtpResultMap">
+        <id property="id" column="otp_pk" />
+        <association property="otp" resultMap="OtpEntity" />
+        <association property="member" resultMap="MemberEntity" />
+    </resultMap>
 
+    <resultMap id="OtpEntity" type="Otp" autoMapping="true">
+        <id property="id" column="otp_pk" />
+    </resultMap>
+    <resultMap id="MemberEntity" type="Member" autoMapping="true">
+        <id property="id" column="member_pk "/>
+    </resultMap>
 </mapper>

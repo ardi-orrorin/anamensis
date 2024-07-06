@@ -68,19 +68,16 @@ const OTPVerify = () => {
                 loading ? <LoadingSpinner size={12}/> : '확인'
             }
             </button>
-
             {
                 typeof otp?.verifyState !== 'undefined'
                 && <div className={'flex w-full justify-center items-center'}>
-                <p className={[
-                    'w-full py-3 text-center text-white rounded',
-                    otp?.verifyState ? 'bg-blue-700' : 'bg-red-600'].join(' ')}
-                >{otp?.verifyState ? '성공' : '실패'}
-                </p>
-              </div>
-
+                    <p className={[
+                        'w-full py-3 text-center text-white rounded',
+                        otp?.verifyState ? 'bg-blue-700' : 'bg-red-600'].join(' ')}
+                    >{otp?.verifyState ? '성공' : '실패'}
+                    </p>
+                </div>
             }
-
         </div>
     )
 }

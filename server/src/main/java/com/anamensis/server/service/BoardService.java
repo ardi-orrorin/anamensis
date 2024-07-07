@@ -33,9 +33,14 @@ public class BoardService {
     private final RedisTemplate<String, Object> redisTemplate;
 
 
+    /** @deprecated
+     * 0.0.30 버전에서 deprecated
+     * */
     public Mono<Long> count(Board board) {
         return Mono.fromCallable(() -> boardMapper.count(board));
     }
+
+
 
     public Flux<BoardResponse.List> findAll(
         Page page,

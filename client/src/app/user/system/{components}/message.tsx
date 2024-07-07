@@ -58,8 +58,7 @@ const Message = () => {
             })
         }
 
-        const debounce = createDebounce(500);
-        debounce(fetch);
+        fetch();
 
     }, [modal.id, messageList.length]);
 
@@ -251,28 +250,28 @@ const Message = () => {
 
                             />
                         </div>
-                        {/*<div className={'flex flex-col gap-2'}>*/}
-                        {/*    <span>*/}
-                        {/*        추가4*/}
-                        {/*    </span>*/}
-                        {/*    <textarea className={'outline-0 text-sm p-2 rounded h-12 overflow-y-hidden focus:bg-blue-100 focus:h-52 focus:overflow-y-auto duration-500'}*/}
-                        {/*              placeholder={'메시지 내용을 입력하세요'}*/}
-                        {/*              name={'extra4'}*/}
-                        {/*              value={message.extra4}*/}
-                        {/*              onChange={onChangeHandler}*/}
-                        {/*    />*/}
-                        {/*</div>*/}
-                        {/*<div className={'flex flex-col gap-2'}>*/}
-                        {/*    <span>*/}
-                        {/*        추가5*/}
-                        {/*    </span>*/}
-                        {/*    <textarea className={'outline-0 text-sm p-2 rounded h-12 overflow-y-hidden focus:bg-blue-100 focus:h-52 focus:overflow-y-auto duration-500'}*/}
-                        {/*              placeholder={'메시지 내용을 입력하세요'}*/}
-                        {/*              name={'extra5'}*/}
-                        {/*              value={message.extra5}*/}
-                        {/*              onChange={onChangeHandler}*/}
-                        {/*    />*/}
-                        {/*</div>*/}
+                        <div className={'flex flex-col gap-2'}>
+                            <span>
+                                추가4
+                            </span>
+                            <textarea className={'outline-0 text-sm p-2 rounded h-12 overflow-y-hidden focus:bg-blue-100 focus:h-52 focus:overflow-y-auto duration-500'}
+                                      placeholder={'메시지 내용을 입력하세요'}
+                                      name={'extra4'}
+                                      value={message.extra4}
+                                      onChange={onChangeHandler}
+                            />
+                        </div>
+                        <div className={'flex flex-col gap-2'}>
+                            <span>
+                                추가5
+                            </span>
+                            <textarea className={'outline-0 text-sm p-2 rounded h-12 overflow-y-hidden focus:bg-blue-100 focus:h-52 focus:overflow-y-auto duration-500'}
+                                      placeholder={'메시지 내용을 입력하세요'}
+                                      name={'extra5'}
+                                      value={message.extra5}
+                                      onChange={onChangeHandler}
+                            />
+                        </div>
                         <div className={'flex gap-3 duration-300'}>
                             {
                                 init &&

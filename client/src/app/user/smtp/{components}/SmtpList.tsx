@@ -1,24 +1,15 @@
-'use client';
-
-import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import SmtpCard, {SmtpCardProps} from "@/app/user/smtp/{components}/SmtpCard";
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {PageResponse} from "@/app/{commons}/types/commons";
 import apiCall from "@/app/{commons}/func/api";
-import {preload} from "swr";
 
-const SmtpList = () => {
-    const [data, setData] = useState<PageResponse<SmtpCardProps>>({} as PageResponse<SmtpCardProps>);
-
-    preload('/api/user/smtp/list', async () => {
-        return await apiCall<PageResponse<SmtpCardProps>>({
-            path: '/api/user/smtp/list',
-            method: 'GET',
-            isReturnData: true,
-        })
-    })
-    .then(res => {
-        setData(res);
+const SmtpList = async () => {
+    const data = await apiCall<PageResponse<SmtpCardProps>>({
+        path: '/api/user-config-smtp',
+        method: 'GET',
+        call: 'Server',
+        setAuthorization: true,
+        isReturnData: true
     })
 
     return (

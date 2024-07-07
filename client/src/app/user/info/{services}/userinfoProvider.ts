@@ -1,5 +1,5 @@
 import {createContext} from "react";
-import {UserInfoI} from "@/app/user/email/{services}/userInfoProvider";
+import {UserInfoI} from "@/app/user/email/page";
 
 export interface UserinfoProviderI {
     img: string;

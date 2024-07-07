@@ -1,5 +1,3 @@
-'use client';
-
 import React from "react";
 import SmtpList from "@/app/user/smtp/{components}/SmtpList";
 

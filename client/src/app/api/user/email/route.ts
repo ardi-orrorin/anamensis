@@ -11,7 +11,6 @@ export async function GET(){
         isReturnData: true,
     });
 
-
     return new NextResponse(JSON.stringify(result), {
         status: 200,
         headers: {

@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -18,6 +19,9 @@ public class BoardResponse implements Serializable {
     @Builder
     @Setter
     public static class List implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
 
         private long id;
 
@@ -194,6 +198,10 @@ public class BoardResponse implements Serializable {
     @Builder
     @Setter
     public static class SummaryList implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
+
         private long id;
         private long categoryPk;
         private String title;

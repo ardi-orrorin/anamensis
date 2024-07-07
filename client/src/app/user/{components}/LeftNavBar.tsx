@@ -75,7 +75,7 @@ const LeftNavBar = ({
         <>
         <nav className={['z-30 min-h-svh bg-blue-400 py-2 duration-500 '
             , isOpen || !isModalMode  ? 'translate-x-0 shadow-outset-lg' : 'translate-x-[-1000px]'
-            , isModalMode ? 'fixed w-[220px]': 'w-[250px]'
+            , isModalMode ? 'fixed w-[220px]': 'min-w-[200px]'
         ].join(' ')}>
             <div className={'flex justify-between px-5 py-2'}>
                 <button onClick={openToggle} className={'text-white'}>
@@ -105,7 +105,7 @@ const LeftNavBar = ({
                           href={'/user/info'}
                           onClick={onChangeDisabledHandler}
                     >
-                        <div className={'w-full p-3 hover:bg-blue-500 duration-300'}>
+                        <div className={'flex w-full p-3 hover:bg-blue-500 duration-300'}>
                             <FontAwesomeIcon icon={faCheckToSlot} width={iconSize} />
                             <span>&nbsp; 유저 정보</span>
                         </div>

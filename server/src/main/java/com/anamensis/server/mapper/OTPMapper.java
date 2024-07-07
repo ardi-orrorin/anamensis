@@ -1,6 +1,7 @@
 package com.anamensis.server.mapper;
 
 import com.anamensis.server.entity.OTP;
+import com.anamensis.server.resultMap.OtpResultMap;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Optional;
@@ -8,7 +9,7 @@ import java.util.Optional;
 @Mapper
 public interface OTPMapper {
 
-    Optional<OTP> selectByUserId(String userId);
+    Optional<OtpResultMap> selectByUserId(String userId);
 
     Optional<OTP> selectByMemberPk(long memberPk);
 

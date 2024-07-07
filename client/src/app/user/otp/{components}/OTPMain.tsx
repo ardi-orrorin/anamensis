@@ -13,20 +13,23 @@ const OTPMain = ({step}: {step: OTPStepEnum}) => {
     return (
         <main className={'flex flex-col gap-5 min-w-[400px] max-w-1/3'}>
             {
-                [OTPStepEnum.INIT, OTPStepEnum.OTP, OTPStepEnum.VERIFY].includes(step) &&
-                <InitStep />
+                [OTPStepEnum.INIT, OTPStepEnum.OTP, OTPStepEnum.VERIFY].includes(step)
+                && <InitStep />
             }
             {
-                otp.existOtp &&
-                <OTPInit />
+                [OTPStepEnum.INIT, OTPStepEnum.OTP, OTPStepEnum.VERIFY].includes(step)
+                && otp.existOtp
+                && <OTPInit />
             }
             {
-                [OTPStepEnum.OTP, OTPStepEnum.VERIFY].includes(step) &&
-                <OTPGenerate />
+                [OTPStepEnum.INIT, OTPStepEnum.OTP, OTPStepEnum.VERIFY].includes(step)
+                && <OTPGenerate />
             }
             {
-                [OTPStepEnum.VERIFY].includes(step) && otp.callApiReq && otp.isViewOtpQRCode &&
-                <OTPVerify />
+                [OTPStepEnum.VERIFY].includes(step)
+                && otp.callApiReq
+                && otp.isViewOtpQRCode
+                && <OTPVerify />
             }
         </main>
     );

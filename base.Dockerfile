@@ -3,5 +3,5 @@ LABEL      author="ARDI"
 RUN        apt-get update
 RUN        apt-get install -y curl
 RUN        apt-get install -y nodejs
-RUN        apt-get install -y unzip
-RUN        curl -fsSL https://bun.sh/install | bash
+RUN        apt-get install -y npm
+RUN        npm i -g bun

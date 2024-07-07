@@ -3,6 +3,7 @@ package com.anamensis.server.service;
 import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.OTP;
 import com.anamensis.server.mapper.OTPMapper;
+import com.anamensis.server.resultMap.OtpResultMap;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
@@ -23,7 +24,7 @@ public class OTPService {
 
     private final GoogleAuthenticator gAuth;
 
-    public Mono<OTP> selectByUserId(String userId) {
+    public Mono<OtpResultMap> selectByUserId(String userId) {
         return Mono.justOrEmpty(otpMapper.selectByUserId(userId))
                    .switchIfEmpty(Mono.error(new RuntimeException("not found")));
     }

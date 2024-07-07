@@ -1,23 +1,41 @@
-import axios from "axios";
-import {cookies} from "next/headers";
 import {NextRequest} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
+import {OtpInfoI} from "@/app/user/otp/{components}/InitStep";
 
 export async function GET() {
-    const res = await apiCall<any>({
-        path: '/api/otp',
-        method: 'GET',
-        call: 'Server',
-        setAuthorization: true,
-        isReturnData: true,
-    });
 
-    return new Response(JSON.stringify(res), {
-        status: 200,
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
+    try {
+        const res = await apiCall<OtpInfoI>({
+            path: '/api/otp',
+            method: 'GET',
+            call: 'Server',
+            setAuthorization: true,
+            isReturnData: true,
+        });
+
+        return new Response(JSON.stringify(res), {
+            status: 200,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    } catch (e) {
+        const res = {
+            id: 0,
+            sAuth: false,
+            createAt: '',
+        } as OtpInfoI;
+
+        return new Response(JSON.stringify(res), {
+            status: 200,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    }
+
+
+
 }
 
 export async function POST(req: NextRequest) {

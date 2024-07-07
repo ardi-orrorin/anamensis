@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useEffect, useState} from "react";
+import React, {Children, useEffect, useState} from "react";
 import ModalProvider, {ModalI} from "@/app/user/{services}/modalProvider";
 import LeftNavBar from "@/app/user/{components}/LeftNavBar";
 import Contents from "@/app/user/{components}/Contents";
@@ -10,7 +10,7 @@ import {preload} from "swr";
 import apiCall from "@/app/{commons}/func/api";
 
 
-export default function Layout({children}: {children: React.ReactNode}) {
+export default function Layout({children}: {children: React.ReactNode & {test:'1'}}) {
 
     const [boardSummary, setBoardSummary] = useState<BoardSummaryI[]>([]);
     const [attendInfo, setAttendInfo] = useState<AttendInfoI>({} as AttendInfoI);
@@ -40,9 +40,6 @@ export default function Layout({children}: {children: React.ReactNode}) {
     .then((data) => {
         setBoardSummary(data);
     });
-
-
-
 
     preload('/api/user/point-history/summary', async () => {
         return await apiCall<PointSummaryI[]>({

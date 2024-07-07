@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 
@@ -14,6 +15,9 @@ public class AttendResponse {
 
     @Getter @Builder @ToString
     public static class AttendInfo implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
 
         private String userId;
 

@@ -11,6 +11,7 @@ import com.anamensis.server.mapper.BoardIndexMapper;
 import com.anamensis.server.mapper.BoardMapper;
 import com.anamensis.server.resultMap.BoardResultMap;
 import lombok.RequiredArgsConstructor;
+import org.reactivestreams.Publisher;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,6 +92,14 @@ public class BoardService {
              })
              .flatMapMany(Flux::fromIterable)
              .cast(BoardResponse.SummaryList.class)
+             .publishOn(Schedulers.boundedElastic())
+             .onErrorResume(e -> {
+                 if(!e.getMessage().equals("Cannot deserialize")) return Mono.error(e);
+                 return updateSummaryList(memberPk)
+                     .mapNotNull(b -> redisTemplate.boundListOps("board:summary:member:" + memberPk).range(0, -1))
+                     .flatMapMany(Flux::fromIterable)
+                     .cast(BoardResponse.SummaryList.class);
+             })
              .publishOn(Schedulers.boundedElastic());
     }
 

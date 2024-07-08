@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useState} from "react";
 import {Category} from "@/app/board/{services}/types";
 import Link from "next/link";
 import {faPen} from "@fortawesome/free-solid-svg-icons/faPen";
@@ -6,6 +6,11 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBars} from "@fortawesome/free-solid-svg-icons";
 import {RoleType} from "@/app/user/system/{services}/types";
 import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
+import {useHotkeys} from "react-hotkeys-hook";
+import {useRouter} from "next/navigation";
+import {Options} from "react-hotkeys-hook/src/types";
+import {log} from "util";
+import HotKeybtn from "@/app/{components}/hotKeybtn";
 
 const LeftMenu = ({
     roles,
@@ -13,6 +18,9 @@ const LeftMenu = ({
     roles: RoleType[],
 }) => {
     const { setSearchParams} = useContext(SearchParamsProvider);
+    const router = useRouter();
+
+    const boardBaseUrl = '/board/new?categoryPk=';
     const onChangeParamsHandler = ({type, value}: {type: string, value: string | number | boolean}) => {
         const search =
             type === 'categoryPk'
@@ -32,10 +40,56 @@ const LeftMenu = ({
         scrollTo(0, 0);
     }
 
+    const hotkeysOption: Options = {
+        preventDefault: true,
+        keyup: true,
+        keydown: true,
+        enableOnContentEditable: false,
+    }
+    const confirmRole = (item: { roles: RoleType[] }) => {
+        return item.roles.find(r =>
+            roles.find(roles => roles === r)
+        );
+    }
+
+    useHotkeys(['shift+0'], _ => {
+        onChangeParamsHandler({type: 'isSelf', value: true})
+    },hotkeysOption);
+
+    useHotkeys(['mod+shift+1', 'mod+shift+2', 'mod+shift+3', 'mod+shift+4', 'mod+shift+5'], (e, handler)=> {
+        switch(handler.keys?.join('')) {
+            case '1':
+                const cate = Category.findByName("공지 게시판")!;
+                if(!confirmRole(cate)) return;
+                router.push(boardBaseUrl + cate.id);
+                break;
+            case '2':
+                const cate2 = Category.findByName("자유 게시판")!;
+                if(!confirmRole(cate2)) return;
+                router.push(boardBaseUrl + cate2.id);
+                break;
+            case '3':
+                const cate3 = Category.findByName("Q & A")!;
+                if(!confirmRole(cate3)) return;
+                router.push(boardBaseUrl + cate3.id);
+                break;
+            case '4':
+                const cate4 = Category.findByName("알뜰 게시판")!;
+                if(!confirmRole(cate4)) return;
+                router.push(boardBaseUrl + cate4.id);
+                break;
+            case '5':
+                const cate5 = Category.findByName("이미지 게시판")!;
+                if(!confirmRole(cate5)) return;
+                router.push(boardBaseUrl + cate5.id);
+                break;
+        }
+    },hotkeysOption);
+
     return (
         <div className={'fixed left-[5%] xl:left-[13%]'}>
             <div className={'flex flex-col gap-20'}>
-                <div className={'flex flex-col w-60 gap-3 shadow rounded p-3 bg-white border border-solid border-gray-100'}>
+                <div className={'flex flex-col w-60 gap-2 shadow rounded p-3 bg-white border border-solid border-gray-100'}>
                     <div className={'flex gap-2 justify-center items-center text-sm py-2 font-bold'}>
                         <FontAwesomeIcon icon={faBars} height={'16'}/>
                         <span>
@@ -45,9 +99,13 @@ const LeftMenu = ({
                     <div>
                         {
                             roles.length > 0
-                            && <button className={'flex w-full justify-center text-xs'}
+                            && <button className={'flex py-2 px-5 w-full justify-between items-center text-xs hover:bg-gray-100 duration-500'}
                                        onClick={() => onChangeParamsHandler({type: 'isSelf', value: true})}
-                            >내 글 보기
+                            >
+                                <span>
+                                    내 글 보기
+                                </span>
+                                <HotKeybtn hotkey={['SHIFT', '0']} />
                             </button>
                         }
                     </div>
@@ -68,11 +126,7 @@ const LeftMenu = ({
                       <div className={'w-full flex flex-col items-center text-xs'}>
                           {
                               Category.list.map((item, index) => {
-                                  const hasRoleCategory = item.roles.find(r =>
-                                      roles.find(userRole =>
-                                          userRole === r
-                                      )
-                                  )
+                                  const hasRoleCategory = confirmRole(item);
 
                                   if(item.id === '0' || !hasRoleCategory) {
                                       return null
@@ -80,10 +134,15 @@ const LeftMenu = ({
 
                                   return (
                                       <Link key={'category-write-menu' + index}
-                                            href={`/board/new?categoryPk=${item.id}`}
-                                            className={'py-2 w-full text-center hover:bg-gray-100 duration-300'}
+                                            href={boardBaseUrl + item.id}
+                                            className={'py-2 px-5 w-full items-center gap-1 hover:bg-gray-100 duration-300'}
                                       >
-                                          {item.name}
+                                          <div className={'flex justify-between items-center'}>
+                                              <span>
+                                                {item.name}
+                                              </span>
+                                              <HotKeybtn hotkey={['CTRL','SHIFT', item.id]} />
+                                          </div>
                                       </Link>
                                   )
                               })
@@ -106,6 +165,8 @@ const CategorySelect = ({
     const [selectToggle, setSelectToggle] = useState(false);
     const {searchParams} = useContext(SearchParamsProvider);
 
+    const router = useRouter();
+
     const onToggleHandler = () => {
         setSelectToggle(!selectToggle);
     }
@@ -116,6 +177,24 @@ const CategorySelect = ({
         onClick({type: 'categoryPk', value: pk});
         setSelectToggle(false);
     }
+
+    const hotkeysOption: Options = {
+        preventDefault: true,
+        keyup: true,
+        keydown: true,
+    }
+
+    useHotkeys(['shift+`, shift+1', 'shift+2', 'shift+3', 'shift+4', 'shift+5'], (e, handler)=> {
+        if(handler.keys?.join('') === 'backquote') {
+
+            const selCategoryPk = Category.findById('0')!.id;
+            selectHandler(selCategoryPk);
+            return
+        }
+        const selCategoryPk = Category.findById(handler.keys?.join('')!)!.id;
+        selectHandler(selCategoryPk);
+
+    }, hotkeysOption, []);
 
     return (
         <div className={[
@@ -141,10 +220,11 @@ const CategorySelect = ({
                     Category.list.map((item, index) => {
                         return (
                             <button key={'category-menu-selectbox' + index}
-                                    className={'p-2 border-solid border border-white focus:outline-none'}
+                                    className={'py-2 px-6 flex justify-between items-center border-solid border border-white focus:outline-none'}
                                     onClick={()=>selectHandler(item.id)}
                             >
                                 <span>{item.name}</span>
+                                <HotKeybtn hotkey={['SHIFT', item.id === '0' ? '`' : item.id]} />
                             </button>
                         )
                     })

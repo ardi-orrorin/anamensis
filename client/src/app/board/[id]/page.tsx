@@ -24,6 +24,8 @@ import KeyDownEvent from "@/app/board/{services}/keyDownEvent";
 import {deleteImage, initBlock, listSort, notAvailDupCheck, updateBoard} from "@/app/board/{services}/funcs";
 import WriterInfo from "@/app/board/[id]/{components}/writerInfo";
 import {useRouter} from "next/navigation";
+import {useHotkeys} from "react-hotkeys-hook";
+import HotKeybtn from "@/app/{components}/hotKeybtn";
 
 export interface RateInfoI {
     id      : number;
@@ -316,13 +318,31 @@ export default function Page({params}: {params : {id: string}}) {
         });
     }
 
+    useHotkeys('shift+f', ()=> setFullScreen(!fullScreen));
+    useHotkeys('backspace', _ => router.back());
+
     if(!board?.data?.content || board.data?.content?.list?.length === 0) {
         return <GlobalLoadingSpinner />
     }
 
     return (
         <div className={'p-5 flex flex-col gap-5 justify-center items-center'}>
-            <div className={`w-full flex flex-col gap-6 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-3/5'}`}>
+            <div className={`relative w-full flex flex-col gap-6 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-3/5'}`}>
+                <div className={[`absolute z-10 top-32 -right-52 hidden`, fullScreen ? 'lg:hidden' : 'lg:block'].join(' ')}>
+                    <div className={'flex flex-col w-40 h-40 p-2 text-xs shadow rounded  bg-gray-50'}>
+                        <h1 className={'flex justify-center p-2'}>
+                            단축키
+                        </h1>
+                        <ul className={'flex flex-col gap-2 justify-center items-center'}>
+                            <li className={'flex gap-2 items-center'}>
+                                <span>
+                                    너비 변경 : 
+                                </span> 
+                                <HotKeybtn hotkey={['SHIFT', 'F']} />
+                            </li>
+                        </ul>
+                    </div>
+                </div>
                 <div className={'flex h-8 border-l-8 border-solid border-gray-500 px-2 items-center'}>
                     <span className={'font-bold'}>
                         {Category.findById(board.data.categoryPk.toString())?.name}
@@ -468,6 +488,7 @@ export default function Page({params}: {params : {id: string}}) {
                 (isNewBoard || !board.isView) && (!isNewBoard || !board.isView)
                 && <div className={'h-60'} />
             }
+
         </div>
     )
 }

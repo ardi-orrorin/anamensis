@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {PageResponse} from "@/app/{commons}/types/commons";
 import apiCall from "@/app/{commons}/func/api";
 import BoardComponent, {BoardListI} from "@/app/{components}/boardComponent";
@@ -13,6 +13,7 @@ import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchPar
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {createDebounce} from "@/app/{commons}/func/debounce";
+import {useHotkeys} from "react-hotkeys-hook";
 
 export type DynamicPage = {
     isEndOfList: boolean;
@@ -39,10 +40,12 @@ export default function Page() {
     } as BoardListParamsI);
 
     const moreRef = React.useRef<HTMLDivElement>(null);
+    const searchRef = useRef<HTMLInputElement>(null);
 
-    const fetchDebounce = createDebounce(500);
+    const fetchDebounce = createDebounce(200);
 
     useEffect(() => {
+        if(loading) return;
         setLoading(true);
         apiCall<PageResponse<BoardListI>, BoardListParamsI>({
             path: '/api/board',
@@ -113,8 +116,21 @@ export default function Page() {
         if(e.key === 'Enter') {
             onSearchHandler(false);
         }
+        if(e.key === 'Escape') {
+            if(!searchRef?.current) return;
+
+            setSearchValue('')
+            searchRef.current.blur();
+        }
     }
 
+    useHotkeys('shift+f',(e, v)=>{
+        e.preventDefault();
+
+        if(searchRef.current) {
+            searchRef.current.focus();
+        }
+    })
 
     return (
         <SearchParamsProvider.Provider value={{
@@ -124,6 +140,7 @@ export default function Page() {
                 <div className={'px-4 sm:px-10 md:px-20 lg:px-44 w-full flex justify-center items-center gap-3'}>
                     <div className={['relative flex justify-center duration-700', searchFocus ? 'w-full sm:w-[70%]' : 'w-70 sm:w-[40%]'].join(' ')}>
                         <input className={'rounded-full outline-0 border-solid border-gray-200 border text-xs w-full h-10 py-3 pl-4 pr-20 focus:bg-blue-50 duration-500'}
+                               ref={searchRef}
                                placeholder={'검색어'}
                                value={searchValue || ''}
                                onChange={(e) => setSearchValue(e.target.value)}
@@ -177,8 +194,8 @@ export default function Page() {
                         }
                     </div>
                 </div>
-                <div>
-                    <div className={'flex justify-center text-xs py-5'}>
+                <div className={'relative'}>
+                    <div className={'absolute w-full -top-56 flex justify-center text-xs py-5'}>
                         {
                             loading
                             ? <LoadingSpinner size={20} />

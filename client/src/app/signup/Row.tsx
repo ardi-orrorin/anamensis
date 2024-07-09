@@ -1,7 +1,7 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheck} from "@fortawesome/free-solid-svg-icons/faCheck";
 import {CheckProps, CheckType, UserProps} from "@/app/signup/page";
-import {useState} from "react";
+import {LegacyRef, useState} from "react";
 
 export type RowProps = {
     className?  : string;

@@ -358,7 +358,7 @@ export default function Page({params}: {params : {id: string}}) {
 
         const changeValue = ({item, key, value}: {item: BlockI, key: string, value: string}) => {
             if(item.textStyle![key] === value) {
-                item.textStyle![key] = '';
+                return item.textStyle![key] = '';
             }
 
             item.textStyle![key] = value;

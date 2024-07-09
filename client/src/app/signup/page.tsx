@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import Row from "@/app/signup/Row";
 import EmailTemplate from "@/app/signup/EmailTemplate";
 import {useRouter} from "next/navigation";
@@ -119,6 +119,8 @@ export default function Page() {
             phone      : phone.length === 0 ? 'uncheck' : check.phone,
         });
     },[user]);
+
+
 
 
     const setProps = async (e: React.ChangeEvent<HTMLInputElement>) => {

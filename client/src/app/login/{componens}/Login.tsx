@@ -33,6 +33,13 @@ const Login = () => {
     const {user, setUser} = useContext(LoginProvider);
     const [loading, setLoading] = useState<boolean>(false);
 
+    const idRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if(!idRef?.current) return;
+        idRef.current.focus();
+    },[idRef]);
+
     useEffect(() => {
         if (user.username.length < 4) {
             setUser({
@@ -130,6 +137,7 @@ const Login = () => {
                 <div className={'flex'}>
                     <input
                         className={'w-full border border-none outline-0 focus:bg-blue-100 duration-300 text-xs rounded my-2 p-2'}
+                        ref={idRef}
                         placeholder={'아이디를 입력하세요.'}
                         name={'username'}
                         value={user.username}

@@ -41,10 +41,10 @@ const LeftMenu = ({
 
     const hotkeysOption: Options = {
         preventDefault: true,
-        keyup: true,
-        keydown: true,
-        enableOnContentEditable: false,
+        ignoreModifiers: true,
+        enableOnFormTags: true
     }
+
     const confirmRole = (item: { roles: RoleType[] }) => {
         return item.roles.find(r =>
             roles.find(roles => roles === r)
@@ -68,13 +68,13 @@ const LeftMenu = ({
                 break;
         }
 
-    }, hotkeysOption, []);
+    }, hotkeysOption, [roles]);
 
     useHotkeys(['mod+shift+1', 'mod+shift+2', 'mod+shift+3', 'mod+shift+4', 'mod+shift+5'], (e, handler)=> {
         const selCate = Category.findById(handler.keys!.join(''))!;
         if(!confirmRole(selCate)) return;
         router.push(boardBaseUrl + selCate.id);
-    }, hotkeysOption, []);
+    }, hotkeysOption,[roles]);
 
     return (
         <div className={'fixed left-[5%] xl:left-[13%]'}>
@@ -153,8 +153,8 @@ const LeftMenu = ({
                             roles.length > 0
                             ? <>
                                 <li className={'flex justify-between items-center gap-2'}>
-                                    <span>로그인</span>
-                                    <HotKeybtn hotkey={['SHIFT', 'L']} />
+                                    <span>로그아웃</span>
+                                    <HotKeybtn hotkey={['SHIFT', 'O']} />
                                 </li>
                                 <li className={'flex justify-between items-center gap-2'}>
                                     <span>사용자 정보</span>
@@ -162,8 +162,8 @@ const LeftMenu = ({
                                 </li>
                             </>
                             : <li className={'flex justify-between items-center gap-2'}>
-                                <span>로그아웃</span>
-                                <HotKeybtn hotkey={['SHIFT', 'O']} />
+                                <span>로그인</span>
+                                <HotKeybtn hotkey={['SHIFT', 'L']} />
                             </li>
                         }
                     </ul>

@@ -10,7 +10,6 @@ import LeftMenu from "@/app/{components}/leftMenu";
 import TopMenu from "@/app/{components}/topMenu";
 import {RoleType} from "@/app/user/system/{services}/types";
 import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
-import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useHotkeys} from "react-hotkeys-hook";
@@ -42,7 +41,7 @@ export default function Page() {
     const moreRef = React.useRef<HTMLDivElement>(null);
     const searchRef = useRef<HTMLInputElement>(null);
 
-    const fetchDebounce = createDebounce(200);
+    const fetchDebounce = createDebounce(100);
 
     useEffect(() => {
         if(loading) return;
@@ -195,11 +194,10 @@ export default function Page() {
                     </div>
                 </div>
                 <div className={'relative'}>
-                    <div className={'absolute w-full -top-56 flex justify-center text-xs py-5'}>
+                    <div className={'absolute w-full -top-72 flex justify-center text-xs py-5'}>
                         {
-                            loading
-                            ? <LoadingSpinner size={20} />
-                            : !dynamicPage.isEndOfList
+                            !loading
+                            && !dynamicPage.isEndOfList
                             && !dynamicPage.isVisible
                             && <div ref={moreRef} className={'w-10 h-10'} />
                         }

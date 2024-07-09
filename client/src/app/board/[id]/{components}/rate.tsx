@@ -18,13 +18,13 @@ const Rate = (props: {
             : board?.data?.rate;
     },[rateInfo?.count, board.data?.rate]);
 
-    if(!board.data.isLogin) return <></>
+    if(!board.data?.isLogin) return <></>
 
     return (
         <div className={"flex justify-center"}>
             {
                 !newBoard && board.isView
-                && board.data.categoryPk !== 1
+                && board.data?.categoryPk !== 1
                 && <button
                     className={"px-6 py-3 flex gap-2 justify-center items-center border border-blue-400 text-xl rounded hover:bg-blue-400 hover:text-white duration-300"}
                     onClick={onClick}

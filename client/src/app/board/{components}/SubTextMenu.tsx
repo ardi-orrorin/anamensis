@@ -26,7 +26,6 @@ const SubTextMenu = ({
 
     if(!textStyle) return;
 
-
     const selectFontStyle = (type: string, value:string) => {
         value = textStyle[type] === value ? '' : value;
         onClickSubTextMenu(type, value)

@@ -22,6 +22,7 @@ export type BlockType = {
     comment      : string;
     notAvailDup  : boolean;
     type         : 'text' | 'object' | 'extra';
+    shortcut?     : string;
 }
 
 export type BlockComponentType = BlockType & {
@@ -38,12 +39,14 @@ export const blockTypeList: BlockComponentType[] = [
         command           : '/h1',
         type              : 'text',
         notAvailDup       : false,
+        shortcut          : 'mod+1',
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '2.4rem',
             fontWeight    : '700',
             letterSpacing : '0.03rem',
             padding       : '0.5rem',
         }),
+
     },
     {
         code              : '00002',
@@ -54,6 +57,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '세션 부제목',
         type              : 'text',
         notAvailDup       : false,
+        shortcut          : 'mod+2',
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '1.8rem',
             fontWeight    : '600',
@@ -70,6 +74,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '세션 본문 제목',
         type              : 'text',
         notAvailDup       : false,
+        shortcut          : 'mod+3',
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '1.2rem',
             fontWeight    : '500',
@@ -87,6 +92,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '세션 본문 내용',
         type              : 'text',
         notAvailDup       : false,
+        shortcut          : 'mod+4',
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '1rem',
             letterSpacing : '0.03rem',
@@ -102,6 +108,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '세션 본문 작은 내용',
         type              : 'text',
         notAvailDup       : false,
+        shortcut          : 'mod+5',
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '0.8rem',
             letterSpacing : '0.03rem',
@@ -117,6 +124,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '인용',
         type              : 'text',
         notAvailDup       : false,
+        shortcut          : 'mod+6',
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '1rem',
             padding       : '1rem 0.5rem 1rem 1.3rem',

@@ -84,7 +84,7 @@ export class Category {
 
     public static findById(id: string): Category | undefined {
         return Category.list.find((e) =>
-            e.id === id.toString()
+            e.id === id?.toString()
         );
     }
 

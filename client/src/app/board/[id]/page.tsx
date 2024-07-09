@@ -388,7 +388,7 @@ export default function Page({params}: {params : {id: string}}) {
 
 
     if(!board?.data?.content || board.data?.content?.list?.length === 0) {
-        return <GlobalLoadingSpinner />
+        return;
     }
 
     return (
@@ -473,7 +473,7 @@ export default function Page({params}: {params : {id: string}}) {
                 </div>
                 <div className={'flex h-8 border-l-8 border-solid border-gray-500 px-2 items-center'}>
                     <span className={'font-bold'}>
-                        {Category.findById(board.data.categoryPk.toString())?.name}
+                        {Category.findById(board.data?.categoryPk.toString())?.name}
                     </span>
                 </div>
                 <div className={'flex flex-col sm:flex-row justify-between gap-3 h-auto border-b-2 border-solid border-blue-200 py-3'}>
@@ -486,8 +486,8 @@ export default function Page({params}: {params : {id: string}}) {
                         {
                             !isNewBoard &&
                             <HeaderBtn isView={board.isView}
-                                       isWriter={board.data.isWriter || false}
-                                       isLogin={board.data.isLogin || false}
+                                       isWriter={board.data?.isWriter || false}
+                                       isLogin={board.data?.isLogin || false}
                                        submitClickHandler={() => debounce(() => submitHandler(false))}
                                        editClickHandler={editClickHandler}
                                        deleteClickHandler={() => debounce(() => deleteHandler())}
@@ -499,14 +499,14 @@ export default function Page({params}: {params : {id: string}}) {
                                 && <button
                                     className={[
                                         'w-16 rounded h-full border-2 py-1 px-3 text-xs duration-300',
-                                        board.data.isPublic
+                                        board.data?.isPublic
                                             ? 'text-blue-600 border-blue-200 hover:bg-blue-200 hover:text-white'
                                             : 'text-red-600 border-red-200 hover:bg-red-200 hover:text-white'
                                     ].join(' ')}
                                     onClick={() => {
                                         setBoard({...board, data: {...board.data, isPublic: !board.data.isPublic}});
                                     }}
-                                > { board.data.isPublic ? '공개' : '비공개' }
+                                > { board.data?.isPublic ? '공개' : '비공개' }
                               </button>
                             }
                             {
@@ -514,14 +514,14 @@ export default function Page({params}: {params : {id: string}}) {
                                 && <button
                                 className={[
                                     'w-16 rounded h-full border-2 py-1 px-3 text-xs duration-300 whitespace-pre',
-                                    board.data.membersOnly
+                                    board.data?.membersOnly
                                         ? 'text-red-600 border-red-200 hover:bg-red-200 hover:text-white'
                                         : 'text-blue-600 border-blue-200 hover:bg-blue-200 hover:text-white'
                                 ].join(' ')}
                                 onClick={() => {
                                     setBoard({...board, data: {...board.data, membersOnly: !board.data.membersOnly}});
                                 }}
-                              > { board.data.membersOnly ? '회원\n 전용' : '모두' }
+                              > { board.data?.membersOnly ? '회원\n 전용' : '모두' }
                               </button>
                             }
                             <button
@@ -549,7 +549,7 @@ export default function Page({params}: {params : {id: string}}) {
                 </div>
                 <div className={['flex flex-col', board.isView ? 'gap-2' : 'gap-4'].join(' ')}>
                     {
-                        board.data.content.list.map((item, index) => {
+                        board.data?.content?.list.map((item, index) => {
                           return <Block key={'block' + index}
                                           blockRef={blockRef}
                                           onChangeHandler={e => {

@@ -67,7 +67,6 @@ const LeftMenu = ({
                 router.push('/user');
                 break;
         }
-
     }, hotkeysOption, [roles]);
 
     useHotkeys(['mod+shift+1', 'mod+shift+2', 'mod+shift+3', 'mod+shift+4', 'mod+shift+5'], (e, handler)=> {
@@ -77,11 +76,11 @@ const LeftMenu = ({
     }, hotkeysOption,[roles]);
 
     return (
-        <div className={'fixed left-[5%] xl:left-[13%]'}>
-            <div className={'flex flex-col gap-20'}>
+        <div className={'fixed z-30 left-[5%] xl:left-[13%]'}>
+            <div className={'flex flex-col gap-5'}>
                 <div className={'flex flex-col w-60 gap-2 shadow rounded p-3 bg-white border border-solid border-gray-100'}>
                     <div className={'flex gap-2 justify-center items-center text-sm py-2 font-bold'}>
-                        <FontAwesomeIcon icon={faBars} height={'16'}/>
+                        <FontAwesomeIcon icon={faBars} height={'16'} />
                         <span>
                             메뉴
                         </span>
@@ -111,7 +110,7 @@ const LeftMenu = ({
                         <FontAwesomeIcon icon={faPen} height={'16'} />
                         <span>
                               글쓰기
-                          </span>
+                        </span>
                       </div>
                       <div className={'w-full flex flex-col items-center text-xs'}>
                           {
@@ -138,10 +137,8 @@ const LeftMenu = ({
                               })
                           }
                       </div>
-
                   </div>
                 }
-
                 <div className={'flex flex-col w-full px-3 py-6 gap-2 justify-center items-center shadow rounded'}>
                     <h1 className={'text-sm font-bold'}>단축키</h1>
                     <ul className={'flex flex-col w-full px-5 gap-3 text-xs'}>

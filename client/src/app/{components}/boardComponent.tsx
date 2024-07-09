@@ -20,6 +20,7 @@ export interface BoardListI {
     isPublic     : boolean;
     membersOnly  : boolean;
 }
+
 const BoardComponent = (props: BoardListI) => {
     const {
        id, body, categoryPk

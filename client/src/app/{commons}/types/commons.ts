@@ -13,7 +13,6 @@ export interface PageI {
     getOffset: number;
 }
 
-
 export interface StatusResponse {
     status: string;
     message: string;

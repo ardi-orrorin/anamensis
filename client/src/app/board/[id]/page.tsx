@@ -24,6 +24,9 @@ import KeyDownEvent from "@/app/board/{services}/keyDownEvent";
 import {deleteImage, initBlock, listSort, notAvailDupCheck, updateBoard} from "@/app/board/{services}/funcs";
 import WriterInfo from "@/app/board/[id]/{components}/writerInfo";
 import {useRouter} from "next/navigation";
+import {useHotkeys} from "react-hotkeys-hook";
+import HotKeybtn from "@/app/{components}/hotKeybtn";
+import {Options} from "react-hotkeys-hook/src/types";
 
 export interface RateInfoI {
     id      : number;
@@ -316,13 +319,158 @@ export default function Page({params}: {params : {id: string}}) {
         });
     }
 
+    useHotkeys('shift+f', ()=> setFullScreen(!fullScreen));
+    useHotkeys('backspace', _ => router.back());
+
+    const hotkeyOption: Options = {
+        preventDefault: true,
+        scopes: ['board'],
+        enableOnFormTags: true,
+    };
+    useHotkeys(['mod+1', 'mod+2', 'mod+3', 'mod+4', 'mod+5', 'mod+6'], (_, handler) => {
+        if(blockService?.blockMenu !== 'openTextMenu') return;
+
+        const seq = document.activeElement?.parentElement?.id.split('-')[2];
+        if(!seq) return;
+
+        const block = blockTypeList.find(item => item.shortcut === 'mod+' + handler.keys?.join(''));
+        if(!block) return;
+
+        const newList = board.data?.content?.list.map((item, index) => {
+            if (item.seq !== Number(seq)) return item;
+
+            item.code = block.code;
+            return item;
+        });
+
+        setBoard({...board, data: {...board.data, content: {list: newList}}});
+
+        setTimeout(() => {
+            blockRef?.current[Number(seq)]?.focus();
+        },100)
+
+    }, hotkeyOption);
+
+    useHotkeys(['mod+b', 'mod+i', 'mod+;'], (e, handler) => {
+        if(blockService?.blockMenu !== 'openTextMenu') return;
+
+        const seq = document.activeElement?.parentElement?.id.split('-')[2];
+
+        const changeValue = ({item, key, value}: {item: BlockI, key: string, value: string}) => {
+            if(item.textStyle![key] === value) {
+                item.textStyle![key] = '';
+            }
+
+            item.textStyle![key] = value;
+        }
+
+        const newList = board.data?.content?.list.map((item, index) => {
+            if (item.seq !== Number(seq)) return item;
+
+            switch (handler.keys?.join('')) {
+                case 'b':
+                    changeValue({item, key: 'fontWeight', value: '700'});
+                    break;
+                case 'i':
+                    changeValue({item, key: 'fontStyle', value: 'Italic'});
+                    break;
+                case ';':
+                    changeValue({item, key: 'textDecoration', value: 'line-through'});
+                    break;
+            }
+
+            return item;
+        });
+
+        setBoard({...board, data: {...board.data, content: {list: newList}}});
+
+    }, hotkeyOption);
+
+
     if(!board?.data?.content || board.data?.content?.list?.length === 0) {
         return <GlobalLoadingSpinner />
     }
 
     return (
         <div className={'p-5 flex flex-col gap-5 justify-center items-center'}>
-            <div className={`w-full flex flex-col gap-6 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-3/5'}`}>
+            <div className={`relative w-full flex flex-col gap-6 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-3/5'}`}>
+                <div className={[`absolute z-10 top-1/4 -right-52 hidden`, fullScreen ? 'lg:hidden' : 'lg:block'].join(' ')}>
+                    <div className={'flex flex-col w-48 px-2 py-4 text-xs shadow rounded  bg-gray-50'}>
+                        <h1 className={'flex justify-center p-2'}>
+                            단축키
+                        </h1>
+                        <ul className={'w-full flex flex-col gap-2 justify-center items-center'}>
+                            <li className={'w-full px-5 justify-between flex gap-2 items-center'}>
+                                <span>
+                                    너비 변경 : 
+                                </span> 
+                                <HotKeybtn hotkey={['SHIFT', 'F']} />
+                            </li>
+                            {
+                                (isNewBoard || !board.isView)
+                                && <>
+                                <li className={'w-full px-5 justify-between flex gap-2 items-center'}>
+                                    <span>
+                                        h1블록 :
+                                    </span>
+                                    <HotKeybtn hotkey={['CTRL', '1']} />
+                                </li>
+                                <li className={'w-full px-5 justify-between flex gap-2 items-center'}>
+                                    <span>
+                                        h2블록 :
+                                    </span>
+                                    <HotKeybtn hotkey={['CTRL', '2']} />
+                                </li>
+                                <li className={'w-full px-5 justify-between flex gap-2 items-center'}>
+                                    <span>
+                                        h3블록 :
+                                    </span>
+                                    <HotKeybtn hotkey={['CTRL', '3']} />
+                                </li>
+                                <li className={'w-full px-5 justify-between flex gap-2 items-center'}>
+                                    <span>
+                                        h4블록 :
+                                    </span>
+                                    <HotKeybtn hotkey={['CTRL', '4']} />
+                                </li>
+                                <li className={'w-full px-5 justify-between flex gap-2 items-center'}>
+                                    <span>
+                                        h5블록 :
+                                    </span>
+                                  <HotKeybtn hotkey={['CTRL', '5']} />
+                                </li>
+                                <li className={'w-full px-5 justify-between flex gap-2 items-center'}>
+                                    <span>
+                                         인용 블록:
+                                    </span>
+                                  <HotKeybtn hotkey={['CTRL', '6']} />
+                                </li>
+                                <li className={'w-full px-5 py-2 justify-center flex items-center'}>
+                                     폰트 스타일
+                                </li>
+                                <li className={'w-full px-5 justify-between flex gap-2 items-center'}>
+                                    <span>
+                                        굵게 :
+                                    </span>
+                                  <HotKeybtn hotkey={['CTRL', 'B']} />
+                                </li>
+                                <li className={'w-full px-5 justify-between flex gap-2 items-center'}>
+                                    <span>
+                                        이탤릭체 :
+                                    </span>
+                                  <HotKeybtn hotkey={['CTRL', 'I']} />
+                                </li>
+                                <li className={'w-full px-5 justify-between flex gap-2 items-center'}>
+                                    <span>
+                                        취소선 :
+                                    </span>
+                                  <HotKeybtn hotkey={['CTRL', ';']} />
+                                </li>
+                                </>
+                            }
+                        </ul>
+                    </div>
+                </div>
                 <div className={'flex h-8 border-l-8 border-solid border-gray-500 px-2 items-center'}>
                     <span className={'font-bold'}>
                         {Category.findById(board.data.categoryPk.toString())?.name}
@@ -468,6 +616,7 @@ export default function Page({params}: {params : {id: string}}) {
                 (isNewBoard || !board.isView) && (!isNewBoard || !board.isView)
                 && <div className={'h-60'} />
             }
+
         </div>
     )
 }

@@ -9,7 +9,6 @@ import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchPar
 import {useHotkeys} from "react-hotkeys-hook";
 import {useRouter} from "next/navigation";
 import {Options} from "react-hotkeys-hook/src/types";
-import {log} from "util";
 import HotKeybtn from "@/app/{components}/hotKeybtn";
 
 const LeftMenu = ({
@@ -42,10 +41,10 @@ const LeftMenu = ({
 
     const hotkeysOption: Options = {
         preventDefault: true,
-        keyup: true,
-        keydown: true,
-        enableOnContentEditable: false,
+        ignoreModifiers: true,
+        enableOnFormTags: true
     }
+
     const confirmRole = (item: { roles: RoleType[] }) => {
         return item.roles.find(r =>
             roles.find(roles => roles === r)
@@ -54,37 +53,28 @@ const LeftMenu = ({
 
     useHotkeys(['shift+0'], _ => {
         onChangeParamsHandler({type: 'isSelf', value: true})
-    },hotkeysOption);
+    }, hotkeysOption, []);
 
-    useHotkeys(['mod+shift+1', 'mod+shift+2', 'mod+shift+3', 'mod+shift+4', 'mod+shift+5'], (e, handler)=> {
+    useHotkeys(['shift+o', 'shift+l', 'shift+i'], (e, handler) => {
         switch(handler.keys?.join('')) {
-            case '1':
-                const cate = Category.findByName("공지 게시판")!;
-                if(!confirmRole(cate)) return;
-                router.push(boardBaseUrl + cate.id);
+            case 'o':
+                router.push('/api/logout');
                 break;
-            case '2':
-                const cate2 = Category.findByName("자유 게시판")!;
-                if(!confirmRole(cate2)) return;
-                router.push(boardBaseUrl + cate2.id);
+            case 'l':
+                router.push('/login');
                 break;
-            case '3':
-                const cate3 = Category.findByName("Q & A")!;
-                if(!confirmRole(cate3)) return;
-                router.push(boardBaseUrl + cate3.id);
-                break;
-            case '4':
-                const cate4 = Category.findByName("알뜰 게시판")!;
-                if(!confirmRole(cate4)) return;
-                router.push(boardBaseUrl + cate4.id);
-                break;
-            case '5':
-                const cate5 = Category.findByName("이미지 게시판")!;
-                if(!confirmRole(cate5)) return;
-                router.push(boardBaseUrl + cate5.id);
+            case 'i':
+                router.push('/user');
                 break;
         }
-    },hotkeysOption);
+
+    }, hotkeysOption, [roles]);
+
+    useHotkeys(['mod+shift+1', 'mod+shift+2', 'mod+shift+3', 'mod+shift+4', 'mod+shift+5'], (e, handler)=> {
+        const selCate = Category.findById(handler.keys!.join(''))!;
+        if(!confirmRole(selCate)) return;
+        router.push(boardBaseUrl + selCate.id);
+    }, hotkeysOption,[roles]);
 
     return (
         <div className={'fixed left-[5%] xl:left-[13%]'}>
@@ -148,9 +138,36 @@ const LeftMenu = ({
                               })
                           }
                       </div>
+
                   </div>
                 }
 
+                <div className={'flex flex-col w-full px-3 py-6 gap-2 justify-center items-center shadow rounded'}>
+                    <h1 className={'text-sm font-bold'}>단축키</h1>
+                    <ul className={'flex flex-col w-full px-5 gap-3 text-xs'}>
+                        <li className={'flex justify-between items-center gap-2'}>
+                            <span>검색</span>
+                            <HotKeybtn hotkey={['SHIFT', 'F']} />
+                        </li>
+                        {
+                            roles.length > 0
+                            ? <>
+                                <li className={'flex justify-between items-center gap-2'}>
+                                    <span>로그아웃</span>
+                                    <HotKeybtn hotkey={['SHIFT', 'O']} />
+                                </li>
+                                <li className={'flex justify-between items-center gap-2'}>
+                                    <span>사용자 정보</span>
+                                    <HotKeybtn hotkey={['SHIFT', 'I']} />
+                                </li>
+                            </>
+                            : <li className={'flex justify-between items-center gap-2'}>
+                                <span>로그인</span>
+                                <HotKeybtn hotkey={['SHIFT', 'L']} />
+                            </li>
+                        }
+                    </ul>
+                </div>
             </div>
         </div>
     )

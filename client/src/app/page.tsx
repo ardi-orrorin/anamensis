@@ -12,7 +12,7 @@ import {RoleType} from "@/app/user/system/{services}/types";
 import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {createDebounce} from "@/app/{commons}/func/debounce";
-import {useHotkeys} from "react-hotkeys-hook";
+import {useRootHotKey} from "@/app/{hooks}/hotKey";
 
 export type DynamicPage = {
     isEndOfList: boolean;
@@ -123,13 +123,7 @@ export default function Page() {
         }
     }
 
-    useHotkeys('shift+f',(e, v)=>{
-        e.preventDefault();
-
-        if(searchRef.current) {
-            searchRef.current.focus();
-        }
-    })
+    useRootHotKey({searchRef});
 
     return (
         <SearchParamsProvider.Provider value={{

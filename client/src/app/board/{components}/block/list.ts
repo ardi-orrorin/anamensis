@@ -1,6 +1,15 @@
 import InputBlock from "@/app/board/{components}/block/input/InputBlock";
 import {BlockProps} from "@/app/board/{components}/block/type/Types";
-import {faHeading, faImage, faLink, faList, faPercent, faQuoteLeft, faVideo} from "@fortawesome/free-solid-svg-icons";
+import {
+    faCode,
+    faHeading,
+    faImage,
+    faLink,
+    faList,
+    faPercent,
+    faQuoteLeft,
+    faVideo
+} from "@fortawesome/free-solid-svg-icons";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import FileBlock from "@/app/board/{components}/block/file/fileBlock";
 import LinkBlock from "@/app/board/{components}/block/input/linkBlock";
@@ -12,6 +21,7 @@ import AlbumBlock from "@/app/board/{components}/block/extra/albumBlock";
 import {faCircleQuestion} from "@fortawesome/free-solid-svg-icons/faCircleQuestion";
 import QuestionBlock from "@/app/board/{components}/block/extra/questionBlock";
 import YoutubeBlock from "@/app/board/{components}/block/file/youtube";
+import CodeBlock from "@/app/board/{components}/block/input/CodeBlock";
 
 export type BlockType = {
     code         : string;
@@ -187,6 +197,18 @@ export const blockTypeList: BlockComponentType[] = [
     //         Component     : FileFile,
     //     }),
     // },
+    {
+        code              : '00203',
+        tag               : 'code',
+        command           : '/code',
+        label             : 'Code',
+        icon              : faCode,
+        comment           : '코드',
+        type              : 'object',
+        notAvailDup       : false,
+        component         : (props: BlockProps)  =>
+            CodeBlock({...props, type: 'object'}),
+    },
     {
         code              : '00203',
         tag               : 'youtube',

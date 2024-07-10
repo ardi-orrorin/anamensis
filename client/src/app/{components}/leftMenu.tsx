@@ -41,7 +41,6 @@ const LeftMenu = ({
 
     const hotkeysOption: Options = {
         preventDefault: true,
-        ignoreModifiers: true,
         enableOnFormTags: true
     }
 
@@ -51,7 +50,7 @@ const LeftMenu = ({
         );
     }
 
-    useHotkeys(['shift+0'], _ => {
+    useHotkeys(['0'], _ => {
         onChangeParamsHandler({type: 'isSelf', value: true})
     }, hotkeysOption, []);
 
@@ -69,14 +68,14 @@ const LeftMenu = ({
         }
     }, hotkeysOption, [roles]);
 
-    useHotkeys(['mod+shift+1', 'mod+shift+2', 'mod+shift+3', 'mod+shift+4', 'mod+shift+5'], (e, handler)=> {
+    useHotkeys(['shift+1', 'shift+2', 'shift+3', 'shift+4', 'shift+5'], (e, handler)=> {
         const selCate = Category.findById(handler.keys!.join(''))!;
         if(!confirmRole(selCate)) return;
         router.push(boardBaseUrl + selCate.id);
     }, hotkeysOption,[roles]);
 
     return (
-        <div className={'fixed z-30 left-[5%] xl:left-[13%]'}>
+        <div className={'sticky z-30 top-10 left-[5%] xl:left-[13%]'}>
             <div className={'flex flex-col gap-5'}>
                 <div className={'flex flex-col w-60 gap-2 shadow rounded p-3 bg-white border border-solid border-gray-100'}>
                     <div className={'flex gap-2 justify-center items-center text-sm py-2 font-bold'}>
@@ -94,14 +93,13 @@ const LeftMenu = ({
                                 <span>
                                     내 글 보기
                                 </span>
-                                <HotKeybtn hotkey={['SHIFT', '0']} />
+                                <HotKeybtn hotkey={['0']} />
                             </button>
                         }
                     </div>
                     <div className={'w-auto text-sm'}>
                         <CategorySelect onClick={onChangeParamsHandler} />
                     </div>
-
                 </div>
                 {
                     roles.length > 0
@@ -130,7 +128,7 @@ const LeftMenu = ({
                                               <span>
                                                 {item.name}
                                               </span>
-                                              <HotKeybtn hotkey={['CTRL','SHIFT', item.id]} />
+                                              <HotKeybtn hotkey={['SHIFT', item.id]} />
                                           </div>
                                       </Link>
                                   )
@@ -139,7 +137,7 @@ const LeftMenu = ({
                       </div>
                   </div>
                 }
-                <div className={'flex flex-col w-full px-3 py-6 gap-2 justify-center items-center shadow rounded'}>
+                <div className={'flex flex-col w-60 px-3 py-6 gap-2 justify-center items-center shadow rounded'}>
                     <h1 className={'text-sm font-bold'}>단축키</h1>
                     <ul className={'flex flex-col w-full px-5 gap-3 text-xs'}>
                         <li className={'flex justify-between items-center gap-2'}>
@@ -198,7 +196,7 @@ const CategorySelect = ({
         keydown: true,
     }
 
-    useHotkeys(['shift+`, shift+1', 'shift+2', 'shift+3', 'shift+4', 'shift+5'], (e, handler)=> {
+    useHotkeys(['`, 1', '2', '3', '4', '5'], (e, handler)=> {
         if(handler.keys?.join('') === 'backquote') {
 
             const selCategoryPk = Category.findById('0')!.id;
@@ -238,7 +236,7 @@ const CategorySelect = ({
                                     onClick={()=>selectHandler(item.id)}
                             >
                                 <span>{item.name}</span>
-                                <HotKeybtn hotkey={['SHIFT', item.id === '0' ? '`' : item.id]} />
+                                <HotKeybtn hotkey={[item.id === '0' ? '`' : item.id]} />
                             </button>
                         )
                     })

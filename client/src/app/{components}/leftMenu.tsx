@@ -10,6 +10,7 @@ import {useHotkeys} from "react-hotkeys-hook";
 import {useRouter} from "next/navigation";
 import {Options} from "react-hotkeys-hook/src/types";
 import HotKeybtn from "@/app/{components}/hotKeybtn";
+import {useRootLeftMenuHotKey} from "@/app/{hooks}/hotKey";
 
 const LeftMenu = ({
     roles,
@@ -39,40 +40,19 @@ const LeftMenu = ({
         scrollTo(0, 0);
     }
 
-    const hotkeysOption: Options = {
-        preventDefault: true,
-        enableOnFormTags: true
-    }
-
     const confirmRole = (item: { roles: RoleType[] }) => {
         return item.roles.find(r =>
             roles.find(roles => roles === r)
         );
     }
 
-    useHotkeys(['0'], _ => {
-        onChangeParamsHandler({type: 'isSelf', value: true})
-    }, hotkeysOption, []);
-
-    useHotkeys(['shift+o', 'shift+l', 'shift+i'], (e, handler) => {
-        switch(handler.keys?.join('')) {
-            case 'o':
-                router.push('/api/logout');
-                break;
-            case 'l':
-                router.push('/login');
-                break;
-            case 'i':
-                router.push('/user');
-                break;
-        }
-    }, hotkeysOption, [roles]);
-
-    useHotkeys(['shift+1', 'shift+2', 'shift+3', 'shift+4', 'shift+5'], (e, handler)=> {
-        const selCate = Category.findById(handler.keys!.join(''))!;
-        if(!confirmRole(selCate)) return;
-        router.push(boardBaseUrl + selCate.id);
-    }, hotkeysOption,[roles]);
+    useRootLeftMenuHotKey({
+        onChangeParamsHandler,
+        router,
+        roles,
+        boardBaseUrl,
+        confirmRole,
+    })
 
     return (
         <div className={'sticky z-30 top-10 left-[5%] xl:left-[13%]'}>

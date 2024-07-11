@@ -50,7 +50,7 @@ export default function Page() {
 
     useEffect(()=> {
         apiCall<NoticeType[]>({
-            path: '/api/board/notice/recent',
+            path: '/api/board/notice',
             method: 'GET',
             isReturnData: true
         })

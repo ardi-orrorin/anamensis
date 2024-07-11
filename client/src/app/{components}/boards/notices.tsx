@@ -2,7 +2,14 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCalendarDays, faCircleExclamation, faEye, faUser} from "@fortawesome/free-solid-svg-icons";
 import React from "react";
 import Link from "next/link";
-import {NoticeType} from "@/app/page";
+
+export type NoticeType = {
+    id        : number;
+    title     : string;
+    writer    : string;
+    viewCount : number;
+    createdAt : string;
+}
 
 const Notices = ({data}: {data: NoticeType[]}) => {
 

@@ -1,12 +1,9 @@
-import {NextRequest} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
-import {PageResponse} from "@/app/{commons}/types/commons";
-import {BoardListI} from "@/app/{components}/boardComponent";
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
-import {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
+import {NoticeType} from "@/app/{components}/boards/notices";
 
-export async function GET(req: NextRequest) {
-    const result = await apiCall<PageResponse<BoardListI>, URLSearchParams>({
+export async function GET() {
+    const result = await apiCall<NoticeType[]>({
         path: '/public/api/boards/notice',
         method: 'GET',
         call: 'Server',

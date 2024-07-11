@@ -1,5 +1,6 @@
 package com.anamensis.server.resultMap;
 
+import com.anamensis.server.entity.Board;
 import com.anamensis.server.entity.File;
 import com.anamensis.server.entity.Member;
 import lombok.Getter;
@@ -17,6 +18,16 @@ public class BoardResultMap {
         private Member member;
         private com.anamensis.server.entity.Board board;
         private File file;
+    }
 
+    @Getter
+    @Setter
+    @ToString
+    public static class List {
+        private long id;
+        private com.anamensis.server.entity.Board board;
+        private String writer;
+        private String profile;
+        private long commentCount;
     }
 }

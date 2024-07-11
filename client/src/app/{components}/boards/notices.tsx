@@ -28,19 +28,19 @@ export default Notices;
 
 const Row = ({data}: {data: NoticeType}) => {
     return (
-        <Link className={'w-full py-2 px-4 flex justify-between shadow hover:shadow-md duration-300'}
+        <Link className={'w-full py-2 px-4 flex justify-between shadow hover:shadow-md duration-300 bg-neutral-50'}
               href={'/board/' + data.id}
         >
             <div className={'flex gap-1 text-sm text-gray-600'}>
                 <span>
                     <FontAwesomeIcon icon={faCircleExclamation} />
                 </span>
-                <span className={'flex px-1 h-5 line-clamp-1'}>
+                <span className={'flex px-1 h-10 sm:h-5 line-clamp-2 break-all'}>
                     {data.title}
                 </span>
             </div>
-            <div className={'w-auto flex text-sm text-gray-600'}>
-                <span className={'w-24 px-1 flex gap-1'}>
+            <div className={'w-auto flex flex-col sm:flex-row text-sm text-gray-600'}>
+                <span className={'w-40 sm:w-24 px-1 flex gap-1 justify-end'}>
                     <span>
                         <FontAwesomeIcon icon={faUser} size={'xs'} />
                     </span>

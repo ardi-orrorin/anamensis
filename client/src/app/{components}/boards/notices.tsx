@@ -36,7 +36,7 @@ const Row = ({data}: {data: NoticeType}) => {
                     <FontAwesomeIcon icon={faCircleExclamation} />
                 </span>
                 <span className={'flex px-1 h-5 line-clamp-1'}>
-                    {data.title} sfsdfdsfsdfs
+                    {data.title}
                 </span>
             </div>
             <div className={'w-auto flex text-sm text-gray-600'}>
@@ -48,7 +48,7 @@ const Row = ({data}: {data: NoticeType}) => {
                         {data.writer}
                     </span>
                 </span>
-                <span className={'w-40 px-1 flex gap-1'}>
+                <span className={'w-40 px-1 flex justify-end gap-1'}>
                     <span>
                         <FontAwesomeIcon icon={faCalendarDays} size={'xs'} />
                     </span>

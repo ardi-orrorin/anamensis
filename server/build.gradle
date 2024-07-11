@@ -31,7 +31,6 @@ dependencies {
     implementation 'org.flywaydb:flyway-core:10.15.0'
     implementation 'org.flywaydb:flyway-mysql:10.15.0'
 
-
     implementation 'net.coobird:thumbnailator:0.4.20'
 
     implementation 'com.warrenstrange:googleauth:1.5.0'

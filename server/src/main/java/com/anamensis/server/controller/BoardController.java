@@ -149,6 +149,12 @@ public class BoardController {
             .collectList();
     }
 
+    @PublicAPI
+    @GetMapping("notice")
+    public Mono<List<BoardResponse.Notice>> findNotice() {
+        return boardService.findNotice();
+    }
+
     @PostMapping("")
     public Mono<Board> save(
         @RequestBody BoardRequest.Create board,

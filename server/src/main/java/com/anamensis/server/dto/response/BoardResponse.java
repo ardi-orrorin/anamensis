@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -220,6 +221,32 @@ public class BoardResponse implements Serializable {
                     .updatedAt(board.getBoard().getUpdateAt().toString())
                     .categoryPk(board.getBoard().getCategoryPk())
                     .build();
+        }
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class Notice implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        private long id;
+        private String title;
+        private String writer;
+        private long viewCount;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime createdAt;
+
+        public static Notice from(BoardResultMap.Board board) {
+            return Notice.builder()
+                .id(board.getId())
+                .title(board.getBoard().getTitle())
+                .writer(board.getMember().getUserId())
+                .viewCount(board.getBoard().getViewCount())
+                .createdAt(board.getBoard().getCreateAt())
+                .build();
         }
     }
 }

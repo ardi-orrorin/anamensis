@@ -57,12 +57,15 @@ export const useBoardHotKey = ({
 
     }, hotkeyOption);
 
-    useHotkeys(['mod+b', 'mod+i', 'mod+;'], (e, handler) => {
+    useHotkeys(['mod+b', 'mod+i', 'mod+;', 'mod+/'], (e, handler) => {
         if(blockService?.blockMenu !== 'openTextMenu') return;
 
         const seq = document.activeElement?.parentElement?.id.split('-')[2];
 
         const changeValue = ({item, key, value}: {item: BlockI, key: string, value: string}) => {
+            if(key === '' || key === '') {
+                return item.textStyle = {};
+            }
             if(item.textStyle![key] === value) {
                 return item.textStyle![key] = '';
             }
@@ -82,6 +85,9 @@ export const useBoardHotKey = ({
                     break;
                 case ';':
                     changeValue({item, key: 'textDecoration', value: 'line-through'});
+                    break;
+                case '/':
+                    changeValue({item, key: '', value: ''});
                     break;
             }
 

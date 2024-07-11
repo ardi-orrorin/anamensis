@@ -13,10 +13,20 @@ import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchPar
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useRootHotKey} from "@/app/{hooks}/hotKey";
+import Notices from "@/app/{components}/boards/notices";
+import {preload} from "swr";
 
 export type DynamicPage = {
     isEndOfList: boolean;
     isVisible  : boolean;
+}
+
+export type NoticeType = {
+    id        : number;
+    title     : string;
+    writer    : string;
+    viewCount : number;
+    createdAt : string;
 }
 
 export default function Page() {
@@ -38,10 +48,24 @@ export default function Page() {
         size: pageSize,
     } as BoardListParamsI);
 
+    const [noticeList, setNoticeList] = useState<NoticeType[]>([]);
+
     const moreRef = React.useRef<HTMLDivElement>(null);
     const searchRef = useRef<HTMLInputElement>(null);
 
     const fetchDebounce = createDebounce(100);
+
+    useEffect(()=> {
+        apiCall<NoticeType[]>({
+            path: '/api/board/notice',
+            method: 'GET',
+            isReturnData: true
+        })
+        .then(res => {
+            if(!res) return;
+            setNoticeList(res);
+        })
+    },[]);
 
     useEffect(() => {
         if(loading) return;
@@ -168,16 +192,19 @@ export default function Page() {
                         <LeftMenu roles={roles}
                         />
                     </div>
-
-                    <div className={'w-[850px] flex flex-wrap gap-5 justify-center items-center'}>
+                    <div className={'w-[850px] flex flex-wrap gap-5 justify-center items-start'}>
                         {
                             !initLoading
                             && !loading
                             && data?.length === 0
                             && <div className={'text-center text-2xl w-full py-20 text-gray-600'}>검색 결과가 없습니다.</div>
                         }
+
+                        <Notices data={noticeList} />
+
                         {
                             data
+                            && data?.length > 0
                             && data.map((item, index) => {
                                 if(!item) return;
                                 return (

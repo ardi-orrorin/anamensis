@@ -1,0 +1,56 @@
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faCalendarDays, faCircleExclamation, faEye, faUser} from "@fortawesome/free-solid-svg-icons";
+import React from "react";
+import Link from "next/link";
+import {NoticeType} from "@/app/page";
+
+const Notices = ({data}: {data: NoticeType[]}) => {
+
+    return (
+        <div className={'w-full flex-col md:w-[85%] flex gap-2'}>
+            {
+                data.map((notice, index) => {
+                    return <Row key={'notide' + notice.id} data={notice} />
+                })
+            }
+        </div>
+    )
+}
+
+export default Notices;
+
+
+const Row = ({data}: {data: NoticeType}) => {
+    return (
+        <Link className={'w-full py-2 px-4 flex justify-between shadow'}
+              href={'/board/' + data.id}
+        >
+            <div className={'flex gap-1 text-sm text-gray-600'}>
+                <span>
+                    <FontAwesomeIcon icon={faCircleExclamation} />
+                </span>
+                <span className={'flex px-1 h-5 line-clamp-1'}>
+                    {data.title}
+                </span>
+            </div>
+            <div className={'w-auto flex text-sm text-gray-600'}>
+                <span className={'w-24 px-1 flex gap-1'}>
+                    <span>
+                        <FontAwesomeIcon icon={faUser} size={'xs'} />
+                    </span>
+                    <span>
+                        {data.writer}
+                    </span>
+                </span>
+                <span className={'w-36 px-1 flex gap-1'}>
+                    <span>
+                        <FontAwesomeIcon icon={faCalendarDays} size={'xs'} />
+                    </span>
+                    <span>
+                        {data.createdAt}
+                    </span>
+                </span>
+            </div>
+        </Link>
+    )
+}

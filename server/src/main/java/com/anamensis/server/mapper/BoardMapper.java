@@ -29,6 +29,8 @@ public interface BoardMapper {
         @Param("page") Page page
     );
 
+    List<BoardResultMap.Board> findNotice();
+
     long count(Board board);
 
     int disableByPk(

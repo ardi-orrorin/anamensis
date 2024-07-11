@@ -113,6 +113,17 @@
          ORDER BY id DESC
          LIMIT #{page.offset}, #{page.size}
     </select>
+    <select id="findNotice" resultMap="BoardResultMapBoard">
+        SELECT *
+          FROM board b
+          JOIN member m
+            ON b.member_pk   = m.id
+         WHERE b.category_pk = 1
+           AND b.is_public   = 1
+           AND b.is_use      = 1
+         ORDER BY b.id DESC
+         LIMIT 3
+    </select>
     <update id="updateByPk" parameterType="Board">
         UPDATE board
         <set>

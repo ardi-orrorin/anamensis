@@ -77,6 +77,7 @@ public class BoardController {
             )
             .subscribeOn(Schedulers.boundedElastic())
             .collectList()
+            .log()
             .map(l -> new PageResponse<>(page, l));
     }
 

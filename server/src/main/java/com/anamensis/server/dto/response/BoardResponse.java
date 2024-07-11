@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -19,6 +20,7 @@ public class BoardResponse implements Serializable {
     @Getter
     @Builder
     @Setter
+    @ToString
     public static class List implements Serializable {
 
         @Serial
@@ -74,6 +76,26 @@ public class BoardResponse implements Serializable {
             if (board.getFile().getFilePath() != null) {
                 builder.profileImage(board.getFile().getFilePath() + board.getFile().getFileName());
             }
+            return builder.build();
+        }
+
+        public static List from(BoardResultMap.List board) {
+
+            List.ListBuilder builder = List.builder()
+                    .id(board.getBoard().getId())
+                    .title(board.getBoard().getTitle())
+                    .viewCount(board.getBoard().getViewCount())
+                    .writer(board.getWriter())
+                    .createdAt(board.getBoard().getCreateAt())
+                    .isAdsense(board.getBoard().isAdsense())
+                    .commentCount(board.getCommentCount())
+                    .categoryPk(board.getBoard().getCategoryPk())
+                    .updatedAt(board.getBoard().getUpdateAt())
+                    .isPublic(board.getBoard().getIsPublic())
+                    .membersOnly(board.getBoard().isMembersOnly())
+                    .profileImage(board.getProfile())
+                    .body(board.getBoard().getContent().get("list"));
+
             return builder.build();
         }
     }

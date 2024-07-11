@@ -13,7 +13,7 @@ export type NoticeType = {
 const Notices = ({data}: {data: NoticeType[]}) => {
 
     return (
-        <div className={'w-full flex-col md:w-[85%] flex gap-2'}>
+        <div className={'w-full flex-col md:w-[85%] flex gap-3'}>
             {
                 data.map((notice, index) => {
                     return <Row key={'notice' + notice.id} data={notice} />
@@ -28,7 +28,7 @@ export default Notices;
 
 const Row = ({data}: {data: NoticeType}) => {
     return (
-        <Link className={'w-full py-2 px-4 flex justify-between shadow'}
+        <Link className={'w-full py-2 px-4 flex justify-between shadow hover:shadow-md duration-300'}
               href={'/board/' + data.id}
         >
             <div className={'flex gap-1 text-sm text-gray-600'}>
@@ -36,7 +36,7 @@ const Row = ({data}: {data: NoticeType}) => {
                     <FontAwesomeIcon icon={faCircleExclamation} />
                 </span>
                 <span className={'flex px-1 h-5 line-clamp-1'}>
-                    {data.title}
+                    {data.title} sfsdfdsfsdfs
                 </span>
             </div>
             <div className={'w-auto flex text-sm text-gray-600'}>
@@ -48,7 +48,7 @@ const Row = ({data}: {data: NoticeType}) => {
                         {data.writer}
                     </span>
                 </span>
-                <span className={'w-36 px-1 flex gap-1'}>
+                <span className={'w-40 px-1 flex gap-1'}>
                     <span>
                         <FontAwesomeIcon icon={faCalendarDays} size={'xs'} />
                     </span>

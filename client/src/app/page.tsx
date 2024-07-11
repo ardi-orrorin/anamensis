@@ -13,21 +13,14 @@ import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchPar
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useRootHotKey} from "@/app/{hooks}/hotKey";
-import Notices from "@/app/{components}/boards/notices";
-import {preload} from "swr";
+import Notices, {NoticeType} from "@/app/{components}/boards/notices";
 
 export type DynamicPage = {
     isEndOfList: boolean;
     isVisible  : boolean;
 }
 
-export type NoticeType = {
-    id        : number;
-    title     : string;
-    writer    : string;
-    viewCount : number;
-    createdAt : string;
-}
+
 
 export default function Page() {
 

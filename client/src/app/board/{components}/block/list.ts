@@ -210,7 +210,7 @@ export const blockTypeList: BlockComponentType[] = [
             CodeBlock({...props, type: 'object'}),
     },
     {
-        code              : '00203',
+        code              : '00204',
         tag               : 'youtube',
         command           : '/youtube',
         label             : 'Youtube',

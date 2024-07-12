@@ -28,7 +28,9 @@
                AND title LIKE CONCAT('%', #{title}, '%')
            </if>
     </select>
-    <select id="findList" resultMap="BoardResultMapBoard">
+
+    <!-- todo: findList 안정성 확인 후 삭제 예정 -start -->
+    <select id="findListDelete" resultMap="BoardResultMapBoard">
         SELECT *
              , m.id AS member_pk
              , b.id AS board_pk
@@ -90,6 +92,75 @@
          ORDER BY b.id DESC
          LIMIT #{page.offset}, #{page.size}
     </select>
+    <!-- todo: findList 안정성 확인 후 삭제 예정 -end -->
+
+    <select id="findList" resultMap="BoardResultMapBoardList">
+        SELECT *
+             , b.id AS board_pk
+             , (SELECT count(*)
+                  FROM board_comment bc
+                 WHERE bc.board_pk   = b.id
+                   AND bc.is_use     = 1
+             ) AS comment_count
+             , (SELECT m.name
+                  FROM member m
+                 WHERE b.member_pk = m.id
+             ) AS writer
+             , (SELECT concat(f.file_path, f.file_name)
+                  FROM file f
+                 WHERE f.table_ref_pk  = b.member_pk
+                   AND f.table_code_pk = (SELECT tc.id
+                                            FROM table_code tc
+                                           WHERE tc.table_name = 'member')
+                   AND f.is_use        = 1
+             ) AS profile
+          FROM board b
+            <if test="params != null and params.type != null and params.type == 'content' and params.value != null and params.value != ''">
+                JOIN board_index bi
+                  ON bi.board_id = b.id
+                 AND bi.content LIKE CONCAT('%', #{params.value}, '%')
+            </if>
+            <if test="params != null and params.type != null and params.type != '' and params.value != null and params.value != ''">
+                <choose>
+                    <when test="params != null and params.type == 'memberId'">
+                        JOIN member m2
+                          ON b.member_pk = m2.id
+                         AND m2.user_id LIKE CONCAT('%', #{params.value}, '%')
+                    </when>
+                </choose>
+            </if>
+         WHERE b.is_use = 1
+            <if test="params != null and params.isSelf != null and params.isSelf">
+                AND b.member_pk = #{member.id}
+            </if>
+            <if test="params != null and params.categoryPk != 0">
+                AND b.category_pk = #{params.categoryPk}
+            </if>
+            <if test="params != null and params.isSelf == null or params.isSelf == false">
+                AND b.is_public = 1
+                <if test="member != null and member.id != null and member.id > 0">
+                    OR b.id IN (SELECT b2.id
+                                  FROM board b2
+                                 WHERE b2.member_pk = #{member.id}
+                                    <if test="params != null and params.categoryPk != 0">
+                                        AND b2.category_pk = #{params.categoryPk}
+                                    </if>
+                                    <if test="params != null
+                                         and params.type != null
+                                         and params.type != ''
+                                         and params.value != null
+                                         and params.value != ''
+                                         and params.type == 'title'"
+                                    >
+                                        AND b.title LIKE CONCAT('%', #{params.value}, '%')
+                                    </if>
+                                    AND b2.is_use = 1)
+                </if>
+            </if>
+         ORDER BY b.id DESC
+         LIMIT #{page.offset}, #{page.size}
+    </select>
+
     <select id="findByPk" resultMap="BoardResultMapBoard" parameterType="Long">
         SELECT *
              , m.create_at as member_create_at
@@ -162,6 +233,14 @@
          WHERE id         = #{boardPk}
            AND is_use     = 1
     </update>
+
+    <resultMap id="BoardResultMapBoardList" type="com.anamensis.server.resultMap.BoardResultMap$List">
+        <result property="id" column="board_pk"/>
+        <result property="commentCount" column="comment_count"/>
+        <result property="writer" column="writer"/>
+        <result property="profile" column="profile"/>
+        <association property="board" resultMap="BoardEntity" />
+    </resultMap>
 
     <resultMap id="BoardResultMapBoard" type="com.anamensis.server.resultMap.BoardResultMap$Board">
         <id property="id" column="id"/>

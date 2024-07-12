@@ -52,6 +52,17 @@ public class BoardService {
                 .map(BoardResponse.List::from);
     }
 
+//    public Flux<BoardResponse.List> findAllTest(
+//        Page page,
+//        BoardRequest.Params params,
+//        Member member
+//    ) {
+//        return Flux.fromIterable(boardMapper.findListTest(page, params, member))
+//            .doOnNext(b -> System.out.println("dfdfdf " + b))
+//            .publishOn(Schedulers.boundedElastic())
+//            .map(BoardResponse.List::from);
+//    }
+
     public Flux<BoardResponse.List> findOnePage() {
         List<Object> list;
 

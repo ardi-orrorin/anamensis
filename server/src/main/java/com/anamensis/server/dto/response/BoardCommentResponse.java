@@ -46,9 +46,6 @@ public class BoardCommentResponse {
                 builder.isWriter(false);
             }
 
-            System.out.println(builder);
-
-
             return builder.build();
         }
 

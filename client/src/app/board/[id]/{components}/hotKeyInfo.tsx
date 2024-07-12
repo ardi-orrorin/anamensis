@@ -68,8 +68,7 @@ const HotKeyInfo = ({
                         <HotKeybtn hotkey={['CTRL', 'B']} />
                     </li>
                     <li className={'w-full px-5 justify-between flex gap-2 items-center'}>
-                        <span>n dev
-
+                        <span>
                             이탤릭체 :
                         </span>
                         <HotKeybtn hotkey={['CTRL', 'I']} />

@@ -87,18 +87,27 @@ CREATE TABLE change_code(
 ) COMMENT '변경 코드';
 
 CREATE TABLE board (
-    id           BIGINT          PRIMARY KEY             AUTO_INCREMENT              COMMENT 'PK',
-    category_pk  BIGINT          NOT NULL                                            COMMENT '카테고리 PK',
-    title        VARCHAR(255)    NOT NULL                                            COMMENT '제목',
-    content      TEXT            NOT NULL                                            COMMENT '본문',
-    rate         BIGINT          NOT NULL                DEFAULT             0       COMMENT '좋아요',
-    view_count   BIGINT          NOT NULL                DEFAULT             0       COMMENT '조회수',
-    create_at    TIMESTAMP(6)    NOT NULL                                            COMMENT '생성일자',
-    update_at    TIMESTAMP(6)    NOT NULL                                            COMMENT '수정일자',
-    member_pk    BIGINT(255)     NOT NULL                                            COMMENT '유저 아이디',
-    isAdsense    TINYINT(1)      NOT NULL                DEFAULT             0       COMMENT '광고 여부 0:안함, 1:광고',
-    is_use       TINYINT(1)      NOT NULL                DEFAULT             1       COMMENT '사용 여부 0:사용안함, 1:사용'
+    id                BIGINT          PRIMARY KEY      AUTO_INCREMENT              COMMENT 'PK',
+    category_pk       BIGINT          NOT NULL                                     COMMENT '카테고리 PK',
+    title             VARCHAR(255)    NOT NULL                                     COMMENT '제목',
+    content           TEXT            NOT NULL                                     COMMENT '본문',
+    rate              BIGINT          NOT NULL         DEFAULT             0       COMMENT '좋아요',
+    view_count        BIGINT          NOT NULL         DEFAULT             0       COMMENT '조회수',
+    create_at         TIMESTAMP(6)    NOT NULL                                     COMMENT '생성일자',
+    update_at         TIMESTAMP(6)    NOT NULL                                     COMMENT '수정일자',
+    member_pk         BIGINT(255)     NOT NULL                                     COMMENT '유저 아이디',
+    isAdsense         TINYINT(1)      NOT NULL         DEFAULT             0       COMMENT '광고 여부 0:안함, 1:광고',
+    is_public         TINYINT(1)      NOT NULL         DEFAULT             0       COMMENT '공개 여부 0:안함, 1:공개',
+    members_only      TINYINT(1)      NOT NULL         DEFAULT             0       COMMENT '회원 전용 0:안함, 1:회원',
+    is_use            TINYINT(1)      NOT NULL         DEFAULT             1       COMMENT '사용 여부 0:사용안함, 1:사용'
 ) COMMENT '게시글';
+
+CREATE TABLE board_index (
+    board_id BIGINT PRIMARY KEY NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
+) COMMENT 'Board content index 테이블';
 
 CREATE TABLE board_comment (
     id             BIGINT          PRIMARY KEY    AUTO_INCREMENT                     COMMENT 'PK',
@@ -142,6 +151,7 @@ CREATE TABLE point_history (
     table_ref_pk   BIGINT          NOT NULL                         COMMENT '참조된 테이블 PK',
     member_pk      BIGINT          NOT NULL                         COMMENT '유저 PK',
     point_code_pk  BIGINT          NOT NULL                         COMMENT '포인트 코드 PK',
+    value          INT             NOT NULL                         COMMENT '포인트 값',
     create_at      TIMESTAMP(6)    NOT NULL                         COMMENT '생성일자'
 ) COMMENT '포인트 이력';
 
@@ -207,118 +217,45 @@ CREATE TABLE smtp_push_history_count (
     count                  INT      NOT NULL        DEFAULT      0
 ) COMMENT 'smtp_push_history 카운트';
 
-
 ALTER TABLE smtp_push_history_count ADD PRIMARY KEY (member_pk, member_config_smtp_pk);
 
-ALTER TABLE system_message ADD INDEX web_sys_pk_idx (web_sys_pk);
-ALTER TABLE system_message ADD INDEX is_use_idx (is_use);
-ALTER TABLE system_message ADD INDEX create_at_idx (create_at);
-ALTER TABLE system_message ADD INDEX update_at_idx (update_at);
-ALTER TABLE system_message ADD INDEX id_idx (id);
-ALTER TABLE system_message ADD INDEX subject_idx (subject);
 ALTER TABLE system_message ADD FOREIGN KEY (web_sys_pk) REFERENCES web_sys(code);
 
-ALTER TABLE web_sys ADD INDEX web_sys_code_idx (code);
-ALTER TABLE web_sys ADD INDEX web_sys_name_idx (name);
-ALTER TABLE web_sys ADD INDEX web_sys_access_permission_idx (permission);
-
-ALTER TABLE smtp_push_history ADD INDEX member_pk_idx (member_pk);
-ALTER TABLE smtp_push_history ADD INDEX member_config_smtp_pk_idx (member_config_smtp_pk);
-ALTER TABLE smtp_push_history ADD INDEX create_at_idx (create_at);
 ALTER TABLE smtp_push_history ADD FOREIGN KEY (member_pk) REFERENCES member(id);
 ALTER TABLE smtp_push_history ADD FOREIGN KEY (member_config_smtp_pk) REFERENCES member_config_smtp(id);
 
-ALTER TABLE member_config_smtp ADD INDEX member_pk_idx (member_pk);
 ALTER TABLE member_config_smtp ADD FOREIGN KEY (member_pk) REFERENCES member(id);
 
-ALTER TABLE email_verify ADD INDEX email_idx (email);
-ALTER TABLE email_verify ADD INDEX code_idx (code);
-ALTER TABLE email_verify ADD INDEX create_at_idx (create_at);
-ALTER TABLE email_verify ADD INDEX expire_at_idx (expire_at);
-ALTER TABLE email_verify ADD INDEX is_use_idx (is_use);
-
-ALTER TABLE point_history ADD INDEX create_at_idx (create_at);
 ALTER TABLE point_history ADD FOREIGN KEY (member_pk) REFERENCES member(id);
 ALTER TABLE point_history ADD FOREIGN KEY (point_code_pk) REFERENCES point_code(id);
 ALTER TABLE point_history ADD FOREIGN KEY (table_code_pk) REFERENCES table_code(id);
 
-ALTER TABLE point_code ADD INDEX point_name_idx (name);
-ALTER TABLE point_code ADD INDEX is_use_idx (is_use);
-
-ALTER TABLE share_link ADD INDEX org_link_idx (org_link);
-ALTER TABLE share_link ADD INDEX create_at_idx (create_at);
-ALTER TABLE share_link ADD INDEX is_use_idx (is_use);
 ALTER TABLE share_link ADD FOREIGN KEY (member_pk) REFERENCES member(id);
 
-ALTER TABLE board_history ADD INDEX create_at_idx (create_at);
-ALTER TABLE board_history ADD INDEX change_code_idx (change_code_pk);
 ALTER TABLE board_history ADD FOREIGN KEY (board_pk) REFERENCES board(id);
 ALTER TABLE board_history ADD FOREIGN KEY (change_code_pk) REFERENCES change_code(id);
 
-ALTER TABLE board_comment ADD INDEX create_at_idx (create_at);
-ALTER TABLE board_comment ADD INDEX is_use_idx (is_use);
-ALTER TABLE board_comment ADD INDEX parent_pk_idx (parent_pk);
-ALTER TABLE board_comment ADD FULLTEXT INDEX content_idx (content) WITH PARSER ngram;
 ALTER TABLE board_comment ADD FOREIGN KEY (board_pk) REFERENCES board(id);
 ALTER TABLE board_comment ADD FOREIGN KEY (user_id) REFERENCES member(user_id);
 ALTER TABLE board_comment ADD FOREIGN KEY (parent_pk) REFERENCES board_comment(id);
 
-ALTER TABLE board ADD INDEX is_use_idx (is_use);
-ALTER TABLE board ADD INDEX create_at_idx (create_at);
-ALTER TABLE board ADD FULLTEXT INDEX title_idx (title) WITH PARSER ngram;
-ALTER TABLE board ADD FULLTEXT INDEX content_idx (content) WITH PARSER ngram;
-ALTER TABLE board ADD FULLTEXT INDEX title_and_content_idx (title, content) WITH PARSER ngram;
 ALTER TABLE board ADD FOREIGN KEY (member_pk) REFERENCES member(id);
 ALTER TABLE board ADD FOREIGN KEY (category_pk) REFERENCES category(id);
 
-ALTER TABLE change_code ADD INDEX change_name_idx (change_name);
-
-ALTER TABLE category ADD INDEX name_idx (name);
-ALTER TABLE category ADD INDEX parent_pk_idx (parent_pk);
-ALTER TABLE category ADD INDEX is_use_idx (is_use);
 ALTER TABLE category ADD FOREIGN KEY (parent_pk) REFERENCES category(id);
 
 ALTER TABLE file ADD UNIQUE (file_name, file_path);
-ALTER TABLE file ADD INDEX create_at_idx (create_at);
-ALTER TABLE file ADD INDEX table_code_idx (table_code_pk);
-ALTER TABLE file ADD INDEX table_ref_pk_idx (table_ref_pk);
-ALTER TABLE file ADD FULLTEXT INDEX file_name_idx (file_name) WITH PARSER ngram;
-ALTER TABLE file ADD FULLTEXT INDEX org_file_name_idx (org_file_name) WITH PARSER ngram;
-ALTER TABLE file ADD FULLTEXT INDEX org_and_file_name_idx (file_name, org_file_name) WITH PARSER ngram;
 ALTER TABLE file ADD FOREIGN KEY (table_code_pk) REFERENCES table_code(id);
 
-ALTER TABLE table_code ADD INDEX table_name_idx (table_name);
-ALTER TABLE table_code ADD INDEX is_use_idx (is_use);
-
-ALTER TABLE attendance ADD INDEX lastDate_idx (lastDate);
 ALTER TABLE attendance ADD CHECK ( days >= 1 );
 ALTER TABLE attendance ADD FOREIGN KEY (member_pk) REFERENCES member(id);
 
-ALTER TABLE log_history ADD INDEX member_pk_idx (member_pk);
-ALTER TABLE log_history ADD INDEX method_idx (method);
-ALTER TABLE log_history ADD INDEX path_idx (path);
-ALTER TABLE log_history ADD INDEX query_idx (query);
-ALTER TABLE log_history ADD INDEX uri_idx (uri);
-ALTER TABLE log_history ADD INDEX create_at_idx (create_at);
-ALTER TABLE log_history ADD INDEX remote_address_idx (remote_address);
-ALTER TABLE log_history ADD INDEX local_address_idx (local_address);
-ALTER TABLE log_history ADD INDEX session_idx (session);
 ALTER TABLE log_history ADD FOREIGN KEY (member_pk) REFERENCES member(id);
 
-ALTER TABLE login_history ADD INDEX member_pk_idx (member_pk);
-ALTER TABLE login_history ADD INDEX create_at_idx (create_at);
-ALTER TABLE login_history ADD INDEX ip_idx (ip);
-ALTER TABLE login_history ADD INDEX location_idx (location);
-ALTER TABLE login_history ADD INDEX device_idx (device);
 ALTER TABLE login_history ADD FOREIGN KEY (member_pk) REFERENCES member(id);
 
 ALTER TABLE otp ADD FOREIGN KEY (member_pk) REFERENCES member(id);
-ALTER TABLE otp ADD INDEX member_pk_idx (member_pk);
-ALTER TABLE otp ADD INDEX is_use_idx (is_use);
 ALTER TABLE role ADD PRIMARY KEY (role, member_pk);
-
-ALTER TABLE member ADD INDEX member_idx (user_id);
-ALTER TABLE member ADD INDEX is_use_idx (is_use);
 
 CREATE TRIGGER smtp_push_history_insert
     AFTER INSERT ON smtp_push_history
@@ -343,49 +280,48 @@ END ;
 
 
 INSERT INTO web_sys
-(code, name, description, permission)
-VALUES ('001', 'default', '기본값', 'ADMIN');
+       (code, name, description, permission)
+VALUES ('001', 'default', '기본값', 'ADMIN')
+     , ('002', 'auth', '2차 인증 변경알림', 'ADMIN')
+     , ('003', 'confirmLogin', '로그인 위치 확인', 'ADMIN');
 
 INSERT INTO system_message
-(web_sys_pk, subject, content, create_at, update_at)
-VALUES ('001', '시스템 메시지', '시스템 메시지입니다.', current_timestamp, current_timestamp);
+       (id, web_sys_pk, subject, content, create_at, update_at, is_use)
+VALUES (1, '001', '시스템 메시지', '시스템 메시지입니다.', current_timestamp, current_timestamp, 1)
+     , (2, '002','2차 인증 비활성화', '%s님의 2차 인증 설정이 변경되었습니다.', now(), now(), 1)
+     , (3, '002','2차 인증 활성화', '%s님의 2차 인증 설정이 변경되었습니다.', now(), now(), 1)
+     , (4, '003','새로운 장소에서 로그인이 발생했습니다.', ' ip : %s </br> device : %s </br> location : %s </br> 에서 로그인이 발생했습니다.', now(), now(), 1);
 
 
 INSERT INTO point_code
 (id, name, point)
-VALUES (1,'attend-1', 10)
-     , (2,'attend-2', 15)
-     , (3,'attend-3', 15)
-     , (4,'attend-4', 30)
-     , (5,'attend-5', 30)
-     , (6,'attend-6', 50)
-     , (7,'attend-7', 50)
-     , (8,'attend-8', 50)
-     , (9,'attend-9', 50)
-     , (10,'attend-10', 100)
-     , (11,'board', 15)
-     , (12,'board_comment', 5);
+VALUES (1,  'attend-1',      10)
+     , (2,  'attend-2',      15)
+     , (3,  'attend-3',      15)
+     , (4,  'attend-4',      30)
+     , (5,  'attend-5',      30)
+     , (6,  'attend-6',      50)
+     , (7,  'attend-7',      50)
+     , (8,  'attend-8',      50)
+     , (9,  'attend-9',      50)
+     , (10, 'attend-10',     100)
+     , (11, 'board',         15)
+     , (12, 'board_comment', 5)
+     , (13, 'q&a',           0);
 
 
 INSERT INTO table_code
 (id, table_name, is_use)
 VALUES (1, 'member'  , 1)
-     ,  (2, 'board' , 1)
-     ,  (3, 'board_comment', 1)
-     ,  (4, 'attendance', 1);
-
+     , (2, 'board' , 1)
+     , (3, 'board_comment', 1)
+     , (4, 'attendance', 1);
 
 INSERT INTO category
 (id, name, parent_pk, is_use)
 VALUES (1, 'notice'  , NULL, 1)
      , (2, 'free'    , NULL, 1)
      , (3, 'qna'     , NULL, 1)
-     , (4, 'alttuel' , NULL, 1);
-
-
-
-
-
-
-
+     , (4, 'alttuel' , NULL, 1)
+     , (5, 'album'   , NULL, 1);
 

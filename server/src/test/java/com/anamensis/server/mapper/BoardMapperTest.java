@@ -86,7 +86,7 @@ class BoardMapperTest {
         page.setPage(1);
         page.setSize(4);
 
-        List<BoardResultMap.Board> list = bm.findList(page, new BoardRequest.Params(), new Member());
+        List<BoardResultMap.List> list = bm.findList(page, new BoardRequest.Params(), new Member());
         assertEquals(4, list.size());
 
 
@@ -104,16 +104,6 @@ class BoardMapperTest {
             assertNotNull(board.getViewCount());
             assertNotNull(board.isUse());
 
-            assertNotNull(b.getMember());
-            Member member = b.getMember();
-            assertNotNull(member.getId());
-            assertNotNull(member.getUserId());
-            assertNotNull(member.getName());
-            assertNotNull(member.getPoint());
-            assertNotNull(member.getEmail());
-            assertNotNull(member.getSAuth());
-            assertNotNull(member.getSAuthType());
-            assertNotNull(member.getCreateAt());
         });
 
         assertFalse(list.stream().anyMatch(b -> b.getBoard().getId() == 11));
@@ -142,16 +132,6 @@ class BoardMapperTest {
             assertNotNull(board.getViewCount());
             assertNotNull(board.isUse());
 
-            assertNotNull(b.getMember());
-            Member member = b.getMember();
-            assertNotNull(member.getId());
-            assertNotNull(member.getUserId());
-            assertNotNull(member.getName());
-            assertNotNull(member.getPoint());
-            assertNotNull(member.getEmail());
-            assertNotNull(member.getSAuth());
-            assertNotNull(member.getSAuthType());
-            assertNotNull(member.getCreateAt());
         });
 
         assertFalse(list.stream().anyMatch(b -> b.getBoard().getId() == 7));
@@ -179,16 +159,6 @@ class BoardMapperTest {
             assertNotNull(board.getViewCount());
             assertNotNull(board.isUse());
 
-            assertNotNull(b.getMember());
-            Member member = b.getMember();
-            assertNotNull(member.getId());
-            assertNotNull(member.getUserId());
-            assertNotNull(member.getName());
-            assertNotNull(member.getPoint());
-            assertNotNull(member.getEmail());
-            assertNotNull(member.getSAuth());
-            assertNotNull(member.getSAuthType());
-            assertNotNull(member.getCreateAt());
         });
 
         assertFalse(list.stream().anyMatch(b -> b.getBoard().getId() == 3));

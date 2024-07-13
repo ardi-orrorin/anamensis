@@ -468,7 +468,9 @@ export default function Page({params}: {params : {id: string}}) {
                 }
                 {
                     !commentLoading
-                    && <Comment />
+                    && <Comment isNewBoard={isNewBoard}
+                                params={params}
+                    />
                 }
             </div>
             <div>

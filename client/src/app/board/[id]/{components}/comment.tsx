@@ -1,4 +1,4 @@
-import {useContext, useMemo, useState} from "react";
+import {useContext, useEffect, useMemo, useRef, useState} from "react";
 import {BlockI, BoardI, CommentI} from "@/app/board/{services}/types";
 import Image from "next/image";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
@@ -10,10 +10,13 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {defaultProfile} from "@/app/{commons}/func/image";
-import {mutate} from "swr";
+import useSWR, {mutate, preload} from "swr";
 import moment from "moment";
 import {QuestionBlockExtraValueType} from "@/app/board/{components}/block/extra/questionBlock";
 import {updateBoard} from "@/app/board/{services}/funcs";
+import {useRouter, useSearchParams} from "next/navigation";
+import {PageI, PageResponse} from "@/app/{commons}/types/commons";
+import PageNavigator from "@/app/{commons}/PageNavigator";
 
 export type SaveComment = {
     boardPk   : string;
@@ -22,10 +25,39 @@ export type SaveComment = {
     parentPk? : string;
 }
 
-const Comment = () => {
-    const {comment, board} = useContext(BoardProvider);
+const Comment = ({
+    isNewBoard,
+    params
+} : {
+    isNewBoard: boolean
+    params: {id: string}
+}) => {
+    const searchParams = useSearchParams();
+
+    const {comment,setComment, board} = useContext(BoardProvider);
     const {newComment, setNewComment} = useContext(BoardProvider);
+
+    const [page, setPage] = useState<PageI>({
+        page: 1,
+        size: 10,
+    } as PageI);
     const [loading, setLoading] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+
+    preload([`/api/board/comment/${board.data.id}`, searchParams], async () => {
+        if(isNewBoard) return;
+        return await apiCall<PageResponse<CommentI>>({
+            path: '/api/board/comment',
+            method: 'GET',
+            params: {boardPk: params.id, page: searchParams.get('page') || 1, size: searchParams.get('size') || 10},
+        })
+    })
+    .then(res => {
+        if(!res) return;
+        setPage(res.data.page);
+        setComment(res.data.content);
+    })
+
 
     const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setNewComment({...newComment, content: e.target.value});
@@ -49,7 +81,8 @@ const Comment = () => {
                 isReturnData: true,
             })
 
-            mutate(`/api/board/comment/${board.data.id}`);
+            mutate([`/api/board/comment/${board.data.id}`, searchParams]);
+
 
             setNewComment({
                 boardPk: board.data.id,
@@ -74,20 +107,22 @@ const Comment = () => {
 
     return (
         <div className={'w-auto flex flex-col gap-4'}>
-            <div className={'flex gap-2 text-lg items-center py-2'}>
+            <div className={'flex gap-2 text-lg items-center py-2'}
+                 ref={ref}
+            >
                 <FontAwesomeIcon icon={faComment} />
                 <div className={'flex'}>
                     <h2>
                         댓글
                     </h2>
                     <span>
-                        ({comment.length})
+                        ({page.total})
                     </span>
                 </div>
             </div>
             {
-                board.isView
-                && board.data.isLogin
+                board?.isView
+                && board?.data?.isLogin
                 && <div className={'w-full flex gap-1'}>
                     <button className={[
                         'absolute h-16 flex flex-col justify-center items-center text-xs text-white bg-blue-400 hover:bg-red-600 duration-300'
@@ -126,7 +161,7 @@ const Comment = () => {
                     })
                 }
             </div>
-
+            <PageNavigator {...page} />
         </div>
     )
 }

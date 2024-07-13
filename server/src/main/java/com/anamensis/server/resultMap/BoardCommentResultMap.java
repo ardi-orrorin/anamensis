@@ -18,4 +18,13 @@ public class BoardCommentResultMap {
         private File file;
     }
 
+    @Getter
+    @Setter
+    @ToString
+    public static class List {
+        private long id;
+        private com.anamensis.server.entity.BoardComment boardComment;
+        private String profile;
+    }
+
 }

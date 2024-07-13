@@ -1,5 +1,7 @@
 package com.anamensis.server.controller;
 
+import com.anamensis.server.dto.Page;
+import com.anamensis.server.dto.PageResponse;
 import com.anamensis.server.dto.request.BoardCommentRequest;
 import com.anamensis.server.dto.response.BoardCommentResponse;
 import com.anamensis.server.entity.*;
@@ -27,14 +29,28 @@ public class BoardCommentController {
 
     @PublicAPI
     @GetMapping("")
-    public Mono<List<BoardCommentResponse.Comment>> list(
+    public Mono<PageResponse<BoardCommentResponse.Comment>> list(
             @RequestParam long boardPk,
+            Page page,
             @AuthenticationPrincipal UserDetails user
     ) {
+
         String userId = user != null ? user.getUsername() : null;
-        return boardCommentService.findAllByBoardPk(boardPk)
+
+        Mono<Integer> count = boardCommentService.count(boardPk);
+
+        return boardCommentService.findAllByBoardPk(boardPk, page)
                 .map(board -> BoardCommentResponse.Comment.fromResultMap(board, userId))
-                .collectList();
+                .collectList()
+                .zipWith(count)
+                .map(t -> {
+                    page.setTotal(t.getT2());
+                    return new PageResponse<>(
+                            page,
+                            t.getT1()
+                        );
+                    }
+                );
     }
 
     @PostMapping("")

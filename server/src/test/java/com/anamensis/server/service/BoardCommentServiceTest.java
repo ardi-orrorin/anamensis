@@ -1,5 +1,6 @@
 package com.anamensis.server.service;
 
+import com.anamensis.server.dto.Page;
 import com.anamensis.server.entity.BoardComment;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,12 +26,15 @@ class BoardCommentServiceTest {
     @Order(1)
     @DisplayName("게시글 번호로 댓글 조회")
     void findAllByBoardPk() {
-        StepVerifier.create(bcs.findAllByBoardPk(1))
+        Page page = new Page();
+        page.setPage(1);
+        page.setSize(10);
+        StepVerifier.create(bcs.findAllByBoardPk(1, page))
                 .expectNextCount(6)
                 .verifyComplete();
 
 
-        StepVerifier.create(bcs.findAllByBoardPk(1))
+        StepVerifier.create(bcs.findAllByBoardPk(1, page))
                 .assertNext(boardComment -> {
                     BoardComment bc = boardComment.getBoardComment();
                     assertEquals(1, bc.getId());
@@ -49,12 +53,12 @@ class BoardCommentServiceTest {
                 .expectNextCount(4)
                 .verifyComplete();
 
-        StepVerifier.create(bcs.findAllByBoardPk(2))
+        StepVerifier.create(bcs.findAllByBoardPk(2, page))
                 .expectNextCount(4)
                 .verifyComplete();
 
 
-        StepVerifier.create(bcs.findAllByBoardPk(2))
+        StepVerifier.create(bcs.findAllByBoardPk(2, page))
                 .assertNext(boardComment -> {
                     BoardComment bc = boardComment.getBoardComment();
                     assertEquals(7, bc.getId());
@@ -82,7 +86,7 @@ class BoardCommentServiceTest {
                 .verifyComplete();
 
 
-        StepVerifier.create(bcs.findAllByBoardPk(3))
+        StepVerifier.create(bcs.findAllByBoardPk(3, page))
                 .expectNextCount(0)
                 .verifyComplete();
     }
@@ -97,15 +101,19 @@ class BoardCommentServiceTest {
         bc.setUserId("d-member-1");
         bc.setCreateAt(LocalDateTime.now());
 
+        Page page = new Page();
+        page.setPage(1);
+        page.setSize(10);
+
         StepVerifier.create(bcs.save(bc))
                 .expectNext(true)
                 .verifyComplete();
 
-        StepVerifier.create(bcs.findAllByBoardPk(1))
+        StepVerifier.create(bcs.findAllByBoardPk(1, page))
                 .expectNextCount(7)
                 .verifyComplete();
 
-        StepVerifier.create(bcs.findAllByBoardPk(1))
+        StepVerifier.create(bcs.findAllByBoardPk(1, page))
                 .expectNextCount(6)
                 .assertNext(boardComment -> {
                     BoardComment bc1 = boardComment.getBoardComment();
@@ -160,11 +168,15 @@ class BoardCommentServiceTest {
     @DisplayName("댓글 삭제")
     @Order(3)
     void delete() {
+        Page page = new Page();
+        page.setPage(1);
+        page.setSize(10);
+
         StepVerifier.create(bcs.delete(1, "d-member-1"))
                 .expectNext(true)
                 .verifyComplete();
 
-        StepVerifier.create(bcs.findAllByBoardPk(1))
+        StepVerifier.create(bcs.findAllByBoardPk(1, page))
                 .expectNextCount(5)
                 .verifyComplete();
 
@@ -180,7 +192,7 @@ class BoardCommentServiceTest {
                 .expectNext(true)
                 .verifyComplete();
 
-        StepVerifier.create(bcs.findAllByBoardPk(1))
+        StepVerifier.create(bcs.findAllByBoardPk(1, page))
                 .expectNextCount(4)
                 .verifyComplete();
 

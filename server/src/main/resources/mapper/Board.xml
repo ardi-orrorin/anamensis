@@ -97,10 +97,11 @@
     <select id="findList" resultMap="BoardResultMapBoardList">
         SELECT *
              , b.id AS board_pk
-             , (SELECT count(*)
-                  FROM board_comment bc
-                 WHERE bc.board_pk   = b.id
-                   AND bc.is_use     = 1
+             , (SELECT IFNULL((
+                    SELECT count
+                      FROM board_comment_count bcc
+                     WHERE bcc.board_pk  = b.id)
+                , 0)
              ) AS comment_count
              , (SELECT m.name
                   FROM member m

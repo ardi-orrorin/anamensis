@@ -103,7 +103,7 @@ const Comment = ({
         });
     }
 
-    // if(!board.isView || !comment?.length) return <></>
+    if(!board.isView) return <></>
 
     return (
         <div className={'w-auto flex flex-col gap-4'}>

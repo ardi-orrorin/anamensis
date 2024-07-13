@@ -41,7 +41,7 @@
                                             FROM table_code tc
                                            WHERE tc.table_name = 'member')
                    AND f.is_use    = 1
-                   AND m.user_id = bc.user_id
+                 WHERE m.user_id = bc.user_id
              ) AS profile
           FROM board_comment bc
          WHERE bc.board_pk  = #{boardPk}

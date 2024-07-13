@@ -103,7 +103,7 @@ const Comment = ({
         });
     }
 
-    if(!board.isView || !comment?.length) return <></>
+    // if(!board.isView || !comment?.length) return <></>
 
     return (
         <div className={'w-auto flex flex-col gap-4'}>
@@ -121,8 +121,8 @@ const Comment = ({
                 </div>
             </div>
             {
-                board.isView
-                && board.data.isLogin
+                board?.isView
+                && board?.data?.isLogin
                 && <div className={'w-full flex gap-1'}>
                     <button className={[
                         'absolute h-16 flex flex-col justify-center items-center text-xs text-white bg-blue-400 hover:bg-red-600 duration-300'

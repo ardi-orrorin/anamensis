@@ -174,7 +174,6 @@ public class BoardController {
 
         Mono<Board> insertBoard = userService.findUserByUserId(user.getUsername())
                 .flatMap(u -> {
-
                     board.setMemberPk(u.getId());
                     return boardService.save(board.toEntity());
                 })

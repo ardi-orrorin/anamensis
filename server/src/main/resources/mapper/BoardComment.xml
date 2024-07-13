@@ -25,10 +25,11 @@
 <!--    </select>-->
 
     <select id="count" resultType="int">
-        SELECT count(*)
-          FROM board_comment bc
-         WHERE bc.board_pk  = #{boardPk}
-           AND bc.is_use    = 1
+        SELECT IFNULL((
+            SELECT count
+             FROM board_comment_count bcc
+            WHERE bcc.board_pk  = #{boardPk})
+        , 0);
     </select>
 
     <select id="findAllByBoardPk" resultMap="boardCommentListResultMap">

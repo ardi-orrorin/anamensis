@@ -1,5 +1,6 @@
 package com.anamensis.server.service;
 
+import com.anamensis.server.dto.Page;
 import com.anamensis.server.entity.BoardComment;
 import com.anamensis.server.exception.AuthorizationException;
 import com.anamensis.server.mapper.BoardCommentMapper;
@@ -15,8 +16,12 @@ public class BoardCommentService {
 
     private final BoardCommentMapper boardCommentMapper;
 
-    public Flux<BoardCommentResultMap.BoardComment> findAllByBoardPk(long boardPk) {
-        return Flux.fromIterable(boardCommentMapper.findAllByBoardPk(boardPk));
+    public Mono<Integer> count(long boardPk) {
+        return Mono.just(boardCommentMapper.count(boardPk));
+    }
+
+    public Flux<BoardCommentResultMap.List> findAllByBoardPk(long boardPk, Page page) {
+        return Flux.fromIterable(boardCommentMapper.findAllByBoardPk(boardPk, page));
     }
 
     public Mono<Boolean> save(BoardComment boardComment) {

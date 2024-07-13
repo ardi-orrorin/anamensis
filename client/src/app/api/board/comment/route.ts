@@ -7,10 +7,12 @@ import {CommentI} from "@/app/board/{services}/types";
 
 export async function GET(req: NextRequest){
     const boardPk = req.nextUrl.searchParams.get('boardPk')!;
+    const searchParams = req.nextUrl.searchParams;
+
     const result = await apiCall<CommentI[]>({
         path: '/public/api/board/comments',
         method: 'GET',
-        params: {boardPk: boardPk as string},
+        params: {boardPk: boardPk as string, page: searchParams.get('page') || 1, size: searchParams.get('size') || 10},
         call: 'Server',
         setAuthorization: true,
         isReturnData: true,

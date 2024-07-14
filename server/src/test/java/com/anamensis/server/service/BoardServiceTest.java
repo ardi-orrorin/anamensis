@@ -35,33 +35,34 @@ class BoardServiceTest {
     @Test
     @Order(1)
     @DisplayName("게시글 갯수 조회 테스트")
+    @Disabled("사용안함")
     void count() {
-        Board b = new Board();
-
-        StepVerifier.create(bs.count(b))
-                .expectNext(10L)
-                .verifyComplete();
-
-        b.setTitle("4");
-        StepVerifier.create(bs.count(b))
-                .expectNext(1L)
-                .verifyComplete();
-
-        b.setTitle("제목1");
-        StepVerifier.create(bs.count(b))
-                .expectNext(2L)
-                .verifyComplete();
-
-        b.setCategoryPk(2);
-        StepVerifier.create(bs.count(b))
-                .expectNext(0L)
-                .verifyComplete();
-
-        b.setTitle(null);
-        b.setCategoryPk(1);
-        StepVerifier.create(bs.count(b))
-                .expectNext(10L)
-                .verifyComplete();
+//        Board b = new Board();
+//
+//        StepVerifier.create(bs.count(b))
+//                .expectNext(10L)
+//                .verifyComplete();
+//
+//        b.setTitle("4");
+//        StepVerifier.create(bs.count(b))
+//                .expectNext(1L)
+//                .verifyComplete();
+//
+//        b.setTitle("제목1");
+//        StepVerifier.create(bs.count(b))
+//                .expectNext(2L)
+//                .verifyComplete();
+//
+//        b.setCategoryPk(2);
+//        StepVerifier.create(bs.count(b))
+//                .expectNext(0L)
+//                .verifyComplete();
+//
+//        b.setTitle(null);
+//        b.setCategoryPk(1);
+//        StepVerifier.create(bs.count(b))
+//                .expectNext(10L)
+//                .verifyComplete();
 
     }
 

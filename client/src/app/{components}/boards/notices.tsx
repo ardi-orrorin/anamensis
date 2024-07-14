@@ -13,7 +13,7 @@ export type NoticeType = {
 const Notices = ({data}: {data: NoticeType[]}) => {
 
     return (
-        <div className={'w-full flex-col md:w-[85%] flex gap-3'}>
+        <div className={'w-full flex-col flex gap-3'}>
             {
                 data.map((notice, index) => {
                     return <Row key={'notice' + notice.id} data={notice} />
@@ -28,7 +28,7 @@ export default Notices;
 
 const Row = ({data}: {data: NoticeType}) => {
     return (
-        <Link className={'w-full py-2 px-4 flex justify-between shadow hover:shadow-md duration-300 bg-neutral-50'}
+        <Link className={'w-full py-2 px-4 flex justify-between shadow hover:shadow-md duration-300 border-solid border border-gray-200 rounded'}
               href={'/board/' + data.id}
         >
             <div className={'flex gap-1 text-sm text-gray-600'}>

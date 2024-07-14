@@ -238,8 +238,10 @@ public class BoardService {
             })
             .then(Mono.defer(() -> {
                 redisTemplate.boundListOps("board:summary:member:" + memberPk)
-                    .expire(30, TimeUnit.DAYS);
+                    .expire(15, TimeUnit.DAYS);
+
                 return Mono.just(redisTemplate.hasKey("board:summary:member:" + memberPk));
-            }));
+                }
+            ));
     }
 }

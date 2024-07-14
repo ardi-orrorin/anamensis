@@ -185,26 +185,29 @@ export default function Page() {
                         <LeftMenu roles={roles}
                         />
                     </div>
-                    <div className={'w-[850px] flex flex-wrap gap-5 justify-center items-start'}>
-                        {
-                            !initLoading
-                            && !loading
-                            && data?.length === 0
-                            && <div className={'text-center text-2xl w-full py-20 text-gray-600'}>검색 결과가 없습니다.</div>
-                        }
+                    <div className={'w-[850px] flex flex-col gap-5 justify-start items-center'}>
+                        <div className={'w-full'}>
+                            <Notices data={noticeList} />
+                        </div>
+                        <div className={'w-full flex flex-wrap gap-2'}>
+                            {
+                                !initLoading
+                                && !loading
+                                && data?.length === 0
+                                && <div className={'text-center text-2xl w-full py-20 text-gray-600'}>검색 결과가 없습니다.</div>
+                            }
 
-                        <Notices data={noticeList} />
-
-                        {
-                            data
-                            && data?.length > 0
-                            && data.map((item, index) => {
-                                if(!item) return;
-                                return (
-                                    <BoardComponent key={'boardsummary' + index} {...item} />
-                                )
-                            })
-                        }
+                            {
+                                data
+                                && data?.length > 0
+                                && data.map((item, index) => {
+                                    if(!item) return;
+                                    return (
+                                        <BoardComponent key={'boardsummary' + index} {...item} />
+                                    )
+                                })
+                            }
+                        </div>
                     </div>
                 </div>
                 <div className={'relative'}>

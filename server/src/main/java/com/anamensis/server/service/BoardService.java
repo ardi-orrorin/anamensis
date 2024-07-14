@@ -11,6 +11,7 @@ import com.anamensis.server.mapper.BoardIndexMapper;
 import com.anamensis.server.mapper.BoardMapper;
 import com.anamensis.server.resultMap.BoardResultMap;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,15 +33,7 @@ public class BoardService {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
-
-    /** @deprecated
-     * 0.0.30 버전에서 deprecated
-     * */
-    public Mono<Long> count(Board board) {
-        return Mono.fromCallable(() -> boardMapper.count(board));
-    }
-
-
+    private final VirtualThreadTaskExecutor virtualThreadTaskExecutor;
 
     public Flux<BoardResponse.List> findAll(
         Page page,
@@ -48,20 +41,9 @@ public class BoardService {
         Member member
     ) {
         return Flux.fromIterable(boardMapper.findList(page, params, member))
-                .publishOn(Schedulers.boundedElastic())
+                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
                 .map(BoardResponse.List::from);
     }
-
-//    public Flux<BoardResponse.List> findAllTest(
-//        Page page,
-//        BoardRequest.Params params,
-//        Member member
-//    ) {
-//        return Flux.fromIterable(boardMapper.findListTest(page, params, member))
-//            .doOnNext(b -> System.out.println("dfdfdf " + b))
-//            .publishOn(Schedulers.boundedElastic())
-//            .map(BoardResponse.List::from);
-//    }
 
     public Flux<BoardResponse.List> findOnePage() {
         List<Object> list;
@@ -84,7 +66,6 @@ public class BoardService {
 
     public Mono<BoardResultMap.Board> findByPk(long boardPk) {
         return Mono.justOrEmpty(boardMapper.findByPk(boardPk))
-                .log("boardMapper.findByPk")
                 .switchIfEmpty(Mono.error(new RuntimeException("게시글이 없습니다.")));
     }
 
@@ -102,7 +83,7 @@ public class BoardService {
              })
              .flatMapMany(Flux::fromIterable)
              .cast(BoardResponse.SummaryList.class)
-             .publishOn(Schedulers.boundedElastic())
+             .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
              .onErrorResume(e -> {
                  if(!e.getMessage().equals("Cannot deserialize")) return Mono.error(e);
                  return updateSummaryList(memberPk)
@@ -110,7 +91,7 @@ public class BoardService {
                      .flatMapMany(Flux::fromIterable)
                      .cast(BoardResponse.SummaryList.class);
              })
-             .publishOn(Schedulers.boundedElastic());
+             .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor));
     }
 
 
@@ -122,10 +103,11 @@ public class BoardService {
 
         board.setCreateAt(LocalDateTime.now());
         board.setUpdateAt(LocalDateTime.now());
+
         return Mono.fromCallable(()-> boardMapper.save(board))
                 .onErrorMap(RuntimeException::new)
                 .flatMap($ -> Mono.just(board))
-                .publishOn(Schedulers.boundedElastic())
+                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
                 .doOnNext($ -> updateCaches(0).subscribe());
     }
 
@@ -186,7 +168,7 @@ public class BoardService {
 
     public Mono<Boolean> viewUpdateByPk(long boardPk) {
         return Mono.fromCallable(() -> boardMapper.viewUpdateByPk(boardPk) == 1)
-                .publishOn(Schedulers.boundedElastic())
+                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
                 .doOnNext($ -> onePageCache(boardPk))
                 .onErrorReturn(false);
     }
@@ -194,14 +176,16 @@ public class BoardService {
     public Mono<Boolean> disableByPk(long boardPk, long memberPk) {
         return Mono.just(boardMapper.disableByPk(boardPk, memberPk, LocalDateTime.now()) == 1)
                 .onErrorReturn(false)
-                .flatMap($ -> updateCaches(boardPk));
+                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+                .doOnNext($ -> updateCaches(boardPk).subscribe());
     }
 
     public Mono<Boolean> updateByPk(Board board) {
         board.setUpdateAt(LocalDateTime.now());
         return Mono.fromCallable(() -> boardMapper.updateByPk(board) == 1)
                 .onErrorReturn(false)
-                .flatMap($ -> updateCaches(board.getId()));
+                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+                .doOnNext($ -> updateCaches(board.getId()).subscribe());
     }
 
     public Mono<Boolean> addSelectAnswerQueue(SelectAnswerQueueDto saqdto) {
@@ -220,8 +204,9 @@ public class BoardService {
 
     private Mono<Boolean> updateCaches(long id) {
         return updateSummaryList(id)
-                .flatMap($ -> updateNoticeCache())
-                .publishOn(Schedulers.boundedElastic())
+                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+                .doOnNext($ -> updateNoticeCache().subscribe())
+                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
                 .doOnNext($ -> onePageCache(id));
     }
 

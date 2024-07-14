@@ -270,5 +270,15 @@ public class BoardResponse implements Serializable {
                 .createdAt(board.getBoard().getCreateAt())
                 .build();
         }
+
+        public static Notice from(BoardResultMap.Notice notice) {
+            return Notice.builder()
+                .id(notice.getId())
+                .title(notice.getBoard().getTitle())
+                .writer(notice.getWriter())
+                .viewCount(notice.getBoard().getViewCount())
+                .createdAt(notice.getBoard().getCreateAt())
+                .build();
+        }
     }
 }

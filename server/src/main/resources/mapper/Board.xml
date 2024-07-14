@@ -17,17 +17,6 @@
                 #{rate}, #{viewCount}, #{createAt},
                 #{memberPk}, #{isAdsense}, #{updateAt}, #{isPublic}, #{membersOnly})
     </insert>
-    <select id="count" resultType="long">
-        SELECT COUNT(*)
-          FROM board
-         WHERE is_use = 1
-           <if test="categoryPk != 0">
-               AND category_pk = #{categoryPk}
-           </if>
-           <if test="title != null">
-               AND title LIKE CONCAT('%', #{title}, '%')
-           </if>
-    </select>
 
     <!-- todo: findList 안정성 확인 후 삭제 예정 -start -->
     <select id="findListDelete" resultMap="BoardResultMapBoard">
@@ -97,10 +86,11 @@
     <select id="findList" resultMap="BoardResultMapBoardList">
         SELECT *
              , b.id AS board_pk
-             , (SELECT count(*)
-                  FROM board_comment bc
-                 WHERE bc.board_pk   = b.id
-                   AND bc.is_use     = 1
+             , (SELECT IFNULL((
+                    SELECT count
+                      FROM board_comment_count bcc
+                     WHERE bcc.board_pk  = b.id)
+                , 0)
              ) AS comment_count
              , (SELECT m.name
                   FROM member m
@@ -184,11 +174,13 @@
          ORDER BY id DESC
          LIMIT #{page.offset}, #{page.size}
     </select>
-    <select id="findNotice" resultMap="BoardResultMapBoard">
+    <select id="findNotice" resultMap="BoardResultMapBoardNotice">
         SELECT *
+             , b.id AS board_pk
+             , (SELECT m.user_id
+                  FROM member m
+             ) AS writer
           FROM board b
-          JOIN member m
-            ON b.member_pk   = m.id
          WHERE b.category_pk = 1
            AND b.is_public   = 1
            AND b.is_use      = 1
@@ -234,6 +226,13 @@
            AND is_use     = 1
     </update>
 
+    <resultMap id="BoardResultMapBoardNotice" type="com.anamensis.server.resultMap.BoardResultMap$Notice">
+        <id property="id" column="board_pk"/>
+        <result property="writer" column="writer"/>
+        <association property="board" resultMap="BoardEntity" />
+    </resultMap>
+
+
     <resultMap id="BoardResultMapBoardList" type="com.anamensis.server.resultMap.BoardResultMap$List">
         <result property="id" column="board_pk"/>
         <result property="commentCount" column="comment_count"/>
@@ -241,6 +240,7 @@
         <result property="profile" column="profile"/>
         <association property="board" resultMap="BoardEntity" />
     </resultMap>
+
 
     <resultMap id="BoardResultMapBoard" type="com.anamensis.server.resultMap.BoardResultMap$Board">
         <id property="id" column="id"/>

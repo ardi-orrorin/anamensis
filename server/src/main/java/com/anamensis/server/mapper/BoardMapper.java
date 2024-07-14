@@ -29,7 +29,7 @@ public interface BoardMapper {
         @Param("page") Page page
     );
 
-    List<BoardResultMap.Board> findNotice();
+    List<BoardResultMap.Notice> findNotice();
 
     long count(Board board);
 

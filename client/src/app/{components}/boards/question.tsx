@@ -26,7 +26,7 @@ const QuestionBoardComponent = (props: BoardListI) => {
     return (
         <>
             <HeaderComponent {...props} />
-            <div className={'w-full h-[100px] flex flex-col gap-3 justify-start items-start p-3'}>
+            <div className={'w-full flex flex-col gap-3 justify-start items-start px-3'}>
                 <div className={'flex gap-2'}>
                     <label className={['text-xs2 px-2 py-1 text-white', extraValue?. state === 'wait' ? 'bg-green-700' : 'bg-yellow-600'].join(' ')}>
                         {extraValue?.state === 'wait' ? '대기중' : '완료'}
@@ -39,7 +39,7 @@ const QuestionBoardComponent = (props: BoardListI) => {
                     </label>
                 </div>
                 <div className={''}>
-                    <p className={'line-clamp-[2] text-xs text-pretty'}>
+                    <p className={'line-clamp-[1] text-xs break-all whitespace-pre-line'}>
                         {text}
                     </p>
                 </div>

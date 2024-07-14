@@ -28,31 +28,33 @@ const AlttuelBoardComponent = (props: BoardListI) => {
     }
 
     return (
-        <>
-            <HeaderComponent {...props} />
-            <div className={'p-3 flex gap-3 h-auto'}>
-                <Image className={'rounded'}
+        <div className={'flex h-full'}>
+            <div className={'relative min-w-[30%]'}>
+                <Image className={'w-full h-full object-cover'}
                        src={defaultNoImg(extraValue?.img?.replace(/(\.[^.]+)$/, '_thumb$1'))}
                        width={80}
                        height={80}
                        alt={''}
                 />
-                <div className={'flex flex-col w-full justify-between gap-1'}>
-                    <div className={'flex gap-1'}>
-                        {
-                            extraValue?.tags
-                            && extraValue?.tags?.length > 0
-                                ? extraValue?.tags?.map((tag, index) =>
-                                    <label key={index} className={'bg-gray-600 px-2 py-0.5 text-xs text-white'}>
-                                        {tag}
-                                    </label>
-                                )
-                                : <label className={'bg-gray-400 px-2 py-0.5 text-xs text-white'}>
-                                    No Tag
+                <div className={'absolute z-10 left-2 bottom-2 flex flex-wrap gap-2'}>
+                    {
+                        extraValue?.tags
+                        && extraValue?.tags?.length > 0
+                            ? extraValue?.tags?.map((tag, index) =>
+                                <label key={index} className={'bg-gray-500 px-2 py-1 text-xs text-white'}>
+                                    {tag}
                                 </label>
-                        }
-                    </div>
-                    <div className={'flex flex-col gap-0.5'}>
+                            )
+                            : <label className={'bg-gray-500 px-2 py-1 text-xs text-white'}>
+                                No Tag
+                            </label>
+                    }
+                </div>
+            </div>
+            <div className={'w-full h-full flex flex-col justify-between'}>
+                <HeaderComponent {...props} />
+                <div className={'flex flex-col gap-1 w-full justify-between'}>
+                    <div className={'px-3 flex gap-5'}>
                         <p className={'text-sm'}>
                             상품명 : &nbsp; {value}
                         </p>
@@ -64,9 +66,9 @@ const AlttuelBoardComponent = (props: BoardListI) => {
                         </p>
                     </div>
                 </div>
+                <FooterComponent {...props} />
             </div>
-            <FooterComponent {...props} />
-        </>
+        </div>
     )
 }
 

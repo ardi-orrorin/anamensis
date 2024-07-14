@@ -35,16 +35,6 @@ public class BoardService {
 
     private final VirtualThreadTaskExecutor virtualThreadTaskExecutor;
 
-
-    /** @deprecated
-     * 0.0.30 버전에서 deprecated
-     * */
-    public Mono<Long> count(Board board) {
-        return Mono.fromCallable(() -> boardMapper.count(board));
-    }
-
-
-
     public Flux<BoardResponse.List> findAll(
         Page page,
         BoardRequest.Params params,
@@ -54,17 +44,6 @@ public class BoardService {
                 .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
                 .map(BoardResponse.List::from);
     }
-
-//    public Flux<BoardResponse.List> findAllTest(
-//        Page page,
-//        BoardRequest.Params params,
-//        Member member
-//    ) {
-//        return Flux.fromIterable(boardMapper.findListTest(page, params, member))
-//            .doOnNext(b -> System.out.println("dfdfdf " + b))
-//            .publishOn(Schedulers.boundedElastic())
-//            .map(BoardResponse.List::from);
-//    }
 
     public Flux<BoardResponse.List> findOnePage() {
         List<Object> list;

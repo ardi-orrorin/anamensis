@@ -9,6 +9,7 @@ export class RateColor {
         new RateColor({color: "#eab308", rate: 49}),
         new RateColor({color: "#a21caf", rate: 99}),
         new RateColor({color: "#b91c1c", rate: 999}),
+        new RateColor({color: "#ff5f5f", rate: Number.MAX_VALUE}),
     ];
 
     constructor({color, rate}: {color: string, rate: number}) {

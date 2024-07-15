@@ -13,7 +13,7 @@
                 rate, view_count, create_at,
                 member_pk, isAdsense, update_at,
                 is_public, members_only)
-        VALUES (#{categoryPk}, #{title}, #{content, typeHandler=JsonTypeHandler},
+        VALUES (#{categoryPk}, #{title}, #{content, typeHandler=JsonObjectTypeHandler},
                 #{rate}, #{viewCount}, #{createAt},
                 #{memberPk}, #{isAdsense}, #{updateAt}, #{isPublic}, #{membersOnly})
     </insert>
@@ -179,6 +179,7 @@
              , b.id AS board_pk
              , (SELECT m.user_id
                   FROM member m
+                 WHERE m.id = b.member_pk
              ) AS writer
           FROM board b
          WHERE b.category_pk = 1
@@ -197,7 +198,7 @@
                 title       = #{title},
             </if>
             <if test="content != null and content != ''">
-                content     = #{content, typeHandler=JsonTypeHandler},
+                content     = #{content, typeHandler=JsonObjectTypeHandler},
             </if>
             <if test="isPublic != null">
                 is_public    = #{isPublic},
@@ -252,7 +253,7 @@
 
     <resultMap id="BoardEntity" type="Board" autoMapping="true">
         <id property="id" column="board_pk"/>
-        <result property="content" column="content" typeHandler="JsonTypeHandler"/>
+        <result property="content" column="content" typeHandler="JsonObjectTypeHandler"/>
     </resultMap>
     <resultMap id="MemberEntity" type="Member" autoMapping="true">
         <id property="id" column="member_pk"/>
@@ -263,6 +264,6 @@
     </resultMap>
 
     <resultMap id="BoardResultMap" type="Board">
-        <result property="content" column="content" typeHandler="JsonTypeHandler"/>
+        <result property="content" column="content" typeHandler="JsonObjectTypeHandler"/>
     </resultMap>
 </mapper>

@@ -12,6 +12,8 @@ import com.anamensis.server.exception.AuthorizationException;
 import com.anamensis.server.resultMap.BoardResultMap;
 import com.anamensis.server.service.*;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,8 +26,6 @@ import reactor.util.function.Tuple2;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
@@ -212,7 +212,7 @@ public class BoardController {
                 })
                 .doOnNext(b -> {
                     if(b.getCategoryPk() != 3) return;
-                    findPoint(board.getContent())
+                    findPoint(new JSONObject(board.getContent()))
                         .doOnNext(p ->
                             userService.subtractPoint(b.getMemberPk(), p.point)
                                 .subscribe()
@@ -264,7 +264,7 @@ public class BoardController {
                 AtomicReference<PointComment> pointCommentAtomic = new AtomicReference<>();
                 AtomicReference<Member> commentMemberAtomic = new AtomicReference<>();
 
-                findPoint(board.getContent())
+                findPoint(new JSONObject(board.getContent()))
                     .doOnNext(pointCommentAtomic::set)
                     .flatMap(point ->
                         boardCommentService.findById(point.selectCommentId)
@@ -396,12 +396,12 @@ public class BoardController {
             });
     }
 
-    private Mono<PointComment> findPoint(Map<String, Object> content) {
-        List<Map<String, Object>> list = (List<Map<String, Object>>) content.get("list");
-        if(Objects.isNull(list)) return Mono.error(new RuntimeException("객체를 찾을 수 없습니다."));
+    private Mono<PointComment> findPoint(JSONObject content) {
 
-        Map<String, Object> extraValue = (Map<String, Object>) list.get(0).get("extraValue");
-        if(Objects.isNull(extraValue)) return Mono.error(new RuntimeException("객체를 찾을 수 없습니다."));
+        JSONArray list = content.getJSONArray("list");
+        if(list.isNull(0)) return Mono.error(new RuntimeException("객체를 찾을 수 없습니다."));
+        if(list.getJSONObject(0).isNull("extraValue")) return Mono.error(new RuntimeException("객체를 찾을 수 없습니다."));
+        JSONObject extraValue = list.getJSONObject(0).getJSONObject("extraValue");
 
         long selectCommentId = extraValue.get("selectId") == ""
             ? 0

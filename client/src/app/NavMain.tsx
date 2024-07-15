@@ -74,7 +74,7 @@ const NavMain = async () => {
 
 const NavItem = ({name, url, prefetch}: NavItemProps) => {
     return (
-        <li className={'p-3'}>
+        <li className={'p-3 h-full hover:bg-blue-600 rounded duration-500'}>
             <Link className={'flex'}
                   href={url}
                   prefetch={prefetch}

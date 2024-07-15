@@ -42,12 +42,14 @@ BEGIN
 END ;
 
 CREATE TRIGGER board_comment_count_delete
-    AFTER DELETE ON board_comment
+    AFTER UPDATE ON board_comment
     FOR EACH ROW
 BEGIN
+    IF NEW.is_use = FALSE THEN
     UPDATE board_comment_count
        SET count = count - 1
      WHERE board_pk = old.board_pk;
+    END IF;
 END ;
 
 CREATE TRIGGER log_history_count_insert

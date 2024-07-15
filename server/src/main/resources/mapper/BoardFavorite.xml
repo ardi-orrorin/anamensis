@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.server.mapper.BoardFavoriteMapper">
+    <select id="findAllByMemberPk">
+        SELECT *
+          FROM board_favorite bf
+         WHERE bf.member_pk = #{memberPk}
+    </select>
+    <select id="existFavorite" resultType="boolean">
+        SELECT exists(
+            SELECT *
+              FROM board_favorite bf
+             WHERE bf.member_pk = #{memberPk}
+               AND bf.board_pk = #{boardPk}
+        )
+    </select>
+    <insert id="save">
+        INSERT INTO board_favorite
+               (board_pk, member_pk)
+        VALUES (#{boardPk}, #{memberPk})
+    </insert>
+    <delete id="deleteByBoardPkAndMemberPk">
+        DELETE
+          FROM board_favorite
+         WHERE board_pk  = #{boardPk}
+           AND member_pk = #{memberPk}
+    </delete>
+</mapper>

@@ -4,7 +4,7 @@ import {useContext} from "react";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import Link from "next/link";
 import {Category} from "@/app/board/{services}/types";
-import {defaultNoImg} from "@/app/{commons}/func/image";
+import {defaultNoImg, defaultProfile} from "@/app/{commons}/func/image";
 
 const WriterInfo = () => {
 
@@ -17,7 +17,7 @@ const WriterInfo = () => {
                        height={70}
                        width={70}
                        alt={'profile'}
-                       src={defaultNoImg(board.data.profileImage)}
+                       src={defaultProfile(board.data.profileImage)}
                 />
                 <div className={'flex flex-col gap-2'}>
                     <div className={'flex gap-1'}>

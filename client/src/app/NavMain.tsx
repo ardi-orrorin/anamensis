@@ -52,7 +52,7 @@ const NavMain = async () => {
     return (
         <nav className={'w-full flex justify-between items-center bg-blue-500 text-white h-12'}>
             <div className={''}>
-                <Link className={'flex justify-center p-3'}
+                <Link className={'flex justify-center p-3 hover:bg-blue-600 rounded duration-500'}
                       href={'/'}
                 >ANAMENSIS</Link>
             </div>

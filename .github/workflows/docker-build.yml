@@ -30,6 +30,9 @@ jobs:
       - name: Decode and set .env.local
         run: echo "${{ secrets.NEXTJS_ENV }}" | base64 --decode > ./client/.env.local
 
+      - name: nextJs Add Environment Version
+        run: sed "s|__ANAMENSIS_VERSION__|${{ env.VERSION }}|g" ./client/.env.local > ./client/.env.local.temp && mv ./client/.env.local.temp ./client/.env.local
+
       - name: Decode and set application.yml
         run: echo "${{ secrets.SITE_TEST_CONFIG }}" | base64 --decode > ./server/src/main/resources/application.yml
 
@@ -77,5 +80,3 @@ jobs:
 
       - name: Clean up
         run: rm -rf *
-
-

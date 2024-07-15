@@ -108,7 +108,7 @@ public class BoardService {
                 .onErrorMap(RuntimeException::new)
                 .flatMap($ -> Mono.just(board))
                 .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
-                .doOnNext($ -> updateCaches(0).subscribe());
+                .doOnNext($ -> updateCaches(0, board.getMemberPk()).subscribe());
     }
 
     public void saveIndex(long boardPk, String content) {
@@ -177,7 +177,7 @@ public class BoardService {
         return Mono.just(boardMapper.disableByPk(boardPk, memberPk, LocalDateTime.now()) == 1)
                 .onErrorReturn(false)
                 .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
-                .doOnNext($ -> updateCaches(boardPk).subscribe());
+                .doOnNext($ -> updateCaches(boardPk, memberPk).subscribe());
     }
 
     public Mono<Boolean> updateByPk(Board board) {
@@ -185,7 +185,7 @@ public class BoardService {
         return Mono.fromCallable(() -> boardMapper.updateByPk(board) == 1)
                 .onErrorReturn(false)
                 .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
-                .doOnNext($ -> updateCaches(board.getId()).subscribe());
+                .doOnNext($ -> updateCaches(board.getId(), board.getMemberPk()).subscribe());
     }
 
     public Mono<Boolean> addSelectAnswerQueue(SelectAnswerQueueDto saqdto) {
@@ -202,8 +202,8 @@ public class BoardService {
     }
 
 
-    private Mono<Boolean> updateCaches(long id) {
-        return updateSummaryList(id)
+    private Mono<Boolean> updateCaches(long id, long memberPk) {
+        return updateSummaryList(memberPk)
                 .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
                 .doOnNext($ -> updateNoticeCache().subscribe())
                 .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
@@ -228,18 +228,20 @@ public class BoardService {
         page.setPage(1);
         page.setSize(8);
 
-        return Mono.fromCallable(() -> boardMapper.findByMemberPk(memberPk, page))
-            .doOnNext($ -> redisTemplate.delete("board:summary:member:" + memberPk))
-            .flatMapMany(Flux::fromIterable)
+        return Mono.fromCallable(() -> redisTemplate.delete("board:summary:member:" + memberPk))
+            .flatMapIterable($ -> boardMapper.findByMemberPk(memberPk, page))
             .map(BoardResponse.SummaryList::from)
+            .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
             .doOnNext(list -> {
                 redisTemplate.boundListOps("board:summary:member:" + memberPk)
                     .rightPush(list);
             })
             .then(Mono.defer(() -> {
                 redisTemplate.boundListOps("board:summary:member:" + memberPk)
-                    .expire(30, TimeUnit.DAYS);
+                    .expire(15, TimeUnit.DAYS);
+
                 return Mono.just(redisTemplate.hasKey("board:summary:member:" + memberPk));
-            }));
+                }
+            ));
     }
 }

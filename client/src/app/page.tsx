@@ -149,7 +149,7 @@ export default function Page() {
             <div className={'p-5 flex flex-col gap-10'}>
                 <div className={'px-4 sm:px-10 md:px-20 lg:px-44 w-full flex justify-center items-center gap-3'}>
                     <div className={['relative flex justify-center duration-700', searchFocus ? 'w-full sm:w-[70%]' : 'w-70 sm:w-[40%]'].join(' ')}>
-                        <input className={'rounded-full outline-0 border-solid border-gray-200 border text-xs w-full h-10 py-3 pl-4 pr-20 focus:bg-blue-50 duration-500'}
+                        <input className={'rounded-full outline-0 border-solid border-gray-200 border text-xs w-full h-10 py-3 pl-4 pr-20 focus:border-gray-500 duration-500'}
                                ref={searchRef}
                                placeholder={'검색어'}
                                value={searchValue || ''}
@@ -185,26 +185,29 @@ export default function Page() {
                         <LeftMenu roles={roles}
                         />
                     </div>
-                    <div className={'w-[850px] flex flex-wrap gap-5 justify-center items-start'}>
-                        {
-                            !initLoading
-                            && !loading
-                            && data?.length === 0
-                            && <div className={'text-center text-2xl w-full py-20 text-gray-600'}>검색 결과가 없습니다.</div>
-                        }
+                    <div className={'w-[850px] flex flex-col gap-5 justify-start items-center'}>
+                        <div className={'w-full'}>
+                            <Notices data={noticeList} />
+                        </div>
+                        <div className={'w-full flex flex-wrap gap-2'}>
+                            {
+                                !initLoading
+                                && !loading
+                                && data?.length === 0
+                                && <div className={'text-center text-2xl w-full py-20 text-gray-600'}>검색 결과가 없습니다.</div>
+                            }
 
-                        <Notices data={noticeList} />
-
-                        {
-                            data
-                            && data?.length > 0
-                            && data.map((item, index) => {
-                                if(!item) return;
-                                return (
-                                    <BoardComponent key={'boardsummary' + index} {...item} />
-                                )
-                            })
-                        }
+                            {
+                                data
+                                && data?.length > 0
+                                && data.map((item, index) => {
+                                    if(!item) return;
+                                    return (
+                                        <BoardComponent key={'boardsummary' + index} {...item} />
+                                    )
+                                })
+                            }
+                        </div>
                     </div>
                 </div>
                 <div className={'relative'}>

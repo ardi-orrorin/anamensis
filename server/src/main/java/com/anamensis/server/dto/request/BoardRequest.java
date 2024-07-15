@@ -17,6 +17,7 @@ public class BoardRequest {
         private String value;
         private long categoryPk;
         private Boolean isSelf;
+        private Boolean isFavorite;
     }
 
     @Getter

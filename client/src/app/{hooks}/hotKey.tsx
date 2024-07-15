@@ -39,8 +39,15 @@ export const useRootLeftMenuHotKey = ({
     enableOnFormTags: true
   }
 
-  useHotkeys(['0'], _ => {
-    onChangeParamsHandler({type: 'isSelf', value: true})
+  useHotkeys(['0','9'], (_, handler) => {
+    switch(handler.keys?.join('')) {
+      case '0':
+        onChangeParamsHandler({type: 'isSelf', value: false})
+        break;
+      case '9':
+        onChangeParamsHandler({type: 'isFavorite', value: true})
+        break;
+    }
   }, hotkeysOption, []);
 
   useHotkeys(['shift+o', 'shift+l', 'shift+i'], (e, handler) => {

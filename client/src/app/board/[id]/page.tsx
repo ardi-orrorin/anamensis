@@ -370,14 +370,19 @@ export default function Page({params}: {params : {id: string}}) {
                     </span>
                 </div>
                 <div className={'flex flex-col sm:flex-row justify-between gap-3 h-auto border-b-2 border-solid border-blue-200 py-3'}>
-                    <button onClick={onClickFavoriteHandler}>
-                        {
-                            isFavorite
-                            ? <FontAwesomeIcon icon={faStarSolid} className={'text-yellow-600'} />
-                            : <FontAwesomeIcon icon={faStarRegular} className={'text-yellow-600'} />
-                        }
-
-                    </button>
+                    {
+                        !isNewBoard
+                        && board.isView
+                        && board.data.isPublic
+                        && board.data.isLogin
+                        && <button onClick={onClickFavoriteHandler}>
+                            {
+                                isFavorite
+                                    ? <FontAwesomeIcon icon={faStarSolid} className={'text-yellow-600'} />
+                                    : <FontAwesomeIcon icon={faStarRegular} className={'text-yellow-600'} />
+                            }
+                        </button>
+                    }
                     <BoardTitle board={board}
                                 newBoard={isNewBoard}
                                 onChange={onChangeTitleHandler}

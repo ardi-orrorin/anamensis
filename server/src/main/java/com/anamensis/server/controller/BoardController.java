@@ -59,7 +59,9 @@ public class BoardController {
             && params.getCategoryPk() == 0
             && params.getType() == null
             && params.getValue() == null
-            && !params.getIsSelf();
+            && !params.getIsSelf()
+            && params.getIsFavorite() != null
+            && !params.getIsFavorite();
 
         if(condition) {
             list = boardService.findOnePage();

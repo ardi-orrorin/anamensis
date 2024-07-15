@@ -128,7 +128,7 @@
             </if>
             <if test="params != null and params.isSelf == null or params.isSelf == false">
                 AND b.is_public = 1
-                <if test="member != null and member.id != null and member.id > 0">
+                <if test="member != null and member.id != null and member.id > 0 and !params.isFavorite">
                     OR b.id IN (SELECT b2.id
                                   FROM board b2
                                  WHERE b2.member_pk = #{member.id}
@@ -146,7 +146,13 @@
                                     </if>
                                     AND b2.is_use = 1)
                 </if>
+                <if test="params != null and params.isFavorite">
+                    AND b.id IN (SELECT bf.board_pk
+                                   FROM board_favorite bf
+                                  WHERE bf.member_pk = #{member.id})
+                </if>
             </if>
+
          ORDER BY b.id DESC
          LIMIT #{page.offset}, #{page.size}
     </select>

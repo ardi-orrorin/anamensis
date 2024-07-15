@@ -9,6 +9,7 @@ export interface BoardListParamsI {
     categoryPk? : string;
     isSelf      : boolean;
     add         : boolean;
+    isFavorite  : boolean;
     [key: string]: string | number | undefined | boolean;
 }
 

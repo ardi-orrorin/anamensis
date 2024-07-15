@@ -40,7 +40,7 @@ const BoardComponent = (props: BoardListI & {favorites: string[]}) => {
     return (
         <Link className={[
             'relative flex flex-col justify-between w-full h-[170px] border-solid border rounded shadow active:bg-blue-50 hover:shadow-xl  active:shadow-xl duration-300',
-            isFavorite ? 'border-yellow-100 hover:border-yellow-500 bg-amber-50' : 'bg-white border-gray-200 hover:border-gray-500'
+            isFavorite ? 'border-amber-200 hover:border-amber-500 bg-amber-50' : 'bg-white border-gray-200 hover:border-gray-500'
         ].join(' ')}
               href={`/board/${id}`}
               prefetch={true}

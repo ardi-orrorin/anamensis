@@ -1,23 +1,27 @@
 import {NextRequest} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
-import {PageResponse} from "@/app/{commons}/types/commons";
-import {BoardListI} from "@/app/{components}/boardComponent";
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
-import {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
 
 export async function GET() {
-    const result = await apiCall<number[]>({
-        path: '/api/board-favorites',
-        method: 'GET',
-        call: 'Server',
-        setAuthorization: true,
-        isReturnData: true,
-    })
+    try{
+        const result = await apiCall<number[]>({
+            path: '/api/board-favorites',
+            method: 'GET',
+            call: 'Server',
+            setAuthorization: true,
+            isReturnData: true,
+        })
 
-    return ExNextResponse({
-        body: JSON.stringify(result),
-        status: 200,
-    })
+        return ExNextResponse({
+            body: JSON.stringify(result),
+            status: 200,
+        })
+    } catch (e) {
+        return ExNextResponse({
+            body: JSON.stringify([]),
+            status: 200,
+        })
+    }
 }
 
 

@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -25,9 +24,6 @@ public class BoardFavoriteController {
     public Mono<List<String>> findAll(
         @AuthenticationPrincipal UserDetails userDetails
     ) {
-        if(userDetails == null) {
-            return Mono.just(List.of());
-        }
         return userService.findUserByUserId(userDetails.getUsername())
             .flatMapMany(user -> boardFavoriteService.findAllCache(user.getId()))
             .collectList();

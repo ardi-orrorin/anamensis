@@ -24,6 +24,8 @@ export interface BoardProviderI {
     setSummary: Dispatch<SetStateAction<BoardSummaryI[]>>;
     myPoint: number;
     setMyPoint: Dispatch<SetStateAction<number>>;
+    isFavorite: boolean;
+    setIsFavorite: Dispatch<SetStateAction<boolean>>
 }
 
 const BoardProvider = createContext<BoardProviderI>({} as BoardProviderI);

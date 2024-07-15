@@ -34,10 +34,13 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
     const [rateInfo, setRateInfo] = useState<RateInfoI>({} as RateInfoI);
 
+    const [isFavorite, setIsFavorite] = useState<boolean>(false);
+
     const [blockService, setBlockService] = useState<BlockService>({} as BlockService);
 
     const [waitUploadFiles, setWaitUploadFiles] = useState<TempFileI[]>([]);
     const [waitRemoveFiles, setWaitRemoveFiles] = useState<TempFileI[]>([]);
+
 
     const isNewBoard = useMemo(() => !params.id || params.id === 'new',[params.id]);
 
@@ -178,6 +181,18 @@ export default function Page({children, params} : {children: ReactNode, params: 
         }
     }
 
+    useEffect(()=>{
+        apiCall<boolean>({
+            path: '/api/board-favorites/' + params.id,
+            method: 'GET',
+            call: 'Proxy',
+            isReturnData: true
+        })
+        .then(res => {
+            setIsFavorite(res);
+        });
+    },[])
+
     // const fetchComment = useSWR(`/api/board/comment/${params.id}`, async () => {
     //     if(isNewBoard) return;
     //     return await apiCall<CommentI[]>({
@@ -219,7 +234,8 @@ export default function Page({children, params} : {children: ReactNode, params: 
                 newComment, setNewComment,
                 deleteComment, setDeleteComment,
                 summary, setSummary,
-                myPoint, setMyPoint
+                myPoint, setMyPoint,
+                isFavorite, setIsFavorite,
             }}>
                 <TempFileProvider.Provider value={{
                     waitUploadFiles, setWaitUploadFiles,

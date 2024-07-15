@@ -149,7 +149,7 @@ export default function Page() {
             <div className={'p-5 flex flex-col gap-10'}>
                 <div className={'px-4 sm:px-10 md:px-20 lg:px-44 w-full flex justify-center items-center gap-3'}>
                     <div className={['relative flex justify-center duration-700', searchFocus ? 'w-full sm:w-[70%]' : 'w-70 sm:w-[40%]'].join(' ')}>
-                        <input className={'rounded-full outline-0 border-solid border-gray-200 border text-xs w-full h-10 py-3 pl-4 pr-20 focus:bg-blue-50 duration-500'}
+                        <input className={'rounded-full outline-0 border-solid border-gray-200 border text-xs w-full h-10 py-3 pl-4 pr-20 focus:border-gray-500 duration-500'}
                                ref={searchRef}
                                placeholder={'검색어'}
                                value={searchValue || ''}

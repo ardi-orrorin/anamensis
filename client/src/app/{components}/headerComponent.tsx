@@ -11,7 +11,7 @@ const HeaderComponent = (props: BoardListI) => {
         , writer, membersOnly
     } = props;
     return (
-        <div className={'flex w-full h-[55px] min-h[55px] max-h-[55px] justify-between px-3 items-center'}>
+        <div className={'pt-2 flex w-full h-[55px] min-h[55px] max-h-[55px] justify-between px-3 items-center'}>
             <div className={'h-auto flex flex-col gap-1'}>
                 <span className={'flex gap-2 text-xs text-blue-700'}>
                     <span className={''}>

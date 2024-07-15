@@ -54,16 +54,18 @@ const AlttuelBoardComponent = (props: BoardListI) => {
             <div className={'w-full h-full flex flex-col justify-between'}>
                 <HeaderComponent {...props} />
                 <div className={'flex flex-col gap-1 w-full justify-between'}>
-                    <div className={'px-3 flex gap-5'}>
+                    <div className={'px-3 flex flex-col gap-5'}>
                         <p className={'text-sm'}>
                             상품명 : &nbsp; {value}
                         </p>
-                        <p className={'text-xs text-red-600 font-bold'}>
-                            가격: &nbsp; {money(extraValue?.price)}
-                        </p>
-                        <p className={'text-xs text-gray-600'}>
-                            배송비: &nbsp; {money(extraValue?.deliveryFee)}
-                        </p>
+                        <div className={'flex gap-5'}>
+                            <p className={'text-xs text-red-600 font-bold'}>
+                                가격: &nbsp; {money(extraValue?.price)}
+                            </p>
+                            <p className={'text-xs text-gray-600'}>
+                                배송비: &nbsp; {money(extraValue?.deliveryFee)}
+                            </p>
+                        </div>
                     </div>
                 </div>
                 <FooterComponent {...props} />

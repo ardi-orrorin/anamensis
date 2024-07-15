@@ -185,7 +185,7 @@ export default function Page() {
                         <LeftMenu roles={roles}
                         />
                     </div>
-                    <div className={'w-[850px] flex flex-col gap-5 justify-start items-center'}>
+                    <div className={'w-[600px] flex flex-col gap-5 justify-start items-center'}>
                         <div className={'w-full'}>
                             <Notices data={noticeList} />
                         </div>

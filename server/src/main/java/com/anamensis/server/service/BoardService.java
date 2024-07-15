@@ -11,6 +11,7 @@ import com.anamensis.server.mapper.BoardIndexMapper;
 import com.anamensis.server.mapper.BoardMapper;
 import com.anamensis.server.resultMap.BoardResultMap;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -95,10 +96,11 @@ public class BoardService {
     }
 
 
+    @SneakyThrows
     public Mono<Board> save(Board board) {
         if(board.getTitle() == null || board.getTitle().isEmpty())
             return Mono.error(new RuntimeException("제목을 입력해주세요."));
-        if(board.getContent() == null || board.getContent().isEmpty())
+        if(board.getContent() == null || board.getContent().getJSONArray("list").isNull(0))
             return Mono.error(new RuntimeException("내용을 입력해주세요."));
 
         board.setCreateAt(LocalDateTime.now());

@@ -4,14 +4,10 @@ package com.anamensis.server.dto.response;
 import com.anamensis.server.entity.Member;
 import com.anamensis.server.resultMap.BoardResultMap;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -36,7 +32,7 @@ public class BoardResponse implements Serializable {
 
         private String writer;
 
-        private Object body;
+        private java.util.List<Object> body;
 
         private String profileImage;
 
@@ -56,6 +52,7 @@ public class BoardResponse implements Serializable {
 
         private boolean membersOnly;
 
+        @SneakyThrows
         public static List from(BoardResultMap.Board board) {
 
             List.ListBuilder builder = List.builder()
@@ -71,7 +68,7 @@ public class BoardResponse implements Serializable {
                     .isPublic(board.getBoard().getIsPublic())
                     .membersOnly(board.getBoard().isMembersOnly());
 
-            builder.body(board.getBoard().getContent().get("list"));
+            builder.body(board.getBoard().getContent().getJSONArray("list").toList());
 
             if (board.getFile().getFilePath() != null) {
                 builder.profileImage(board.getFile().getFilePath() + board.getFile().getFileName());
@@ -79,6 +76,7 @@ public class BoardResponse implements Serializable {
             return builder.build();
         }
 
+        @SneakyThrows
         public static List from(BoardResultMap.List board) {
 
             List.ListBuilder builder = List.builder()
@@ -94,7 +92,7 @@ public class BoardResponse implements Serializable {
                     .isPublic(board.getBoard().getIsPublic())
                     .membersOnly(board.getBoard().isMembersOnly())
                     .profileImage(board.getProfile())
-                    .body(board.getBoard().getContent().get("list"));
+                    .body(board.getBoard().getContent().getJSONArray("list").toList());
 
             return builder.build();
         }
@@ -141,7 +139,7 @@ public class BoardResponse implements Serializable {
                     .id(board.getId())
                     .title(board.getBoard().getTitle())
                     .categoryPk(board.getBoard().getCategoryPk())
-                    .content(board.getBoard().getContent())
+                    .content(board.getBoard().getContent().toMap())
                     .writer(board.getMember().getUserId())
                     .viewCount(board.getBoard().getViewCount())
                     .createdAt(board.getBoard().getCreateAt())
@@ -164,57 +162,57 @@ public class BoardResponse implements Serializable {
     }
 
 
-    @Getter
-    @Builder
-    @Setter
-    public static class ExContent {
-
-        private long id;
-
-        private String title;
-
-        private long categoryPk;
-
-        private Map<String, Object> content;
-
-        private String writer;
-
-        private String profileImage;
-
-        private long viewCount;
-
-        private long rate;
-
-        private java.util.List<BoardCommentResponse.Comment> comments;
-
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-        private LocalDateTime createdAt;
-
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-        private LocalDateTime updatedAt;
-
-        private Boolean isPublic;
-
-        private boolean membersOnly;
-
-        public static ExContent from(Content board, java.util.List<BoardCommentResponse.Comment> comments) {
-            ExContent.ExContentBuilder builder = ExContent.builder()
-                    .id(board.getId())
-                    .title(board.getTitle())
-                    .categoryPk(board.getCategoryPk())
-                    .content(board.getContent())
-                    .writer(board.getWriter())
-                    .viewCount(board.getViewCount())
-                    .createdAt(board.getCreatedAt())
-                    .comments(comments)
-                    .profileImage(board.getProfileImage())
-                    .updatedAt(board.getUpdatedAt())
-                    .isPublic(board.getIsPublic())
-                    .membersOnly(board.isMembersOnly());
-
-            return builder.build();
-        }
-    }
+//    @Getter
+//    @Builder
+//    @Setter
+//    public static class ExContent {
+//
+//        private long id;
+//
+//        private String title;
+//
+//        private long categoryPk;
+//
+//        private Map<String, Object> content;
+//
+//        private String writer;
+//
+//        private String profileImage;
+//
+//        private long viewCount;
+//
+//        private long rate;
+//
+//        private java.util.List<BoardCommentResponse.Comment> comments;
+//
+//        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+//        private LocalDateTime createdAt;
+//
+//        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+//        private LocalDateTime updatedAt;
+//
+//        private Boolean isPublic;
+//
+//        private boolean membersOnly;
+//
+//        public static ExContent from(Content board, java.util.List<BoardCommentResponse.Comment> comments) {
+//            ExContent.ExContentBuilder builder = ExContent.builder()
+//                    .id(board.getId())
+//                    .title(board.getTitle())
+//                    .categoryPk(board.getCategoryPk())
+//                    .content(board.getContent())
+//                    .writer(board.getWriter())
+//                    .viewCount(board.getViewCount())
+//                    .createdAt(board.getCreatedAt())
+//                    .comments(comments)
+//                    .profileImage(board.getProfileImage())
+//                    .updatedAt(board.getUpdatedAt())
+//                    .isPublic(board.getIsPublic())
+//                    .membersOnly(board.isMembersOnly());
+//
+//            return builder.build();
+//        }
+//    }
 
 
     @Getter

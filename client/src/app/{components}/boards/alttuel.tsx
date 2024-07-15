@@ -29,7 +29,7 @@ const AlttuelBoardComponent = (props: BoardListI) => {
 
     return (
         <div className={'flex h-full'}>
-            <div className={'min-w-[30%] max-w-[30%] sm:min-w-[30%] sm:max-w-[30%] h-full'}>
+            <div className={'min-w-[90px] max-w-[90px] sm:min-w-[120px] sm:max-w-[120px] h-full'}>
                 <Image className={'w-full h-full object-cover'}
                        src={defaultNoImg(extraValue?.img?.replace(/(\.[^.]+)$/, '_thumb$1'))}
                        width={80}

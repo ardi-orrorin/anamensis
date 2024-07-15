@@ -79,11 +79,11 @@ const LeftMenu = ({
                         }
                         {
                             roles.length > 0
-                            && <button className={'flex py-2 px-5 w-full justify-between items-center text-xs hover:bg-gray-100 duration-500'}
+                            && <button className={'flex py-2 px-5 w-full justify-between items-center text-xs hover:bg-gray-100 duration-500 outline-0'}
                                        onClick={() => onChangeParamsHandler({type: 'isFavorite', value: true})}
                           >
-                                <span>
-                                    북마크
+                                <span >
+                                     즐겨 찾기
                                 </span>
                             <HotKeybtn hotkey={['9']} />
                           </button>

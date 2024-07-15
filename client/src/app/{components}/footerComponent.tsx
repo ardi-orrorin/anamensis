@@ -17,7 +17,7 @@ const FooterComponent = (props: BoardListI) => {
         : moment(createdAt).format('YYYY-MM-DD HH:mm');
 
     return (
-        <div className={'px-3 h-[30px] min-h[30px] max-h-[30px] flex justify-between items-center text-xs text-gray-500'}>
+        <div className={'px-3 pb-2 h-[30px] min-h[30px] max-h-[30px] flex justify-between items-center text-xs text-gray-500'}>
             <div className={'flex gap-3 items-center'}>
                 <span className={'flex gap-1 items-center'}>
                     <FontAwesomeIcon icon={faEye} />

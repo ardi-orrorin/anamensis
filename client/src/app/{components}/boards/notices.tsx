@@ -28,7 +28,7 @@ export default Notices;
 
 const Row = ({data}: {data: NoticeType}) => {
     return (
-        <Link className={'w-full py-2 px-4 flex justify-between shadow hover:shadow-md duration-300 border-solid border border-gray-200 rounded'}
+        <Link className={'w-full py-2 px-4 flex justify-between shadow hover:shadow-md duration-300 border-solid border border-gray-200 hover:border-gray-500 rounded'}
               href={'/board/' + data.id}
         >
             <div className={'flex gap-1 text-sm text-gray-600'}>

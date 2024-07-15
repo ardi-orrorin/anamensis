@@ -29,32 +29,19 @@ const AlttuelBoardComponent = (props: BoardListI) => {
 
     return (
         <div className={'flex h-full'}>
-            <div className={'relative min-w-[30%]'}>
+            <div className={'min-w-[30%] max-w-[30%] sm:min-w-[30%] sm:max-w-[30%] h-full'}>
                 <Image className={'w-full h-full object-cover'}
                        src={defaultNoImg(extraValue?.img?.replace(/(\.[^.]+)$/, '_thumb$1'))}
                        width={80}
                        height={80}
                        alt={''}
                 />
-                <div className={'absolute z-10 left-2 bottom-2 flex flex-wrap gap-2'}>
-                    {
-                        extraValue?.tags
-                        && extraValue?.tags?.length > 0
-                            ? extraValue?.tags?.map((tag, index) =>
-                                <label key={index} className={'bg-gray-500 px-2 py-1 text-xs text-white'}>
-                                    {tag}
-                                </label>
-                            )
-                            : <label className={'bg-gray-500 px-2 py-1 text-xs text-white'}>
-                                No Tag
-                            </label>
-                    }
-                </div>
+
             </div>
             <div className={'w-full h-full flex flex-col justify-between'}>
                 <HeaderComponent {...props} />
-                <div className={'flex flex-col gap-1 w-full justify-between'}>
-                    <div className={'px-3 flex flex-col gap-5'}>
+                <div className={'flex flex-col px-3 py-1 gap-1 w-full justify-between overflow-y-auto'}>
+                    <div className={'flex flex-col gap-1 justify-between'}>
                         <p className={'text-sm'}>
                             상품명 : &nbsp; {value}
                         </p>
@@ -66,6 +53,20 @@ const AlttuelBoardComponent = (props: BoardListI) => {
                                 배송비: &nbsp; {money(extraValue?.deliveryFee)}
                             </p>
                         </div>
+                    </div>
+                    <div className={'flex flex-wrap gap-2'}>
+                        {
+                            extraValue?.tags
+                            && extraValue?.tags?.length > 0
+                                ? extraValue?.tags?.map((tag, index) =>
+                                    <label key={index} className={'text-gray-500 text-xs'}>
+                                        {tag}
+                                    </label>
+                                )
+                                : <label className={'text-gray-500 text-xs'}>
+                                    No Tag
+                                </label>
+                        }
                     </div>
                 </div>
                 <FooterComponent {...props} />

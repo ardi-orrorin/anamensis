@@ -14,6 +14,7 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useRootHotKey} from "@/app/{hooks}/hotKey";
 import Notices, {NoticeType} from "@/app/{components}/boards/notices";
+import {preload} from "swr";
 
 export type DynamicPage = {
     isEndOfList: boolean;
@@ -36,6 +37,8 @@ export default function Page() {
         isVisible  : false,
     });
 
+    const [favorites, setFavorites] = useState<string[]>([]);
+
     const [searchParams, setSearchParams] = useState<BoardListParamsI>({
         page: 1,
         size: pageSize,
@@ -47,6 +50,18 @@ export default function Page() {
     const searchRef = useRef<HTMLInputElement>(null);
 
     const fetchDebounce = createDebounce(100);
+
+    preload('/api/board-favorites', async () => {
+        return await apiCall<any, boolean>({
+            path: '/api/board-favorites',
+            method: 'GET',
+            isReturnData: true
+        })
+    })
+    .then(res => {
+        if(!res) return;
+        setFavorites(res);
+    })
 
     useEffect(()=> {
         apiCall<NoticeType[]>({
@@ -185,7 +200,7 @@ export default function Page() {
                         <LeftMenu roles={roles}
                         />
                     </div>
-                    <div className={'w-[850px] flex flex-col gap-5 justify-start items-center'}>
+                    <div className={'w-[600px] flex flex-col gap-5 justify-start items-center'}>
                         <div className={'w-full'}>
                             <Notices data={noticeList} />
                         </div>
@@ -203,7 +218,7 @@ export default function Page() {
                                 && data.map((item, index) => {
                                     if(!item) return;
                                     return (
-                                        <BoardComponent key={'boardsummary' + index} {...item} />
+                                        <BoardComponent key={'boardsummary' + index} {...{...item, favorites}} />
                                     )
                                 })
                             }

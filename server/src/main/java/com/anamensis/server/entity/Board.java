@@ -3,10 +3,9 @@ package com.anamensis.server.entity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.json.JSONObject;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 
 @Getter
 @Setter
@@ -16,7 +15,7 @@ public class Board {
     private long categoryPk;
     private long memberPk;
     private String title;
-    private Map<String, Object> content;
+    private JSONObject content;
     private long rate;
     private long viewCount;
     private LocalDateTime createAt;

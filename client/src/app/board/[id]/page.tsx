@@ -5,9 +5,16 @@ import {ChangeEvent, useCallback, useContext, useEffect, useMemo, useRef, useSta
 import {HtmlElements} from "@/app/board/{components}/block/type/Types";
 import {BlockI, BoardI, Category} from "@/app/board/{services}/types";
 import {blockTypeList} from "@/app/board/{components}/block/list";
-import {faDownLeftAndUpRightToCenter, faUpRightAndDownLeftFromCenter} from "@fortawesome/free-solid-svg-icons";
+import {
+    faDownLeftAndUpRightToCenter, faStar as faStarSolid,
+    faUpRightAndDownLeftFromCenter
+} from "@fortawesome/free-solid-svg-icons";
+
+import {faStar as faStarRegular} from "@fortawesome/free-regular-svg-icons";
+
+
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import apiCall from "@/app/{commons}/func/api";
+import apiCall, {ApiCallProps} from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import SubTextMenu from "@/app/board/{components}/SubTextMenu";
 import Comment from "@/app/board/[id]/{components}/comment";
@@ -39,6 +46,7 @@ export default function Page({params}: {params : {id: string}}) {
     const {
         board, setBoard
         , rateInfo, setRateInfo
+        , isFavorite, setIsFavorite
     } = useContext(BoardProvider);
 
     const {
@@ -316,6 +324,24 @@ export default function Page({params}: {params : {id: string}}) {
         });
     }
 
+    const onClickFavoriteHandler = async () => {
+        const options: ApiCallProps = isFavorite ? {
+            path: '/api/board-favorites/' + params.id,
+            method: 'DELETE',
+            isReturnData: true
+        } : {
+            path: '/api/board-favorites',
+            method: 'POST',
+            body: {id: params.id},
+            isReturnData: true
+        }
+        await apiCall(options)
+            .then(res => {
+                setIsFavorite(!isFavorite);
+                console.log(!isFavorite)
+            });
+    }
+
     useBoardHotKey({
         blockService,
         board,
@@ -344,6 +370,19 @@ export default function Page({params}: {params : {id: string}}) {
                     </span>
                 </div>
                 <div className={'flex flex-col sm:flex-row justify-between gap-3 h-auto border-b-2 border-solid border-blue-200 py-3'}>
+                    {
+                        !isNewBoard
+                        && board.isView
+                        && board.data.isPublic
+                        && board.data.isLogin
+                        && <button onClick={onClickFavoriteHandler}>
+                            {
+                                isFavorite
+                                    ? <FontAwesomeIcon icon={faStarSolid} className={'text-yellow-600'} />
+                                    : <FontAwesomeIcon icon={faStarRegular} className={'text-yellow-600'} />
+                            }
+                        </button>
+                    }
                     <BoardTitle board={board}
                                 newBoard={isNewBoard}
                                 onChange={onChangeTitleHandler}

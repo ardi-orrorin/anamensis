@@ -28,7 +28,7 @@ const AlbumBoardComponent = (props: BoardListI) => {
     return (
         <>
             <div className={'flex h-full'}>
-                <div className={'relative min-w-[30%] max-w-[30%] sm:min-w-[30%] sm:max-w-[30%] h-full'}>
+                <div className={'relative min-w-[90px] max-w-[90px] sm:min-w-[120px] sm:max-w-[120px] h-full'}>
                     <img className={'w-full h-full object-cover'}
                          src={defaultNoImg(extraValue?.images[extraValue.defaultIndex])}
                          alt={''}

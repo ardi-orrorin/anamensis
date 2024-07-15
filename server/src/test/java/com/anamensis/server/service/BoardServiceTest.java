@@ -7,6 +7,7 @@ import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.entity.Board;
 import com.anamensis.server.entity.Member;
 import com.anamensis.server.resultMap.BoardResultMap;
+import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -221,7 +222,7 @@ class BoardServiceTest {
         b.setCategoryPk(1);
         b.setTitle("테스트 제목 추가");
         Map<String , Object> content = Map.of("content", "테스트 내용 추가");
-        b.setContent(content);
+        b.setContent(new JSONObject(content));
 
         StepVerifier.create(bs.save(b))
                 .assertNext(board -> {
@@ -365,7 +366,7 @@ class BoardServiceTest {
                 .verifyComplete();
 
         Map<String, Object> newContent = Map.of("content", "테스트 내용 수정");
-        b.setContent(newContent);
+        b.setContent(new JSONObject(newContent));
 
         StepVerifier.create(bs.updateByPk(b))
                 .expectNext(true)

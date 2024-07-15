@@ -34,17 +34,21 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
     const [rateInfo, setRateInfo] = useState<RateInfoI>({} as RateInfoI);
 
+    const [isFavorite, setIsFavorite] = useState<boolean>(false);
+
     const [blockService, setBlockService] = useState<BlockService>({} as BlockService);
 
     const [waitUploadFiles, setWaitUploadFiles] = useState<TempFileI[]>([]);
     const [waitRemoveFiles, setWaitRemoveFiles] = useState<TempFileI[]>([]);
 
+    const [loading, setLoading] = useState<boolean>(false);
+    const [commentLoading, setCommentLoading] = useState<boolean>(false);
+
     const isNewBoard = useMemo(() => !params.id || params.id === 'new',[params.id]);
 
     const searchParams = useSearchParams();
 
-    const [loading, setLoading] = useState<boolean>(false);
-    const [commentLoading, setCommentLoading] = useState<boolean>(false);
+
 
     useEffect(() => {
         if(!isNewBoard && !board?.isView || board.isView) return;
@@ -170,6 +174,19 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
             setSummary(summaryRes);
 
+            if(!res?.data?.isLogin) return;
+
+            const isFavorite = await preload(`/api/board-favorites/${params.id}`, async () =>
+                await apiCall<boolean>({
+                    path: '/api/board-favorites/' + params.id,
+                    method: 'GET',
+                    call: 'Proxy',
+                    isReturnData: true
+                })
+            );
+
+            setIsFavorite(isFavorite);
+
         } catch (e: any) {
             alert(e.response.data);
             location.href = '/';
@@ -178,21 +195,9 @@ export default function Page({children, params} : {children: ReactNode, params: 
         }
     }
 
-    // const fetchComment = useSWR(`/api/board/comment/${params.id}`, async () => {
-    //     if(isNewBoard) return;
-    //     return await apiCall<CommentI[]>({
-    //         path: '/api/board/comment',
-    //         method: 'GET',
-    //         params: {boardPk: params.id},
-    //         call: 'Proxy'
-    //     })
-    //     .then(res => {
-    //         setComment(res.data);
-    //     })
-    //     .finally(() => {
-    //         setCommentLoading(false);
-    //     });
-    // })
+    useEffect(()=>{
+
+    },[])
 
     const fetchRate = () => {
         preload(`/api/board/rate/${params.id}`, async () => {
@@ -219,7 +224,8 @@ export default function Page({children, params} : {children: ReactNode, params: 
                 newComment, setNewComment,
                 deleteComment, setDeleteComment,
                 summary, setSummary,
-                myPoint, setMyPoint
+                myPoint, setMyPoint,
+                isFavorite, setIsFavorite,
             }}>
                 <TempFileProvider.Provider value={{
                     waitUploadFiles, setWaitUploadFiles,

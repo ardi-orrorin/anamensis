@@ -25,10 +25,11 @@ const LeftMenu = ({
         const search =
             type === 'categoryPk'
                 ? {[type]: Number(value)}
-                : type === 'isSelf'
+                : type === 'isSelf' || type === 'isFavorite'
                     ? {[type]: value === value}
                     : {type: value};
 
+        console.log(search)
 
         const params = {
             ...search,
@@ -75,6 +76,17 @@ const LeftMenu = ({
                                 </span>
                                 <HotKeybtn hotkey={['0']} />
                             </button>
+                        }
+                        {
+                            roles.length > 0
+                            && <button className={'flex py-2 px-5 w-full justify-between items-center text-xs hover:bg-gray-100 duration-500 outline-0'}
+                                       onClick={() => onChangeParamsHandler({type: 'isFavorite', value: true})}
+                          >
+                                <span >
+                                     즐겨 찾기
+                                </span>
+                            <HotKeybtn hotkey={['9']} />
+                          </button>
                         }
                     </div>
                     <div className={'w-auto text-sm'}>

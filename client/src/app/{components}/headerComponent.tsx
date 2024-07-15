@@ -3,6 +3,8 @@ import Image from "next/image";
 import {defaultProfile} from "@/app/{commons}/func/image";
 import React from "react";
 import {BoardListI} from "@/app/{components}/boardComponent";
+import {faStar} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const HeaderComponent = (props: BoardListI) => {
     const {

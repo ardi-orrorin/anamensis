@@ -18,7 +18,7 @@ export interface BoardI {
     removeFiles?    : string[];
     isPublic?       : boolean;
     membersOnly     : boolean;
-    searchText?     : string;
+    // searchText?     : string;
     writerCreatedAt : string;
 }
 

@@ -16,6 +16,7 @@
                updated_at = #{updatedAt}
          WHERE board_id   = #{boardId}
     </update>
+
     <delete id="delete">
         DELETE
           FROM board_index

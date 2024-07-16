@@ -42,6 +42,7 @@ public class BoardController {
     private final FileService fileService;
     private final BoardCommentService boardCommentService;
     private final MemberConfigSmtpService memberConfigSmtpService;
+    private final BoardIndexService boardIndexService;
 
     @PublicAPI
     @GetMapping("")
@@ -208,7 +209,10 @@ public class BoardController {
                                     .subscribe();
                             }
 
-                            boardService.saveIndex(b.getId(), board.getSearchText());
+                            board.setId(b.getId());
+                            boardIndexService.save(board.toEntity())
+                                .subscribe();
+
                         })
                         .subscribe();
                 })
@@ -240,7 +244,10 @@ public class BoardController {
             .doOnNext(r -> {
                 if(r.getStatus() != StatusType.SUCCESS) return;
 
-                boardService.updateIndex(boardPk, board.getSearchText());
+                board.setId(boardPk);
+
+                boardIndexService.update(board.toEntity())
+                    .subscribe();
 
                 if(board.getRemoveFiles().length == 0) return;
 
@@ -302,30 +309,7 @@ public class BoardController {
             });
     }
 
-    private Mono<Tuple2<PointCode, TableCode>> insertQnAPointHistory(long memberPk, int point) {
-        Mono<PointCode> qnaPointCode = pointService.selectByIdOrTableName("q&a")
-            .share()
-            .subscribeOn(Schedulers.boundedElastic());
 
-        Mono<TableCode> tableCode = tableCodeService.findByIdByTableName(0, "board")
-            .share()
-            .subscribeOn(Schedulers.boundedElastic());
-
-        return Mono.zip(qnaPointCode, tableCode)
-            .publishOn(Schedulers.boundedElastic())
-            .flatMap(t -> {
-                PointHistory ph = new PointHistory();
-                ph.setMemberPk(memberPk);
-                ph.setPointCodePk(t.getT1().getId());
-                ph.setCreateAt(LocalDateTime.now());
-                ph.setTableCodePk(t.getT2().getId());
-                ph.setTableRefPk(t.getT1().getId());
-                ph.setValue(point);
-
-                return pointHistoryService.insert(ph)
-                    .flatMap($ -> Mono.just(t));
-            });
-    }
 
     @DeleteMapping("/{id}")
     public Mono<StatusResponse> disableByPk(
@@ -360,7 +344,8 @@ public class BoardController {
                             .subscribeOn(Schedulers.boundedElastic())
                             .subscribe();
 
-                    boardService.deleteIndex(boardPk);
+                    boardIndexService.delete(boardPk)
+                        .subscribe();
                 })
                 .doOnNext(r -> {
                     if(r.getStatus() != StatusType.SUCCESS) return;
@@ -374,7 +359,32 @@ public class BoardController {
                         .subscribe();
                 });
     }
-    
+
+    private Mono<Tuple2<PointCode, TableCode>> insertQnAPointHistory(long memberPk, int point) {
+        Mono<PointCode> qnaPointCode = pointService.selectByIdOrTableName("q&a")
+            .share()
+            .subscribeOn(Schedulers.boundedElastic());
+
+        Mono<TableCode> tableCode = tableCodeService.findByIdByTableName(0, "board")
+            .share()
+            .subscribeOn(Schedulers.boundedElastic());
+
+        return Mono.zip(qnaPointCode, tableCode)
+            .publishOn(Schedulers.boundedElastic())
+            .flatMap(t -> {
+                PointHistory ph = new PointHistory();
+                ph.setMemberPk(memberPk);
+                ph.setPointCodePk(t.getT1().getId());
+                ph.setCreateAt(LocalDateTime.now());
+                ph.setTableCodePk(t.getT2().getId());
+                ph.setTableRefPk(t.getT1().getId());
+                ph.setValue(point);
+
+                return pointHistoryService.insert(ph)
+                    .flatMap($ -> Mono.just(t));
+            });
+    }
+
     private Mono<StatusResponse> updateByPk(
         long boardPk,
         BoardRequest.Create board,

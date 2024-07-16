@@ -113,6 +113,12 @@ public class BoardService {
                 .doOnNext($ -> updateCaches(0, board.getMemberPk()).subscribe());
     }
 
+
+    /**
+     * Save index.
+     * @deprecated Use {@link BoardIndexService#save(Board)}
+     *
+     */
     public void saveIndex(long boardPk, String content) {
         BoardIndex boardIndex = new BoardIndex();
         boardIndex.setBoardId(boardPk);
@@ -122,6 +128,11 @@ public class BoardService {
         boardIndexMapper.save(boardIndex);
     }
 
+    /**
+     * Update index.
+     * @deprecated Use {@link BoardIndexService#update(Board)}
+     *
+     */
     public void updateIndex(long boardPk, String content) {
         BoardIndex boardIndex = new BoardIndex();
         boardIndex.setBoardId(boardPk);
@@ -138,6 +149,12 @@ public class BoardService {
         }
     }
 
+
+    /**
+     * Delete index.
+     * @deprecated Use {@link BoardIndexService#delete(long)}
+     *
+     */
     public void deleteIndex(long boardPk) {
         boardIndexMapper.delete(boardPk);
     }

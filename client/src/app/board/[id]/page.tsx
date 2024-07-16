@@ -338,7 +338,6 @@ export default function Page({params}: {params : {id: string}}) {
         await apiCall(options)
             .then(res => {
                 setIsFavorite(!isFavorite);
-                console.log(!isFavorite)
             });
     }
 

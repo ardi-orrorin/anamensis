@@ -62,9 +62,9 @@ export interface DeleteCommentI {
 }
 
 export class Category {
-    public readonly name: string;
-    public readonly id: string;
-    public readonly roles: RoleType[];
+    public readonly name  : string;
+    public readonly id    : string;
+    public readonly roles : RoleType[];
 
     public static readonly list = [
         new Category("0", "전체 보기", [RoleType.ADMIN, RoleType.USER, RoleType.MASTER, RoleType.GUEST]),

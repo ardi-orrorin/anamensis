@@ -152,8 +152,14 @@
                                   WHERE bf.member_pk = #{member.id})
                 </if>
             </if>
-
-         ORDER BY b.id DESC
+            <choose>
+                <when test="params != null and params.type != null and params.type == 'content' and params.value != null and params.value != ''">
+                    ORDER BY bi.board_id DESC
+                </when>
+                <otherwise>
+                    ORDER BY b.id DESC
+                </otherwise>
+            </choose>
          LIMIT #{page.offset}, #{page.size}
     </select>
 

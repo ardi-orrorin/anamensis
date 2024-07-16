@@ -3,8 +3,11 @@ package com.anamensis.batch.job.boardIndex;
 import com.anamensis.batch.entity.*;
 import com.anamensis.batch.mapper.BoardIndexMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.json.JSONArray;
+import org.mybatis.spring.batch.MyBatisBatchItemWriter;
 import org.mybatis.spring.batch.MyBatisCursorItemReader;
 import org.mybatis.spring.batch.builder.MyBatisBatchItemWriterBuilder;
 import org.mybatis.spring.batch.builder.MyBatisCursorItemReaderBuilder;
@@ -12,6 +15,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.integration.async.AsyncItemProcessor;
+import org.springframework.batch.integration.async.AsyncItemWriter;
 import org.springframework.batch.item.Chunk;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.stereotype.Component;
@@ -24,6 +28,7 @@ import java.util.concurrent.Future;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class BoardIndexStep {
 
     private final SqlSessionFactory sqlSessionFactory;
@@ -32,16 +37,14 @@ public class BoardIndexStep {
 
 
     /**
-     * Board index step step.
-     * chunk size = 200의 경우 java heap size = 2G 이상 추천
+     * 성능에 따라 chunk size 10~100 추천
      *
-     * @return the step
      */
     public Step boardIndexStep(JobRepository jobRepository, PlatformTransactionManager tm) {
         boardIndexMapper.deleteAll();
 
         return new StepBuilder("board-index-step", jobRepository)
-                .<Board, Future<BoardIndex>>chunk(200, tm)
+                .<Board, Future<BoardIndex>>chunk(100, tm)
                 .reader(myBatisCursorItemReader())
                 .processor(this::asyncBoardIndexProcessor)
                 .writer(this::save)
@@ -49,19 +52,18 @@ public class BoardIndexStep {
                 .build();
     }
 
+    @SneakyThrows
     private void save(Chunk<? extends Future<BoardIndex>> futures) {
-        new MyBatisBatchItemWriterBuilder<Future<BoardIndex>>()
+
+        AsyncItemWriter<BoardIndex> asyncItemWriter = new AsyncItemWriter<>();
+
+        MyBatisBatchItemWriter<BoardIndex> builder = new MyBatisBatchItemWriterBuilder<BoardIndex>()
             .sqlSessionFactory(sqlSessionFactory)
             .statementId("com.anamensis.batch.mapper.BoardIndexMapper.save")
-            .itemToParameterConverter(boardIndexFuture -> {
-                try {
-                    return boardIndexFuture.get();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            })
-            .build()
-            .write(futures);
+            .build();
+
+        asyncItemWriter.setDelegate(builder);
+        asyncItemWriter.write(futures);
     }
 
     private MyBatisCursorItemReader<Board> myBatisCursorItemReader() {
@@ -89,6 +91,7 @@ public class BoardIndexStep {
         bi.setContent(content);
         bi.setCreatedAt(LocalDateTime.now());
         bi.setUpdatedAt(LocalDateTime.now());
+
         return bi;
     }
 

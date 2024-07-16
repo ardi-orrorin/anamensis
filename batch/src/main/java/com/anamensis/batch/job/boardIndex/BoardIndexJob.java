@@ -34,7 +34,8 @@ public class BoardIndexJob extends QuartzJobBean {
         Job job = new JobBuilder("board-index-job", jobRepository)
             .start(boardIndexStep.boardIndexStep(jobRepository, tm))
             .incrementer(new RunIdIncrementer())
-            .build();;
+            .preventRestart()
+            .build();
 
         JobParameters jobParameters = new JobParametersBuilder(this.jobExplorer)
             .getNextJobParameters(job)

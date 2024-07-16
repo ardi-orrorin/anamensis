@@ -1,6 +1,5 @@
 package com.anamensis.batch.job.boardIndex;
 
-import com.anamensis.batch.job.dummyfile.DummyFileJob;
 import org.quartz.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +9,7 @@ public class BoardIndexConfig {
     @Bean
     public Trigger boardIndexJobTrigger() {
         SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule();
-        scheduleBuilder.withRepeatCount(1);
+        scheduleBuilder.withRepeatCount(0);
         scheduleBuilder.withIntervalInSeconds(10);
 
         return TriggerBuilder.newTrigger()

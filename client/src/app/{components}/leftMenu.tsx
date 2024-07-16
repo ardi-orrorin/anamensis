@@ -79,7 +79,7 @@ const LeftMenu = ({
                         }
                         {
                             roles.length > 0
-                            && <button className={'flex py-2 px-5 w-full justify-between items-center text-xs hover:bg-gray-100 duration-500 outline-0'}
+                            && <button className={'flex py-2 px-5 w-full justify-between items-center text-xs hover:bg-amber-50 duration-500 outline-0'}
                                        onClick={() => onChangeParamsHandler({type: 'isFavorite', value: true})}
                           >
                                 <span >

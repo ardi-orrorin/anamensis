@@ -36,7 +36,7 @@ export const useRootLeftMenuHotKey = ({
 
   const hotkeysOption: Options = {
     preventDefault: true,
-    enableOnFormTags: true
+    enableOnFormTags: false,
   }
 
   useHotkeys(['0','9'], (_, handler) => {

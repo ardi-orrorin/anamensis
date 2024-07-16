@@ -1,7 +1,5 @@
 'use client';
 
-
-
 import React, {MutableRefObject, useContext, useState} from "react";
 import {faBold, faItalic, faTextSlash} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -10,7 +8,6 @@ import BoardProvider from "@/app/board/{services}/BoardProvider";
 import MenuColorItem from "@/app/board/{components}/MenuColorItem";
 import MenuFontsizeItem from "@/app/board/{components}/MenuFontsizeItem";
 import MenuItem from "@/app/board/{components}/MenuItem";
-
 
 export type ToggleEnum = 'blockMenu' | 'fontSize' | 'color' | 'backgroundColor' | 'fontStyle' | '';
 
@@ -26,8 +23,8 @@ const SubTextMenu = ({
     if(!blockService.block) return;
     const {seq, code, textStyle} = blockService.block;
 
-    if(!textStyle) return;
 
+    if(!textStyle) return;
 
     const selectFontStyle = (type: string, value:string) => {
         value = textStyle[type] === value ? '' : value;

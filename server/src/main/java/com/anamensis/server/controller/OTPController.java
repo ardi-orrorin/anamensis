@@ -1,8 +1,10 @@
 package com.anamensis.server.controller;
 
+import com.anamensis.server.dto.response.OtpResponse;
 import com.anamensis.server.entity.AuthType;
 import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.OTP;
+import com.anamensis.server.resultMap.OtpResultMap;
 import com.anamensis.server.service.OTPService;
 import com.anamensis.server.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +19,20 @@ import java.util.concurrent.atomic.AtomicReference;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/otp")
-@Slf4j
 public class OTPController {
 
     private final OTPService otpService;
     private final UserService userService;
 
     @GetMapping("")
+    public Mono<OtpResponse.Info> info(
+        @AuthenticationPrincipal UserDetails user
+    ) {
+        return otpService.selectByUserId(user.getUsername())
+                .map(OtpResponse.Info::fromOtpResultMap);
+    }
+
+    @GetMapping("generate")
     public Mono<String> generate(
             @AuthenticationPrincipal UserDetails user
     ){
@@ -53,12 +62,12 @@ public class OTPController {
             @AuthenticationPrincipal UserDetails user,
             @RequestBody Integer code
     ){
-        AtomicReference<OTP> otpAtomic = new AtomicReference<>();
+        AtomicReference<OtpResultMap> otpAtomic = new AtomicReference<>();
         return otpService.selectByUserId(user.getUsername())
                 .doOnNext(otpAtomic::set)
-                .flatMap(otp -> otpService.verify(otp.getHash(), code))
+                .flatMap(otp -> otpService.verify(otp.getOtp().getHash(), code))
                 .flatMap(result ->
-                    result ? userService.editAuth(otpAtomic.get().getMemberPk(), true, AuthType.OTP)
+                    result ? userService.editAuth(otpAtomic.get().getOtp().getMemberPk(), true, AuthType.OTP)
                            : Mono.just(false)
                 )
                 .onErrorReturn(false);

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-npm run start &
+bun run start &
 
 java -Djava.net.preferIPv4Stack=true -jar /app.jar &
 

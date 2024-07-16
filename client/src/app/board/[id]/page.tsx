@@ -2,13 +2,19 @@
 
 import Block from "@/app/board/{components}/Block";
 import {ChangeEvent, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
-import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 import {HtmlElements} from "@/app/board/{components}/block/type/Types";
 import {BlockI, BoardI, Category} from "@/app/board/{services}/types";
 import {blockTypeList} from "@/app/board/{components}/block/list";
-import {faDownLeftAndUpRightToCenter, faUpRightAndDownLeftFromCenter} from "@fortawesome/free-solid-svg-icons";
+import {
+    faDownLeftAndUpRightToCenter, faStar as faStarSolid,
+    faUpRightAndDownLeftFromCenter
+} from "@fortawesome/free-solid-svg-icons";
+
+import {faStar as faStarRegular} from "@fortawesome/free-regular-svg-icons";
+
+
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import apiCall from "@/app/{commons}/func/api";
+import apiCall, {ApiCallProps} from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import SubTextMenu from "@/app/board/{components}/SubTextMenu";
 import Comment from "@/app/board/[id]/{components}/comment";
@@ -24,6 +30,8 @@ import KeyDownEvent from "@/app/board/{services}/keyDownEvent";
 import {deleteImage, initBlock, listSort, notAvailDupCheck, updateBoard} from "@/app/board/{services}/funcs";
 import WriterInfo from "@/app/board/[id]/{components}/writerInfo";
 import {useRouter} from "next/navigation";
+import HotKeyInfo from "@/app/board/[id]/{components}/hotKeyInfo";
+import {useBoardHotKey} from "@/app/board/[id]/{hooks}/hotkey";
 
 export interface RateInfoI {
     id      : number;
@@ -38,6 +46,7 @@ export default function Page({params}: {params : {id: string}}) {
     const {
         board, setBoard
         , rateInfo, setRateInfo
+        , isFavorite, setIsFavorite
     } = useContext(BoardProvider);
 
     const {
@@ -83,7 +92,6 @@ export default function Page({params}: {params : {id: string}}) {
 
         return block;
     };
-
     const validation = useCallback(() => {
         const title = board.data.title !== '';
         const content = board.data.content.list.filter(item => item.value !== '').length > 0;
@@ -119,8 +127,6 @@ export default function Page({params}: {params : {id: string}}) {
 
         return true;
     };
-
-    if(loading) return <GlobalLoadingSpinner />;
 
     const submitHandler = async (isSave: boolean) => {
         if(!validation()) {
@@ -318,160 +324,206 @@ export default function Page({params}: {params : {id: string}}) {
         });
     }
 
+    const onClickFavoriteHandler = async () => {
+        const options: ApiCallProps = isFavorite ? {
+            path: '/api/board-favorites/' + params.id,
+            method: 'DELETE',
+            isReturnData: true
+        } : {
+            path: '/api/board-favorites',
+            method: 'POST',
+            body: {id: params.id},
+            isReturnData: true
+        }
+        await apiCall(options)
+            .then(res => {
+                setIsFavorite(!isFavorite);
+            });
+    }
+
+    useBoardHotKey({
+        blockService,
+        board,
+        setBoard,
+        fullScreen,
+        setFullScreen,
+        router,
+        blockRef
+    })
+
     if(!board?.data?.content || board.data?.content?.list?.length === 0) {
-        return <GlobalLoadingSpinner />
+        return;
     }
 
     return (
-        <>
-            <div className={'p-5 flex flex-col gap-5 justify-center items-center'}>
-                <div className={`w-full flex flex-col gap-6 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-3/5'}`}>
-                    <div className={'flex h-8 border-l-8 border-solid border-gray-500 px-2 items-center'}>
-                        <span className={'font-bold'}>
-                            {Category.findById(board.data.categoryPk.toString())?.name}
-                        </span>
-                    </div>
-                    <div className={'flex flex-col sm:flex-row justify-between gap-3 h-auto border-b-2 border-solid border-blue-200 py-3'}>
-                        <BoardTitle board={board}
-                                    newBoard={isNewBoard}
-                                    onChange={onChangeTitleHandler}
-                                    onKeyUp={e => onKeyUpHandler(e, 0)}
-                        />
-                        <div className={'flex justify-end sm:justify-start gap-2 h-10 sm:h-auto'}>
-                            {
-                                !isNewBoard &&
-                                <HeaderBtn isView={board.isView}
-                                           isWriter={board.data.isWriter || false}
-                                           isLogin={board.data.isLogin || false}
-                                           submitClickHandler={() => debounce(() => submitHandler(false))}
-                                           editClickHandler={editClickHandler}
-                                           deleteClickHandler={() => debounce(() => deleteHandler())}
-                                />
-                            }
-                            <div className={'flex gap-1'}>
-                                {
-                                    (isNewBoard || !board.isView)
-                                    && <button
-                                        className={[
-                                            'w-16 rounded h-full border-2 py-1 px-3 text-xs duration-300',
-                                            board.data.isPublic
-                                                ? 'text-blue-600 border-blue-200 hover:bg-blue-200 hover:text-white'
-                                                : 'text-red-600 border-red-200 hover:bg-red-200 hover:text-white'
-                                        ].join(' ')}
-                                        onClick={() => {
-                                            setBoard({...board, data: {...board.data, isPublic: !board.data.isPublic}});
-                                        }}
-                                    > { board.data.isPublic ? '공개' : '비공개' }
-                                  </button>
-                                }
-                                {
-                                    (isNewBoard || !board.isView)
-                                    && <button
-                                    className={[
-                                        'w-16 rounded h-full border-2 py-1 px-3 text-xs duration-300 whitespace-pre',
-                                        board.data.membersOnly
-                                            ? 'text-red-600 border-red-200 hover:bg-red-200 hover:text-white'
-                                            : 'text-blue-600 border-blue-200 hover:bg-blue-200 hover:text-white'
-                                    ].join(' ')}
-                                    onClick={() => {
-                                        setBoard({...board, data: {...board.data, membersOnly: !board.data.membersOnly}});
-                                    }}
-                                  > { board.data.membersOnly ? '회원\n 전용' : '모두' }
-                                  </button>
-                                }
-                                <button
-                                    className={'w-14 rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
-                                    onClick={() => setFullScreen(!fullScreen)}>
-                                    {
-                                        fullScreen
-                                        ? <FontAwesomeIcon className={'text-blue-400'}
-                                                           icon={faDownLeftAndUpRightToCenter}
-                                        />
-                                        : <FontAwesomeIcon className={'text-blue-400'}
-                                                           icon={faUpRightAndDownLeftFromCenter}
-                                        />
-                                    }
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        {
-                            !isNewBoard
-                            && board.isView
-                            && <BoardInfo {...board}/>
-                        }
-                    </div>
-                    <div className={['flex flex-col', board.isView ? 'gap-2' : 'gap-4'].join(' ')}>
-                        {
-                            board.data.content.list.map((item, index) => {
-                              return <Block key={'block' + index}
-                                              blockRef={blockRef}
-                                              onChangeHandler={e => {
-                                                  onChangeHandler(e, item.seq)
-                                              }}
-                                              onKeyDownHandler={e => {
-                                                  onKeyDownHandler(e, item.seq)
-                                              }}
-                                              onKeyUpHandler={e => {
-                                                  onKeyUpHandler(e, item.seq)
-                                              }}
-                                              onClickAddHandler={() => addBlockHandler(item.seq)}
-                                              onClickDeleteHandler={onClickDeleteHandler}
-                                              {...item}
-                                />
-                            })
-                        }
-                    </div>
-                    <div>
-                        {
-                            isNewBoard
-                            && <div className={'flex gap-1 justify-end mt-5'}>
-                            <button
-                              className={'w-full rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
-                              onClick={() => debounce(() => submitHandler(true))}
-                            >작성
-                            </button>
-                          </div>
-                        }
-                        {
-                            !isNewBoard
-                            && !board.isView
-                            && <div className={'flex gap-1 justify-end mt-5'}>
-                            <button
-                              className={'w-full rounded h-10 border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
-                              onClick={() => debounce(() => submitHandler(false))}
-                            >저장
-                            </button>
-                          </div>
-                        }
-                    </div>
-                    <Rate newBoard={isNewBoard}
-                          onClick={() => debounce(onChangeRateHandler)}
+        <div className={'p-5 flex flex-col gap-5 justify-center items-center'}>
+            <div className={`relative w-full flex flex-col gap-6 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-3/5'}`}>
+                <div className={[`absolute z-10 top-1/4 -right-52 hidden`, fullScreen ? 'lg:hidden' : 'lg:block'].join(' ')}>
+                    <HotKeyInfo isNewBoard={isNewBoard}
+                                isView={board?.isView}
                     />
+                </div>
+                <div className={'flex h-8 border-l-8 border-solid border-gray-500 px-2 items-center'}>
+                    <span className={'font-bold'}>
+                        {Category.findById(board.data?.categoryPk.toString())?.name}
+                    </span>
+                </div>
+                <div className={'flex flex-col sm:flex-row justify-between gap-3 h-auto border-b-2 border-solid border-blue-200 py-3'}>
                     {
                         !isNewBoard
                         && board.isView
-                        && <WriterInfo />
+                        && board.data.isPublic
+                        && board.data.isLogin
+                        && <button onClick={onClickFavoriteHandler}>
+                            {
+                                isFavorite
+                                    ? <FontAwesomeIcon icon={faStarSolid} className={'text-yellow-600'} />
+                                    : <FontAwesomeIcon icon={faStarRegular} className={'text-yellow-600'} />
+                            }
+                        </button>
                     }
+                    <BoardTitle board={board}
+                                newBoard={isNewBoard}
+                                onChange={onChangeTitleHandler}
+                                onKeyUp={e => onKeyUpHandler(e, 0)}
+                    />
+                    <div className={'flex justify-end sm:justify-start gap-2 h-10 sm:h-auto'}>
+                        {
+                            !isNewBoard &&
+                            <HeaderBtn isView={board.isView}
+                                       isWriter={board.data?.isWriter || false}
+                                       isLogin={board.data?.isLogin || false}
+                                       submitClickHandler={() => debounce(() => submitHandler(false))}
+                                       editClickHandler={editClickHandler}
+                                       deleteClickHandler={() => debounce(() => deleteHandler())}
+                            />
+                        }
+                        <div className={'flex gap-1'}>
+                            {
+                                (isNewBoard || !board.isView)
+                                && <button
+                                    className={[
+                                        'w-16 rounded h-full border-2 py-1 px-3 text-xs duration-300',
+                                        board.data?.isPublic
+                                            ? 'text-blue-600 border-blue-200 hover:bg-blue-200 hover:text-white'
+                                            : 'text-red-600 border-red-200 hover:bg-red-200 hover:text-white'
+                                    ].join(' ')}
+                                    onClick={() => {
+                                        setBoard({...board, data: {...board.data, isPublic: !board.data.isPublic}});
+                                    }}
+                                > { board.data?.isPublic ? '공개' : '비공개' }
+                              </button>
+                            }
+                            {
+                                (isNewBoard || !board.isView)
+                                && <button
+                                className={[
+                                    'w-16 rounded h-full border-2 py-1 px-3 text-xs duration-300 whitespace-pre',
+                                    board.data?.membersOnly
+                                        ? 'text-red-600 border-red-200 hover:bg-red-200 hover:text-white'
+                                        : 'text-blue-600 border-blue-200 hover:bg-blue-200 hover:text-white'
+                                ].join(' ')}
+                                onClick={() => {
+                                    setBoard({...board, data: {...board.data, membersOnly: !board.data.membersOnly}});
+                                }}
+                              > { board.data?.membersOnly ? '회원\n 전용' : '모두' }
+                              </button>
+                            }
+                            <button
+                                className={'w-14 rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                                onClick={() => setFullScreen(!fullScreen)}>
+                                {
+                                    fullScreen
+                                    ? <FontAwesomeIcon className={'text-blue-400'}
+                                                       icon={faDownLeftAndUpRightToCenter}
+                                    />
+                                    : <FontAwesomeIcon className={'text-blue-400'}
+                                                       icon={faUpRightAndDownLeftFromCenter}
+                                    />
+                                }
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div>
                     {
-                        !commentLoading
-                        && <Comment />
+                        !isNewBoard
+                        && board.isView
+                        && <BoardInfo {...board}/>
+                    }
+                </div>
+                <div className={['flex flex-col', board.isView ? 'gap-2' : 'gap-4'].join(' ')}>
+                    {
+                        board.data?.content?.list.map((item, index) => {
+                          return <Block key={'block' + index}
+                                          blockRef={blockRef}
+                                          onChangeHandler={e => {
+                                              onChangeHandler(e, item.seq)
+                                          }}
+                                          onKeyDownHandler={e => {
+                                              onKeyDownHandler(e, item.seq)
+                                          }}
+                                          onKeyUpHandler={e => {
+                                              onKeyUpHandler(e, item.seq)
+                                          }}
+                                          onClickAddHandler={() => addBlockHandler(item.seq)}
+                                          onClickDeleteHandler={onClickDeleteHandler}
+                                          {...item}
+                            />
+                        })
                     }
                 </div>
                 <div>
                     {
-                        !board.isView
-
-                        && blockService.blockMenu === 'openTextMenu'
-                        && <SubTextMenu blockRef={blockRef}/>
+                        isNewBoard
+                        && <div className={'flex gap-1 justify-end mt-5'}>
+                        <button
+                          className={'w-full rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                          onClick={() => debounce(() => submitHandler(true))}
+                        >작성
+                        </button>
+                      </div>
+                    }
+                    {
+                        !isNewBoard
+                        && !board.isView
+                        && <div className={'flex gap-1 justify-end mt-5'}>
+                        <button
+                          className={'w-full rounded h-10 border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                          onClick={() => debounce(() => submitHandler(false))}
+                        >저장
+                        </button>
+                      </div>
                     }
                 </div>
+                <Rate newBoard={isNewBoard}
+                      onClick={() => debounce(onChangeRateHandler)}
+                />
                 {
-                    (isNewBoard || !board.isView) && (!isNewBoard || !board.isView)
-                    && <div className={'h-60'} />
+                    !isNewBoard
+                    && board.isView
+                    && <WriterInfo />
+                }
+                {
+                    !commentLoading
+                    && <Comment isNewBoard={isNewBoard}
+                                params={params}
+                    />
                 }
             </div>
-        </>
+            <div>
+                {
+                    !board.isView
+
+                    && blockService.blockMenu === 'openTextMenu'
+                    && <SubTextMenu blockRef={blockRef}/>
+                }
+            </div>
+            {
+                (isNewBoard || !board.isView) && (!isNewBoard || !board.isView)
+                && <div className={'h-60'} />
+            }
+
+        </div>
     )
 }

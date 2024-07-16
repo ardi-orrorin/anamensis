@@ -1,14 +1,20 @@
 'use client';
 
-import React, {useEffect, useState} from "react";
+import React, {Children, useEffect, useState} from "react";
 import ModalProvider, {ModalI} from "@/app/user/{services}/modalProvider";
 import LeftNavBar from "@/app/user/{components}/LeftNavBar";
 import Contents from "@/app/user/{components}/Contents";
-import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import ModalBackground from "@/app/user/{components}/ModalBackground";
+import UserProvider, {AttendInfoI, BoardSummaryI, PointSummaryI} from "@/app/user/{services}/userProvider";
+import {preload} from "swr";
+import apiCall from "@/app/{commons}/func/api";
 
 
-export default function Layout({children}: {children: React.ReactNode}) {
+export default function Layout({children}: {children: React.ReactNode & {test:'1'}}) {
+
+    const [boardSummary, setBoardSummary] = useState<BoardSummaryI[]>([]);
+    const [attendInfo, setAttendInfo] = useState<AttendInfoI>({} as AttendInfoI);
+    const [pointSummary, setPointSummary] = useState<PointSummaryI[]>([]);
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [modal, setModal] = useState<ModalI>({} as ModalI);
@@ -23,22 +29,53 @@ export default function Layout({children}: {children: React.ReactNode}) {
         setIsModalMode(isModalMode);
     },[isModalMode]);
 
+    preload('/api/board/summary', async () => {
+        return await apiCall<BoardSummaryI[]>({
+            path: "/api/board/summary",
+            params: {page:1, size: 8},
+            method: "GET",
+            isReturnData: true
+        })
+    })
+    .then((data) => {
+        setBoardSummary(data);
+    });
+
+    preload('/api/user/point-history/summary', async () => {
+        return await apiCall<PointSummaryI[]>({
+            path: "/api/user/point-history/summary",
+            params: {page:1, size: 8},
+            method: "GET",
+            isReturnData: true,
+        })
+    })
+    .then((data) => {
+        setPointSummary(data);
+    });
+
+
     return (
-        <main className={'flex items-start'}>
-            <ModalProvider.Provider value={{modal, setModal}}>
-                <LeftNavBar isOpen={isOpen}
-                            setIsOpen={setIsOpen}
-                            isModalMode={isModalMode}
-                            setIsModalMode={setIsModalMode}
-                />
-                <Contents isOpen={isOpen} setIsOpen={setIsOpen} isModalMode={isModalMode}>
-                    {children}
-                </Contents>
-                {
-                    modal.component
-                }
-                <ModalBackground isOpen={modal.isOpen} />
-            </ModalProvider.Provider>
-        </main>
+        <UserProvider.Provider value={{
+            boardSummary, setBoardSummary,
+            attendInfo, setAttendInfo,
+            pointSummary, setPointSummary
+        }}>
+            <main className={'flex items-start'}>
+                <ModalProvider.Provider value={{modal, setModal}}>
+                    <LeftNavBar isOpen={isOpen}
+                                setIsOpen={setIsOpen}
+                                isModalMode={isModalMode}
+                                setIsModalMode={setIsModalMode}
+                    />
+                    <Contents isOpen={isOpen} setIsOpen={setIsOpen} isModalMode={isModalMode}>
+                        {children}
+                    </Contents>
+                    {
+                        modal.component
+                    }
+                    <ModalBackground isOpen={modal.isOpen} />
+                </ModalProvider.Provider>
+            </main>
+        </UserProvider.Provider>
     )
 }

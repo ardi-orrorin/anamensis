@@ -18,7 +18,7 @@ const config: Config = {
       },
       fontSize: {
         "xs2" : "0.7rem",
-        "xss" : "0.3rem",
+        "xss" : "0.5rem",
       }
     },
   },

@@ -13,22 +13,13 @@
                 rate, view_count, create_at,
                 member_pk, isAdsense, update_at,
                 is_public, members_only)
-        VALUES (#{categoryPk}, #{title}, #{content, typeHandler=JsonTypeHandler},
+        VALUES (#{categoryPk}, #{title}, #{content, typeHandler=JsonObjectTypeHandler},
                 #{rate}, #{viewCount}, #{createAt},
                 #{memberPk}, #{isAdsense}, #{updateAt}, #{isPublic}, #{membersOnly})
     </insert>
-    <select id="count" resultType="long">
-        SELECT COUNT(*)
-          FROM board
-         WHERE is_use = 1
-           <if test="categoryPk != 0">
-               AND category_pk = #{categoryPk}
-           </if>
-           <if test="title != null">
-               AND title LIKE CONCAT('%', #{title}, '%')
-           </if>
-    </select>
-    <select id="findList" resultMap="BoardResultMapBoard">
+
+    <!-- todo: findList 안정성 확인 후 삭제 예정 -start -->
+    <select id="findListDelete" resultMap="BoardResultMapBoard">
         SELECT *
              , m.id AS member_pk
              , b.id AS board_pk
@@ -90,6 +81,82 @@
          ORDER BY b.id DESC
          LIMIT #{page.offset}, #{page.size}
     </select>
+    <!-- todo: findList 안정성 확인 후 삭제 예정 -end -->
+
+    <select id="findList" resultMap="BoardResultMapBoardList">
+        SELECT *
+             , b.id AS board_pk
+             , (SELECT IFNULL((
+                    SELECT count
+                      FROM board_comment_count bcc
+                     WHERE bcc.board_pk  = b.id)
+                , 0)
+             ) AS comment_count
+             , (SELECT m.name
+                  FROM member m
+                 WHERE b.member_pk = m.id
+             ) AS writer
+             , (SELECT concat(f.file_path, f.file_name)
+                  FROM file f
+                 WHERE f.table_ref_pk  = b.member_pk
+                   AND f.table_code_pk = (SELECT tc.id
+                                            FROM table_code tc
+                                           WHERE tc.table_name = 'member')
+                   AND f.is_use        = 1
+             ) AS profile
+          FROM board b
+            <if test="params != null and params.type != null and params.type == 'content' and params.value != null and params.value != ''">
+                JOIN board_index bi
+                  ON bi.board_id = b.id
+                 AND bi.content LIKE CONCAT('%', #{params.value}, '%')
+            </if>
+            <if test="params != null and params.type != null and params.type != '' and params.value != null and params.value != ''">
+                <choose>
+                    <when test="params != null and params.type == 'memberId'">
+                        JOIN member m2
+                          ON b.member_pk = m2.id
+                         AND m2.user_id LIKE CONCAT('%', #{params.value}, '%')
+                    </when>
+                </choose>
+            </if>
+         WHERE b.is_use = 1
+            <if test="params != null and params.isSelf != null and params.isSelf">
+                AND b.member_pk = #{member.id}
+            </if>
+            <if test="params != null and params.categoryPk != 0">
+                AND b.category_pk = #{params.categoryPk}
+            </if>
+            <if test="params != null and params.isSelf == null or params.isSelf == false">
+                AND b.is_public = 1
+                <if test="member != null and member.id != null and member.id > 0 and !params.isFavorite">
+                    OR b.id IN (SELECT b2.id
+                                  FROM board b2
+                                 WHERE b2.member_pk = #{member.id}
+                                    <if test="params != null and params.categoryPk != 0">
+                                        AND b2.category_pk = #{params.categoryPk}
+                                    </if>
+                                    <if test="params != null
+                                         and params.type != null
+                                         and params.type != ''
+                                         and params.value != null
+                                         and params.value != ''
+                                         and params.type == 'title'"
+                                    >
+                                        AND b.title LIKE CONCAT('%', #{params.value}, '%')
+                                    </if>
+                                    AND b2.is_use = 1)
+                </if>
+                <if test="params != null and params.isFavorite">
+                    AND b.id IN (SELECT bf.board_pk
+                                   FROM board_favorite bf
+                                  WHERE bf.member_pk = #{member.id})
+                </if>
+            </if>
+
+         ORDER BY b.id DESC
+         LIMIT #{page.offset}, #{page.size}
+    </select>
+
     <select id="findByPk" resultMap="BoardResultMapBoard" parameterType="Long">
         SELECT *
              , m.create_at as member_create_at
@@ -107,11 +174,26 @@
     </select>
     <select id="findByMemberPk" resultMap="BoardResultMapBoard">
         SELECT *
+             , id as board_pk
           FROM board
          WHERE member_pk = #{memberPk}
            AND is_use  = 1
          ORDER BY id DESC
          LIMIT #{page.offset}, #{page.size}
+    </select>
+    <select id="findNotice" resultMap="BoardResultMapBoardNotice">
+        SELECT *
+             , b.id AS board_pk
+             , (SELECT m.user_id
+                  FROM member m
+                 WHERE m.id = b.member_pk
+             ) AS writer
+          FROM board b
+         WHERE b.category_pk = 1
+           AND b.is_public   = 1
+           AND b.is_use      = 1
+         ORDER BY b.id DESC
+         LIMIT 3
     </select>
     <update id="updateByPk" parameterType="Board">
         UPDATE board
@@ -123,7 +205,7 @@
                 title       = #{title},
             </if>
             <if test="content != null and content != ''">
-                content     = #{content, typeHandler=JsonTypeHandler},
+                content     = #{content, typeHandler=JsonObjectTypeHandler},
             </if>
             <if test="isPublic != null">
                 is_public    = #{isPublic},
@@ -152,6 +234,22 @@
            AND is_use     = 1
     </update>
 
+    <resultMap id="BoardResultMapBoardNotice" type="com.anamensis.server.resultMap.BoardResultMap$Notice">
+        <id property="id" column="board_pk"/>
+        <result property="writer" column="writer"/>
+        <association property="board" resultMap="BoardEntity" />
+    </resultMap>
+
+
+    <resultMap id="BoardResultMapBoardList" type="com.anamensis.server.resultMap.BoardResultMap$List">
+        <result property="id" column="board_pk"/>
+        <result property="commentCount" column="comment_count"/>
+        <result property="writer" column="writer"/>
+        <result property="profile" column="profile"/>
+        <association property="board" resultMap="BoardEntity" />
+    </resultMap>
+
+
     <resultMap id="BoardResultMapBoard" type="com.anamensis.server.resultMap.BoardResultMap$Board">
         <id property="id" column="id"/>
         <result property="commentCount" column="comment_count"/>
@@ -162,7 +260,7 @@
 
     <resultMap id="BoardEntity" type="Board" autoMapping="true">
         <id property="id" column="board_pk"/>
-        <result property="content" column="content" typeHandler="JsonTypeHandler"/>
+        <result property="content" column="content" typeHandler="JsonObjectTypeHandler"/>
     </resultMap>
     <resultMap id="MemberEntity" type="Member" autoMapping="true">
         <id property="id" column="member_pk"/>
@@ -173,6 +271,6 @@
     </resultMap>
 
     <resultMap id="BoardResultMap" type="Board">
-        <result property="content" column="content" typeHandler="JsonTypeHandler"/>
+        <result property="content" column="content" typeHandler="JsonObjectTypeHandler"/>
     </resultMap>
 </mapper>

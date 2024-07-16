@@ -1,44 +1,20 @@
 'use client';
 
-import {useEffect, useState} from "react";
+import {useContext} from "react";
 import Link from "next/link";
-import apiCall from "@/app/{commons}/func/api";
-import {createDebounce} from "@/app/{commons}/func/debounce";
-import {Table} from "@/app/user/point-history/{services}/types";
 import {RateColor} from "@/app/{commons}/types/rate";
-import useSWR, {preload} from "swr";
-import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
+import UserProvider from "@/app/user/{services}/userProvider";
 
-
-export interface BoardSummaryI {
-    id          : number;
-    categoryPk  : number;
-    title       : string;
-    rate        : number;
-    viewCount   : number;
-    createdAt   : string;
-}
 
 const BoardSummary = () => {
 
-    const [data, setData] = useState<BoardSummaryI[]>([]);
-
-    preload('/api/board/summary', async () => {
-        return await apiCall<BoardSummaryI[]>({
-            path: "/api/board/summary",
-            params: {page:1, size: 8},
-            method: "GET",
-        })
-    })
-    .then((res) => {
-        setData(res.data);
-    });
+    const {boardSummary} = useContext(UserProvider);
 
     return (
         <div className={'w-full h-max flex justify-center items-start overflow-y-hidden'}>
             <div className={'w-full flex flex-col text-sm'}>
                 {
-                    data.map((e, i) => {
+                    boardSummary.map((e, i) => {
                         return (
                             <Link key={`summary-${i}`}
                                   href={`/board/${e.id}`}

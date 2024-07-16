@@ -16,7 +16,7 @@ import java.util.Optional;
 public interface BoardMapper {
     int save(Board board);
 
-    List<BoardResultMap.Board> findList(
+    List<BoardResultMap.List> findList(
         @Param("page") Page page,
         @Param("params") BoardRequest.Params params,
         @Param("member") Member member
@@ -28,6 +28,8 @@ public interface BoardMapper {
         @Param("memberPk") long memberPk,
         @Param("page") Page page
     );
+
+    List<BoardResultMap.Notice> findNotice();
 
     long count(Board board);
 

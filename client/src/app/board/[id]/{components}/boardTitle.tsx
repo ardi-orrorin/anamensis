@@ -14,7 +14,7 @@ const BoardTitle = (props: {
         newBoard
     } = props;
 
-    return <div className={"font-bold flex items-center w-full"}>
+    return <div className={"font-bold flex w-full items-center"}>
         {
             !board.isView
             && board.data
@@ -29,7 +29,7 @@ const BoardTitle = (props: {
         {
             board.isView
             && !newBoard
-            && <span className={"w-full text-lg py-1"}
+            && <span className={"flex w-full text-lg py-1 break-all"}
             >{props.board.data.title}
             </span>
         }

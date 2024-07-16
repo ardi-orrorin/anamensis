@@ -30,9 +30,12 @@ ext {
 dependencies {
     implementation 'org.flywaydb:flyway-core:10.15.0'
     implementation 'org.flywaydb:flyway-mysql:10.15.0'
+    // https://mvnrepository.com/artifact/org.json/json
+    implementation 'org.json:json:20240303'
 
 
     implementation 'net.coobird:thumbnailator:0.4.20'
+
     implementation 'com.warrenstrange:googleauth:1.5.0'
 
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.1.1'

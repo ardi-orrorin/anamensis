@@ -46,8 +46,24 @@ public class BoardCommentResponse {
                 builder.isWriter(false);
             }
 
-            System.out.println(builder);
+            return builder.build();
+        }
 
+        public static Comment fromResultMap(BoardCommentResultMap.List resultMap, String userId) {
+            CommentBuilder builder = Comment.builder()
+                    .id(resultMap.getId())
+                    .content(resultMap.getBoardComment().getContent())
+                    .writer(resultMap.getBoardComment().getUserId())
+                    .profileImage(resultMap.getProfile())
+                    .parentPk(resultMap.getBoardComment().getParentPk())
+                    .blockSeq(resultMap.getBoardComment().getBlockSeq())
+                    .createdAt(resultMap.getBoardComment().getCreateAt());
+
+            if(userId != null && userId.length() > 0){
+                builder.isWriter(resultMap.getBoardComment().getUserId().equals(userId) );
+            } else {
+                builder.isWriter(false);
+            }
 
             return builder.build();
         }

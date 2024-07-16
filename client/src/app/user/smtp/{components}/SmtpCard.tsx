@@ -30,7 +30,6 @@ const SmtpCard = (smtpCardProps: SmtpCardProps) => {
         })
         .then(res => {
             router.push('/user/smtp');
-            // window.location.replace('/user/smtp');
         });
     }
 

@@ -1,20 +1,21 @@
 package com.anamensis.server.service;
 
 
+import com.anamensis.server.dto.Device;
 import com.anamensis.server.dto.UserDto;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.dto.response.UserResponse;
-import com.anamensis.server.entity.AuthType;
-import com.anamensis.server.entity.Member;
-import com.anamensis.server.entity.Role;
-import com.anamensis.server.entity.RoleType;
+import com.anamensis.server.entity.*;
 import com.anamensis.server.exception.DuplicateUserException;
 import com.anamensis.server.mapper.MemberMapper;
 import com.anamensis.server.mapper.PointCodeMapper;
 import com.anamensis.server.provider.AwsSesMailProvider;
 import com.anamensis.server.provider.EmailVerifyProvider;
+import com.anamensis.server.provider.MailProvider;
 import com.anamensis.server.resultMap.MemberResultMap;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -44,6 +46,9 @@ public class UserService implements ReactiveUserDetailsService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    private final AwsSesMailProvider awsSesMailProvider;
+
 
     public Mono<Member> findUserByUserId(String userId) {
         return Mono.justOrEmpty(memberMapper.findMemberByUserId(userId))
@@ -172,6 +177,51 @@ public class UserService implements ReactiveUserDetailsService {
 
         return Mono.fromCallable(() -> memberMapper.updatePwd(resetPwd.getUserId(), password, resetPwd.getEmail()) > 0)
                 .onErrorReturn(false);
+    }
+
+    public Mono<Boolean> changeAuthAlertEmail(
+        Member member,
+        AuthType authType
+    ) {
+
+        String subject = authType == AuthType.NONE ? "2차 인증이 비활성화 되었습니다." : "2차 인증이 활성화 되었습니다.";
+
+        String bodyTemplate = """
+            %s님의 2차 인증 설정이 변경되었습니다. \n
+            변경 시간 : %s
+            """;
+
+        try {
+            awsSesMailProvider.systemEmail(
+                subject,
+                String.format(bodyTemplate, member.getUserId(), LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))),
+                member.getEmail()
+            );
+        } catch (MessagingException e) {
+            return Mono.error(new RuntimeException("Email not send"));
+        }
+
+        return Mono.just(true);
+    }
+
+    public Mono<Boolean> unConfirmLogin(Member member, Device device) {
+        String subject = "새로운 장소에서 로그인이 발생했습니다.";
+        String bodyTemplate = """
+            ip : %s </br>
+            device : %s </br>
+            location : %s </br>
+            dateTime : %s </br>
+            에서 로그인이 발생했습니다.
+            """;
+
+        String body = String.format(bodyTemplate, device.ip(), device.device(), device.Location(), LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        try {
+            awsSesMailProvider.systemEmail(subject, body, member.getEmail());
+        } catch (MessagingException e) {
+            return Mono.error(new RuntimeException("Email not send"));
+        }
+
+        return Mono.just(true);
     }
 
     private Mono<Role> generateRole(Member users, RoleType roleType) {

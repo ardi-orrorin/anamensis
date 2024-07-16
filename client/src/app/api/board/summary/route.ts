@@ -1,6 +1,6 @@
 import {NextRequest} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
-import {BoardSummaryI} from "@/app/user/{components}/BoardSummary";
+import {BoardSummaryI} from "@/app/user/{services}/userProvider";
 
 export async function GET(req: NextRequest){
     const params = new URLSearchParams(req.nextUrl.searchParams);

@@ -25,8 +25,10 @@
         </if>
     </sql>
     <select id="count">
-        SELECT COUNT(*)
-        <include refid="pointHistory"/>
+        SELECT IFNULL((SELECT phc.count
+                         FROM point_history_count phc
+                        WHERE phc.member_pk = #{memberPk})
+               , 0)
     </select>
 
     <select id="selectByPointHistory" resultMap="pointHistoryResultMap">

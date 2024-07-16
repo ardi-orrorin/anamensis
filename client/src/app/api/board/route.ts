@@ -7,13 +7,17 @@ import {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
 
 export async function GET(req: NextRequest) {
     const searchParams = new URLSearchParams(req.nextUrl.searchParams);
-    const { page, size, type, value, categoryPk, isSelf } = Object.fromEntries(searchParams.entries()) as BoardListParamsI;
+    const { page, size
+        , type, value, categoryPk
+        , isSelf, isFavorite
+    } = Object.fromEntries(searchParams.entries()) as BoardListParamsI;
     const params = {
         page,
         size,
         type,
         value,
         categoryPk,
+        isFavorite,
         isSelf : Boolean(isSelf),
     }
 

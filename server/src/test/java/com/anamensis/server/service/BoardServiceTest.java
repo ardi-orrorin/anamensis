@@ -7,6 +7,7 @@ import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.entity.Board;
 import com.anamensis.server.entity.Member;
 import com.anamensis.server.resultMap.BoardResultMap;
+import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,33 +36,34 @@ class BoardServiceTest {
     @Test
     @Order(1)
     @DisplayName("게시글 갯수 조회 테스트")
+    @Disabled("사용안함")
     void count() {
-        Board b = new Board();
-
-        StepVerifier.create(bs.count(b))
-                .expectNext(10L)
-                .verifyComplete();
-
-        b.setTitle("4");
-        StepVerifier.create(bs.count(b))
-                .expectNext(1L)
-                .verifyComplete();
-
-        b.setTitle("제목1");
-        StepVerifier.create(bs.count(b))
-                .expectNext(2L)
-                .verifyComplete();
-
-        b.setCategoryPk(2);
-        StepVerifier.create(bs.count(b))
-                .expectNext(0L)
-                .verifyComplete();
-
-        b.setTitle(null);
-        b.setCategoryPk(1);
-        StepVerifier.create(bs.count(b))
-                .expectNext(10L)
-                .verifyComplete();
+//        Board b = new Board();
+//
+//        StepVerifier.create(bs.count(b))
+//                .expectNext(10L)
+//                .verifyComplete();
+//
+//        b.setTitle("4");
+//        StepVerifier.create(bs.count(b))
+//                .expectNext(1L)
+//                .verifyComplete();
+//
+//        b.setTitle("제목1");
+//        StepVerifier.create(bs.count(b))
+//                .expectNext(2L)
+//                .verifyComplete();
+//
+//        b.setCategoryPk(2);
+//        StepVerifier.create(bs.count(b))
+//                .expectNext(0L)
+//                .verifyComplete();
+//
+//        b.setTitle(null);
+//        b.setCategoryPk(1);
+//        StepVerifier.create(bs.count(b))
+//                .expectNext(10L)
+//                .verifyComplete();
 
     }
 
@@ -220,7 +222,7 @@ class BoardServiceTest {
         b.setCategoryPk(1);
         b.setTitle("테스트 제목 추가");
         Map<String , Object> content = Map.of("content", "테스트 내용 추가");
-        b.setContent(content);
+        b.setContent(new JSONObject(content));
 
         StepVerifier.create(bs.save(b))
                 .assertNext(board -> {
@@ -364,7 +366,7 @@ class BoardServiceTest {
                 .verifyComplete();
 
         Map<String, Object> newContent = Map.of("content", "테스트 내용 수정");
-        b.setContent(newContent);
+        b.setContent(new JSONObject(newContent));
 
         StepVerifier.create(bs.updateByPk(b))
                 .expectNext(true)

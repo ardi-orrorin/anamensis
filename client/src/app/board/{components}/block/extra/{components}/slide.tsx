@@ -37,51 +37,40 @@ const Slide = ({
         if(!containerRef?.current) return 0;
         const containerWidth = containerRef.current.clientWidth - (containerRef.current.clientWidth % slideWidth);
         return totalWidth - containerWidth
-    },[containerRef?.current]);
+    },[containerRef?.current?.clientWidth]);
 
-    const prevSlide = () => {
-        const result =
-            containerPosition + slideWidth <= 0
-                ? containerPosition + slideWidth
-                : -containerMaxWidth;
 
-        setContainerPosition(result);
-    }
-
-    const nextSlide = () => {
-        const result = containerPosition <= -containerMaxWidth
-            ? 0
-            : containerPosition - slideWidth;
+    const slide = (isReverse: boolean) => {
+        const imageLength = Math.floor(Number(containerRef?.current?.offsetWidth) / slideWidth);
+        const result = isReverse
+            ? containerPosition + slideWidth <= 0
+                ? containerPosition + slideWidth * imageLength
+                : -containerMaxWidth
+            : containerPosition <= -containerMaxWidth
+                ? 0
+                : containerPosition - slideWidth * imageLength;
 
         setContainerPosition(result);
     }
 
-    const prevImage = () => {
-        if(selectedIndex === 0) {
-            setSelectedIndex(images.length - 1);
-        } else {
-            setSelectedIndex(selectedIndex - 1);
-        }
-    }
-
-    const nextImage = () => {
-        if(selectedIndex === images.length - 1) {
-            setSelectedIndex(0);
-        } else {
-            setSelectedIndex(selectedIndex + 1);
-        }
+    const imageShow = (isReverse: boolean) => {
+       isReverse
+       ? selectedIndex === 0
+            ? setSelectedIndex(images.length - 1)
+            : setSelectedIndex(selectedIndex - 1)
+       : selectedIndex === images.length - 1
+            ? setSelectedIndex(0)
+            : setSelectedIndex(selectedIndex + 1);
     }
 
     const onMouseUpHandler = (e: React.MouseEvent) => {
         const cur = containerPosition - (mouseDownX - e.clientX) * 2;
 
-        if(cur >= 0) {
-            setContainerPosition(0);
-        } else if(cur < -containerMaxWidth) {
-            setContainerPosition(-containerMaxWidth);
-        } else {
-            setContainerPosition(cur);
-        }
+        cur >= 0
+        ? setContainerPosition(0)
+        : cur <= -containerMaxWidth
+            ? setContainerPosition(-containerMaxWidth)
+            : setContainerPosition(cur);
 
         setMouseDownX(0);
 
@@ -98,12 +87,12 @@ const Slide = ({
         <div className={'flex flex-col gap-2 w-full px-4'}>
             <div className={'relative flex w-auto justify-center items-center'}>
                 <button className={'absolute left-5 z-10 w-10 h-10 bg-white rounded border border-solid border-gray-200'}
-                           onClick={prevImage}
+                           onClick={()=>imageShow(true)}
                 >
                     <FontAwesomeIcon icon={faChevronLeft} />
                 </button>
 
-                <img className={'h-[400px] sm:h-[800px] rounded-xl object-contain'}
+                <img className={'w-full h-[600px] sm:h-[800px] rounded-xl object-cover sm:object-contain'}
                      src={process.env.NEXT_PUBLIC_CDN_SERVER + images[selectedIndex]} alt={''}
                      onClick={onImageClick}
                      onError={(e) => {
@@ -111,7 +100,7 @@ const Slide = ({
                      }}
                 />
                 <button className={'absolute right-5 z-10 w-10 h-10 bg-white rounded border border-solid border-gray-200'}
-                        onClick={nextImage}
+                        onClick={()=>imageShow(false)}
                 >
                     <FontAwesomeIcon icon={faChevronRight} />
                 </button>
@@ -126,7 +115,7 @@ const Slide = ({
                     containerRef?.current
                     && containerRef?.current?.clientWidth < totalWidth
                     && <button className={'absolute left-5 z-10 w-10 h-10 bg-white rounded border border-solid border-gray-200 opacity-70'}
-                               onClick={prevSlide}
+                               onClick={()=> slide(true)}
                     >
                         <FontAwesomeIcon icon={faChevronLeft} />
                     </button>
@@ -160,12 +149,8 @@ const Slide = ({
                                              setSelectedIndex(index);
                                          }}
                                          onMouseEnter={(e) => {
-                                             if(isView) {
-                                                 mouseDownX === 0 && setSelectedIndex(index);
-                                             } else {
-                                                 e?.currentTarget?.parentElement?.children[1]
-                                                     .classList.replace('hidden', 'flex');
-                                             }
+                                             e?.currentTarget?.parentElement?.children[1]
+                                                 ?.classList.replace('hidden', 'flex');
                                          }}
                                     />
                                     {
@@ -179,12 +164,11 @@ const Slide = ({
                         })
                     }
                 </div>
-
                 {
                     containerRef?.current
                     && containerRef?.current?.clientWidth < totalWidth
                     && <button className={'absolute right-5 z-10 w-10 h-10 bg-white rounded border border-solid border-gray-200 opacity-70'}
-                               onClick={nextSlide}
+                               onClick={()=> slide(false)}
                     >
                         <FontAwesomeIcon icon={faChevronRight} />
                     </button>

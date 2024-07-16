@@ -215,7 +215,7 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
              ref={el => {props!.blockRef!.current[props.seq] = el}}
         >
             <div className={[
-                'flex w-full items-center gap-4 outline-0 break-all',
+                'flex flex-col sm:flex-row w-full items-center gap-4 outline-0 break-all',
                 isView || 'p-4',
             ].join(' ')}
                  style={{backgroundColor: isView ? '' : 'rgba(230,230,230,0.2)'}}
@@ -223,7 +223,7 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
                <ImageThumb {...{thumb, extraValue, imgViewProps, oriImg, imageRef,
                    setImgViewProps, onChangeImageHandler, onChangeFileHandler, isView: isView!}}
                />
-               <div className={'flex flex-col gap-2 w-full pl-4 border-l border-solid border-gray-300'}>
+               <div className={'flex flex-col gap-2 w-full sm:pl-4 sm:border-l sm:border-solid sm:border-gray-300'}>
                     <Title {...{value, onChangeHandler, isView: isView!}} />
                     <SiteLink {...{extraValue, onChangeHandler, isView: isView!}} />
                     <div className={'flex gap-2'}>
@@ -399,7 +399,6 @@ const Title = ({
 
 }
 
-// todo: 이미지 삭제 로직 추가
 const ImageThumb = ({
     thumb,
     extraValue,
@@ -425,8 +424,8 @@ const ImageThumb = ({
     if(!isView)
         return (
             <>
-                <div style={{position: 'relative'}}>
-                    <img className={'w-[150px] h-[150px] min-w-[150px] min-h-[150px] object-cover rounded'}
+                <div className={'relative w-full sm:w-auto'}>
+                    <img className={'w-full h-[200px] sm:w-[150px] sm:h-[150px] sm:min-w-[150px] sm:min-h-[150px] object-cover rounded'}
                          src={thumb}
                          alt={'대표 이미지'}
                          onClick={onChangeImageHandler}
@@ -453,8 +452,8 @@ const ImageThumb = ({
         )
     return (
         <>
-            <div style={{position: 'relative'}}>
-                <Image className={'w-[150px] h-[150px] min-w-[150px] min-h-[150px] object-cover rounded'}
+            <div className={'relative w-full sm:w-auto duration-500'}>
+                <Image className={'w-full h-[200px] sm:w-[150px] sm:h-[150px] sm:min-w-[150px] sm:min-h-[150px] object-cover rounded duration-500'}
                        width={150}
                        height={150}
                        src={thumb}
@@ -469,7 +468,7 @@ const ImageThumb = ({
                 />
                 {
                     extraValue?.img && imgViewProps.imgModal
-                    && <div className={'absolute z-10 flex justify-center items-center top-0 left-0 w-full h-full text-sm text-white bg-opacity-40 bg-black rounded'}
+                    && <div className={'absolute z-10 flex justify-center items-center top-0 left-0 w-full h-full text-sm text-white bg-opacity-40 bg-black rounded  duration-500'}
                             onMouseLeave={()=> setImgViewProps(prevState => ({
                                 ...prevState,
                                 imgModal: false
@@ -484,16 +483,17 @@ const ImageThumb = ({
                 }
                 {
                     imgViewProps.viewImg
-                    && <div className={'absolute z-[99] w-[700px] h-auto left-0 top-0 p-2 bg-white rounded border border-solid border-gray-200 shadow-md'}>
+                    && <div className={'fixed z-[99] w-full h-full flex justify-center items-center left-0 top-0 p-2 bg-gray-600 bg-opacity-40 duration-500'}
+                            onClick={()=> setImgViewProps(prevState => ({
+                                ...prevState,
+                                viewImg: false
+                            }))}
+                    >
                     <Image src={oriImg}
                            alt={'원본 이미지'}
                            width={700}
                            height={700}
                            onClick={()=> setImgViewProps(prevState => ({
-                               ...prevState,
-                               viewImg: false
-                           }))}
-                           onMouseLeave={() => setImgViewProps(prevState => ({
                                ...prevState,
                                viewImg: false
                            }))}

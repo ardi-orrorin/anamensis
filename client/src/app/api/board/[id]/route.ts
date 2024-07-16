@@ -10,7 +10,6 @@ export async function GET(req: NextRequest) {
 
     const getCookies = (cookies().get('next.access.token') || cookies().get('next.refresh.token'))?.value !== undefined;
 
-
     try{
        const data = await apiCall<BoardI>({
             path: '/public/api/boards/' + id,

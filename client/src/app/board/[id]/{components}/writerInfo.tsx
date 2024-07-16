@@ -4,20 +4,20 @@ import {useContext} from "react";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import Link from "next/link";
 import {Category} from "@/app/board/{services}/types";
-import {defaultNoImg} from "@/app/{commons}/func/image";
+import {defaultNoImg, defaultProfile} from "@/app/{commons}/func/image";
 
 const WriterInfo = () => {
 
     const { board, summary }  = useContext(BoardProvider);
 
     return (
-        <div className={'flex p-2 border border-solid border-blue-300 rounded'}>
-            <div className={'flex w-1/2 items-center p-2 gap-3 text-sm'}>
+        <div className={'flex flex-col sm:flex-row p-2 gap-2 sm:gap-0 border border-solid border-blue-300 rounded'}>
+            <div className={'flex w-full sm:w-1/2 items-center p-2 gap-2 text-sm  duration-500'}>
                 <Image className={'border-solid border-2 border-blue-200 rounded-full'}
                        height={70}
                        width={70}
                        alt={'profile'}
-                       src={defaultNoImg(board.data.profileImage)}
+                       src={defaultProfile(board.data.profileImage)}
                 />
                 <div className={'flex flex-col gap-2'}>
                     <div className={'flex gap-1'}>
@@ -38,7 +38,7 @@ const WriterInfo = () => {
                     </div>
                 </div>
             </div>
-            <div className={'flex flex-col w-2/3 max-h-20 px-2 border-solid border-l border-blue-200 text-sm overflow-y-scroll'}>
+            <div className={'flex w-full flex-col sm:w-2/3 max-h-28 sm:max-h-20 px-2 sm:border-solid sm:border-l sm:border-blue-200 text-sm overflow-y-scroll'}>
                 {
                     summary.map((item, index) => {
                         const category = Category.findById(item.categoryPk.toString())?.name;

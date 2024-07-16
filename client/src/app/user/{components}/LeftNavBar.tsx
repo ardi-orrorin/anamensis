@@ -42,14 +42,7 @@ const LeftNavBar = ({
 
     const iconSize = 16;
     const menuItems: MenuItemType[] = [
-        {name: '유저 정보', href:'/user/info', icon: faCheckToSlot, role: RoleType.USER},
-        {name: '로그인기록', href:'/user/history', icon: faClockRotateLeft, role: RoleType.USER},
-        {name: 'SMTP', href:'/user/smtp', icon: faEnvelope, role: RoleType.ADMIN},
-        {name: 'SMTP 발송 내역', href:'/user/smtp-history', icon: faEnvelope, role: RoleType.ADMIN},
-        {name: 'OTP', href:'/user/otp', icon:faKey, role: RoleType.MASTER},
-        {name: 'EMAIL', href:'/user/email', icon: faEnvelope, role: RoleType.USER},
         {name: 'SYSTEM', href:'/user/system', icon: faGear, role: RoleType.ADMIN},
-        {name: '포인트 적립 내역', href:'/user/point-history', icon: faFilePowerpoint, role: RoleType.USER},
     ]
 
     const initFetch = useSWR('/user/navBar', async () => {
@@ -82,7 +75,7 @@ const LeftNavBar = ({
         <>
         <nav className={['z-30 min-h-svh bg-blue-400 py-2 duration-500 '
             , isOpen || !isModalMode  ? 'translate-x-0 shadow-outset-lg' : 'translate-x-[-1000px]'
-            , isModalMode ? 'fixed w-[220px]': 'w-[250px]'
+            , isModalMode ? 'fixed w-[220px]': 'min-w-[200px]'
         ].join(' ')}>
             <div className={'flex justify-between px-5 py-2'}>
                 <button onClick={openToggle} className={'text-white'}>
@@ -107,6 +100,83 @@ const LeftNavBar = ({
                         </div>
                     </Link>
                 </li>
+                <li className={'w-full'}>
+                    <Link className={'text text-white w-full'}
+                          href={'/user/info'}
+                          onClick={onChangeDisabledHandler}
+                    >
+                        <div className={'flex w-full p-3 hover:bg-blue-500 duration-300'}>
+                            <FontAwesomeIcon icon={faCheckToSlot} width={iconSize} />
+                            <span>&nbsp; 유저 정보</span>
+                        </div>
+                    </Link>
+                </li>
+                <li className={'w-full'}>
+                    <Link className={'text text-white w-full'}
+                          href={'/user/history'}
+                          onClick={onChangeDisabledHandler}
+                    >
+                        <div className={'w-full p-3 hover:bg-blue-500 duration-300'}>
+                            <FontAwesomeIcon icon={faClockRotateLeft} width={iconSize} />
+                            <span>&nbsp; 로그인기록</span>
+                        </div>
+                    </Link>
+                </li>
+                <li className={'w-full'}>
+                    <Link className={'text text-white w-full'}
+                          href={'/user/email'}
+                          onClick={onChangeDisabledHandler}
+                    >
+                        <div className={'w-full p-3 hover:bg-blue-500 duration-300'}>
+                            <FontAwesomeIcon icon={faEnvelope} width={iconSize} />
+                            <span>&nbsp; EMAIL</span>
+                        </div>
+                    </Link>
+                </li>
+                <li className={'w-full'}>
+                    <Link className={'text text-white w-full'}
+                          href={'/user/point-history'}
+                          onClick={onChangeDisabledHandler}
+                    >
+                        <div className={'w-full p-3 hover:bg-blue-500 duration-300'}>
+                            <FontAwesomeIcon icon={faFilePowerpoint} width={iconSize} />
+                            <span>&nbsp; 포인트 적립 내역</span>
+                        </div>
+                    </Link>
+                </li>
+                <li className={'w-full'}>
+                    <Link className={'text text-white w-full'}
+                          href={'/user/smtp'}
+                          onClick={onChangeDisabledHandler}
+                    >
+                        <div className={'w-full p-3 hover:bg-blue-500 duration-300'}>
+                            <FontAwesomeIcon icon={faEnvelope} width={iconSize} />
+                            <span>&nbsp; SMTP</span>
+                        </div>
+                    </Link>
+                </li>
+                <li className={'w-full'}>
+                    <Link className={'text text-white w-full'}
+                          href={'/user/smtp-history'}
+                          onClick={onChangeDisabledHandler}
+                    >
+                        <div className={'w-full p-3 hover:bg-blue-500 duration-300'}>
+                            <FontAwesomeIcon icon={faEnvelope} width={iconSize} />
+                            <span>&nbsp; SMTP 발송 내역</span>
+                        </div>
+                    </Link>
+                </li>
+                <li className={'w-full'}>
+                    <Link className={'text text-white w-full'}
+                          href={'/user/otp'}
+                          onClick={onChangeDisabledHandler}
+                    >
+                        <div className={'w-full p-3 hover:bg-blue-500 duration-300'}>
+                            <FontAwesomeIcon icon={faKey} width={iconSize} />
+                            <span>&nbsp; OTP</span>
+                        </div>
+                    </Link>
+                </li>
                 {
                     menuItems.map((item, index) => {
                         if(!item.role || !roles.find(role => role === item.role)) {
@@ -114,7 +184,7 @@ const LeftNavBar = ({
                         }
 
                         return (
-                            <li key={index}
+                            <li key={'userleftnavbar' + index}
                                 className={'w-full'}
                             >
                                 <Link className={'text text-white w-full'}

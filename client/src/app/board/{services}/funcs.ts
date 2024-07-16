@@ -1,6 +1,5 @@
 import {BlockI, BoardContentI, BoardI} from "@/app/board/{services}/types";
 import {blockTypeList} from "@/app/board/{components}/block/list";
-import {ImageShowProps} from "@/app/board/{components}/block/extra/albumBlock";
 import {Dispatch, SetStateAction} from "react";
 import {TempFileI} from "@/app/board/{services}/TempFileProvider";
 
@@ -48,18 +47,18 @@ export const updateBoard = ({
     waitUploadFiles?: TempFileI[];
     waitRemoveFiles?: TempFileI[];
 }) : BoardI => {
-    // todo: 저장시 빈 라인 제거 할 것인가?
-    // 현재 : 빈 라인 포함 저장
-
     const {content, isPublic, title} = board;
 
     const bodyContent = content.list.filter(item => item.value !== '');
 
     const textRegex = /^0000\d{1}$/;
 
-    const searchText = title + ' '
-        + bodyContent.filter(item => textRegex.test(item.code))
-            .map(item => item.value).join(' ');
+    // const searchText = title + ' '
+    //     + bodyContent
+    //         .filter(item =>
+    //             textRegex.test(item.code) || item.code === '00301'
+    //         )
+    //         .map(item => item.value).join(' ');
 
     const uploadFiles = waitUploadFiles
         ? waitUploadFiles.map(item => item.id)
@@ -77,7 +76,7 @@ export const updateBoard = ({
         isPublic,
         uploadFiles,
         removeFiles,
-        searchText
+        // searchText
     };
 }
 

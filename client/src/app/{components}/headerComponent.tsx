@@ -3,6 +3,8 @@ import Image from "next/image";
 import {defaultProfile} from "@/app/{commons}/func/image";
 import React from "react";
 import {BoardListI} from "@/app/{components}/boardComponent";
+import {faStar} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const HeaderComponent = (props: BoardListI) => {
     const {
@@ -11,7 +13,7 @@ const HeaderComponent = (props: BoardListI) => {
         , writer, membersOnly
     } = props;
     return (
-        <div className={'flex h-[55px] min-h[55px] max-h-[55px] border-b border-solid border-gray-200 justify-between px-3 items-center'}>
+        <div className={'pt-2 flex w-full h-[55px] min-h[55px] max-h-[55px] justify-between px-3 items-center'}>
             <div className={'h-auto flex flex-col gap-1'}>
                 <span className={'flex gap-2 text-xs text-blue-700'}>
                     <span className={''}>
@@ -30,7 +32,7 @@ const HeaderComponent = (props: BoardListI) => {
                         </span>
                     }
                 </span>
-                <span className={'w-60 text-sm line-clamp-1'}>
+                <span className={'text-sm line-clamp-1'}>
                     {title}
                 </span>
             </div>

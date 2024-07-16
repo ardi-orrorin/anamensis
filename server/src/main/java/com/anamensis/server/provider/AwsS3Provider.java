@@ -33,7 +33,7 @@ public class AwsS3Provider {
 
     private static final float PROFILE = 0.4f;
     private static final float CONTENT_THUMBNAIL = 0.6f;
-    private static final float ALTTUEL_THUMBNAIL = 0.3f;
+    private static final float ALTTUEL_THUMBNAIL = 0.4f;
 
     private static final float ALBUM_THUMBNAIL = 0.7f;
 
@@ -74,11 +74,14 @@ public class AwsS3Provider {
 
                     } catch (IOException e) {
                         return Mono.error(new RuntimeException(e));
+                    } finally {
+                        DataBufferUtils.release(data);
                     }
 
                     return Mono.just(true);
                 });
     }
+
 
     private Thumbnails.Builder<? extends InputStream> buildThumbnail(
         InputStream is, int width, int height, ThumbnailType thumbnailType
@@ -110,7 +113,7 @@ public class AwsS3Provider {
     }
 
     public Mono<Boolean> saveAlttuelThumbnail(FilePart filePart, String path, String filename) {
-        return this.saveS3(filePart, path, filename, 100, 100, ThumbnailType.ALTTUEL_THUMBNAIL);
+        return this.saveS3(filePart, path, filename, 300, 300, ThumbnailType.ALTTUEL_THUMBNAIL);
     }
 
     public Mono<Boolean> saveAlbumThumbnail(FilePart filePart, String path, String filename) {

@@ -28,45 +28,50 @@ const AlttuelBoardComponent = (props: BoardListI) => {
     }
 
     return (
-        <>
-            <HeaderComponent {...props} />
-            <div className={'p-3 flex gap-3 h-auto'}>
-                <Image className={'rounded'}
+        <div className={'flex h-full'}>
+            <div className={'min-w-[90px] max-w-[90px] sm:min-w-[120px] sm:max-w-[120px] h-full'}>
+                <Image className={'w-full h-full object-cover'}
                        src={defaultNoImg(extraValue?.img?.replace(/(\.[^.]+)$/, '_thumb$1'))}
                        width={80}
                        height={80}
                        alt={''}
                 />
-                <div className={'flex flex-col w-full justify-between gap-1'}>
-                    <div className={'flex gap-1'}>
+
+            </div>
+            <div className={'w-full h-full flex flex-col justify-between'}>
+                <HeaderComponent {...props} />
+                <div className={'flex flex-col px-3 py-1 gap-1 w-full justify-between overflow-y-auto'}>
+                    <div className={'flex flex-col gap-1 justify-between'}>
+                        <p className={'text-sm'}>
+                            상품명 : &nbsp; {value}
+                        </p>
+                        <div className={'flex gap-5'}>
+                            <p className={'text-xs text-red-600 font-bold'}>
+                                가격: &nbsp; {money(extraValue?.price)}
+                            </p>
+                            <p className={'text-xs text-gray-600'}>
+                                배송비: &nbsp; {money(extraValue?.deliveryFee)}
+                            </p>
+                        </div>
+                    </div>
+                    <div className={'flex flex-wrap gap-2'}>
                         {
                             extraValue?.tags
                             && extraValue?.tags?.length > 0
                                 ? extraValue?.tags?.map((tag, index) =>
-                                    <label key={index} className={'bg-gray-600 px-2 py-0.5 text-xs text-white'}>
+                                    <label key={index} className={'text-gray-500 text-xs'}>
                                         {tag}
                                     </label>
                                 )
-                                : <label className={'bg-gray-400 px-2 py-0.5 text-xs text-white'}>
+                                : <label className={'text-gray-500 text-xs'}>
                                     No Tag
                                 </label>
                         }
                     </div>
-                    <div className={'flex flex-col gap-0.5'}>
-                        <p className={'text-sm'}>
-                            상품명 : &nbsp; {value}
-                        </p>
-                        <p className={'text-xs text-red-600 font-bold'}>
-                            가격: &nbsp; {money(extraValue?.price)}
-                        </p>
-                        <p className={'text-xs text-gray-600'}>
-                            배송비: &nbsp; {money(extraValue?.deliveryFee)}
-                        </p>
-                    </div>
                 </div>
+                <FooterComponent {...props} />
             </div>
-            <FooterComponent {...props} />
-        </>
+        </div>
     )
 }
 

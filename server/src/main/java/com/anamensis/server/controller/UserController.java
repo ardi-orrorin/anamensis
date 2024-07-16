@@ -85,6 +85,17 @@ public class UserController {
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe();
 
+        member.flatMap(u ->
+            loginHistoryService.confirmedLogin(u.getMember(), device)
+                .flatMap(b -> {
+                    if(b) return Mono.just(true);
+                    return userService.unConfirmLogin(u.getMember(), device);
+                })
+        )
+        .subscribeOn(Schedulers.boundedElastic())
+        .subscribe();
+
+
         if(AuthType.OTP.equals(user.getAuthType().toUpperCase())) {
             return otpLogin(user.getCode().toString(), member, token);
         } else if(AuthType.EMAIL.equals(user.getAuthType().toUpperCase())) {
@@ -258,7 +269,11 @@ public class UserController {
             @RequestBody UserRequest.SAuth auth,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
+
+        AtomicReference<Member> memberAtomic = new AtomicReference<>();
+
         return userService.findUserByUserId(userDetails.getUsername())
+                .doOnNext(memberAtomic::set)
                 .flatMap(u -> userService.editAuth(u.getId(), auth.isSauth(), AuthType.fromString(auth.getSauthType())))
                 .flatMap(result -> {
                     HttpStatus status = result ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
@@ -269,6 +284,11 @@ public class UserController {
                 .doOnNext(s -> {
                     if(!s.getStatus().equals(HttpStatus.OK)) return;
                     userService.addUserInfoCache(userDetails.getUsername())
+                        .subscribe();
+                })
+                .doOnNext(s -> {
+                    if(!s.getStatus().equals(HttpStatus.OK)) return;
+                    userService.changeAuthAlertEmail(memberAtomic.get(), AuthType.fromString(auth.getSauthType()))
                         .subscribe();
                 });
     }

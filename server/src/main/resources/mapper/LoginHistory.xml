@@ -18,6 +18,22 @@
          LIMIT #{page.offset}, #{page.size}
     </select>
 
+    <select id="exist">
+        SELECT EXISTS(SELECT *
+                        FROM login_history
+                       WHERE member_pk   = #{memberPk}
+                             AND ip      = #{ip}
+                             AND create_at
+                         BETWEEN current_timestamp() - INTERVAL 1 YEAR
+                             AND current_timestamp()
+                          OR member_pk   = #{memberPk}
+                             AND device  = #{device}
+                             AND create_at
+                         BETWEEN current_timestamp() - INTERVAL 1 YEAR
+                             AND current_timestamp()
+                     )
+    </select>
+
     <insert id="save" parameterType="map">
         INSERT INTO login_history
                (member_pk, ip, location, device, create_at)

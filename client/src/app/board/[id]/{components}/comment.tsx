@@ -1,4 +1,4 @@
-import {useContext, useMemo, useState} from "react";
+import {useContext, useMemo, useRef, useState} from "react";
 import {BlockI, BoardI, CommentI} from "@/app/board/{services}/types";
 import Image from "next/image";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
@@ -10,10 +10,13 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {defaultProfile} from "@/app/{commons}/func/image";
-import {mutate} from "swr";
+import {mutate, preload} from "swr";
 import moment from "moment";
 import {QuestionBlockExtraValueType} from "@/app/board/{components}/block/extra/questionBlock";
 import {updateBoard} from "@/app/board/{services}/funcs";
+import {useSearchParams} from "next/navigation";
+import {PageI, PageResponse} from "@/app/{commons}/types/commons";
+import PageNavigator from "@/app/{commons}/PageNavigator";
 
 export type SaveComment = {
     boardPk   : string;
@@ -22,10 +25,40 @@ export type SaveComment = {
     parentPk? : string;
 }
 
-const Comment = () => {
-    const {comment, board} = useContext(BoardProvider);
+const Comment = ({
+    isNewBoard,
+    params
+} : {
+    isNewBoard: boolean
+    params: {id: string}
+}) => {
+    const searchParams = useSearchParams();
+
+    const {comment,setComment, board} = useContext(BoardProvider);
     const {newComment, setNewComment} = useContext(BoardProvider);
+
+    const [page, setPage] = useState<PageI>({
+        page: 1,
+        size: 10,
+    } as PageI);
     const [loading, setLoading] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+
+    preload([`/api/board/comment/${board.data.id}`, searchParams], async () => {
+        if(isNewBoard) return;
+        return await apiCall<PageResponse<CommentI>>({
+            path: '/api/board/comment',
+            method: 'GET',
+            params: {boardPk: params.id, page: searchParams.get('page') || 1, size: searchParams.get('size') || 10},
+        })
+    })
+    .then(res => {
+        if(!res) return;
+        setPage(res.data.page);
+        setComment(res.data.content);
+    })
+
+    const reload = () => mutate([`/api/board/comment/${board.data.id}`, searchParams]);
 
     const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setNewComment({...newComment, content: e.target.value});
@@ -49,7 +82,7 @@ const Comment = () => {
                 isReturnData: true,
             })
 
-            mutate(`/api/board/comment/${board.data.id}`);
+            await reload();
 
             setNewComment({
                 boardPk: board.data.id,
@@ -74,20 +107,22 @@ const Comment = () => {
 
     return (
         <div className={'w-auto flex flex-col gap-4'}>
-            <div className={'flex gap-2 text-lg items-center py-2'}>
+            <div className={'flex gap-2 text-lg items-center py-2'}
+                 ref={ref}
+            >
                 <FontAwesomeIcon icon={faComment} />
                 <div className={'flex'}>
                     <h2>
                         댓글
                     </h2>
                     <span>
-                        ({comment.length})
+                        ({page.total})
                     </span>
                 </div>
             </div>
             {
-                board.isView
-                && board.data.isLogin
+                board?.isView
+                && board?.data?.isLogin
                 && <div className={'w-full flex gap-1'}>
                     <button className={[
                         'absolute h-16 flex flex-col justify-center items-center text-xs text-white bg-blue-400 hover:bg-red-600 duration-300'
@@ -121,23 +156,26 @@ const Comment = () => {
                 {
                     comment.map((item, index) => {
                         return (
-                            <CommentItem key={index} {...item} />
+                            <CommentItem key={index} {...item} reload={reload} />
                         )
                     })
                 }
             </div>
-
+            {
+                page.total > 10
+                && <PageNavigator {...page} />
+            }
         </div>
     )
 }
 
-const CommentItem = (props: CommentI) => {
+const CommentItem = (props: CommentI & {reload: ()=> Promise<any>}) => {
     const {
         blockSeq, content
         , writer, profileImage
         , createdAt, children
         , isWriter
-        , id
+        , id, reload
     } = props;
 
     const {board} = useContext(BoardProvider);
@@ -167,12 +205,11 @@ const CommentItem = (props: CommentI) => {
                 method: 'DELETE',
                 isReturnData: true,
             })
-
         } catch (err: any) {
             alert(err.response.data.message);
         } finally {
             setLoading(false);
-            await mutate(`/api/board/comment/${board.data.id}`);
+            await reload();
             setDeleteComment({confirm: false});
         }
     }
@@ -229,9 +266,9 @@ const CommentItem = (props: CommentI) => {
                 && extraValue?.state === 'wait'
                 && <button className={'w-full h-9 sm:w-[40px] sm:h-auto flex justify-center items-center bg-green-400 text-white hover:bg-green-800 duration-300'}
                            onClick={selectedAnswerHandler}
-              >
-                채택 하기
-              </button>
+                >
+                    채택 하기
+                </button>
             }
             {
                 board?.data?.categoryPk === 3
@@ -239,9 +276,9 @@ const CommentItem = (props: CommentI) => {
                 && extraValue?.selectId.toString() === id.toString()
                 && <button className={'w-full h-9 sm:w-[30px] sm:h-auto px-1 flex justify-center items-center bg-yellow-600 text-white duration-300'}
                            onClick={selectedAnswerHandler}
-              >
-                채택
-              </button>
+                >
+                    채택
+                </button>
             }
             {
                 loading
@@ -266,13 +303,13 @@ const CommentItem = (props: CommentI) => {
                         : <div className={['w-0 sm:w-[30px]'].join(' ')} />
                 }
                 <div className={'flex flex-col sm:flex-row w-full'}>
-                    <div className={'flex flex-row sm:flex-col w-full justify-between sm:justify-start sm:w-48 gap-2 border-b sm:border-x p-3 border-solid border-gray-200'}
+                    <div className={'flex flex-row sm:flex-col w-full justify-between sm:justify-start sm:w-48 gap-2 border-b sm:border-b-0 sm:border-x p-3 border-solid border-gray-200'}
                          onClick={() => {deleteComment.confirm && disabledDeleteConfirm()}}
                     >
                         <div className={'flex gap-2 items-center sm:items-end'}>
-                            <Image className={'h-6 w-6 rounded-full'}
+                            <Image className={'h-10 w-10 rounded-full'}
                                    src={defaultProfile(profileImage)}
-                                   height={30} width={30}
+                                   height={50} width={530}
                                    alt={''}
                             />
                             <div className={'flex h-full gap-1 items-center sm:items-end text-xs'}>

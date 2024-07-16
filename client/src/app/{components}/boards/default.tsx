@@ -20,7 +20,7 @@ const DefaultBoardComponent = (props: BoardListI) => {
         <>
             <HeaderComponent {...props} />
             <div className={'p-3 flex flex-col h-auto'}>
-                <p className={'line-clamp-[3] text-xs text-pretty'}>
+                <p className={'line-clamp-[3] text-xs break-all whitespace-pre-line'}>
                     {text}
                 </p>
             </div>

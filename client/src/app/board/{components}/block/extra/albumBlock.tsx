@@ -274,7 +274,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
                         }
                     </button>
                     <input type={'file'}
-                           accept={'image/*'}
+                           accept={['image/jpeg','image/bmp','image/png'].join(', ')}
                            multiple={true}
                            onChange={onChangeHandler}
                            ref={inputRef}

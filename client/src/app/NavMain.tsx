@@ -52,7 +52,7 @@ const NavMain = async () => {
     return (
         <nav className={'w-full flex justify-between items-center bg-blue-500 text-white h-12'}>
             <div className={''}>
-                <Link className={'flex justify-center p-3'}
+                <Link className={'flex justify-center p-3 hover:bg-blue-600 rounded duration-500'}
                       href={'/'}
                 >ANAMENSIS</Link>
             </div>
@@ -74,7 +74,7 @@ const NavMain = async () => {
 
 const NavItem = ({name, url, prefetch}: NavItemProps) => {
     return (
-        <li className={'p-3'}>
+        <li className={'p-3 h-full hover:bg-blue-600 rounded duration-500'}>
             <Link className={'flex'}
                   href={url}
                   prefetch={prefetch}

@@ -9,6 +9,7 @@ import com.anamensis.server.resultMap.BoardResultMap;
 import com.fasterxml.jackson.databind.node.DecimalNode;
 import com.fasterxml.jackson.datatype.jsr310.DecimalUtils;
 import jakarta.validation.constraints.DecimalMax;
+import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -56,7 +57,7 @@ class BoardMapperTest {
         assertThrowsExactly(DataIntegrityViolationException.class, () -> bm.save(board));
         Map<String, Object> content = Map.of("content", "게시글 내용");
 
-        board.setContent(content);
+        board.setContent(new JSONObject(content));
         assertThrowsExactly(DataIntegrityViolationException.class, () -> bm.save(board));
 
         board.setCategoryPk(category.getId());
@@ -86,7 +87,7 @@ class BoardMapperTest {
         page.setPage(1);
         page.setSize(4);
 
-        List<BoardResultMap.Board> list = bm.findList(page, new BoardRequest.Params(), new Member());
+        List<BoardResultMap.List> list = bm.findList(page, new BoardRequest.Params(), new Member());
         assertEquals(4, list.size());
 
 
@@ -104,16 +105,6 @@ class BoardMapperTest {
             assertNotNull(board.getViewCount());
             assertNotNull(board.isUse());
 
-            assertNotNull(b.getMember());
-            Member member = b.getMember();
-            assertNotNull(member.getId());
-            assertNotNull(member.getUserId());
-            assertNotNull(member.getName());
-            assertNotNull(member.getPoint());
-            assertNotNull(member.getEmail());
-            assertNotNull(member.getSAuth());
-            assertNotNull(member.getSAuthType());
-            assertNotNull(member.getCreateAt());
         });
 
         assertFalse(list.stream().anyMatch(b -> b.getBoard().getId() == 11));
@@ -142,16 +133,6 @@ class BoardMapperTest {
             assertNotNull(board.getViewCount());
             assertNotNull(board.isUse());
 
-            assertNotNull(b.getMember());
-            Member member = b.getMember();
-            assertNotNull(member.getId());
-            assertNotNull(member.getUserId());
-            assertNotNull(member.getName());
-            assertNotNull(member.getPoint());
-            assertNotNull(member.getEmail());
-            assertNotNull(member.getSAuth());
-            assertNotNull(member.getSAuthType());
-            assertNotNull(member.getCreateAt());
         });
 
         assertFalse(list.stream().anyMatch(b -> b.getBoard().getId() == 7));
@@ -179,16 +160,6 @@ class BoardMapperTest {
             assertNotNull(board.getViewCount());
             assertNotNull(board.isUse());
 
-            assertNotNull(b.getMember());
-            Member member = b.getMember();
-            assertNotNull(member.getId());
-            assertNotNull(member.getUserId());
-            assertNotNull(member.getName());
-            assertNotNull(member.getPoint());
-            assertNotNull(member.getEmail());
-            assertNotNull(member.getSAuth());
-            assertNotNull(member.getSAuthType());
-            assertNotNull(member.getCreateAt());
         });
 
         assertFalse(list.stream().anyMatch(b -> b.getBoard().getId() == 3));
@@ -279,7 +250,7 @@ class BoardMapperTest {
         board.setMemberPk(member.getId());
         board.setTitle("게시글 제목");
         Map<String, Object> content = Map.of("content", "게시글 내용");
-        board.setContent(content);
+        board.setContent(new JSONObject(content));
         board.setCategoryPk(category.getId());
         board.setCreateAt(LocalDateTime.now());
         board.setUpdateAt(LocalDateTime.now());
@@ -372,7 +343,7 @@ class BoardMapperTest {
         Board board = new Board();
         board.setMemberPk(member.getId());
         Map<String, Object> content = Map.of("content", "게시글 내용");
-        board.setContent(content);
+        board.setContent(new JSONObject(content));
         board.setCategoryPk(category.getId());
         board.setCreateAt(LocalDateTime.now());
         board.setUpdateAt(LocalDateTime.now());
@@ -400,7 +371,7 @@ class BoardMapperTest {
         board.setMemberPk(member.getId());
         Map<String, Object> content = Map.of("content", "게시글 내용");
         board.setTitle("게시글 제목");
-        board.setContent(content);
+        board.setContent(new JSONObject(content));
         board.setCategoryPk(category.getId());
         board.setCreateAt(LocalDateTime.now());
         board.setUpdateAt(LocalDateTime.now());
@@ -426,7 +397,7 @@ class BoardMapperTest {
         board.setMemberPk(member.getId());
         Map<String, Object> content = Map.of("content", "게시글 내용");
         board.setTitle("게시글 제목");
-        board.setContent(content);
+        board.setContent(new JSONObject(content));
         board.setCategoryPk(category.getId());
         board.setCreateAt(LocalDateTime.now());
         board.setUpdateAt(LocalDateTime.now());

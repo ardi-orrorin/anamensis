@@ -4,26 +4,53 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.anamensis.server.mapper.BoardCommentMapper">
-    <select id="findAllByBoardPk" resultMap="boardCommentResultMap">
-        SELECT *
-             , bc.board_pk AS id
-             , bc.id       AS board_comment_id
-             , m.id        AS member_id
-             , f.id        AS file_id
-          FROM board_comment bc
-          JOIN member m
-            ON bc.user_id      = m.user_id
-          LEFT JOIN file f
-            ON f.table_ref_pk  = m.id
-           AND f.table_code_pk = (SELECT tc.id
-                                    FROM table_code tc
-                                   WHERE tc.table_name = 'member')
-           AND f.is_use    = 1
-         WHERE bc.board_pk = #{boardPk}
-          AND  bc.is_use   = 1
-         ORDER BY bc.id
+<!--    <select id="findAllByBoardPk" resultMap="boardCommentResultMap">-->
+<!--        SELECT *-->
+<!--             , bc.board_pk AS id-->
+<!--             , bc.id       AS board_comment_id-->
+<!--             , m.id        AS member_id-->
+<!--             , f.id        AS file_id-->
+<!--          FROM board_comment bc-->
+<!--          JOIN member m-->
+<!--            ON bc.user_id      = m.user_id-->
+<!--          LEFT JOIN file f-->
+<!--            ON f.table_ref_pk  = m.id-->
+<!--           AND f.table_code_pk = (SELECT tc.id-->
+<!--                                    FROM table_code tc-->
+<!--                                   WHERE tc.table_name = 'member')-->
+<!--           AND f.is_use    = 1-->
+<!--         WHERE bc.board_pk = #{boardPk}-->
+<!--          AND  bc.is_use   = 1-->
+<!--         ORDER BY bc.id-->
+<!--    </select>-->
+
+    <select id="count" resultType="int">
+        SELECT IFNULL((
+            SELECT count
+             FROM board_comment_count bcc
+            WHERE bcc.board_pk  = #{boardPk})
+        , 0);
     </select>
-    
+
+    <select id="findAllByBoardPk" resultMap="boardCommentListResultMap">
+        SELECT *
+             , (SELECT concat(f.file_path, f.file_name)
+                  FROM member m
+                  LEFT JOIN file f
+                    ON f.table_ref_pk  = m.id
+                   AND f.table_code_pk = (SELECT tc.id
+                                            FROM table_code tc
+                                           WHERE tc.table_name = 'member')
+                   AND f.is_use    = 1
+                 WHERE m.user_id = bc.user_id
+             ) AS profile
+          FROM board_comment bc
+         WHERE bc.board_pk  = #{boardPk}
+           AND bc.is_use   = 1
+         ORDER BY bc.id
+         LIMIT #{page.offset}, #{page.size}
+    </select>
+
     <select id="findById">
         SELECT *
           FROM board_comment
@@ -46,6 +73,12 @@
            AND user_id  = #{userId}
            AND is_use   = 1
     </update>
+
+    <resultMap id="boardCommentListResultMap" type="com.anamensis.server.resultMap.BoardCommentResultMap$List">
+        <id property="id" column="id"/>
+        <result property="profile" column="profile" />
+        <association property="boardComment" resultMap="boardCommentEntity" />
+    </resultMap>
 
     <resultMap id="boardCommentResultMap" type="com.anamensis.server.resultMap.BoardCommentResultMap$BoardComment">
         <id property="id" column="id"/>

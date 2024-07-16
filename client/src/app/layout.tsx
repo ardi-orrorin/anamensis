@@ -5,6 +5,7 @@ import Error from "@/app/error";
 import {Metadata, Viewport} from "next";
 import Head from "next/head";
 import Script from "next/script";
+import Footer from "@/app/{components}/mainFooter";
 
 export const metadata: Metadata = {
     title: 'anamensis',
@@ -45,28 +46,31 @@ export default function RootLayout({
 }) {
 
     const gId = process.env.NEXT_PUBLIC_GID;
-  return (
-	<html lang="ko">
-        <Script id={'google-analytics'} async
-                src={`https://www.googletagmanager.com/gtag/js?id=G-${gId}`}
-        />
-        <Script id={'google-analytics'} dangerouslySetInnerHTML={{
-            __html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
+    
+    return (
+        <html lang="ko">
+            <Script id={'google-analytics'} async
+                    src={`https://www.googletagmanager.com/gtag/js?id=G-${gId}`}
+            />
+            <Script id={'google-analytics'} dangerouslySetInnerHTML={{
+                __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+        
+                gtag('config', 'G-${gId}');
+                `
+            }} />
+            <body>
+                <NavMain />
+                <div className={'min-h-screen'}>
+                    <ErrorBoundary errorComponent={Error}>
+                        {children}
+                    </ErrorBoundary>
+                </div>
+                <Footer />
+            </body>
 
-            gtag('config', 'G-${gId}');
-            `
-        }} />
-        <body>
-            <NavMain />
-            <div>
-                <ErrorBoundary errorComponent={Error}>
-                    {children}
-                </ErrorBoundary>
-            </div>
-        </body>
-	</html>
-  )
+        </html>
+    )
 }

@@ -110,7 +110,7 @@ class OTPServiceTest {
         StepVerifier.create(os.selectByUserId(member1.getUserId()))
                     .assertNext(otp -> {
                         assertNotNull(otp);
-                        assertEquals(member1.getId(), otp.getMemberPk());
+                        assertEquals(member1.getId(), otp.getOtp().getMemberPk());
                     })
                     .verifyComplete();
 
@@ -128,7 +128,7 @@ class OTPServiceTest {
         StepVerifier.create(os.selectByUserId(member2.getUserId()))
                     .assertNext(otp -> {
                         assertNotNull(otp);
-                        assertEquals(member2.getId(), otp.getMemberPk());
+                        assertEquals(member2.getId(), otp.getOtp().getMemberPk());
                     })
                     .verifyComplete();
 

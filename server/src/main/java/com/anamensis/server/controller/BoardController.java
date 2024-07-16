@@ -12,6 +12,8 @@ import com.anamensis.server.exception.AuthorizationException;
 import com.anamensis.server.resultMap.BoardResultMap;
 import com.anamensis.server.service.*;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,8 +26,6 @@ import reactor.util.function.Tuple2;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
@@ -42,6 +42,7 @@ public class BoardController {
     private final FileService fileService;
     private final BoardCommentService boardCommentService;
     private final MemberConfigSmtpService memberConfigSmtpService;
+    private final BoardIndexService boardIndexService;
 
     @PublicAPI
     @GetMapping("")
@@ -59,7 +60,9 @@ public class BoardController {
             && params.getCategoryPk() == 0
             && params.getType() == null
             && params.getValue() == null
-            && !params.getIsSelf();
+            && !params.getIsSelf()
+            && params.getIsFavorite() != null
+            && !params.getIsFavorite();
 
         if(condition) {
             list = boardService.findOnePage();
@@ -127,11 +130,10 @@ public class BoardController {
 
     @GetMapping("summary")
     public Mono<List<BoardResponse.SummaryList>> findByMemberPk(
-        Page page,
         @AuthenticationPrincipal UserDetails user
     ) {
         return userService.findUserByUserId(user.getUsername())
-                .flatMapMany(u -> boardService.findByMemberPk(u.getId(), page))
+                .flatMapMany(u -> boardService.findSummaryList(u.getId()))
                 .flatMap(b -> rateService.countRate(b.getId())
                     .doOnNext(b::setRate)
                     .map($ -> b)
@@ -145,12 +147,15 @@ public class BoardController {
     public Mono<List<BoardResponse.SummaryList>> findByMemberId(
         @PathVariable(name = "userId") String userId
     ) {
-        Page page = new Page();
-        page.setPage(1);
-        page.setSize(5);
         return userService.findUserByUserId(userId)
-            .flatMapMany(u -> boardService.findByMemberPk(u.getId(), page))
+            .flatMapMany(u -> boardService.findSummaryList(u.getId()))
             .collectList();
+    }
+
+    @PublicAPI
+    @GetMapping("notice")
+    public Mono<List<BoardResponse.Notice>> findNotice() {
+        return boardService.findNotice();
     }
 
     @PostMapping("")
@@ -166,16 +171,12 @@ public class BoardController {
         Mono<PointCode> pointCode = pointService.selectByIdOrTableName("board")
                 .subscribeOn(Schedulers.boundedElastic());
 
-        Mono<PointCode> qnaPointCode = pointService.selectByIdOrTableName("q&a")
-                .subscribeOn(Schedulers.boundedElastic());
-
         Mono<TableCode> tableCode = tableCodeService.findByIdByTableName(0, "board")
                 .share()
                 .subscribeOn(Schedulers.boundedElastic());
 
         Mono<Board> insertBoard = userService.findUserByUserId(user.getUsername())
                 .flatMap(u -> {
-
                     board.setMemberPk(u.getId());
                     return boardService.save(board.toEntity());
                 })
@@ -208,13 +209,16 @@ public class BoardController {
                                     .subscribe();
                             }
 
-                            boardService.saveIndex(b.getId(), board.getSearchText());
+                            board.setId(b.getId());
+                            boardIndexService.save(board.toEntity())
+                                .subscribe();
+
                         })
                         .subscribe();
                 })
                 .doOnNext(b -> {
                     if(b.getCategoryPk() != 3) return;
-                    findPoint(board.getContent())
+                    findPoint(new JSONObject(board.getContent()))
                         .doOnNext(p ->
                             userService.subtractPoint(b.getMemberPk(), p.point)
                                 .subscribe()
@@ -240,7 +244,10 @@ public class BoardController {
             .doOnNext(r -> {
                 if(r.getStatus() != StatusType.SUCCESS) return;
 
-                boardService.updateIndex(boardPk, board.getSearchText());
+                board.setId(boardPk);
+
+                boardIndexService.update(board.toEntity())
+                    .subscribe();
 
                 if(board.getRemoveFiles().length == 0) return;
 
@@ -266,7 +273,7 @@ public class BoardController {
                 AtomicReference<PointComment> pointCommentAtomic = new AtomicReference<>();
                 AtomicReference<Member> commentMemberAtomic = new AtomicReference<>();
 
-                findPoint(board.getContent())
+                findPoint(new JSONObject(board.getContent()))
                     .doOnNext(pointCommentAtomic::set)
                     .flatMap(point ->
                         boardCommentService.findById(point.selectCommentId)
@@ -302,30 +309,7 @@ public class BoardController {
             });
     }
 
-    private Mono<Tuple2<PointCode, TableCode>> insertQnAPointHistory(long memberPk, int point) {
-        Mono<PointCode> qnaPointCode = pointService.selectByIdOrTableName("q&a")
-            .share()
-            .subscribeOn(Schedulers.boundedElastic());
 
-        Mono<TableCode> tableCode = tableCodeService.findByIdByTableName(0, "board")
-            .share()
-            .subscribeOn(Schedulers.boundedElastic());
-
-        return Mono.zip(qnaPointCode, tableCode)
-            .publishOn(Schedulers.boundedElastic())
-            .flatMap(t -> {
-                PointHistory ph = new PointHistory();
-                ph.setMemberPk(memberPk);
-                ph.setPointCodePk(t.getT1().getId());
-                ph.setCreateAt(LocalDateTime.now());
-                ph.setTableCodePk(t.getT2().getId());
-                ph.setTableRefPk(t.getT1().getId());
-                ph.setValue(point);
-
-                return pointHistoryService.insert(ph)
-                    .flatMap($ -> Mono.just(t));
-            });
-    }
 
     @DeleteMapping("/{id}")
     public Mono<StatusResponse> disableByPk(
@@ -360,7 +344,8 @@ public class BoardController {
                             .subscribeOn(Schedulers.boundedElastic())
                             .subscribe();
 
-                    boardService.deleteIndex(boardPk);
+                    boardIndexService.delete(boardPk)
+                        .subscribe();
                 })
                 .doOnNext(r -> {
                     if(r.getStatus() != StatusType.SUCCESS) return;
@@ -374,7 +359,32 @@ public class BoardController {
                         .subscribe();
                 });
     }
-    
+
+    private Mono<Tuple2<PointCode, TableCode>> insertQnAPointHistory(long memberPk, int point) {
+        Mono<PointCode> qnaPointCode = pointService.selectByIdOrTableName("q&a")
+            .share()
+            .subscribeOn(Schedulers.boundedElastic());
+
+        Mono<TableCode> tableCode = tableCodeService.findByIdByTableName(0, "board")
+            .share()
+            .subscribeOn(Schedulers.boundedElastic());
+
+        return Mono.zip(qnaPointCode, tableCode)
+            .publishOn(Schedulers.boundedElastic())
+            .flatMap(t -> {
+                PointHistory ph = new PointHistory();
+                ph.setMemberPk(memberPk);
+                ph.setPointCodePk(t.getT1().getId());
+                ph.setCreateAt(LocalDateTime.now());
+                ph.setTableCodePk(t.getT2().getId());
+                ph.setTableRefPk(t.getT1().getId());
+                ph.setValue(point);
+
+                return pointHistoryService.insert(ph)
+                    .flatMap($ -> Mono.just(t));
+            });
+    }
+
     private Mono<StatusResponse> updateByPk(
         long boardPk,
         BoardRequest.Create board,
@@ -388,21 +398,22 @@ public class BoardController {
             .flatMap(u -> boardService.updateByPk(board.toEntity()))
             .map(result -> {
                 StatusResponse.StatusResponseBuilder sb = StatusResponse.builder();
-                return result ? sb.status(StatusType.SUCCESS)
-                    .message("게시글이 수정 되었습니다.")
-                    .build()
+                return result
+                    ? sb.status(StatusType.SUCCESS)
+                        .message("게시글이 수정 되었습니다.")
+                        .build()
                     : sb.status(StatusType.FAIL)
-                    .message("게시글 수정에 실패하였습니다.")
-                    .build();
+                        .message("게시글 수정에 실패하였습니다.")
+                        .build();
             });
     }
 
-    private Mono<PointComment> findPoint(Map<String, Object> content) {
-        List<Map<String, Object>> list = (List<Map<String, Object>>) content.get("list");
-        if(Objects.isNull(list)) return Mono.error(new RuntimeException("객체를 찾을 수 없습니다."));
+    private Mono<PointComment> findPoint(JSONObject content) {
 
-        Map<String, Object> extraValue = (Map<String, Object>) list.get(0).get("extraValue");
-        if(Objects.isNull(extraValue)) return Mono.error(new RuntimeException("객체를 찾을 수 없습니다."));
+        JSONArray list = content.getJSONArray("list");
+        if(list.isNull(0)) return Mono.error(new RuntimeException("객체를 찾을 수 없습니다."));
+        if(list.getJSONObject(0).isNull("extraValue")) return Mono.error(new RuntimeException("객체를 찾을 수 없습니다."));
+        JSONObject extraValue = list.getJSONObject(0).getJSONObject("extraValue");
 
         long selectCommentId = extraValue.get("selectId") == ""
             ? 0

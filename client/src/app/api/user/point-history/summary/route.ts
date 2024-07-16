@@ -1,6 +1,6 @@
 import apiCall from "@/app/{commons}/func/api";
-import {PointSummaryI} from "@/app/user/{components}/PointSummary";
 import {NextRequest} from "next/server";
+import {PointSummaryI} from "@/app/user/{services}/userProvider";
 
 export async function GET(req: NextRequest){
     const params = new URLSearchParams(req.nextUrl.searchParams);

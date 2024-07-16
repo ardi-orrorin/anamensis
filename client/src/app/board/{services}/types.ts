@@ -18,7 +18,7 @@ export interface BoardI {
     removeFiles?    : string[];
     isPublic?       : boolean;
     membersOnly     : boolean;
-    searchText?     : string;
+    // searchText?     : string;
     writerCreatedAt : string;
 }
 
@@ -84,7 +84,7 @@ export class Category {
 
     public static findById(id: string): Category | undefined {
         return Category.list.find((e) =>
-            e.id === id.toString()
+            e.id === id?.toString()
         );
     }
 

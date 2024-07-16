@@ -17,7 +17,7 @@ const LeftMenu = ({
 }:{
     roles: RoleType[],
 }) => {
-    const { setSearchParams} = useContext(SearchParamsProvider);
+    const { setSearchParams, searchParams} = useContext(SearchParamsProvider);
     const router = useRouter();
 
     const boardBaseUrl = '/board/new?categoryPk=';
@@ -29,13 +29,14 @@ const LeftMenu = ({
                     ? {[type]: value === value}
                     : {type: value};
 
-        console.log(search)
-
         const params = {
+            ...searchParams,
             ...search,
             page: 1, size: 20,
             add: false
         } as BoardListParamsI;
+
+        console.log(params)
 
         setSearchParams(params);
         scrollTo(0, 0);
@@ -79,10 +80,10 @@ const LeftMenu = ({
                         }
                         {
                             roles.length > 0
-                            && <button className={'flex py-2 px-5 w-full justify-between items-center text-xs hover:bg-amber-50 duration-500 outline-0'}
+                            && <button className={'flex py-2 px-5 w-full justify-between items-center text-xs text-amber-600 hover:bg-amber-50 duration-500 outline-0'}
                                        onClick={() => onChangeParamsHandler({type: 'isFavorite', value: true})}
                           >
-                                <span >
+                                <span>
                                      즐겨 찾기
                                 </span>
                             <HotKeybtn hotkey={['9']} />

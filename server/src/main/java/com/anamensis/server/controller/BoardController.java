@@ -60,6 +60,7 @@ public class BoardController {
             && params.getCategoryPk() == 0
             && params.getType() == null
             && params.getValue() == null
+            && params.getIsSelf() != null
             && !params.getIsSelf()
             && params.getIsFavorite() != null
             && !params.getIsFavorite();

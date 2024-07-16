@@ -31,8 +31,7 @@ import java.util.concurrent.Future;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class
-EmailStep {
+public class EmailStep {
 
     private final SqlSessionFactory sqlSessionFactory;
 

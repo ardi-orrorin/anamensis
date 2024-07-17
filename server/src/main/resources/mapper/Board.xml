@@ -108,7 +108,7 @@
             <if test="params != null and params.type != null and params.type == 'content' and params.value != null and params.value != ''">
                 JOIN board_index bi
                   ON bi.board_id = b.id
-                 AND bi.content REGEXP REPLACE(#{params.value}, ' ', '|')
+                 AND bi.content REGEXP REGEXP_REPLACE(TRIM(#{params.value}), '\\s+', '|')
             </if>
          WHERE b.is_use = 1
             <if test="params != null and params.isSelf != null and params.isSelf">

@@ -108,16 +108,7 @@
             <if test="params != null and params.type != null and params.type == 'content' and params.value != null and params.value != ''">
                 JOIN board_index bi
                   ON bi.board_id = b.id
-                 AND bi.content LIKE CONCAT('%', #{params.value}, '%')
-            </if>
-            <if test="params != null and params.type != null and params.type != '' and params.value != null and params.value != ''">
-                <choose>
-                    <when test="params != null and params.type == 'memberId'">
-                        JOIN member m2
-                          ON b.member_pk = m2.id
-                         AND m2.user_id LIKE CONCAT('%', #{params.value}, '%')
-                    </when>
-                </choose>
+                 AND bi.content REGEXP REGEXP_REPLACE(TRIM(#{params.value}), '\\s+', '|')
             </if>
          WHERE b.is_use = 1
             <if test="params != null and params.isSelf != null and params.isSelf">
@@ -152,7 +143,6 @@
                                   WHERE bf.member_pk = #{member.id})
                 </if>
             </if>
-
          ORDER BY b.id DESC
          LIMIT #{page.offset}, #{page.size}
     </select>

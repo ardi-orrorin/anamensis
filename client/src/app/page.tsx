@@ -14,14 +14,13 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useRootHotKey} from "@/app/{hooks}/hotKey";
 import Notices, {NoticeType} from "@/app/{components}/boards/notices";
-import {preload} from "swr";
+import useSWR, {preload} from "swr";
+import SearchInfo from "@/app/{components}/searchInfo";
 
 export type DynamicPage = {
     isEndOfList: boolean;
     isVisible  : boolean;
 }
-
-
 
 export default function Page() {
 
@@ -51,20 +50,21 @@ export default function Page() {
 
     const fetchDebounce = createDebounce(100);
 
-    preload('/api/board-favorites', async () => {
-        return await apiCall<any, boolean>({
+    useSWR('/api/board-favorites', async () => {
+        return await apiCall<string[]>({
             path: '/api/board-favorites',
             method: 'GET',
             isReturnData: true
         })
-    })
-    .then(res => {
-        if(!res) return;
-        setFavorites(res);
-    })
+        .then(res => {
+            if(res.length === 0) return;
+            setFavorites(res);
+        })
+    },{});
 
-    useEffect(()=> {
-        apiCall<NoticeType[]>({
+
+    useSWR('/api/notice', async () => {
+        return await apiCall<NoticeType[]>({
             path: '/api/board/notice',
             method: 'GET',
             isReturnData: true
@@ -73,7 +73,8 @@ export default function Page() {
             if(!res) return;
             setNoticeList(res);
         })
-    },[]);
+    },{});
+
 
     useEffect(() => {
         if(loading) return;
@@ -162,7 +163,7 @@ export default function Page() {
             searchParams, setSearchParams,
         }}>
             <div className={'p-5 flex flex-col gap-10'}>
-                <div className={'px-4 sm:px-10 md:px-20 lg:px-44 w-full flex justify-center items-center gap-3'}>
+                <div className={'px-4 sm:px-10 md:px-20 lg:px-44 w-full flex flex-col justify-center items-center gap-3'}>
                     <div className={['relative flex justify-center duration-700', searchFocus ? 'w-full sm:w-[70%]' : 'w-70 sm:w-[40%]'].join(' ')}>
                         <input className={'rounded-full outline-0 border-solid border-gray-200 border text-xs w-full h-10 py-3 pl-4 pr-20 focus:border-gray-500 duration-500'}
                                ref={searchRef}
@@ -191,7 +192,9 @@ export default function Page() {
                             />
                         </button>
                     </div>
+                    <SearchInfo />
                 </div>
+
                 <div className={'flex sm:hidden justify-center'}>
                     <TopMenu />
                 </div>

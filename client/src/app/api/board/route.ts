@@ -18,8 +18,9 @@ export async function GET(req: NextRequest) {
         value,
         categoryPk,
         isFavorite,
-        isSelf : Boolean(isSelf),
+        isSelf,
     }
+
 
     const result = await apiCall<PageResponse<BoardListI>, URLSearchParams>({
         path: '/public/api/boards',

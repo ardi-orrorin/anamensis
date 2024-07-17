@@ -31,24 +31,24 @@ export const useRootLeftMenuHotKey = ({
   roles: RoleType[],
   router: AppRouterInstance,
   confirmRole: (item: { roles: RoleType[] }) => RoleType | undefined
-  onChangeParamsHandler: (params: {type: string, value: string | number | boolean}) => void,
+  onChangeParamsHandler: ({type, value}: {type: string, value: string | number | boolean}) => void,
 }) => {
 
   const hotkeysOption: Options = {
     preventDefault: true,
-    enableOnFormTags: true
+    enableOnFormTags: false,
   }
 
   useHotkeys(['0','9'], (_, handler) => {
     switch(handler.keys?.join('')) {
       case '0':
-        onChangeParamsHandler({type: 'isSelf', value: false})
+        onChangeParamsHandler({type: 'isSelf', value: true})
         break;
       case '9':
         onChangeParamsHandler({type: 'isFavorite', value: true})
         break;
     }
-  }, hotkeysOption, []);
+  }, hotkeysOption);
 
   useHotkeys(['shift+o', 'shift+l', 'shift+i'], (e, handler) => {
     switch(handler.keys?.join('')) {

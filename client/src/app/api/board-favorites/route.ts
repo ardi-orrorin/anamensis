@@ -2,7 +2,7 @@ import {NextRequest} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
     try{
         const result = await apiCall<number[]>({
             path: '/api/board-favorites',

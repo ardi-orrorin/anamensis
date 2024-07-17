@@ -26,8 +26,10 @@ const LeftMenu = ({
             type === 'categoryPk'
                 ? {[type]: Number(value)}
                 : type === 'isSelf' || type === 'isFavorite'
-                    ? {[type]: value === value}
+                    ? {[type]: value}
                     : {type: value};
+
+
 
         const params = {
             ...searchParams,
@@ -35,8 +37,6 @@ const LeftMenu = ({
             page: 1, size: 20,
             add: false
         } as BoardListParamsI;
-
-        console.log(params)
 
         setSearchParams(params);
         scrollTo(0, 0);

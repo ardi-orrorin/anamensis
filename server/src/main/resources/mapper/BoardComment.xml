@@ -42,13 +42,16 @@
                                             FROM table_code tc
                                            WHERE tc.table_name = 'member')
                    AND f.is_use    = 1
-                 WHERE m.user_id = bc.user_id
+                 WHERE m.user_id = bc1.user_id
              ) AS profile
-          FROM board_comment bc
-         WHERE bc.board_pk  = #{boardPk}
-           AND bc.is_use   = 1
-         ORDER BY bc.id
-         LIMIT #{page.offset}, #{page.size}
+          FROM board_comment bc1
+          JOIN (
+               SELECT bc.id
+                 FROM board_comment bc
+                WHERE board_pk = #{boardPk}
+                  AND is_use = 1
+                LIMIT #{page.offset}, #{page.size}
+             ) bc2 ON bc2.id = bc1.id;
     </select>
 
     <select id="findById">

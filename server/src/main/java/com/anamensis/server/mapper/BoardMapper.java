@@ -22,6 +22,12 @@ public interface BoardMapper {
         @Param("member") Member member
     );
 
+    List<BoardResultMap.List> findIsSelf(
+        @Param("page") Page page,
+        @Param("params") BoardRequest.Params params,
+        @Param("member") Member member
+    );
+
     Optional<BoardResultMap.Board> findByPk(long boardPk);
 
     List<BoardResultMap.Board> findByMemberPk(

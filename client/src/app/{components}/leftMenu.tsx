@@ -93,7 +93,8 @@ const LeftMenu = ({
                         }
                     </div>
                     <div className={'w-auto text-sm'}>
-                        <CategorySelect onClick={onChangeParamsHandler} />
+                        <CategorySelect onClick={onChangeParamsHandler}
+                        />
                     </div>
                 </div>
                 {
@@ -171,8 +172,6 @@ const CategorySelect = ({
     
     const [selectToggle, setSelectToggle] = useState(false);
     const {searchParams} = useContext(SearchParamsProvider);
-
-    const router = useRouter();
 
     const onToggleHandler = () => {
         setSelectToggle(!selectToggle);

@@ -47,39 +47,16 @@
                           ON bi.board_id = b1.id
                          AND bi.content REGEXP REGEXP_REPLACE(TRIM(#{params.value}), '\\s+', '|')
                     </if>
-                 WHERE b1.is_use = 1
-                    <if test="params != null and params.isSelf != null and params.isSelf">
-                        AND b1.member_pk = #{member.id}
-                    </if>
+                    <if test="params != null and params.isFavorite">
+                        JOIN board_favorite bf
+                          ON bf.board_pk = b1.id
+                         AND bf.member_pk = #{member.id}
+                   </if>
+                 WHERE 1 = 1
+                   AND b1.is_use    = 1
+                   AND b1.is_public = 1
                     <if test="params != null and params.categoryPk != 0">
                         AND b1.category_pk = #{params.categoryPk}
-                    </if>
-                    <if test="params != null and params.isSelf == null or params.isSelf == false">
-                        AND b1.is_public = 1
-                        <if test="member != null and member.id != null and member.id > 0 and !params.isFavorite">
-                            OR b1.id IN (SELECT b2.id
-                                           FROM board b2
-                                          FORCE INDEX (idx_id_desc_use)
-                                          WHERE b2.member_pk = #{member.id}
-                                            <if test="params != null and params.categoryPk != 0">
-                                                AND b2.category_pk = #{params.categoryPk}
-                                            </if>
-                                            <if test="params != null
-                                                 and params.type != null
-                                                 and params.type != ''
-                                                 and params.value != null
-                                                 and params.value != ''
-                                                 and params.type == 'title'"
-                                            >
-                                                AND b1.title LIKE CONCAT('%', #{params.value}, '%')
-                                            </if>
-                                            AND b2.is_use = 1)
-                        </if>
-                        <if test="params != null and params.isFavorite">
-                            AND b1.id IN (SELECT bf.board_pk
-                                            FROM board_favorite bf
-                                           WHERE bf.member_pk = #{member.id})
-                        </if>
                     </if>
                  ORDER BY b1.id DESC
                  LIMIT #{page.offset}, #{page.size}

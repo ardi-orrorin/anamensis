@@ -18,71 +18,6 @@
                 #{memberPk}, #{isAdsense}, #{updateAt}, #{isPublic}, #{membersOnly})
     </insert>
 
-    <!-- todo: findList 안정성 확인 후 삭제 예정 -start -->
-    <select id="findListDelete" resultMap="BoardResultMapBoard">
-        SELECT *
-             , m.id AS member_pk
-             , b.id AS board_pk
-             , f.id AS file_pk
-             , (SELECT count(*)
-                  FROM board_comment bc
-                 WHERE bc.board_pk  = b.id
-                   AND bc.is_use     = 1
-             ) AS comment_count
-          FROM board b
-            <if test="params != null and params.type != null and params.type == 'content' and params.value != null and params.value != ''">
-                JOIN board_index bi
-                  ON bi.board_id = b.id
-                 AND bi.content LIKE CONCAT('%', #{params.value}, '%')
-            </if>
-          JOIN member m
-            ON m.id            = b.member_pk
-          LEFT OUTER JOIN file f
-            ON f.table_ref_pk  = m.id
-           AND f.is_use        = 1
-           AND f.table_code_pk = (SELECT t.id
-                                    FROM table_code t
-                                   WHERE t.table_name = 'member')
-         WHERE b.is_use = 1
-           <if test="params != null and params.isSelf != null and params.isSelf">
-               AND b.member_pk = #{member.id}
-           </if>
-           <if test="params != null and params.categoryPk != 0">
-               AND b.category_pk = #{params.categoryPk}
-           </if>
-           <if test="params != null and params.type != null and params.type != '' and params.value != null and params.value != ''">
-               <choose>
-                    <when test="params != null and params.type == 'memberId'">
-                         AND m.user_id LIKE CONCAT('%', #{params.value}, '%')
-                    </when>
-               </choose>
-           </if>
-           <if test="params != null and params.isSelf == null or params.isSelf == false">
-               AND b.is_public = 1
-               <if test="member != null and member.id != null and member.id > 0">
-                   OR b.id IN (SELECT b2.id
-                                 FROM board b2
-                                WHERE b2.member_pk = #{member.id}
-                                   <if test="params != null and params.categoryPk != 0">
-                                       AND b2.category_pk = #{params.categoryPk}
-                                   </if>
-                                   <if test="params != null
-                                         and params.type != null
-                                         and params.type != ''
-                                         and params.value != null
-                                         and params.value != ''
-                                         and params.type == 'title'"
-                                   >
-                                       AND b.title LIKE CONCAT('%', #{params.value}, '%')
-                                   </if>
-                                  AND b2.is_use = 1)
-               </if>
-           </if>
-         ORDER BY b.id DESC
-         LIMIT #{page.offset}, #{page.size}
-    </select>
-    <!-- todo: findList 안정성 확인 후 삭제 예정 -end -->
-
     <select id="findList" resultMap="BoardResultMapBoardList">
         SELECT *
              , b.id AS board_pk
@@ -105,46 +40,50 @@
                    AND f.is_use        = 1
              ) AS profile
           FROM board b
-            <if test="params != null and params.type != null and params.type == 'content' and params.value != null and params.value != ''">
-                JOIN board_index bi
-                  ON bi.board_id = b.id
-                 AND bi.content REGEXP REGEXP_REPLACE(TRIM(#{params.value}), '\\s+', '|')
-            </if>
-         WHERE b.is_use = 1
-            <if test="params != null and params.isSelf != null and params.isSelf">
-                AND b.member_pk = #{member.id}
-            </if>
-            <if test="params != null and params.categoryPk != 0">
-                AND b.category_pk = #{params.categoryPk}
-            </if>
-            <if test="params != null and params.isSelf == null or params.isSelf == false">
-                AND b.is_public = 1
-                <if test="member != null and member.id != null and member.id > 0 and !params.isFavorite">
-                    OR b.id IN (SELECT b2.id
-                                  FROM board b2
-                                 WHERE b2.member_pk = #{member.id}
-                                    <if test="params != null and params.categoryPk != 0">
-                                        AND b2.category_pk = #{params.categoryPk}
-                                    </if>
-                                    <if test="params != null
-                                         and params.type != null
-                                         and params.type != ''
-                                         and params.value != null
-                                         and params.value != ''
-                                         and params.type == 'title'"
-                                    >
-                                        AND b.title LIKE CONCAT('%', #{params.value}, '%')
-                                    </if>
-                                    AND b2.is_use = 1)
-                </if>
-                <if test="params != null and params.isFavorite">
-                    AND b.id IN (SELECT bf.board_pk
-                                   FROM board_favorite bf
-                                  WHERE bf.member_pk = #{member.id})
-                </if>
-            </if>
-         ORDER BY b.id DESC
-         LIMIT #{page.offset}, #{page.size}
+          JOIN (SELECT b1.id
+                  FROM  board b1
+                    <if test="params != null and params.type != null and params.type == 'content' and params.value != null and params.value != ''">
+                        JOIN board_index bi
+                          ON bi.board_id = b1.id
+                         AND bi.content REGEXP REGEXP_REPLACE(TRIM(#{params.value}), '\\s+', '|')
+                    </if>
+                 WHERE b1.is_use = 1
+                    <if test="params != null and params.isSelf != null and params.isSelf">
+                        AND b1.member_pk = #{member.id}
+                    </if>
+                    <if test="params != null and params.categoryPk != 0">
+                        AND b1.category_pk = #{params.categoryPk}
+                    </if>
+                    <if test="params != null and params.isSelf == null or params.isSelf == false">
+                        AND b1.is_public = 1
+                        <if test="member != null and member.id != null and member.id > 0 and !params.isFavorite">
+                            OR b1.id IN (SELECT b2.id
+                                           FROM board b2
+                                          FORCE INDEX (idx_id_desc_use)
+                                          WHERE b2.member_pk = #{member.id}
+                                            <if test="params != null and params.categoryPk != 0">
+                                                AND b2.category_pk = #{params.categoryPk}
+                                            </if>
+                                            <if test="params != null
+                                                 and params.type != null
+                                                 and params.type != ''
+                                                 and params.value != null
+                                                 and params.value != ''
+                                                 and params.type == 'title'"
+                                            >
+                                                AND b1.title LIKE CONCAT('%', #{params.value}, '%')
+                                            </if>
+                                            AND b2.is_use = 1)
+                        </if>
+                        <if test="params != null and params.isFavorite">
+                            AND b1.id IN (SELECT bf.board_pk
+                                            FROM board_favorite bf
+                                           WHERE bf.member_pk = #{member.id})
+                        </if>
+                    </if>
+                 ORDER BY b1.id DESC
+                 LIMIT #{page.offset}, #{page.size}
+         ) b3 ON b3.id = b.id
     </select>
 
     <select id="findByPk" resultMap="BoardResultMapBoard" parameterType="Long">

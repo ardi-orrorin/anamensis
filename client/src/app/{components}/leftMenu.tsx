@@ -24,12 +24,10 @@ const LeftMenu = ({
     const onChangeParamsHandler = ({type, value}: {type: string, value: string | number | boolean}) => {
         const search =
             type === 'categoryPk'
-                ? {[type]: Number(value)}
+                ? {[type]: searchParams[type]?.toString() === value ? 0 : Number(value)}
                 : type === 'isSelf' || type === 'isFavorite'
-                    ? {[type]: value}
+                    ? {[type]: !searchParams[type]}
                     : {type: value};
-
-
 
         const params = {
             ...searchParams,
@@ -185,13 +183,10 @@ const CategorySelect = ({
 
     const hotkeysOption: Options = {
         preventDefault: true,
-        keyup: true,
-        keydown: true,
     }
 
     useHotkeys(['`, 1', '2', '3', '4', '5'], (e, handler)=> {
         if(handler.keys?.join('') === 'backquote') {
-
             const selCategoryPk = Category.findById('0')!.id;
             selectHandler(selCategoryPk);
             return
@@ -199,7 +194,7 @@ const CategorySelect = ({
         const selCategoryPk = Category.findById(handler.keys?.join('')!)!.id;
         selectHandler(selCategoryPk);
 
-    }, hotkeysOption, []);
+    }, hotkeysOption,[searchParams]);
 
     return (
         <div className={[

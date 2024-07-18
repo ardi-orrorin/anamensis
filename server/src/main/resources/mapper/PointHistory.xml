@@ -36,6 +36,7 @@
           FROM point_history ph1
           JOIN (SELECT ph.id
                   FROM point_history ph
+                 FORCE INDEX (idx_id_desc_member_pk)
                 <if test="param != null and param.pointCodeName != null and param.pointCodeName != ''">
                   JOIN point_code pc
                     ON ph.point_code_pk = pc.id

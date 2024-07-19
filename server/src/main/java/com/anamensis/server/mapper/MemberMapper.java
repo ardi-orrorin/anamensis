@@ -1,6 +1,8 @@
 package com.anamensis.server.mapper;
 
 
+import com.anamensis.server.dto.Page;
+import com.anamensis.server.dto.request.BoardRequest;
 import com.anamensis.server.entity.AuthType;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.entity.Member;
@@ -15,7 +17,12 @@ import java.util.Optional;
 @Mapper
 public interface MemberMapper {
 
-    List<Member> findAllMember();
+    long count(UserRequest.Params params);
+
+    List<MemberResultMap> findAllMember(
+        @Param("page") Page page,
+        @Param("params") UserRequest.Params params
+    );
 
     Optional<Member> findMemberByUserId(String userId);
 
@@ -53,4 +60,6 @@ public interface MemberMapper {
     int deleteRole(Role role);
 
     int update(Member member);
+
+
 }

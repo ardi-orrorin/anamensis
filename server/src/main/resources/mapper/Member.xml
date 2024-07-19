@@ -8,9 +8,41 @@
         SELECT *
           FROM member
     </sql>
-    <select id="findAllMember" resultType="Member">
-        <include refid="tbl_member"/>
+
+    <select id="count" resultType="Long">
+        SELECT COUNT(DISTINCT m.id)
+          FROM member m
+        <if test="role != null and role != ''">
+          JOIN role r
+            ON r.member_pk = m.id
+           AND r.role = #{role}
+        </if>
+         WHERE 1 = 1
+        <if test="userId != null and userId != ''">
+           AND m.user_id LIKE concat('%', #{userId}, '%')
+        </if>
     </select>
+
+    <select id="findAllMember" resultMap="memberResultMap">
+        SELECT *
+          FROM member m
+          JOIN (SELECT m1.id
+                  FROM member m1
+                 WHERE 1 = 1
+                  <if test="params != null and params.userId != null and params.userId != ''">
+                    AND m1.user_id LIKE concat('%', #{params.userId}, '%')
+                  </if>
+                 ORDER BY m1.user_id
+                 LIMIT #{page.offset}, #{page.size}
+             ) m2
+            ON m.id = m2.id
+          JOIN role r
+            ON r.member_pk = m2.id
+           <if test="params != null and params.role != null and params.role != ''">
+               AND r.role = #{params.role}
+           </if>
+    </select>
+
     <select id="findMemberByUserId" resultType="Member">
         <include refid="tbl_member"/>
         WHERE user_id = #{userId}

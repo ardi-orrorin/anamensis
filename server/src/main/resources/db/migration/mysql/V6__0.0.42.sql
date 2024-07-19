@@ -1,0 +1,1 @@
+CREATE INDEX idx_user_id_create_at_desc ON member(user_id, create_at DESC);

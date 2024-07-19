@@ -78,24 +78,25 @@
                 <if test="params != null and params.type != null and params.type == 'content' and params.value != null and params.value != ''">
                  JOIN board_index bi
                    ON bi.board_id = b1.id
-                  AND bi.content REGEXP REGEXP_REPLACE(TRIM('업데이트'), '\\s+', '|')
+                  AND bi.content REGEXP REGEXP_REPLACE(TRIM(#{params.value}), '\\s+', '|')
                 </if>
                 WHERE 1 = 1
                   AND b1.member_pk = #{member.id}
                 <if test="params != null and params.categoryPk != 0">
-                    AND b1.category_pk = #{params.categoryPk}
+                  AND b1.category_pk = #{params.categoryPk}
                 </if>
-                  AND b1.is_use    = 1
+                  AND b1.is_use = 1
                 ORDER BY b1.id DESC
                 LIMIT #{page.offset}, #{page.size}
-            ) b3 ON b3.id = b.id
-        JOIN member m
-          ON m.id = b.member_pk
-        JOIN file f
-          ON f.table_ref_pk  = b.member_pk
-         AND f.table_code_pk = (SELECT tc.id
-                                  FROM table_code tc
-                                 WHERE tc.table_name = 'member')
+            ) b3
+           ON b3.id = b.id
+         JOIN member m
+           ON m.id  = b.member_pk
+         JOIN file f
+           ON f.table_ref_pk  = b.member_pk
+          AND f.table_code_pk = (SELECT tc.id
+                                   FROM table_code tc
+                                  WHERE tc.table_name = 'member')
          AND f.is_use = 1;
     </select>
 
@@ -119,7 +120,7 @@
              , id as board_pk
           FROM board
          WHERE member_pk = #{memberPk}
-           AND is_use  = 1
+           AND is_use    = 1
          ORDER BY id DESC
          LIMIT #{page.offset}, #{page.size}
     </select>

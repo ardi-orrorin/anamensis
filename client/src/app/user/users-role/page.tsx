@@ -96,12 +96,18 @@ export default function Page() {
     }
 
     const onSaveRoles = async (mode: 'add' | 'delete') => {
+
+        const ids = users
+            .filter(user => select.includes(user.id))
+            .filter(user => {
+                if(mode === 'add') return !user.roles.includes(role);
+                if(mode === 'delete') return user.roles.includes(role);
+            })
+            .map(user => user.id);
+
         const body = {
-            ids: select,
-            mode,
-            role,
+            mode, ids, role,
         }
-        console.log(body)
 
         try {
             const res = await apiCall({
@@ -110,7 +116,6 @@ export default function Page() {
                 body,
                 isReturnData: true
             });
-            console.log(res);
 
             if(!res) return;
             await mutate();

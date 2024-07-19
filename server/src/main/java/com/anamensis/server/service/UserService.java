@@ -245,9 +245,7 @@ public class UserService implements ReactiveUserDetailsService {
         return Mono.just(role);
     }
 
-    // fixme: primary 중복 오류 수정
     public Mono<Boolean> updateRole(UserRequest.UpdateRole role) {
-
         return Mono.fromCallable(() -> {
                 if("add".equalsIgnoreCase(role.getMode())) {
                     return memberMapper.saveRoles(role.getIds(), role.getRole()) > 0;

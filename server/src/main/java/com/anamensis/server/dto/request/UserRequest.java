@@ -10,6 +10,7 @@ import lombok.*;
 import org.hibernate.validator.constraints.pl.NIP;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class UserRequest {
 
@@ -175,7 +176,7 @@ public class UserRequest {
     @ToString
     public static class UpdateRole {
         private String mode;
-        private long id;
+        private List<Long> ids;
         private RoleType role;
 
         public void setRole(String role) {

@@ -7,6 +7,7 @@ import com.anamensis.server.entity.AuthType;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.Role;
+import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.resultMap.MemberResultMap;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -56,10 +57,16 @@ public interface MemberMapper {
     int save(Member member);
 
     int saveRole(Role role);
-
-    int deleteRole(Role role);
+    int saveRoles(
+        @Param("ids") List<Long> ids,
+        @Param("role") RoleType role
+    );
 
     int update(Member member);
 
+    int deleteRoles(
+        @Param("ids") List<Long> ids,
+        @Param("role") RoleType role
+    );
 
 }

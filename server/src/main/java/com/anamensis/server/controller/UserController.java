@@ -10,6 +10,7 @@ import com.anamensis.server.provider.TokenProvider;
 import com.anamensis.server.resultMap.MemberResultMap;
 import com.anamensis.server.service.*;
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
@@ -39,6 +40,36 @@ public class UserController {
     private final PointService ps;
     private final PointHistoryService phs;
     private final TableCodeService tableCodeService;
+
+
+    @MasterAPI
+    @GetMapping("list")
+    public Mono<PageResponse<UserResponse.List>> findAll(
+        Page page,
+        UserRequest.Params params
+    ) {
+
+        Mono<List<UserResponse.List>> users = userService.findAllMember(page, params)
+            .collectList()
+            .subscribeOn(Schedulers.boundedElastic());
+
+        Mono<Long> count = userService.count(params)
+            .subscribeOn(Schedulers.boundedElastic());
+
+        return Mono.zip(users, count)
+            .flatMap(t -> {
+                page.setTotal(t.getT2().intValue());
+                return Mono.just(new PageResponse<>(page, t.getT1()));
+            });
+    }
+
+    @MasterAPI
+    @PutMapping("role")
+    public Mono<Boolean> updateRole(
+            @RequestBody UserRequest.UpdateRole role
+    ) {
+        return userService.updateRole(role);
+    }
 
     @PublicAPI
     @PostMapping("login")

@@ -1,5 +1,6 @@
 package com.anamensis.server.mapper;
 
+import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.entity.AuthType;
 import com.anamensis.server.entity.Member;
@@ -86,37 +87,43 @@ class MemberMapperTest {
     @DisplayName("모든 유저 조회")
     @Order(1)
     void findAllUsers() {
-        List<Member> member = memberMapper.findAllMember();
+        Page page = new Page();
+        page.setPage(1);
+        page.setSize(10);
+
+        UserRequest.Params params = new UserRequest.Params();
+
+        List<MemberResultMap> member = memberMapper.findAllMember(page, params);
         assertTrue(member.size() > 0);
 
         // not null
         member.forEach(m -> {
-            assertNotEquals(0, m.getId());
-            assertNotNull(m.getUserId());
-            assertNotNull(m.getName());
-            assertNotNull(m.getEmail());
-            assertNotNull(m.getPhone());
-            assertNotNull(m.getCreateAt());
+            assertNotEquals(0, m.getMemberPk());
+            assertNotNull(m.getMember().getUserId());
+            assertNotNull(m.getMember().getName());
+            assertNotNull(m.getMember().getEmail());
+            assertNotNull(m.getMember().getPhone());
+            assertNotNull(m.getMember().getCreateAt());
         });
 
-        member.stream().filter(m -> m.getUserId().equals("admin1"))
+        member.stream().filter(m -> m.getMember().getUserId().equals("admin1"))
                 .findFirst()
                 .ifPresentOrElse(m -> {
-                    assertEquals("admin1", m.getUserId());
-                    assertEquals("admin1", m.getName());
-                    assertEquals("admin1@gmail.com", m.getEmail());
-                    assertEquals("010-1111-1111", m.getPhone());
-                    assertTrue(m.isUse());
+                    assertEquals("admin1", m.getMember().getUserId());
+                    assertEquals("admin1", m.getMember().getName());
+                    assertEquals("admin1@gmail.com", m.getMember().getEmail());
+                    assertEquals("010-1111-1111", m.getMember().getPhone());
+                    assertTrue(m.getMember().isUse());
                 }, () -> fail("user not found"));
 
-        member.stream().filter(m -> m.getUserId().equals("admin2"))
+        member.stream().filter(m -> m.getMember().getUserId().equals("admin2"))
                 .findFirst()
                 .ifPresentOrElse(m -> {
-                    assertEquals("admin2", m.getUserId());
-                    assertEquals("admin2", m.getName());
-                    assertEquals("admin2@gmail.com", m.getEmail());
-                    assertEquals("010-1111-2222", m.getPhone());
-                    assertTrue(m.isUse());
+                    assertEquals("admin2", m.getMember().getUserId());
+                    assertEquals("admin2", m.getMember().getName());
+                    assertEquals("admin2@gmail.com", m.getMember().getEmail());
+                    assertEquals("010-1111-2222", m.getMember().getPhone());
+                    assertTrue(m.getMember().isUse());
                 }, () -> fail("user not found"));
     }
 

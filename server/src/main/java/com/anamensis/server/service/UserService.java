@@ -2,6 +2,7 @@ package com.anamensis.server.service;
 
 
 import com.anamensis.server.dto.Device;
+import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.UserDto;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.dto.response.UserResponse;
@@ -24,6 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -48,6 +50,18 @@ public class UserService implements ReactiveUserDetailsService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private final AwsSesMailProvider awsSesMailProvider;
+
+
+    public Mono<Long> count(UserRequest.Params params) {
+        return Mono.fromCallable(() -> memberMapper.count(params));
+    }
+
+
+    public Flux<UserResponse.List> findAllMember(Page page, UserRequest.Params params) {
+        return Flux.fromIterable(memberMapper.findAllMember(page, params))
+            .log()
+            .map(UserResponse.List::transToList);
+    }
 
 
     public Mono<Member> findUserByUserId(String userId) {
@@ -229,5 +243,19 @@ public class UserService implements ReactiveUserDetailsService {
         role.setMemberPk(users.getId());
         role.setRole(roleType);
         return Mono.just(role);
+    }
+
+    public Mono<Boolean> updateRole(UserRequest.UpdateRole role) {
+        return Mono.fromCallable(() -> {
+                if("add".equalsIgnoreCase(role.getMode())) {
+                    return memberMapper.saveRoles(role.getIds(), role.getRole()) > 0;
+                } else if("delete".equalsIgnoreCase(role.getMode())) {
+                    return memberMapper.deleteRoles(role.getIds(), role.getRole()) > 0;
+                } else {
+                    return false;
+                }
+            })
+            .onErrorReturn(false);
+
     }
 }

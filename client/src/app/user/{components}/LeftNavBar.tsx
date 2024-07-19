@@ -9,7 +9,7 @@ import {
     faFilePowerpoint,
     faGear,
     faKey,
-    faRectangleList,
+    faRectangleList, faUserGear,
 } from "@fortawesome/free-solid-svg-icons";
 import React, {useEffect} from "react";
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
@@ -43,6 +43,7 @@ const LeftNavBar = ({
     const iconSize = 16;
     const menuItems: MenuItemType[] = [
         {name: 'SYSTEM', href:'/user/system', icon: faGear, role: RoleType.ADMIN},
+        {name: '권한관리', href:'/user/users-role', icon: faUserGear, role: RoleType.MASTER},
     ]
 
     const initFetch = useSWR('/user/navBar', async () => {

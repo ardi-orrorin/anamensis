@@ -7,6 +7,7 @@ import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.Role;
 import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.resultMap.MemberResultMap;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.jsonwebtoken.io.Serializer;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,6 +16,7 @@ import lombok.ToString;
 import org.springframework.http.HttpStatus;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class UserResponse {
@@ -32,7 +34,7 @@ public class UserResponse {
         private long refreshTokenExpiresIn;
 
         private String username;
-        private List<RoleType> roles;
+        private java.util.List<RoleType> roles;
 
         public static Login transToLogin(MemberResultMap member, Token token) {
             return Login.builder()
@@ -103,6 +105,38 @@ public class UserResponse {
 
         public static Status transToStatus(HttpStatus status, String message) {
             return new Status(status, message);
+        }
+    }
+
+    @Getter
+    @Builder
+    public static class List {
+
+        private long id;
+
+        private String userId;
+
+        private String email;
+
+        private String name;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime createAt;
+
+        private Boolean isUse;
+
+        private java.util.List<RoleType> roles;
+
+        public static List transToList(MemberResultMap user) {
+            return List.builder()
+                    .id(user.getMember().getId())
+                    .userId(user.getMember().getUserId())
+                    .email(user.getMember().getEmail())
+                    .name(user.getMember().getName())
+                    .createAt(user.getMember().getCreateAt())
+                    .isUse(user.getMember().isUse())
+                    .roles(user.getRoles().stream().map(Role::getRole).toList())
+                    .build();
         }
     }
 

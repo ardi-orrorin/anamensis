@@ -1,6 +1,7 @@
 package com.anamensis.server.config;
 
 import com.anamensis.server.controller.AdminAPI;
+import com.anamensis.server.controller.MasterAPI;
 import com.anamensis.server.controller.PublicAPI;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.result.method.RequestMappingInfo;
@@ -14,7 +15,8 @@ public class PathRequestMappingConfig extends RequestMappingHandlerMapping {
     @Override
     protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
         boolean skip = method.getAnnotation(PublicAPI.class) == null
-                    && method.getAnnotation(AdminAPI.class)  == null;
+                    && method.getAnnotation(AdminAPI.class)  == null
+                    && method.getAnnotation(MasterAPI.class) == null;
 
         if(skip) return super.getMappingForMethod(method, handlerType);
 
@@ -30,6 +32,12 @@ public class PathRequestMappingConfig extends RequestMappingHandlerMapping {
             return RequestMappingInfo.paths("admin")
                     .build()
                     .combine(requestMappingInfo);
+        }
+
+        if(requestMappingInfo != null && method.getAnnotation(MasterAPI.class) != null) {
+            return RequestMappingInfo.paths("master")
+                .build()
+                .combine(requestMappingInfo);
         }
 
         return requestMappingInfo;

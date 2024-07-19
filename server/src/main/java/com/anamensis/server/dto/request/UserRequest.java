@@ -2,6 +2,7 @@ package com.anamensis.server.dto.request;
 
 import com.anamensis.server.dto.ResetPwdProgress;
 import com.anamensis.server.entity.Member;
+import com.anamensis.server.entity.RoleType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -152,5 +153,33 @@ public class UserRequest {
             return progress;
         }
 
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    public static class Params {
+
+        private String userId;
+
+        private RoleType role;
+
+        public void setRole(String role) {
+            this.role = RoleType.valueOf(role.toUpperCase());
+        }
+
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    public static class UpdateRole {
+        private String mode;
+        private long id;
+        private RoleType role;
+
+        public void setRole(String role) {
+            this.role = RoleType.valueOf(role.toUpperCase());
+        }
     }
 }

@@ -41,9 +41,14 @@ public class BoardService {
         BoardRequest.Params params,
         Member member
     ) {
-        return Flux.fromIterable(boardMapper.findList(page, params, member))
-                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
-                .map(BoardResponse.List::from);
+
+        List<BoardResultMap.List> list = params.getIsSelf() != null && params.getIsSelf()
+            ? boardMapper.findIsSelf(page, params, member)
+            : boardMapper.findList(page, params, member);
+
+        return Flux.fromIterable(list)
+            .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+            .map(BoardResponse.List::from);
     }
 
     public Flux<BoardResponse.List> findOnePage() {

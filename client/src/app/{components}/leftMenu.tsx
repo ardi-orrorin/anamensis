@@ -22,16 +22,20 @@ const LeftMenu = ({
 
     const boardBaseUrl = '/board/new?categoryPk=';
     const onChangeParamsHandler = ({type, value}: {type: string, value: string | number | boolean}) => {
-        const search =
-            type === 'categoryPk'
-                ? {[type]: searchParams[type]?.toString() === value ? 0 : Number(value)}
-                : type === 'isSelf' || type === 'isFavorite'
-                    ? {[type]: !searchParams[type]}
-                    : {type: value};
+        const category = type === 'categoryPk'
+            && {[type]: searchParams[type]?.toString() === value ? 0 : Number(value)}
+
+        const isSelf = type === 'isSelf'
+            && {[type]: !searchParams[type], isFavorite: false};
+
+        const isFavorite = type === 'isFavorite'
+            && {[type]: !searchParams[type], isSelf: false};
 
         const params = {
             ...searchParams,
-            ...search,
+            ...category,
+            ...isSelf,
+            ...isFavorite,
             page: 1, size: 20,
             add: false
         } as BoardListParamsI;
@@ -89,7 +93,8 @@ const LeftMenu = ({
                         }
                     </div>
                     <div className={'w-auto text-sm'}>
-                        <CategorySelect onClick={onChangeParamsHandler} />
+                        <CategorySelect onClick={onChangeParamsHandler}
+                        />
                     </div>
                 </div>
                 {
@@ -167,8 +172,6 @@ const CategorySelect = ({
     
     const [selectToggle, setSelectToggle] = useState(false);
     const {searchParams} = useContext(SearchParamsProvider);
-
-    const router = useRouter();
 
     const onToggleHandler = () => {
         setSelectToggle(!selectToggle);

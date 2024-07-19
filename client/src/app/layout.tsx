@@ -3,7 +3,6 @@ import NavMain from "@/app/NavMain";
 import {ErrorBoundary} from "next/dist/client/components/error-boundary";
 import Error from "@/app/error";
 import {Metadata, Viewport} from "next";
-import Head from "next/head";
 import Script from "next/script";
 import Footer from "@/app/{components}/mainFooter";
 

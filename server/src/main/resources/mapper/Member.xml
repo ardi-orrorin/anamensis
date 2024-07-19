@@ -96,8 +96,19 @@
     </insert>
     <insert id="saveRole" parameterType="Role">
         INSERT INTO role (member_pk, role)
-        VALUES (#{memberPk}, #{role})
+        VALUES (#{memberPk}},#{role})
+            <foreach collection="ids" item="id" separator=",">
+                (#{id}, #{role})
+            </foreach>
     </insert>
+    <insert id="saveRoles">
+        INSERT INTO role (member_pk, role)
+        VALUES
+        <foreach collection="ids" item="id" separator=",">
+            (#{id}, #{role})
+        </foreach>
+    </insert>
+
     <update id="editAuth" parameterType="map">
         UPDATE member
            SET s_auth      = #{isAuth},
@@ -145,6 +156,16 @@
           FROM role
          WHERE member_pk = #{memberPk}
            AND role      = #{role}
+    </delete>
+
+    <delete id="deleteRoles">
+        DELETE
+          FROM role
+         WHERE member_pk
+            IN <foreach collection="ids" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+           AND role = #{role}
     </delete>
     
     <resultMap id="memberResultMap" type="MemberResultMap" autoMapping="true">

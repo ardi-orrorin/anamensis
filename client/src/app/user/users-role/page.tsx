@@ -25,6 +25,8 @@ export default function Page() {
 
     const [users, setUsers] = useState<UsersRole[]>([]);
     const [page, setPage] = useState<PageI>({} as PageI);
+    const [select, setSelect] = useState<number[]>([]);
+    const [role, setRole] = useState<RoleType>('' as RoleType);
 
     const maxIndex = useMemo(()=> page.total - ((page.page - 1) * page.size), [page]);
 
@@ -59,7 +61,7 @@ export default function Page() {
         }
 
         const body = {
-            id: user.id,
+            ids: [user.id],
             role: selRole,
             mode,
         }
@@ -79,11 +81,77 @@ export default function Page() {
         }
     }
 
+    const onSelectHandlerAll = () => {
+        if(select.length === users.length) {
+            return setSelect([]);
+        }
+        setSelect([...users.map((user) => user.id)]);
+    }
+
+    const onSelectHandler = (id: number) => {
+        if(select.includes(id)) {
+            return setSelect(select.filter((item) => item !== id));
+        }
+        return setSelect([...select, id]);
+    }
+
+    const onSaveRoles = async (mode: 'add' | 'delete') => {
+        const body = {
+            ids: select,
+            mode,
+            role,
+        }
+        console.log(body)
+
+        try {
+            const res = await apiCall({
+                path : '/api/user/users-role',
+                method : 'PUT',
+                body,
+                isReturnData: true
+            });
+            console.log(res);
+
+            if(!res) return;
+            await mutate();
+        } catch (e) {
+            const err = e as AxiosError
+            console.log(err)
+        }
+    }
+
 
     return (
-        <div className={'flex w-full h-full flex-col'}>
+        <div className={'flex w-full h-full flex-col gap-2'}>
+            <div className={'px-2 w-full flex gap-2 h-7'}>
+                {
+                    select.length > 0
+                    && <div className={'h-full flex gap-2 text-sm items-center'}>
+                        <span>
+                          선택 : {select.length}
+                        </span>
+                        <select className={'w-20 outline-0'} onChange={e => {setRole(e.target.value as RoleType)}}>
+                            <option value={''}>선택</option>
+                            <option value={'ADMIN'}>ADMIN</option>
+                            <option value={'USER'}>USER</option>
+                            <option value={'GUEST'}>GUEST</option>
+                        </select>
+                        <button className={'w-16 bg-blue-300 text-white rounded-md text-sm px-2 py-1'}
+                              onClick={()=>onSaveRoles('add')}
+                        >
+                          저장
+                        </button>
+                        <button className={'w-16 bg-red-700 text-white rounded-md text-sm px-2 py-1'}
+                                onClick={()=>onSaveRoles('delete')}
+                        >
+                          삭제
+                        </button>
+                    </div>
+                }
+            </div>
             <table className={'w-full'}>
                 <colgroup>
+                    <col style={{width: '3%'}}/>
                     <col style={{width: '3%'}}/>
                     <col style={{width: '10%'}}/>
                     <col style={{width: '10%'}}/>
@@ -96,6 +164,13 @@ export default function Page() {
                 </colgroup>
                 <thead className={'bg-blue-300 text-white h-8 align-middle'}>
                     <tr className={'text-sm border-x border-white border-solid'}>
+                        <th className={'border-x border-white border-solid'}>
+                            <input className={'border-0 outline-0 text-lg'}
+                                   type={'checkbox'}
+                                   checked={select.length === users.length}
+                                   onClick={onSelectHandlerAll}
+                            />
+                        </th>
                         <th className={'border-x border-white border-solid'}>#</th>
                         <th className={'border-x border-white border-solid'}>아이디</th>
                         <th className={'border-x border-white border-solid'}>이름</th>
@@ -112,6 +187,12 @@ export default function Page() {
                 users.map((user, index) => {
                     return (
                         <tr key={'user-role' + user.id} className={['border-b border-gray-200 border-solid', index % 2 === 1 ? 'bg-blue-50': ''].join(' ')}>
+                            <td className={'py-2 px-3'}>
+                                <input type={'checkbox'}
+                                       checked={!!select.find(id => id === user.id)}
+                                       onClick={() =>onSelectHandler(user.id)}
+                                />
+                            </td>
                             <td className={'py-2 px-3'}>
                                 { maxIndex - index }
                             </td>
@@ -141,7 +222,7 @@ export default function Page() {
                                 { user.isUse ? '사용' : '비사용' }
                             </td>
                             <td className={'py-2 px-3'}>
-                                <select onChange={e => onChangeRole('add', user, e.target.value as RoleType)}>
+                                <select className={'w-20 bg-opacity-0'} onChange={e => onChangeRole('add', user, e.target.value as RoleType)}>
                                     <option value={''}>선택</option>
                                     {
                                         !user.roles.includes('ADMIN')
@@ -154,7 +235,7 @@ export default function Page() {
                                 </select>
                             </td>
                             <td className={'py-2 px-3'}>
-                                <select onChange={e => onChangeRole('delete', user, e.target.value as RoleType)}>
+                                <select className={'w-20'} onChange={e => onChangeRole('delete', user, e.target.value as RoleType)}>
                                     <option value={''}>선택</option>
                                     {
                                         user.roles.map(role => {

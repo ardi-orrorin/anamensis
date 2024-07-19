@@ -18,13 +18,13 @@ const NavMain = async () => {
 
     const rightMenuItems : NavItemProps[] = [
         {
-            name: <FontAwesomeIcon icon={faPenToSquare} />,
+            name: <FontAwesomeIcon className={'w-4'} icon={faPenToSquare} />,
             url: '/board/new?categoryPk=2',
             loginRequired: true,
             prefetch: true,
         },
         {
-            name: <FontAwesomeIcon icon={faUserPlus} />,
+            name: <FontAwesomeIcon className={'w-4'} icon={faUserPlus} />,
             url: '/signup',
             loginRequired: false,
             prefetch: true,
@@ -36,7 +36,7 @@ const NavMain = async () => {
             prefetch: true,
         },
         {
-            name: <FontAwesomeIcon icon={faRightToBracket} />,
+            name: <FontAwesomeIcon className={'w-4'} icon={faRightToBracket} />,
             url: '/login',
             loginRequired: false,
             prefetch: true,
@@ -50,11 +50,12 @@ const NavMain = async () => {
     ];
 
     return (
-        <nav className={'w-full flex justify-between items-center bg-blue-500 text-white h-12'}>
-            <div className={''}>
-                <Link className={'flex justify-center p-3 hover:bg-blue-600 rounded duration-500'}
+        <nav className={'w-full p-1 flex justify-between items-center bg-blue-500 text-white h-12'}>
+            <div>
+                <Link className={'w-28 h-10 flex justify-center items-center hover:bg-blue-600 rounded duration-500'}
                       href={'/'}
-                >ANAMENSIS</Link>
+                >ANAMENSIS
+                </Link>
             </div>
             <div className={'w-1/3'}>
                 <ul className={'flex justify-end'}>
@@ -74,8 +75,8 @@ const NavMain = async () => {
 
 const NavItem = ({name, url, prefetch}: NavItemProps) => {
     return (
-        <li className={'p-3 h-full hover:bg-blue-600 rounded duration-500'}>
-            <Link className={'flex'}
+        <li>
+            <Link className={'w-10 h-10 flex justify-center items-center hover:bg-blue-600 rounded duration-500'}
                   href={url}
                   prefetch={prefetch}
             >{name}

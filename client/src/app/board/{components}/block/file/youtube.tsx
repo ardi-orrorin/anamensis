@@ -26,12 +26,14 @@ const YoutubeBlock = (props: ExpendBlockProps) => {
         width: 16,
         height: 9
     });
+    const [tempValue, setTempValue] = useState<string>('');
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         if(e.target.name === 'value') {
             const url = e.target.value.replaceAll('"', '');
-            onChangeValueHandler!(url);
+            setTempValue(url);
         }
+
         if(e.target.name === 'width') {
             const height = Math.trunc(Number(e.target.value) / ratio.width * ratio.height);
 
@@ -62,6 +64,10 @@ const YoutubeBlock = (props: ExpendBlockProps) => {
         })
     }
 
+    const submitValueHandler = () => {
+        onChangeValueHandler!(tempValue);
+    }
+
     return (
         <div id={`block-${hash}`}
              className={'w-full overflow-x-auto'}
@@ -74,10 +80,11 @@ const YoutubeBlock = (props: ExpendBlockProps) => {
                 >
                     <input className={'w-full p-1 outline-0'}
                            name={'value'}
-                           value={value}
+                           value={tempValue}
                            placeholder={'url 주소 ex) https://www.youtube.com/embed/~~~'}
                            onChange={onChangeHandler}
                            ref={el => {blockRef!.current[props.seq] = el}}
+                           onBlur={submitValueHandler}
                     />
                     <div className={'flex'}>
                         <input className={'w-1/3 p-1 outline-0'}

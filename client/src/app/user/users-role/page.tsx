@@ -97,7 +97,7 @@ export default function Page() {
 
     const onSaveRoles = async (mode: 'add' | 'delete') => {
 
-        const ids = users
+        const ids: number[] = users
             .filter(user => select.includes(user.id))
             .filter(user => {
                 if(mode === 'add') return !user.roles.includes(role);

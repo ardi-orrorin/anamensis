@@ -96,10 +96,7 @@
     </insert>
     <insert id="saveRole" parameterType="Role">
         INSERT INTO role (member_pk, role)
-        VALUES (#{memberPk}},#{role})
-            <foreach collection="ids" item="id" separator=",">
-                (#{id}, #{role})
-            </foreach>
+        VALUES (#{memberPk}, #{role})
     </insert>
     <insert id="saveRoles">
         INSERT INTO role (member_pk, role)

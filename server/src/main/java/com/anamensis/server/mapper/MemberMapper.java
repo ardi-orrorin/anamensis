@@ -64,6 +64,8 @@ public interface MemberMapper {
 
     int update(Member member);
 
+    int deleteRole(Role role);
+
     int deleteRoles(
         @Param("ids") List<Long> ids,
         @Param("role") RoleType role

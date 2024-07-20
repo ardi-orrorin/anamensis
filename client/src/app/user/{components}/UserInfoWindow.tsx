@@ -2,7 +2,6 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import React from "react";
 
-
 export type UserInfoWindowProps = {
     winKey    : string,
     title     : string,
@@ -16,7 +15,7 @@ const UserInfoWindow = (props: UserInfoWindowProps) => {
     const {winKey, title, children, open, onClick} = props;
 
     return (
-        <div className={['flex flex-col w-full md:w-[500px] h-80 border border-solid border-blue-300 shadow-blue-100 shadow-md rounded duration-300',
+        <div className={['flex flex-col w-full md:w-[48%] h-80 border border-solid border-blue-300 shadow-blue-100 shadow-md rounded duration-300',
                         open ? '' : 'hidden',
                         ].join(' ')}
         >

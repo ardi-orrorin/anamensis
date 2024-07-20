@@ -1,5 +1,5 @@
 import {ExpendBlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
-import React, {CSSProperties, useContext, useEffect, useRef, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBorderAll, faImage} from "@fortawesome/free-solid-svg-icons";
@@ -36,6 +36,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
 
     const extraValue = props.extraValue as ImageShowProps;
     const {setWaitUploadFiles, setWaitRemoveFiles} = useContext(TempFileProvider);
+    const [viewMode, setViewMode] = useState<string>(extraValue?.mode || 'thumbnail');
     const [uploadProgress, setUploadProgress] = useState<ProgressType>({
         size: 0,
         progress: 0,
@@ -156,6 +157,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
 
 
     const onChangeModeHandler = (mode: string) => {
+        setViewMode(mode);
         if(!onChangeExtraValueHandler) return;
         onChangeExtraValueHandler({
             ...extraValue,
@@ -232,6 +234,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
              className={'flex w-full flex-col gap-5'}
              aria-roledescription={type}
              ref={el => {
+                 if(!props.blockRef?.current) return;
                  props!.blockRef!.current[props.seq] = el
              }}
         >
@@ -244,7 +247,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
                     >
                         <p>
                             {
-                                uploadProgress.size === uploadProgress.progress
+                                uploadProgress?.size === uploadProgress?.progress
                                 ? '이미지 업로드 완료'
                                 : '이미지 업로드 진행중 (최대 30개)'
                             }
@@ -293,11 +296,11 @@ const AlbumBlock = (props: ExpendBlockProps) => {
                                 <button key={'mode' + index}
                                         className={[
                                             'w-16 h-8 rounded border border-solid border-gray-200',
-                                            extraValue.mode === mode.mode ? 'bg-gray-800' : 'bg-white'
+                                            viewMode === mode.mode ? 'bg-gray-800' : 'bg-white'
                                         ].join(' ')}
                                         onClick={() => onChangeModeHandler(mode.mode)}
                                 >
-                                    <FontAwesomeIcon className={extraValue.mode === mode.mode ? 'text-white' : ''}
+                                    <FontAwesomeIcon className={viewMode === mode.mode ? 'text-white' : ''}
                                                      icon={mode.icon}
                                     />
                                 </button>
@@ -309,7 +312,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
             {
                 extraValue?.images?.length > 0
                 && modes.find(mode =>
-                    mode.mode === extraValue.mode
+                    mode.mode === viewMode
                 )?.component
             }
             {

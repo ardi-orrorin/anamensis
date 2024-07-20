@@ -96,6 +96,7 @@ export default function Page() {
     }
 
     const onSaveRoles = async (mode: 'add' | 'delete') => {
+        if(role as string === '') return alert('권한를 선택하십시오.');
         const ids: number[] = users
             .filter(user => select.includes(user.id))
             .filter(user => {
@@ -119,6 +120,7 @@ export default function Page() {
             if(!res) return;
             await mutate();
             setSelect([]);
+            setRole('' as RoleType);
         } catch (e) {
             const err = e as AxiosError
             console.log(err)

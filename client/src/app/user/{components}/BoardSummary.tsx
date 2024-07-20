@@ -18,7 +18,7 @@ const BoardSummary = () => {
                         return (
                             <Link key={`summary-${i}`}
                                   href={`/board/${e.id}`}
-                                  className={`flex gap-3 text-sm w-full hover:bg-gray-100 cursor-pointer rounded py-1 h-8`}
+                                  className={`flex gap-3 text-sm w-full hover:bg-gray-100 cursor-pointer rounded py-1 h-8 hover:shadow duration-500`}
                             >
                                 <span className={`py-0.5 w-12 rounded text-xs text-white flex justify-center items-center`}
                                       style={{backgroundColor: RateColor.findColor(e.rate)?.getColor}}

@@ -32,7 +32,6 @@ const Contents = ({
                       <FontAwesomeIcon icon={faBars} />
                     </button>
                   </div>
-
                 }
 
                 {/*<div className={'w-1/3 flex justify-center text-lg'}>*/}

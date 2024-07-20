@@ -31,7 +31,6 @@ const PointSummary = () => {
                             </span>
                             <span className={'py-0.5 px-4 flex justify-center items-center'}>{e.createdAt.substring(0, 10)}</span>
                         </div>
-
                     </div>
                 ))
             }

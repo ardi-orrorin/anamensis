@@ -84,7 +84,10 @@ const LinkBlock = (props: ExpendBlockProps) => {
                          onKeyDown={onKeyDownChangeHandler}
                          onFocus={onFocusHandler}
                          disabled={isView}
-                         ref={el => {blockRef!.current[seq] = el}}
+                         ref={el => {
+                             if(!blockRef?.current) return;
+                             blockRef!.current[seq] = el
+                         }}
                 />
                 : <a className={'flex justify-between w-full p-4 gap-2'}
                      style={{backgroundColor: 'rgba(230,230,230,0.2)'}}
@@ -92,7 +95,10 @@ const LinkBlock = (props: ExpendBlockProps) => {
                      target={'_blank'}
                      onMouseEnter={onMouseEnterHandler}
                      aria-roledescription={'object'}
-                     ref={el => {blockRef!.current[seq] = el}}
+                     ref={el => {
+                         if(!blockRef?.current) return;
+                         blockRef!.current[seq] = el
+                     }}
                 >
                     <div className={'flex flex-col gap-1 justify-between p-1'}
                     >

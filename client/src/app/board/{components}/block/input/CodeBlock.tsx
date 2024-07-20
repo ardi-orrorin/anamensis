@@ -33,10 +33,13 @@ const CodeBlock = (props: BlockProps & {type: string}) => {
     },[])
 
     return (
-        <div className={'flex flex-col p-1 gap-2 bg-gray-100'}
+        <div className={'w-full flex flex-col p-1 gap-2 bg-gray-100'}
              id={`block-${hash}`}
              aria-roledescription={type}
-             ref={el => {props!.blockRef!.current[props.seq] = el}}
+             ref={el => {
+                 if(!props.blockRef?.current) return;
+                 props!.blockRef!.current[props.seq] = el
+             }}
         >
             {
                 !isView

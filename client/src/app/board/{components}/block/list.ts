@@ -7,7 +7,7 @@ import {
     faLink,
     faList,
     faPercent,
-    faQuoteLeft,
+    faQuoteLeft, faRetweet,
     faVideo
 } from "@fortawesome/free-solid-svg-icons";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
@@ -22,6 +22,7 @@ import {faCircleQuestion} from "@fortawesome/free-solid-svg-icons/faCircleQuesti
 import QuestionBlock from "@/app/board/{components}/block/extra/questionBlock";
 import YoutubeBlock from "@/app/board/{components}/block/file/youtube";
 import CodeBlock from "@/app/board/{components}/block/input/CodeBlock";
+import RefBlock from "@/app/board/{components}/block/extra/refBlock";
 
 export type BlockType = {
     code         : string;
@@ -220,6 +221,18 @@ export const blockTypeList: BlockComponentType[] = [
         notAvailDup       : false,
         component         : (props: BlockProps)  =>
             YoutubeBlock({...props, type: 'object'}),
+    },
+    {
+        code              : '00205',
+        tag               : 'ref',
+        command           : '/ref',
+        label             : 'reference',
+        icon              : faRetweet,
+        comment           : '블록참조',
+        type              : 'object',
+        notAvailDup       : false,
+        component         : (props: BlockProps)  =>
+            RefBlock({...props, type: 'object', code: '00205'}),
     },
     {
         code              : '00301',

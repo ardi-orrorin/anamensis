@@ -42,7 +42,10 @@ export default function InputBase({
 
     const props: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement> = {
         value,
-        ref           : el => {blockRef!.current[seq] = el},
+        ref           : el => {
+            if(!blockRef?.current) return;
+            blockRef.current[seq] = el
+        },
         onKeyUp       : onKeyUpHandler,
         onKeyDown     : onKeyDownHandler,
         onChange      : onChangeHandler,

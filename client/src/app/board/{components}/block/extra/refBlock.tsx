@@ -5,6 +5,8 @@ import apiCall from "@/app/{commons}/func/api";
 import {BlockI, BoardI} from "@/app/board/{services}/types";
 import {blockTypeList} from "@/app/board/{components}/block/list";
 import Link from "next/link";
+import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
+import moment from "moment";
 
 
 export type RefBlockExtraValueType = {
@@ -28,10 +30,11 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
     const [valid, setValid] = useState<string>('');
     const [boardValue, setBoardValue] = useState<BoardI>({} as BoardI);
     const [refBlock, setRefBlock] = useState<BlockI>({} as BlockI);
+    const [loading, setLoading] = useState<boolean>(false);
 
-    const {mutate} = useSWR(['/api/board/ref', extraValue?.boardId], async () => {
+    const {mutate} = useSWR(['/api/board/ref', hash], async () => {
         if(!extraValue?.boardId || extraValue.boardId === '') return;
-
+        setLoading(true);
         return await apiCall<BoardI>({
             path: '/api/board/' + extraValue.boardId,
             method: 'GET',
@@ -45,11 +48,15 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
                 alert('참조 블록을 참조 할 수 없습니다.');
                 return ;
             }
+
             setRefBlock(block as BlockI);
             setBoardValue(res);
         })
         .catch(e => {
             console.log(e)
+        })
+        .finally(() => {
+            setLoading(false);
         })
     })
 
@@ -59,7 +66,7 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
         setValid('');
     }
 
-    const onChangeValueHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeValueHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if(value === '') return;
         const regExp = /\/board\/(\d+)#block-(\d){13}-(\d+)/i;
 
@@ -77,18 +84,21 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
             blockId
         } as RefBlockExtraValueType);
 
-        mutate();
+        setTimeout(async () => {
+            await mutate();
+        },100);
     }
 
-    const Component = blockTypeList.find(e => {
-        return e.code === refBlock?.code
-    })?.component;
+    const Component = useMemo(()=> {
+        return blockTypeList.find(e => {
+            return e.code === refBlock?.code
+        })?.component;
+    }, [refBlock, boardValue]);
 
     return (
         <div id={`block-${hash}`}
              className={'w-full'}
              aria-roledescription={type}
-
         >
             <div className={[
                 'flex flex-col w-full items-center gap-4 outline-0 break-all',
@@ -100,6 +110,7 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
                     !isView
                     && <input className={'w-full text-sm px-2 py-1 outline-0 bg-opacity-0 bg-white'}
                               value={value}
+                              placeholder={'링크를 입력하세요.'}
                               onChange={onChangeHandler}
                               onBlur={onChangeValueHandler}
                               onKeyUp={onKeyUpHandler}
@@ -114,9 +125,12 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
                 }
                 {
                     boardValue?.content?.list?.length > 0
-                    && <div className={'p-3 w-full flex flex-col gap-4 justify-start items-center border border-solid border-red-800 rounded'}>
-                        <div className={'w-full flex justify-between gap-1 text-xs'}>
-                          <div>
+                    && <div className={'p-3 w-full flex flex-col gap-4 justify-start items-start sm:items-center border border-solid border-red-800 bg-red-400 bg-opacity-5 rounded'}>
+                        <div className={'w-full flex flex-col sm:flex-row justify-between items-start gap-1 text-sm'}>
+                          <div className={'flex gap-2'}>
+                            <label className={'text-red-700 font-bold'}>
+                              Reference
+                            </label>
                             <Link className={'text-blue-600'}
                                   href={`/board/${extraValue.boardId}#block-${extraValue.blockId}`}
                                   target={'_blank'}
@@ -124,20 +138,22 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
                               원본 보기
                             </Link>
                           </div>
-                          <div className={'flex gap-1 items-center'}>
-                            <span className={'px-2'}>
+                          <div className={'hidden sm:flex gap-1 items-center'}>
+                            <span className={'pr-2 line-clamp-1'}>
                               제목: {boardValue.title}
                             </span>
                             <span className={'px-2 border border-solid border-x-2 border-y-0 border-gray-500'}>
                              작성자: {boardValue.writer}
                               </span>
                             <span className={'px-2'}>
-                                수정일 : {boardValue.updatedAt}
+                                수정일 : {moment(boardValue.updatedAt).format('YYYY-MM-DD')}
                               </span>
                           </div>
                         </div>
                         {
-                            boardValue.isPublic
+                            loading
+                            ? <LoadingSpinner size={20} />
+                            : !boardValue.isPublic
                             ? <span className={'text-sm text-red-600'}>
                               비공개 게시글입니다.
                               </span>
@@ -149,7 +165,6 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
                                 && <Component {...{...refBlock, isView: true} as BlockProps | ExpendBlockProps}/>
                         }
                     </div>
-
                 }
             </div>
         </div>

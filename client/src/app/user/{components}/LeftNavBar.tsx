@@ -9,9 +9,10 @@ import {
     faFilePowerpoint,
     faGear,
     faKey,
-    faRectangleList, faUserGear,
+    faRectangleList,
+    faUserGear,
 } from "@fortawesome/free-solid-svg-icons";
-import React, {useEffect} from "react";
+import React from "react";
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import {faTableList} from "@fortawesome/free-solid-svg-icons/faTableList";
 import {RoleType} from "@/app/user/system/{services}/types";

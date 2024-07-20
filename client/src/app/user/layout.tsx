@@ -1,12 +1,12 @@
 'use client';
 
-import React, {Children, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import ModalProvider, {ModalI} from "@/app/user/{services}/modalProvider";
 import LeftNavBar from "@/app/user/{components}/LeftNavBar";
 import Contents from "@/app/user/{components}/Contents";
 import ModalBackground from "@/app/user/{components}/ModalBackground";
 import UserProvider, {AttendInfoI, BoardSummaryI, PointSummaryI} from "@/app/user/{services}/userProvider";
-import {preload} from "swr";
+import useSWR, {preload} from "swr";
 import apiCall from "@/app/{commons}/func/api";
 
 
@@ -28,6 +28,17 @@ export default function Layout({children}: {children: React.ReactNode & {test:'1
         const isModalMode = JSON.parse(localStorage.getItem('isModalMode')!);
         setIsModalMode(isModalMode);
     },[isModalMode]);
+
+    useSWR('/user/attend', async () => {
+        return await apiCall<AttendInfoI>({
+            path: "/api/user/attend",
+            method: "GET",
+            isReturnData: true,
+        })
+        .then((data) => {
+            setAttendInfo(data);
+        });
+    })
 
     preload('/api/board/summary', async () => {
         return await apiCall<BoardSummaryI[]>({

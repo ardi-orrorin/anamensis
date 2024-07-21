@@ -385,7 +385,7 @@ export default function Page({params}: {params : {id: string}}) {
                     <BoardTitle board={board}
                                 newBoard={isNewBoard}
                                 onChange={onChangeTitleHandler}
-                                onKeyUp={e => onKeyUpHandler(e, 0)}
+                                onKeyDown={e => onKeyDownHandler(e, 0)}
                     />
                     <div className={'flex justify-end sm:justify-start gap-2 h-10 sm:h-auto'}>
                         {

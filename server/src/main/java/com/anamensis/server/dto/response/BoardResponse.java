@@ -161,58 +161,52 @@ public class BoardResponse implements Serializable {
         }
     }
 
+    @Getter
+    @Builder
+    @Setter
+    public static class RefContent {
+        private long id;
 
-//    @Getter
-//    @Builder
-//    @Setter
-//    public static class ExContent {
-//
-//        private long id;
-//
-//        private String title;
-//
-//        private long categoryPk;
-//
-//        private Map<String, Object> content;
-//
-//        private String writer;
-//
-//        private String profileImage;
-//
-//        private long viewCount;
-//
-//        private long rate;
-//
-//        private java.util.List<BoardCommentResponse.Comment> comments;
-//
-//        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-//        private LocalDateTime createdAt;
-//
-//        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-//        private LocalDateTime updatedAt;
-//
-//        private Boolean isPublic;
-//
-//        private boolean membersOnly;
-//
-//        public static ExContent from(Content board, java.util.List<BoardCommentResponse.Comment> comments) {
-//            ExContent.ExContentBuilder builder = ExContent.builder()
-//                    .id(board.getId())
-//                    .title(board.getTitle())
-//                    .categoryPk(board.getCategoryPk())
-//                    .content(board.getContent())
-//                    .writer(board.getWriter())
-//                    .viewCount(board.getViewCount())
-//                    .createdAt(board.getCreatedAt())
-//                    .comments(comments)
-//                    .profileImage(board.getProfileImage())
-//                    .updatedAt(board.getUpdatedAt())
-//                    .isPublic(board.getIsPublic())
-//                    .membersOnly(board.isMembersOnly());
-//
-//            return builder.build();
-//        }
-//    }
+        private String title;
+
+        private Map<String, Object> content;
+
+        private String writer;
+
+        private Boolean isWriter;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime updatedAt;
+
+        private Boolean isPublic;
+
+        private boolean membersOnly;
+
+        public static RefContent from(BoardResultMap.Board board, Member member) {
+
+            RefContent.RefContentBuilder builder = RefContent.builder()
+                .id(board.getId())
+                .title(board.getBoard().getTitle())
+                .writer(board.getMember().getUserId())
+                .updatedAt(board.getBoard().getUpdateAt())
+                .isPublic(board.getBoard().getIsPublic())
+                .membersOnly(board.getBoard().isMembersOnly());
+
+
+            if(board.getBoard().getIsPublic()) {
+                builder.content(board.getBoard().getContent().toMap());
+            } else if (board.getBoard().isMembersOnly() && member == null) {
+                builder.content(board.getBoard().getContent().toMap());
+            } else if (board.getBoard().getMemberPk() == member.getId()) {
+                builder.isWriter(true);
+                builder.content(board.getBoard().getContent().toMap());
+            }
+
+            return builder.build();
+        }
+
+    }
+
 
 
     @Getter

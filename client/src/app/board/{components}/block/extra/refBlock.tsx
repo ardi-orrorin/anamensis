@@ -2,7 +2,7 @@ import {BlockProps, ExpendBlockProps} from "@/app/board/{components}/block/type/
 import {useMemo, useState} from "react";
 import useSWR from "swr";
 import apiCall from "@/app/{commons}/func/api";
-import {BlockI, BoardI} from "@/app/board/{services}/types";
+import {BlockI, BoardI, RefBoardI} from "@/app/board/{services}/types";
 import {blockTypeList} from "@/app/board/{components}/block/list";
 import Link from "next/link";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
@@ -21,26 +21,26 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
         onChangeExtraValueHandler,
         onKeyUpHandler,
         onKeyDownHandler,
-
     } = props;
 
     const extraValue = props.extraValue as RefBlockExtraValueType;
 
     const [value, setValue] = useState<string>('');
     const [valid, setValid] = useState<string>('');
-    const [boardValue, setBoardValue] = useState<BoardI>({} as BoardI);
+    const [boardValue, setBoardValue] = useState<RefBoardI>({} as RefBoardI);
     const [refBlock, setRefBlock] = useState<BlockI>({} as BlockI);
     const [loading, setLoading] = useState<boolean>(false);
 
     const {mutate} = useSWR(['/api/board/ref', hash], async () => {
         if(!extraValue?.boardId || extraValue.boardId === '') return;
         setLoading(true);
-        return await apiCall<BoardI>({
-            path: '/api/board/' + extraValue.boardId,
+        return await apiCall<RefBoardI>({
+            path: '/api/board/ref/' + extraValue.boardId,
             method: 'GET',
             isReturnData: true
         })
         .then(res => {
+            setBoardValue(res);
             const block = res?.content?.list?.length > 0
                 && res.content?.list?.find(block => block.hash === extraValue.blockId);
 
@@ -50,7 +50,6 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
             }
 
             setRefBlock(block as BlockI);
-            setBoardValue(res);
         })
         .catch(e => {
             console.log(e)
@@ -124,7 +123,7 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
                     && <span className={'text-sm text-red-600'}>{valid}</span>
                 }
                 {
-                    boardValue?.content?.list?.length > 0
+                    Number(boardValue?.id) > 0
                     && <div className={'p-3 w-full flex flex-col gap-4 justify-start items-start sm:items-center border border-solid border-red-800 bg-red-400 bg-opacity-5 rounded'}>
                         <div className={'w-full flex flex-col sm:flex-row justify-between items-start gap-1 text-sm'}>
                           <div className={'flex gap-2'}>
@@ -140,24 +139,24 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
                           </div>
                           <div className={'hidden sm:flex gap-1 items-center'}>
                             <span className={'pr-2 line-clamp-1'}>
-                              제목: {boardValue.title}
+                                제목: {boardValue.title}
                             </span>
                             <span className={'px-2 border border-solid border-x-2 border-y-0 border-gray-500'}>
-                             작성자: {boardValue.writer}
-                              </span>
+                                작성자: {boardValue.writer}
+                            </span>
                             <span className={'px-2'}>
                                 수정일 : {moment(boardValue.updatedAt).format('YYYY-MM-DD')}
-                              </span>
+                            </span>
                           </div>
                         </div>
                         {
                             loading
                             ? <LoadingSpinner size={20} />
-                            : !boardValue.isPublic
+                            : !boardValue.isPublic && !boardValue.isWriter
                             ? <span className={'text-sm text-red-600'}>
                               비공개 게시글입니다.
                               </span>
-                            : boardValue.membersOnly
+                            : boardValue.membersOnly && !boardValue.isLogin
                                 ? <span className={'text-sm text-red-600'}>
                                   회원 전용 게시글 입니다.
                                 </span>

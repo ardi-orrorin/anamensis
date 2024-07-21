@@ -36,15 +36,15 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                 >
                     <div>
                         <select className={'w-32 border border-solid border-gray-300 rounded-md text-sm px-3 py-1'}
-                                defaultValue={searchParams.size}
+                                defaultValue={searchParams.size || '20'}
                                 name={'size'}
                         >
-                            <option value={10}>10</option>
-                            <option value={20}>20</option>
-                            <option value={30}>30</option>
-                            <option value={50}>50</option>
-                            <option value={100}>100</option>
-                            <option value={200}>200</option>
+                            <option value={'10'}>10</option>
+                            <option value={'20'}>20</option>
+                            <option value={'30'}>30</option>
+                            <option value={'50'}>50</option>
+                            <option value={'100'}>100</option>
+                            <option value={'200'}>200</option>
                         </select>
                     </div>
                     <div>

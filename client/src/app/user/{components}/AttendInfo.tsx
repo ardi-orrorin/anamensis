@@ -7,24 +7,12 @@ import {createDebounce} from "@/app/{commons}/func/debounce";
 import useSWR, {mutate, preload} from "swr";
 import UserProvider, {AttendInfoI} from "@/app/user/{services}/userProvider";
 
-
-const fetchData = apiCall<AttendInfoI>({
-    path: "/api/user/attend",
-    method: "GET",
-    isReturnData: true,
-})
-
 export default function AttendInfo() {
 
     const {attendInfo, setAttendInfo} = useContext(UserProvider)
 
     const [loading, setLoading] = useState<boolean>(false);
     const debounce = createDebounce(500);
-
-    preload('/user/attend', async () => fetchData)
-        .then((data) => {
-            setAttendInfo(data);
-        });
 
     const attend = () => {
         setLoading(true);
@@ -40,7 +28,7 @@ export default function AttendInfo() {
                     : '이미 출석하셨습니다. 내일 다시 시도해주세요.';
 
                 alert(message);
-                await mutate('/user/attend', fetchData);
+                await mutate('/user/attend');
             })
             .finally(() => {
                 setLoading(false);
@@ -72,7 +60,7 @@ export default function AttendInfo() {
                 <span>{attendInfo.days}회</span>
             </div>
             <div className={'w-full'}>
-                <button className={'w-full bg-blue-300 text-white p-2 rounded hover:bg-blue-700 duration-500'}
+                <button className={'w-full bg-blue-300 text-white p-2 rounded hover:bg-blue-700 duration-500 shadow'}
                         onClick={attend}
                         disabled={loading}
                 >

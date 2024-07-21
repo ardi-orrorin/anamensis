@@ -9,9 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("api/categories")
@@ -19,23 +16,10 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
 
-//    @GetMapping("")
-//    public Mono<CategoryResponse.Result<List<Category>>> getAllCategories() {
-//
-//        return Mono.just(categoryService.selectAll())
-//                .map(result -> CategoryResponse.Result.<List<Category>>builder()
-//                        .body(result)
-//                        .status(HttpStatus.OK)
-//                        .message("OK")
-//                        .build()
-//                );
-//    }
-
     @PostMapping("")
     public Mono<CategoryResponse.Result<Category>> insertCategory(
             @Valid @RequestBody CategoryRequest.Create category
     ) {
-
         Category newCategory = new Category(0, category.getName(), category.getParentId(), true);
 
         return categoryService.insert(newCategory)

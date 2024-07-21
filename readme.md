@@ -4,48 +4,67 @@
 ## ERD --> [Link](https://www.erdcloud.com/d/kaLkfNKiwKcPe85k4)
 ![](./resource/erd.jpg)
 
-
-## JKS 인증키 생성 방법
-```shell
-keytool -genkeypair -alias 'alias' -keyalg RSA \
--dname "CN=Web Server,OU=Unit,O=Organization,L=City,S=State,C=US" \
--keypass 'secret' -keystore 'file.jks' -storepass 'password'
-```
-
 ## docker create secret
-- application.yml 파일을 secret으로 등록
+- application.yml 파일 및 nextjs.env secret으로 등록
+
 ```shell
-
-docker secret create server_anamensis_secret_config application.yml
-docker secret create batch_anamensis_secret_config application.yml
-docker secret create config_anamensis_secret_config application.yml
-docker secret create config_anamensis_secret_keystore anamensis.jks
-
+docker secret create server_anamensis_secret_config server-config.yml
+docker secret create config_anamensis_secret_config config-config.yml
+docker secret create config_anamensis_secret_keystore keystore.jks
+docker secret create batch_anamensis_secret_config batch-config.yml
+docker secret create nextjs_anamensis_secret_config nextjs.env
 ```
 
-## docker create network
-- anamensis 전용 네트워크 생성(선택 사항 docker-compose 수정 필요) 
-```shell
-docker network create anamensis -d overlay --scope swarm
-```
-
-## docker build & deploy
+## docker build
 - docker build & deploy
-- service : site(nextjs + server), batch, config
+- service : site(nextjs + server), batch, config, base
 - port : service port
 - docker_hub_id : docker hub id 혹은 docker registry id
+- base_id : docker build base Docker Image
 ```shell
-#build
-/root/build.sh service version docker_hub_id
+#build, site, batch, config
+/root/build.sh service version docker_hub_id base_id
 
-#deploy
-/root/deploy.sh version port docker_hub_id
+#build base
+/root/build.sh base version docker_hub_id
+
 ```
 - example build & deploy
 ```shell
-#build
-./build.sh server 1.0.0 anamensis
+#site build
+./build.sh site 0.0.40 anamensis anamensis
 
-#deploy
-./deploy.sh 1.0.0 8080 anamensis
+#base build
+/root/build.sh base 0.0.1 anamensis
+```
+
+## example site application.yml
+```yaml
+spring:
+  application:
+    name: server, aws, mysql, security, redis
+  config:
+    import: optional:configserver:https://url
+  flyway: #db migration
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration/mysql
+    validate-on-migrate: true
+    validate-migration-naming: true
+```
+
+## example site nextjs.env
+- [Google RECAPTCHA Link](https://www.google.com/recaptcha)
+- [Google Analytics Link](https://analytics.google.com/analytics/web/)
+
+```text
+NEXT_PUBLIC_SERVER=http(s):// + Spring Server Domain
+NEXT_PUBLIC_DOMAIN=NextJS Public Domain
+NEXT_PUBLIC_CDN_SERVER=http(s):// + CDN Server Url
+NEXT_PUBLIC_CDN_SERVER_HOST=CDN Server Url
+NEXT_PUBLIC_RECAPTCHA_SITE_KEY=Google ReCaptcha Site Key
+NEXT_PUBLIC_RECAPTCHA_PRIVATE_KEY=Google ReCaptcha Private Key 
+NEXT_PUBLIC_SSL=TRUE
+NEXT_PUBLIC_GID=Google Analytics GID
+NEXT_PUBLIC_VERSION=__ANAMENSIS_VERSION__
 ```

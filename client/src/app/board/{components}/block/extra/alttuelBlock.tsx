@@ -1,7 +1,6 @@
 import {ExpendBlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
-import React, {ChangeEvent, CSSProperties, useContext, useEffect, useMemo, useRef, useState} from "react";
+import React, {ChangeEvent, useContext, useEffect, useMemo, useRef, useState} from "react";
 import Image from "next/image";
-import Link from "next/link";
 import axios from "axios";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
@@ -212,7 +211,10 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
         <div id={`block-${hash}`}
              className={'w-full'}
              aria-roledescription={type}
-             ref={el => {props!.blockRef!.current[props.seq] = el}}
+             ref={el => {
+                 if(!props.blockRef?.current) return ;
+                 props!.blockRef!.current[props.seq] = el
+            }}
         >
             <div className={[
                 'flex flex-col sm:flex-row w-full items-center gap-4 outline-0 break-all',

@@ -23,6 +23,13 @@ type CopyProps = {
     seq: string;
 }
 
+type ContextMenuProps = {
+    clientX: number;
+    clientY: number;
+    isView: boolean;
+    mode: 'url' | 'answer';
+}
+
 export default function Block(props: BlockProps) {
     const {
         seq, code,
@@ -35,8 +42,8 @@ export default function Block(props: BlockProps) {
     const {board, setBoard, comment, setNewComment, newComment} = useContext(BoardProvider);
 
     const {blockService, setBlockService, commentService, setCommentService, selectedBlock} = useContext(BlockProvider);
-    const [isCopy, setIsCopy] = useState<CopyProps>({} as CopyProps);
     const [touch, setTouch] = useState(setTimeout(() => false, 0));
+    const [contextMenu, setContextMenu] = useState<ContextMenuProps>({} as ContextMenuProps);
 
     const block = blockTypeList.find(b=> b.code === props.code);
 
@@ -158,21 +165,40 @@ export default function Block(props: BlockProps) {
         setBoard({...board, data: {...board.data, content: {list: newList}}});
     }
 
-    const shareLinkHandler = async (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+    const contextLinkHandler = async (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
         e.preventDefault();
+        const {clientX, clientY} = e.nativeEvent as MouseEvent;
+        setContextMenu({clientX, clientY, isView: true} as ContextMenuProps);
+
+    }
+
+    const shareLinkHandler = () => {
         if(!board.data.isLogin) return;
-
-
         if(typeof window === 'undefined') return ;
-        if(!e.currentTarget.textContent) return ;
+        if(!board?.data?.id) return;
 
-        setIsCopy({isCopy: true, seq: hash});
+        const url = `${window.location.origin}/board/${board.data.id}#block-${hash}`;
+
+        navigator.clipboard.writeText(url);
+        setContextMenu({...contextMenu, isView: false, mode: 'url'});
 
         setTimeout(() => {
-            setIsCopy({isCopy: false, seq: hash});
+            setContextMenu({} as ContextMenuProps);
+        },700);
+    }
+
+    const answerLinkHandler = () => {
+        if(!board.data.isLogin) return;
+        if(typeof window === 'undefined') return ;
+
+        setContextMenu({...contextMenu, isView: false, mode: 'answer'});
+
+        setTimeout(() => {
             if(board.data.isLogin) setNewComment({...newComment, blockSeq: hash});
+            setContextMenu({} as ContextMenuProps);
         }, 700);
     }
+
     const shareLinkLongTouchHandler = async (e: React.TouchEvent<HTMLDivElement>) => {
         if(!board.data.isLogin) return;
 
@@ -181,7 +207,7 @@ export default function Block(props: BlockProps) {
         if(touch) clearTimeout(touch);
 
         setTouch(setTimeout(() => {
-            shareLinkHandler(e);
+            contextLinkHandler(e);
         }, touchTime));
     }
 
@@ -190,17 +216,44 @@ export default function Block(props: BlockProps) {
             'flex relative items-center',
             selectedBlock === hash && board.isView && 'bg-red-700 border-2 border-dashed border-red-800 border-opacity-20 bg-opacity-20 rounded',
         ].join(' ')}
-             onContextMenu={shareLinkHandler}
+             onContextMenu={contextLinkHandler}
              onTouchStart={shareLinkLongTouchHandler}
              onTouchEnd={() => clearTimeout(touch)}
         >
             {
-                board.isView
-                && isCopy.isCopy
-                && <div className={'absolute z-50 -bottom-14 w-72 h-14 flex justify-center items-center bg-white rounded shadow border-l-8 border-solid border-blue-300 duration-200'
-                }>
-                    {`block-${isCopy.seq?.split('-')[1]}`} 댓글 북마크로 복사되었습니다.
+                contextMenu.isView
+                && <div className={`z-[20] w-40 fixed flex flex-col justify-start items-start bg-gray-500 rounded shadow-md`}
+                         style={{left: contextMenu.clientX, top: contextMenu.clientY}}
+                >
+                    <button className={'w-full p-2 text-sm bg-white hover:bg-gray-400 hover:text-white duration-300'}
+                            onClick={shareLinkHandler}
+                    >
+                      블록 주소 복사
+                    </button>
+                    <button className={'w-full p-2 text-sm bg-white hover:bg-gray-400 hover:text-white duration-300'}
+                            onClick={answerLinkHandler}
+                    >
+                      댓글 참조
+                    </button>
                 </div>
+            }
+            {
+                !contextMenu.isView
+                && contextMenu.clientY
+                && contextMenu.clientX
+                && <div className={`z-[20] p-2 w-60 fixed flex flex-col text-sm justify-center items-center bg-white rounded shadow-md`}
+                        style={{left: contextMenu.clientX, top: contextMenu.clientY}}
+                >
+                    {
+                        contextMenu.mode === 'url'
+                        ? 'url 주소를 클립보드로 복사했습니다.'
+                        : contextMenu.mode === 'answer'
+                            ? '댓글 참조를 클립보드로 복사했습니다.'
+                            : ''
+                    }
+
+                </div>
+
             }
             {
                 !board.isView

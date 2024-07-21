@@ -96,7 +96,7 @@ export default function Page() {
     }
 
     const onSaveRoles = async (mode: 'add' | 'delete') => {
-
+        if(role as string === '') return alert('권한를 선택하십시오.');
         const ids: number[] = users
             .filter(user => select.includes(user.id))
             .filter(user => {
@@ -119,6 +119,8 @@ export default function Page() {
 
             if(!res) return;
             await mutate();
+            setSelect([]);
+            setRole('' as RoleType);
         } catch (e) {
             const err = e as AxiosError
             console.log(err)
@@ -191,7 +193,7 @@ export default function Page() {
             {
                 users.map((user, index) => {
                     return (
-                        <tr key={'user-role' + user.id} className={['border-b border-gray-200 border-solid', index % 2 === 1 ? 'bg-blue-50': ''].join(' ')}>
+                        <tr key={'user-role' + user.id} className={['border-b border-gray-200 border-solid', index % 2 === 1 ? 'bg-blue-50': '', select.includes(user.id) && 'bg-yellow-300'].join(' ')}>
                             <td className={'py-2 px-3'}>
                                 <input type={'checkbox'}
                                        checked={!!select.find(id => id === user.id)}
@@ -227,7 +229,7 @@ export default function Page() {
                                 { user.isUse ? '사용' : '비사용' }
                             </td>
                             <td className={'py-2 px-3'}>
-                                <select className={'w-20 bg-opacity-0'} onChange={e => onChangeRole('add', user, e.target.value as RoleType)}>
+                                <select className={'w-full bg-none'} onChange={e => onChangeRole('add', user, e.target.value as RoleType)}>
                                     <option value={''}>선택</option>
                                     {
                                         !user.roles.includes('ADMIN')
@@ -240,7 +242,7 @@ export default function Page() {
                                 </select>
                             </td>
                             <td className={'py-2 px-3'}>
-                                <select className={'w-20'} onChange={e => onChangeRole('delete', user, e.target.value as RoleType)}>
+                                <select className={'w-full bg-none'} onChange={e => onChangeRole('delete', user, e.target.value as RoleType)}>
                                     <option value={''}>선택</option>
                                     {
                                         user.roles.map(role => {

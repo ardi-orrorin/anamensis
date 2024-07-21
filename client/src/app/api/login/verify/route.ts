@@ -14,16 +14,25 @@ export async function POST(req: NextRequest){
     const ipRegExp = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/;
     const ipMatch = ipRegExp.exec(clientIp || '');
 
-    const geoLocation: GeoLocationType = await getGeoLocation(ipMatch?.[0]);
+    // const geoLocation: GeoLocationType = await getGeoLocation(ipMatch?.[0]);
+    //
+    // const headers = {
+    //     'Content-Type': 'application/json',
+    //     'User-Agent': req.headers.get('User-Agent') || '',
+    //     'Ip': geoLocation.ipv4,
+    //     'Location': `${geoLocation.countryName}-${geoLocation.state}-${geoLocation.city}`
+    // }
+
+    const headers = {
+        'Content-Type': 'application/json',
+        'User-Agent': req.headers.get('User-Agent') || '',
+        'Ip': ipMatch?.[0] || '',
+        'Location': `Test`
+    }
 
     try {
         const resData = await axios.post(url, user, {
-            headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': req.headers.get('User-Agent') || '',
-                'Ip': geoLocation.ipv4,
-                'Location': `${geoLocation.countryName}-${geoLocation.state}-${geoLocation.city}`
-            },
+            headers,
             withCredentials: true
         })
         const next = new NextResponse(JSON.stringify(resData.data), {

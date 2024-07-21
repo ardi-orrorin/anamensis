@@ -40,10 +40,13 @@ const QuestionBlock = (props: ExpendBlockProps) => {
 
 
     return (
-        <div className={'flex flex-col gap-2'}
+        <div className={'w-full flex flex-col gap-2'}
              id={`block_${hash}`}
              aria-roledescription={type}
-             ref={el => {props!.blockRef!.current[props.seq] = el}}
+             ref={el => {
+                 if(!props.blockRef?.current) return ;
+                 props!.blockRef!.current[props.seq] = el
+             }}
         >
             {
                 extraValue?.state === 'wait'

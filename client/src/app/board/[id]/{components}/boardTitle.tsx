@@ -3,14 +3,14 @@ import {BoardService} from "@/app/board/{services}/BoardProvider";
 const BoardTitle = (props: {
     board     : BoardService,
     onChange  : (e: React.ChangeEvent<HTMLInputElement>) => void,
-    onKeyUp   : (e: any) => void,
+    onKeyDown   : (e: any) => void,
     newBoard  : boolean
 }) => {
 
     const {
         board,
         onChange,
-        onKeyUp,
+        onKeyDown,
         newBoard
     } = props;
 
@@ -22,7 +22,7 @@ const BoardTitle = (props: {
                       name={"title"}
                       value={board.data?.title}
                       onChange={onChange}
-                      onKeyUp={onKeyUp}
+                      onKeyDown={onKeyDown}
                       placeholder={"제목을 입력하세요"}
             />
         }

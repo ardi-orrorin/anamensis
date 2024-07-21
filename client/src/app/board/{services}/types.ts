@@ -1,6 +1,18 @@
 import {CSSProperties} from "react";
 import {RoleType} from "@/app/user/system/{services}/types";
 
+export interface RefBoardI {
+    id         : string;
+    title      : string;
+    content    : BoardContentI;
+    writer     : string;
+    updatedAt  : string;
+    isPublic   : boolean;
+    membersOnly: boolean;
+    isLogin?   : boolean;
+    isWriter?  : boolean;
+}
+
 export interface BoardI {
     id              : string;
     categoryPk      : number;
@@ -21,6 +33,8 @@ export interface BoardI {
     // searchText?     : string;
     writerCreatedAt : string;
 }
+
+
 
 
 export interface BoardContentI {

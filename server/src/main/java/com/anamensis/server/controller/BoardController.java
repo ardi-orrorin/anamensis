@@ -129,6 +129,24 @@ public class BoardController {
             });
     }
 
+
+    @PublicAPI
+    @GetMapping("/ref/{id}")
+    public Mono<BoardResponse.RefContent> findRefByPk(
+        @PathVariable(name = "id") long boardPk,
+        @AuthenticationPrincipal UserDetails user
+    ) {
+        return boardService.findByPk(boardPk)
+            .flatMap(board -> {
+                if(user == null) {
+                    return Mono.just(BoardResponse.RefContent.from(board, null));
+                }
+
+                return userService.findUserByUserId(user.getUsername())
+                    .flatMap(u -> Mono.just(BoardResponse.RefContent.from(board, u)));
+            });
+    }
+
     @GetMapping("summary")
     public Mono<List<BoardResponse.SummaryList>> findByMemberPk(
         @AuthenticationPrincipal UserDetails user

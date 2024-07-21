@@ -24,7 +24,9 @@ const enter = (args: KeyEventType) => {
 
     event.preventDefault();
 
-    seq === 0 && event?.currentTarget?.getAttribute('name') === 'title' && blockRef.current[0]?.focus();
+    if(seq === 0 && event?.currentTarget?.getAttribute('name') === 'title'){
+        return blockRef.current[0]?.focus();
+    }
 
     const list = board.data?.content?.list;
 
@@ -66,6 +68,7 @@ const backspace = (args: KeyEventType) => {
 
     const curRef = blockRef.current[seq] as HTMLInputElement;
 
+    if(curRef.selectionStart !== curRef.selectionEnd) return;
 
     const initCondition = seq === 1 && blockRef?.current[seq - 1]?.ariaRoleDescription === 'extra';
     const initSeq =  initCondition ? 1 : 0;

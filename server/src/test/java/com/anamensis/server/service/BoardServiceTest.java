@@ -2,6 +2,7 @@ package com.anamensis.server.service;
 
 import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.SelectAnswerQueueDto;
+import com.anamensis.server.dto.SerializedJSONObject;
 import com.anamensis.server.dto.request.BoardRequest;
 import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.entity.Board;
@@ -222,7 +223,7 @@ class BoardServiceTest {
         b.setCategoryPk(1);
         b.setTitle("테스트 제목 추가");
         Map<String , Object> content = Map.of("content", "테스트 내용 추가");
-        b.setContent(new JSONObject(content));
+        b.setContent(new SerializedJSONObject(content));
 
         StepVerifier.create(bs.save(b))
                 .assertNext(board -> {
@@ -366,7 +367,7 @@ class BoardServiceTest {
                 .verifyComplete();
 
         Map<String, Object> newContent = Map.of("content", "테스트 내용 수정");
-        b.setContent(new JSONObject(newContent));
+        b.setContent(new SerializedJSONObject(newContent));
 
         StepVerifier.create(bs.updateByPk(b))
                 .expectNext(true)

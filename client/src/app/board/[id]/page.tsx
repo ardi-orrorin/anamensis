@@ -291,7 +291,7 @@ export default function Page({params}: {params : {id: string}}) {
 
     }
 
-    const onKeyDownHandler = (e: React.KeyboardEvent<HTMLElement>, seq: number) => {
+    const onKeyDownHandler = (e: React.KeyboardEvent<HTMLElement>, seq: number, isTitle?: boolean) => {
         if(e.nativeEvent.isComposing) return;
 
         switch (e.key) {
@@ -305,6 +305,7 @@ export default function Page({params}: {params : {id: string}}) {
                 KeyDownEvent.arrowDown({seq, blockRef, event: e, board});
                 break;
             case 'Backspace':
+                if(isTitle) return;
                 KeyDownEvent.backspace({board, seq, blockRef, setBoard, addBlock, event: e});
                 break;
         }
@@ -385,7 +386,7 @@ export default function Page({params}: {params : {id: string}}) {
                     <BoardTitle board={board}
                                 newBoard={isNewBoard}
                                 onChange={onChangeTitleHandler}
-                                onKeyDown={e => onKeyDownHandler(e, 0)}
+                                onKeyDown={e => onKeyDownHandler(e, 0, true)}
                     />
                     <div className={'flex justify-end sm:justify-start gap-2 h-10 sm:h-auto'}>
                         {

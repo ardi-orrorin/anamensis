@@ -10,6 +10,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 
 public class BoardResponse implements Serializable {
 
@@ -148,12 +149,12 @@ public class BoardResponse implements Serializable {
                     .membersOnly(board.getBoard().isMembersOnly())
                     .writerCreatedAt(board.getMember().getCreateAt());
 
-            if(member != null) {
+            if(Objects.nonNull(member)) {
                 builder.isWriter(board.getBoard().getMemberPk() == member.getId());
             }
 
 
-            if (board.getFile().getFilePath() != null) {
+            if (Objects.nonNull(board.getFile().getFilePath())) {
                 builder.profileImage(board.getFile().getFilePath() + board.getFile().getFileName());
             }
 
@@ -195,10 +196,10 @@ public class BoardResponse implements Serializable {
 
             if(board.getBoard().getIsPublic()) {
                 builder.content(board.getBoard().getContent().toMap());
-            } else if (board.getBoard().isMembersOnly() && member == null) {
-                builder.content(board.getBoard().getContent().toMap());
-            } else if (board.getBoard().getMemberPk() == member.getId()) {
+            } else if (Objects.nonNull(member) && board.getBoard().getMemberPk() == member.getId()) {
                 builder.isWriter(true);
+                builder.content(board.getBoard().getContent().toMap());
+            } else if (board.getBoard().isMembersOnly() && member == null) {
                 builder.content(board.getBoard().getContent().toMap());
             }
 

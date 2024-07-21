@@ -36,6 +36,12 @@ public class BoardService {
 
     private final VirtualThreadTaskExecutor virtualThreadTaskExecutor;
 
+    private final String BOARD_PK_KEY = "board:pk:%s";
+
+    private final BoardExpire boardExpire = new BoardExpire(1, TimeUnit.HOURS);
+
+    record BoardExpire(long timeout, TimeUnit timeUnit) {}
+
     public Flux<BoardResponse.List> findAll(
         Page page,
         BoardRequest.Params params,
@@ -69,10 +75,46 @@ public class BoardService {
             .cast(BoardResponse.List.class);
     }
 
-
     public Mono<BoardResultMap.Board> findByPk(long boardPk) {
         return Mono.justOrEmpty(boardMapper.findByPk(boardPk))
-                .switchIfEmpty(Mono.error(new RuntimeException("게시글이 없습니다.")));
+            .switchIfEmpty(Mono.error(new RuntimeException("게시글을 찾을 수 없습니다.")));
+    }
+
+    public Mono<BoardResultMap.Board> cacheFindByPk(long boardPk) {
+        String key = String.format(BOARD_PK_KEY, boardPk);
+
+        return Mono.fromCallable(()-> redisTemplate.hasKey(key))
+            .flatMap(b -> {
+                if(!b) {
+                    BoardResultMap.Board board = boardMapper.findByPk(boardPk).orElseThrow(()-> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+                    redisTemplate.boundValueOps(key).set(board, boardExpire.timeout, boardExpire.timeUnit);
+                }
+
+                return Mono.fromCallable(()-> redisTemplate.boundValueOps(key).get());
+            })
+            .cast(BoardResultMap.Board.class);
+    }
+
+    public Mono<Boolean> refreshCacheBoard(long boardPk) {
+        String key = String.format(BOARD_PK_KEY, boardPk);
+
+        if(!redisTemplate.hasKey(key)) return Mono.just(false);
+
+        redisTemplate.boundValueOps(key).expire(boardExpire.timeout, boardExpire.timeUnit);
+        return Mono.just(true);
+
+    }
+
+    private Mono<Boolean> updateCacheBoard(long boardPk) {
+        String key = String.format(BOARD_PK_KEY, boardPk);
+        if(redisTemplate.hasKey(key)) {
+            BoardResultMap.Board board = boardMapper.findByPk(boardPk)
+                .orElseThrow(()-> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+
+            redisTemplate.boundValueOps(key).set(board, boardExpire.timeout, boardExpire.timeUnit);
+        }
+        return Mono.just(true)
+            .onErrorReturn(false);
     }
 
     public Flux<BoardResponse.SummaryList> findSummaryList(long memberPk) {
@@ -231,7 +273,8 @@ public class BoardService {
                 .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
                 .doOnNext($ -> updateNoticeCache().subscribe())
                 .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
-                .doOnNext($ -> onePageCache(id));
+                .doOnNext($ -> onePageCache(id))
+                .doOnNext($ -> updateCacheBoard(id).subscribe());
     }
 
     private Mono<Boolean> updateNoticeCache() {

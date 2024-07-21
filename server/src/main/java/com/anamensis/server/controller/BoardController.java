@@ -26,6 +26,7 @@ import reactor.util.function.Tuple2;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
@@ -99,7 +100,7 @@ public class BoardController {
 
         Mono<BoardResultMap.Board> content = (user == null)
             ? boardService.findByPk(boardPk)
-            : member.flatMap(u -> boardService.findByPk(boardPk));
+            : member.flatMap(u -> boardService.cacheFindByPk(boardPk));
 
         Mono<Long> count = rateService.countRate(boardPk)
             .subscribeOn(Schedulers.boundedElastic());
@@ -126,6 +127,10 @@ public class BoardController {
                 boardService.viewUpdateByPk(boardPk)
                     .subscribeOn(Schedulers.boundedElastic())
                     .subscribe();
+
+                boardService.refreshCacheBoard(boardPk)
+                    .subscribeOn(Schedulers.boundedElastic())
+                    .subscribe();
             });
     }
 
@@ -136,9 +141,9 @@ public class BoardController {
         @PathVariable(name = "id") long boardPk,
         @AuthenticationPrincipal UserDetails user
     ) {
-        return boardService.findByPk(boardPk)
+        return boardService.cacheFindByPk(boardPk)
             .flatMap(board -> {
-                if(user == null) {
+                if(Objects.isNull(user)) {
                     return Mono.just(BoardResponse.RefContent.from(board, null));
                 }
 
@@ -434,7 +439,7 @@ public class BoardController {
         if(list.getJSONObject(0).isNull("extraValue")) return Mono.error(new RuntimeException("객체를 찾을 수 없습니다."));
         JSONObject extraValue = list.getJSONObject(0).getJSONObject("extraValue");
 
-        long selectCommentId = extraValue.get("selectId") == ""
+        long selectCommentId = extraValue.get("selectId").equals("")
             ? 0
             : Long.parseLong(extraValue.get("selectId").toString());
 

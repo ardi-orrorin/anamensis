@@ -1,6 +1,7 @@
 package com.anamensis.server.mapper;
 
 import com.anamensis.server.dto.Page;
+import com.anamensis.server.dto.SerializedJSONObject;
 import com.anamensis.server.dto.request.BoardRequest;
 import com.anamensis.server.entity.Board;
 import com.anamensis.server.entity.Category;
@@ -57,7 +58,7 @@ class BoardMapperTest {
         assertThrowsExactly(DataIntegrityViolationException.class, () -> bm.save(board));
         Map<String, Object> content = Map.of("content", "게시글 내용");
 
-        board.setContent(new JSONObject(content));
+        board.setContent(new SerializedJSONObject(content));
         assertThrowsExactly(DataIntegrityViolationException.class, () -> bm.save(board));
 
         board.setCategoryPk(category.getId());
@@ -250,7 +251,7 @@ class BoardMapperTest {
         board.setMemberPk(member.getId());
         board.setTitle("게시글 제목");
         Map<String, Object> content = Map.of("content", "게시글 내용");
-        board.setContent(new JSONObject(content));
+        board.setContent(new SerializedJSONObject(content));
         board.setCategoryPk(category.getId());
         board.setCreateAt(LocalDateTime.now());
         board.setUpdateAt(LocalDateTime.now());
@@ -343,7 +344,7 @@ class BoardMapperTest {
         Board board = new Board();
         board.setMemberPk(member.getId());
         Map<String, Object> content = Map.of("content", "게시글 내용");
-        board.setContent(new JSONObject(content));
+        board.setContent(new SerializedJSONObject(content));
         board.setCategoryPk(category.getId());
         board.setCreateAt(LocalDateTime.now());
         board.setUpdateAt(LocalDateTime.now());
@@ -371,7 +372,7 @@ class BoardMapperTest {
         board.setMemberPk(member.getId());
         Map<String, Object> content = Map.of("content", "게시글 내용");
         board.setTitle("게시글 제목");
-        board.setContent(new JSONObject(content));
+        board.setContent(new SerializedJSONObject(content));
         board.setCategoryPk(category.getId());
         board.setCreateAt(LocalDateTime.now());
         board.setUpdateAt(LocalDateTime.now());
@@ -397,7 +398,7 @@ class BoardMapperTest {
         board.setMemberPk(member.getId());
         Map<String, Object> content = Map.of("content", "게시글 내용");
         board.setTitle("게시글 제목");
-        board.setContent(new JSONObject(content));
+        board.setContent(new SerializedJSONObject(content));
         board.setCategoryPk(category.getId());
         board.setCreateAt(LocalDateTime.now());
         board.setUpdateAt(LocalDateTime.now());

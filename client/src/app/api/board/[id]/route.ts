@@ -24,6 +24,7 @@ export async function GET(req: NextRequest) {
             status: 200,
             isRoles: false,
         })
+
     } catch (e: any) {
         return ExNextResponse({
             body: JSON.stringify(e.response.data),

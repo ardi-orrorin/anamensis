@@ -137,9 +137,13 @@ export default function Page() {
             return;
         }
 
+        const regex = /[^a-zA-Z0-9ㄱ-ㅎ가-힣\s]/g;
+
+        const value = searchValue.replace(regex, '');
+
         const params = searchValue === ''
         ? {...initPage} as BoardListParamsI
-        : {...searchParams, ...initPage, value: searchValue, type: 'content'};
+        : {...searchParams, ...initPage, value, type: 'content'};
 
         setSearchParams(params);
     },[searchParams, searchValue]);

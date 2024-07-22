@@ -86,7 +86,6 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
         } as RefBlockExtraValueType);
 
         setTimeout(async () => {
-            console.log('sdfsdf')
             await mutate();
         },100);
     }
@@ -97,7 +96,7 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
         })?.component;
     }, [refBlock, boardValue]);
 
-    console.log(boardValue)
+
     return (
         <div id={`block-${hash}`}
              className={'w-full'}

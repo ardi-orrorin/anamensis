@@ -23,7 +23,6 @@ const SubTextMenu = ({
     if(!blockService.block) return;
     const {seq, code, textStyle} = blockService.block;
 
-
     if(!textStyle) return;
 
     const selectFontStyle = (type: string, value:string) => {

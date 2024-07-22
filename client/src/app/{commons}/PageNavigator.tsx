@@ -29,7 +29,7 @@ const PageNavigator = ({
         <div className={'w-full flex justify-center gap-x-2 mt-6'}>
             {
                 page !== 1 &&
-                  <Link className={['border border-solid border-gray-300 rounded-md text-sm px-4 py-2'].join(' ')}
+                  <Link className={['border border-solid border-gray-300 rounded-md text-sm px-4 py-2 hover:bg-main hover:text-white duration-500'].join(' ')}
                         href={`?page=${skipPrevPage}&size=${size}`}
                   >
                     <FontAwesomeIcon icon={faAnglesLeft} />
@@ -38,7 +38,7 @@ const PageNavigator = ({
             {
                 pages.map((item, index) => {
                     return (
-                        <Link className={['border border-solid border-gray-300 rounded-md text-sm px-4 py-2', page === item ? 'bg-blue-500 text-white' : ''].join(' ')}
+                        <Link className={['border border-solid border-gray-300 rounded-md text-sm px-4 py-2', page === item ? 'bg-main text-white' : 'hover:bg-main hover:text-white duration-500'].join(' ')}
                               href={`?page=${item}&size=${size}`}
                               key={`navi-${index}`}
                               prefetch={true}
@@ -50,7 +50,7 @@ const PageNavigator = ({
             }
             {
                 page !== lastPage && lastPage !== 0 && total !== 0 &&
-                  <Link className={'border border-solid border-gray-300 rounded-md text-sm px-4 py-2'}
+                  <Link className={'border border-solid border-gray-300 rounded-md text-sm px-4 py-2 hover:bg-main hover:text-white duration-500'}
                         href={`?page=${skipNextPage}&size=${size}`}
                   >
                     <FontAwesomeIcon icon={faAnglesRight} />

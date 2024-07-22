@@ -75,7 +75,7 @@ const LeftNavBar = ({
 
     return (
         <>
-        <nav className={['z-30 min-h-svh bg-blue-400 py-2 duration-500 '
+        <nav className={['z-30 min-h-dvh bg-main py-2 duration-500 '
             , isOpen || !isModalMode  ? 'translate-x-0 shadow-outset-lg' : 'translate-x-[-1000px]'
             , isModalMode ? 'fixed w-[220px]': 'min-w-[200px]'
         ].join(' ')}>

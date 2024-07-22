@@ -45,10 +45,10 @@ export default function Page() {
                 }
                 {
                     windowList.filter(e => !e.open).length > 0
-                    ? <button className={'w-[50px] h-10 bg-blue-400 text-white rounded'} onClick={()=> windowToggle(true)}>
+                    ? <button className={'w-[50px] h-10 bg-main text-white rounded'} onClick={()=> windowToggle(true)}>
                           <FontAwesomeIcon icon={faWindowRestore} />
                     </button>
-                    : <button className={'w-[50px] h-10 bg-blue-400 text-white rounded'} onClick={()=> windowToggle(false)}>
+                    : <button className={'w-[50px] h-10 bg-main text-white rounded'} onClick={()=> windowToggle(false)}>
                           <FontAwesomeIcon icon={faWindowMinimize} />
                     </button>
                 }

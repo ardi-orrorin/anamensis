@@ -30,12 +30,12 @@ const System = ({websys}: {websys: WebSysI[]}) => {
                     <col width="30%"/>
                 </colgroup>
                 <thead>
-                <tr className={'bg-blue-300 h-10 text-white'}>
-                    <th>Code</th>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Permission</th>
-                    <th>BTN</th>
+                <tr className={'bg-main h-9 text-white'}>
+                    <th className={'border-solid border-x border-white'}>Code</th>
+                    <th className={'border-solid border-x border-white'}>Name</th>
+                    <th className={'border-solid border-x border-white'}>Description</th>
+                    <th className={'border-solid border-x border-white'}>Permission</th>
+                    <th className={'border-solid border-x border-white'}>BTN</th>
                 </tr>
                 </thead>
                 <tbody>

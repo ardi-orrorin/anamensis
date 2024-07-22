@@ -79,7 +79,6 @@ const ProfileImg = ({imgData} : {imgData: string}) => {
                     ...loading,
                     img: false
                 });
-
             })
     }
 
@@ -92,7 +91,7 @@ const ProfileImg = ({imgData} : {imgData: string}) => {
 
     return (
         <div className={'relative'}>
-            <Image className={'rounded-full border-4 border-solid border-blue-200 w-[150px] h-[150px]'}
+            <Image className={'rounded-full border-4 border-solid border-main w-[150px] h-[150px]'}
                    src={defaultProfile(img)}
                    alt={''}
                    placeholder={"empty"}

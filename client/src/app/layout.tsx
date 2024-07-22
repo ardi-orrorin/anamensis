@@ -62,7 +62,7 @@ export default function RootLayout({
             }} />
             <body>
                 <NavMain />
-                <div className={'min-h-screen'}>
+                <div className={'min-h-screen h-full'}>
                     <ErrorBoundary errorComponent={Error}>
                         {children}
                     </ErrorBoundary>

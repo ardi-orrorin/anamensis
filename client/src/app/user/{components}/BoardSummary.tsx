@@ -4,6 +4,7 @@ import {useContext} from "react";
 import Link from "next/link";
 import {RateColor} from "@/app/{commons}/types/rate";
 import UserProvider from "@/app/user/{services}/userProvider";
+import moment from "moment";
 
 
 const BoardSummary = () => {
@@ -18,7 +19,7 @@ const BoardSummary = () => {
                         return (
                             <Link key={`summary-${i}`}
                                   href={`/board/${e.id}`}
-                                  className={`flex gap-3 text-sm w-full hover:bg-gray-100 cursor-pointer rounded py-1 h-8 hover:shadow duration-500`}
+                                  className={`flex gap-3 text-sm w-full justify-between hover:bg-gray-100 cursor-pointer rounded py-1 h-8 hover:shadow duration-500`}
                             >
                                 <span className={`py-0.5 w-12 rounded text-xs text-white flex justify-center items-center`}
                                       style={{backgroundColor: RateColor.findColor(e.rate)?.getColor}}
@@ -28,9 +29,13 @@ const BoardSummary = () => {
                                 <div className={'py-0.5 w-40 line-clamp-1'}>
                                     { e.title }
                                 </div>
-                                    <div className={'flex '}>
-                                        <span className={'py-0.5 px-4 flex justify-center items-center'}>{e.viewCount}</span>
-                                        <span className={'py-0.5 px-4 flex justify-center items-center'}>{e.createdAt.substring(0, 10)}</span>
+                                    <div className={'flex justify-end'}>
+                                        <span className={'py-0.5 flex justify-end items-center'}>
+                                            {e.viewCount}
+                                        </span>
+                                        <span className={'py-0.5 w-24 min-w-24 flex justify-end items-center'}>
+                                            { moment(e.createdAt).format('YYYY-MM-DD') }
+                                        </span>
                                     </div>
                                 </div>
                             </Link>

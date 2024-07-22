@@ -60,7 +60,7 @@ export default function AttendInfo() {
                 <span>{attendInfo.days}회</span>
             </div>
             <div className={'w-full'}>
-                <button className={'w-full bg-blue-300 text-white p-2 rounded hover:bg-blue-700 duration-500 shadow'}
+                <button className={'w-full bg-main text-white p-2 rounded hover:bg-blue-700 duration-500 shadow'}
                         onClick={attend}
                         disabled={loading}
                 >

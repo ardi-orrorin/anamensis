@@ -369,7 +369,7 @@ export default function Page({params}: {params : {id: string}}) {
                         {Category.findById(board.data?.categoryPk.toString())?.name}
                     </span>
                 </div>
-                <div className={'flex flex-col sm:flex-row justify-between gap-3 h-auto border-b-2 border-solid border-blue-200 py-3'}>
+                <div className={'flex flex-col sm:flex-row justify-between gap-3 h-auto border-b-2 border-solid border-main py-3'}>
                     {
                         !isNewBoard
                         && board.isView
@@ -457,19 +457,19 @@ export default function Page({params}: {params : {id: string}}) {
                     {
                         board.data?.content?.list.map((item, index) => {
                           return <Block key={'block' + index}
-                                          blockRef={blockRef}
-                                          onChangeHandler={e => {
-                                              onChangeHandler(e, item.seq)
-                                          }}
-                                          onKeyDownHandler={e => {
-                                              onKeyDownHandler(e, item.seq)
-                                          }}
-                                          onKeyUpHandler={e => {
-                                              onKeyUpHandler(e, item.seq)
-                                          }}
-                                          onClickAddHandler={() => addBlockHandler(item.seq)}
-                                          onClickDeleteHandler={onClickDeleteHandler}
-                                          {...item}
+                                        blockRef={blockRef}
+                                        onChangeHandler={e => {
+                                            onChangeHandler(e, item.seq)
+                                        }}
+                                        onKeyDownHandler={e => {
+                                            onKeyDownHandler(e, item.seq)
+                                        }}
+                                        onKeyUpHandler={e => {
+                                            onKeyUpHandler(e, item.seq)
+                                        }}
+                                        onClickAddHandler={() => addBlockHandler(item.seq)}
+                                        onClickDeleteHandler={onClickDeleteHandler}
+                                        {...item}
                             />
                         })
                     }
@@ -524,7 +524,6 @@ export default function Page({params}: {params : {id: string}}) {
                 (isNewBoard || !board.isView) && (!isNewBoard || !board.isView)
                 && <div className={'h-60'} />
             }
-
         </div>
     )
 }

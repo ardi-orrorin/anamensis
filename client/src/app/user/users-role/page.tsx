@@ -8,6 +8,7 @@ import {useSearchParams} from "next/navigation";
 import PageNavigator from "@/app/{commons}/PageNavigator";
 import {RoleType} from "@/app/user/system/{services}/types";
 import useSWR, {mutate, preload} from "swr";
+import moment from "moment";
 
 export type UsersRole = {
     id       : number
@@ -164,12 +165,12 @@ export default function Page() {
                     <col style={{width: '10%'}}/>
                     <col style={{width: '10%'}}/>
                     <col style={{width: '25%'}}/>
-                    <col style={{width: '15%'}}/>
+                    <col style={{width: '13%'}}/>
                     <col style={{width: '7%'}}/>
                     <col style={{width: '10%'}}/>
                     <col style={{width: '10%'}}/>
                 </colgroup>
-                <thead className={'bg-blue-300 text-white h-8 align-middle'}>
+                <thead className={'bg-main text-white h-9 align-middle'}>
                     <tr className={'text-sm border-x border-white border-solid'}>
                         <th className={'border-x border-white border-solid'}>
                             <input className={'border-0 outline-0 text-lg'}
@@ -223,13 +224,13 @@ export default function Page() {
                                 }
                             </td>
                             <td className={'py-2 px-3'}>
-                                { user.createAt }
+                                { moment(user.createAt).format('YYYY-MM-DD HH:mm') }
                             </td>
-                            <td className={'py-2 px-3'}>
+                            <td className={'text-center'}>
                                 { user.isUse ? '사용' : '비사용' }
                             </td>
                             <td className={'py-2 px-3'}>
-                                <select className={'w-full bg-none'} onChange={e => onChangeRole('add', user, e.target.value as RoleType)}>
+                                <select className={'w-full bg-none outline-0'} onChange={e => onChangeRole('add', user, e.target.value as RoleType)}>
                                     <option value={''}>선택</option>
                                     {
                                         !user.roles.includes('ADMIN')
@@ -242,7 +243,7 @@ export default function Page() {
                                 </select>
                             </td>
                             <td className={'py-2 px-3'}>
-                                <select className={'w-full bg-none'} onChange={e => onChangeRole('delete', user, e.target.value as RoleType)}>
+                                <select className={'w-full bg-none outline-0'} onChange={e => onChangeRole('delete', user, e.target.value as RoleType)}>
                                     <option value={''}>선택</option>
                                     {
                                         user.roles.map(role => {

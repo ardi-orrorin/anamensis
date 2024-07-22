@@ -21,25 +21,14 @@ const Thumbnail = ({
     const [columns, setColumns] = useState<number>(5);
     const [columnToggle, setColumnToggle] = useState<boolean>(false);
     const divRef = useRef<HTMLDivElement>(null);
-    const [divWidth, setDivWidth] = useState<number>(500);
 
     const { setAlbumToggle } = useContext(AlbumProvider);
 
-    useEffect(()=> {
-        const reSize = setTimeout(() => {
-            setDivWidth(Number(divRef?.current?.clientWidth));
-        },700);
-
-        return () => {
-            clearTimeout(reSize);
-        }
-    })
-
     return (
-        <div style={containerStyle}
+        <div className={'w-full flex flex-col relative'}
              ref={divRef}
         >
-            <div style={selectStyle}>
+            <div className={'w-full flex justify-end'}>
                 <div className={'relative flex flex-col py-2 text-sm'}>
                     <button className={'w-24 h-10 bg-white rounded border border-solid border-gray-200'}
                             onClick={() => setColumnToggle(!columnToggle)}
@@ -66,7 +55,7 @@ const Thumbnail = ({
                 </div>
             </div>
             <div style={imagesContainerStyle(columns)}
-                 className={'transform-gpu'}
+                 className={'w-full border-2 border-solid border-[#BFDBFE] transform-gpu'}
             >
                 {
                     images?.length > 0
@@ -74,8 +63,7 @@ const Thumbnail = ({
                         return (
                             <div key={'thumbnail' + index}
                                  className={'relative flex'}>
-                                <img style={imageStyle(divWidth / columns)}
-                                     className={'transform-gpu'}
+                                <img className={'w-full flex justify-center object-cover items-center border-2 border-solid border-[#BFDBFE] aspect-square transform-gpu'}
                                      src={defaultNoImg(image.replace(/(\.[^.]+)$/, '_thumb$1'))}
                                      alt={'thumbnail'}
                                      onError={(e) => {
@@ -109,35 +97,9 @@ const Thumbnail = ({
     )
 }
 
-
-const containerStyle: CSSProperties = {
-    display: 'flex',
-    width: '100%',
-    flexDirection: 'column',
-    position: 'relative',
-}
-
 const imagesContainerStyle = (columns:number) : CSSProperties => ({
     display: 'grid',
     gridTemplateColumns: `repeat(${columns}, 1fr)`,
-    border: '2px solid #BFDBFE',
-    width: '100%',
 });
-
-const imageStyle = (height: number) : CSSProperties => ({
-    border: '2px solid #BFDBFE',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    objectFit: 'cover',
-    height: `${height}px`,
-});
-
-const selectStyle: CSSProperties = {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    width: '100%',
-}
 
 export default Thumbnail;

@@ -1,5 +1,5 @@
 import {ExpendBlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useContext, useEffect, useMemo, useRef, useState} from "react";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBorderAll, faImage} from "@fortawesome/free-solid-svg-icons";
@@ -215,18 +215,42 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         }
     }
 
-    const componentProps = {
+    const componentProps = useMemo(() => ({
         images       : extraValue?.images || [],
         isView       : isView || false,
         defaultIndex : extraValue?.defaultIndex ?? 0,
         deleteImageHandler,
         onChaneDefaultIndexHandler,
-    }
+    }),[isView, extraValue]);
 
-    const modes = [
+    const modes = useMemo(() => [
         {icon: faBorderAll, mode: 'thumbnail', component: <Thumbnail {...componentProps}/>},
         {icon: faImage, mode: 'slide', component: <Slide {...componentProps} />},
-    ]
+    ], [componentProps]);
+
+    const modeComponent = useMemo(()=>
+        modes.map((mode, index) => {
+            return (
+                <button key={'mode' + index}
+                        className={[
+                            'w-16 h-8 rounded border border-solid border-gray-200',
+                            viewMode === mode.mode ? 'bg-gray-800' : 'bg-white'
+                        ].join(' ')}
+                        onClick={() => onChangeModeHandler(mode.mode)}
+                >
+                    <FontAwesomeIcon className={viewMode === mode.mode ? 'text-white' : ''}
+                                     icon={mode.icon}
+                    />
+                </button>
+            )
+        })
+    ,[modes])
+
+    const modeView = useMemo(() =>
+        modes.find(mode =>
+            mode.mode === viewMode
+        )?.component
+    ,[modes])
 
     return (
         <AlbumProvider.Provider value={{albumToggle, setAlbumToggle}}>
@@ -290,30 +314,12 @@ const AlbumBlock = (props: ExpendBlockProps) => {
             {
                 extraValue?.images?.length > 0
                 && <div className={'flex justify-end'}>
-                    {
-                        modes.map((mode, index) => {
-                            return (
-                                <button key={'mode' + index}
-                                        className={[
-                                            'w-16 h-8 rounded border border-solid border-gray-200',
-                                            viewMode === mode.mode ? 'bg-gray-800' : 'bg-white'
-                                        ].join(' ')}
-                                        onClick={() => onChangeModeHandler(mode.mode)}
-                                >
-                                    <FontAwesomeIcon className={viewMode === mode.mode ? 'text-white' : ''}
-                                                     icon={mode.icon}
-                                    />
-                                </button>
-                            )
-                        })
-                    }
+                    { modeComponent }
                 </div>
             }
             {
                 extraValue?.images?.length > 0
-                && modes.find(mode =>
-                    mode.mode === viewMode
-                )?.component
+                && modeView
             }
             {
                 extraValue?.images?.length > 0

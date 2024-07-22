@@ -75,6 +75,10 @@ export default function Page({params}: {params : {id: string}}) {
         blockTypeList.map(item => ({ command: item.command, code: item.code, notAvailDup : item.notAvailDup}))
     ), []);
 
+    const categoryName = useMemo(() =>
+            Category.findById(board.data?.categoryPk.toString())?.name
+    ,[board?.data?.categoryPk]);
+
     const router = useRouter();
 
     useEffect(() => {
@@ -92,6 +96,7 @@ export default function Page({params}: {params : {id: string}}) {
 
         return block;
     };
+
     const validation = useCallback(() => {
         const title = board.data.title !== '';
         const content = board.data.content.list.filter(item => item.value !== '').length > 0;
@@ -137,7 +142,6 @@ export default function Page({params}: {params : {id: string}}) {
         setLoading(true);
 
         try {
-
             const body = updateBoard({
                 board: board.data,
                 list: board.data.content.list,
@@ -243,7 +247,6 @@ export default function Page({params}: {params : {id: string}}) {
     }
 
     const fileDeleteHandler = async (blockList: BlockI[], seq: number) => {
-
         const fileRegexp = new RegExp('00[2-3][0-9]{2}');
         const fileBlock = blockList.find(item =>
             item.seq === seq && fileRegexp.test(item.code)
@@ -283,6 +286,7 @@ export default function Page({params}: {params : {id: string}}) {
     }
 
     const onChangeTitleHandler = (e: ChangeEvent<HTMLInputElement>) => {
+        console.log('onChangeTitleHandler', e.target.value)
         if(e.target.name !== 'title') return ;
         setBoard({...board, data: {...board.data, title: e.target.value}});
     }
@@ -352,6 +356,7 @@ export default function Page({params}: {params : {id: string}}) {
         blockRef
     })
 
+
     if(!board?.data?.content || board.data?.content?.list?.length === 0) {
         return;
     }
@@ -366,7 +371,7 @@ export default function Page({params}: {params : {id: string}}) {
                 </div>
                 <div className={'flex h-8 border-l-8 border-solid border-gray-500 px-2 items-center'}>
                     <span className={'font-bold'}>
-                        {Category.findById(board.data?.categoryPk.toString())?.name}
+                        { categoryName }
                     </span>
                 </div>
                 <div className={'flex flex-col sm:flex-row justify-between gap-3 h-auto border-b-2 border-solid border-main py-3'}>
@@ -416,7 +421,7 @@ export default function Page({params}: {params : {id: string}}) {
                               </button>
                             }
                             {
-                                (isNewBoard || !board.isView)
+                                ( isNewBoard || !board.isView )
                                 && <button
                                 className={[
                                     'w-16 rounded h-full border-2 py-1 px-3 text-xs duration-300 whitespace-pre',
@@ -455,46 +460,46 @@ export default function Page({params}: {params : {id: string}}) {
                 </div>
                 <div className={['flex flex-col', board.isView ? 'gap-2' : 'gap-4'].join(' ')}>
                     {
-                        board.data?.content?.list.map((item, index) => {
-                          return <Block key={'block' + index}
-                                        blockRef={blockRef}
-                                        onChangeHandler={e => {
-                                            onChangeHandler(e, item.seq)
-                                        }}
-                                        onKeyDownHandler={e => {
-                                            onKeyDownHandler(e, item.seq)
-                                        }}
-                                        onKeyUpHandler={e => {
-                                            onKeyUpHandler(e, item.seq)
-                                        }}
-                                        onClickAddHandler={() => addBlockHandler(item.seq)}
-                                        onClickDeleteHandler={onClickDeleteHandler}
-                                        {...item}
+                        board.data?.content?.list.map((item, index) =>
+                            <Block key={'block' + index}
+                                   blockRef={blockRef}
+                                   onChangeHandler={e => {
+                                       onChangeHandler(e, item.seq)
+                                   }}
+                                   onKeyDownHandler={e => {
+                                       onKeyDownHandler(e, item.seq)
+                                   }}
+                                   onKeyUpHandler={e => {
+                                       onKeyUpHandler(e, item.seq)
+                                   }}
+                                   onClickAddHandler={() => addBlockHandler(item.seq)}
+                                   onClickDeleteHandler={onClickDeleteHandler}
+                                   {...item}
                             />
-                        })
+                        )
                     }
                 </div>
                 <div>
                     {
                         isNewBoard
                         && <div className={'flex gap-1 justify-end mt-5'}>
-                        <button
-                          className={'w-full rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
-                          onClick={() => debounce(() => submitHandler(true))}
-                        >작성
-                        </button>
-                      </div>
+                            <button
+                              className={'w-full rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                              onClick={() => debounce(() => submitHandler(true))}
+                            >작성
+                            </button>
+                        </div>
                     }
                     {
                         !isNewBoard
                         && !board.isView
                         && <div className={'flex gap-1 justify-end mt-5'}>
-                        <button
-                          className={'w-full rounded h-10 border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
-                          onClick={() => debounce(() => submitHandler(false))}
-                        >저장
-                        </button>
-                      </div>
+                            <button
+                              className={'w-full rounded h-10 border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                              onClick={() => debounce(() => submitHandler(false))}
+                            >저장
+                            </button>
+                        </div>
                     }
                 </div>
                 <Rate newBoard={isNewBoard}
@@ -515,7 +520,6 @@ export default function Page({params}: {params : {id: string}}) {
             <div>
                 {
                     !board.isView
-
                     && blockService.blockMenu === 'openTextMenu'
                     && <SubTextMenu blockRef={blockRef}/>
                 }

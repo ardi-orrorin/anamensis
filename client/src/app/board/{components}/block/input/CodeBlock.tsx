@@ -87,7 +87,7 @@ const CodeBlock = (props: BlockProps & {type: string}) => {
               </div>
             }
             <div className={'w-full'}
-                 style={{height: extraValue?.line * 18}}
+                 style={{height: (extraValue?.line || 1) * 18}}
             >
                 <Editor defaultLanguage={'java'}
                         value={value}

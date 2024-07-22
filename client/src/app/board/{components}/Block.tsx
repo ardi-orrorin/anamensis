@@ -10,7 +10,7 @@ import {
     MouseEnterHTMLElements,
     MouseLeaveHTMLElements
 } from "@/app/board/{components}/block/type/Types";
-import React, {useContext, useMemo, useState} from "react";
+import React, {useCallback, useContext, useMemo, useState} from "react";
 import MenuItem from "@/app/board/{components}/MenuItem";
 import BlockProvider, {BlockMenu, BlockService} from "@/app/board/{services}/BlockProvider";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
@@ -25,7 +25,7 @@ type ContextMenuProps = {
     mode: 'url' | 'answer';
 }
 
-export default function Block(props: BlockProps) {
+const Block = (props: BlockProps) => {
     const {
         seq, code,
         value, hash,
@@ -46,7 +46,7 @@ export default function Block(props: BlockProps) {
 
     const Component = block?.component!;
 
-    const onFocusHandler = (e: React.FocusEvent<HtmlElements>) => {
+    const onFocusHandler = useCallback((e: React.FocusEvent<HtmlElements>) => {
         if(e.currentTarget.ariaRoleDescription !== 'text') {
             return setBlockService({} as BlockService);
         }
@@ -57,6 +57,7 @@ export default function Block(props: BlockProps) {
         const positionY = rect.y - 45
 
         const block: BlockI = {seq, code, value, textStyle, hash};
+
         setBlockService({
             ...blockService,
             block,
@@ -64,7 +65,7 @@ export default function Block(props: BlockProps) {
             screenX: positionX,
             screenY: positionY,
         })
-    }
+    },[board?.data?.content?.list[seq]]);
 
     const onMouseEnterHandler = (e: React.MouseEvent<MouseEnterHTMLElements> ) => {
         if(e.currentTarget.ariaRoleDescription === 'object') {
@@ -95,12 +96,13 @@ export default function Block(props: BlockProps) {
         })
     }
 
-    const onMouseLeaveHandler = (e: React.MouseEvent<MouseLeaveHTMLElements> ) => {
+    const onMouseLeaveHandler = useCallback((e: React.MouseEvent<MouseLeaveHTMLElements> ) => {
         setBlockService({blockMenu: '', block: {} as BlockI, screenX: 0, screenY: 0});
         setCommentService({commentMenu: false, screenX: 0, screenY: 0, blockSeq: '', comments: []});
-    }
+    },[]);
 
-    const openMenuToggle  = () => {
+    const openMenuToggle  = useCallback(() => {
+
         if(blockService.blockMenu !== 'openMenu' || blockService.block.seq !== seq) {
             setBlockService({...blockService, blockMenu: 'openMenu', block: {seq, code, value, textStyle, hash}});
             return ;
@@ -110,9 +112,9 @@ export default function Block(props: BlockProps) {
                 seq: 0, code: '', value: '', hash: '',
             }
         });
-    }
+    },[]);
 
-    const onClickObjectMenu = (type: string) => {
+    const onClickObjectMenu = useCallback((type: string) => {
         if(type === 'delete') {
             if(!onClickDeleteHandler) return;
             onClickDeleteHandler(seq);
@@ -138,9 +140,9 @@ export default function Block(props: BlockProps) {
             window.open(url, '_blank');
             return ;
         }
-    }
+    },[]);
 
-    const onChangeValueHandler = (value: string) => {
+    const onChangeValueHandler = useCallback((value: string) => {
         const newList = board.data?.content?.list.map((item, index) => {
             if (item.seq === seq) {
                 item.value = value;
@@ -149,9 +151,9 @@ export default function Block(props: BlockProps) {
         });
 
         setBoard({...board, data: {...board.data, content: {list: newList}}});
-    }
+    },[board?.data?.content.list[seq]])
 
-    const onChangeExtraValueHandler = (value: ExtraValueI) => {
+    const onChangeExtraValueHandler = useCallback((value: ExtraValueI) => {
         const newList = board.data?.content?.list.map((item, index) => {
             if (item.seq === seq) {
                 item.extraValue = value;
@@ -160,16 +162,19 @@ export default function Block(props: BlockProps) {
         });
 
         setBoard({...board, data: {...board.data, content: {list: newList}}});
-    }
+    },[board?.data?.content.list[seq]]);
 
-    const contextLinkHandler = async (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+    const contextLinkHandler = useCallback(async (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
         if(!board?.isView) return;
+        if(!board?.data?.isLogin) return;
+
         e.preventDefault();
+
         const {clientX, clientY} = e.nativeEvent as MouseEvent;
         setContextMenu({clientX, clientY, isView: true} as ContextMenuProps);
-    }
+    },[board?.isView, board?.data?.isLogin]);
 
-    const shareLinkHandler = () => {
+    const shareLinkHandler = useCallback(() => {
         if(!board.data.isLogin) return;
         if(typeof window === 'undefined') return ;
         if(!board?.data?.id) return;
@@ -182,9 +187,9 @@ export default function Block(props: BlockProps) {
         setTimeout(() => {
             setContextMenu({} as ContextMenuProps);
         },700);
-    }
+    },[contextMenu]);
 
-    const answerLinkHandler = () => {
+    const answerLinkHandler = useCallback(() => {
         if(!board.data.isLogin) return;
         if(typeof window === 'undefined') return ;
 
@@ -194,9 +199,9 @@ export default function Block(props: BlockProps) {
             if(board.data.isLogin) setNewComment({...newComment, blockSeq: hash});
             setContextMenu({} as ContextMenuProps);
         }, 700);
-    }
+    },[contextMenu]);
 
-    const shareLinkLongTouchHandler = async (e: React.TouchEvent<HTMLDivElement>) => {
+    const shareLinkLongTouchHandler = useCallback(async (e: React.TouchEvent<HTMLDivElement>) => {
         if(!board.data.isLogin) return;
 
         e.preventDefault();
@@ -206,7 +211,7 @@ export default function Block(props: BlockProps) {
         setTouch(setTimeout(() => {
             contextLinkHandler(e);
         }, touchTime));
-    }
+    },[board?.data?.isLogin]);
 
     return (
         <div className={[
@@ -302,4 +307,4 @@ export default function Block(props: BlockProps) {
     )
 }
 
-
+export default React.memo(Block);

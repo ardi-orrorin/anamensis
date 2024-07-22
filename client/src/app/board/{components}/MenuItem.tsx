@@ -17,7 +17,7 @@ const MenuItem = ({
     toggle?  : ToggleEnum,
     subMenu? : boolean,
 }) => {
-
+    // completed
     const {blockService, setBlockService} = useContext(BlockProvider);
     const {board, setBoard} = useContext(BoardProvider);
 
@@ -68,6 +68,43 @@ const MenuItem = ({
         },100);
     };
 
+    const blockMenu = useMemo(() =>
+        blockTypeList.map((block: BlockType, index: number) => {
+            const {
+                label, code,
+                comment, command,
+                icon, notAvailDup
+            } = block;
+
+            if(notAvailDupCheck(code, board.data?.content)) return;
+            if(block.type === 'extra') return;
+
+            return (
+                <li key={'blockList'+ index} className={'w-full'}>
+                    <button className={[
+                        'flex w-full h-full p-2 text-left text-sm rounded duration-300 hover:bg-blue-200 hover:text-blue-800',
+                        curCode === code && 'bg-blue-100'
+                    ].join(' ')}
+                            onClick={()=> openMenuClick(code)}
+                    >
+                        <div className={'flex flex-col h-full p-2'}>
+                            <FontAwesomeIcon icon={icon} height={15}/>
+                            <div>[{command}]</div>
+                        </div>
+                        <div className={'flex flex-col w-full p-1'}>
+                            <div>
+                                {label}
+                            </div>
+                            <div>
+                                {comment}
+                            </div>
+                        </div>
+                    </button>
+                </li>
+            )
+        })
+    ,[]);
+
     return (
         <>
             <div className={[
@@ -81,42 +118,7 @@ const MenuItem = ({
                     subMenu ? '' : 'overflow-y-scroll scroll-p-2 max-h-72'
                 ].join(' ')}>
                     <ul className={'flex flex-col w-full'}>
-                        {
-                            blockTypeList.map((block: BlockType, index: number) => {
-                                const {
-                                    label, code,
-                                    comment, command,
-                                    icon, notAvailDup
-                                } = block;
-
-                                if(notAvailDupCheck(code, board.data?.content)) return;
-                                if(block.type === 'extra') return;
-
-                                return (
-                                    <li key={'blockList'+ index} className={'w-full'}>
-                                        <button className={[
-                                            'flex w-full h-full p-2 text-left text-sm rounded duration-300 hover:bg-blue-200 hover:text-blue-800',
-                                            curCode === code && 'bg-blue-100'
-                                        ].join(' ')}
-                                                onClick={()=> openMenuClick(code)}
-                                        >
-                                            <div className={'flex flex-col h-full p-2'}>
-                                                <FontAwesomeIcon icon={icon} height={15}/>
-                                                <div>[{command}]</div>
-                                            </div>
-                                            <div className={'flex flex-col w-full p-1'}>
-                                                <div>
-                                                    {label}
-                                                </div>
-                                                <div>
-                                                    {comment}
-                                                </div>
-                                            </div>
-                                        </button>
-                                    </li>
-                                )
-                            })
-                        }
+                        { blockMenu }
                     </ul>
                 </div>
             </div>

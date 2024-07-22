@@ -1,4 +1,4 @@
-import {CSSProperties} from "react";
+import {CSSProperties, useMemo} from "react";
 import Image from "next/image";
 import {MouseLeaveHTMLElements} from "@/app/board/{components}/block/type/Types";
 
@@ -11,7 +11,9 @@ export type FileImageProps = {
 export default function FileImage(props: FileImageProps){
     const {value, onMouseEnterHandler, onMouseLeaveHandler} = props;
 
-    const thumb = value.replace(/(\.[^.]+)$/, '_thumb$1');
+    const thumb = useMemo(() =>
+        value.replace(/(\.[^.]+)$/, '_thumb$1')
+    ,[value]);
 
     const url = process.env.NEXT_PUBLIC_CDN_SERVER + thumb;
 

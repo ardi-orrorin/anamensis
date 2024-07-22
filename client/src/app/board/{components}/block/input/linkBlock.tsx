@@ -17,7 +17,7 @@ const LinkBlock = (props: ExpendBlockProps) => {
         value, type,
         isView, hash,
         onChangeValueHandler, onKeyUpHandler,
-        onKeyDownHandler, onMouseEnterHandler,
+        onMouseEnterHandler,
         onFocusHandler, onChangeExtraValueHandler,
     }: ExpendBlockProps = props;
 

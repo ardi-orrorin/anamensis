@@ -206,6 +206,15 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
         onChangeExtraValueHandler(newValue);
     }
 
+    const tags = useMemo(() =>
+        Array.from(extraValue?.tags ?? [])
+            .map((tag, index) =>
+                <Tag key={index}
+                     {...{tag, deleteTagHandler, isView: isView!}}
+                />
+            )
+    ,[extraValue?.tags, isView])
+
 
     return (
         <div id={`block-${hash}`}
@@ -246,14 +255,7 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
                             && extraValue?.tags
                             && extraValue?.tags?.length > 0
                             && <div className={'flex py-2 gap-2 text-sm text-blue-700'}>
-                                {
-                                    Array.from(extraValue?.tags ?? [])
-                                        .map((tag, index) =>
-                                            <Tag key={index}
-                                                 {...{tag, deleteTagHandler, isView: isView!}}
-                                            />
-                                        )
-                                }
+                                { tags }
                           </div>
                         }
                     </div>

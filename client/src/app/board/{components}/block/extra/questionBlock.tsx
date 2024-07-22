@@ -1,5 +1,5 @@
 import {ExpendBlockProps} from "@/app/board/{components}/block/type/Types";
-import {useContext, useEffect, useMemo} from "react";
+import {useCallback, useContext, useEffect, useMemo} from "react";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import moment from "moment";
 
@@ -31,13 +31,19 @@ const QuestionBlock = (props: ExpendBlockProps) => {
 
     },[])
 
-    const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
 
         if(!onChangeExtraValueHandler) return;
         onChangeExtraValueHandler({...extraValue, [name]: value});
-    }
+    },[extraValue]);
 
+
+    const result = useMemo(()=>
+        extraValue?.state === 'wait'
+            ? <QWait {...{...extraValue, onChangeHandler}} />
+            : <QCompleted {...{...extraValue, onChangeHandler}}/>
+    ,[extraValue?.state])
 
     return (
         <div className={'w-full flex flex-col gap-2'}
@@ -48,11 +54,7 @@ const QuestionBlock = (props: ExpendBlockProps) => {
                  props!.blockRef!.current[props.seq] = el
              }}
         >
-            {
-                extraValue?.state === 'wait'
-                ? <QWait {...{...extraValue, onChangeHandler}} />
-                : <QCompleted {...{...extraValue, onChangeHandler}}/>
-            }
+            { result }
         </div>
     );
 }
@@ -65,6 +67,7 @@ const QWait = ({
     onChangeHandler: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
     const {board, myPoint, setMyPoint} = useContext(BoardProvider);
+    const dueDate = useMemo(()=> moment(endDate).format('YYYY-MM-DD'),[endDate]);
 
     const onChangeDateHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         if(moment(e.target.value).isAfter(moment().add(9, 'days'))) {
@@ -104,7 +107,7 @@ const QWait = ({
                     board?.data?.isWriter
                     || board.isView
                     ? <span className={'flex justify-center items-center font-bold'}>
-                        {moment(endDate).format('YYYY년 MM월 DD일')}
+                        { dueDate }
                     </span>
                     : <input className={'flex justify-center items-center h-8 p-2 outline-0'}
                              type={'date'}
@@ -142,7 +145,7 @@ const QWait = ({
                           최대 가능한 포인트 :
                         </span>
                         <span className={'font-bold'}>
-                          {myPoint}
+                          { myPoint }
                         </span>
                     </div>
                 }
@@ -158,7 +161,12 @@ const QCompleted = ({
 ) => {
     const { comment } = useContext(BoardProvider);
 
-    const selectWriter = comment.find(item => Number(item.id) === Number(selectId));
+    const selectWriter = useMemo(() =>
+        comment.find(item => Number(item.id) === Number(selectId))
+    ,[selectId]);
+
+    const answerDate = useMemo(()=> moment(selectDate).format('YYYY-MM-DD'),[selectWriter?.createdAt]);
+    const adoptionDate = useMemo(()=> moment().format('YYYY-MM-DD'),[selectDate]);
 
     return (
         <div className={'flex flex-col gap-1 text-sm'}>
@@ -181,7 +189,7 @@ const QCompleted = ({
                         답변일 : &nbsp;
                     </span>
                     <span className={'text-blue-700 font-bold'}>
-                        { moment(selectWriter?.createdAt).format('YYYY년 MM월 DD일') }
+                        { answerDate }
                     </span>
                 </div>
                 <div className={'flex'}>
@@ -189,7 +197,7 @@ const QCompleted = ({
                         채택일 : &nbsp;
                     </span>
                     <span className={'text-blue-700 font-bold'}>
-                        { selectDate === '0' ? '미정' : moment(selectDate).format('YYYY년 MM월 DD일') }
+                        { selectDate === '0' ? '미정' : adoptionDate }
                     </span>
                 </div>
                 <div className={'flex'}>

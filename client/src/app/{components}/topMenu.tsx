@@ -1,5 +1,5 @@
 import {Category} from "@/app/board/{services}/types";
-import {useContext} from "react";
+import {useContext, useMemo} from "react";
 import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
 
 
@@ -12,24 +12,26 @@ const TopMenu = () => {
         setSearchParams({ categoryPk: value, page: 1, size: 20 } as BoardListParamsI);
     }
 
+    const CategoryComponent = useMemo(()=>
+        Category.list.map((item, index) => {
+
+            return (
+                <button key={'category-write' + index}
+                        className={[
+                            'py-3 w-[31.5%] text-sm text-center border border-solid border-gray-100 shadow hover:bg-gray-100 duration-300',
+                            searchParams.categoryPk === item.id ? 'bg-gray-100' : ''
+                        ].join(' ')}
+                        onClick={() => onChangeCategory(item.id)}
+                        disabled={searchParams.categoryPk === item.id}
+                >
+                    {item.name}
+                </button>
+            )
+        }),[searchParams.categoryPk])
+
     return (
         <div className={'w-full flex flex-wrap gap-2 justify-center text-gray-700'}>
-            {
-                Category.list.map((item, index) => {
-                    return (
-                        <button key={'category-write' + index}
-                                className={[
-                                    'py-3 w-[31.5%] text-sm text-center border border-solid border-gray-100 shadow hover:bg-gray-100 duration-300',
-                                    searchParams.categoryPk === item.id ? 'bg-gray-100' : ''
-                                ].join(' ')}
-                                onClick={() => onChangeCategory(item.id)}
-                                disabled={searchParams.categoryPk === item.id}
-                        >
-                            {item.name}
-                        </button>
-                    )
-                })
-            }
+            { CategoryComponent }
         </div>
     );
 }

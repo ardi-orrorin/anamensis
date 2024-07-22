@@ -1,7 +1,7 @@
 import {Category} from "@/app/board/{services}/types";
 import Image from "next/image";
 import {defaultProfile} from "@/app/{commons}/func/image";
-import React from "react";
+import React, {useMemo} from "react";
 import {BoardListI} from "@/app/{components}/boardComponent";
 
 const HeaderComponent = (props: BoardListI) => {
@@ -10,12 +10,16 @@ const HeaderComponent = (props: BoardListI) => {
         , isPublic, profileImage
         , writer, membersOnly
     } = props;
+
+    const categoryName = useMemo(()=>
+        Category.findById(categoryPk)?.name
+    ,[categoryPk])
     return (
         <div className={'pt-2 flex w-full h-[55px] min-h[55px] max-h-[55px] justify-between px-3 items-center'}>
             <div className={'h-auto flex flex-col gap-1'}>
                 <span className={'flex gap-2 text-xs text-blue-700'}>
                     <span className={''}>
-                        {Category.findById(categoryPk)?.name}
+                        { categoryName }
                     </span>
                     {
                         membersOnly

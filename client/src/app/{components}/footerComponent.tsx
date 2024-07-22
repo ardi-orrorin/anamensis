@@ -4,6 +4,7 @@ import {RateColor} from "@/app/{commons}/types/rate";
 import {faHeart} from "@fortawesome/free-solid-svg-icons/faHeart";
 import {BoardListI} from "@/app/{components}/boardComponent";
 import moment from "moment";
+import {useMemo} from "react";
 
 const FooterComponent = (props: BoardListI) => {
     const {
@@ -12,9 +13,19 @@ const FooterComponent = (props: BoardListI) => {
     } = props;
 
 
-    const createAt = moment().isSame(createdAt, 'day')
+    const createAt = useMemo(() =>
+        moment().isSame(createdAt, 'day')
         ? moment(createdAt).format('HH:mm')
-        : moment(createdAt).format('YYYY-MM-DD HH:mm');
+        : moment(createdAt).format('YYYY-MM-DD HH:mm')
+    , [createdAt])
+
+    const rateColor = useMemo(() =>
+        RateColor.findColor(rate)?.getColor
+    ,[rate])
+
+    const commentCountColor = useMemo(() =>
+        RateColor.findColor(commentCount)?.getColor
+    ,[commentCount])
 
     return (
         <div className={'px-3 pb-2 h-[30px] min-h[30px] max-h-[30px] flex justify-between items-center text-xs text-gray-500'}>
@@ -24,13 +35,13 @@ const FooterComponent = (props: BoardListI) => {
                     {viewCount}
                 </span>
                 <span className={`flex gap-1 items-center`}
-                      style={{color: RateColor.findColor(rate)?.getColor}}
+                      style={{color: rateColor}}
                 >
                     <FontAwesomeIcon icon={faHeart} />
                     {rate}
                 </span>
                 <span className={`flex gap-1 items-center`}
-                      style={{color: RateColor.findColor(commentCount)?.getColor}}
+                      style={{color: commentCountColor}}
                 >
                     <FontAwesomeIcon icon={faComment} />
                     {commentCount}

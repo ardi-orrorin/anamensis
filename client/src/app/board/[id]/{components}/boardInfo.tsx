@@ -1,6 +1,4 @@
 import {BoardService} from "@/app/board/{services}/BoardProvider";
-import Image from "next/image";
-import {defaultProfile} from "@/app/{commons}/func/image";
 import {BoardI} from "@/app/board/{services}/types";
 
 const data = (props: BoardService) => {

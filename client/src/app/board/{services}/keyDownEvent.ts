@@ -80,6 +80,7 @@ const backspace = (args: KeyEventType) => {
             if (item.seq !== initSeq) return item;
             return addBlock(initSeq, true);
         });
+
         setBoard({...board, data: {...board.data, content: {list: newList}}});
     }
 

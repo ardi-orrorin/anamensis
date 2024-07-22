@@ -1,5 +1,5 @@
 import {Category} from "@/app/board/{services}/types";
-import {useContext, useMemo} from "react";
+import {useCallback, useContext, useMemo} from "react";
 import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
 
 
@@ -8,9 +8,9 @@ const TopMenu = () => {
         searchParams, setSearchParams,
     } = useContext(SearchParamsProvider);
 
-    const onChangeCategory = (value: string) => {
+    const onChangeCategory = useCallback((value: string) => {
         setSearchParams({ categoryPk: value, page: 1, size: 20 } as BoardListParamsI);
-    }
+    },[]);
 
     const CategoryComponent = useMemo(()=>
         Category.list.map((item, index) => {

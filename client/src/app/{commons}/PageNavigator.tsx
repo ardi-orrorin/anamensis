@@ -3,21 +3,38 @@ import Link from "next/link";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {redirect} from "next/navigation";
 import {faAnglesLeft, faAnglesRight} from "@fortawesome/free-solid-svg-icons";
+import {useMemo} from "react";
 
 const PageNavigator = ({
     page, size, total
 }: PageI) => {
 
-    const lastPage = Math.ceil(total / size);
+    const lastPage = useMemo(() => Math.ceil(total / size), [total, size]);
 
-    const startPAge = Math.max(1, page - 3);
+    const startPAge = useMemo(() => Math.max(1, page - 3), [page]);
 
-    const curEndPage = Math.min(lastPage, page + 3);
+    const curEndPage = useMemo(() => Math.min(lastPage, page + 3), [lastPage, page]);
 
-    const pages = Array.from({length: curEndPage - startPAge + 1}, (_, i) => startPAge + i);
+    const pageNumbers = useMemo(()=>
+        Array.from({length: curEndPage - startPAge + 1}, (_, i) => startPAge + i)
+    ,[curEndPage, startPAge, page])
 
-    const skipNextPage = page + 5 > lastPage ? lastPage : page + 5;
-    const skipPrevPage = page - 5 < 1 ? 1 : page - 5;
+    const skipNextPage = useMemo(() => page + 5 > lastPage ? lastPage : page + 5,[page, lastPage]);
+    const skipPrevPage = useMemo(() => page - 5 < 1 ? 1 : page - 5,[page]);
+
+    const pages = useMemo(() =>
+        pageNumbers.map((item, index) => {
+            return (
+                <Link className={['border border-solid border-gray-300 rounded-md text-sm px-4 py-2', page === item ? 'bg-main text-white' : 'hover:bg-main hover:text-white duration-500'].join(' ')}
+                      href={`?page=${item}&size=${size}`}
+                      key={`navi-${index}`}
+                      prefetch={true}
+                >
+                    {item}
+                </Link>
+            )
+        })
+    ,[pageNumbers])
 
     if(total !== 0 && lastPage < page) {
         redirect(`?page=${lastPage}&size=${size}`);
@@ -35,19 +52,7 @@ const PageNavigator = ({
                     <FontAwesomeIcon icon={faAnglesLeft} />
                   </Link>
             }
-            {
-                pages.map((item, index) => {
-                    return (
-                        <Link className={['border border-solid border-gray-300 rounded-md text-sm px-4 py-2', page === item ? 'bg-main text-white' : 'hover:bg-main hover:text-white duration-500'].join(' ')}
-                              href={`?page=${item}&size=${size}`}
-                              key={`navi-${index}`}
-                              prefetch={true}
-                        >
-                            {item}
-                        </Link>
-                    )
-                })
-            }
+            { pages }
             {
                 page !== lastPage && lastPage !== 0 && total !== 0 &&
                   <Link className={'border border-solid border-gray-300 rounded-md text-sm px-4 py-2 hover:bg-main hover:text-white duration-500'}

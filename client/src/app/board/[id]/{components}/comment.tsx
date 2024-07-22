@@ -46,6 +46,7 @@ const Comment = ({
 
     preload([`/api/board/comment/${board.data.id}`, searchParams], async () => {
         if(isNewBoard) return;
+
         return await apiCall<PageResponse<CommentI>>({
             path: '/api/board/comment',
             method: 'GET',
@@ -103,6 +104,14 @@ const Comment = ({
         });
     }
 
+    const comments = useMemo(() =>
+        comment.map((item, index) => {
+            return (
+                <CommentItem key={index} {...item} reload={reload} />
+            )
+        })
+    ,[comment])
+
     if(!board.isView) return <></>
 
     return (
@@ -130,7 +139,7 @@ const Comment = ({
                             style={{width: newComment.blockSeq !== undefined && newComment.blockSeq !== null ? '29px' : '0'}}
                             onClick={onDeleteHandler}
                     >
-                      <span>{newComment.blockSeq?.split('-')[1]}</span>
+                      <span>{ newComment.blockSeq?.split('-')[1] }</span>
                     </button>
                     <textarea className={[
                         'w-full h-16 border border-solid border-gray-200  resize-none text-sm outline-0 duration-300',
@@ -153,13 +162,7 @@ const Comment = ({
                 </div>
             }
             <div className={'w-auto flex flex-col gap-4'}>
-                {
-                    comment.map((item, index) => {
-                        return (
-                            <CommentItem key={index} {...item} reload={reload} />
-                        )
-                    })
-                }
+                { comments }
             </div>
             {
                 page.total > 10
@@ -322,7 +325,7 @@ const CommentItem = (props: CommentI & {reload: ()=> Promise<any>}) => {
                          onClick={() => {deleteComment.confirm && disabledDeleteConfirm()}}
                     >
                         <p className={''}>
-                            {content}
+                            { content }
                         </p>
                     </div>
                 </div>

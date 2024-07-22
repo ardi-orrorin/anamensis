@@ -31,7 +31,6 @@ export const useBoardHotKey = ({
     };
 
     useHotkeys('shift+f', ()=> setFullScreen(!fullScreen));
-    useHotkeys('backspace', _ => router.back());
 
     useHotkeys(['mod+1', 'mod+2', 'mod+3', 'mod+4', 'mod+5', 'mod+6'], (_, handler) => {
         if(blockService?.blockMenu !== 'openTextMenu') return;

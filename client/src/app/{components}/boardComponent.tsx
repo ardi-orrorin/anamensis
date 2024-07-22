@@ -34,15 +34,15 @@ const BoardComponent = (props: BoardListI & {favorites: string[]}) => {
         {categoryPk: 5, component: AlbumBoardComponent},
     ],[]);
 
-    const isFavorite = useMemo(() => favorites?.find(boardPk => id.toString() === boardPk.toString())
-        , [favorites, id]);
+    const isFavorite = useMemo(() =>
+        favorites?.find(boardPk => id.toString() === boardPk.toString())
+    , [favorites, id]);
 
-    const Component = useMemo(() => {
-
-        return Components.find((component) => {
-            return component.categoryPk === Number(categoryPk)
-        })?.component(props)
-    },[categoryPk])
+    const Component = useMemo(() =>
+        Components.find((component) =>
+            component.categoryPk === Number(categoryPk)
+        )?.component(props)
+    ,[categoryPk])
 
     return (
         <Link className={[

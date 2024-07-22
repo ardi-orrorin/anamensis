@@ -26,16 +26,23 @@ const BoardComponent = (props: BoardListI & {favorites: string[]}) => {
        id, body, categoryPk, favorites
     } = props;
 
-    const Components = [
+    const Components = useMemo(()=>[
         {categoryPk: 1, component: DefaultBoardComponent},
         {categoryPk: 2, component: DefaultBoardComponent},
         {categoryPk: 3, component: QuestionBoardComponent},
         {categoryPk: 4, component: AlttuelBoardComponent},
         {categoryPk: 5, component: AlbumBoardComponent},
-    ]
+    ],[]);
 
     const isFavorite = useMemo(() => favorites?.find(boardPk => id.toString() === boardPk.toString())
         , [favorites, id]);
+
+    const Component = useMemo(() => {
+
+        return Components.find((component) => {
+            return component.categoryPk === Number(categoryPk)
+        })?.component(props)
+    },[categoryPk])
 
     return (
         <Link className={[
@@ -45,11 +52,7 @@ const BoardComponent = (props: BoardListI & {favorites: string[]}) => {
               href={`/board/${id}`}
               prefetch={true}
         >
-            {
-                Components.find((component) =>
-                    component.categoryPk === Number(categoryPk)
-                )?.component(props)
-            }
+            { Component }
         </Link>
     )
 }

@@ -10,7 +10,7 @@ import {
     MouseEnterHTMLElements,
     MouseLeaveHTMLElements
 } from "@/app/board/{components}/block/type/Types";
-import React, {useContext, useState} from "react";
+import React, {useContext, useMemo, useState} from "react";
 import MenuItem from "@/app/board/{components}/MenuItem";
 import BlockProvider, {BlockMenu, BlockService} from "@/app/board/{services}/BlockProvider";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
@@ -40,7 +40,9 @@ export default function Block(props: BlockProps) {
     const [touch, setTouch] = useState(setTimeout(() => false, 0));
     const [contextMenu, setContextMenu] = useState<ContextMenuProps>({} as ContextMenuProps);
 
-    const block = blockTypeList.find(b=> b.code === props.code);
+    const block = useMemo(() =>
+        blockTypeList.find(b => b.code === props.code)
+    , [props.code]);
 
     const Component = block?.component!;
 

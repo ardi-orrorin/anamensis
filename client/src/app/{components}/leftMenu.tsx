@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, {useCallback, useContext, useMemo, useState} from "react";
 import {Category} from "@/app/board/{services}/types";
 import Link from "next/link";
 import {faPen} from "@fortawesome/free-solid-svg-icons/faPen";
@@ -21,7 +21,9 @@ const LeftMenu = ({
     const router = useRouter();
 
     const boardBaseUrl = '/board/new?categoryPk=';
+
     const onChangeParamsHandler = ({type, value}: {type: string, value: string | number | boolean}) => {
+
         const category = type === 'categoryPk'
             && {[type]: searchParams[type]?.toString() === value ? 0 : Number(value)}
 
@@ -44,11 +46,11 @@ const LeftMenu = ({
         scrollTo(0, 0);
     }
 
-    const confirmRole = (item: { roles: RoleType[] }) => {
+    const confirmRole = useCallback((item: { roles: RoleType[] }) => {
         return item.roles.find(r =>
             roles.find(roles => roles === r)
         );
-    }
+    },[roles]);
 
     useRootLeftMenuHotKey({
         onChangeParamsHandler,
@@ -57,6 +59,19 @@ const LeftMenu = ({
         boardBaseUrl,
         confirmRole,
     })
+
+    const categoryList = useMemo(()=>
+        Category.list.map((item, index) => {
+            const hasRoleCategory = confirmRole(item);
+
+            if(item.id === '0' || !hasRoleCategory) {
+                return null
+            }
+
+            return (
+                <CategoryItem key={'category' + index} {...{item, index, boardBaseUrl}} />
+            )
+    }),[roles]);
 
     return (
         <div className={'sticky z-30 top-10 left-[5%] xl:left-[13%]'}>
@@ -93,8 +108,7 @@ const LeftMenu = ({
                         }
                     </div>
                     <div className={'w-auto text-sm'}>
-                        <CategorySelect onClick={onChangeParamsHandler}
-                        />
+                        <CategorySelect onClick={onChangeParamsHandler}/>
                     </div>
                 </div>
                 {
@@ -107,29 +121,7 @@ const LeftMenu = ({
                         </span>
                       </div>
                       <div className={'w-full flex flex-col items-center text-xs'}>
-                          {
-                              Category.list.map((item, index) => {
-                                  const hasRoleCategory = confirmRole(item);
-
-                                  if(item.id === '0' || !hasRoleCategory) {
-                                      return null
-                                  }
-
-                                  return (
-                                      <Link key={'category-write-menu' + index}
-                                            href={boardBaseUrl + item.id}
-                                            className={'py-2 px-5 w-full items-center gap-1 hover:bg-gray-100 duration-300'}
-                                      >
-                                          <div className={'flex justify-between items-center b'}>
-                                              <span>
-                                                {item.name}
-                                              </span>
-                                              <HotKeybtn hotkey={['SHIFT', item.id]} />
-                                          </div>
-                                      </Link>
-                                  )
-                              })
-                          }
+                          { categoryList }
                       </div>
                   </div>
                 }
@@ -164,10 +156,27 @@ const LeftMenu = ({
     )
 }
 
+const CategoryItem = ({item, index, boardBaseUrl}:{item: Category, index: number, boardBaseUrl: string}) => {
+
+    return (
+        <Link key={'category-write-menu' + index}
+              href={boardBaseUrl + item.id}
+              className={'py-2 px-5 w-full items-center gap-1 hover:bg-gray-100 duration-300'}
+        >
+            <div className={'flex justify-between items-center b'}>
+                  <span>
+                    {item.name}
+                  </span>
+                <HotKeybtn hotkey={['SHIFT', item.id]} />
+            </div>
+        </Link>
+    )
+}
+
 const CategorySelect = ({
-    onClick
+    onClick,
 }: {
-    onClick: ({type, value}: {type: string, value: string}) => void
+    onClick: ({type, value}: {type: string, value: string}) => void;
 }) => {
     
     const [selectToggle, setSelectToggle] = useState(false);
@@ -199,6 +208,22 @@ const CategorySelect = ({
 
     }, hotkeysOption,[searchParams]);
 
+    const CategoryList = useMemo(() => Category.list.map((item, index) => {
+        return (
+            <button key={'category-menu-selectbox' + index}
+                    className={'py-2 px-6 flex justify-between items-center border-solid border border-white focus:outline-none'}
+                    onClick={() => selectHandler(item.id)}
+            >
+                <span>{item.name}</span>
+                <HotKeybtn hotkey={[item.id === '0' ? '`' : item.id]} />
+            </button>
+        )
+    }),[selectToggle]);
+
+    const CategoryName = useMemo(()=>
+        Category.findById(searchParams.categoryPk || '0')?.name ?? '카테고리'
+    ,[searchParams]);
+
     return (
         <div className={[
             'relative w-auto text-xs bg-gray-50 hover:border-gray-500 duration-500',
@@ -208,7 +233,7 @@ const CategorySelect = ({
                     onClick={onToggleHandler}
             >
                 <div />
-                <span>{Category.findById(searchParams.categoryPk || '0')?.name ?? '카테고리'}</span>
+                <span>{ CategoryName }</span>
                 <div>
                     <div className={['duration-300', selectToggle ? '-rotate-180' : '-rotate-90'].join(' ')}>
                         ▲
@@ -217,21 +242,10 @@ const CategorySelect = ({
             </button>
             <div className={[
                 'absolute z-10 flex flex-col w-full bg-gray-50 overflow-y-hidden duration-500',
-                selectToggle ? 'max-h-80 rounded-b-sm shadow-md' : 'max-h-0'].join(' ')
+                selectToggle ? 'max-h-80 rounded-b-sm shadow-md' : 'max-h-0',
+            ].join(' ')
             }>
-                {
-                    Category.list.map((item, index) => {
-                        return (
-                            <button key={'category-menu-selectbox' + index}
-                                    className={'py-2 px-6 flex justify-between items-center border-solid border border-white focus:outline-none'}
-                                    onClick={()=>selectHandler(item.id)}
-                            >
-                                <span>{item.name}</span>
-                                <HotKeybtn hotkey={[item.id === '0' ? '`' : item.id]} />
-                            </button>
-                        )
-                    })
-                }
+                { CategoryList }
             </div>
         </div>
     )

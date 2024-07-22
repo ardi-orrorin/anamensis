@@ -3,13 +3,13 @@ import HeaderComponent from "@/app/{components}/headerComponent";
 import Image from "next/image";
 import {defaultNoImg} from "@/app/{commons}/func/image";
 import FooterComponent from "@/app/{components}/footerComponent";
-import React from "react";
+import React, {useCallback, useContext, useMemo} from "react";
 import {BoardListI} from "@/app/{components}/boardComponent";
 
 const AlttuelBoardComponent = (props: BoardListI) => {
     const { body} = props;
 
-    const alttuelBlock = body?.filter((block) =>
+    const alttuelBlock =body?.filter((block) =>
         block.code === '00301'
     )[0];
 
@@ -25,7 +25,7 @@ const AlttuelBoardComponent = (props: BoardListI) => {
             .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
         return money + '원';
-    }
+    };
 
     return (
         <div className={'flex h-full'}>

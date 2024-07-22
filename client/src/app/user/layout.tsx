@@ -71,14 +71,10 @@ export default function Layout({children}: {children: React.ReactNode & {test:'1
             attendInfo, setAttendInfo,
             pointSummary, setPointSummary
         }}>
-            <main className={'flex items-start'}>
+            <main className={'flex items-start min-h-screen h-auto'}>
                 <ModalProvider.Provider value={{modal, setModal}}>
-                    <LeftNavBar isOpen={isOpen}
-                                setIsOpen={setIsOpen}
-                                isModalMode={isModalMode}
-                                setIsModalMode={setIsModalMode}
-                    />
-                    <Contents isOpen={isOpen} setIsOpen={setIsOpen} isModalMode={isModalMode}>
+                    <LeftNavBar {...{isOpen, setIsOpen, isModalMode, setIsModalMode}}/>
+                    <Contents {...{isOpen, setIsOpen, isModalMode}}>
                         {children}
                     </Contents>
                     {

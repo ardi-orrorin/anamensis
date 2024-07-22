@@ -37,7 +37,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                       method={'get'}
                 >
                     <div>
-                        <select className={'w-32 border border-solid border-gray-300 rounded-md text-sm px-3 py-1'}
+                        <select className={'w-32 border border-solid border-gray-300 rounded-md text-sm px-3 py-1 outline-0'}
                                 defaultValue={searchParams.size || '20'}
                                 name={'size'}
                         >
@@ -66,7 +66,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                     <col style={{width: '20%'}}/>
                     <col style={{width: '15%'}}/>
                 </colgroup>
-               <thead className={'bg-blue-300 text-white h-8 align-middle'}>
+               <thead className={'bg-main text-white h-9 align-middle'}>
                  <tr className={'text-sm border-x border-white border-solid'}>
                   <th className={'border-x border-white border-solid'}>#</th>
                   <th className={'border-x border-white border-solid'}>IP</th>

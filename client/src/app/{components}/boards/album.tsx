@@ -3,13 +3,18 @@ import {ImageShowProps} from "@/app/board/{components}/block/extra/albumBlock";
 import HeaderComponent from "@/app/{components}/headerComponent";
 import {defaultNoImg} from "@/app/{commons}/func/image";
 import FooterComponent from "@/app/{components}/footerComponent";
+import {useEffect, useMemo, useState} from "react";
+import {BlockI} from "@/app/board/{services}/types";
+import {
+    LeftRightDialogHeader
+} from "next/dist/client/components/react-dev-overlay/internal/components/LeftRightDialogHeader";
 
 const AlbumBoardComponent = (props: BoardListI) => {
     const { body } = props;
 
-    const albumBlock = body?.filter((block) =>
+    const extraValue = body?.filter((block) =>
         block.code === '00302'
-    )[0];
+    )[0].extraValue as ImageShowProps;
 
     let text = '';
     try {
@@ -21,9 +26,6 @@ const AlbumBoardComponent = (props: BoardListI) => {
     } catch (e) {
         console.log(e)
     }
-
-    const extraValue = albumBlock?.extraValue as ImageShowProps;
-
 
     return (
         <>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useEffect, useRef, useState} from "react";
+import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import {PageResponse} from "@/app/{commons}/types/commons";
 import apiCall from "@/app/{commons}/func/api";
 import BoardComponent, {BoardListI} from "@/app/{components}/boardComponent";
@@ -128,7 +128,7 @@ export default function Page() {
     },[moreRef?.current, loading]);
 
 
-    const onSearchHandler = (init: boolean) => {
+    const onSearchHandler = useCallback((init: boolean) => {
         const initPage = {page: 1, size: pageSize};
 
         if(init) {
@@ -137,14 +137,18 @@ export default function Page() {
             return;
         }
 
+        const regex = /[^a-zA-Z0-9ㄱ-ㅎ가-힣\s]/g;
+
+        const value = searchValue.replace(regex, '');
+
         const params = searchValue === ''
         ? {...initPage} as BoardListParamsI
-        : {...searchParams, ...initPage, value: searchValue, type: 'content'};
+        : {...searchParams, ...initPage, value, type: 'content'};
 
         setSearchParams(params);
-    }
+    },[searchParams, searchValue]);
 
-    const onEnterHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const onEnterHandler = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
         if(e.key === 'Enter') {
             onSearchHandler(false);
         }
@@ -154,9 +158,16 @@ export default function Page() {
             setSearchValue('')
             searchRef.current.blur();
         }
-    }
+    },[searchRef, searchValue]);
 
-    useRootHotKey({searchRef});
+    useRootHotKey({searchRef})
+
+    const dataComponent = useMemo(() => data.map((item, index) => {
+        if(!item) return;
+        return (
+            <BoardComponent key={'boardsummary' + index} {...{...item, favorites}} />
+        )
+    }),[data, favorites]);
 
     return (
         <SearchParamsProvider.Provider value={{
@@ -218,12 +229,7 @@ export default function Page() {
                             {
                                 data
                                 && data?.length > 0
-                                && data.map((item, index) => {
-                                    if(!item) return;
-                                    return (
-                                        <BoardComponent key={'boardsummary' + index} {...{...item, favorites}} />
-                                    )
-                                })
+                                && dataComponent
                             }
                         </div>
                     </div>

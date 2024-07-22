@@ -39,7 +39,10 @@ public class BoardFavoriteService {
     }
 
     public Mono<Boolean> existFavorite(Long memberPk, Long boardPk) {
-        return Mono.fromCallable(() -> boardFavoriteMapper.existFavorite(memberPk, boardPk));
+        return Mono.fromCallable(() ->
+            redisTemplate.boundSetOps("board:favorite:member:" + memberPk)
+                .isMember(boardPk.toString())
+        );
     }
 
     public Flux<String> findAll(Long memberPk) {
@@ -67,7 +70,7 @@ public class BoardFavoriteService {
         String key = String.format(KEY, memberPk);
 
         return Mono.fromCallable(() -> redisTemplate.delete(key))
-            .flatMapMany($-> findAll(memberPk))
+            .flatMapMany($-> this.findAll(memberPk))
             .doOnNext(boardId -> redisTemplate.boundSetOps(key).add(boardId))
             .then(Mono.just(true));
 

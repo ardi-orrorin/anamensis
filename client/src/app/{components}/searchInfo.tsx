@@ -1,4 +1,4 @@
-import {useContext} from "react";
+import {useContext, useMemo} from "react";
 import SearchParamsProvider from "@/app/{services}/SearchParamsProvider";
 import {Category} from "@/app/board/{services}/types";
 
@@ -17,6 +17,10 @@ const SearchInfo = () => {
         setSearchParams(params);
     }
 
+    const CategoryName = useMemo(() =>
+        Category.findById(searchParams?.categoryPk!)?.name!
+    ,[searchParams.categoryPk])
+
     return (
         <div className={'flex gap-2'}>
             {
@@ -30,7 +34,7 @@ const SearchInfo = () => {
             {
                 searchParams?.categoryPk?.toString() !== '0'
                 && searchParams?.categoryPk
-                && <DisabledBtn {...{name: Category.findById(searchParams?.categoryPk!)?.name! , type: 'categoryPk', onChangeSearchHandler}} />
+                && <DisabledBtn {...{name: CategoryName, type: 'categoryPk', onChangeSearchHandler}} />
             }
         </div>
     )

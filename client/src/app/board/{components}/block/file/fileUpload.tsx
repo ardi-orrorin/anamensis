@@ -20,8 +20,6 @@ export default function FileUpload (props: FileUploadProps) {
     const [progress, setProgress] = useState<number>(0);
     const {setWaitUploadFiles} = useContext(TempFileProvider);
 
-
-
     const onClick = () => {
         if(!useFileInputRef.current) return ;
         useFileInputRef.current.click();

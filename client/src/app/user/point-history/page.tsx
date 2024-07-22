@@ -34,7 +34,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                       method={'get'}
                 >
                     <div>
-                        <select className={'w-32 border border-solid border-gray-300 rounded-md text-sm px-3 py-1'}
+                        <select className={'w-32 border border-solid border-gray-300 rounded-md text-sm px-3 py-1 outline-0'}
                                 defaultValue={searchParams.size || '20'}
                                 name={'size'}
                         >
@@ -47,7 +47,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                         </select>
                     </div>
                     <div>
-                        <button className={'w-20 border border-solid border-gray-300 rounded-md text-sm px-3 py-1'}
+                        <button className={'w-20 border border-solid border-gray-300 rounded-md text-sm px-3 py-1 outline-0'}
                                 type={'submit'}
                         >
                             조회
@@ -63,7 +63,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                     <col style={{width: '10%'}} />
                     <col style={{width: '15%'}} />
                 </colgroup>
-                <thead className={'bg-blue-300 text-white h-8 align-middle'}>
+                <thead className={'bg-main text-white h-9 align-middle'}>
                     <tr className={'text-sm border-x border-white border-solid'}>
                         <th className={'border-x border-white border-solid'}>#</th>
                         <th className={'border-x border-white border-solid'}>테이블명</th>

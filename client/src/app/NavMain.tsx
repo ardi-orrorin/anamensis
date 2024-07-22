@@ -3,6 +3,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPenToSquare, faRightFromBracket, faUser, faUserPlus} from "@fortawesome/free-solid-svg-icons";
 import {cookies} from "next/headers";
 import {faRightToBracket} from "@fortawesome/free-solid-svg-icons/faRightToBracket";
+import Image from "next/image";
 
 type NavItemProps = {
     name: string | JSX.Element,
@@ -50,11 +51,16 @@ const NavMain = async () => {
     ];
 
     return (
-        <nav className={'w-full p-1 flex justify-between items-center bg-blue-500 text-white h-12'}>
+        <nav className={'w-full p-1 flex justify-between items-center bg-main text-white h-12'}>
             <div>
-                <Link className={'w-28 h-10 flex justify-center items-center hover:bg-blue-600 rounded duration-500'}
+                <Link className={'px-2 h-10 flex justify-center items-center hover:bg-blue-800 rounded duration-500'}
                       href={'/'}
-                >ANAMENSIS
+                >
+                    <Image src={process.env.NEXT_PUBLIC_CDN_SERVER + '/favicon.jpg'}
+                           alt={''}
+                           width={30}
+                           height={30}
+                    />
                 </Link>
             </div>
             <div className={'w-1/3'}>
@@ -76,7 +82,7 @@ const NavMain = async () => {
 const NavItem = ({name, url, prefetch}: NavItemProps) => {
     return (
         <li>
-            <Link className={'w-10 h-10 flex justify-center items-center hover:bg-blue-600 rounded duration-500'}
+            <Link className={'w-10 h-10 flex justify-center items-center hover:bg-blue-800 rounded duration-500'}
                   href={url}
                   prefetch={prefetch}
             >{name}

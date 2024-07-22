@@ -10,18 +10,13 @@ import {
     MouseEnterHTMLElements,
     MouseLeaveHTMLElements
 } from "@/app/board/{components}/block/type/Types";
-import React, {useContext, useState} from "react";
+import React, {useContext, useMemo, useState} from "react";
 import MenuItem from "@/app/board/{components}/MenuItem";
 import BlockProvider, {BlockMenu, BlockService} from "@/app/board/{services}/BlockProvider";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import {BlockI, CommentI, ExtraValueI} from "@/app/board/{services}/types";
 import SubObjectMenu from "@/app/board/{components}/SubObjectMenu";
 import {findElement} from "@/app/board/{services}/funcs";
-
-type CopyProps = {
-    isCopy: boolean;
-    seq: string;
-}
 
 type ContextMenuProps = {
     clientX: number;
@@ -45,7 +40,9 @@ export default function Block(props: BlockProps) {
     const [touch, setTouch] = useState(setTimeout(() => false, 0));
     const [contextMenu, setContextMenu] = useState<ContextMenuProps>({} as ContextMenuProps);
 
-    const block = blockTypeList.find(b=> b.code === props.code);
+    const block = useMemo(() =>
+        blockTypeList.find(b => b.code === props.code)
+    , [props.code]);
 
     const Component = block?.component!;
 
@@ -166,10 +163,10 @@ export default function Block(props: BlockProps) {
     }
 
     const contextLinkHandler = async (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+        if(!board?.isView) return;
         e.preventDefault();
         const {clientX, clientY} = e.nativeEvent as MouseEvent;
         setContextMenu({clientX, clientY, isView: true} as ContextMenuProps);
-
     }
 
     const shareLinkHandler = () => {
@@ -251,7 +248,6 @@ export default function Block(props: BlockProps) {
                             ? '댓글 참조를 클립보드로 복사했습니다.'
                             : ''
                     }
-
                 </div>
 
             }
@@ -293,7 +289,6 @@ export default function Block(props: BlockProps) {
                                {...props}
                     />
                 </div>
-
             </div>
             {
                 !board.isView

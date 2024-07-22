@@ -8,6 +8,7 @@ import {RateColor} from "@/app/{commons}/types/rate";
 import useSWR, {preload} from "swr";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import UserProvider from "@/app/user/{services}/userProvider";
+import moment from "moment";
 
 
 
@@ -29,7 +30,9 @@ const PointSummary = () => {
                             <span className={'py-0.5 '}>
                                 {Table.fromString(e.tableName).useWith}
                             </span>
-                            <span className={'py-0.5 px-4 flex justify-center items-center'}>{e.createdAt.substring(0, 10)}</span>
+                            <span className={'py-0.5 flex justify-end items-center'}>
+                                {moment(e.createdAt).format('YYYY-MM-DD')}
+                            </span>
                         </div>
                     </div>
                 ))

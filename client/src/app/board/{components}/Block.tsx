@@ -139,7 +139,7 @@ const Block = (props: BlockProps) => {
             window.open(url, '_blank');
             return ;
         }
-    },[board.isView]);
+    },[board.isView, seq]);
 
     const onChangeValueHandler = useCallback((value: string) => {
         const newList = board.data?.content?.list.map((item, index) => {

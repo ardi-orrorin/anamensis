@@ -1,4 +1,4 @@
-import {CSSProperties, useMemo} from "react";
+import {useMemo} from "react";
 import Image from "next/image";
 import {MouseLeaveHTMLElements} from "@/app/board/{components}/block/type/Types";
 
@@ -9,7 +9,9 @@ export type FileImageProps = {
 }
 
 export default function FileImage(props: FileImageProps){
-    const {value, onMouseEnterHandler, onMouseLeaveHandler} = props;
+    const {
+        value, onMouseEnterHandler, onMouseLeaveHandler
+    } = props;
 
     const thumb = useMemo(() =>
         value.replace(/(\.[^.]+)$/, '_thumb$1')

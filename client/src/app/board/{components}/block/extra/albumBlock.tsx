@@ -10,6 +10,7 @@ import ImageView from "@/app/board/{components}/block/extra/{components}/ImageVi
 import Thumbnail from "@/app/board/{components}/block/extra/{components}/thumbnail";
 import Slide from "@/app/board/{components}/block/extra/{components}/slide";
 import {deleteImage} from "@/app/board/{services}/funcs";
+import BoardProvider from "@/app/board/{services}/BoardProvider";
 
 export type ImageShowProps = {
     defaultIndex: number;
@@ -39,6 +40,9 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         waitUploadFiles, setWaitUploadFiles,
         waitRemoveFiles, setWaitRemoveFiles
     } = useContext(TempFileProvider);
+
+    const {board} = useContext(BoardProvider);
+
     const [viewMode, setViewMode] = useState<string>(extraValue?.mode || 'thumbnail');
     const [uploadProgress, setUploadProgress] = useState<ProgressType>({
         size: 0,
@@ -105,7 +109,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         }
 
         e.target.value = '';
-    },[extraValue, isView]);
+    },[extraValue, isView, board.data.title]);
 
     const upload = useCallback(async (file: File, fileContent: FileContentType, uploadedImages: string[], size: number, progress: number[]) => {
 
@@ -156,7 +160,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
             ...extraValue,
             images: [...extraValue.images, ...uploadedImages],
         } as ImageShowProps);
-    },[extraValue, isView]);
+    },[extraValue, isView, board.data.title]);
 
 
     const onChangeModeHandler = useCallback((mode: string) => {
@@ -166,7 +170,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
             ...extraValue,
             mode: mode,
         } as ImageShowProps);
-    },[extraValue, isView]);
+    },[extraValue, isView, board.data.title]);
 
 
     const onChaneDefaultIndexHandler = useCallback((index: number) => {

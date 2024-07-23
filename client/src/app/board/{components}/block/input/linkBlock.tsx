@@ -3,6 +3,7 @@
 import React, {CSSProperties, useEffect} from "react";
 import {ExpendBlockProps} from "@/app/board/{components}/block/type/Types";
 import apiCall from "@/app/{commons}/func/api";
+import ObjectTemplate from "@/app/board/{components}/block/ObjectTemplate";
 
 type OGType = {
     title       : string;
@@ -17,7 +18,7 @@ const LinkBlock = (props: ExpendBlockProps) => {
         value, type,
         isView, hash,
         onChangeValueHandler, onKeyUpHandler,
-        onMouseEnterHandler,
+        onMouseEnterHandler, onMouseLeaveHandler,
         onFocusHandler, onChangeExtraValueHandler,
     }: ExpendBlockProps = props;
 
@@ -65,14 +66,11 @@ const LinkBlock = (props: ExpendBlockProps) => {
     }
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        onChangeValueHandler!(e.target.value);
+        onChangeValueHandler!(e?.target?.value);
     }
 
     return (
-        <div id={`block-${hash}`}
-             className={['w-full'].join(' ')}
-             aria-roledescription={type}
-        >
+        <ObjectTemplate {...{hash, seq, blockRef, type, onMouseEnterHandler, onMouseLeaveHandler}}>
             {
                 !extraValue || !extraValue.title
                 ? <input className={'w-full p-2 break-all text-blue-700 outline-0'}
@@ -93,7 +91,6 @@ const LinkBlock = (props: ExpendBlockProps) => {
                      style={{backgroundColor: 'rgba(230,230,230,0.2)'}}
                      href={value}
                      target={'_blank'}
-                     onMouseEnter={onMouseEnterHandler}
                      aria-roledescription={'object'}
                      ref={el => {
                          if(!blockRef?.current) return;
@@ -114,7 +111,7 @@ const LinkBlock = (props: ExpendBlockProps) => {
                     />
                 </a>
             }
-        </div>
+        </ObjectTemplate>
     )
 }
 

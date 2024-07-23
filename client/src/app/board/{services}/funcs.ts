@@ -5,7 +5,8 @@ import {TempFileI} from "@/app/board/{services}/TempFileProvider";
 
 export function findElement(ele: HTMLElement) {
     if(ele?.parentElement?.id.includes('block')) return ele.parentElement;
-    return findElement(ele.parentElement!);
+    if(ele?.id.includes('block')) return ele;
+    return findElement(ele?.parentElement!);
 }
 
 export const listSort = (list: BlockI[]) => {

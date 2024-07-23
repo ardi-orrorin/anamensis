@@ -1,7 +1,8 @@
 import {ExpendBlockProps} from "@/app/board/{components}/block/type/Types";
 import {useCallback, useContext, useEffect, useMemo} from "react";
-import BoardProvider from "@/app/board/{services}/BoardProvider";
+import BoardProvider, {BoardService} from "@/app/board/{services}/BoardProvider";
 import moment from "moment";
+import {CommentI} from "@/app/board/{services}/types";
 
 export type QuestionBlockExtraValueType = {
     selectId   : string;
@@ -13,9 +14,11 @@ export type QuestionBlockExtraValueType = {
 
 const QuestionBlock = (props: ExpendBlockProps) => {
     const {
-        hash, onChangeExtraValueHandler, type
+        hash, onChangeExtraValueHandler, type,
+        isView
     }: ExpendBlockProps = props;
 
+    const {board, myPoint, comment} = useContext(BoardProvider);
     const extraValue = props.extraValue as QuestionBlockExtraValueType;
 
     useEffect(()=> {
@@ -31,19 +34,19 @@ const QuestionBlock = (props: ExpendBlockProps) => {
 
     },[])
 
-    const onChangeHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
 
         if(!onChangeExtraValueHandler) return;
         onChangeExtraValueHandler({...extraValue, [name]: value});
-    },[extraValue]);
+    }
 
 
     const result = useMemo(()=>
         extraValue?.state === 'wait'
-            ? <QWait {...{...extraValue, onChangeHandler}} />
-            : <QCompleted {...{...extraValue, onChangeHandler}}/>
-    ,[extraValue?.state])
+            ? <QWait {...{...extraValue, ...{board, myPoint}, onChangeHandler}} />
+            : <QCompleted {...{...extraValue,...{comment}, onChangeHandler}}/>
+    ,[extraValue, board.data.title, comment])
 
     return (
         <div className={'w-full flex flex-col gap-2'}
@@ -62,22 +65,24 @@ const QuestionBlock = (props: ExpendBlockProps) => {
 const QWait = ({
     endDate,
     point,
+    myPoint,
+    board,
     onChangeHandler,
 } : QuestionBlockExtraValueType & {
+    myPoint: number;
+    board: BoardService;
     onChangeHandler: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
-    const {board, myPoint, setMyPoint} = useContext(BoardProvider);
     const dueDate = useMemo(()=> moment(endDate).format('YYYY-MM-DD'),[endDate]);
-
-    const onChangeDateHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeDateHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         if(moment(e.target.value).isAfter(moment().add(9, 'days'))) {
             return onChangeHandler(e);
         }
 
         alert('최소 10일 이후부터 설정 가능합니다.');
-    }
+    },[board.data.title]);
 
-    const onChangePointHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangePointHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const integerRegex = /^[0-9]+$/;
         if(!integerRegex.test(e.target.value)) return ;
 
@@ -90,7 +95,7 @@ const QWait = ({
             e.target.value = '0';
         }
         onChangeHandler(e);
-    }
+    },[board.data.title, point]);
 
     return (
         <div className={'flex flex-col gap-1 text-sm'}>
@@ -157,13 +162,13 @@ const QWait = ({
 const QCompleted = ({
     selectId,
     selectDate,
-} : QuestionBlockExtraValueType
-) => {
-    const { comment } = useContext(BoardProvider);
-
+    comment,
+} : QuestionBlockExtraValueType & {
+    comment: CommentI[];
+}) => {
     const selectWriter = useMemo(() =>
         comment.find(item => Number(item.id) === Number(selectId))
-    ,[selectId]);
+    ,[selectId, comment]);
 
     const answerDate = useMemo(()=> moment(selectDate).format('YYYY-MM-DD'),[selectWriter?.createdAt]);
     const adoptionDate = useMemo(()=> moment().format('YYYY-MM-DD'),[selectDate]);

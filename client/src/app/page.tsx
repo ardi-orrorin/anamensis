@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {PageResponse} from "@/app/{commons}/types/commons";
 import apiCall from "@/app/{commons}/func/api";
 import BoardComponent, {BoardListI} from "@/app/{components}/boardComponent";
@@ -14,7 +14,7 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useRootHotKey} from "@/app/{hooks}/hotKey";
 import Notices, {NoticeType} from "@/app/{components}/boards/notices";
-import useSWR, {preload} from "swr";
+import useSWR from "swr";
 import SearchInfo from "@/app/{components}/searchInfo";
 
 export type DynamicPage = {
@@ -211,8 +211,7 @@ export default function Page() {
                 </div>
                 <div className={'flex flex-row justify-start sm:justify-center'}>
                     <div className={'hidden sm:block relative min-w-[300px]'}>
-                        <LeftMenu roles={roles}
-                        />
+                        <LeftMenu roles={roles}/>
                     </div>
                     <div className={'w-[600px] flex flex-col gap-5 justify-start items-center'}>
                         <div className={'w-full'}>
@@ -225,7 +224,6 @@ export default function Page() {
                                 && data?.length === 0
                                 && <div className={'text-center text-2xl w-full py-20 text-gray-600'}>검색 결과가 없습니다.</div>
                             }
-
                             {
                                 data
                                 && data?.length > 0

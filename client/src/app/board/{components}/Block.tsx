@@ -307,4 +307,6 @@ const Block = (props: BlockProps) => {
     )
 }
 
-export default React.memo(Block);
+export default React.memo(Block,(prevProps, nextProps) => {
+    return prevProps.value === nextProps.value && prevProps.seq === nextProps.seq
+});

@@ -1,7 +1,7 @@
 'use client';
 
 import UserInfoWindow, {UserInfoWindowProps} from "@/app/user/{components}/UserInfoWindow";
-import {useState} from "react";
+import {useCallback, useMemo, useState} from "react";
 import {faWindowRestore} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faWindowMinimize} from "@fortawesome/free-solid-svg-icons/faWindowMinimize";
@@ -24,44 +24,50 @@ export default function Page() {
         setWindowList(list);
     }
 
-    const windowToggle = (open: boolean) => {
+    const windowToggle = useCallback((open: boolean) => {
         setWindowList(windowList.map(e => ({...e, open})));
-    }
+    },[windowList]);
+
+    const minimizeWindows = useMemo(() =>
+            windowList
+                .filter(e=> !e.open)
+                .map((e, i ) => (
+                    <button key={'btn'+i}
+                            className={'w-auto px-4 h-10 bg-gray-400 text-sm whitespace-pre-wrap text-white rounded'}
+                            onClick={() => onClickHandler(e.winKey, true)}
+                    >
+                        {e.title}
+                    </button>
+                ))
+    ,[windowList])
+
+    const toggle = useMemo(()=>
+        windowList.filter(e => !e.open).length > 0
+            ? <button className={'w-[50px] h-10 bg-main text-white rounded'} onClick={()=> windowToggle(true)}>
+                <FontAwesomeIcon icon={faWindowRestore} />
+            </button>
+            : <button className={'w-[50px] h-10 bg-main text-white rounded'} onClick={()=> windowToggle(false)}>
+                <FontAwesomeIcon icon={faWindowMinimize} />
+            </button>
+    ,[windowList]);
+
+    const maximizeWindows = useMemo(() =>
+        windowList.map((e, i ) => (
+            <UserInfoWindow key={`window-${i}`}
+                            onClick={onClickHandler}
+                            {...e}
+            />
+        ))
+    ,[windowList])
 
     return (
         <main className={'flex flex-col gap-3'}>
             <div className={'flex gap-4 flex-wrap duration-300'}>
-                {
-                    windowList
-                        .filter(e=> !e.open)
-                        .map((e, i ) => (
-                            <button key={'btn'+i}
-                                    className={'w-auto px-4 h-10 bg-gray-400 text-sm whitespace-pre-wrap text-white rounded'}
-                                    onClick={() => onClickHandler(e.winKey, true)}
-                            >
-                                {e.title}
-                            </button>
-                        ))
-                }
-                {
-                    windowList.filter(e => !e.open).length > 0
-                    ? <button className={'w-[50px] h-10 bg-main text-white rounded'} onClick={()=> windowToggle(true)}>
-                          <FontAwesomeIcon icon={faWindowRestore} />
-                    </button>
-                    : <button className={'w-[50px] h-10 bg-main text-white rounded'} onClick={()=> windowToggle(false)}>
-                          <FontAwesomeIcon icon={faWindowMinimize} />
-                    </button>
-                }
+                { minimizeWindows }
+                { toggle }
             </div>
             <div className={'h-full flex gap-4 flex-wrap duration-300'}>
-                {
-                    windowList.map((e, i ) => (
-                        <UserInfoWindow key={`window-${i}`}
-                                        onClick={onClickHandler}
-                                        {...e}
-                        />
-                    ))
-                }
+                { maximizeWindows }
             </div>
         </main>
     )

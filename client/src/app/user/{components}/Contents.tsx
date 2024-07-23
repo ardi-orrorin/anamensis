@@ -1,6 +1,6 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBars} from "@fortawesome/free-solid-svg-icons";
-import React, {Suspense} from "react";
+import React, {Suspense, useCallback} from "react";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 
@@ -16,10 +16,10 @@ const Contents = ({
     children: React.ReactNode
 }) => {
 
-    const openToggle = () => {
+    const openToggle = useCallback(() => {
         bodyScrollToggle(true);
         setIsOpen(!isOpen);
-    }
+    },[isOpen]);
 
 
     return (

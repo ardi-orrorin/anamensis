@@ -50,7 +50,7 @@ const YoutubeBlock = (props: ExpendBlockProps) => {
         }
     },[value, extraValue, ratio]);
 
-    const onChangeSelectHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const onChangeSelectHandler = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
         const [width,  height] = e.target.value.split(':')
             .map(value => Number(value));
 
@@ -66,11 +66,11 @@ const YoutubeBlock = (props: ExpendBlockProps) => {
             width: extraValue.width,
             height: String(Math.trunc(Number(extraValue.width) / width * height)),
         })
-    }
+    },[extraValue]);
 
-    const submitValueHandler = () => {
+    const submitValueHandler = useCallback(() => {
         onChangeValueHandler!(tempValue);
-    }
+    },[tempValue]);
 
     return (
         <ObjectTemplate {...{hash, seq, blockRef, type, onMouseEnterHandler, onMouseLeaveHandler}}>

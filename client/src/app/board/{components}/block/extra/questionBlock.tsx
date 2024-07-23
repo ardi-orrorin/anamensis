@@ -34,12 +34,12 @@ const QuestionBlock = (props: ExpendBlockProps) => {
 
     },[])
 
-    const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
 
         if(!onChangeExtraValueHandler) return;
         onChangeExtraValueHandler({...extraValue, [name]: value});
-    }
+    },[extraValue]);
 
 
     const result = useMemo(()=>

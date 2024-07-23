@@ -298,7 +298,7 @@ export default function Page({params}: {params : {id: string}}) {
     const onChangeTitleHandler = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         if(e.target.name !== 'title') return ;
         setBoard({...board, data: {...board.data, title: e.target.value}});
-    },[board?.data?.title]);
+    },[board?.data?.title, board.isView]);
 
     const onKeyUpHandler = (e: React.KeyboardEvent<HTMLElement>, seq: number) => {
 

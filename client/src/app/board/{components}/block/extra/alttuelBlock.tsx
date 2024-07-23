@@ -1,5 +1,5 @@
 import {ExpendBlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
-import React, {ChangeEvent, useContext, useEffect, useMemo, useRef, useState} from "react";
+import React, {ChangeEvent, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import Image from "next/image";
 import axios from "axios";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
@@ -9,6 +9,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import apiCall from "@/app/{commons}/func/api";
 import {NO_IMAGE} from "@/app/{services}/constants";
+import BoardProvider from "@/app/board/{services}/BoardProvider";
 
 
 export type AlttuelBlockProps = {
@@ -34,9 +35,9 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
     }: ExpendBlockProps = props;
 
     const maxFileSize = 5 * 1024 * 1024;
-
     const extraValue = props.extraValue as AlttuelBlockProps;
     const {setWaitUploadFiles, setWaitRemoveFiles} = useContext(TempFileProvider);
+    const { board } = useContext(BoardProvider);
 
     const imageRef = useRef<HTMLInputElement>(null);
     const [imgViewProps, setImgViewProps] = useState<ImgViewProps>({
@@ -63,16 +64,16 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
         return defaultNoImg(extraValue?.img);
     }, [extraValue?.img])
 
-    const addCommasToNumber = (number: number)  => {
+    const addCommasToNumber = useCallback((number: number)  => {
         if(Number(number) === 0) return '무료';
         const money = number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         return `${money}원`;
-    }
+    },[]);
 
-    const onChangeImageHandler = () => {
+    const onChangeImageHandler = useCallback(() => {
         if(!imageRef.current) return;
         imageRef.current.click();
-    }
+    },[imageRef?.current]);
 
     const onChangeFileHandler = async (e: ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
@@ -150,7 +151,7 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
         }
     }
 
-    const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    const onChangeHandler = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
         const {name, value} = e.target;
 
@@ -168,7 +169,7 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
 
         if(!onChangeExtraValueHandler) return;
         onChangeExtraValueHandler(newValue);
-    }
+    },[board.data.title, extraValue, isView]);
 
     const addTagHandler = (e:  React.KeyboardEvent<HTMLInputElement>) => {
         if(e.code !== 'Space') return;

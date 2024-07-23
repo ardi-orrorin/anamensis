@@ -5,6 +5,7 @@ import DefaultBoardComponent from "@/app/{components}/boards/default";
 import AlttuelBoardComponent from "@/app/{components}/boards/alttuel";
 import AlbumBoardComponent from "@/app/{components}/boards/album";
 import QuestionBoardComponent from "@/app/{components}/boards/question";
+import {useSearchParams} from "next/navigation";
 
 export interface BoardListI {
     id           : string;
@@ -42,7 +43,7 @@ const BoardComponent = (props: BoardListI & {favorites: string[]}) => {
         Components.find((component) =>
             component.categoryPk === Number(categoryPk)
         )?.component(props)
-    ,[categoryPk])
+    ,[categoryPk, body])
 
     return (
         <Link className={[

@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React, {useCallback, useContext} from "react";
 import AlbumProvider from "@/app/board/{components}/block/extra/providers/albumProvier";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
@@ -14,7 +14,7 @@ const ImageView = ({
 
     const {albumToggle, setAlbumToggle} = useContext(AlbumProvider);
 
-    const prevImage = (e: React.MouseEvent) => {
+    const prevImage = useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
         const index = images.indexOf(albumToggle.viewImage);
@@ -29,9 +29,9 @@ const ImageView = ({
                 viewToggle: true,
             });
         }
-    }
+    },[albumToggle]);
 
-    const nextImage = (e: React.MouseEvent) => {
+    const nextImage = useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
 
@@ -47,20 +47,18 @@ const ImageView = ({
                 viewToggle: true,
             });
         }
-    }
+    },[albumToggle]);
 
-    const disableToggleHandler = () => {
+    const disableToggleHandler = useCallback(() => {
         setAlbumToggle({
             viewImage: '',
             viewToggle: false,
         });
-    }
+    },[]);
 
     return (
         <>
-            <div className={'z-30 flex justify-center items-center fixed top-0 left-0 w-full h-full'}
-                 // onClick={disableToggleHandler}
-            >
+            <div className={'z-30 flex justify-center items-center fixed top-0 left-0 w-full h-full'}>
                 <button className={'z-50 absolute top-5 right-5 w-[40px] h-[40px] bg-white rounded-full'}
                         onClick={disableToggleHandler}
                 >

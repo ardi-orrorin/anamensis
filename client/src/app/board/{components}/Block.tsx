@@ -102,7 +102,6 @@ const Block = (props: BlockProps) => {
     },[]);
 
     const openMenuToggle  = useCallback(() => {
-
         if(blockService.blockMenu !== 'openMenu' || blockService.block.seq !== seq) {
             setBlockService({...blockService, blockMenu: 'openMenu', block: {seq, code, value, textStyle, hash}});
             return ;
@@ -140,7 +139,7 @@ const Block = (props: BlockProps) => {
             window.open(url, '_blank');
             return ;
         }
-    },[]);
+    },[board.isView]);
 
     const onChangeValueHandler = useCallback((value: string) => {
         const newList = board.data?.content?.list.map((item, index) => {
@@ -151,7 +150,7 @@ const Block = (props: BlockProps) => {
         });
 
         setBoard({...board, data: {...board.data, content: {list: newList}}});
-    },[board?.data?.content.list[seq]])
+    },[board?.data?.content.list[seq], board.data.title, board.isView])
 
     const onChangeExtraValueHandler = useCallback((value: ExtraValueI) => {
         const newList = board.data?.content?.list.map((item, index) => {
@@ -162,7 +161,7 @@ const Block = (props: BlockProps) => {
         });
 
         setBoard({...board, data: {...board.data, content: {list: newList}}});
-    },[board?.data?.content.list[seq]]);
+    },[board?.data?.content.list[seq], board.data.title, board.isView]);
 
     const contextLinkHandler = useCallback(async (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
         if(!board?.isView) return;
@@ -307,6 +306,4 @@ const Block = (props: BlockProps) => {
     )
 }
 
-export default React.memo(Block,(prevProps, nextProps) => {
-    return prevProps.value === nextProps.value && prevProps.seq === nextProps.seq
-});
+export default Block;

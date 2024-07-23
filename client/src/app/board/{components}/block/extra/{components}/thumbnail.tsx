@@ -22,7 +22,7 @@ const Thumbnail = ({
     const [columnToggle, setColumnToggle] = useState<boolean>(false);
     const divRef = useRef<HTMLDivElement>(null);
 
-    const { setAlbumToggle } = useContext(AlbumProvider);
+    const { albumToggle, setAlbumToggle } = useContext(AlbumProvider);
 
     const arrays = useMemo(() =>
         Array.from({length: 4}, (_, index) => {
@@ -72,7 +72,7 @@ const Thumbnail = ({
                 </div>
             )
         })
-    ,[images])
+    ,[images, isView, defaultIndex])
 
     return (
         <div className={'w-full flex flex-col relative'}
@@ -98,7 +98,6 @@ const Thumbnail = ({
                     && imageList
                 }
             </div>
-
         </div>
     )
 }

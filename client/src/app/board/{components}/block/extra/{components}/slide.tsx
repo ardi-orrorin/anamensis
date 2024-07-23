@@ -1,4 +1,4 @@
-import React, {useContext, useMemo, useRef, useState} from "react";
+import React, {useCallback, useContext, useMemo, useRef, useState} from "react";
 import AlbumProvider from "@/app/board/{components}/block/extra/providers/albumProvier";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faChevronLeft, faChevronRight} from "@fortawesome/free-solid-svg-icons";
@@ -39,8 +39,7 @@ const Slide = ({
         return totalWidth - containerWidth
     },[containerRef?.current?.clientWidth]);
 
-
-    const slide = (isReverse: boolean) => {
+    const slide = useCallback((isReverse: boolean) => {
         const imageLength = Math.floor(Number(containerRef?.current?.offsetWidth) / slideWidth);
         const result = isReverse
             ? containerPosition + slideWidth <= 0
@@ -51,9 +50,9 @@ const Slide = ({
                 : containerPosition - slideWidth * imageLength;
 
         setContainerPosition(result);
-    }
+    },[containerRef?.current, slideWidth, containerPosition]);
 
-    const imageShow = (isReverse: boolean) => {
+    const imageShow = useCallback((isReverse: boolean) => {
        isReverse
        ? selectedIndex === 0
             ? setSelectedIndex(images.length - 1)
@@ -61,9 +60,9 @@ const Slide = ({
        : selectedIndex === images.length - 1
             ? setSelectedIndex(0)
             : setSelectedIndex(selectedIndex + 1);
-    }
+    },[selectedIndex]);
 
-    const onMouseUpHandler = (e: React.MouseEvent) => {
+    const onMouseUpHandler = useCallback((e: React.MouseEvent) => {
         const cur = containerPosition - (mouseDownX - e.clientX) * 2;
 
         cur >= 0
@@ -73,15 +72,49 @@ const Slide = ({
             : setContainerPosition(cur);
 
         setMouseDownX(0);
+    },[mouseDownX, containerPosition, containerMaxWidth]);
 
-    }
-    const onImageClick = () => {
+    const onImageClick = useCallback(() => {
         setAlbumToggle({
             viewImage: images[selectedIndex],
             viewToggle: true,
         });
-    }
+    },[]);
 
+    const imageList = useMemo(()=>
+        images?.map((image, index) => {
+            return (
+                <div key={'slide' + index}
+                     className={'relative flex duration-500'}
+                     style={{width: slideWidth}}
+                >
+                    <img className={[
+                        `min-w-[${slideWidth}px] w-[${slideWidth}px] max-w-[${slideWidth}px] min-h-[${slideWidth}px] h-[${slideWidth}px] max-h-[${slideWidth}px] object-cover border-solid`,
+                        index === selectedIndex ? 'border-4 border-blue-400' : 'border border-white'
+                    ].join(' ')}
+                         src={defaultNoImg(image.replace(/(\.[^.]+)$/, '_thumb$1'))}
+                         alt={'slide'}
+                         onError={(e) => {
+                             e.currentTarget.src = NO_IMAGE;
+                         }}
+                         onClick={() => {
+                             setSelectedIndex(index);
+                         }}
+                         onMouseEnter={(e) => {
+                             e?.currentTarget?.parentElement?.children[1]
+                                 ?.classList.replace('hidden', 'flex');
+                         }}
+                    />
+                    {
+                        !isView && <DeleteOverlay {...{index, image, deleteImageHandler, setAlbumToggle, onChaneDefaultIndexHandler}} />
+                    }
+                    {
+                        index === defaultIndex && <DefaultLabel />
+                    }
+                </div>
+            )
+        })
+    ,[isView, selectedIndex, defaultIndex]);
 
     return (
         <div className={'flex flex-col gap-2 w-full px-4'}>
@@ -130,38 +163,7 @@ const Slide = ({
                 >
                     {
                         images?.length > 0
-                        && images?.map((image, index) => {
-                            return (
-                                <div key={'slide' + index}
-                                     className={'relative flex duration-500'}
-                                     style={{width: slideWidth}}
-                                >
-                                    <img className={[
-                                             `min-w-[${slideWidth}px] w-[${slideWidth}px] max-w-[${slideWidth}px] min-h-[${slideWidth}px] h-[${slideWidth}px] max-h-[${slideWidth}px] object-cover border-solid`,
-                                             index === selectedIndex ? 'border-4 border-blue-400' : 'border border-white'
-                                         ].join(' ')}
-                                         src={defaultNoImg(image.replace(/(\.[^.]+)$/, '_thumb$1'))}
-                                         alt={'slide'}
-                                         onError={(e) => {
-                                             e.currentTarget.src = NO_IMAGE;
-                                         }}
-                                         onClick={() => {
-                                             setSelectedIndex(index);
-                                         }}
-                                         onMouseEnter={(e) => {
-                                             e?.currentTarget?.parentElement?.children[1]
-                                                 ?.classList.replace('hidden', 'flex');
-                                         }}
-                                    />
-                                    {
-                                        !isView && <DeleteOverlay {...{index, image, deleteImageHandler, setAlbumToggle, onChaneDefaultIndexHandler}} />
-                                    }
-                                    {
-                                        index === defaultIndex && <DefaultLabel />
-                                    }
-                                </div>
-                            )
-                        })
+                        && imageList
                     }
                 </div>
                 {

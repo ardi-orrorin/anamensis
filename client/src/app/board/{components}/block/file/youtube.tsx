@@ -1,5 +1,6 @@
-import {useState} from "react";
+import {useCallback, useState} from "react";
 import {ExpendBlockProps} from "@/app/board/{components}/block/type/Types";
+import ObjectTemplate from "@/app/board/{components}/block/ObjectTemplate";
 
 export type YoutubeBlockProps = {
     width: string;
@@ -15,9 +16,11 @@ const YoutubeBlock = (props: ExpendBlockProps) => {
     const {
         value, hash,
         type, isView,
-        blockRef,
+        blockRef, seq,
         onChangeValueHandler,
-        onChangeExtraValueHandler
+        onChangeExtraValueHandler,
+        onMouseLeaveHandler,
+        onMouseEnterHandler,
     } = props;
 
     const extraValue = props.extraValue as YoutubeBlockProps;
@@ -28,7 +31,7 @@ const YoutubeBlock = (props: ExpendBlockProps) => {
     });
     const [tempValue, setTempValue] = useState<string>('');
 
-    const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         if(e.target.name === 'value') {
             const url = e.target.value.replaceAll('"', '');
             setTempValue(url);
@@ -45,8 +48,9 @@ const YoutubeBlock = (props: ExpendBlockProps) => {
 
             onChangeExtraValueHandler!({width, height: e.target.value});
         }
-    }
-    const onChangeSelectHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    },[value, extraValue, ratio]);
+
+    const onChangeSelectHandler = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
         const [width,  height] = e.target.value.split(':')
             .map(value => Number(value));
 
@@ -62,17 +66,14 @@ const YoutubeBlock = (props: ExpendBlockProps) => {
             width: extraValue.width,
             height: String(Math.trunc(Number(extraValue.width) / width * height)),
         })
-    }
+    },[extraValue]);
 
-    const submitValueHandler = () => {
+    const submitValueHandler = useCallback(() => {
         onChangeValueHandler!(tempValue);
-    }
+    },[tempValue]);
 
     return (
-        <div id={`block-${hash}`}
-             className={'w-full overflow-x-auto'}
-             aria-roledescription={type}
-        >
+        <ObjectTemplate {...{hash, seq, blockRef, type, onMouseEnterHandler, onMouseLeaveHandler}}>
             {
                 !isView
                 && <div className={'flex flex-col gap-3 p-4'}
@@ -122,7 +123,7 @@ const YoutubeBlock = (props: ExpendBlockProps) => {
                     </iframe>
                 </div>
             }
-        </div>
+        </ObjectTemplate>
     )
 }
 

@@ -85,17 +85,13 @@ export default function Page({params}: {params : {id: string}}) {
         window.scrollTo(0, 0);
     },[]);
 
-    const addBlock = (seq: number, init: boolean, value?: string) => {
+    const addBlock = useCallback((seq: number, init: boolean, value?: string) => {
         const block: BlockI = initBlock({seq: 0});
-        if(!init) {
-            block.seq = seq + 0.1;
-        }
-        if(value) {
-            block.value = value;
-        }
+        if(!init) block.seq = seq + 0.1;
+        if(value) block.value = value;
 
         return block;
-    };
+    },[]);
 
     const validation = useCallback(() => {
         const title = board.data.title !== '';
@@ -169,7 +165,7 @@ export default function Page({params}: {params : {id: string}}) {
         }
     }
 
-    const deleteHandler = async () => {
+    const deleteHandler = useCallback(async () => {
         setLoading(true);
         try {
             await apiCall({
@@ -181,9 +177,9 @@ export default function Page({params}: {params : {id: string}}) {
         } finally {
             router.push('../');
         }
-    };
+    },[]);
 
-    const addBlockHandler = (seq: number, value?: string) => {
+    const addBlockHandler = useCallback((seq: number, value?: string) => {
         const list = board.data?.content?.list;
         if (!list) return ;
 
@@ -192,9 +188,9 @@ export default function Page({params}: {params : {id: string}}) {
         listSort(list);
 
         setBoard({...board, data: {...board.data, content: {list: list}}});
-    };
+    },[board.data?.content?.list, board.isView, board?.data?.title]);
 
-    const onChangeHandler = (e: ChangeEvent<HtmlElements>, seq: number) => {
+    const onChangeHandler = useCallback((e: ChangeEvent<HtmlElements>, seq: number) => {
         const list = board.data?.content?.list;
         if (!list) return ;
 
@@ -208,17 +204,17 @@ export default function Page({params}: {params : {id: string}}) {
         });
 
         setBoard({...board, data: {...board.data, content: {list: list}}});
-    };
+    },[board.data?.content?.list, board.isView, board?.data?.title]);
 
-    const editClickHandler = () => {
+    const editClickHandler = useCallback(() => {
         if(!isNewBoard && !board.isView) {
             location.reload();
         } else {
             setBoard({...board, isView: !board.isView});
         }
-    }
+    },[board.data?.content?.list, board.isView]);
 
-    const onClickDeleteHandler = async (seq: number) => {
+    const onClickDeleteHandler = useCallback(async (seq: number) => {
         const list = board.data?.content?.list;
 
         await fileDeleteHandler(list, seq);
@@ -241,55 +237,68 @@ export default function Page({params}: {params : {id: string}}) {
             }
         });
 
-        if(newList.length === 0) {
-            addBlockHandler(0);
-        }
-    }
+        if(newList.length === 0) addBlockHandler(0);
 
-    const fileDeleteHandler = async (blockList: BlockI[], seq: number) => {
+    },[board.data?.content?.list, board.isView]);
+
+    const fileDeleteHandler = useCallback(async (blockList: BlockI[], seq: number) => {
         const fileRegexp = new RegExp('00[2-3][0-9]{2}');
         const fileBlock = blockList.find(item =>
             item.seq === seq && fileRegexp.test(item.code)
         );
 
-
         if(!fileBlock) return ;
 
-        const fileRootPath = '/resource/board/'
+        if(isNewBoard) {
+            await apiCall({
+                path: '/api/file/delete/filename',
+                method: 'PUT',
+                body: {fileUri: fileBlock.value as string},
+                isReturnData: true
+            });
+        } else {
+            deleteImage({
+                absolutePath: fileBlock.value as string,
+                setWaitUploadFiles,
+                setWaitRemoveFiles
+            });
+        }
 
-        if(!fileBlock?.extraValue) return ;
 
-        const files = Object?.keys(fileBlock?.extraValue!).filter(key =>
-            fileBlock.extraValue![key].toString().includes(fileRootPath)
-        )?.map(key =>
-            fileBlock.extraValue![key]
-        );
+        // const fileRootPath = '/resource/board/'
+        // if(!fileBlock?.extraValue) return ;
 
-        fileBlock.value.includes('/resource/board/') && files.push(fileBlock.value);
+        // const files = Object?.keys(fileBlock?.extraValue!).filter(key =>
+        //     fileBlock.extraValue![key].toString().includes(fileRootPath)
+        // )?.map(key =>
+        //     fileBlock.extraValue![key]
+        // );
+        //
+        // fileBlock.value.includes('/resource/board/') && files.push(fileBlock.value);
+        //
+        // files.flat().forEach(file => {
+        //     console.log('sdfdsfsdfsdf', file);
+        //     if(isNewBoard) {
+        //         apiCall({
+        //             path: '/api/file/delete/filename',
+        //             method: 'PUT',
+        //             body: {fileUri: file as string},
+        //             isReturnData: true
+        //         });
+        //     } else {
+        //         deleteImage({
+        //             absolutePath: file as string,
+        //             setWaitUploadFiles,
+        //             setWaitRemoveFiles
+        //         });
+        //     }
+        // });
+    },[board.isView, board.data?.content?.list, waitUploadFiles, waitRemoveFiles])
 
-        files.flat().forEach(file => {
-            if(isNewBoard) {
-                apiCall({
-                    path: '/api/file/delete/filename',
-                    method: 'PUT',
-                    body: {fileUri: file as string},
-                    isReturnData: true
-                });
-            } else {
-                deleteImage({
-                    absolutePath: file as string,
-                    setWaitUploadFiles,
-                    setWaitRemoveFiles
-                });
-            }
-        });
-    }
-
-    const onChangeTitleHandler = (e: ChangeEvent<HTMLInputElement>) => {
-        console.log('onChangeTitleHandler', e.target.value)
+    const onChangeTitleHandler = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         if(e.target.name !== 'title') return ;
         setBoard({...board, data: {...board.data, title: e.target.value}});
-    }
+    },[board?.data?.title, board.isView]);
 
     const onKeyUpHandler = (e: React.KeyboardEvent<HTMLElement>, seq: number) => {
 
@@ -315,7 +324,7 @@ export default function Page({params}: {params : {id: string}}) {
         }
     }
 
-    const onChangeRateHandler = async () => {
+    const onChangeRateHandler = useCallback(async () => {
         return await apiCall<RateInfoI>({
             path: rateInfo.status ? '/api/board/rate/' + params.id : '/api/board/rate/add/' + params.id,
             method: rateInfo.status ? 'DELETE' : 'GET',
@@ -327,24 +336,28 @@ export default function Page({params}: {params : {id: string}}) {
         .catch(e => {
             rateInfo.status || alert('로그인이 필요합니다.');
         });
-    }
+    },[rateInfo]);
 
-    const onClickFavoriteHandler = async () => {
-        const options: ApiCallProps = isFavorite ? {
-            path: '/api/board-favorites/' + params.id,
-            method: 'DELETE',
-            isReturnData: true
-        } : {
-            path: '/api/board-favorites',
-            method: 'POST',
-            body: {id: params.id},
-            isReturnData: true
+    const onClickFavoriteHandler = useCallback(async () => {
+        try {
+            const options: ApiCallProps = isFavorite ? {
+                path: '/api/board-favorites/' + params.id,
+                method: 'DELETE',
+                isReturnData: true
+            } : {
+                path: '/api/board-favorites',
+                method: 'POST',
+                body: {id: params.id},
+                isReturnData: true
+            }
+            await apiCall(options);
+            setIsFavorite(!isFavorite);
+
+        } catch (e: any) {
+            console.log(e)
         }
-        await apiCall(options)
-            .then(res => {
-                setIsFavorite(!isFavorite);
-            });
-    }
+
+    },[isFavorite]);
 
     useBoardHotKey({
         blockService,

@@ -1,5 +1,5 @@
 import {BlockProps, ExpendBlockProps} from "@/app/board/{components}/block/type/Types";
-import {useMemo, useState} from "react";
+import {useCallback, useMemo, useState} from "react";
 import useSWR from "swr";
 import apiCall from "@/app/{commons}/func/api";
 import {BlockI, BoardI, RefBoardI} from "@/app/board/{services}/types";
@@ -7,6 +7,7 @@ import {blockTypeList} from "@/app/board/{components}/block/list";
 import Link from "next/link";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import moment from "moment";
+import ObjectTemplate from "@/app/board/{components}/block/ObjectTemplate";
 
 
 export type RefBlockExtraValueType = {
@@ -18,9 +19,12 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
     const {
         hash, type,
         isView, code,
+        seq, blockRef,
         onChangeExtraValueHandler,
         onKeyUpHandler,
         onKeyDownHandler,
+        onMouseEnterHandler,
+        onMouseLeaveHandler
     } = props;
 
     const extraValue = props.extraValue as RefBlockExtraValueType;
@@ -61,13 +65,12 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
         revalidateOnFocus: false,
     })
 
-
-    const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setValue(e.target.value);
         setValid('');
-    }
+    },[]);
 
-    const onChangeValueHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeValueHandler = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         if(value === '') return;
         const regExp = /\/board\/(\d+)#block-(\d){13}-(\d+)/i;
 
@@ -88,7 +91,7 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
         setTimeout(async () => {
             await mutate();
         },100);
-    }
+    },[value, extraValue]);
 
     const Component = useMemo(()=> {
         return blockTypeList.find(e => {
@@ -98,15 +101,13 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
 
 
     return (
-        <div id={`block-${hash}`}
-             className={'w-full'}
-             aria-roledescription={type}
-        >
+        <ObjectTemplate {...{hash, seq, blockRef, type, onMouseEnterHandler, onMouseLeaveHandler}}>
             <div className={[
                 'flex flex-col w-full items-center gap-4 outline-0 break-all',
                 isView || 'p-1',
             ].join(' ')}
                  style={{backgroundColor: isView ? '' : 'rgba(230,230,230,0.2)'}}
+
             >
                 {
                     !isView
@@ -169,7 +170,7 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
                     </div>
                 }
             </div>
-        </div>
+        </ObjectTemplate>
     )
 }
 

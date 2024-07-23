@@ -48,8 +48,6 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
     const searchParams = useSearchParams();
 
-
-
     useEffect(() => {
         if(!isNewBoard && !board?.isView || board.isView) return;
 
@@ -147,7 +145,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
     },[])
 
 
-    const fetchBoard = async () => {
+    const fetchBoard = useCallback( async () => {
         try {
             const res = await preload(`/api/board/${params.id}`, async () => {
                 return await apiCall<BoardI & {isLogin : boolean}>({
@@ -193,13 +191,9 @@ export default function Page({children, params} : {children: ReactNode, params: 
         } finally {
             setLoading(false);
         }
-    }
+    },[params.id, board.isView]);
 
-    useEffect(()=>{
-
-    },[])
-
-    const fetchRate = () => {
+    const fetchRate = useCallback(() => {
         preload(`/api/board/rate/${params.id}`, async () => {
             return await apiCall<RateInfoI>({
                 path: '/api/board/rate/' + params.id,
@@ -210,7 +204,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
         .then(res => {
             setRateInfo(res.data);
         });
-    }
+    },[params.id]);
 
     return (
         <LoadingProvider.Provider value={{

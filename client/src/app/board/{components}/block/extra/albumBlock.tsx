@@ -1,5 +1,5 @@
 import {ExpendBlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
-import React, {useContext, useEffect, useMemo, useRef, useState} from "react";
+import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBorderAll, faImage} from "@fortawesome/free-solid-svg-icons";
@@ -10,6 +10,7 @@ import ImageView from "@/app/board/{components}/block/extra/{components}/ImageVi
 import Thumbnail from "@/app/board/{components}/block/extra/{components}/thumbnail";
 import Slide from "@/app/board/{components}/block/extra/{components}/slide";
 import {deleteImage} from "@/app/board/{services}/funcs";
+import BoardProvider from "@/app/board/{services}/BoardProvider";
 
 export type ImageShowProps = {
     defaultIndex: number;
@@ -35,7 +36,13 @@ const AlbumBlock = (props: ExpendBlockProps) => {
     const maxFileSize = 5 * 1024 * 1024;
 
     const extraValue = props.extraValue as ImageShowProps;
-    const {setWaitUploadFiles, setWaitRemoveFiles} = useContext(TempFileProvider);
+    const {
+        waitUploadFiles, setWaitUploadFiles,
+        waitRemoveFiles, setWaitRemoveFiles
+    } = useContext(TempFileProvider);
+
+    const {board} = useContext(BoardProvider);
+
     const [viewMode, setViewMode] = useState<string>(extraValue?.mode || 'thumbnail');
     const [uploadProgress, setUploadProgress] = useState<ProgressType>({
         size: 0,
@@ -61,7 +68,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         } as ImageShowProps);
     },[]);
 
-    const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if(!files) return;
         if(files.length > oneFileLength) {
@@ -102,9 +109,9 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         }
 
         e.target.value = '';
-    }
+    },[extraValue, isView, board.data.title]);
 
-    const upload = async (file: File, fileContent: FileContentType, uploadedImages: string[], size: number, progress: number[]) => {
+    const upload = useCallback(async (file: File, fileContent: FileContentType, uploadedImages: string[], size: number, progress: number[]) => {
 
         if(file.size > maxFileSize) return;
 
@@ -153,28 +160,28 @@ const AlbumBlock = (props: ExpendBlockProps) => {
             ...extraValue,
             images: [...extraValue.images, ...uploadedImages],
         } as ImageShowProps);
-    }
+    },[extraValue, isView, board.data.title]);
 
 
-    const onChangeModeHandler = (mode: string) => {
+    const onChangeModeHandler = useCallback((mode: string) => {
         setViewMode(mode);
         if(!onChangeExtraValueHandler) return;
         onChangeExtraValueHandler({
             ...extraValue,
             mode: mode,
         } as ImageShowProps);
-    }
+    },[extraValue, isView, board.data.title]);
 
 
-    const onChaneDefaultIndexHandler = (index: number) => {
+    const onChaneDefaultIndexHandler = useCallback((index: number) => {
         if(!onChangeExtraValueHandler) return;
         onChangeExtraValueHandler({
             ...extraValue,
             defaultIndex: index,
         } as ImageShowProps);
-    }
+    },[extraValue, isView]);
 
-    const deleteImageHandler = async  (absolutePath: string, index: number) => {
+    const deleteImageHandler = useCallback(async (absolutePath: string, index: number) => {
         try {
             const res = await apiCall({
                 path: '/api/file/delete/filename',
@@ -213,7 +220,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         } catch (e) {
             console.error(e);
         }
-    }
+    },[extraValue, waitUploadFiles, waitRemoveFiles, isView]);
 
     const componentProps = useMemo(() => ({
         images       : extraValue?.images || [],

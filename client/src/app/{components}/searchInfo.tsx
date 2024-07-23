@@ -1,11 +1,11 @@
-import {useContext, useMemo} from "react";
+import {useCallback, useContext, useMemo} from "react";
 import SearchParamsProvider from "@/app/{services}/SearchParamsProvider";
 import {Category} from "@/app/board/{services}/types";
 
 const SearchInfo = () => {
     const {searchParams, setSearchParams} = useContext(SearchParamsProvider);
 
-    const onChangeSearchHandler = (type:string) => {
+    const onChangeSearchHandler = useCallback((type:string) => {
         const isCategory = type === 'categoryPk';
 
         const params = {
@@ -15,7 +15,7 @@ const SearchInfo = () => {
         }
 
         setSearchParams(params);
-    }
+    },[searchParams]);
 
     const CategoryName = useMemo(() =>
         Category.findById(searchParams?.categoryPk!)?.name!

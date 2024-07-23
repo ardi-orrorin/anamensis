@@ -32,7 +32,6 @@ export default function FileUpload (props: FileUploadProps) {
         if(!file) return ;
         if(file.size > 1024 * 1024 * 5) return alert('5MB 이하의 파일만 업로드 가능합니다.');
 
-
         isImage
         ? await uploadImage(e, formData, file)
         : await uploadFile(e, formData, file);

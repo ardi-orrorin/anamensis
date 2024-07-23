@@ -22,7 +22,7 @@ const LeftMenu = ({
 
     const boardBaseUrl = '/board/new?categoryPk=';
 
-    const onChangeParamsHandler = ({type, value}: {type: string, value: string | number | boolean}) => {
+    const onChangeParamsHandler = useCallback(({type, value}: {type: string, value: string | number | boolean}) => {
 
         const category = type === 'categoryPk'
             && {[type]: searchParams[type]?.toString() === value ? 0 : Number(value)}
@@ -44,7 +44,7 @@ const LeftMenu = ({
 
         setSearchParams(params);
         scrollTo(0, 0);
-    }
+    },[searchParams]);
 
     const confirmRole = useCallback((item: { roles: RoleType[] }) => {
         return item.roles.find(r =>

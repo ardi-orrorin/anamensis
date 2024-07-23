@@ -57,7 +57,4 @@ const BoardComponent = (props: BoardListI & {favorites: string[]}) => {
     )
 }
 
-
-
-
-export default BoardComponent;
+export default React.memo(BoardComponent);

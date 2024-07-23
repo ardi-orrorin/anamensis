@@ -1,6 +1,6 @@
 'use client';
 
-import {useContext} from "react";
+import React, {useContext} from "react";
 import Link from "next/link";
 import {RateColor} from "@/app/{commons}/types/rate";
 import UserProvider from "@/app/user/{services}/userProvider";
@@ -47,4 +47,4 @@ const BoardSummary = () => {
     );
 }
 
-export default BoardSummary;
+export default React.memo(BoardSummary);

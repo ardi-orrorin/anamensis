@@ -6,6 +6,7 @@ import axios from "axios";
 import Link from "next/link";
 import apiCall from "@/app/{commons}/func/api";
 import {useRouter} from "next/navigation";
+import React from "react";
 
 export interface SmtpCardProps {
     id: number;
@@ -87,4 +88,4 @@ const SmtpCard = (smtpCardProps: SmtpCardProps) => {
     );
 }
 
-export default SmtpCard;
+export default React.memo(SmtpCard);

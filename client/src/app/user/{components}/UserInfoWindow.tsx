@@ -39,4 +39,4 @@ const UserInfoWindow = (props: UserInfoWindowProps) => {
     );
 }
 
-export default UserInfoWindow;
+export default React.memo(UserInfoWindow);

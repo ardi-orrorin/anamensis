@@ -41,4 +41,4 @@ const PointSummary = () => {
     );
 }
 
-export default PointSummary;
+export default React.memo(PointSummary);

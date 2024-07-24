@@ -12,7 +12,7 @@ import {
     faRectangleList,
     faUserGear,
 } from "@fortawesome/free-solid-svg-icons";
-import React from "react";
+import React, {useCallback, useMemo} from "react";
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import {faTableList} from "@fortawesome/free-solid-svg-icons/faTableList";
 import {RoleType} from "@/app/user/system/{services}/types";
@@ -60,18 +60,42 @@ const LeftNavBar = ({
         });
     });
 
-    const openToggle = () => {
+    const openToggle = useCallback(() => {
         bodyScrollToggle(false, false);
         setIsModalMode(!isModalMode);
         setIsOpen(!isOpen);
         localStorage.setItem('isModalMode', JSON.stringify(!isModalMode));
-    }
+    },[isModalMode, isOpen]);
 
 
-    const onChangeDisabledHandler = () => {
+    const onChangeDisabledHandler = useCallback(() => {
         bodyScrollToggle(false, true);
         setIsOpen(false);
-    }
+    },[]);
+
+    const roleMenu = useMemo(()=>
+        menuItems.map((item, index) => {
+            if(!item.role || !roles.find(role => role === item.role)) {
+                return null;
+            }
+
+            return (
+                <li key={'userleftnavbar' + index}
+                    className={'w-full'}
+                >
+                    <Link className={'text text-white w-full'}
+                          href={item.href}
+                          onClick={onChangeDisabledHandler}
+                    >
+                        <div className={'w-full p-3 hover:bg-blue-500 duration-300'}>
+                            <FontAwesomeIcon icon={item.icon} width={iconSize} />
+                            <span>&nbsp; {item.name}</span>
+                        </div>
+                    </Link>
+                </li>
+            )
+        })
+    , [menuItems, roles]);
 
     return (
         <>
@@ -179,29 +203,7 @@ const LeftNavBar = ({
                         </div>
                     </Link>
                 </li>
-                {
-                    menuItems.map((item, index) => {
-                        if(!item.role || !roles.find(role => role === item.role)) {
-                            return null;
-                        }
-
-                        return (
-                            <li key={'userleftnavbar' + index}
-                                className={'w-full'}
-                            >
-                                <Link className={'text text-white w-full'}
-                                      href={item.href}
-                                      onClick={onChangeDisabledHandler}
-                                >
-                                    <div className={'w-full p-3 hover:bg-blue-500 duration-300'}>
-                                        <FontAwesomeIcon icon={item.icon} width={iconSize} />
-                                        <span>&nbsp; {item.name}</span>
-                                    </div>
-                                </Link>
-                            </li>
-                        )
-                    })
-                }
+                { roleMenu }
             </ul>
         </nav>
             {

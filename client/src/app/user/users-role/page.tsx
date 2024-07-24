@@ -1,14 +1,14 @@
 'use client'
 
-import {useCallback, useMemo, useState} from "react";
+import React, {useCallback, useMemo, useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
 import {PageI, PageResponse} from "@/app/{commons}/types/commons";
 import {AxiosError} from "axios";
 import {useSearchParams} from "next/navigation";
 import PageNavigator from "@/app/{commons}/PageNavigator";
 import {RoleType} from "@/app/user/system/{services}/types";
-import useSWR, {mutate, preload} from "swr";
-import moment from "moment";
+import useSWR from "swr";
+import Row from "@/app/user/users-role/{components}/row";
 
 export type UsersRole = {
     id       : number
@@ -55,7 +55,7 @@ export default function Page() {
     })
 
 
-    const onChangeRole = async (mode: 'add' | 'delete', user: UsersRole, selRole : RoleType) => {
+    const onChangeRole = useCallback(async (mode: 'add' | 'delete', user: UsersRole, selRole : RoleType) => {
         if(selRole as string === '') return;
         if(mode === 'delete' && user.roles.length === 1) {
             return alert('최소 한 개 이상의 권한은 보유해야 합니다.')
@@ -80,23 +80,23 @@ export default function Page() {
         } catch (e) {
             const err = e as AxiosError
         }
-    }
+    },[]);
 
-    const onSelectHandlerAll = () => {
+    const onSelectHandlerAll = useCallback(() => {
         if(select.length === users.length) {
             return setSelect([]);
         }
         setSelect([...users.map((user) => user.id)]);
-    }
+    },[select, users]);
 
-    const onSelectHandler = (id: number) => {
+    const onSelectHandler = useCallback((id: number) => {
         if(select.includes(id)) {
             return setSelect(select.filter((item) => item !== id));
         }
         return setSelect([...select, id]);
-    }
+    },[select]);
 
-    const onSaveRoles = async (mode: 'add' | 'delete') => {
+    const onSaveRoles = useCallback(async (mode: 'add' | 'delete') => {
         if(role as string === '') return alert('권한를 선택하십시오.');
         const ids: number[] = users
             .filter(user => select.includes(user.id))
@@ -126,7 +126,7 @@ export default function Page() {
             const err = e as AxiosError
             console.log(err)
         }
-    }
+    },[select, role, users]);
 
 
     return (
@@ -194,71 +194,9 @@ export default function Page() {
             {
                 users.map((user, index) => {
                     return (
-                        <tr key={'user-role' + user.id} className={['border-b border-gray-200 border-solid', index % 2 === 1 ? 'bg-blue-50': '', select.includes(user.id) && 'bg-yellow-300'].join(' ')}>
-                            <td className={'py-2 px-3'}>
-                                <input type={'checkbox'}
-                                       checked={!!select.find(id => id === user.id)}
-                                       onClick={() =>onSelectHandler(user.id)}
-                                />
-                            </td>
-                            <td className={'py-2 px-3'}>
-                                { maxIndex - index }
-                            </td>
-                            <td className={'py-4 px-3'}>
-                                { user.userId }
-                            </td>
-                            <td className={'py-2 px-3'}>
-                                { user.name }
-                            </td>
-                            <td className={'py-2 px-3'}>
-                                { user.email }
-                            </td>
-                            <td className={'py-2 px-3'}>
-                                {
-                                    user.roles.map(role =>
-                                        <span key={'user-role-roles' + role}
-                                             className={'text-sm px-1'}
-                                        >{ role }
-                                        </span>
-                                    )
-                                }
-                            </td>
-                            <td className={'py-2 px-3'}>
-                                { moment(user.createAt).format('YYYY-MM-DD HH:mm') }
-                            </td>
-                            <td className={'text-center'}>
-                                { user.isUse ? '사용' : '비사용' }
-                            </td>
-                            <td className={'py-2 px-3'}>
-                                <select className={'w-full bg-none outline-0'} onChange={e => onChangeRole('add', user, e.target.value as RoleType)}>
-                                    <option value={''}>선택</option>
-                                    {
-                                        !user.roles.includes('ADMIN')
-                                        && <option value={'ADMIN'}>ADMIN</option>
-                                    }
-                                    {
-                                        !user.roles.includes('GUEST')
-                                        && <option value={'GUEST'}>GUEST</option>
-                                    }
-                                </select>
-                            </td>
-                            <td className={'py-2 px-3'}>
-                                <select className={'w-full bg-none outline-0'} onChange={e => onChangeRole('delete', user, e.target.value as RoleType)}>
-                                    <option value={''}>선택</option>
-                                    {
-                                        user.roles.map(role => {
-                                            if(role === 'MASTER') return;
-                                            return (
-                                                <option key={'user-role-roles-option' + role}
-                                                        value={role}
-                                                >{ role }
-                                                </option>
-                                            )
-                                        })
-                                    }
-                                </select>
-                            </td>
-                        </tr>
+                        <Row key={'user-roles' + user.id}
+                             {...{user, index, maxIndex, select, onSelectHandler, onChangeRole }}
+                        />
                     )
                 })
             }

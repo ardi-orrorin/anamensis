@@ -1,5 +1,5 @@
 'use client';
-import {useContext, useState} from "react";
+import {useCallback, useContext, useState} from "react";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {useRouter} from "next/navigation";
 import apiCall from "@/app/{commons}/func/api";
@@ -14,7 +14,7 @@ export default function AttendInfo() {
     const [loading, setLoading] = useState<boolean>(false);
     const debounce = createDebounce(500);
 
-    const attend = () => {
+    const attend = useCallback(() => {
         setLoading(true);
 
         const fetch = async () => {
@@ -35,7 +35,7 @@ export default function AttendInfo() {
             });
         }
         debounce(fetch);
-    }
+    },[]);
 
     return (
         <div className={'w-full h-full flex flex-col gap-5 justify-center items-start'}>

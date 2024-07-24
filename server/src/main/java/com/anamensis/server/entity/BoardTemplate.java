@@ -11,11 +11,17 @@ import java.time.LocalDateTime;
 public class BoardTemplate {
 
     private long id;
+
     private long memberPk;
+
+    private String name;
+
     private SerializedJSONObject content;
+
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
+
     private Boolean isPublic;
-    private boolean membersOnly;
-    private boolean isUse;
+    private Boolean membersOnly;
+    private Boolean isUse;
 }

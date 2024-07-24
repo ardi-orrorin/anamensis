@@ -1,5 +1,6 @@
 CREATE TABLE board_template (
     id                BIGINT          PRIMARY KEY      AUTO_INCREMENT              COMMENT 'PK',
+    name              VARCHAR(255)    NOT NULL                                     COMMENT '게시글 템플릿 이름',
     content           TEXT            NOT NULL                                     COMMENT '본문',
     create_at         TIMESTAMP(6)    NOT NULL                                     COMMENT '생성일자',
     update_at         TIMESTAMP(6)    NOT NULL                                     COMMENT '수정일자',

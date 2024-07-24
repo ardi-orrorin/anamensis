@@ -23,20 +23,29 @@
 
     <insert id="save">
         INSERT INTO board_template
-               (content, create_at, update_at
+               (name, content, create_at, update_at
              , member_pk, is_public, members_only)
-        VALUES (#{content, typeHandler=JsonObjectTypeHandler}, #{createAt}, #{updateAt}
+        VALUES (#{name}, #{content, typeHandler=JsonObjectTypeHandler}, #{createAt}, #{updateAt}
              , #{memberPk}, #{isPublic}, #{membersOnly})
     </insert>
 
     <update id="update">
         UPDATE board_template bt
         <set>
-            <if test="content != null and content != ''">
-                bt.content  = #{content, typeHandler=JsonObjectTypeHandler},
+            <if test="name != null and name != ''">
+                bt.name         = #{name},
             </if>
-            <if test="updateAt != null updateAt != ''">
-                bt.updateAt =  #{updateAt},
+            <if test="content != null and content != ''">
+                bt.content      = #{content, typeHandler=JsonObjectTypeHandler},
+            </if>
+            <if test="updateAt != null and updateAt != ''">
+                bt.update_at    =  #{updateAt},
+            </if>
+            <if test="isPublic != null">
+                bt.is_public    =  #{isPublic},
+            </if>
+            <if test="membersOnly != null">
+                bt.members_only =  #{membersOnly},
             </if>
         </set>
          WHERE bt.id = #{id}
@@ -44,7 +53,8 @@
 
     <update id="disabled">
         UPDATE board_template bt
-           SET bt.is_use = 0
-         WHERE bt.id     = #{id}
+           SET bt.is_use    = 0
+         WHERE bt.id        = #{id}
+           AND bt.member_pk = #{memberPk}
     </update>
 </mapper>

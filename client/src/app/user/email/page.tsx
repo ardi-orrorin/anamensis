@@ -19,11 +19,6 @@ export interface AuthPropsI {
     sauth: boolean;
 }
 
-const fetchData = apiCall<UserInfoI>({
-    path: '/api/user/email',
-    method: 'GET',
-    isReturnData: true,
-})
 
 export default async function Page() {
 

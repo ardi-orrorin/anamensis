@@ -14,6 +14,7 @@ public class BoardTemplateRequest {
     @Getter
     @Setter
     public static class Save {
+        private long id;
         private String name;
         private Map<String, Object> content;
         private Boolean isPublic;
@@ -22,6 +23,7 @@ public class BoardTemplateRequest {
         public static BoardTemplate toEntity(Save boardTemplate, long memberPk) {
             BoardTemplate entity = new BoardTemplate();
 
+            entity.setId(boardTemplate.getId());
             entity.setName(boardTemplate.getName());
             entity.setContent(new SerializedJSONObject(boardTemplate.getContent()));
             entity.setIsPublic(boardTemplate.getIsPublic());

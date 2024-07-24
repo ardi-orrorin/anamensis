@@ -24,6 +24,7 @@ const BoardTitle = (props: {
                       onChange={onChange}
                       onKeyDown={onKeyDown}
                       placeholder={"제목을 입력하세요"}
+                      autoFocus={true}
             />
         }
         {

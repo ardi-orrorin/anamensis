@@ -84,7 +84,8 @@ public class BoardService {
         return Mono.fromCallable(()-> redisTemplate.hasKey(key))
             .flatMap(b -> {
                 if(!b) {
-                    BoardResultMap.Board board = boardMapper.findByPk(boardPk).orElseThrow(()-> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+                    BoardResultMap.Board board = boardMapper.findByPk(boardPk)
+                        .orElseThrow(()-> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
                     redisTemplate.boundValueOps(key).set(board, boardExpire.timeout(), boardExpire.timeUnit());
                 }
 

@@ -72,5 +72,10 @@ export const useRootLeftMenuHotKey = ({
     if(!confirmRole(selCate)) return;
     router.push(boardBaseUrl + selCate.id);
   }, hotkeysOption,[roles]);
+
+  useHotkeys(['shift+0'], (e, handler)=> {
+    if(roles.length === 0) return;
+    router.push('/board/temp');
+  }, hotkeysOption,[roles]);
   
 }

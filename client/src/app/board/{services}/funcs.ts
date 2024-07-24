@@ -1,4 +1,4 @@
-import {BlockI, BoardContentI, BoardI} from "@/app/board/{services}/types";
+import {BlockI, BoardContentI, BoardI, BoardTemplate} from "@/app/board/{services}/types";
 import {blockTypeList} from "@/app/board/{components}/block/list";
 import {Dispatch, SetStateAction} from "react";
 import {TempFileI} from "@/app/board/{services}/TempFileProvider";
@@ -37,29 +37,34 @@ export const initBlock = ({
     seq, value: '', code: code ?? '00005', textStyle: {}, hash: Date.now() + '-' + seq
 })
 
-export const updateBoard = ({
-    board,
-    list,
-    waitUploadFiles,
-    waitRemoveFiles,
-}: {
-    board: BoardI;
-    list?: BlockI[];
-    waitUploadFiles?: TempFileI[];
-    waitRemoveFiles?: TempFileI[];
-}) : BoardI => {
-    const {content, isPublic, title} = board;
 
-    const bodyContent = content.list.filter(item => item.value !== '');
+type BoardUpdateProps = {
+    board            : BoardI;
+    list?            : BlockI[];
+    waitUploadFiles? : TempFileI[];
+    waitRemoveFiles? : TempFileI[];
+    isTemplate?      : boolean;
+}
 
-    const textRegex = /^0000\d{1}$/;
 
-    // const searchText = title + ' '
-    //     + bodyContent
-    //         .filter(item =>
-    //             textRegex.test(item.code) || item.code === '00301'
-    //         )
-    //         .map(item => item.value).join(' ');
+export function updateBoard(params: BoardUpdateProps & { isTemplate: true }) : BoardTemplate;
+export function updateBoard(params: BoardUpdateProps & { isTemplate: false | undefined }) : BoardI;
+
+export function updateBoard(params: BoardUpdateProps) : BoardI | BoardTemplate {
+    const {board, list, waitUploadFiles, waitRemoveFiles, isTemplate} = params;
+    const {content, isPublic, title,membersOnly} = board;
+
+    if(isTemplate) {
+        return {
+            name: title,
+            content: {
+                ...content,
+                list: content.list
+            },
+            isPublic,
+            membersOnly,
+        } as BoardTemplate;
+    }
 
     const uploadFiles = waitUploadFiles
         ? waitUploadFiles.map(item => item.id)

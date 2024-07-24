@@ -46,7 +46,8 @@ export default function Page({params}: {params : {id: string}}) {
     const {
         board, setBoard
         , rateInfo, setRateInfo
-        , isFavorite, setIsFavorite
+        , isFavorite, setIsFavorite,
+        isNewBoard, isTemplate,
     } = useContext(BoardProvider);
 
     const {
@@ -66,8 +67,6 @@ export default function Page({params}: {params : {id: string}}) {
     const [fullScreen, setFullScreen] = useState<boolean>(false);
 
     const blockRef = useRef<HTMLElement[] | null[]>([]);
-
-    const isNewBoard = useMemo(() => !params.id || params.id === 'new',[params.id]);
 
     const debounce = createDebounce(300);
 
@@ -138,27 +137,42 @@ export default function Page({params}: {params : {id: string}}) {
         setLoading(true);
 
         try {
-            const body = updateBoard({
-                board: board.data,
-                list: board.data.content.list,
-                waitUploadFiles,
-                waitRemoveFiles
-            });
+            const body = isTemplate
+                ? updateBoard({
+                    isTemplate,
+                    board: board.data,
+                })
+                : updateBoard({
+                    isTemplate,
+                    board: board.data,
+                    list: board.data.content.list,
+                    waitUploadFiles,
+                    waitRemoveFiles,
+                });
+
+            const path = '/api' + (
+                isSave ? isNewBoard
+                           ? '/board/new'
+                           : isTemplate
+                           && '/board-template'
+                       : params.id
+            );
 
             const result = await apiCall<BoardI, BoardI>({
-                path: '/api/board/' + (isSave ? 'new' : params.id),
                 method: isSave ? 'POST': 'PUT',
+                path,
                 body,
             })
             .then(res => {
                 return res.data;
             });
 
-            if(isSave) {
-                router.push('/board/' + result?.id);
-            } else {
-               location.reload();
-            }
+            isNewBoard && isSave
+                ? router.push('/board/' + result?.id)
+                : isTemplate && isSave
+                ? router.push('/')
+                : location.reload();
+
         } catch (e) {
             alert('저장에 실패했습니다.');
             setLoading(false);
@@ -382,14 +396,21 @@ export default function Page({params}: {params : {id: string}}) {
                                 isView={board?.isView}
                     />
                 </div>
-                <div className={'flex h-8 border-l-8 border-solid border-gray-500 px-2 items-center'}>
+                <div className={'flex gap-1 h-8 border-l-8 border-solid border-gray-500 px-2 items-center'}>
                     <span className={'font-bold'}>
                         { categoryName }
                     </span>
+                    {
+                        isTemplate
+                        && <span className={'font-bold'}>
+                            (템플릿 추가)
+                        </span>
+                    }
                 </div>
                 <div className={'flex flex-col sm:flex-row justify-between gap-3 h-auto border-b-2 border-solid border-main py-3'}>
                     {
                         !isNewBoard
+                        && !isTemplate
                         && board.isView
                         && board.data.isPublic
                         && board.data.isLogin
@@ -408,8 +429,9 @@ export default function Page({params}: {params : {id: string}}) {
                     />
                     <div className={'flex justify-end sm:justify-start gap-2 h-10 sm:h-auto'}>
                         {
-                            !isNewBoard &&
-                            <HeaderBtn isView={board.isView}
+                            !isNewBoard
+                            && !isTemplate
+                            && <HeaderBtn isView={board.isView}
                                        isWriter={board.data?.isWriter || false}
                                        isLogin={board.data?.isLogin || false}
                                        submitClickHandler={() => debounce(() => submitHandler(false))}
@@ -467,6 +489,7 @@ export default function Page({params}: {params : {id: string}}) {
                 <div>
                     {
                         !isNewBoard
+                        && !isTemplate
                         && board.isView
                         && <BoardInfo {...board}/>
                     }
@@ -495,6 +518,7 @@ export default function Page({params}: {params : {id: string}}) {
                 <div>
                     {
                         isNewBoard
+                        || isTemplate
                         && <div className={'flex gap-1 justify-end mt-5'}>
                             <button
                               className={'w-full rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
@@ -505,6 +529,7 @@ export default function Page({params}: {params : {id: string}}) {
                     }
                     {
                         !isNewBoard
+                        && !isTemplate
                         && !board.isView
                         && <div className={'flex gap-1 justify-end mt-5'}>
                             <button
@@ -525,9 +550,7 @@ export default function Page({params}: {params : {id: string}}) {
                 }
                 {
                     !commentLoading
-                    && <Comment isNewBoard={isNewBoard}
-                                params={params}
-                    />
+                    && <Comment params={params} />
                 }
             </div>
             <div>

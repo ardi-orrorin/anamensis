@@ -326,6 +326,7 @@ export default function Page() {
                          setProps={setProps}
                          inputCheck={inputCheck}
                          description={description.id}
+                         autoFocus={true}
                     />
                     <Row name={'pwd'}
                          value={user}

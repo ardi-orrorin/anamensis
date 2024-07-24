@@ -5,7 +5,7 @@ import {
     faHeading,
     faImage,
     faLink,
-    faList,
+    faList, faMinus,
     faPercent,
     faQuoteLeft, faRetweet,
     faVideo
@@ -23,6 +23,7 @@ import QuestionBlock from "@/app/board/{components}/block/extra/questionBlock";
 import YoutubeBlock from "@/app/board/{components}/block/file/youtube";
 import CodeBlock from "@/app/board/{components}/block/input/CodeBlock";
 import RefBlock from "@/app/board/{components}/block/extra/refBlock";
+import Separator from "@/app/board/{components}/block/object/separator";
 
 export type BlockType = {
     code         : string;
@@ -203,6 +204,18 @@ export const blockTypeList: BlockComponentType[] = [
         notAvailDup       : false,
         component         : (props: BlockProps)  =>
             RefBlock({...props, type: 'object', code: '00205'}),
+    },
+    {
+        code              : '00191',
+        tag               : 'separator',
+        command           : '/sep',
+        label             : 'Separator',
+        icon              : faMinus,
+        comment           : '구분선',
+        type              : 'object',
+        notAvailDup       : false,
+        component         : (props: BlockProps)  =>
+            Separator({...props, type: 'object'}),
     },
     {
         code              : '00201',

@@ -20,6 +20,7 @@ const LinkBlock = (props: ExpendBlockProps) => {
         onChangeValueHandler, onKeyUpHandler,
         onMouseEnterHandler, onMouseLeaveHandler,
         onFocusHandler, onChangeExtraValueHandler,
+        onKeyDownHandler
     }: ExpendBlockProps = props;
 
     const extraValue = props.extraValue as OGType;
@@ -30,7 +31,9 @@ const LinkBlock = (props: ExpendBlockProps) => {
 
 
     const onKeyDownChangeHandler = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if(e.key !== 'Enter') return ;
+        if(e.key !== 'Enter') {
+            return onKeyDownHandler!(e);
+        }
 
         const urlRegex = new RegExp(/(http(s)?:\/\/)([a-z0-9\w]+\.*)+[a-z0-9]{2,5}/gi);
 
@@ -70,7 +73,7 @@ const LinkBlock = (props: ExpendBlockProps) => {
     }
 
     return (
-        <ObjectTemplate {...{hash, seq, blockRef, type, onMouseEnterHandler, onMouseLeaveHandler}}>
+        <ObjectTemplate {...{hash, seq, type, isView, blockRef, onMouseEnterHandler, onMouseLeaveHandler}}>
             {
                 !extraValue || !extraValue.title
                 ? <input className={'w-full p-2 break-all text-blue-700 outline-0'}

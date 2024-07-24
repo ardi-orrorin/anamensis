@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.server.mapper.BoardTemplateMapper">
+    <select id="findAll" resultType="BoardTemplate">
+        SELECT *
+          FROM board_template bt
+          JOIN (SELECT bt2.id
+                  FROM board_template bt2
+                 WHERE bt2.is_use = 1
+                   AND bt2.member_pk = #{memberPk}) bt3
+            ON bt.id = bt3.id;
+    </select>
+
+    <select id="findById" resultType="BoardTemplate">
+        SELECT *
+          FROM board_template bt
+         WHERE bt.id     = #{id}
+           AND bt.is_use = 1
+    </select>
+
+    <insert id="save">
+        INSERT INTO board_template
+               (content, create_at, update_at
+             , member_pk, is_public, members_only)
+        VALUES (#{content, typeHandler=JsonObjectTypeHandler}, #{createAt}, #{updateAt}
+             , #{memberPk}, #{isPublic}, #{membersOnly})
+    </insert>
+
+    <update id="update">
+        UPDATE board_template bt
+        <set>
+            <if test="content != null and content != ''">
+                bt.content  = #{content, typeHandler=JsonObjectTypeHandler},
+            </if>
+            <if test="updateAt != null updateAt != ''">
+                bt.updateAt =  #{updateAt},
+            </if>
+        </set>
+         WHERE bt.id = #{id}
+    </update>
+
+    <update id="disabled">
+        UPDATE board_template bt
+           SET bt.is_use = 0
+         WHERE bt.id     = #{id}
+    </update>
+</mapper>

@@ -73,7 +73,7 @@ const YoutubeBlock = (props: ExpendBlockProps) => {
     },[tempValue]);
 
     return (
-        <ObjectTemplate {...{hash, seq, blockRef, type, onMouseEnterHandler, onMouseLeaveHandler}}>
+        <ObjectTemplate {...{hash, seq, blockRef, type, isView, onMouseEnterHandler, onMouseLeaveHandler}}>
             {
                 !isView
                 && <div className={'flex flex-col gap-3 p-4'}
@@ -84,7 +84,10 @@ const YoutubeBlock = (props: ExpendBlockProps) => {
                            value={tempValue}
                            placeholder={'url 주소 ex) https://www.youtube.com/embed/~~~'}
                            onChange={onChangeHandler}
-                           ref={el => {blockRef!.current[props.seq] = el}}
+                           ref={el => {
+                               if(!blockRef?.current) return;
+                               blockRef!.current[seq] = el
+                           }}
                            onBlur={submitValueHandler}
                     />
                     <div className={'flex'}>

@@ -28,13 +28,14 @@ type ContextMenuProps = {
 const Block = (props: BlockProps) => {
     const {
         seq, code,
-        value, hash,
+        value, hash, isView,
         textStyle, blockRef,
         onClickAddHandler,
-        onClickDeleteHandler,
+        onClickDeleteHandler
     } = props;
 
     const {board, setBoard, comment, setNewComment, newComment} = useContext(BoardProvider);
+    const {isPublic, membersOnly, title} = board?.data;
 
     const {blockService, setBlockService, commentService, setCommentService, selectedBlock} = useContext(BlockProvider);
     const [touch, setTouch] = useState(setTimeout(() => false, 0));
@@ -46,8 +47,8 @@ const Block = (props: BlockProps) => {
 
     const Component = block?.component!;
 
-    const onFocusHandler = useCallback((e: React.FocusEvent<HtmlElements>) => {
-        if(e.currentTarget.ariaRoleDescription !== 'text') {
+    const onFocusHandler = (e: React.FocusEvent<HtmlElements>) => {
+        if (e.currentTarget.ariaRoleDescription !== 'text') {
             return setBlockService({} as BlockService);
         }
 
@@ -65,7 +66,7 @@ const Block = (props: BlockProps) => {
             screenX: positionX,
             screenY: positionY,
         })
-    },[board?.data?.content?.list[seq]]);
+    }
 
     const onMouseEnterHandler = (e: React.MouseEvent<MouseEnterHTMLElements> ) => {
         if(e.currentTarget.ariaRoleDescription === 'object') {
@@ -113,7 +114,7 @@ const Block = (props: BlockProps) => {
         });
     },[]);
 
-    const onClickObjectMenu = useCallback((type: string) => {
+    const onClickObjectMenu = (type: string) => {
         if(type === 'delete') {
             if(!onClickDeleteHandler) return;
             onClickDeleteHandler(seq);
@@ -139,9 +140,9 @@ const Block = (props: BlockProps) => {
             window.open(url, '_blank');
             return ;
         }
-    },[board.isView, seq]);
+    }
 
-    const onChangeValueHandler = useCallback((value: string) => {
+    const onChangeValueHandler = (value: string) => {
         const newList = board.data?.content?.list.map((item, index) => {
             if (item.seq === seq) {
                 item.value = value;
@@ -150,9 +151,9 @@ const Block = (props: BlockProps) => {
         });
 
         setBoard({...board, data: {...board.data, content: {list: newList}}});
-    },[board?.data?.content.list[seq], board.data.title, board.isView])
+    }
 
-    const onChangeExtraValueHandler = useCallback((value: ExtraValueI) => {
+    const onChangeExtraValueHandler = (value: ExtraValueI) => {
         const newList = board.data?.content?.list.map((item, index) => {
             if (item.seq === seq) {
                 item.extraValue = value;
@@ -161,22 +162,19 @@ const Block = (props: BlockProps) => {
         });
 
         setBoard({...board, data: {...board.data, content: {list: newList}}});
-    },[board?.data?.content.list[seq], board.data.title, board.isView]);
+    }
 
-    const contextLinkHandler = useCallback(async (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
-        if(!board?.isView) return;
-        if(!board?.data?.isLogin) return;
+    const contextLinkHandler = async (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+        if(!board?.isView || !board?.data?.isLogin) return;
 
         e.preventDefault();
 
         const {clientX, clientY} = e.nativeEvent as MouseEvent;
         setContextMenu({clientX, clientY, isView: true} as ContextMenuProps);
-    },[board?.isView, board?.data?.isLogin]);
+    }
 
     const shareLinkHandler = useCallback(() => {
-        if(!board.data.isLogin) return;
-        if(typeof window === 'undefined') return ;
-        if(!board?.data?.id) return;
+        if(!board.data.isLogin || !board?.data?.id ||  typeof window === 'undefined') return;
 
         const url = `${window.location.origin}/board/${board.data.id}#block-${hash}`;
 
@@ -189,8 +187,7 @@ const Block = (props: BlockProps) => {
     },[contextMenu]);
 
     const answerLinkHandler = useCallback(() => {
-        if(!board.data.isLogin) return;
-        if(typeof window === 'undefined') return ;
+        if(!board.data.isLogin || typeof window === 'undefined') return;
 
         setContextMenu({...contextMenu, isView: false, mode: 'answer'});
 
@@ -198,9 +195,10 @@ const Block = (props: BlockProps) => {
             if(board.data.isLogin) setNewComment({...newComment, blockSeq: hash});
             setContextMenu({} as ContextMenuProps);
         }, 700);
+
     },[contextMenu]);
 
-    const shareLinkLongTouchHandler = useCallback(async (e: React.TouchEvent<HTMLDivElement>) => {
+    const shareLinkLongTouchHandler = async (e: React.TouchEvent<HTMLDivElement>) => {
         if(!board.data.isLogin) return;
 
         e.preventDefault();
@@ -210,7 +208,7 @@ const Block = (props: BlockProps) => {
         setTouch(setTimeout(() => {
             contextLinkHandler(e);
         }, touchTime));
-    },[board?.data?.isLogin]);
+    }
 
     return (
         <div className={[
@@ -223,20 +221,25 @@ const Block = (props: BlockProps) => {
         >
             {
                 contextMenu.isView
-                && <div className={`z-[20] w-40 fixed flex flex-col justify-start items-start bg-gray-500 rounded shadow-md`}
+                && <>
+                    <div className={`z-[20] w-40 fixed flex flex-col justify-start items-start bg-gray-500 rounded shadow-md`}
                          style={{left: contextMenu.clientX, top: contextMenu.clientY}}
-                >
-                    <button className={'w-full p-2 text-sm bg-white hover:bg-gray-400 hover:text-white duration-300'}
-                            onClick={shareLinkHandler}
                     >
-                      블록 주소 복사
-                    </button>
-                    <button className={'w-full p-2 text-sm bg-white hover:bg-gray-400 hover:text-white duration-300'}
-                            onClick={answerLinkHandler}
-                    >
-                      댓글 참조
-                    </button>
-                </div>
+                        <button className={'w-full p-2 text-sm bg-white hover:bg-gray-400 hover:text-white duration-300'}
+                                onClick={shareLinkHandler}
+                        >
+                          블록 주소 복사
+                        </button>
+                        <button className={'w-full p-2 text-sm bg-white hover:bg-gray-400 hover:text-white duration-300'}
+                                onClick={answerLinkHandler}
+                        >
+                          댓글 참조
+                        </button>
+                    </div>
+                    <div className={'z-[10] w-full h-full fixed top-0 left-0'}
+                         onClick={()=> setContextMenu({} as ContextMenuProps)}
+                    ></div>
+                </>
             }
             {
                 !contextMenu.isView

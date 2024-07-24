@@ -42,6 +42,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
     } = useContext(TempFileProvider);
 
     const {board} = useContext(BoardProvider);
+    const {title, isPublic, membersOnly} = board?.data;
 
     const [viewMode, setViewMode] = useState<string>(extraValue?.mode || 'thumbnail');
     const [uploadProgress, setUploadProgress] = useState<ProgressType>({
@@ -109,7 +110,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         }
 
         e.target.value = '';
-    },[extraValue, isView, board.data.title]);
+    },[extraValue, isView, title, membersOnly, isPublic]);
 
     const upload = useCallback(async (file: File, fileContent: FileContentType, uploadedImages: string[], size: number, progress: number[]) => {
 
@@ -160,7 +161,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
             ...extraValue,
             images: [...extraValue.images, ...uploadedImages],
         } as ImageShowProps);
-    },[extraValue, isView, board.data.title]);
+    },[extraValue, isView, title, membersOnly, isPublic]);
 
 
     const onChangeModeHandler = useCallback((mode: string) => {
@@ -170,7 +171,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
             ...extraValue,
             mode: mode,
         } as ImageShowProps);
-    },[extraValue, isView, board.data.title]);
+    },[extraValue, isView, title, membersOnly, isPublic]);
 
 
     const onChaneDefaultIndexHandler = useCallback((index: number) => {
@@ -179,7 +180,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
             ...extraValue,
             defaultIndex: index,
         } as ImageShowProps);
-    },[extraValue, isView]);
+    },[extraValue, isView, title, membersOnly, isPublic]);
 
     const deleteImageHandler = useCallback(async (absolutePath: string, index: number) => {
         try {

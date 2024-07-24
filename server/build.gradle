@@ -1,14 +1,18 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.1'
+    id 'org.springframework.boot' version '3.3.2'
     id 'io.spring.dependency-management' version '1.1.5'
+    id 'org.graalvm.buildtools.native' version '0.10.2'
 }
 
 group = 'com.anamensis'
 version = 'anamensis-' + project.getProperties().get('version')
 
 java {
-    sourceCompatibility = '21'
+//    sourceCompatibility = '21'
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 configurations {
@@ -23,23 +27,24 @@ repositories {
 
 ext {
     set('springCloudVersion', "2023.0.2")
+    set('flywaydb','10.16.0')
+    set('awsSpring', '3.1.1')
+    set('jsonwebtoken', '0.12.6')
 }
 
 
 
 dependencies {
-    implementation 'org.flywaydb:flyway-core:10.15.0'
-    implementation 'org.flywaydb:flyway-mysql:10.15.0'
-    // https://mvnrepository.com/artifact/org.json/json
+    implementation "org.flywaydb:flyway-core:${flywaydb}"
+    implementation "org.flywaydb:flyway-mysql:${flywaydb}"
     implementation 'org.json:json:20240303'
 
 
     implementation 'net.coobird:thumbnailator:0.4.20'
-
     implementation 'com.warrenstrange:googleauth:1.5.0'
 
-    implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.1.1'
-    implementation 'io.awspring.cloud:spring-cloud-aws-starter-ses:3.1.1'
+    implementation "io.awspring.cloud:spring-cloud-aws-starter-s3:${awsSpring}"
+    implementation "io.awspring.cloud:spring-cloud-aws-starter-ses:${awsSpring}"
 
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -49,9 +54,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
 
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    implementation "io.jsonwebtoken:jjwt-api:${jsonwebtoken}"
+    implementation "io.jsonwebtoken:jjwt-impl:${jsonwebtoken}"
+    implementation "io.jsonwebtoken:jjwt-jackson:${jsonwebtoken}"
 
 
     implementation 'org.springframework.cloud:spring-cloud-starter-config'

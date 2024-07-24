@@ -179,7 +179,7 @@ export default function Page({params}: {params : {id: string}}) {
         }
     },[]);
 
-    const addBlockHandler = useCallback((seq: number, value?: string) => {
+    const addBlockHandler = (seq: number, value?: string) => {
         const list = board.data?.content?.list;
         if (!list) return ;
 
@@ -188,9 +188,9 @@ export default function Page({params}: {params : {id: string}}) {
         listSort(list);
 
         setBoard({...board, data: {...board.data, content: {list: list}}});
-    },[board.data?.content?.list, board.isView, board?.data?.title]);
+    }
 
-    const onChangeHandler = useCallback((e: ChangeEvent<HtmlElements>, seq: number) => {
+    const onChangeHandler = (e: ChangeEvent<HtmlElements>, seq: number) => {
         const list = board.data?.content?.list;
         if (!list) return ;
 
@@ -204,17 +204,17 @@ export default function Page({params}: {params : {id: string}}) {
         });
 
         setBoard({...board, data: {...board.data, content: {list: list}}});
-    },[board.data?.content?.list, board.isView, board?.data?.title]);
+    }
 
-    const editClickHandler = useCallback(() => {
+    const editClickHandler = () => {
         if(!isNewBoard && !board.isView) {
             location.reload();
         } else {
             setBoard({...board, isView: !board.isView});
         }
-    },[board.data?.content?.list, board.isView]);
+    }
 
-    const onClickDeleteHandler = useCallback(async (seq: number) => {
+    const onClickDeleteHandler = async (seq: number) => {
         const list = board.data?.content?.list;
 
         await fileDeleteHandler(list, seq);
@@ -239,7 +239,7 @@ export default function Page({params}: {params : {id: string}}) {
 
         if(newList.length === 0) addBlockHandler(0);
 
-    },[board.data?.content?.list, board.isView]);
+    }
 
     const fileDeleteHandler = useCallback(async (blockList: BlockI[], seq: number) => {
         const fileRegexp = new RegExp('00[2-3][0-9]{2}');
@@ -295,10 +295,10 @@ export default function Page({params}: {params : {id: string}}) {
         // });
     },[board.isView, board.data?.content?.list, waitUploadFiles, waitRemoveFiles])
 
-    const onChangeTitleHandler = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const onChangeTitleHandler = (e: ChangeEvent<HTMLInputElement>) => {
         if(e.target.name !== 'title') return ;
         setBoard({...board, data: {...board.data, title: e.target.value}});
-    },[board?.data?.title, board.isView]);
+    }
 
     const onKeyUpHandler = (e: React.KeyboardEvent<HTMLElement>, seq: number) => {
 

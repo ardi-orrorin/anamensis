@@ -1,5 +1,6 @@
 package com.anamensis.server.service;
 
+import com.anamensis.server.dto.CacheExpire;
 import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.SelectAnswerQueueDto;
 import com.anamensis.server.dto.request.BoardRequest;
@@ -28,6 +29,9 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 @Transactional
 public class BoardService {
+    private static final String BOARD_PK_KEY = "board:pk:%s";
+    private static final CacheExpire boardExpire = new CacheExpire(1, TimeUnit.HOURS);
+
     private final BoardMapper boardMapper;
 
     private final BoardIndexMapper boardIndexMapper;
@@ -35,12 +39,6 @@ public class BoardService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     private final VirtualThreadTaskExecutor virtualThreadTaskExecutor;
-
-    private final String BOARD_PK_KEY = "board:pk:%s";
-
-    private final BoardExpire boardExpire = new BoardExpire(1, TimeUnit.HOURS);
-
-    record BoardExpire(long timeout, TimeUnit timeUnit) {}
 
     public Flux<BoardResponse.List> findAll(
         Page page,
@@ -87,7 +85,7 @@ public class BoardService {
             .flatMap(b -> {
                 if(!b) {
                     BoardResultMap.Board board = boardMapper.findByPk(boardPk).orElseThrow(()-> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
-                    redisTemplate.boundValueOps(key).set(board, boardExpire.timeout, boardExpire.timeUnit);
+                    redisTemplate.boundValueOps(key).set(board, boardExpire.timeout(), boardExpire.timeUnit());
                 }
 
                 return Mono.fromCallable(()-> redisTemplate.boundValueOps(key).get());
@@ -100,7 +98,7 @@ public class BoardService {
 
         if(!redisTemplate.hasKey(key)) return Mono.just(false);
 
-        redisTemplate.boundValueOps(key).expire(boardExpire.timeout, boardExpire.timeUnit);
+        redisTemplate.boundValueOps(key).expire(boardExpire.timeout(), boardExpire.timeUnit());
         return Mono.just(true);
 
     }
@@ -111,7 +109,7 @@ public class BoardService {
             BoardResultMap.Board board = boardMapper.findByPk(boardPk)
                 .orElseThrow(()-> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
-            redisTemplate.boundValueOps(key).set(board, boardExpire.timeout, boardExpire.timeUnit);
+            redisTemplate.boundValueOps(key).set(board, boardExpire.timeout(), boardExpire.timeUnit());
         }
         return Mono.just(true)
             .onErrorReturn(false);

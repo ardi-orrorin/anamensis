@@ -17,5 +17,5 @@ public interface BoardTemplateMapper {
 
     int update(BoardTemplate boardTemplate);
 
-    int disabled(long id);
+    int disabled(long id, long memberPk);
 }

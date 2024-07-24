@@ -16,13 +16,14 @@ import reactor.core.scheduler.Schedulers;
 @Transactional
 public class BoardFavoriteService {
 
+    private static final String KEY = "board:favorite:member:%s";
+
     private final BoardFavoriteMapper boardFavoriteMapper;
 
     private final RedisTemplate<String, String> redisTemplate;
 
     private final VirtualThreadTaskExecutor virtualThreadTaskExecutor;
 
-    private final String KEY = "board:favorite:member:%s";
 
     public Flux<String> findAllCache(Long memberPk) {
 

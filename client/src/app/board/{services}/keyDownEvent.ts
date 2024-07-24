@@ -136,9 +136,12 @@ const arrowUp = (args: KeyEventType) => {
 
     if(!prevRef) return;
 
-    const prevPosition = curRef.selectionStart! > prevRef.value.length ? prevRef.value.length : curRef.selectionStart;
-    prevRef.setSelectionRange(prevPosition, prevPosition);
-    prevRef.focus();
+    const prevPosition = curRef?.selectionStart! > prevRef?.value?.length ? prevRef?.value?.length : curRef?.selectionStart;
+
+    if(!prevRef?.setSelectionRange || !prevRef?.focus) return;
+
+    prevRef?.setSelectionRange(prevPosition, prevPosition);
+    prevRef?.focus();
 }
 
 const arrowDown = (args: any) => {

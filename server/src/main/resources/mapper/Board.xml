@@ -164,7 +164,7 @@
     </update>
     <update id="disableByPk" parameterType="Map">
         UPDATE board
-           SET is_use  = 0
+           SET is_use    = 0
            AND update_at = #{updateAt}
          WHERE id        = #{boardPk}
            AND is_use    = 1

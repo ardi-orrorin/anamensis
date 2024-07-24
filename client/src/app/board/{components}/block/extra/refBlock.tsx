@@ -101,13 +101,12 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
 
 
     return (
-        <ObjectTemplate {...{hash, seq, blockRef, type, onMouseEnterHandler, onMouseLeaveHandler}}>
+        <ObjectTemplate {...{hash, seq, type, isView, blockRef, onMouseEnterHandler, onMouseLeaveHandler}}>
             <div className={[
                 'flex flex-col w-full items-center gap-4 outline-0 break-all',
                 isView || 'p-1',
             ].join(' ')}
                  style={{backgroundColor: isView ? '' : 'rgba(230,230,230,0.2)'}}
-
             >
                 {
                     !isView
@@ -142,14 +141,14 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
                             </Link>
                           </div>
                           <div className={'hidden sm:flex gap-1 items-center'}>
-                            <span className={'pr-2 line-clamp-1'}>
-                                제목: {boardValue.title}
+                            <span className={'pr-2 w-32 line-clamp-1'}>
+                                {boardValue.title}
                             </span>
                             <span className={'px-2 border border-solid border-x-2 border-y-0 border-gray-500'}>
-                                작성자: {boardValue.writer}
+                                {boardValue.writer}
                             </span>
                             <span className={'px-2'}>
-                                수정일 : {moment(boardValue.updatedAt).format('YYYY-MM-DD')}
+                                {moment(boardValue.updatedAt).format('YYYY-MM-DD')}
                             </span>
                           </div>
                         </div>

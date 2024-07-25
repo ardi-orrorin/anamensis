@@ -6,7 +6,7 @@ import {HtmlElements} from "@/app/board/{components}/block/type/Types";
 import {BlockI, BoardI, Category} from "@/app/board/{services}/types";
 import {blockTypeList} from "@/app/board/{components}/block/list";
 import {
-    faDownLeftAndUpRightToCenter, faStar as faStarSolid,
+    faDownLeftAndUpRightToCenter, faEllipsisVertical, faStar as faStarSolid,
     faUpRightAndDownLeftFromCenter
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -32,6 +32,7 @@ import WriterInfo from "@/app/board/[id]/{components}/writerInfo";
 import {useRouter} from "next/navigation";
 import HotKeyInfo from "@/app/board/[id]/{components}/hotKeyInfo";
 import {useBoardHotKey} from "@/app/board/[id]/{hooks}/hotkey";
+import TemplateMenu from "@/app/board/[id]/{components}/templateMenu";
 
 export interface RateInfoI {
     id      : number;
@@ -71,7 +72,7 @@ export default function Page({params}: {params : {id: string}}) {
     const debounce = createDebounce(300);
 
     const shortList = useMemo(()=> (
-        blockTypeList.map(item => ({ command: item.command, code: item.code, notAvailDup : item.notAvailDup}))
+        blockTypeList.map(item => ({ command: item.command, code: item.code, notAvailDup : item.notAvailDup, onTemplate: item.onTemplate}))
     ), []);
 
     const categoryName = useMemo(() =>
@@ -108,6 +109,8 @@ export default function Page({params}: {params : {id: string}}) {
         if(notAvailDupCheck(block?.code, board.data?.content)) {
             return alert('중복 사용할 수 없는 블록입니다.');
         }
+
+        if(isTemplate && !block?.onTemplate) return ;
 
         if(block.notAvailDup) return ;
 
@@ -442,33 +445,36 @@ export default function Page({params}: {params : {id: string}}) {
                         <div className={'flex gap-1'}>
                             {
                                 (isNewBoard || !board.isView)
-                                && <button
-                                    className={[
-                                        'w-16 rounded h-full border-2 py-1 px-3 text-xs duration-300',
-                                        board.data?.isPublic
-                                            ? 'text-blue-600 border-blue-200 hover:bg-blue-200 hover:text-white'
-                                            : 'text-red-600 border-red-200 hover:bg-red-200 hover:text-white'
-                                    ].join(' ')}
-                                    onClick={() => {
-                                        setBoard({...board, data: {...board.data, isPublic: !board.data.isPublic}});
-                                    }}
-                                > { board.data?.isPublic ? '공개' : '비공개' }
-                              </button>
+                                && <>
+                                    <button
+                                      className={[
+                                          'w-16 rounded h-full border-2 py-1 px-3 text-xs duration-300',
+                                          board.data?.isPublic
+                                              ? 'text-blue-600 border-blue-200 hover:bg-blue-200 hover:text-white'
+                                              : 'text-red-600 border-red-200 hover:bg-red-200 hover:text-white'
+                                      ].join(' ')}
+                                      onClick={() => {
+                                          setBoard({...board, data: {...board.data, isPublic: !board.data.isPublic}});
+                                      }}
+                                    > { board.data?.isPublic ? '공개' : '비공개' }
+                                    </button>
+                                    <button className={[
+                                            'w-16 rounded h-full border-2 py-1 px-3 text-xs duration-300 whitespace-pre',
+                                            board.data?.membersOnly
+                                                ? 'text-red-600 border-red-200 hover:bg-red-200 hover:text-white'
+                                                : 'text-blue-600 border-blue-200 hover:bg-blue-200 hover:text-white'
+                                        ].join(' ')}
+                                            onClick={() => {
+                                                setBoard({...board, data: {...board.data, membersOnly: !board.data.membersOnly}});
+                                            }}>
+                                        { board.data?.membersOnly ? '회원\n 전용' : '모두' }
+                                    </button>
+                                </>
                             }
                             {
-                                ( isNewBoard || !board.isView )
-                                && <button
-                                className={[
-                                    'w-16 rounded h-full border-2 py-1 px-3 text-xs duration-300 whitespace-pre',
-                                    board.data?.membersOnly
-                                        ? 'text-red-600 border-red-200 hover:bg-red-200 hover:text-white'
-                                        : 'text-blue-600 border-blue-200 hover:bg-blue-200 hover:text-white'
-                                ].join(' ')}
-                                onClick={() => {
-                                    setBoard({...board, data: {...board.data, membersOnly: !board.data.membersOnly}});
-                                }}
-                              > { board.data?.membersOnly ? '회원\n 전용' : '모두' }
-                              </button>
+                                isNewBoard
+                                && !isTemplate
+                                && <TemplateMenu />
                             }
                             <button
                                 className={'w-14 rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
@@ -517,8 +523,7 @@ export default function Page({params}: {params : {id: string}}) {
                 </div>
                 <div>
                     {
-                        isNewBoard
-                        || isTemplate
+                        (isNewBoard || isTemplate)
                         && <div className={'flex gap-1 justify-end mt-5'}>
                             <button
                               className={'w-full rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}

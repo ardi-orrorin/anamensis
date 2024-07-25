@@ -10,7 +10,7 @@ const Separator = (props: ExpendBlockProps) => {
     } = props;
     return (
         <ObjectTemplate {...{seq, blockRef, isView, type, hash,  onMouseEnterHandler, onMouseLeaveHandler}} >
-            <line className={'w-full h-0.5 my-1 bg-gray-400'} />
+            <div className={'w-full h-0.5 my-1 bg-gray-400'} />
         </ObjectTemplate>
     )
 }

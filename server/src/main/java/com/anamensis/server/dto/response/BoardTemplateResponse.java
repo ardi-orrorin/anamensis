@@ -8,6 +8,7 @@ import lombok.Setter;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 public class BoardTemplateResponse {
@@ -40,7 +41,7 @@ public class BoardTemplateResponse {
         private Boolean isPublic;
         private Boolean membersOnly;
 
-        private LocalDateTime updateAt;
+        private String updateAt;
 
         public static Detail from(BoardTemplate boardTemplate) {
             Detail response = new Detail();
@@ -49,7 +50,7 @@ public class BoardTemplateResponse {
             response.setContent(boardTemplate.getContent().toMap());
             response.setIsPublic(boardTemplate.getIsPublic());
             response.setMembersOnly(boardTemplate.getMembersOnly());
-            response.setUpdateAt(boardTemplate.getUpdateAt());
+            response.setUpdateAt(boardTemplate.getUpdateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             return response;
         }
     }

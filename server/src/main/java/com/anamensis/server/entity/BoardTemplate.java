@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class BoardTemplate {
+public class BoardTemplate{
 
     private long id;
 

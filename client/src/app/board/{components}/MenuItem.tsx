@@ -19,7 +19,7 @@ const MenuItem = ({
 }) => {
     // completed
     const {blockService, setBlockService} = useContext(BlockProvider);
-    const {board, setBoard} = useContext(BoardProvider);
+    const {board, setBoard,isTemplate} = useContext(BoardProvider);
 
     const curCode = useMemo(() => {
         const item = board.data?.content?.list.find(item => item.seq === seq);
@@ -76,6 +76,7 @@ const MenuItem = ({
                 icon, notAvailDup
             } = block;
 
+            if(isTemplate && !block?.onTemplate) return;
             if(notAvailDupCheck(code, board.data?.content)) return;
             if(block.type === 'extra') return;
 
@@ -128,6 +129,9 @@ const MenuItem = ({
                      onClick={onCloseHandler}
                 />
             }
+            <div className={'z-10 fixed w-full h-full'}
+                 onClick={() => setBlockService({...blockService, blockMenu: ''})}
+            ></div>
         </>
     )
 }

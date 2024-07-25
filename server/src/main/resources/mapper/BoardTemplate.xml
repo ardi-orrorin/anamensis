@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.anamensis.server.mapper.BoardTemplateMapper">
-    <select id="findAll" resultType="BoardTemplate">
+    <select id="findAll" resultMap="BoardTemplateEntity">
         SELECT *
           FROM board_template bt
           JOIN (SELECT bt2.id
@@ -14,7 +14,7 @@
             ON bt.id = bt3.id;
     </select>
 
-    <select id="findById" resultType="BoardTemplate">
+    <select id="findById" resultMap="BoardTemplateEntity">
         SELECT *
           FROM board_template bt
          WHERE bt.id     = #{id}
@@ -57,4 +57,9 @@
          WHERE bt.id        = #{id}
            AND bt.member_pk = #{memberPk}
     </update>
+
+    <resultMap id="BoardTemplateEntity" type="BoardTemplate" autoMapping="true">
+        <id property="id" column="id"/>
+        <result property="content" column="content" typeHandler="JsonObjectTypeHandler"/>
+    </resultMap>
 </mapper>

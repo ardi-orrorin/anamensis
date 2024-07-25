@@ -61,8 +61,8 @@ export function updateBoard(params: BoardUpdateProps) : BoardI | BoardTemplate {
                 ...content,
                 list: content.list
             },
-            isPublic,
-            membersOnly,
+            isPublic : isPublic ?? false,
+            membersOnly : membersOnly ?? false,
         } as BoardTemplate;
     }
 

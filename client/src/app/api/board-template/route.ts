@@ -4,23 +4,21 @@ import apiCall from "@/app/{commons}/func/api";
 import {StatusResponse} from "@/app/{commons}/types/commons";
 import {cookies} from "next/headers";
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
+import {TemplateList} from "@/app/board/[id]/{components}/templateMenu";
 
 export async function GET(req: NextRequest) {
-    const id = req.nextUrl.pathname.split('/')[req.nextUrl.pathname.split('/').length - 1];
-
-    const getCookies = (cookies().get('next.access.token') || cookies().get('next.refresh.token'))?.value !== undefined;
-
     try{
-       const data = await apiCall<BoardI>({
-            path: '/public/api/boards/' + id,
+       const data = await apiCall<TemplateList>({
+            path: '/api/board-template',
             method: 'GET',
             call: 'Server',
             setAuthorization: true,
             isReturnData: true,
         });
 
+        console.log(data)
         return ExNextResponse({
-            body: JSON.stringify({...data, isLogin: getCookies}),
+            body: JSON.stringify(data),
             status: 200,
             isRoles: false,
         })
@@ -45,6 +43,8 @@ export async function POST(req: NextRequest) {
         setAuthorization: true,
         isReturnData: true,
     });
+
+    console.log(result)
 
     return ExNextResponse({
         body: JSON.stringify(result),

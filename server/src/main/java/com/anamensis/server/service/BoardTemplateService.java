@@ -5,6 +5,7 @@ import com.anamensis.server.dto.response.BoardTemplateResponse;
 import com.anamensis.server.entity.BoardTemplate;
 import com.anamensis.server.mapper.BoardTemplateMapper;
 import lombok.RequiredArgsConstructor;
+import org.reactivestreams.Publisher;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -35,10 +36,7 @@ public class BoardTemplateService {
             return this.cacheFindAll(memberPk)
                 .doOnNext($ -> redisTemplate.expire(key, boardTemplateExpire.timeout(), boardTemplateExpire.timeUnit()));
         }
-        return Flux.fromIterable(boardTemplateMapper.findAll(memberPk))
-            .map(BoardTemplateResponse.List::from)
-            .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
-            .doOnNext($ -> updateCache(memberPk));
+        return updateCache(memberPk);
     }
 
     public Flux<BoardTemplateResponse.List> cacheFindAll(long memberPk) {
@@ -54,12 +52,16 @@ public class BoardTemplateService {
 
     public Mono<Boolean> save(BoardTemplate boardTemplate) {
         return Mono.fromCallable(() -> boardTemplateMapper.save(boardTemplate) > 0)
-                .onErrorReturn(false);
+                .onErrorReturn(false)
+                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+                .doOnNext($ -> updateCache(boardTemplate.getMemberPk()).subscribe());
     }
 
     public Mono<Boolean> update(BoardTemplate boardTemplate) {
         return Mono.fromCallable(() -> boardTemplateMapper.update(boardTemplate) > 0)
-                .onErrorReturn(false);
+                .onErrorReturn(false)
+                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+                .doOnNext($ -> updateCache(boardTemplate.getMemberPk()).subscribe());
     }
 
     public Mono<Boolean> disable(List<Long> ids, long memberPk) {
@@ -73,12 +75,17 @@ public class BoardTemplateService {
                 .then(Mono.just(count.get() == ids.size()));
     }
 
-    private void updateCache(long memberPk) {
+    private Flux<BoardTemplateResponse.List> updateCache(long memberPk) {
         String key = String.format(BOARD_TEMPLATE_PREFIX, memberPk);
+
         redisTemplate.delete(key);
-        redisTemplate.boundSetOps(key)
-            .add(boardTemplateMapper.findAll(memberPk)
-                , boardTemplateExpire.timeout()
-                , boardTemplateExpire.timeUnit());
+        return Flux.fromIterable(boardTemplateMapper.findAll(memberPk))
+            .map(BoardTemplateResponse.List::from)
+            .doOnNext(list -> {
+                redisTemplate.boundSetOps(key)
+                    .add(list);
+
+                redisTemplate.expire(key, boardTemplateExpire.timeout(), boardTemplateExpire.timeUnit());
+            });
     }
 }

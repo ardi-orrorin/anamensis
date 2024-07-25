@@ -6,7 +6,7 @@ import {cookies} from "next/headers";
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
 import {TemplateList} from "@/app/board/[id]/{components}/templateMenu";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
     try{
        const data = await apiCall<TemplateList>({
             path: '/api/board-template',
@@ -16,7 +16,6 @@ export async function GET(req: NextRequest) {
             isReturnData: true,
         });
 
-        console.log(data)
         return ExNextResponse({
             body: JSON.stringify(data),
             status: 200,
@@ -43,8 +42,6 @@ export async function POST(req: NextRequest) {
         setAuthorization: true,
         isReturnData: true,
     });
-
-    console.log(result)
 
     return ExNextResponse({
         body: JSON.stringify(result),

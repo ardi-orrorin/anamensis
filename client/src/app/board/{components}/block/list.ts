@@ -215,7 +215,7 @@ export const blockTypeList: BlockComponentType[] = [
         notAvailDup       : false,
         onTemplate        : false,
         component         : (props: BlockProps)  =>
-            RefBlock({...props, type: 'object', code: '00205'}),
+            RefBlock({...props, type: 'object', code: '00123'}),
     },
     {
         code              : '00191',
@@ -228,7 +228,7 @@ export const blockTypeList: BlockComponentType[] = [
         notAvailDup       : false,
         onTemplate        : true,
         component         : (props: BlockProps)  =>
-            Separator({...props, type: 'object'}),
+            Separator({...props, type: 'object', skip: true}),
     },
     {
         code              : '00201',

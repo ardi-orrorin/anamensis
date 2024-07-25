@@ -34,19 +34,19 @@ const QuestionBlock = (props: ExpendBlockProps) => {
 
     },[])
 
-    const onChangeHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
 
         if(!onChangeExtraValueHandler) return;
         onChangeExtraValueHandler({...extraValue, [name]: value});
-    },[extraValue]);
+    }
 
 
     const result = useMemo(()=>
         extraValue?.state === 'wait'
             ? <QWait {...{...extraValue, ...{board, myPoint}, onChangeHandler}} />
             : <QCompleted {...{...extraValue,...{comment}, onChangeHandler}}/>
-    ,[extraValue, board.data.title, comment])
+    ,[ board.data, comment, myPoint])
 
     return (
         <div className={'w-full flex flex-col gap-2'}
@@ -74,15 +74,14 @@ const QWait = ({
     onChangeHandler: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
     const dueDate = useMemo(()=> moment(endDate).format('YYYY-MM-DD'),[endDate]);
-    const onChangeDateHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeDateHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         if(moment(e.target.value).isAfter(moment().add(9, 'days'))) {
             return onChangeHandler(e);
         }
-
         alert('최소 10일 이후부터 설정 가능합니다.');
-    },[board.data.title]);
+    }
 
-    const onChangePointHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangePointHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const integerRegex = /^[0-9]+$/;
         if(!integerRegex.test(e.target.value)) return ;
 
@@ -95,7 +94,7 @@ const QWait = ({
             e.target.value = '0';
         }
         onChangeHandler(e);
-    },[board.data.title, point]);
+    }
 
     return (
         <div className={'flex flex-col gap-1 text-sm'}>

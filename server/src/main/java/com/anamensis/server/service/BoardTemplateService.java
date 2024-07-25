@@ -72,7 +72,10 @@ public class BoardTemplateService {
                         count.getAndIncrement();
                     }
                 })
-                .then(Mono.just(count.get() == ids.size()));
+                .last()
+                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+                .doOnNext($ -> updateCache(memberPk).subscribe())
+                .flatMap($ -> Mono.just(count.get() == ids.size()));
     }
 
     private Flux<BoardTemplateResponse.List> updateCache(long memberPk) {

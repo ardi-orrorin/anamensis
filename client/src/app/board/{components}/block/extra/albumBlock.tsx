@@ -182,7 +182,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         } as ImageShowProps);
     },[extraValue, isView, title, membersOnly, isPublic]);
 
-    const deleteImageHandler = useCallback(async (absolutePath: string, index: number) => {
+    const deleteImageHandler = async (absolutePath: string, index: number) => {
         try {
             const res = await apiCall({
                 path: '/api/file/delete/filename',
@@ -221,7 +221,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         } catch (e) {
             console.error(e);
         }
-    },[extraValue, waitUploadFiles, waitRemoveFiles, isView]);
+    }
 
     const componentProps = useMemo(() => ({
         images       : extraValue?.images || [],

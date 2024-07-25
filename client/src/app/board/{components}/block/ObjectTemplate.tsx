@@ -6,6 +6,7 @@ const ObjectTemplate = ({
     hash,
     type,
     isView,
+    skip,
     children,
     blockRef,
     onMouseLeaveHandler,
@@ -14,6 +15,7 @@ const ObjectTemplate = ({
     seq: number;
     hash: string;
     type: string;
+    skip?: boolean;
     isView?: boolean;
     children: React.ReactNode;
     blockRef?: MutableRefObject<HTMLElement[] | null[]>;
@@ -27,6 +29,10 @@ const ObjectTemplate = ({
              onMouseEnter={onMouseEnterHandler}
              onMouseLeave={onMouseLeaveHandler}
              ref={el => {
+                 if(skip) {
+                     blockRef!.current[seq] = el;
+                     return;
+                 }
                  if(!isView || !blockRef?.current) return;
                  blockRef!.current[seq] = el
              }}

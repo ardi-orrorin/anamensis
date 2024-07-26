@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequiredArgsConstructor
 @Transactional
 public class BoardTemplateService {
-    private static final String BOARD_TEMPLATE_PREFIX = "board:%d:template";
+    private static final String BOARD_TEMPLATE_PREFIX = "board:template:member:%s";
     private static final CacheExpire boardTemplateExpire = new CacheExpire(1, TimeUnit.DAYS);
 
     private final BoardTemplateMapper boardTemplateMapper;

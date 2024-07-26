@@ -1,12 +1,13 @@
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
-import {useContext, useEffect, useRef, useState} from "react";
+import {useContext, useRef, useState} from "react";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import useSWR from "swr";
 import apiCall from "@/app/{commons}/func/api";
-import {BlockI, BoardTemplate} from "@/app/board/{services}/types";
+import {BoardTemplate} from "@/app/board/{services}/types";
 import {blockTypeList} from "@/app/board/{components}/block/list";
 import {StatusResponse} from "@/app/{commons}/types/commons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
+import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 
 
 type TemplateMenuOpenProps = {
@@ -26,9 +27,11 @@ const TemplateMenu = () => {
     const [templates, setTemplates] = useState([] as TemplateList[]);
     const [open, setOpen] = useState({} as TemplateMenuOpenProps);
     const ref = useRef<HTMLButtonElement>(null);
+    const [loading, setLoading] = useState(false);
 
-    const { mutate } = useSWR('/api/board-template', () =>
-        apiCall<TemplateList[]>({
+    const { mutate } = useSWR('/api/board-template', async () => {
+        setLoading(true);
+        await apiCall<TemplateList[]>({
             path: '/api/board-template',
             method: 'GET',
             isReturnData: true,
@@ -36,7 +39,14 @@ const TemplateMenu = () => {
         .then((data) => {
             setTemplates(data);
         })
-    );
+        .finally(() => {
+            setLoading(false);
+        })
+    }, {
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
+        revalidateIfStale: false,
+    });
 
 
     const openTemplateMenu = async () => {
@@ -52,6 +62,7 @@ const TemplateMenu = () => {
     }
 
     const onChangeTemplate = async (id: number) => {
+        setLoading(true);
         try{
             const res = await apiCall<BoardTemplate>({
                 path: '/api/board-template/' + id,
@@ -84,24 +95,29 @@ const TemplateMenu = () => {
                     membersOnly: res.membersOnly
                 }
             })
-
         } catch (e) {
             console.log(e)
+        } finally {
+            await mutate();
+            setLoading(false);
         }
     }
 
     const onRemoveTemplate = async (id: number) => {
-        try{
+        setLoading(true);
+        try {
             const res = await apiCall<StatusResponse>({
                 path: '/api/board-template/' + id,
                 method: 'DELETE',
                 isReturnData: true
             })
 
-            res.status === 'success'
+            res.status === 'SUCCESS'
             && await mutate();
         } catch (e) {
             console.log(e)
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -115,8 +131,13 @@ const TemplateMenu = () => {
                     ].join(' ')}
                     ref={ref}
                     onClick={openTemplateMenu}
+                    disabled={loading}
             >
-                TP({templates.length})
+                {
+                    loading
+                    ? <LoadingSpinner size={20} />
+                    : `TP(${templates.length})`
+                }
             </button>
             {
                 open.open
@@ -170,10 +191,10 @@ const Item = ({
                     {name}
                 </span>
             </button>
-            <button className={'w-12 bg-gray-200 rounded'}
+            <button className={'px-4 py-1 bg-gray-200 rounded'}
                     onClick={()=>onRemoveTemplate(id)}
             >
-                X
+                <FontAwesomeIcon icon={faXmark} />
             </button>
         </div>
     )

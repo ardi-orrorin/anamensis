@@ -102,7 +102,7 @@ const Block = (props: BlockProps) => {
         setCommentService({commentMenu: false, screenX: 0, screenY: 0, blockSeq: '', comments: []});
     },[]);
 
-    const openMenuToggle  = useCallback(() => {
+    const openMenuToggle  = () => {
         if(blockService.blockMenu !== 'openMenu' || blockService.block.seq !== seq) {
             setBlockService({...blockService, blockMenu: 'openMenu', block: {seq, code, value, textStyle, hash}});
             return ;
@@ -112,7 +112,7 @@ const Block = (props: BlockProps) => {
                 seq: 0, code: '', value: '', hash: '',
             }
         });
-    },[]);
+    }
 
     const onClickObjectMenu = (type: string) => {
         if(type === 'delete') {

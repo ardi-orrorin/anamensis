@@ -1,8 +1,7 @@
-import {useContext, useRef, useState} from "react";
-import BoardProvider from "@/app/board/{services}/BoardProvider";
-import useSWR from "swr";
+import {useContext, useEffect, useRef, useState} from "react";
+import BoardProvider, {BoardTemplateService} from "@/app/board/{services}/BoardProvider";
 import apiCall from "@/app/{commons}/func/api";
-import {BoardTemplate} from "@/app/board/{services}/types";
+import {BoardTemplate, boardTemplateList} from "@/app/board/{services}/types";
 import {blockTypeList} from "@/app/board/{components}/block/list";
 import {StatusResponse} from "@/app/{commons}/types/commons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -16,42 +15,38 @@ type TemplateMenuOpenProps = {
     open: boolean;
 }
 
-export type TemplateList = {
-    id: number;
-    name: string;
-}
 
 const TemplateMenu = () => {
 
-    const {board, setBoard} = useContext(BoardProvider);
-    const [templates, setTemplates] = useState([] as TemplateList[]);
+    const {board, setBoard, boardTemplate, setBoardTemplate, isTemplate} = useContext(BoardProvider);
     const [open, setOpen] = useState({} as TemplateMenuOpenProps);
     const ref = useRef<HTMLButtonElement>(null);
     const [loading, setLoading] = useState(false);
 
-    const { mutate } = useSWR('/api/board-template', async () => {
-        setLoading(true);
-        await apiCall<TemplateList[]>({
+    useEffect(()=>{
+        getBoardTemplate();
+    },[])
+
+    const getBoardTemplate = async () => {
+        return await apiCall<boardTemplateList[]>({
             path: '/api/board-template',
             method: 'GET',
             isReturnData: true,
         })
         .then((data) => {
-            setTemplates(data);
+            setBoardTemplate({
+                ...boardTemplate,
+                list: data
+            } as BoardTemplateService);
         })
         .finally(() => {
             setLoading(false);
         })
-    }, {
-        revalidateOnFocus: false,
-        revalidateOnReconnect: false,
-        revalidateIfStale: false,
-    });
+    }
 
 
     const openTemplateMenu = async () => {
         if(!ref?.current) return ;
-        await mutate();
         const {left, bottom} = ref.current.getClientRects()[0];
 
         setOpen({
@@ -64,7 +59,11 @@ const TemplateMenu = () => {
     const onChangeTemplate = async (id: number) => {
         setLoading(true);
         try{
-            const res = await apiCall<BoardTemplate>({
+            const exist =
+                boardTemplate.templates.length > 0
+                && boardTemplate.templates.find(item => item.id === id);
+
+            const res = exist || await apiCall<BoardTemplate>({
                 path: '/api/board-template/' + id,
                 method: 'GET',
                 isReturnData: true
@@ -92,13 +91,21 @@ const TemplateMenu = () => {
                         list: reFormList
                     },
                     isPublic: res.isPublic,
-                    membersOnly: res.membersOnly
+                    membersOnly: res.membersOnly,
+                    title: isTemplate ? res.name : board.data.title
                 }
             })
+
+            setBoardTemplate({
+                ...boardTemplate,
+                isApply: true,
+                templateId: id,
+                templates: [...boardTemplate.templates, res]
+            })
+
         } catch (e) {
             console.log(e)
         } finally {
-            await mutate();
             setLoading(false);
         }
     }
@@ -113,7 +120,7 @@ const TemplateMenu = () => {
             })
 
             res.status === 'SUCCESS'
-            && await mutate();
+            && await getBoardTemplate();
         } catch (e) {
             console.log(e)
         } finally {
@@ -125,7 +132,7 @@ const TemplateMenu = () => {
         <>
             <button className={[
                         'min-w-16 rounded h-full border-2 py-1 px-3 flex justify-center items-center text-sm duration-300 whitespace-pre tracking-widest',
-                        templates.length > 0
+                        boardTemplate?.list?.length > 0
                             ? 'text-blue-600 border-blue-200 hover:bg-blue-200 hover:text-white'
                             : 'text-red-600 border-red-200 hover:bg-red-200 hover:text-white'
                     ].join(' ')}
@@ -136,19 +143,19 @@ const TemplateMenu = () => {
                 {
                     loading
                     ? <LoadingSpinner size={20} />
-                    : `TP(${templates.length})`
+                    : `TP(${boardTemplate?.list?.length})`
                 }
             </button>
             {
                 open.open
-                && templates.length > 0
+                && boardTemplate?.list?.length > 0
                 && <>
                     <ul className={'z-20 p-1 fixed flex flex-col gap-1 border border-solid border-gray-300 bg-white shadow-md'}
                            style={{top: open.clientY, left: open.clientX}}
                            onClick={() => setOpen({clientX: 0, clientY: 0, open: false})}
                     >
                         {
-                            templates.sort((a, b) => a.id - b.id)
+                            boardTemplate.list.sort((a, b) => a.id - b.id)
                                 .map((template) => {
                                     return (
                                         <Item key={'template' + template.id}

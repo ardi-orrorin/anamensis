@@ -49,6 +49,7 @@ export default function Page({params}: {params : {id: string}}) {
         , rateInfo, setRateInfo
         , isFavorite, setIsFavorite,
         isNewBoard, isTemplate,
+        boardTemplate, setBoardTemplate,
     } = useContext(BoardProvider);
 
     const {
@@ -155,19 +156,23 @@ export default function Page({params}: {params : {id: string}}) {
 
             const path = '/api' + (
                 isSave ? isNewBoard
-                           ? '/board/new'
-                           : isTemplate
-                           && '/board-template'
-                       : `/board/${params.id}`
+                         ? '/board/new'
+                         : isTemplate
+                         ? '/board-template'
+                         : `/board/${params.id}`
+                       : isTemplate
+                         ? '/board-template/' + boardTemplate.templateId
+                         : `/board/${params.id}`
             );
 
             const result = await apiCall<BoardI, BoardI>({
                 method: isSave ? 'POST': 'PUT',
                 path,
                 body,
+                isReturnData: true
             })
             .then(res => {
-                return res.data;
+                return res
             });
 
             isNewBoard && isSave
@@ -386,7 +391,6 @@ export default function Page({params}: {params : {id: string}}) {
         blockRef
     })
 
-
     if(!board?.data?.content || board.data?.content?.list?.length === 0) {
         return;
     }
@@ -472,8 +476,7 @@ export default function Page({params}: {params : {id: string}}) {
                                 </>
                             }
                             {
-                                isNewBoard
-                                && !isTemplate
+                                (isNewBoard || isTemplate)
                                 && <TemplateMenu />
                             }
                             <button
@@ -524,6 +527,7 @@ export default function Page({params}: {params : {id: string}}) {
                 <div>
                     {
                         (isNewBoard || isTemplate)
+                        && !boardTemplate?.isApply
                         && <div className={'flex gap-1 justify-end mt-5'}>
                             <button
                               className={'w-full rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
@@ -534,7 +538,7 @@ export default function Page({params}: {params : {id: string}}) {
                     }
                     {
                         !isNewBoard
-                        && !isTemplate
+                        && (!isTemplate || boardTemplate.isApply)
                         && !board.isView
                         && <div className={'flex gap-1 justify-end mt-5'}>
                             <button

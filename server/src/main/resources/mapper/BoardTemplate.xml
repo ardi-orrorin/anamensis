@@ -30,25 +30,25 @@
     </insert>
 
     <update id="update">
-        UPDATE board_template bt
+        UPDATE board_template
         <set>
             <if test="name != null and name != ''">
-                bt.name         = #{name},
+                name         = #{name},
             </if>
             <if test="content != null and content != ''">
-                bt.content      = #{content, typeHandler=JsonObjectTypeHandler},
+                content      = #{content, typeHandler=JsonObjectTypeHandler},
             </if>
             <if test="updateAt != null and updateAt != ''">
-                bt.update_at    =  #{updateAt},
+                update_at    = #{updateAt},
             </if>
             <if test="isPublic != null">
-                bt.is_public    =  #{isPublic},
+                is_public    = #{isPublic},
             </if>
             <if test="membersOnly != null">
-                bt.members_only =  #{membersOnly},
+                members_only = #{membersOnly},
             </if>
         </set>
-         WHERE bt.id = #{id}
+         WHERE id = #{id}
     </update>
 
     <update id="disabled">

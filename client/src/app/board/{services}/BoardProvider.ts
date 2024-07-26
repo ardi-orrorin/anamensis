@@ -1,4 +1,4 @@
-import {BoardI, CommentI, DeleteCommentI} from "@/app/board/{services}/types";
+import {BoardI, BoardTemplate, boardTemplateList, CommentI, DeleteCommentI} from "@/app/board/{services}/types";
 import {createContext, Dispatch, SetStateAction} from "react";
 import {RateInfoI} from "@/app/board/[id]/page";
 import {SaveComment} from "@/app/board/[id]/{components}/comment";
@@ -7,6 +7,13 @@ import {BoardSummaryI} from "@/app/user/{services}/userProvider";
 export interface BoardService {
     data: BoardI;
     isView: boolean;
+}
+
+export interface BoardTemplateService {
+    isApply: boolean;
+    templateId: number;
+    list: boardTemplateList[];
+    templates: BoardTemplate[];
 }
 
 export interface BoardProviderI {
@@ -28,6 +35,8 @@ export interface BoardProviderI {
     setIsFavorite: Dispatch<SetStateAction<boolean>>;
     isNewBoard: boolean;
     isTemplate: boolean;
+    boardTemplate: BoardTemplateService;
+    setBoardTemplate: Dispatch<SetStateAction<BoardTemplateService>>
 }
 
 const BoardProvider = createContext<BoardProviderI>({} as BoardProviderI);

@@ -158,7 +158,7 @@ export default function Page({params}: {params : {id: string}}) {
                            ? '/board/new'
                            : isTemplate
                            && '/board-template'
-                       : params.id
+                       : `/board/${params.id}`
             );
 
             const result = await apiCall<BoardI, BoardI>({

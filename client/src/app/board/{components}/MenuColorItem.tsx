@@ -42,7 +42,7 @@ const MenuColorItem = ({
     ,[onClick]);
 
     return (
-        <div className={`absolute flex flex-col justify-left items-center w-20 bg-white duration-300 overflow-y-scroll shadow ${toggle === name ? 'max-h-80' : 'max-h-0'}`}>
+        <div className={`absolute z-30 flex flex-col justify-left items-center w-20 bg-white duration-300 overflow-y-scroll shadow ${toggle === name ? 'max-h-80' : 'max-h-0'}`}>
             { colorSets }
         </div>
     )

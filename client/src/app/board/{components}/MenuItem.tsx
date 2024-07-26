@@ -129,7 +129,7 @@ const MenuItem = ({
                      onClick={onCloseHandler}
                 />
             }
-            <div className={'z-10 fixed w-full h-full'}
+            <div className={'z-[10] fixed w-full h-full'}
                  onClick={() => setBlockService({...blockService, blockMenu: ''})}
             ></div>
         </>

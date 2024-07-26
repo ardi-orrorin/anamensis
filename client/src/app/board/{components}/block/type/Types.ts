@@ -22,6 +22,7 @@ export type BlockProps = {
 
 export type ExpendBlockProps = BlockProps & {
     type: string;
+    skip?: boolean;
 }
 
 export type HtmlElements = HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement | HTMLDataElement;

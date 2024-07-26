@@ -45,11 +45,12 @@ export default function Page({children, params} : {children: ReactNode, params: 
     const [commentLoading, setCommentLoading] = useState<boolean>(false);
 
     const isNewBoard = useMemo(() => !params.id || params.id === 'new',[params.id]);
+    const isTemplate = useMemo(() => !params.id || params.id === 'temp',[params.id]);
 
     const searchParams = useSearchParams();
 
     useEffect(() => {
-        if(!isNewBoard && !board?.isView || board.isView) return;
+        if(!isNewBoard && !board?.isView || !isTemplate && !board?.isView || board.isView) return;
 
         const beforeunload = (e: BeforeUnloadEvent) => {
             e.preventDefault();
@@ -76,10 +77,11 @@ export default function Page({children, params} : {children: ReactNode, params: 
     },[]);
 
     useEffect(() => {
-        if(!isNewBoard) return ;
-        if(!searchParams?.get('categoryPk') || searchParams.get('categoryPk') === 'undefined') {
+        if(!isNewBoard && !isTemplate) return ;
+        if(isNewBoard && !searchParams?.get('categoryPk') || isNewBoard && searchParams.get('categoryPk') === 'undefined') {
             alert('잘못된 접근입니다.');
-            location.href = '/board/';
+            location.href = '/';
+            return;
         }
 
         const categoryPk = Number(searchParams.get('categoryPk') || 0);
@@ -118,7 +120,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
     },[]);
 
     useEffect(() => {
-        if(isNewBoard) return ;
+        if(isNewBoard || isTemplate) return ;
 
         setLoading(true);
 
@@ -130,7 +132,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
     useEffect(()=> {
         if(searchParams.get('categoryPk') !== '3') return;
-        if(!isNewBoard || board?.isView) return ;
+        if(!isNewBoard || board?.isView || isTemplate) return ;
 
         preload(`/api/user/get-point`, async () => {
             return await apiCall({
@@ -220,6 +222,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
                 summary, setSummary,
                 myPoint, setMyPoint,
                 isFavorite, setIsFavorite,
+                isTemplate, isNewBoard,
             }}>
                 <TempFileProvider.Provider value={{
                     waitUploadFiles, setWaitUploadFiles,

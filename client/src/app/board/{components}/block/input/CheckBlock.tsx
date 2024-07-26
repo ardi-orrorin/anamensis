@@ -32,7 +32,7 @@ const CheckBlock = (props: ExpendBlockProps) => {
     }
 
     return (
-        <ObjectTemplate {...{hash, seq, blockRef, type, onMouseEnterHandler, onMouseLeaveHandler}}>
+        <ObjectTemplate {...{hash, seq, type, isView, blockRef, onMouseEnterHandler, onMouseLeaveHandler}}>
             <div className={'flex w-full break-all p-2 gap-2'}
                  style={{backgroundColor: isView ? '' : 'rgba(230,230,230,0.2)'}}
             >
@@ -44,6 +44,10 @@ const CheckBlock = (props: ExpendBlockProps) => {
                              value={''}
                              checked={checked || false}
                              onChange={onCheckChangeHandler}
+                             ref={el => {
+                                 if(!blockRef?.current) return;
+                                 blockRef!.current[seq] = el
+                             }}
                     />
                     : <p className={[
                         'w-auto py-0.5 text-sm outline-0 break-all',

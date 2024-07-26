@@ -10,11 +10,11 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class RateService {
+    private static final String RATE_PREFIX = "board:%d:rate";
+    private static final String USER_BOARD_PREFIX = "user:%d:board:rate";
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    private final String RATE_PREFIX = "board:%d:rate";
-    private final String USER_BOARD_PREFIX = "user:%d:board:rate";
 
     public Mono<Boolean> addRate(long boardPk, long userPk) {
         String rateKey = String.format(RATE_PREFIX, boardPk);

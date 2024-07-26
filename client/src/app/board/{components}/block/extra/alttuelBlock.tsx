@@ -151,7 +151,7 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
         }
     }
 
-    const onChangeHandler = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
         const {name, value} = e.target;
 
@@ -169,7 +169,7 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
 
         if(!onChangeExtraValueHandler) return;
         onChangeExtraValueHandler(newValue);
-    },[board.data.title, extraValue, isView]);
+    }
 
     const addTagHandler = (e:  React.KeyboardEvent<HTMLInputElement>) => {
         if(e.code !== 'Space') return;

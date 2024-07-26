@@ -26,26 +26,28 @@ export type SaveComment = {
 }
 
 const Comment = ({
-    isNewBoard,
     params
 } : {
-    isNewBoard: boolean
-    params: {id: string}
+    params: {id: string};
 }) => {
     const searchParams = useSearchParams();
 
-    const {comment,setComment, board} = useContext(BoardProvider);
+    const {
+        comment,setComment,
+        board, isNewBoard, isTemplate
+    } = useContext(BoardProvider);
     const {newComment, setNewComment} = useContext(BoardProvider);
 
     const [page, setPage] = useState<PageI>({
         page: 1,
         size: 10,
     } as PageI);
+
     const [loading, setLoading] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
 
     preload([`/api/board/comment/${board.data.id}`, searchParams], async () => {
-        if(isNewBoard) return;
+        if(isNewBoard || isTemplate) return;
 
         return await apiCall<PageResponse<CommentI>>({
             path: '/api/board/comment',
@@ -242,6 +244,7 @@ const CommentItem = (props: CommentI & {reload: ()=> Promise<any>}) => {
         }) as BlockI[];
 
         const body = updateBoard({
+            isTemplate: false,
             board: board.data,
             list,
             waitUploadFiles: [],

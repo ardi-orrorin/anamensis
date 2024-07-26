@@ -22,9 +22,6 @@ public class LoginHistoryService {
 
     private final LoginHistoryMapper loginHistoryMapper;
 
-
-
-
     public Mono<Integer> count(long memberPk) {
         return Mono.just(loginHistoryMapper.count(memberPk));
     }

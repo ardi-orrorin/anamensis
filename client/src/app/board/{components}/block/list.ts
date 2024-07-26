@@ -5,7 +5,7 @@ import {
     faHeading,
     faImage,
     faLink,
-    faList,
+    faList, faMinus,
     faPercent,
     faQuoteLeft, faRetweet,
     faVideo
@@ -23,17 +23,19 @@ import QuestionBlock from "@/app/board/{components}/block/extra/questionBlock";
 import YoutubeBlock from "@/app/board/{components}/block/file/youtube";
 import CodeBlock from "@/app/board/{components}/block/input/CodeBlock";
 import RefBlock from "@/app/board/{components}/block/extra/refBlock";
+import Separator from "@/app/board/{components}/block/object/separator";
 
 export type BlockType = {
-    code         : string;
-    tag          : string;
-    command      : string;
-    icon         : IconDefinition;
-    label        : string;
-    comment      : string;
-    notAvailDup  : boolean;
-    type         : 'text' | 'object' | 'extra';
+    code          : string;
+    tag           : string;
+    command       : string;
+    icon          : IconDefinition;
+    label         : string;
+    comment       : string;
+    notAvailDup   : boolean;
+    type          : 'text' | 'object' | 'extra';
     shortcut?     : string;
+    onTemplate    : boolean;
 }
 
 export type BlockComponentType = BlockType & {
@@ -50,6 +52,7 @@ export const blockTypeList: BlockComponentType[] = [
         command           : '/h1',
         type              : 'text',
         notAvailDup       : false,
+        onTemplate        : true,
         shortcut          : 'mod+1',
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '2.4rem',
@@ -68,6 +71,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '세션 부제목',
         type              : 'text',
         notAvailDup       : false,
+        onTemplate        : true,
         shortcut          : 'mod+2',
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '1.8rem',
@@ -85,6 +89,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '세션 본문 제목',
         type              : 'text',
         notAvailDup       : false,
+        onTemplate        : true,
         shortcut          : 'mod+3',
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '1.2rem',
@@ -103,6 +108,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '세션 본문 내용',
         type              : 'text',
         notAvailDup       : false,
+        onTemplate        : true,
         shortcut          : 'mod+4',
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '1rem',
@@ -119,6 +125,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '세션 본문 작은 내용',
         type              : 'text',
         notAvailDup       : false,
+        onTemplate        : true,
         shortcut          : 'mod+5',
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '0.8rem',
@@ -135,6 +142,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '인용',
         type              : 'text',
         notAvailDup       : false,
+        onTemplate        : true,
         shortcut          : 'mod+6',
         component         : (props: BlockProps)  => InputBlock(props, {
             fontSize      : '1rem',
@@ -153,6 +161,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '링크',
         type              : 'object',
         notAvailDup       : false,
+        onTemplate        : true,
         component         : (props: BlockProps)  =>
             LinkBlock({...props, type: 'object'}),
     },
@@ -165,6 +174,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '할일',
         type              : 'object',
         notAvailDup       : false,
+        onTemplate        : true,
         component         : (props: BlockProps)  =>
             CheckBlock({...props, type: 'object'}),
     },
@@ -177,6 +187,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '코드',
         type              : 'object',
         notAvailDup       : false,
+        onTemplate        : false,
         component         : (props: BlockProps)  =>
             CodeBlock({...props, type: 'object'}),
     },
@@ -189,6 +200,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '유튜브',
         type              : 'object',
         notAvailDup       : false,
+        onTemplate        : false,
         component         : (props: BlockProps)  =>
             YoutubeBlock({...props, type: 'object'}),
     },
@@ -201,8 +213,22 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '블록참조',
         type              : 'object',
         notAvailDup       : false,
+        onTemplate        : false,
         component         : (props: BlockProps)  =>
-            RefBlock({...props, type: 'object', code: '00205'}),
+            RefBlock({...props, type: 'object', code: '00123'}),
+    },
+    {
+        code              : '00191',
+        tag               : 'separator',
+        command           : '/sep',
+        label             : 'Separator',
+        icon              : faMinus,
+        comment           : '구분선',
+        type              : 'object',
+        notAvailDup       : false,
+        onTemplate        : true,
+        component         : (props: BlockProps)  =>
+            Separator({...props, type: 'object', skip: true}),
     },
     {
         code              : '00201',
@@ -213,6 +239,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '이미지',
         type              : 'object',
         notAvailDup       : false,
+        onTemplate        : false,
         component         : (props: BlockProps)  =>
             FileBlock({
                 ...props,
@@ -243,6 +270,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '판매정보',
         type              : 'extra',
         notAvailDup       : true,
+        onTemplate        : false,
         component         : (props: BlockProps)  =>
             AlttuelBlock({...props, type: 'extra'}),
     },
@@ -255,6 +283,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : '앨범',
         type              : 'extra',
         notAvailDup       : true,
+        onTemplate        : false,
         component         : (props: BlockProps)  =>
             AlbumBlock({...props, type: 'extra'}),
     },
@@ -267,6 +296,7 @@ export const blockTypeList: BlockComponentType[] = [
         comment           : 'Q/A',
         type              : 'extra',
         notAvailDup       : true,
+        onTemplate        : false,
         component         : (props: BlockProps)  =>
             QuestionBlock({...props, type: 'extra'}),
     },

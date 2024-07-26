@@ -14,6 +14,7 @@ export type RowProps = {
     inputCheck  : (eleId: CheckType) => string;
     disabled?   : boolean;
     description?: string;
+    autoFocus?  : boolean;
 }
 
 const Row = (props:RowProps) => {
@@ -22,7 +23,7 @@ const Row = (props:RowProps) => {
         name, value,
         disabled, description,
         inputCheck, check,
-        setProps
+        setProps, autoFocus
     }: RowProps = props
 
     const [isFocus, setIsFocus] = useState<boolean>(false);
@@ -38,6 +39,7 @@ const Row = (props:RowProps) => {
                    disabled={disabled}
                    onFocus={() => setIsFocus(true)}
                    onBlur={() => setIsFocus(false)}
+                   autoFocus={autoFocus}
             />
             {
                 check[name] !== 'uncheck'

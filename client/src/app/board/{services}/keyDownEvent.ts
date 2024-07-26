@@ -136,9 +136,12 @@ const arrowUp = (args: KeyEventType) => {
 
     if(!prevRef) return;
 
-    const prevPosition = curRef.selectionStart! > prevRef.value.length ? prevRef.value.length : curRef.selectionStart;
-    prevRef.setSelectionRange(prevPosition, prevPosition);
-    prevRef.focus();
+    const prevPosition = curRef?.selectionStart! > prevRef?.value?.length ? prevRef?.value?.length : curRef?.selectionStart;
+
+    if(!prevRef?.setSelectionRange || !prevRef?.focus) return;
+
+    prevRef?.setSelectionRange(prevPosition, prevPosition);
+    prevRef?.focus();
 }
 
 const arrowDown = (args: any) => {
@@ -152,6 +155,8 @@ const arrowDown = (args: any) => {
         ? seq + 2 < board.data.content.list.length && blockRef.current[seq + 2] as HTMLInputElement
         : blockRef.current[seq + 1] as HTMLInputElement;
 
+    console.log(blockRef.current)
+    console.log(nextRef)
 
 
     if(!nextRef) return;

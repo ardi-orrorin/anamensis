@@ -1,7 +1,7 @@
 package com.anamensis.server.provider;
 
-import com.anamensis.server.entity.AuthType;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ClaimsBuilder;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -28,13 +28,13 @@ public class TokenProvider {
         SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
         long exp = isRefresh ? REFRESH_EXP : ACCESS_EXP;
         String type = isRefresh ? "refresh" : "access";
-        Claims claims = Jwts.claims();
-        claims.put("user", userId);
-        claims.put("type", type);
+        ClaimsBuilder claims = Jwts.claims();
+        claims.add("user", userId);
+        claims.add("type", type);
 
         return Jwts.builder()
-            .setClaims(claims)
-            .setExpiration(
+            .claims(claims.build())
+            .expiration(
                 new Timestamp(Instant.now().toEpochMilli() + exp)
             )
             .signWith(SECRET_KEY)
@@ -43,10 +43,10 @@ public class TokenProvider {
 
     public Claims getClaims(String token){
         SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
-        JwtParser jwts =  Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
+        JwtParser jwts =  Jwts.parser()
+                .verifyWith(SECRET_KEY)
                 .build();
-        return jwts.parseClaimsJws(token)
-                .getBody();
+        return jwts.parseSignedClaims(token)
+                .getPayload();
     }
 }

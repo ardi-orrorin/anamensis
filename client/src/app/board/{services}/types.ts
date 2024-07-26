@@ -34,8 +34,14 @@ export interface BoardI {
     writerCreatedAt : string;
 }
 
-
-
+export interface BoardTemplate {
+    id?         : number;
+    name        : string;
+    content     : BoardContentI;
+    updatedAt   : string;
+    isPublic    : boolean;
+    membersOnly : boolean;
+}
 
 export interface BoardContentI {
     list          : BlockI[];

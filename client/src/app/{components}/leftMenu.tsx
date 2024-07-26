@@ -99,12 +99,12 @@ const LeftMenu = ({
                             roles.length > 0
                             && <button className={'flex py-2 px-5 w-full justify-between items-center text-xs text-amber-600 hover:bg-amber-50 duration-500 outline-0'}
                                        onClick={() => onChangeParamsHandler({type: 'isFavorite', value: true})}
-                          >
+                            >
                                 <span>
                                      즐겨 찾기
                                 </span>
-                            <HotKeybtn hotkey={['9']} />
-                          </button>
+                                <HotKeybtn hotkey={['9']} />
+                            </button>
                         }
                     </div>
                     <div className={'w-auto text-sm'}>
@@ -122,6 +122,14 @@ const LeftMenu = ({
                       </div>
                       <div className={'w-full flex flex-col items-center text-xs'}>
                           { categoryList }
+                          <Link href={'/board/temp'}
+                                className={'py-2 px-5 w-full items-center gap-1 hover:bg-gray-100 duration-300'}
+                          >
+                              <div className={'flex justify-between items-center b'}>
+                                 <span> 새 템플릿 </span>
+                                 <HotKeybtn hotkey={['SHIFT','0']} />
+                              </div>
+                          </Link>
                       </div>
                   </div>
                 }

@@ -35,7 +35,7 @@ const MenuFontsizeItem = ({
     ,[fontSize])
 
     return (
-        <div className={`absolute flex flex-col justify-left gap-1 items-start max-w-96 bg-white duration-300 overflow-x-hidden overflow-y-scroll shadow ${toggle === 'fontSize' ? 'max-h-72' : 'max-h-0'}`}>
+        <div className={`absolute z-30 flex flex-col justify-left gap-1 items-start max-w-96 bg-white duration-300 overflow-x-hidden overflow-y-scroll shadow ${toggle === 'fontSize' ? 'max-h-72' : 'max-h-0'}`}>
             { fontSizes }
         </div>
     )

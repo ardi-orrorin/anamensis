@@ -1,14 +1,12 @@
-import {NextRequest, NextResponse} from "next/server";
-import {BoardI, BoardTemplate} from "@/app/board/{services}/types";
+import {NextRequest} from "next/server";
+import {BoardTemplate, boardTemplateList} from "@/app/board/{services}/types";
 import apiCall from "@/app/{commons}/func/api";
 import {StatusResponse} from "@/app/{commons}/types/commons";
-import {cookies} from "next/headers";
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
-import {TemplateList} from "@/app/board/[id]/{components}/templateMenu";
 
 export async function GET() {
     try{
-       const data = await apiCall<TemplateList>({
+       const data = await apiCall<boardTemplateList[]>({
             path: '/api/board-template',
             method: 'GET',
             call: 'Server',

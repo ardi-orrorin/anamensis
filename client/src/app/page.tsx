@@ -44,6 +44,7 @@ export default function Page() {
     } as BoardListParamsI);
 
     const [noticeList, setNoticeList] = useState<NoticeType[]>([]);
+    const isLogin = useMemo(()=> roles.length > 0, [roles]);
 
     const moreRef = React.useRef<HTMLDivElement>(null);
     const searchRef = useRef<HTMLInputElement>(null);
@@ -165,7 +166,7 @@ export default function Page() {
     const dataComponent = useMemo(() => data.map((item, index) => {
         if(!item) return;
         return (
-            <BoardComponent key={'boardsummary' + index} {...{...item, favorites}} />
+            <BoardComponent key={'boardsummary' + index} {...{...item, favorites, isLogin}} />
         )
     }),[data, favorites]);
 

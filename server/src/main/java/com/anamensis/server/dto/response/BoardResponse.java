@@ -78,7 +78,14 @@ public class BoardResponse implements Serializable {
         }
 
         @SneakyThrows
-        public static List from(BoardResultMap.List board) {
+        public static List from(BoardResultMap.List board, Member member) {
+
+            java.util.List<Object> body =
+                board.getBoard().isMembersOnly()
+                    ? member.getId() > 0
+                        ? board.getBoard().getContent().getJSONArray("list").toList()
+                        : java.util.List.of()
+                    : board.getBoard().getContent().getJSONArray("list").toList();
 
             List.ListBuilder builder = List.builder()
                     .id(board.getBoard().getId())
@@ -93,7 +100,7 @@ public class BoardResponse implements Serializable {
                     .isPublic(board.getBoard().getIsPublic())
                     .membersOnly(board.getBoard().isMembersOnly())
                     .profileImage(board.getProfile())
-                    .body(board.getBoard().getContent().getJSONArray("list").toList());
+                    .body(body);
 
             return builder.build();
         }

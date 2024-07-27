@@ -3,11 +3,6 @@ import {ImageShowProps} from "@/app/board/{components}/block/extra/albumBlock";
 import HeaderComponent from "@/app/{components}/headerComponent";
 import {defaultNoImg} from "@/app/{commons}/func/image";
 import FooterComponent from "@/app/{components}/footerComponent";
-import {useEffect, useMemo, useState} from "react";
-import {BlockI} from "@/app/board/{services}/types";
-import {
-    LeftRightDialogHeader
-} from "next/dist/client/components/react-dev-overlay/internal/components/LeftRightDialogHeader";
 
 const AlbumBoardComponent = (props: BoardListI) => {
     const { body } = props;

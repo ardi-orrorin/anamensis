@@ -52,7 +52,7 @@ public class BoardService {
 
         return Flux.fromIterable(list)
             .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
-            .map(BoardResponse.List::from);
+            .map(l -> BoardResponse.List.from(l, member));
     }
 
     public Flux<BoardResponse.List> findOnePage() {

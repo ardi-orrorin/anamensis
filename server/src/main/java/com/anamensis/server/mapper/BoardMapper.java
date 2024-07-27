@@ -35,6 +35,7 @@ public interface BoardMapper {
         @Param("page") Page page
     );
 
+
     List<BoardResultMap.Notice> findNotice();
 
     long count(Board board);

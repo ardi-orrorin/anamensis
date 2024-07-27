@@ -8,6 +8,7 @@ export interface LoginI {
     verify?: boolean;
     authType?: AuthType;
     code?: number;
+    oauth2?: boolean;
 }
 
 export interface LoginProviderI {

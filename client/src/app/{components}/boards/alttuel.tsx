@@ -35,6 +35,7 @@ const AlttuelBoardComponent = (props: BoardListI) => {
                        width={80}
                        height={80}
                        alt={''}
+                       priority={true}
                        onError={e => {
                            (e.target as HTMLImageElement).src = process.env.NEXT_PUBLIC_CDN_SERVER + '/noimage.jpg'
                        }}

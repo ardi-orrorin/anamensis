@@ -12,6 +12,7 @@ import com.anamensis.server.service.*;
 import jakarta.validation.Valid;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,6 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("api/user")
+@Slf4j
 public class UserController {
 
     private final UserService userService;
@@ -76,6 +78,8 @@ public class UserController {
     public Mono<UserResponse.Auth> login(
             @RequestBody UserRequest.Login user
     ) {
+
+        log.info("login: {}", user);
 
         Mono<Member> member = userService.findUserByUserId(user.getUsername(), user.getPassword())
                 .subscribeOn(Schedulers.boundedElastic())
@@ -132,6 +136,37 @@ public class UserController {
         } else if(AuthType.EMAIL.equals(user.getAuthType().toUpperCase())) {
             return emailLogin(user.getCode().toString(), member, token);
         }
+        return notAuth(member, token);
+    }
+
+
+    @PublicAPI
+    @PostMapping("oauth")
+    public Mono<UserResponse.Login> oauth2Login(
+        @RequestBody UserRequest.OauthLogin user,
+        Device device
+    ) {
+        Mono<MemberResultMap> member = userService.findOauthUser(user)
+            .subscribeOn(Schedulers.boundedElastic())
+            .share();
+
+        Mono<Token> token = member.flatMap(u -> generateToken(u.getMember().getUserId()))
+            .subscribeOn(Schedulers.boundedElastic());
+
+        member.flatMap(u -> loginHistoryService.save(device, u.getMember()))
+            .subscribeOn(Schedulers.boundedElastic())
+            .subscribe();
+
+        member.flatMap(u ->
+                loginHistoryService.confirmedLogin(u.getMember(), device)
+                    .flatMap(b -> {
+                        if(b) return Mono.just(true);
+                        return userService.unConfirmLogin(u.getMember(), device);
+                    })
+            )
+            .subscribeOn(Schedulers.boundedElastic())
+            .subscribe();
+
         return notAuth(member, token);
     }
 

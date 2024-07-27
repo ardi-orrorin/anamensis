@@ -142,6 +142,7 @@ public class LogHistoryFilter implements WebFilter {
         String query = ex.getRequest().getQueryParams().toString();
         String URI = ex.getRequest().getURI().toString();
 
+
         return ex.getPrincipal()
                 .flatMap(principal -> userService.findUserByUserId(principal.getName()))
                 .zipWith(ex.getSession())
@@ -162,7 +163,6 @@ public class LogHistoryFilter implements WebFilter {
                 )
                 .flatMap(logHistoryService::save)
                 .then(Mono.just(ex));
-
     }
 
     private ServerWebExchange newRequest(byte[] bytes, ServerWebExchange ex) {

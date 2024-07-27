@@ -45,25 +45,52 @@
 
     <select id="findMemberByUserId" resultType="Member">
         <include refid="tbl_member"/>
-        WHERE user_id = #{userId}
+        WHERE user_id  = #{userId}
+          AND is_use   = 1
+          AND is_oauth = 0
     </select>
+
+    <select id="findOAuthMember" resultType="Member">
+        <include refid="tbl_member"/>
+        WHERE user_id  = #{userId}
+          AND is_use   = 1
+          AND is_oauth = 1
+    </select>
+
     <select id="findMemberByUserIdAndPwd" resultType="Member">
         <include refid="tbl_member"/>
-        WHERE user_id = #{userId}
-          AND pwd     = #{pwd}
+        WHERE user_id  = #{userId}
+          AND pwd      = #{pwd}
+          AND is_use   = 1
+          AND is_oauth = 0
     </select>
+
     <select id="findMemberInfo" resultMap="memberResultMap">
         SELECT *
           FROM member a
           JOIN role b
-            ON a.id      = b.member_pk
-         WHERE a.user_id = #{userId}
+            ON a.id       = b.member_pk
+         WHERE a.user_id  = #{userId}
+           AND a.is_use   = 1
+           AND a.is_oauth = 0
     </select>
+
+    <select id="findOAuthMemberInfo" resultMap="memberResultMap">
+        SELECT *
+          FROM member a
+          JOIN role b
+               ON a.id    = b.member_pk
+         WHERE a.user_id  = #{userId}
+           AND a.is_use   = 1
+           AND a.is_oauth = 1
+    </select>
+
     <select id="existsMember" resultType="boolean">
         SELECT EXISTS(
                SELECT *
                  FROM member
                 WHERE 1 = 1
+                  AND is_oauth = 0
              <choose>
                 <when test="type != null and type == 'id' and value != null and value != ''">
                     AND user_id = #{value}
@@ -90,9 +117,9 @@
             SELECT LAST_INSERT_ID()
         </selectKey>
         INSERT INTO member (user_id, pwd, name,
-                            email, phone, create_at)
+                            email, phone, create_at, is_oauth)
         VALUES (#{userId}, #{pwd}, #{name},
-                #{email}, #{phone}, #{createAt})
+                #{email}, #{phone}, #{createAt}, #{isOAuth})
     </insert>
     <insert id="saveRole" parameterType="Role">
         INSERT INTO role (member_pk, role)

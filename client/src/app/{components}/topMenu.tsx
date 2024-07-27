@@ -2,7 +2,6 @@ import {Category} from "@/app/board/{services}/types";
 import {useCallback, useContext, useMemo} from "react";
 import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
 
-
 const TopMenu = () => {
     const {
         searchParams, setSearchParams,
@@ -14,7 +13,6 @@ const TopMenu = () => {
 
     const CategoryComponent = useMemo(()=>
         Category.list.map((item, index) => {
-
             return (
                 <button key={'category-write' + index}
                         className={[

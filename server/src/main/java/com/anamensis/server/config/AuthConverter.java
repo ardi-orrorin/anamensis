@@ -5,6 +5,7 @@ import com.anamensis.server.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class AuthConverter implements ServerAuthenticationConverter {
 
     private final TokenProvider tokenProvider;
@@ -42,6 +44,8 @@ public class AuthConverter implements ServerAuthenticationConverter {
             exchange.getResponse().addCookie(cookie);
         }
 
+
+        log.info("userId: {}", userId);
         return userService.findByUsername(userId)
                 .onErrorMap(e -> new RuntimeException("유저 정보가 없습니다."))
                 .map(u -> new UsernamePasswordAuthenticationToken(u, token, u.getAuthorities()));

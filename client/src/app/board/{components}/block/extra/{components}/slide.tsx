@@ -6,6 +6,7 @@ import {defaultNoImg} from "@/app/{commons}/func/image";
 import DeleteOverlay from "@/app/board/{components}/block/extra/{components}/deleteOverlay";
 import DefaultLabel from "@/app/board/{components}/block/extra/{components}/defaultLabel";
 import {NO_IMAGE} from "@/app/{services}/constants";
+import Image from "next/image";
 
 const Slide = ({
     images,
@@ -88,22 +89,25 @@ const Slide = ({
                      className={'relative flex duration-500'}
                      style={{width: slideWidth}}
                 >
-                    <img className={[
+                    <Image className={[
                         `min-w-[${slideWidth}px] w-[${slideWidth}px] max-w-[${slideWidth}px] min-h-[${slideWidth}px] h-[${slideWidth}px] max-h-[${slideWidth}px] object-cover border-solid`,
                         index === selectedIndex ? 'border-4 border-blue-400' : 'border border-white'
                     ].join(' ')}
-                         src={defaultNoImg(image.replace(/(\.[^.]+)$/, '_thumb$1'))}
-                         alt={'slide'}
-                         onError={(e) => {
-                             e.currentTarget.src = NO_IMAGE;
-                         }}
-                         onClick={() => {
-                             setSelectedIndex(index);
-                         }}
-                         onMouseEnter={(e) => {
-                             e?.currentTarget?.parentElement?.children[1]
-                                 ?.classList.replace('hidden', 'flex');
-                         }}
+                           src={defaultNoImg(image.replace(/(\.[^.]+)$/, '_thumb$1'))}
+                           alt={'slide'}
+                           width={500}
+                           height={500}
+                              priority={true}
+                            onError={(e) => {
+                                e.currentTarget.src = NO_IMAGE;
+                            }}
+                            onClick={() => {
+                                setSelectedIndex(index);
+                            }}
+                            onMouseEnter={(e) => {
+                                e?.currentTarget?.parentElement?.children[1]
+                                    ?.classList.replace('hidden', 'flex');
+                            }}
                     />
                     {
                         !isView && <DeleteOverlay {...{index, image, deleteImageHandler, setAlbumToggle, onChaneDefaultIndexHandler}} />
@@ -125,12 +129,15 @@ const Slide = ({
                     <FontAwesomeIcon icon={faChevronLeft} />
                 </button>
 
-                <img className={'w-full h-[600px] sm:h-[800px] rounded-xl object-cover sm:object-contain'}
-                     src={process.env.NEXT_PUBLIC_CDN_SERVER + images[selectedIndex]} alt={''}
-                     onClick={onImageClick}
-                     onError={(e) => {
-                         e.currentTarget.src = NO_IMAGE;
-                     }}
+                <Image className={'w-full h-[600px] sm:h-[800px] rounded-xl object-cover sm:object-contain'}
+                       src={process.env.NEXT_PUBLIC_CDN_SERVER + images[selectedIndex]} alt={''}
+                       width={200}
+                       height={200}
+                       priority={true}
+                       onClick={onImageClick}
+                       onError={(e) => {
+                           e.currentTarget.src = NO_IMAGE;
+                       }}
                 />
                 <button className={'absolute right-5 z-10 w-10 h-10 bg-white rounded border border-solid border-gray-200'}
                         onClick={()=>imageShow(false)}

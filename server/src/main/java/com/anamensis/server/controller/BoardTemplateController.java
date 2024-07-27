@@ -56,11 +56,13 @@ public class BoardTemplateController {
             );
     }
 
-    @PutMapping("")
+    @PutMapping("/{id}")
     public Mono<StatusResponse> update(
+        @PathVariable long id,
         @RequestBody BoardTemplateRequest.Save body,
         @AuthenticationPrincipal UserDetails user
     ) {
+        body.setId(id);
         return us.findUserByUserId(user.getUsername())
             .flatMap(u -> bts.update(BoardTemplateRequest.Save.toEntity(body, u.getId())))
             .flatMap(b -> Mono.just(

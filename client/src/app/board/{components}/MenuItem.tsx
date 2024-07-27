@@ -4,7 +4,7 @@ import React, {MutableRefObject, useCallback, useContext, useMemo} from "react";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
 import {ToggleEnum} from "@/app/board/{components}/SubTextMenu";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
-import {notAvailDupCheck} from "@/app/board/{services}/funcs";
+import {notAvailDupCheck, onChangeBlockGlobalHandler} from "@/app/board/{services}/funcs";
 
 const MenuItem = ({
     seq,
@@ -17,7 +17,6 @@ const MenuItem = ({
     toggle?  : ToggleEnum,
     subMenu? : boolean,
 }) => {
-    // completed
     const {blockService, setBlockService} = useContext(BlockProvider);
     const {board, setBoard,isTemplate} = useContext(BoardProvider);
 
@@ -34,21 +33,13 @@ const MenuItem = ({
     const openMenuClick = (code: string) => {
         if(!code || code === '') return ;
 
-        if(notAvailDupCheck(code, board.data?.content)) {
-            alert('중복 사용할 수 없는 블록입니다.');
-            return;
-        }
-
-        const newList = board.data?.content?.list.map((item, index) => {
-            if (item.seq === seq) {
-                if(item.code.slice(0, 3) !== code.slice(0, 3)) {
-                    item.value = '';
-                    item.extraValue = {};
-                    item.textStyle = {};
-                }
-                item.code = code;
-            }
-            return item;
+        onChangeBlockGlobalHandler({
+            seq,
+            code,
+            board,
+            setBoard,
+            blockRef,
+            isTemplate,
         });
 
         setBlockService({
@@ -59,13 +50,7 @@ const MenuItem = ({
                 code  : '',
                 value : '',
                 hash  : '',
-            }});
-
-        setBoard({...board, data: {...board.data, content: {list: newList}}});
-
-        setTimeout(() => {
-            blockRef?.current[seq]?.focus();
-        },100);
+        }});
     };
 
     const blockMenu = useMemo(() =>

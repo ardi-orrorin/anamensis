@@ -33,6 +33,27 @@ export async function GET(req: NextRequest) {
     }
 }
 
+export async function PUT(req:NextRequest) {
+    const body: BoardTemplate = await req.json();
+
+    const id = req.nextUrl.pathname.split('/')[req.nextUrl.pathname.split('/').length - 1];
+
+    const result = await apiCall<StatusResponse, BoardTemplate>({
+        path: '/api/board-template/' + id,
+        method: 'PUT',
+        call: 'Server',
+        body,
+        setAuthorization: true,
+        isReturnData: true,
+    });
+
+    return ExNextResponse({
+        body: JSON.stringify(result),
+        status: 200,
+        isRoles: false,
+    });
+}
+
 export async function DELETE(req: NextRequest) {
 
     const id = req.nextUrl.pathname.split('/')[req.nextUrl.pathname.split('/').length - 1];

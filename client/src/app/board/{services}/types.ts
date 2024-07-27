@@ -43,6 +43,11 @@ export interface BoardTemplate {
     membersOnly : boolean;
 }
 
+export interface boardTemplateList {
+    id : number;
+    name: string;
+}
+
 export interface BoardContentI {
     list          : BlockI[];
     [key: string] : string | number | boolean | BlockI[];

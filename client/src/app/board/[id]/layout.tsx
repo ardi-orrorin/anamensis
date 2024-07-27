@@ -1,6 +1,6 @@
 'use client';
 import {ReactNode, useCallback, useEffect, useMemo, useState} from "react";
-import BoardProvider, {BoardService} from "@/app/board/{services}/BoardProvider";
+import BoardProvider, {BoardService, BoardTemplateService} from "@/app/board/{services}/BoardProvider";
 import BlockProvider, {BlockService, CommentService} from "@/app/board/{services}/BlockProvider";
 import {BlockI, BoardI, CommentI, DeleteCommentI} from "@/app/board/{services}/types";
 import {SaveComment} from "@/app/board/[id]/{components}/comment";
@@ -40,6 +40,13 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
     const [waitUploadFiles, setWaitUploadFiles] = useState<TempFileI[]>([]);
     const [waitRemoveFiles, setWaitRemoveFiles] = useState<TempFileI[]>([]);
+
+    const [boardTemplate, setBoardTemplate] = useState<BoardTemplateService>({
+        isApply: false,
+        templateId: 0,
+        list: [],
+        templates: []
+    });
 
     const [loading, setLoading] = useState<boolean>(false);
     const [commentLoading, setCommentLoading] = useState<boolean>(false);
@@ -223,6 +230,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
                 myPoint, setMyPoint,
                 isFavorite, setIsFavorite,
                 isTemplate, isNewBoard,
+                boardTemplate, setBoardTemplate
             }}>
                 <TempFileProvider.Provider value={{
                     waitUploadFiles, setWaitUploadFiles,

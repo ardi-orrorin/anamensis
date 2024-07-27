@@ -8,7 +8,7 @@ export type KeyEventType = {
     setBoard?: Dispatch<SetStateAction<BoardService>>;
     blockRef?: MutableRefObject<HTMLElement[] |null[]>;
     event?: React.KeyboardEvent<HTMLElement>;
-    addBlock?: (seq: number, init: boolean, value?: string) => BlockI;
+    addBlock?: (seq: number, init: boolean, value?: string, cusSeq?: boolean) => BlockI;
     addBlockHandler?: (seq: number, value?: string) => void;
 }
 
@@ -78,7 +78,7 @@ const backspace = (args: KeyEventType) => {
     if(seq === initSeq && initBlockRef.value === '') {
         const newList = list.map((item, index) => {
             if (item.seq !== initSeq) return item;
-            return addBlock(initSeq, true);
+            return addBlock(initSeq, true, '', true);
         });
 
         setBoard({...board, data: {...board.data, content: {list: newList}}});
@@ -87,7 +87,7 @@ const backspace = (args: KeyEventType) => {
     if(seq === initSeq) {
         setTimeout(() => {
             blockRef.current[initSeq]?.focus();
-        },0);
+        },100);
         return;
     }
 
@@ -114,6 +114,7 @@ const backspace = (args: KeyEventType) => {
     setBoard({...board, data: {...board.data, content: {list: newList}}});
 
     setTimeout(() => {
+        if(blockRef?.current[seq - 1]?.ariaRoleDescription === 'object') return;
         const prevRef = blockRef.current[seq - 1] as HTMLInputElement;
         const position = prevRef.value.length - afterText.length;
         prevRef.setSelectionRange(position, position);
@@ -154,10 +155,6 @@ const arrowDown = (args: any) => {
     const nextRef = blockRef.current[seq + 1]?.ariaRoleDescription === 'object'
         ? seq + 2 < board.data.content.list.length && blockRef.current[seq + 2] as HTMLInputElement
         : blockRef.current[seq + 1] as HTMLInputElement;
-
-    console.log(blockRef.current)
-    console.log(nextRef)
-
 
     if(!nextRef) return;
 

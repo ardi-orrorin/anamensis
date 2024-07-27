@@ -28,6 +28,15 @@ public class UserRequest {
 
     @Getter
     @Setter
+    public static class OauthLogin {
+        private String userId;
+        private String name;
+        private String email;
+        private String provider;
+    }
+
+    @Getter
+    @Setter
     @ToString
     public static class Register {
         @NotNull(message = "User ID is required")

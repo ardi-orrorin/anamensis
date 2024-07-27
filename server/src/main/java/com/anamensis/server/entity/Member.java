@@ -38,4 +38,6 @@ public class Member implements Serializable {
     private Boolean sAuth;
 
     private AuthType sAuthType;
+
+    private boolean isOAuth;
 }

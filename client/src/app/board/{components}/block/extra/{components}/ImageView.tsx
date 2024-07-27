@@ -5,6 +5,7 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {faChevronLeft, faChevronRight} from "@fortawesome/free-solid-svg-icons";
 import {defaultNoImg} from "@/app/{commons}/func/image";
 import {NO_IMAGE} from "@/app/{services}/constants";
+import Image from "next/image";
 
 const ImageView = ({
     images,
@@ -64,12 +65,15 @@ const ImageView = ({
                 >
                     <FontAwesomeIcon icon={faXmark} />
                 </button>
-                <img src={defaultNoImg(albumToggle.viewImage)}
-                     className={'w-auto max-w-[90%] h-auto max-h-[90%] bg-white'}
-                     alt={'view'}
-                     onError={(e) => {
-                         e.currentTarget.src = NO_IMAGE;
-                     }}
+                <Image src={defaultNoImg(albumToggle.viewImage)}
+                       className={'w-auto max-w-[90%] h-auto max-h-[90%] bg-white'}
+                       width={1200}
+                       height={1200}
+                       priority={true}
+                       alt={'view'}
+                       onError={(e) => {
+                           e.currentTarget.src = NO_IMAGE;
+                       }}
                 />
                 <div className={'z-40 fixed top-0 left-0 w-full h-full flex justify-between'}>
                     <button className={'min-w-[25%] w-[25%] h-full flex justify-center items-center shadow-md'}

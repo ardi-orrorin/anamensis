@@ -60,6 +60,7 @@ const NavMain = async () => {
                            alt={''}
                            width={30}
                            height={30}
+                           priority={true}
                     />
                 </Link>
             </div>

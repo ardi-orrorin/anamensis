@@ -9,7 +9,7 @@ import LoginProvider, {LoginI} from "@/app/login/{services}/LoginProvider";
 import ReCAPTCHA from "react-google-recaptcha";
 import apiCall from "@/app/{commons}/func/api";
 import {RoleType} from "@/app/user/system/{services}/types";
-
+import {getProviders, signIn} from "next-auth/react";
 
 export type LoginType = {
     accessToken: string,
@@ -29,6 +29,7 @@ const Login = () => {
     const privateKey = process.env.NEXT_PUBLIC_RECAPTCHA_PRIVATE_KEY;
     const [isRecaptcha, setIsReCaptcha] = useState<boolean>(false);
     const recaptchaRef = useRef<ReCAPTCHA>(null);
+    const [provider, setProvider] = useState<any>({});
 
     const {user, setUser} = useContext(LoginProvider);
     const [loading, setLoading] = useState<boolean>(false);
@@ -50,6 +51,13 @@ const Login = () => {
         return user.username.length > 5 && user.password.length > 4;
     }, [user]);
 
+    useEffect(() => {
+        getProviders()
+        .then((providers) => {
+            setProvider(providers)
+        });
+    },[]);
+
 
     const goLogin = async () => {
         setLoading(true);
@@ -66,7 +74,6 @@ const Login = () => {
                 authType: res.data.authType
             });
         }).catch(err => {
-            console.log(err)
             setError({
                 status: err.response.status,
                 message: err.response.data,
@@ -120,12 +127,14 @@ const Login = () => {
         })
     }
 
+
     return (
         <div className={"flex flex-col gap-4 border border-solid b border-blue-300 sm:w-4/5 md:w-1/2 xl:w-1/3 w-full rounded pb-5"}>
             <div className={'flex flex-col gap-1 bg-blue-300 py-4'}>
                 <h3 className={'flex justify-center font-bold text-white text-base'}
                 >LOGIN</h3>
             </div>
+
             <div className={'flex flex-col px-2'}>
                 <div className={'flex'}>
                     <input
@@ -191,6 +200,21 @@ const Login = () => {
                 <Link href={'/reset-pwd'}
                    className={'flex justify-center text-xs text-blue-500'}
                 >비밀번호 찾기</Link>
+            </div>
+            <div className={'flex justify-between px-3'}>
+                {
+                    Object.values(provider).map((provider) => {
+                        const {name, id} = provider as {name: string, id: string};
+                        return (
+                            <button className={'w-full text-xs text-white my-2 p-2 bg-red-300 hover:bg-red-600 rounded duration-300'}
+                                key={name}
+                                onClick={() => signIn(id)}
+                            >
+                                Sign in with {name}
+                            </button>
+                        )
+                    })
+                }
             </div>
         </div>
     )

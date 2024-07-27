@@ -17,6 +17,7 @@ import com.anamensis.server.resultMap.MemberResultMap;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -32,16 +33,26 @@ import reactor.core.scheduler.Schedulers;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class UserService implements ReactiveUserDetailsService {
 
     @Value("${db.setting.user.attendance_point_code_prefix}")
     private String ATTENDANCE_POINT_CODE_PREFIX;
+
+    private static final Map<String, String> OAUTH_ACCOUNT_PREFIX = Map.of(
+        "GOOGLE", "G",
+        "KAKAO", "K",
+        "NAVER", "N",
+        "GITHUB", "GH",
+        "FACEBOOK", "FB"
+    );
 
     private final MemberMapper memberMapper;
     private final PointCodeMapper pointCodeMapper;
@@ -59,12 +70,12 @@ public class UserService implements ReactiveUserDetailsService {
 
     public Flux<UserResponse.List> findAllMember(Page page, UserRequest.Params params) {
         return Flux.fromIterable(memberMapper.findAllMember(page, params))
-            .log()
             .map(UserResponse.List::transToList);
     }
 
 
     public Mono<Member> findUserByUserId(String userId) {
+        log.info("findUserByUserId: {}", userId);
         return Mono.justOrEmpty(memberMapper.findMemberByUserId(userId))
                 .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
     }
@@ -84,6 +95,30 @@ public class UserService implements ReactiveUserDetailsService {
         return Mono.justOrEmpty(memberMapper.findMemberInfo(userId))
                 .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
     }
+
+    public Mono<MemberResultMap> findOauthUser(UserRequest.OauthLogin user) {
+        Optional<MemberResultMap> member = memberMapper.findOAuthMemberInfo(user.getUserId());
+        if(member.isEmpty()) {
+            Member newUser = new Member();
+            String userId = oAuthUserIdConvert(user.getUserId(), user.getProvider());
+            String tempPwd = bCryptPasswordEncoder.encode(user.getUserId() + user.getProvider() + LocalDateTime.now().getNano());
+
+            newUser.setUserId(userId);
+            newUser.setName(user.getName());
+            newUser.setEmail(user.getEmail());
+            newUser.setPwd(tempPwd);
+            newUser.setCreateAt(LocalDateTime.now());
+            newUser.setOAuth(true);
+            memberMapper.save(newUser);
+
+            member = memberMapper.findOAuthMemberInfo(user.getUserId());
+        }
+
+        return Mono.justOrEmpty(member)
+                .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
+    }
+
+
 
     public Mono<UserResponse.MyPage> findUserInfoCache(String userId) {
         String key =  "user:" + userId + ":info";
@@ -236,6 +271,10 @@ public class UserService implements ReactiveUserDetailsService {
         }
 
         return Mono.just(true);
+    }
+
+    private String oAuthUserIdConvert(String userId, String provider) {
+        return OAUTH_ACCOUNT_PREFIX.get(provider.toUpperCase()) + "-" + userId;
     }
 
     private Mono<Role> generateRole(Member users, RoleType roleType) {

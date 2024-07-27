@@ -4,6 +4,7 @@ import {defaultNoImg} from "@/app/{commons}/func/image";
 import DeleteOverlay from "@/app/board/{components}/block/extra/{components}/deleteOverlay";
 import DefaultLabel from "@/app/board/{components}/block/extra/{components}/defaultLabel";
 import {NO_IMAGE} from "@/app/{services}/constants";
+import Image from "next/image";
 
 const Thumbnail = ({
     images,
@@ -45,23 +46,26 @@ const Thumbnail = ({
             return (
                 <div key={'thumbnail' + index}
                      className={'relative flex'}>
-                    <img className={'w-full flex justify-center object-cover items-center border-2 border-solid border-[#BFDBFE] aspect-square transform-gpu'}
-                         src={defaultNoImg(image.replace(/(\.[^.]+)$/, '_thumb$1'))}
-                         alt={'thumbnail'}
-                         onError={(e) => {
-                             e.currentTarget.src = NO_IMAGE;
-                         }}
-                         onClick={() => {
-                             setAlbumToggle({
-                                 viewImage: image,
-                                 viewToggle: true,
-                             });
-                         }}
-                         onMouseEnter={(e) => {
-                             if(isView) return;
-                             e?.currentTarget?.parentElement?.children[1]
-                                 .classList.replace('hidden', 'flex');
-                         }}
+                    <Image className={'w-full flex justify-center object-cover items-center border-2 border-solid border-[#BFDBFE] aspect-square transform-gpu'}
+                           src={defaultNoImg(image.replace(/(\.[^.]+)$/, '_thumb$1'))}
+                           width={200}
+                           height={200}
+                           priority={true}
+                           alt={'thumbnail'}
+                           onError={(e) => {
+                               e.currentTarget.src = NO_IMAGE;
+                           }}
+                           onClick={() => {
+                               setAlbumToggle({
+                                   viewImage: image,
+                                   viewToggle: true,
+                               });
+                           }}
+                           onMouseEnter={(e) => {
+                               if(isView) return;
+                               e?.currentTarget?.parentElement?.children[1]
+                                   .classList.replace('hidden', 'flex');
+                           }}
                     />
                     {
                         !isView && <DeleteOverlay {...{index, image, deleteImageHandler, setAlbumToggle, onChaneDefaultIndexHandler}} />

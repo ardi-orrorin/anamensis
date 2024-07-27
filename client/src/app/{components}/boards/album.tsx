@@ -3,6 +3,7 @@ import {ImageShowProps} from "@/app/board/{components}/block/extra/albumBlock";
 import HeaderComponent from "@/app/{components}/headerComponent";
 import {defaultNoImg} from "@/app/{commons}/func/image";
 import FooterComponent from "@/app/{components}/footerComponent";
+import Image from "next/image";
 
 const AlbumBoardComponent = (props: BoardListI) => {
     const { body } = props;
@@ -26,12 +27,15 @@ const AlbumBoardComponent = (props: BoardListI) => {
         <>
             <div className={'flex h-full'}>
                 <div className={'relative min-w-[90px] max-w-[90px] sm:min-w-[120px] sm:max-w-[120px] h-full'}>
-                    <img className={'w-full h-full object-cover'}
-                         src={defaultNoImg(extraValue?.images[extraValue.defaultIndex])}
-                         alt={''}
-                         onError={(e) => {
-                             (e.target as HTMLImageElement).src = process.env.NEXT_PUBLIC_CDN_SERVER + '/noimage.jpg'
-                         }}
+                    <Image className={'w-full h-full object-cover'}
+                           src={defaultNoImg(extraValue?.images[extraValue.defaultIndex])}
+                           height={200}
+                           width={200}
+                           alt={''}
+                           priority={true}
+                           onError={(e) => {
+                               (e.target as HTMLImageElement).src = process.env.NEXT_PUBLIC_CDN_SERVER + '/noimage.jpg'
+                           }}
                     />
                     <span className={'absolute z-10 bg-gray-500 text-white w-8 h-8 flex justify-center items-center text-xs right-0 bottom-0'}>
                         {extraValue.images.length}

@@ -97,28 +97,26 @@ public class UserService implements ReactiveUserDetailsService {
     }
 
     public Mono<MemberResultMap> findOauthUser(UserRequest.OauthLogin user) {
-        Optional<MemberResultMap> member = memberMapper.findOAuthMemberInfo(user.getUserId());
-        if(member.isEmpty()) {
-            Member newUser = new Member();
-            String userId = oAuthUserIdConvert(user.getUserId(), user.getProvider());
-            String tempPwd = bCryptPasswordEncoder.encode(user.getUserId() + user.getProvider() + LocalDateTime.now().getNano());
+        String userId = oAuthUserIdConvert(user.getUserId(), user.getProvider());
+        return Mono.fromCallable(() -> memberMapper.findOAuthMemberInfo(userId))
+            .flatMap(memberResultMap -> {
+                if(memberResultMap.isEmpty()) {
 
-            newUser.setUserId(userId);
-            newUser.setName(user.getName());
-            newUser.setEmail(user.getEmail());
-            newUser.setPwd(tempPwd);
-            newUser.setCreateAt(LocalDateTime.now());
-            newUser.setOAuth(true);
-            memberMapper.save(newUser);
+                    String tempPwd = bCryptPasswordEncoder.encode(user.getUserId() + user.getProvider() + LocalDateTime.now().getNano());
 
-            member = memberMapper.findOAuthMemberInfo(user.getUserId());
-        }
-
-        return Mono.justOrEmpty(member)
-                .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
+                    UserRequest.Register newUser = new UserRequest.Register();
+                    newUser.setId(userId);
+                    newUser.setName(user.getName());
+                    newUser.setEmail(user.getEmail());
+                    newUser.setPwd(tempPwd);
+                    return this.saveUser(newUser, true)
+                        .flatMap($ -> Mono.justOrEmpty(memberMapper.findOAuthMemberInfo(userId)))
+                        .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
+                } else {
+                    return Mono.just(memberResultMap.get());
+                }
+            });
     }
-
-
 
     public Mono<UserResponse.MyPage> findUserInfoCache(String userId) {
         String key =  "user:" + userId + ":info";
@@ -181,12 +179,13 @@ public class UserService implements ReactiveUserDetailsService {
     }
 
 
-    public Mono<Member> saveUser(UserRequest.Register user) {
+    public Mono<Member> saveUser(UserRequest.Register user, boolean isOAuth) {
 
         Member member = UserRequest.Register.transToUser(user);
         member.setPwd(bCryptPasswordEncoder.encode(member.getPwd()));
         member.setCreateAt(LocalDateTime.now());
         member.setSAuthType(AuthType.NONE);
+        member.setOAuth(isOAuth);
 
         try {
             pointCodeMapper.selectByIdOrName(0,ATTENDANCE_POINT_CODE_PREFIX + "1")

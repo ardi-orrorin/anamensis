@@ -1,13 +1,22 @@
 import {NextRequest, NextResponse} from "next/server";
 import axios from "axios";
-import {LoginI} from "@/app/login/{services}/LoginProvider";
+import {LoginI, OAuth2I} from "@/app/login/{services}/LoginProvider";
 import {ResponseCookie} from "next/dist/compiled/@edge-runtime/cookies";
 import {ErrorResponse} from "@/app/login/page";
-import {GeoLocationType, getGeoLocation} from "@/app/login/{services}/GeoLocation";
 
 export async function POST(req: NextRequest){
-    const user =  await req.json() as LoginI;
-    const url = process.env.NEXT_PUBLIC_SERVER + '/public/api/user/verify';
+
+    const reqBody = await req.json();
+    const user = reqBody?.provider
+        ? await reqBody as OAuth2I
+        : await reqBody as LoginI;
+
+    const url = process.env.NEXT_PUBLIC_SERVER + (
+        reqBody?.provider
+            ? '/public/api/user/oauth2'
+            : '/public/api/user/verify'
+    )
+
 
     const clientIp = req.ip || req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for');
 

@@ -11,6 +11,13 @@ export interface LoginI {
     oauth2?: boolean;
 }
 
+export interface OAuth2I {
+    userId   : string;
+    name     : string;
+    email    : string;
+    provider : string;
+}
+
 export interface LoginProviderI {
     user: LoginI
     setUser: Dispatch<SetStateAction<LoginI>>

@@ -180,7 +180,7 @@ public class UserController {
 
         AtomicReference<Member> member = new AtomicReference<>();
 
-        return userService.saveUser(user)
+        return userService.saveUser(user, false)
                 .doOnNext(member::set)
                 .flatMap(u -> attendanceService.init(u.getId()))
                 .publishOn(Schedulers.boundedElastic())

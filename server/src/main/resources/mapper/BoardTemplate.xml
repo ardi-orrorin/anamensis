@@ -21,7 +21,7 @@
            AND bt.is_use = 1
     </select>
 
-    <insert id="save">
+    <insert id="save" parameterType="BoardTemplate">
         INSERT INTO board_template
                (name, content, create_at, update_at
              , member_pk, is_public, members_only)
@@ -29,7 +29,7 @@
              , #{memberPk}, #{isPublic}, #{membersOnly})
     </insert>
 
-    <update id="update">
+    <update id="update" parameterType="BoardTemplate">
         UPDATE board_template
         <set>
             <if test="name != null and name != ''">
@@ -38,7 +38,7 @@
             <if test="content != null and content != ''">
                 content      = #{content, typeHandler=JsonObjectTypeHandler},
             </if>
-            <if test="updateAt != null and updateAt != ''">
+            <if test="updateAt != null">
                 update_at    = #{updateAt},
             </if>
             <if test="isPublic != null">

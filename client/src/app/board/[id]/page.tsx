@@ -4,9 +4,9 @@ import Block from "@/app/board/{components}/Block";
 import {ChangeEvent, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import {HtmlElements} from "@/app/board/{components}/block/type/Types";
 import {BlockI, BoardI, Category} from "@/app/board/{services}/types";
-import {blockTypeList} from "@/app/board/{components}/block/list";
 import {
-    faDownLeftAndUpRightToCenter, faEllipsisVertical, faStar as faStarSolid,
+    faDownLeftAndUpRightToCenter,
+    faStar as faStarSolid,
     faUpRightAndDownLeftFromCenter
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -27,7 +27,7 @@ import BlockProvider from "@/app/board/{services}/BlockProvider";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
 import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import KeyDownEvent from "@/app/board/{services}/keyDownEvent";
-import {deleteImage, initBlock, listSort, notAvailDupCheck, updateBoard} from "@/app/board/{services}/funcs";
+import {deleteImage, initBlock, listSort, onChangeBlockGlobalHandler, updateBoard} from "@/app/board/{services}/funcs";
 import WriterInfo from "@/app/board/[id]/{components}/writerInfo";
 import {useRouter} from "next/navigation";
 import HotKeyInfo from "@/app/board/[id]/{components}/hotKeyInfo";
@@ -72,12 +72,8 @@ export default function Page({params}: {params : {id: string}}) {
 
     const debounce = createDebounce(300);
 
-    const shortList = useMemo(()=> (
-        blockTypeList.map(item => ({ command: item.command, code: item.code, notAvailDup : item.notAvailDup, onTemplate: item.onTemplate}))
-    ), []);
-
     const categoryName = useMemo(() =>
-            Category.findById(board.data?.categoryPk.toString())?.name
+        Category.findById(board.data?.categoryPk.toString())?.name
     ,[board?.data?.categoryPk]);
 
     const router = useRouter();
@@ -86,11 +82,10 @@ export default function Page({params}: {params : {id: string}}) {
         window.scrollTo(0, 0);
     },[]);
 
-    const addBlock = useCallback((seq: number, init: boolean, value?: string) => {
-        const block: BlockI = initBlock({seq: 0});
+    const addBlock = useCallback((seq: number, init: boolean, value?: string, cusSeq?: boolean) => {
+        const block: BlockI = initBlock({seq: cusSeq ? seq : 0});
         if(!init) block.seq = seq + 0.1;
         if(value) block.value = value;
-
         return block;
     },[]);
 
@@ -99,38 +94,6 @@ export default function Page({params}: {params : {id: string}}) {
         const content = board.data.content.list.filter(item => item.value !== '').length > 0;
         return title && content;
     },[board.data]);
-
-    const onChangeBlockHandler = (seq: number, e: ChangeEvent<HtmlElements> ) => {
-        const block = shortList.find(item =>
-            item.command + ' ' === e.target?.value
-        );
-
-        if(!block) return;
-
-        if(notAvailDupCheck(block?.code, board.data?.content)) {
-            return alert('중복 사용할 수 없는 블록입니다.');
-        }
-
-        if(isTemplate && !block?.onTemplate) return ;
-
-        if(block.notAvailDup) return ;
-
-        const newList = board.data?.content?.list.map((item, index) => {
-            if (item.seq === seq) {
-                item.code = block.code;
-                item.value = '';
-            }
-            return item;
-        });
-
-        setBoard({...board, data: {...board.data,  content: {list: newList}}});
-
-        setTimeout(() => {
-            blockRef.current[seq]?.focus();
-        },0);
-
-        return true;
-    };
 
     const submitHandler = async (isSave: boolean) => {
         if(!validation()) {
@@ -216,7 +179,16 @@ export default function Page({params}: {params : {id: string}}) {
         const list = board.data?.content?.list;
         if (!list) return ;
 
-        if(onChangeBlockHandler(seq, e)) return ;
+        const onChange = onChangeBlockGlobalHandler({
+            seq,
+            board,
+            setBoard,
+            blockRef,
+            isTemplate,
+            value: e.target.value,
+        });
+
+        if(onChange) return ;
 
         list.map((item, index) => {
             if (item.seq === seq) {
@@ -387,7 +359,6 @@ export default function Page({params}: {params : {id: string}}) {
         setBoard,
         fullScreen,
         setFullScreen,
-        router,
         blockRef
     })
 
@@ -526,8 +497,7 @@ export default function Page({params}: {params : {id: string}}) {
                 </div>
                 <div>
                     {
-                        (isNewBoard || isTemplate)
-                        && !boardTemplate?.isApply
+                        (isNewBoard || (isTemplate && !boardTemplate?.isApply))
                         && <div className={'flex gap-1 justify-end mt-5'}>
                             <button
                               className={'w-full rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}

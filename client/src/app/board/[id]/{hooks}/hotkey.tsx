@@ -13,7 +13,6 @@ export const useBoardHotKey = ({
     setBoard,
     fullScreen,
     setFullScreen,
-    router,
     blockRef
 }:{
     blockService: BlockService,
@@ -21,12 +20,10 @@ export const useBoardHotKey = ({
     setBoard: Dispatch<SetStateAction<BoardService>>,
     fullScreen: boolean,
     setFullScreen: React.Dispatch<React.SetStateAction<boolean>>,
-    router: AppRouterInstance,
     blockRef: React.MutableRefObject<HTMLElement[] | null[]>,
 }) => {
     const hotkeyOption: Options = {
         preventDefault: true,
-        scopes: ['board'],
         enableOnFormTags: true,
     };
 

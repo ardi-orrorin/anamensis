@@ -1,7 +1,8 @@
 import {BlockI, BoardContentI, BoardI, BoardTemplate} from "@/app/board/{services}/types";
 import {blockTypeList} from "@/app/board/{components}/block/list";
-import {Dispatch, SetStateAction} from "react";
+import {Dispatch, MutableRefObject, SetStateAction} from "react";
 import {TempFileI} from "@/app/board/{services}/TempFileProvider";
+import {BoardService} from "@/app/board/{services}/BoardProvider";
 
 export function findElement(ele: HTMLElement) {
     if(ele?.parentElement?.id.includes('block')) return ele.parentElement;
@@ -107,4 +108,73 @@ export const deleteImage = (props: {
     setWaitRemoveFiles(prevState => {
         return [...prevState, {id: 0, fileName, filePath}];
     });
+}
+
+export const onChangeBlockGlobalHandler = ({
+    seq,
+    board, setBoard,
+    blockRef, isTemplate,
+    code, value
+} : {
+    seq         : number;
+    code?       : string;
+    value?      : string;
+    board       : BoardService;
+    setBoard    : Dispatch<SetStateAction<BoardService>>;
+    blockRef?   : MutableRefObject<HTMLElement[] | null[]>;
+    isTemplate? : boolean;
+}) => {
+    if(!value && !code) return;
+
+    const block = blockTypeList.find(item => {
+        return value ? item.command + ' ' === value
+                     : code
+                     ? item.code === code
+                     : false;
+    });
+
+    if(!block) return;
+
+    if(notAvailDupCheck(code || block?.code, board.data?.content)) {
+        return alert('중복 사용할 수 없는 블록입니다.');
+    }
+
+    if(isTemplate && !block?.onTemplate) return ;
+
+    if(block.notAvailDup) return ;
+
+    const list = board.data?.content?.list;
+
+    const newList = list.map((item, index) => {
+        if(code && item.code.slice(0, 3) !== code.slice(0, 3)) {
+            item.extraValue = {};
+            item.textStyle = {};
+        }
+        if (item.seq === seq) {
+            item.code = block.code;
+            item.value = '';
+        }
+        return item;
+    });
+
+    !blockRef?.current[seq + 1]
+    && newList.push(addBlock(seq + 1, true, '', true));
+
+    setBoard({...board, data: {...board.data,  content: {list: newList}}});
+
+    setTimeout(() => {
+        if(!blockRef?.current) return;
+        (block.type === 'object' && block.code === '00191')
+            ? blockRef.current[seq + 1]?.focus()
+            : blockRef.current[seq]?.focus();
+    },0);
+
+    return true;
+};
+
+export const addBlock = (seq: number, init: boolean, value?: string, cusSeq?: boolean) => {
+    const block: BlockI = initBlock({seq: cusSeq ? seq : 0});
+    if(!init) block.seq = seq + 0.1;
+    if(value) block.value = value;
+    return block;
 }

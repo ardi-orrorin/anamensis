@@ -98,7 +98,7 @@ public class UserService implements ReactiveUserDetailsService {
 
     public Mono<MemberResultMap> findOauthUser(UserRequest.OauthLogin user) {
         String userId = oAuthUserIdConvert(user.getUserId(), user.getProvider());
-        return Mono.fromCallable(() -> memberMapper.findOAuthMemberInfo(userId))
+        return Mono.fromCallable(() -> memberMapper.findMemberInfo(userId))
             .flatMap(memberResultMap -> {
                 if(memberResultMap.isEmpty()) {
 
@@ -110,7 +110,7 @@ public class UserService implements ReactiveUserDetailsService {
                     newUser.setEmail(user.getEmail());
                     newUser.setPwd(tempPwd);
                     return this.saveUser(newUser, true)
-                        .flatMap($ -> Mono.justOrEmpty(memberMapper.findOAuthMemberInfo(userId)))
+                        .flatMap($ -> Mono.justOrEmpty(memberMapper.findMemberInfo(userId)))
                         .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
                 } else {
                     return Mono.just(memberResultMap.get());

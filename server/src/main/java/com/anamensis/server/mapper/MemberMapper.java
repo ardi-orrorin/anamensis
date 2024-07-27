@@ -27,11 +27,7 @@ public interface MemberMapper {
 
     Optional<Member> findMemberByUserId(String userId);
 
-    Optional<Member> findOAuthMember(String userId);
-
-
     Optional<MemberResultMap> findMemberInfo(String userId);
-    Optional<MemberResultMap> findOAuthMemberInfo(String userId);
 
     Optional<Member> findMemberByEmailAndUserId(String email, String userId);
 

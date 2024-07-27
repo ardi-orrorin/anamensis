@@ -47,7 +47,6 @@
         <include refid="tbl_member"/>
         WHERE user_id  = #{userId}
           AND is_use   = 1
-          AND is_oauth = 0
     </select>
 
     <select id="findOAuthMember" resultType="Member">
@@ -72,17 +71,6 @@
             ON a.id       = b.member_pk
          WHERE a.user_id  = #{userId}
            AND a.is_use   = 1
-           AND a.is_oauth = 0
-    </select>
-
-    <select id="findOAuthMemberInfo" resultMap="memberResultMap">
-        SELECT *
-          FROM member a
-          JOIN role b
-               ON a.id    = b.member_pk
-         WHERE a.user_id  = #{userId}
-           AND a.is_use   = 1
-           AND a.is_oauth = 1
     </select>
 
     <select id="existsMember" resultType="boolean">

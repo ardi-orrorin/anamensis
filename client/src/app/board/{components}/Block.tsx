@@ -256,7 +256,6 @@ const Block = (props: BlockProps) => {
                             : ''
                     }
                 </div>
-
             }
             {
                 !board.isView

@@ -5,7 +5,7 @@ import DefaultBoardComponent from "@/app/{components}/boards/default";
 import AlttuelBoardComponent from "@/app/{components}/boards/alttuel";
 import AlbumBoardComponent from "@/app/{components}/boards/album";
 import QuestionBoardComponent from "@/app/{components}/boards/question";
-import {useSearchParams} from "next/navigation";
+import MembersOnlyBody from "@/app/{components}/membersOnlyBody";
 
 export interface BoardListI {
     id           : string;
@@ -22,10 +22,14 @@ export interface BoardListI {
     membersOnly  : boolean;
 }
 
-const BoardComponent = (props: BoardListI & {favorites: string[]}) => {
+const BoardComponent = (props: BoardListI & {favorites: string[], isLogin: boolean}) => {
     const {
-       id, body, categoryPk, favorites
+       id, body, categoryPk, favorites, isLogin, membersOnly
     } = props;
+
+    const membersOnlyBody = useMemo(() =>
+        membersOnly && !isLogin
+    ,[membersOnly, isLogin]);
 
     const Components = useMemo(()=>[
         {categoryPk: 1, component: DefaultBoardComponent},
@@ -33,17 +37,18 @@ const BoardComponent = (props: BoardListI & {favorites: string[]}) => {
         {categoryPk: 3, component: QuestionBoardComponent},
         {categoryPk: 4, component: AlttuelBoardComponent},
         {categoryPk: 5, component: AlbumBoardComponent},
-    ],[]);
+    ],[membersOnlyBody]);
 
     const isFavorite = useMemo(() =>
         favorites?.find(boardPk => id.toString() === boardPk.toString())
     , [favorites, id]);
 
-    const Component = useMemo(() =>
-        Components.find((component) =>
+    const Component = useMemo(() => {
+        if(membersOnlyBody) return <MembersOnlyBody {...props} />;
+        return Components.find((component) =>
             component.categoryPk === Number(categoryPk)
         )?.component(props)
-    ,[categoryPk, body])
+    },[categoryPk, body])
 
     return (
         <Link className={[

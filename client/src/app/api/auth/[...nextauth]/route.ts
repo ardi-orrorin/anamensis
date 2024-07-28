@@ -5,9 +5,7 @@ import {ResponseCookie} from "next/dist/compiled/@edge-runtime/cookies";
 import axios from "axios";
 import {cookies} from "next/headers";
 import {NextRequest} from "next/server";
-import Kakao from "next-auth/providers/kakao";
 import Github from "next-auth/providers/github";
-import Naver from "next-auth/providers/naver";
 
 interface RouteHandlerContext {
     params: { nextauth: string[] }
@@ -22,14 +20,14 @@ async function handler(req: NextRequest, context: RouteHandlerContext) {
                 clientSecret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET || '',
 
             }),
-            Kakao({
-                clientId: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID || '',
-                clientSecret: process.env.NEXT_PUBLIC_KAKAO_CLIENT_SECRET || '',
-            }),
             Github({
                 clientId: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID || '',
                 clientSecret: process.env.NEXT_PUBLIC_GITHUB_CLIENT_SECRET || '',
             }),
+            // Kakao({
+            //     clientId: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID || '',
+            //     clientSecret: process.env.NEXT_PUBLIC_KAKAO_CLIENT_SECRET || '',
+            // }),
             // Naver({
             //     clientId: process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || '',
             //     clientSecret: process.env.NEXT_PUBLIC_NAVER_CLIENT_SECRET || '',
@@ -38,7 +36,6 @@ async function handler(req: NextRequest, context: RouteHandlerContext) {
         ],
         callbacks: {
             async signIn({account, credentials, user}) {
-                console.log(account, credentials, user)
                 if(!account?.provider) return false;
 
                 const loginUser  = {

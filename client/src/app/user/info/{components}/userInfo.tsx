@@ -9,16 +9,11 @@ import {UserInfoI} from "@/app/user/email/page";
 
 export const UserInfo = ({profileInfo}: {profileInfo: UserInfoI}) => {
 
-    const [profile, setProfile] = useState<UserInfoI>({} as UserInfoI);
+    const [profile, setProfile] = useState<UserInfoI>(profileInfo);
 
     const [loading, setLoading] = useState<LoadingType>({} as LoadingType);
 
     const debounce = createDebounce(500);
-
-    useEffect(()=> {
-        setProfile(profileInfo);
-    },[profileInfo]);
-
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setProfile({...profile, [e.target.name]: e.target.value})
@@ -89,18 +84,18 @@ export const UserInfo = ({profileInfo}: {profileInfo: UserInfoI}) => {
             </div>
             <div className={'flex gap-3'}>
                 <span className={'flex items-center w-36'}>2차 인증 사용</span>
-                <span className="w-full px-3 py-2 inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className={"sr-only peer hidden"} checked={profile.sauth} disabled/>
-                        <div className="relative w-11 h-6 ray-200 peer-focus:outline-none peer-focus:ring-4
-                                        peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-300
-                                        peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
-                                        peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px]
-                                        after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5
-                                        after:transition-all dark:border-gray-400 peer-checked:bg-main"></div>
-                        <span className="ms-3 text-sm fontclassNameum text-blue-700 items-center">
-                            {profile.sauth ? '사용 중' : '사용 안함'}
-                        </span>
+                <div className="w-full px-3 py-2 inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className={"sr-only peer hidden"} checked={profile.sauth} disabled/>
+                    <div className="relative w-11 h-6 ray-200 peer-focus:outline-none peer-focus:ring-4
+                                    peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-300
+                                    peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
+                                    peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px]
+                                    after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5
+                                    after:transition-all dark:border-gray-400 peer-checked:bg-main"></div>
+                    <span className="ms-3 text-sm fontclassNameum text-blue-700 items-center">
+                        {profile.sauth ? '사용 중' : '사용 안함'}
                     </span>
+                </div>
             </div>
             <div className={'flex gap-3'}>
                 <span className={'flex items-center w-36'}>2차 인증 방법</span>

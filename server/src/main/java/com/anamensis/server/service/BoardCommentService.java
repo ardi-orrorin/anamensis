@@ -20,7 +20,7 @@ public class BoardCommentService {
         return Mono.just(boardCommentMapper.count(boardPk));
     }
 
-    public Flux<BoardCommentResultMap.List> findAllByBoardPk(long boardPk, Page page) {
+    public Flux<BoardCommentResultMap.BoardComment> findAllByBoardPk(long boardPk, Page page) {
         return Flux.fromIterable(boardCommentMapper.findAllByBoardPk(boardPk, page));
     }
 

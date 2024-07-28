@@ -110,6 +110,13 @@ public class UserService implements ReactiveUserDetailsService {
                     newUser.setEmail(user.getEmail());
                     newUser.setPwd(tempPwd);
                     return this.saveUser(newUser, true)
+                        .flatMap(m -> {
+                            Role role = new Role();
+                            role.setMemberPk(m.getId());
+                            role.setRole(RoleType.OAUTH);
+
+                            return Mono.just(memberMapper.saveRole(role) > 0);
+                        })
                         .flatMap($ -> Mono.justOrEmpty(memberMapper.findMemberInfo(userId)))
                         .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
                 } else {

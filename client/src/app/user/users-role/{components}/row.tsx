@@ -21,7 +21,7 @@ const Row = ({
 
     const rolesOption = useMemo(()=>
         user.roles.map(role => {
-            if(role === 'MASTER') return;
+            if(role === 'MASTER' || role === 'OAUTH') return;
             return (
                 <option key={'user-role-roles-option' + role}
                         value={role}
@@ -51,11 +51,11 @@ const Row = ({
             <td className={'py-2 px-3'}>
                 { maxIndex - index }
             </td>
-            <td className={'py-4 px-3'}>
-                { user.userId }
-            </td>
             <td className={'py-2 px-3'}>
-                { user.name }
+                <div className={'flex flex-col gap-2'}>
+                    <span>{ user.userId }</span>
+                    <span>({ user.name })</span>
+                </div>
             </td>
             <td className={'py-2 px-3'}>
                 { user.email }

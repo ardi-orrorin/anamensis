@@ -5,6 +5,7 @@ import {defaultNoImg} from "@/app/{commons}/func/image";
 import FooterComponent from "@/app/{components}/footerComponent";
 import React, {useCallback, useContext, useMemo} from "react";
 import {BoardListI} from "@/app/{components}/boardComponent";
+import {NO_IMAGE} from "@/app/{services}/constants";
 
 const AlttuelBoardComponent = (props: BoardListI) => {
     const { body} = props;
@@ -37,7 +38,7 @@ const AlttuelBoardComponent = (props: BoardListI) => {
                        alt={''}
                        priority={true}
                        onError={e => {
-                           (e.target as HTMLImageElement).src = process.env.NEXT_PUBLIC_CDN_SERVER + '/noimage.jpg'
+                           (e.target as HTMLImageElement).src = NO_IMAGE;
                        }}
                 />
 

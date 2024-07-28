@@ -4,7 +4,8 @@ import {useContext, useMemo} from "react";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import Link from "next/link";
 import {Category} from "@/app/board/{services}/types";
-import {defaultNoImg, defaultProfile} from "@/app/{commons}/func/image";
+import {defaultProfile} from "@/app/{commons}/func/image";
+import {NO_PROFILE} from "@/app/{services}/constants";
 
 const WriterInfo = () => {
 
@@ -43,6 +44,9 @@ const WriterInfo = () => {
                        width={70}
                        alt={'profile'}
                        src={defaultProfile(board.data.profileImage)}
+                       onError={(e) => {
+                           e.currentTarget.src = NO_PROFILE;
+                       }}
                 />
                 <div className={'flex flex-col gap-2'}>
                     <div className={'flex gap-1'}>

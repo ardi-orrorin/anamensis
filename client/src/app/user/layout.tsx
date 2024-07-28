@@ -8,6 +8,7 @@ import ModalBackground from "@/app/user/{components}/ModalBackground";
 import UserProvider, {AttendInfoI, BoardSummaryI, PointSummaryI} from "@/app/user/{services}/userProvider";
 import useSWR, {preload} from "swr";
 import apiCall from "@/app/{commons}/func/api";
+import {RoleType} from "@/app/user/system/{services}/types";
 
 
 export default function Layout({children}: {children: React.ReactNode & {test:'1'}}) {
@@ -15,6 +16,7 @@ export default function Layout({children}: {children: React.ReactNode & {test:'1
     const [boardSummary, setBoardSummary] = useState<BoardSummaryI[]>([]);
     const [attendInfo, setAttendInfo] = useState<AttendInfoI>({} as AttendInfoI);
     const [pointSummary, setPointSummary] = useState<PointSummaryI[]>([]);
+    const [roles, setRoles] = React.useState<RoleType[]>([]);
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [modal, setModal] = useState<ModalI>({} as ModalI);
@@ -69,7 +71,8 @@ export default function Layout({children}: {children: React.ReactNode & {test:'1
         <UserProvider.Provider value={{
             boardSummary, setBoardSummary,
             attendInfo, setAttendInfo,
-            pointSummary, setPointSummary
+            pointSummary, setPointSummary,
+            roles, setRoles
         }}>
             <main className={'flex items-start min-h-screen h-auto'}>
                 <ModalProvider.Provider value={{modal, setModal}}>

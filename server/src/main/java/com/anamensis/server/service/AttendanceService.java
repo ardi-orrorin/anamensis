@@ -28,6 +28,10 @@ public class AttendanceService {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
+    public Mono<Boolean> exist(long memberPk) {
+        return Mono.just(attendanceMapper.exist(memberPk));
+    }
+
     public Mono<Attendance> findByMemberPk(long memberPk) {
         Optional<Attendance> attend =  attendanceMapper.findByMemberPk(memberPk);
         if(attend.isEmpty()) {

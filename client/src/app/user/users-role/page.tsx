@@ -161,12 +161,11 @@ export default function Page() {
                 <colgroup>
                     <col style={{width: '3%'}}/>
                     <col style={{width: '3%'}}/>
-                    <col style={{width: '10%'}}/>
-                    <col style={{width: '10%'}}/>
-                    <col style={{width: '10%'}}/>
+                    <col style={{width: '15%'}}/>
+                    <col style={{width: '15%'}}/>
                     <col style={{width: '25%'}}/>
-                    <col style={{width: '13%'}}/>
-                    <col style={{width: '7%'}}/>
+                    <col style={{width: '10%'}}/>
+                    <col style={{width: '5%'}}/>
                     <col style={{width: '10%'}}/>
                     <col style={{width: '10%'}}/>
                 </colgroup>
@@ -180,8 +179,7 @@ export default function Page() {
                             />
                         </th>
                         <th className={'border-x border-white border-solid'}>#</th>
-                        <th className={'border-x border-white border-solid'}>아이디</th>
-                        <th className={'border-x border-white border-solid'}>이름</th>
+                        <th className={'border-x border-white border-solid'}>아이디 | 이름</th>
                         <th className={'border-x border-white border-solid'}>이메일</th>
                         <th className={'border-x border-white border-solid'}>권한 목록</th>
                         <th className={'border-x border-white border-solid'}>생성일</th>

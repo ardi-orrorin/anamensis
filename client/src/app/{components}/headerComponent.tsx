@@ -3,6 +3,7 @@ import Image from "next/image";
 import {defaultProfile} from "@/app/{commons}/func/image";
 import React, {useMemo} from "react";
 import {BoardListI} from "@/app/{components}/boardComponent";
+import {NO_PROFILE} from "@/app/{services}/constants";
 
 const HeaderComponent = (props: BoardListI) => {
     const {
@@ -45,6 +46,9 @@ const HeaderComponent = (props: BoardListI) => {
                            width={25}
                            height={25}
                            alt={''}
+                           onError={(e) => {
+                               e.currentTarget.src = NO_PROFILE;
+                           }}
                     />
                     <span className={'text-sm'}>
                         {writer}

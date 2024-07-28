@@ -34,7 +34,7 @@ public class BoardCommentResponse {
             CommentBuilder builder = Comment.builder()
                     .id(resultMap.getId())
                     .content(resultMap.getBoardComment().getContent())
-                    .writer(resultMap.getBoardComment().getUserId())
+                    .writer(resultMap.getMember().getName())
                     .profileImage(resultMap.getFile().getFilePath() + resultMap.getFile().getFileName())
                     .parentPk(resultMap.getBoardComment().getParentPk())
                     .blockSeq(resultMap.getBoardComment().getBlockSeq())

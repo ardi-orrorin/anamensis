@@ -4,6 +4,16 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.anamensis.server.mapper.AttendanceMapper">
+
+    <select id="exist">
+        SELECT exists(
+            SELECT *
+              FROM attendance
+             WHERE member_pk = #{memberPk}
+               AND is_use  = 1
+        )
+    </select>
+
     <select id="findByMemberPk" resultType="Attendance">
         SELECT *
           FROM attendance

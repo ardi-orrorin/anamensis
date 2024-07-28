@@ -10,6 +10,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 import apiCall from "@/app/{commons}/func/api";
 import {RoleType} from "@/app/user/system/{services}/types";
 import {getProviders, signIn} from "next-auth/react";
+import Image from "next/image";
 
 export type LoginType = {
     accessToken: string,
@@ -205,12 +206,20 @@ const Login = () => {
                 {
                     Object.values(provider).map((provider) => {
                         const {name, id} = provider as {name: string, id: string};
+                        const logoImg = process.env.NEXT_PUBLIC_CDN_SERVER + '/logo/' + name.toLowerCase() + '-logo.webp';
                         return (
-                            <button className={'w-full text-xs text-white my-2 p-2 bg-red-300 hover:bg-red-600 rounded duration-300'}
+                            <button className={'w-full flex justify-center items-center gap-1 text-xs text-white p-3 bg-red-300 hover:bg-red-600 rounded duration-300'}
                                 key={name}
                                 onClick={() => signIn(id)}
                             >
-                                Sign in with {name}
+                                <Image src={logoImg}
+                                       alt={''}
+                                       width={16}
+                                       height={16}
+                                />
+                                <span className={'font-bold'}>
+                                    Sign in with {name}
+                                </span>
                             </button>
                         )
                     })

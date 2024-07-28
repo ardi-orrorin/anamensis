@@ -165,7 +165,6 @@ public class BoardController {
                 .collectList();
     }
 
-
     @PublicAPI
     @GetMapping("summary/{userId}")
     public Mono<List<BoardResponse.SummaryList>> findByMemberId(
@@ -329,11 +328,8 @@ public class BoardController {
 
                     )
                     .subscribe();
-
             });
     }
-
-
 
     @DeleteMapping("/{id}")
     public Mono<StatusResponse> disableByPk(

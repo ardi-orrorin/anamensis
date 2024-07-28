@@ -11,7 +11,7 @@ import java.util.Optional;
 @Mapper
 public interface BoardCommentMapper {
 
-    List<BoardCommentResultMap.List> findAllByBoardPk(
+    List<BoardCommentResultMap.BoardComment> findAllByBoardPk(
         long boardPk,
         Page page
     );

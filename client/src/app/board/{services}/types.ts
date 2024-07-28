@@ -32,6 +32,7 @@ export interface BoardI {
     membersOnly     : boolean;
     // searchText?     : string;
     writerCreatedAt : string;
+    userId          : string;
 }
 
 export interface BoardTemplate {

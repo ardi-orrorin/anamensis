@@ -20,9 +20,6 @@ const config: Config = {
         "xs2" : "0.7rem",
         "xss" : "0.5rem",
       },
-      // backgroundColor:{
-      //   "main": "#246DCF",
-      // },
       colors: {
         "main": "#246DCF",
       }

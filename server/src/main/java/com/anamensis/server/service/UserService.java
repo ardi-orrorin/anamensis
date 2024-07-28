@@ -6,17 +6,17 @@ import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.UserDto;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.dto.response.UserResponse;
-import com.anamensis.server.entity.*;
+import com.anamensis.server.entity.AuthType;
+import com.anamensis.server.entity.Member;
+import com.anamensis.server.entity.Role;
+import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.exception.DuplicateUserException;
 import com.anamensis.server.mapper.MemberMapper;
 import com.anamensis.server.mapper.PointCodeMapper;
 import com.anamensis.server.provider.AwsSesMailProvider;
-import com.anamensis.server.provider.EmailVerifyProvider;
-import com.anamensis.server.provider.MailProvider;
 import com.anamensis.server.resultMap.MemberResultMap;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -28,14 +28,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +43,9 @@ public class UserService implements ReactiveUserDetailsService {
 
     @Value("${db.setting.user.attendance_point_code_prefix}")
     private String ATTENDANCE_POINT_CODE_PREFIX;
+
+    @Value("${site.host}")
+    private String HOST;
 
     private static final Map<String, String> OAUTH_ACCOUNT_PREFIX = Map.of(
         "GOOGLE", "G",
@@ -107,8 +108,15 @@ public class UserService implements ReactiveUserDetailsService {
                     UserRequest.Register newUser = new UserRequest.Register();
                     newUser.setId(userId);
                     newUser.setName(user.getName());
-                    newUser.setEmail(user.getEmail());
                     newUser.setPwd(tempPwd);
+
+                    if(user.getEmail().equals("")) {
+                        String tempId = UUID.randomUUID().toString().replaceAll("-", "");
+                        newUser.setEmail(tempId + "@" + HOST);
+                    } else {
+                        newUser.setEmail(user.getEmail());
+                    }
+
                     return this.saveUser(newUser, true)
                         .flatMap(m -> {
                             Role role = new Role();

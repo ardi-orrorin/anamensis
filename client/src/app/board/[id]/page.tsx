@@ -140,9 +140,13 @@ export default function Page({params}: {params : {id: string}}) {
 
             isNewBoard && isSave
                 ? router.push('/board/' + result?.id)
-                : isTemplate && isSave
-                ? router.push('/')
                 : location.reload();
+
+            if(isTemplate) {
+                const message = board.data.title + (isSave ? `을(를) 템플릿 저장되었습니다.` : '이(가) 템플릿에 수정했습니다.');
+                alert(message);
+                router.push('/')
+            }
 
         } catch (e) {
             alert('저장에 실패했습니다.');

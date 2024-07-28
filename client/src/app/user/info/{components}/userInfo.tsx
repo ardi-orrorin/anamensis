@@ -36,14 +36,14 @@ export const UserInfo = ({profileInfo}: {profileInfo: UserInfoI}) => {
                 method: 'PUT',
                 body: profile,
             })
-                .then((res) => {
-                    alert('수정되었습니다.')
-                }).finally(() => {
-                    setLoading({
-                        ...loading,
-                        profile: false
-                    });
+            .then((res) => {
+                alert('수정되었습니다.')
+            }).finally(() => {
+                setLoading({
+                    ...loading,
+                    profile: false
                 });
+            });
         }
 
         debounce(fetch);
@@ -51,6 +51,13 @@ export const UserInfo = ({profileInfo}: {profileInfo: UserInfoI}) => {
 
     return (
         <div className={'flex flex-col gap-3 w-full sm:w-2/3 md:w-[400px] duration-500'}>
+            <div className={'flex gap-3'}>
+                <span className={'flex items-center w-36'}>아이디</span>
+                <span className={'w-full py-2 outline-0 text-sm'}
+                >
+                    {profile.userId}
+                </span>
+            </div>
             <div className={'flex gap-3'}>
                 <label className={'flex items-center w-36'}>이름</label>
                 <input className={'w-full px-3 py-2 outline-0 bg-blue-50 duration-300 text-sm'}
@@ -60,13 +67,11 @@ export const UserInfo = ({profileInfo}: {profileInfo: UserInfoI}) => {
                 />
             </div>
             <div className={'flex gap-3'}>
-                <label className={'flex items-center w-36'}>이메일</label>
-                <input className={'w-full px-3 py-2 outline-0 focus:bg-blue-50 duration-300 text-sm disabled:bg-white'}
-                       name={'email'}
-                       value={profile.email}
-                       onChange={onChange}
-                       disabled={true}
-                />
+                <span className={'flex items-center w-36'}>이메일</span>
+                <span className={'w-full py-2 outline-0 text-sm'}
+                >
+                    {profile.email}
+                </span>
             </div>
             <div className={'flex gap-3'}>
                 <label className={'flex items-center w-36'}>연락처</label>
@@ -78,7 +83,7 @@ export const UserInfo = ({profileInfo}: {profileInfo: UserInfoI}) => {
             </div>
             <div className={'flex gap-3'}>
                 <span className={'flex items-center w-36'}>포인트</span>
-                <span className={'w-full px-3 py-2 outline-0 text-sm'}
+                <span className={'w-full py-2 outline-0 text-sm'}
                 >{profile.point}
                     </span>
             </div>
@@ -99,7 +104,7 @@ export const UserInfo = ({profileInfo}: {profileInfo: UserInfoI}) => {
             </div>
             <div className={'flex gap-3'}>
                 <span className={'flex items-center w-36'}>2차 인증 방법</span>
-                <span className={'w-full px-3 py-2 outline-0 text-sm'}
+                <span className={'w-full py-2 outline-0 text-sm'}
                 >{profile.sauthType}
                     </span>
             </div>

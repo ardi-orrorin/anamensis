@@ -41,6 +41,7 @@ const LeftNavBar = ({
 }) => {
 
     const { roles, setRoles } = useContext(UserProvider);
+    const isOAuthUser = useMemo(() => roles.find(role => role === RoleType.OAUTH), [roles]);
 
     const iconSize = 16;
     const menuItems: MenuItemType[] = [
@@ -98,6 +99,8 @@ const LeftNavBar = ({
         })
     , [menuItems, roles]);
 
+    if(roles.length === 0) return <></>
+
     return (
         <>
         <nav className={['z-30 min-h-dvh bg-main py-2 duration-500 '
@@ -150,7 +153,7 @@ const LeftNavBar = ({
                     </Link>
                 </li>
                 {
-                    !roles.find(role => role === RoleType.OAUTH)
+                    !isOAuthUser
                     && <li className={'w-full'}>
                         <Link className={'text text-white w-full'}
                               href={'/user/email'}
@@ -198,7 +201,7 @@ const LeftNavBar = ({
                     </Link>
                 </li>
                 {
-                    !roles.find(role => role === RoleType.OAUTH)
+                    !isOAuthUser
                     && <li className={'w-full'}>
                         <Link className={'text text-white w-full'}
                               href={'/user/otp'}

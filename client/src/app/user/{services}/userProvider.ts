@@ -1,4 +1,5 @@
 import {createContext, Dispatch, SetStateAction} from "react";
+import {RoleType} from "@/app/user/system/{services}/types";
 
 export interface BoardSummaryI {
     id          : number;
@@ -30,7 +31,9 @@ export interface UserProviderI {
     attendInfo: AttendInfoI;
     setAttendInfo: Dispatch<SetStateAction<AttendInfoI>>;
     pointSummary: PointSummaryI[];
-    setPointSummary: Dispatch<SetStateAction<PointSummaryI[]>>
+    setPointSummary: Dispatch<SetStateAction<PointSummaryI[]>>;
+    roles: RoleType[];
+    setRoles: Dispatch<SetStateAction<RoleType[]>>;
 }
 
 const UserProvider = createContext<UserProviderI>({} as UserProviderI);

@@ -92,13 +92,14 @@
              </choose>
              )
     </select>
-    <select id="findMemberByEmailAndUserId">
+    <select id="findMemberByEmailAndUserId" resultType="member">
         <include refid="tbl_member"/>
         WHERE email  = #{email}
         <if test="userId != null and userId != ''">
             AND user_id = #{userId}
         </if>
-          AND is_use = 1
+          AND is_use   = 1
+          AND is_oauth = 0
     </select>
     <insert id="save" parameterType="Member">
         <selectKey keyProperty="id" resultType="int" order="AFTER">

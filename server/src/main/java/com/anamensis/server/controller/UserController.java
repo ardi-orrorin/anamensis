@@ -10,7 +10,6 @@ import com.anamensis.server.provider.TokenProvider;
 import com.anamensis.server.resultMap.MemberResultMap;
 import com.anamensis.server.service.*;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -78,8 +77,6 @@ public class UserController {
     public Mono<UserResponse.Auth> login(
             @RequestBody UserRequest.Login user
     ) {
-
-        log.info("login: {}", user);
 
         Mono<Member> member = userService.findUserByUserId(user.getUsername(), user.getPassword())
                 .subscribeOn(Schedulers.boundedElastic())
@@ -167,7 +164,19 @@ public class UserController {
             .subscribeOn(Schedulers.boundedElastic())
             .subscribe();
 
-        return notAuth(member, token);
+        return notAuth(member, token)
+            .publishOn(Schedulers.boundedElastic())
+            .doOnNext(t -> {
+                member.flatMap(u ->
+                    attendanceService.exist(u.getMemberPk())
+                        .flatMap(b -> {
+                            if (b) return Mono.just(true);
+                            return addAttendanceAndPoint(u.getMember())
+                                .flatMap(b1 -> attendanceService.init(u.getMemberPk()));
+                        })
+                )
+                .subscribe();
+            });
     }
 
 
@@ -177,7 +186,6 @@ public class UserController {
             @Valid @RequestBody
             UserRequest.Register user
     ) {
-
         AtomicReference<Member> member = new AtomicReference<>();
 
         return userService.saveUser(user, false)
@@ -190,33 +198,32 @@ public class UserController {
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(s -> {
                     if(!s.getStatus().equals(HttpStatus.CREATED)) return;
-                    ps.selectByIdOrName("1")
-                        .publishOn(Schedulers.boundedElastic())
-                        .doOnNext(p -> {
-                            userService.updatePoint(member.get().getId(), p.getPoint())
-                                .subscribe();
-                        })
-                        .publishOn(Schedulers.boundedElastic())
-                        .doOnNext(p -> {
-                            tableCodeService.findByIdByTableName(0, "attendance")
-                                .flatMap(t -> {
-                                    PointHistory ph = new PointHistory();
-                                    ph.setMemberPk(member.get().getId());
-                                    ph.setPointCodePk(p.getId());
-                                    ph.setTableCodePk(t.getId());
-                                    ph.setTableRefPk(member.get().getId());
-                                    ph.setCreateAt(LocalDateTime.now());
-                                    return phs.insert(ph);
-                                })
-                                .subscribe();
-                        })
-                        .publishOn(Schedulers.boundedElastic())
-                        .doOnNext(b -> {
-                            userService.findUserInfoCache(member.get().getUserId())
-                                .subscribe();
-                        })
+                    addAttendanceAndPoint(member.get())
                         .subscribe();
                 });
+    }
+
+    private Mono<Boolean> addAttendanceAndPoint(Member member) {
+        return ps.selectByIdOrName("1")
+            .publishOn(Schedulers.boundedElastic())
+            .doOnNext(p -> {
+                userService.updatePoint(member.getId(), p.getPoint())
+                    .flatMap($ -> userService.findUserInfoCache(member.getUserId()))
+                    .flatMap(b ->
+                        tableCodeService.findByIdByTableName(0, "attendance")
+                            .flatMap(t -> {
+                                PointHistory ph = new PointHistory();
+                                ph.setMemberPk(member.getId());
+                                ph.setPointCodePk(p.getId());
+                                ph.setTableCodePk(t.getId());
+                                ph.setTableRefPk(member.getId());
+                                ph.setCreateAt(LocalDateTime.now());
+                                return phs.insert(ph);
+                            })
+                    )
+                    .subscribe();
+            })
+            .flatMap(b -> Mono.just(true));
     }
 
     @PublicAPI

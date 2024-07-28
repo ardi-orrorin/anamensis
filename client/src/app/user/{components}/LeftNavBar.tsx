@@ -12,13 +12,14 @@ import {
     faRectangleList,
     faUserGear,
 } from "@fortawesome/free-solid-svg-icons";
-import React, {useCallback, useMemo} from "react";
+import React, {useCallback, useContext, useMemo} from "react";
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import {faTableList} from "@fortawesome/free-solid-svg-icons/faTableList";
 import {RoleType} from "@/app/user/system/{services}/types";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import useSWR from "swr";
 import apiCall from "@/app/{commons}/func/api";
+import UserProvider from "@/app/user/{services}/userProvider";
 
 type MenuItemType = {
     name: string,
@@ -39,7 +40,7 @@ const LeftNavBar = ({
     setIsModalMode: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
 
-    const [roles, setRoles] = React.useState<RoleType[]>([]);
+    const { roles, setRoles } = useContext(UserProvider);
 
     const iconSize = 16;
     const menuItems: MenuItemType[] = [
@@ -148,17 +149,21 @@ const LeftNavBar = ({
                         </div>
                     </Link>
                 </li>
-                <li className={'w-full'}>
-                    <Link className={'text text-white w-full'}
-                          href={'/user/email'}
-                          onClick={onChangeDisabledHandler}
-                    >
-                        <div className={'w-full p-3 hover:bg-blue-500 duration-300'}>
+                {
+                    !roles.find(role => role === RoleType.OAUTH)
+                    && <li className={'w-full'}>
+                        <Link className={'text text-white w-full'}
+                              href={'/user/email'}
+                              onClick={onChangeDisabledHandler}
+                        >
+                          <div className={'w-full p-3 hover:bg-blue-500 duration-300'}>
                             <FontAwesomeIcon icon={faEnvelope} width={iconSize} />
                             <span>&nbsp; EMAIL</span>
-                        </div>
-                    </Link>
-                </li>
+                          </div>
+                        </Link>
+                    </li>
+                }
+
                 <li className={'w-full'}>
                     <Link className={'text text-white w-full'}
                           href={'/user/point-history'}
@@ -192,17 +197,20 @@ const LeftNavBar = ({
                         </div>
                     </Link>
                 </li>
-                <li className={'w-full'}>
-                    <Link className={'text text-white w-full'}
-                          href={'/user/otp'}
-                          onClick={onChangeDisabledHandler}
-                    >
+                {
+                    !roles.find(role => role === RoleType.OAUTH)
+                    && <li className={'w-full'}>
+                        <Link className={'text text-white w-full'}
+                              href={'/user/otp'}
+                              onClick={onChangeDisabledHandler}
+                        >
                         <div className={'w-full p-3 hover:bg-blue-500 duration-300'}>
                             <FontAwesomeIcon icon={faKey} width={iconSize} />
                             <span>&nbsp; OTP</span>
                         </div>
                     </Link>
-                </li>
+                  </li>
+                }
                 { roleMenu }
             </ul>
         </nav>
@@ -210,7 +218,7 @@ const LeftNavBar = ({
                 isOpen
                 && <div className={'absolute z-10 bg-opacity-25 bg-gray-800 w-full h-full'}
                         onClick={onChangeDisabledHandler}
-                   />
+                />
             }
         </>
     )

@@ -172,7 +172,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
             const summaryRes = await preload(`/api/board/summary/${params.id}`, async () => {
                 return await apiCall<BoardSummaryI[]>({
-                    path: '/api/board/user/summary/' + res.data.writer,
+                    path: '/api/board/user/summary/' + res.data.userId,
                     method: 'GET',
                     call: 'Proxy',
                     isReturnData: true

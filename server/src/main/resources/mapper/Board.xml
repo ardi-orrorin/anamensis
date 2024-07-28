@@ -127,9 +127,9 @@
     <select id="findNotice" resultMap="BoardResultMapBoardNotice">
         SELECT *
              , b.id AS board_pk
-             , (SELECT m.user_id
+             , (SELECT m.name
                   FROM member m
-                 WHERE m.id = b.member_pk
+                 WHERE m.id  = b.member_pk
              ) AS writer
           FROM board b
          WHERE b.category_pk = 1

@@ -119,6 +119,8 @@ public class BoardResponse implements Serializable {
 
         private Map<String, Object> content;
 
+        private String userId;
+
         private String writer;
 
         private String profileImage;
@@ -148,7 +150,8 @@ public class BoardResponse implements Serializable {
                     .title(board.getBoard().getTitle())
                     .categoryPk(board.getBoard().getCategoryPk())
                     .content(board.getBoard().getContent().toMap())
-                    .writer(board.getMember().getUserId())
+                    .userId(board.getMember().getUserId())
+                    .writer(board.getMember().getName())
                     .viewCount(board.getBoard().getViewCount())
                     .createdAt(board.getBoard().getCreateAt())
                     .updatedAt(board.getBoard().getUpdateAt())
@@ -195,7 +198,7 @@ public class BoardResponse implements Serializable {
             RefContent.RefContentBuilder builder = RefContent.builder()
                 .id(board.getId())
                 .title(board.getBoard().getTitle())
-                .writer(board.getMember().getUserId())
+                .writer(board.getMember().getName())
                 .updatedAt(board.getBoard().getUpdateAt())
                 .isPublic(board.getBoard().getIsPublic())
                 .membersOnly(board.getBoard().isMembersOnly());
@@ -265,7 +268,7 @@ public class BoardResponse implements Serializable {
             return Notice.builder()
                 .id(board.getId())
                 .title(board.getBoard().getTitle())
-                .writer(board.getMember().getUserId())
+                .writer(board.getMember().getName())
                 .viewCount(board.getBoard().getViewCount())
                 .createdAt(board.getBoard().getCreateAt())
                 .build();

@@ -200,6 +200,17 @@ const LeftNavBar = ({
                         </div>
                     </Link>
                 </li>
+                <li className={'w-full'}>
+                    <Link className={'text text-white w-full'}
+                          href={'/user/board-block'}
+                          onClick={onChangeDisabledHandler}
+                    >
+                        <div className={'w-full p-3 hover:bg-blue-500 duration-300'}>
+                            <FontAwesomeIcon icon={faEnvelope} width={iconSize} />
+                            <span>&nbsp; 게시글 제한</span>
+                        </div>
+                    </Link>
+                </li>
                 {
                     !isOAuthUser
                     && <li className={'w-full'}>

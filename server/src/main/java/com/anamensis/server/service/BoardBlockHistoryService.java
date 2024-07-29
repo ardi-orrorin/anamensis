@@ -14,6 +14,10 @@ import reactor.core.publisher.Mono;
 public class BoardBlockHistoryService {
     private final BoardBlockHistoryMapper boardBlockHistoryMapper;
 
+    public Mono<Long> count(long memberPk) {
+        return Mono.fromCallable(() -> boardBlockHistoryMapper.count(memberPk));
+    }
+
     public Flux<BoardBlockHistoryResultMap.ResultMap> findByAll(Page page) {
         return Flux.fromIterable(boardBlockHistoryMapper.findByAll(0, page));
     }

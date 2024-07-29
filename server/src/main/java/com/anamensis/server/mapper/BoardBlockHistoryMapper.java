@@ -12,6 +12,8 @@ import java.util.Optional;
 @Mapper
 public interface BoardBlockHistoryMapper {
 
+    long count(long memberPk);
+
     List<BoardBlockHistoryResultMap.ResultMap> findByAll(
         @Param("memberPk") long memberPk,
         @Param("page") Page page

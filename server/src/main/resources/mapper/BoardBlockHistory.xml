@@ -4,9 +4,19 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.anamensis.server.mapper.BoardBlockHistoryMapper">
+    <select id="count">
+        SELECT COUNT(*)
+          FROM board_block_history
+         WHERE 1 = 1
+           <if test="memberPk > 0">
+               AND member_id = #{memberPk}
+           </if>
+    </select>
+
     <select id="findByAll" resultMap="BoardBlockHistoryResultMap">
         SELECT *
              , bbh.board_id  AS board_pk
+             , bbh.id  AS board_block_history_pk
           FROM board_block_history bbh
           JOIN (SELECT bbh2.id
                   FROM board_block_history bbh2
@@ -60,16 +70,14 @@
     <resultMap id="BoardBlockHistoryResultMap" type="com.anamensis.server.resultMap.BoardBlockHistoryResultMap$ResultMap">
         <id property="id" column="id"/>
         <association property="board" resultMap="BoardEntity" />
-        <association property="member" resultMap="MemberEntity" />
+        <association property="boardBlockHistory" resultMap="BoardBlockHistoryEntity" />
     </resultMap>
 
     <resultMap id="BoardEntity" type="Board" autoMapping="true">
         <id property="id" column="board_pk"/>
         <result property="content" column="content" typeHandler="JsonObjectTypeHandler"/>
     </resultMap>
-    <resultMap id="MemberEntity" type="Member" autoMapping="true">
-        <id property="id" column="member_pk"/>
-        <result property="createAt" column="member_create_at" />
+    <resultMap id="BoardBlockHistoryEntity" type="BoardBlockHistory" autoMapping="true">
+        <id property="id" column="board_block_history_pk"/>
     </resultMap>
-
 </mapper>

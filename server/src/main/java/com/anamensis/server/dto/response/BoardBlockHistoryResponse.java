@@ -76,21 +76,28 @@ public class BoardBlockHistoryResponse {
             detail.setTitle(resultMap.getBoard().getTitle());
             detail.setCreatedAt(resultMap.getBoardBlockHistory().getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
-            if(resultMap.getBoardBlockHistory().getAnswer() != null) {
-                detail.setAnswer(resultMap.getBoardBlockHistory().getAnswer());
-            }
+            detail.setAnswer(
+                resultMap.getBoardBlockHistory().getAnswer() != null
+                    ? resultMap.getBoardBlockHistory().getAnswer()
+                    : ""
+            );
 
-            if(resultMap.getBoardBlockHistory().getReason() != null) {
-                detail.setReason(resultMap.getBoardBlockHistory().getReason());
-            }
+            detail.setReason(
+                resultMap.getBoardBlockHistory().getReason() != null
+                    ? resultMap.getBoardBlockHistory().getReason()
+                    : ""
+            );
 
-            if(resultMap.getBoardBlockHistory().getAnswerAt() != null) {
-                detail.setAnswerAt(resultMap.getBoardBlockHistory().getAnswerAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            }
-
-            if(resultMap.getBoardBlockHistory().getResultAt() != null) {
-                detail.setResultAt(resultMap.getBoardBlockHistory().getResultAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            }
+            detail.setAnswerAt(
+                resultMap.getBoardBlockHistory().getAnswerAt() != null
+                    ? resultMap.getBoardBlockHistory().getAnswerAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    : ""
+            );
+            detail.setResultAt(
+                resultMap.getBoardBlockHistory().getResultAt() != null
+                    ? resultMap.getBoardBlockHistory().getResultAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    : ""
+            );
 
             return detail;
         }

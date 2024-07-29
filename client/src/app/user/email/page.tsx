@@ -10,19 +10,20 @@ import UserProvider from "@/app/user/{services}/userProvider";
 import {RoleType} from "@/app/user/system/{services}/types";
 
 export interface UserInfoI {
-    userId: string;
-    email: string;
-    phone: string;
-    name: string;
-    point: number;
-    sauthType: AuthType;
-    sauth: boolean;
-    [key: string]: any;
+    userId        : string;
+    email         : string;
+    phone         : string;
+    name          : string;
+    point         : number;
+    sauthType     : AuthType;
+    sauth         : boolean;
+    createAt      : string;
+    [key: string] : any;
 }
 
 export interface AuthPropsI {
-    sauthType: AuthType;
-    sauth: boolean;
+    sauthType : AuthType;
+    sauth     : boolean;
 }
 
 export default function Page() {

@@ -7,8 +7,11 @@ CREATE TABLE board_block_history (
     board_id   BIGINT          NOT NULL,
     member_id  BIGINT          NOT NULL,
     reason     VARCHAR(512)    NOT NULL,
-    answer     VARCHAR(512)    NOT NULL,
-    created_at TIMESTAMP(6)    NOT NULL
+    answer     VARCHAR(512)    NULL ,
+    result     VARCHAR(512)    NULL ,
+    created_at TIMESTAMP(6)    NOT NULL,
+    answer_at  TIMESTAMP(6)    NULL,
+    result_at  TIMESTAMP(6)    NULL
 );
 
 ALTER TABLE board_block_history ADD FOREIGN KEY (board_id) REFERENCES board(id);

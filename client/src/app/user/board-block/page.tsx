@@ -32,6 +32,10 @@ export default function Page() {
             params: {
                 size: searchParams.get('size') || '20',
                 page: searchParams.get('page') || '1',
+                keyword: searchParams.get('keyword') || '',
+                search: searchParams.get('search') || '',
+                filterType: searchParams.get('filterType') || '',
+                filterKeyword: searchParams.get('filterKeyword') || '',
             },
             isReturnData: true,
         })
@@ -50,7 +54,7 @@ export default function Page() {
             <ModalProvider.Provider value={{
                 modal, setModal
             }}>
-                <div>
+                <div className={'flex flex-col gap-2'}>
                     <History />
                     <PageNavigator {...page} />
                     {

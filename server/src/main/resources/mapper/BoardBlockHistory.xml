@@ -24,11 +24,17 @@
                    <if test="memberPk > 0">
                        AND bbh2.member_id = #{memberPk}
                    </if>
-                 LIMIT #{page.offset}, #{page.size}
+                   <if test="page.filterType == 'status' and page.filterKeyword != ''">
+                       AND bbh2.status = #{page.filterKeyword}
+                   </if>
              ) bbh3 ON bbh.id = bbh3.id
           JOIN board b
             ON bbh.board_id = b.id
+            <if test="page.searchType != '' and page.searchType == 'title' and page.keyword != ''">
+                AND b.title LIKE CONCAT('%', #{page.keyword}, '%')
+            </if>
          ORDER BY bbh.id DESC
+         LIMIT #{page.offset}, #{page.size}
     </select>
 
     <select id="findByPk" resultMap="BoardBlockHistoryResultMap">

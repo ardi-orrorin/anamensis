@@ -17,20 +17,10 @@ export async function POST(req: NextRequest){
             : '/public/api/user/verify'
     )
 
-
     const clientIp = req.ip || req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for');
 
     const ipRegExp = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/;
     const ipMatch = ipRegExp.exec(clientIp || '');
-
-    // const geoLocation: GeoLocationType = await getGeoLocation(ipMatch?.[0]);
-    //
-    // const headers = {
-    //     'Content-Type': 'application/json',
-    //     'User-Agent': req.headers.get('User-Agent') || '',
-    //     'Ip': geoLocation.ipv4,
-    //     'Location': `${geoLocation.countryName}-${geoLocation.state}-${geoLocation.city}`
-    // }
 
     const headers = {
         'Content-Type': 'application/json',

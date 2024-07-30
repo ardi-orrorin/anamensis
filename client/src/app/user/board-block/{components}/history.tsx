@@ -1,5 +1,5 @@
-import {useSearchParams} from "next/navigation";
-import {useContext, useMemo} from "react";
+import {usePathname, useRouter, useSearchParams} from "next/navigation";
+import {useContext, useMemo, useState} from "react";
 import BoardBlockProvider, {BoardBlock} from "@/app/user/board-block/{services}/boardBlockProvider";
 import apiCall from "@/app/{commons}/func/api";
 import ModalProvider from "@/app/user/board-block/{services}/modalProvider";
@@ -11,7 +11,13 @@ const History = () => {
     const searchParams = useSearchParams();
     const {boardBlockHistories, page, boardBlock, setBoardBlock} = useContext(BoardBlockProvider);
     const {modal, setModal} = useContext(ModalProvider);
+    const [keyword, setKeyword] = useState('');
+
     const maxIndex = useMemo(() => page.total - ((page.page - 1) * page.size),[page]);
+
+
+    const router = useRouter();
+    const pathname = usePathname();
 
     const onClickHandler = async (id: number) => {
         return await apiCall<BoardBlock>({
@@ -27,34 +33,68 @@ const History = () => {
         });
     }
 
+    const onChangeSearchParams = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const {name, value} = e.target;
+
+        const params = new URLSearchParams(searchParams.toString());
+        params.set(name, value);
+
+        router.push(pathname + '?' + params.toString());
+    }
+
+    const onSearchHandler = () => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('search', 'title');
+        params.set('keyword', keyword);
+        router.push(pathname + '?' + params.toString());
+    }
+
+    const onFilterHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const {name, value} = e.target;
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('filterType', name);
+        params.set('filterKeyword', value);
+
+        if(value === '') {
+            params.delete('filterType');
+            params.delete('filterKeyword');
+        }
+
+        router.push(pathname + '?' + params.toString());
+    }
+
     return (
         <>
-            <div className={'flex justify-between h-10'}>
-                <div />
-                <form className={'flex gap-3'}
-                      method={'get'}
+            <div className={'flex justify-end h-12 py-2 gap-2'}>
+                <select className={'w-48 border border-solid border-gray-300 rounded-md text-sm px-3 py-1 outline-0'}
+                        name={'status'}
+                        defaultValue={searchParams.get('filterKeyword') || ''}
+                        onChange={onFilterHandler}
                 >
-                    <div>
-                        <select className={'w-32 border border-solid border-gray-300 rounded-md text-sm px-3 py-1 outline-0'}
-                                defaultValue={searchParams.size || '20'}
-                                name={'size'}
-                        >
-                            <option value={'10'}>10</option>
-                            <option value={'20'}>20</option>
-                            <option value={'30'}>30</option>
-                            <option value={'50'}>50</option>
-                            <option value={'100'}>100</option>
-                            <option value={'200'}>200</option>
-                        </select>
-                    </div>
-                    <div>
-                        <button className={'w-20 border border-solid border-gray-300 rounded-md text-sm px-3 py-1'}
-                                type={'submit'}
-                        >
-                            조회
-                        </button>
-                    </div>
-                </form>
+                    <option value={''}>전체</option>
+                    {
+                        Types.list.map((status, index) => {
+                            return <option key={'index' + status.getStatus()}
+                                           value={status.getStatus()}
+                            >{status.getKorName()}
+                            </option>
+                        })
+                    }
+                </select>
+
+                <select className={'w-32 border border-solid border-gray-300 rounded-md text-sm px-3 py-1 outline-0'}
+                        name={'size'}
+                        defaultValue={searchParams.get('size') || '20'}
+                        onChange={onChangeSearchParams}
+                >
+                    <option value={'5'}>5</option>
+                    <option value={'10'}>10</option>
+                    <option value={'20'}>20</option>
+                    <option value={'30'}>30</option>
+                    <option value={'50'}>50</option>
+                    <option value={'100'}>100</option>
+                    <option value={'200'}>200</option>
+                </select>
             </div>
             <table className={'w-full'}>
                 <colgroup>
@@ -76,7 +116,6 @@ const History = () => {
                 <tbody className={'text-sm'}>
                 {
                     boardBlockHistories.map((history, index) => {
-                        console.log(maxIndex);
                         return (
                             <tr key={history.id} className={['border-b border-gray-200 border-solid hover:bg-blue-300 hover:text-white duration-300', index % 2 === 1 ? 'bg-blue-50': ''].join(' ')}
                                 onClick={() => onClickHandler(history.id)}
@@ -91,6 +130,19 @@ const History = () => {
                 }
                 </tbody>
             </table>
+            <div className={'w-full flex gap-1 justify-center py-3 text-xs'}>
+                <input className={'w-60 p-2 border border-solid border-blue-200 outline-0 focus:bg-blue-200 rounded duration-300'}
+                      type={'text'}
+                      placeholder={'검색어를 입력하세요.'}
+                      value={keyword}
+                      onChange={(e) => setKeyword(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && onSearchHandler()}
+                />
+                <button className={'py-2 px-4 bg-main text-white rounded duration-300'}
+                        onClick={onSearchHandler}
+                >검색
+                </button>
+            </div>
         </>
     )
 }

@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.beans.factory.annotation.Value;
 
+@ToString
 public class Page {
 
     @Getter
@@ -24,6 +25,23 @@ public class Page {
 
     @Setter
     private String order;
+
+    @Getter
+    @Setter
+    private String searchType;
+
+    @Getter
+    @Setter
+    private String keyword;
+
+    @Getter
+    @Setter
+    private String filterType;
+
+    @Getter
+    @Setter
+    private String filterKeyword;
+
 
     private boolean endPage;
 

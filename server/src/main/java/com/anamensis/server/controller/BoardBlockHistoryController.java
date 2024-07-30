@@ -38,7 +38,6 @@ public class BoardBlockHistoryController {
         Page page,
         @AuthenticationPrincipal UserDetails user
     ) {
-
         List<RoleType> roles = user.getAuthorities()
             .stream().map(a -> RoleType.valueOf(a.getAuthority()))
             .toList();

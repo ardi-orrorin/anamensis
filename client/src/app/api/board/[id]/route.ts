@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
         return ExNextResponse({
             body: JSON.stringify({...data, isLogin: getCookies}),
             status: 200,
-            isRoles: false,
+            isRoles: true,
         })
 
     } catch (e: any) {

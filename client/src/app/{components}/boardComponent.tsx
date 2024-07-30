@@ -6,6 +6,8 @@ import AlttuelBoardComponent from "@/app/{components}/boards/alttuel";
 import AlbumBoardComponent from "@/app/{components}/boards/album";
 import QuestionBoardComponent from "@/app/{components}/boards/question";
 import MembersOnlyBody from "@/app/{components}/membersOnlyBody";
+import Blocked from "@/app/{components}/boards/blocked";
+import {RoleType} from "@/app/user/system/{services}/types";
 
 export interface BoardListI {
     id           : string;
@@ -20,12 +22,18 @@ export interface BoardListI {
     body?        : BlockI[];
     isPublic     : boolean;
     membersOnly  : boolean;
+    isBlocked    : boolean;
+    roles        : RoleType[];
 }
 
 const BoardComponent = (props: BoardListI & {favorites: string[], isLogin: boolean}) => {
     const {
-       id, body, categoryPk, favorites, isLogin, membersOnly
+       id, body,
+        categoryPk, favorites,
+        isLogin, membersOnly, isBlocked,
+        roles,
     } = props;
+
 
     const membersOnlyBody = useMemo(() =>
         membersOnly && !isLogin
@@ -44,22 +52,35 @@ const BoardComponent = (props: BoardListI & {favorites: string[], isLogin: boole
     , [favorites, id]);
 
     const Component = useMemo(() => {
+        if(isBlocked) return <Blocked {...props} />;
         if(membersOnlyBody) return <MembersOnlyBody {...props} />;
+
         return Components.find((component) =>
             component.categoryPk === Number(categoryPk)
         )?.component(props)
     },[categoryPk, body])
 
     return (
-        <Link className={[
-            'relative flex flex-col justify-between w-full h-[170px] border-solid border rounded shadow active:bg-blue-50 hover:shadow-xl  active:shadow-xl duration-300',
-            isFavorite ? 'border-amber-200 hover:border-amber-500 bg-amber-50' : 'bg-white border-gray-200 hover:border-gray-500'
-        ].join(' ')}
-              href={`/board/${id}`}
-              prefetch={true}
-        >
-            { Component }
-        </Link>
+        <>
+            {
+                isBlocked && !roles.includes(RoleType.ADMIN)
+                ? <span className={
+                    'relative flex flex-col justify-between w-full h-[170px] bg-white border-gray-200 border-solid border rounded shadow active:bg-blue-50 duration-300'
+                }
+                >
+                    { Component }
+                </span>
+                : <Link className={[
+                    'relative flex flex-col justify-between w-full h-[170px] border-solid border rounded shadow active:bg-blue-50 hover:shadow-xl  active:shadow-xl duration-300',
+                    isFavorite ? 'border-amber-200 hover:border-amber-500 bg-amber-50' : 'bg-white border-gray-200 hover:border-gray-500'
+                ].join(' ')}
+                        href={`/board/${id}`}
+                        prefetch={true}
+                >
+                    { Component }
+                </Link>
+            }
+        </>
     )
 }
 

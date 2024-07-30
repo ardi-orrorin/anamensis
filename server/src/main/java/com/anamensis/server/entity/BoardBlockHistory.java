@@ -14,9 +14,14 @@ public class BoardBlockHistory {
     private long id;
     private long boardId;
     private long memberId;
+
+    private BoardBlockStatus status;
+
+    private String title;
     private String reason;
     private String answer;
     private String result;
+
     private LocalDateTime createdAt;
     private LocalDateTime answerAt;
     private LocalDateTime resultAt;

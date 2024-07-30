@@ -6,6 +6,7 @@ CREATE TABLE board_block_history (
     id         BIGINT          NOT NULL PRIMARY KEY AUTO_INCREMENT,
     board_id   BIGINT          NOT NULL,
     member_id  BIGINT          NOT NULL,
+    status     VARCHAR(32)     NOT NULL,
     reason     VARCHAR(512)    NOT NULL,
     answer     VARCHAR(512)    NULL ,
     result     VARCHAR(512)    NULL ,

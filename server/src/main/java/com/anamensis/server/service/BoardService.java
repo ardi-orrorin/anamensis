@@ -78,6 +78,12 @@ public class BoardService {
             .switchIfEmpty(Mono.error(new RuntimeException("게시글을 찾을 수 없습니다.")));
     }
 
+    public Mono<Boolean> updateIsBlockedByPk(long boardPk, boolean isBlocked) {
+        return Mono.fromCallable(()-> boardMapper.updateIsBlockedByPk(boardPk, isBlocked) > 0)
+            .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+            .doOnNext($ -> updateCacheBoard(boardPk).subscribe());
+    }
+
     public Mono<BoardResultMap.Board> cacheFindByPk(long boardPk) {
         String key = String.format(BOARD_PK_KEY, boardPk);
 

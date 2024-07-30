@@ -7,10 +7,12 @@ import com.anamensis.server.dto.request.BoardBlockHistoryRequest;
 import com.anamensis.server.dto.response.BoardBlockHistoryResponse;
 import com.anamensis.server.dto.response.StatusResponse;
 import com.anamensis.server.entity.Member;
+import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.service.BoardBlockHistoryService;
 import com.anamensis.server.service.BoardService;
 import com.anamensis.server.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +25,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/board-block-history")
+@Slf4j
 public class BoardBlockHistoryController {
 
     private final BoardBlockHistoryService boardBlockHistoryService;
@@ -36,6 +39,10 @@ public class BoardBlockHistoryController {
         @AuthenticationPrincipal UserDetails user
     ) {
 
+        List<RoleType> roles = user.getAuthorities()
+            .stream().map(a -> RoleType.valueOf(a.getAuthority()))
+            .toList();
+
         Mono<Member> member = userService.findUserByUserId(user.getUsername())
             .subscribeOn(Schedulers.fromExecutor(executor))
             .share();
@@ -43,11 +50,17 @@ public class BoardBlockHistoryController {
 
         Mono<Long> count = member
             .subscribeOn(Schedulers.fromExecutor(executor))
-            .flatMap(u -> boardBlockHistoryService.count(u.getId()));
+            .flatMap(u -> boardBlockHistoryService.count(
+                roles.contains(RoleType.ADMIN) ? 0 : u.getId()
+            ));
 
         Mono<List<BoardBlockHistoryResponse.List>> result = member
             .subscribeOn(Schedulers.fromExecutor(executor))
-            .flatMapMany(u -> boardBlockHistoryService.findByMemberPk(u.getId(), page))
+            .flatMapMany(u ->
+                roles.contains(RoleType.ADMIN)
+                    ? boardBlockHistoryService.findByAll(page)
+                    : boardBlockHistoryService.findByMemberPk(u.getId(), page)
+            )
             .map(BoardBlockHistoryResponse.List::from)
             .collectList();
 
@@ -75,8 +88,17 @@ public class BoardBlockHistoryController {
         @RequestBody BoardBlockHistoryRequest.Save request
     ) {
         return boardService.findByPk(request.getBoardPk())
-                .doOnNext(b -> request.setMemberPk(b.getBoard().getMemberPk()))
-                .flatMap(u -> boardBlockHistoryService.save(request.toEntity()))
+                .flatMap(b -> {
+                    request.setMemberPk(b.getBoard().getMemberPk());
+
+                    Mono<Boolean> save = boardBlockHistoryService.save(request.toEntity())
+                        .subscribeOn(Schedulers.fromExecutor(executor));
+                    Mono<Boolean> update = boardService.updateIsBlockedByPk(request.getBoardPk(), true)
+                        .subscribeOn(Schedulers.fromExecutor(executor));
+
+                    return Mono.zip(save, update)
+                        .map(t -> t.getT1() && t.getT2());
+                })
                 .flatMap(bool -> {
                     StatusResponse response = StatusResponse.builder()
                         .status(bool ? StatusType.SUCCESS : StatusType.FAIL)
@@ -91,6 +113,18 @@ public class BoardBlockHistoryController {
         @RequestBody BoardBlockHistoryRequest.Update request
     ) {
         return boardBlockHistoryService.update(request.toEntity())
+                .doOnNext($ -> {
+                    if(request.getResultStatus() != null && request.getResultStatus() == BoardBlockHistoryRequest.ResultStatus.UNBLOCKING) {
+                        boardBlockHistoryService.findByPk(request.getId())
+                            .subscribeOn(Schedulers.fromExecutor(executor))
+                            .doOnNext(b -> {
+                                boardService.updateIsBlockedByPk(b.getBoard().getId(), false)
+                                    .subscribeOn(Schedulers.fromExecutor(executor))
+                                    .subscribe();
+                            })
+                            .subscribe();
+                    }
+                })
                 .flatMap(bool -> {
                     StatusResponse response = StatusResponse.builder()
                         .status(bool ? StatusType.SUCCESS : StatusType.FAIL)

@@ -33,6 +33,8 @@ import {useRouter} from "next/navigation";
 import HotKeyInfo from "@/app/board/[id]/{components}/hotKeyInfo";
 import {useBoardHotKey} from "@/app/board/[id]/{hooks}/hotkey";
 import TemplateMenu from "@/app/board/[id]/{components}/templateMenu";
+import ModalProvider from "@/app/user/board-block/{services}/modalProvider";
+import BoardblockModal from "@/app/board/[id]/{components}/boardblockModal";
 
 export interface RateInfoI {
     id      : number;
@@ -50,6 +52,7 @@ export default function Page({params}: {params : {id: string}}) {
         , isFavorite, setIsFavorite,
         isNewBoard, isTemplate,
         boardTemplate, setBoardTemplate,
+        roles,
     } = useContext(BoardProvider);
 
     const {
@@ -66,7 +69,9 @@ export default function Page({params}: {params : {id: string}}) {
         waitRemoveFiles, setWaitRemoveFiles
     } = useContext(TempFileProvider);
 
+
     const [fullScreen, setFullScreen] = useState<boolean>(false);
+    const [modal, setModal] = useState({toggle: false, id: 0});
 
     const blockRef = useRef<HTMLElement[] | null[]>([]);
 
@@ -262,35 +267,6 @@ export default function Page({params}: {params : {id: string}}) {
             });
         }
 
-
-        // const fileRootPath = '/resource/board/'
-        // if(!fileBlock?.extraValue) return ;
-
-        // const files = Object?.keys(fileBlock?.extraValue!).filter(key =>
-        //     fileBlock.extraValue![key].toString().includes(fileRootPath)
-        // )?.map(key =>
-        //     fileBlock.extraValue![key]
-        // );
-        //
-        // fileBlock.value.includes('/resource/board/') && files.push(fileBlock.value);
-        //
-        // files.flat().forEach(file => {
-        //     console.log('sdfdsfsdfsdf', file);
-        //     if(isNewBoard) {
-        //         apiCall({
-        //             path: '/api/file/delete/filename',
-        //             method: 'PUT',
-        //             body: {fileUri: file as string},
-        //             isReturnData: true
-        //         });
-        //     } else {
-        //         deleteImage({
-        //             absolutePath: file as string,
-        //             setWaitUploadFiles,
-        //             setWaitRemoveFiles
-        //         });
-        //     }
-        // });
     },[board.isView, board.data?.content?.list, waitUploadFiles, waitRemoveFiles])
 
     const onChangeTitleHandler = (e: ChangeEvent<HTMLInputElement>) => {
@@ -357,6 +333,10 @@ export default function Page({params}: {params : {id: string}}) {
 
     },[isFavorite]);
 
+    const onBlockClickHandler = useCallback(() => {
+        setModal({toggle: true, id: Number(board?.data?.id)});
+    },[modal]);
+
     useBoardHotKey({
         blockService,
         board,
@@ -371,6 +351,7 @@ export default function Page({params}: {params : {id: string}}) {
     }
 
     return (
+        <ModalProvider.Provider value={{modal, setModal}}>
         <div className={'p-5 flex flex-col gap-5 justify-center items-center'}>
             <div className={`relative w-full flex flex-col gap-6 duration-700 ${fullScreen || 'lg:w-2/3 xl:w-3/5'}`}>
                 <div className={[`absolute z-10 top-1/4 -right-52 hidden`, fullScreen ? 'lg:hidden' : 'lg:block'].join(' ')}>
@@ -413,12 +394,11 @@ export default function Page({params}: {params : {id: string}}) {
                         {
                             !isNewBoard
                             && !isTemplate
-                            && <HeaderBtn isView={board.isView}
-                                       isWriter={board.data?.isWriter || false}
-                                       isLogin={board.data?.isLogin || false}
-                                       submitClickHandler={() => debounce(() => submitHandler(false))}
-                                       editClickHandler={editClickHandler}
-                                       deleteClickHandler={() => debounce(() => deleteHandler())}
+                            && <HeaderBtn roles={roles}
+                                          submitClickHandler={() => debounce(() => submitHandler(false))}
+                                          editClickHandler={editClickHandler}
+                                          deleteClickHandler={() => debounce(() => deleteHandler())}
+                                          blockClickHandler={() => debounce(() => onBlockClickHandler())}
                             />
                         }
                         <div className={'flex gap-1'}>
@@ -547,6 +527,11 @@ export default function Page({params}: {params : {id: string}}) {
                 (isNewBoard || !board.isView) && (!isNewBoard || !board.isView)
                 && <div className={'h-60'} />
             }
+            {
+                modal.toggle
+                && <BoardblockModal />
+            }
         </div>
+        </ModalProvider.Provider>
     )
 }

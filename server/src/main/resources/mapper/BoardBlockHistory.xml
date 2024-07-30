@@ -24,11 +24,11 @@
                    <if test="memberPk > 0">
                        AND bbh2.member_id = #{memberPk}
                    </if>
-                 ORDER BY bbh2.id DESC
                  LIMIT #{page.offset}, #{page.size}
              ) bbh3 ON bbh.id = bbh3.id
           JOIN board b
             ON bbh.board_id = b.id
+         ORDER BY bbh.id DESC
     </select>
 
     <select id="findByPk" resultMap="BoardBlockHistoryResultMap">
@@ -43,20 +43,21 @@
 
     <insert id="save" parameterType="BoardBlockHistory">
         INSERT INTO board_block_history
-               (board_id, member_id, reason, created_at)
-        VALUES (#{boardId}, #{memberId}, #{reason}, #{createdAt});
+               (board_id, member_id, status, reason, created_at)
+        VALUES (#{boardId}, #{memberId}, #{status}, #{reason}, #{createdAt});
     </insert>
     <update id="update" parameterType="BoardBlockHistory">
         UPDATE board_block_history
         <set>
             <if test="answer != null and answer != '' and answerAt != null">
                 answer    = #{answer},
-                answer_at = #{answerAt}
+                answer_at = #{answerAt},
             </if>
             <if test="result != null and result != '' and resultAt != null">
                 result    = #{result},
-                result_at = #{resultAt}
+                result_at = #{resultAt},
             </if>
+                status    = #{status},
         </set>
          WHERE id = #{id};
     </update>

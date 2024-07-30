@@ -166,7 +166,7 @@ export default function Page() {
     const dataComponent = useMemo(() => data.map((item, index) => {
         if(!item) return;
         return (
-            <BoardComponent key={'boardsummary' + index} {...{...item, favorites, isLogin}} />
+            <BoardComponent key={'boardsummary' + index} {...{...item, favorites, isLogin, roles}} />
         )
     }),[data, favorites]);
 

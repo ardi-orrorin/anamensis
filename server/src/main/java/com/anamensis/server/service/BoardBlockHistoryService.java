@@ -32,9 +32,6 @@ public class BoardBlockHistoryService {
     }
 
     public Mono<Boolean> save(BoardBlockHistory boardBlockHistory) {
-
-
-
         return Mono.fromCallable(() -> boardBlockHistoryMapper.save(boardBlockHistory) > 0);
     }
 

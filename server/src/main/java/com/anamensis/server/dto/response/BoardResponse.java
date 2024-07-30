@@ -53,6 +53,8 @@ public class BoardResponse implements Serializable {
 
         private boolean membersOnly;
 
+        private Boolean isBlocked;
+
         @SneakyThrows
         public static List from(BoardResultMap.Board board) {
 
@@ -67,7 +69,8 @@ public class BoardResponse implements Serializable {
                     .categoryPk(board.getBoard().getCategoryPk())
                     .updatedAt(board.getBoard().getUpdateAt())
                     .isPublic(board.getBoard().getIsPublic())
-                    .membersOnly(board.getBoard().isMembersOnly());
+                    .membersOnly(board.getBoard().isMembersOnly())
+                    .isBlocked(board.getBoard().isBlocked());
 
             builder.body(board.getBoard().getContent().getJSONArray("list").toList());
 
@@ -82,10 +85,12 @@ public class BoardResponse implements Serializable {
 
             java.util.List<Object> body =
                 board.getBoard().isMembersOnly()
-                    ? member.getId() > 0
+                    ? member.getId() > 0 // is login
                         ? board.getBoard().getContent().getJSONArray("list").toList()
-                        : java.util.List.of()
-                    : board.getBoard().getContent().getJSONArray("list").toList();
+                        : java.util.List.of() // not login
+                    : board.getBoard().isBlocked()
+                        ? java.util.List.of() // blocked
+                        : board.getBoard().getContent().getJSONArray("list").toList();
 
             List.ListBuilder builder = List.builder()
                     .id(board.getBoard().getId())
@@ -100,6 +105,7 @@ public class BoardResponse implements Serializable {
                     .isPublic(board.getBoard().getIsPublic())
                     .membersOnly(board.getBoard().isMembersOnly())
                     .profileImage(board.getProfile())
+                    .isBlocked(board.getBoard().isBlocked())
                     .body(body);
 
             return builder.build();
@@ -141,6 +147,8 @@ public class BoardResponse implements Serializable {
 
         private boolean membersOnly;
 
+        private Boolean isBlocked;
+
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime writerCreatedAt;
 
@@ -157,7 +165,8 @@ public class BoardResponse implements Serializable {
                     .updatedAt(board.getBoard().getUpdateAt())
                     .isPublic(board.getBoard().getIsPublic())
                     .membersOnly(board.getBoard().isMembersOnly())
-                    .writerCreatedAt(board.getMember().getCreateAt());
+                    .writerCreatedAt(board.getMember().getCreateAt())
+                    .isBlocked(board.getBoard().isBlocked());
 
             if(Objects.nonNull(member)) {
                 builder.isWriter(board.getBoard().getMemberPk() == member.getId());
@@ -193,6 +202,8 @@ public class BoardResponse implements Serializable {
 
         private boolean membersOnly;
 
+        private Boolean isBlocked;
+
         public static RefContent from(BoardResultMap.Board board, Member member) {
 
             RefContent.RefContentBuilder builder = RefContent.builder()
@@ -201,8 +212,12 @@ public class BoardResponse implements Serializable {
                 .writer(board.getMember().getName())
                 .updatedAt(board.getBoard().getUpdateAt())
                 .isPublic(board.getBoard().getIsPublic())
-                .membersOnly(board.getBoard().isMembersOnly());
+                .membersOnly(board.getBoard().isMembersOnly())
+                .isBlocked(board.getBoard().isBlocked());
 
+            if (board.getBoard().isBlocked()) {
+                return builder.build();
+            }
 
             if(board.getBoard().getIsPublic()) {
                 builder.content(board.getBoard().getContent().toMap());

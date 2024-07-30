@@ -12,7 +12,6 @@ import com.anamensis.server.service.BoardBlockHistoryService;
 import com.anamensis.server.service.BoardService;
 import com.anamensis.server.service.UserService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,7 +24,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/board-block-history")
-@Slf4j
 public class BoardBlockHistoryController {
 
     private final BoardBlockHistoryService boardBlockHistoryService;
@@ -90,10 +88,9 @@ public class BoardBlockHistoryController {
                 .flatMap(b -> {
                     request.setMemberPk(b.getBoard().getMemberPk());
 
-                    Mono<Boolean> save = boardBlockHistoryService.save(request.toEntity())
-                        .subscribeOn(Schedulers.fromExecutor(executor));
-                    Mono<Boolean> update = boardService.updateIsBlockedByPk(request.getBoardPk(), true)
-                        .subscribeOn(Schedulers.fromExecutor(executor));
+                    Mono<Boolean> save = boardBlockHistoryService.save(request.toEntity());
+
+                    Mono<Boolean> update = boardService.updateIsBlockedByPk(request.getBoardPk(), true);
 
                     return Mono.zip(save, update)
                         .map(t -> t.getT1() && t.getT2());

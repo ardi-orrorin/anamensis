@@ -32,8 +32,6 @@ public class PageArgumentResolver implements HandlerMethodArgumentResolver {
     ) {
         MultiValueMap<String, String> params = exchange.getRequest().getQueryParams();
 
-        log.info("params: {}", params);
-
         String page = params.getFirst("page");
         String size = params.getFirst("size");
         String criteria = params.getFirst("criteria");

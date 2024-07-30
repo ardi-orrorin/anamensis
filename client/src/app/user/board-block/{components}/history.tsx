@@ -117,7 +117,7 @@ const History = () => {
                 {
                     boardBlockHistories.map((history, index) => {
                         return (
-                            <tr key={history.id} className={['border-b border-gray-200 border-solid hover:bg-blue-300 hover:text-white duration-300', index % 2 === 1 ? 'bg-blue-50': ''].join(' ')}
+                            <tr key={history.id} className={['border-b border-gray-200 border-solid hover:bg-blue-300 hover:text-white active:bg-blue-700 duration-300', index % 2 === 1 ? 'bg-blue-50': ''].join(' ')}
                                 onClick={() => onClickHandler(history.id)}
                             >
                                 <td className={'py-2 px-3'}>{ maxIndex - index }</td>

@@ -19,17 +19,9 @@ export default async function Page() {
         isReturnData: true,
     });
 
-    const img = await apiCall<string>({
-        path: '/api/user/profile-img',
-        method: 'GET',
-        call: 'Server',
-        setAuthorization: true,
-        isReturnData: true,
-    });
-
     return (
         <main className={'flex flex-col gap-7 w-full justify-center items-center'}>
-            <ProfileImg imgData={img} />
+            <ProfileImg />
             <UserInfo profileInfo={profile} />
         </main>
     )

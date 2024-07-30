@@ -4,6 +4,8 @@ import {faPenToSquare, faRightFromBracket, faUser, faUserPlus} from "@fortawesom
 import {cookies} from "next/headers";
 import {faRightToBracket} from "@fortawesome/free-solid-svg-icons/faRightToBracket";
 import Image from "next/image";
+import {NO_IMAGE} from "@/app/{services}/constants";
+import apiCall from "@/app/{commons}/func/api";
 
 type NavItemProps = {
     name: string | JSX.Element,
@@ -17,6 +19,14 @@ const NavMain = async () => {
 
     const isLogged = (cookies()?.get('next.access.token')  || cookies()?.get('next.refresh.token')) !== undefined;
 
+    const profileImg = isLogged && await apiCall<string>({
+        path: '/api/user/profile-img',
+        method: 'GET',
+        call: 'Server',
+        setAuthorization: true,
+        isReturnData: true,
+    });
+
     const rightMenuItems : NavItemProps[] = [
         {
             name: <FontAwesomeIcon className={'w-4'} icon={faPenToSquare} />,
@@ -28,12 +38,6 @@ const NavMain = async () => {
             name: <FontAwesomeIcon className={'w-4'} icon={faUserPlus} />,
             url: '/signup',
             loginRequired: false,
-            prefetch: true,
-        },
-        {
-            name: <FontAwesomeIcon className={'w-4'} icon={faUser} />,
-            url: '/user',
-            loginRequired: true,
             prefetch: true,
         },
         {
@@ -64,8 +68,8 @@ const NavMain = async () => {
                     />
                 </Link>
             </div>
-            <div className={'w-1/3'}>
-                <ul className={'flex justify-end'}>
+            <div className={'w-1/3 h-full'}>
+                <ul className={'flex h-full justify-end'}>
                     {
                         rightMenuItems.map((item, index) => {
                             if(!item.loginRequired === isLogged) {
@@ -73,6 +77,20 @@ const NavMain = async () => {
                             }
                             return <NavItem key={index} {...item} />
                         })
+                    }
+                    {
+                        isLogged
+                        && process.env.NEXT_PUBLIC_CDN_SERVER
+                        && <div className={'flex h-full justify-center items-center px-2 hover:bg-blue-800 rounded duration-500'}>
+                        <Link href={'/user'}>
+                          <Image className={'rounded'}
+                                 src={process.env.NEXT_PUBLIC_CDN_SERVER + profileImg}
+                                 alt={''}
+                                 width={30}
+                                 height={30}
+                          />
+                        </Link>
+                      </div>
                     }
                 </ul>
             </div>

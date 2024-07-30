@@ -70,7 +70,6 @@ public class BoardBlockHistoryController {
                 });
     }
 
-
     @GetMapping("{id}")
     public Mono<BoardBlockHistoryResponse.Detail> findByPk(
         @PathVariable("id") long boardBlockHistoryPk

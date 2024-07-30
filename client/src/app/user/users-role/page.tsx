@@ -157,7 +157,7 @@ export default function Page() {
                     </div>
                 }
             </div>
-            <table className={'w-full'}>
+            <table className={'w-full min-w-[1200px]'}>
                 <colgroup>
                     <col style={{width: '3%'}}/>
                     <col style={{width: '3%'}}/>

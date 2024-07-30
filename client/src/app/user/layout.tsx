@@ -17,6 +17,7 @@ export default function Layout({children}: {children: React.ReactNode & {test:'1
     const [attendInfo, setAttendInfo] = useState<AttendInfoI>({} as AttendInfoI);
     const [pointSummary, setPointSummary] = useState<PointSummaryI[]>([]);
     const [roles, setRoles] = React.useState<RoleType[]>([]);
+    const [profileImg, setProfileImg] = React.useState<string>('');
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [modal, setModal] = useState<ModalI>({} as ModalI);
@@ -42,29 +43,31 @@ export default function Layout({children}: {children: React.ReactNode & {test:'1
         });
     })
 
-    preload('/api/board/summary', async () => {
+    useSWR('/api/board/summary', async () => {
         return await apiCall<BoardSummaryI[]>({
             path: "/api/board/summary",
             params: {page:1, size: 8},
             method: "GET",
             isReturnData: true
         })
+        .then((data) => {
+            setBoardSummary(data);
+        });
     })
-    .then((data) => {
-        setBoardSummary(data);
-    });
 
-    preload('/api/user/point-history/summary', async () => {
+
+    useSWR('/api/user/point-history/summary', async () => {
         return await apiCall<PointSummaryI[]>({
             path: "/api/user/point-history/summary",
             params: {page:1, size: 8},
             method: "GET",
             isReturnData: true,
         })
+        .then((data) => {
+            setPointSummary(data);
+        });
     })
-    .then((data) => {
-        setPointSummary(data);
-    });
+
 
 
     return (
@@ -72,7 +75,8 @@ export default function Layout({children}: {children: React.ReactNode & {test:'1
             boardSummary, setBoardSummary,
             attendInfo, setAttendInfo,
             pointSummary, setPointSummary,
-            roles, setRoles
+            roles, setRoles,
+            profileImg, setProfileImg
         }}>
             <main className={'flex items-start min-h-screen h-auto'}>
                 <ModalProvider.Provider value={{modal, setModal}}>

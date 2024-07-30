@@ -3,22 +3,34 @@
 import Image from "next/image";
 import {defaultProfile} from "@/app/{commons}/func/image";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {LoadingType} from "@/app/user/info/page";
+import UserProvider from "@/app/user/{services}/userProvider";
 
-const ProfileImg = ({imgData} : {imgData: string}) => {
+const ProfileImg = () => {
+
+    const {profileImg, setProfileImg} = useContext(UserProvider);
+
     const inputRef = useRef<HTMLInputElement>(null);
-
     const [loading, setLoading] = useState<LoadingType>({} as LoadingType);
     const [profileEnter, setProfileEnter] = useState<boolean>(false);
-    const [img, setImg] = useState<string>('');
     const debounce = createDebounce(500);
 
-    useEffect(()=>{
-        setImg(imgData);
-    },[imgData])
+    useEffect(()=> {
+        if(profileImg) return;
+
+        apiCall<string>({
+            path: '/api/user/info/profile-img',
+            method: 'GET',
+            isReturnData: true,
+        })
+        .then(res => {
+            setProfileImg(res);
+        });
+    },[])
+
 
 
     const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,13 +57,15 @@ const ProfileImg = ({imgData} : {imgData: string}) => {
                 img: false
             });
 
-            const img = await apiCall({
+            await apiCall<string>({
                 path: '/api/user/info/profile-img',
                 method: 'GET',
                 isReturnData: true,
             })
+            .then(res => {
+                setProfileImg(res);
+            });
 
-            setImg(img);
             setProfileEnter(false)
         }
 
@@ -69,7 +83,7 @@ const ProfileImg = ({imgData} : {imgData: string}) => {
             method: 'DELETE',
         })
             .then((res) => {
-                setImg('')
+                setProfileImg('');
             })
             .catch((err) => {
                 console.log(err)
@@ -92,7 +106,7 @@ const ProfileImg = ({imgData} : {imgData: string}) => {
     return (
         <div className={'relative'}>
             <Image className={'rounded-full border-4 border-solid border-main w-[150px] h-[150px]'}
-                   src={defaultProfile(img)}
+                   src={defaultProfile(profileImg)}
                    alt={''}
                    placeholder={"empty"}
                    width={150}
@@ -101,7 +115,7 @@ const ProfileImg = ({imgData} : {imgData: string}) => {
                    priority={true}
             />
             {
-                !img &&
+                !profileImg &&
               <div className={'flex justify-center items-center absolute border-0 rounded-full left-0 top-0 w-[150px] h-[150px] z-10 bg-gray-200 opacity-70'}>
                   {
                       loading.img
@@ -114,7 +128,7 @@ const ProfileImg = ({imgData} : {imgData: string}) => {
               </div>
             }
             {
-                profileEnter && img &&
+                profileEnter && profileImg &&
               <div className={'flex justify-center items-center absolute border-0 rounded-full left-0 top-0 w-[150px] h-[150px] z-10 opacity-50 bg-gray-200'}
                    onMouseLeave={onMouseLeave}
               >

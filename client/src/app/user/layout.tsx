@@ -68,8 +68,6 @@ export default function Layout({children}: {children: React.ReactNode & {test:'1
         });
     })
 
-
-
     return (
         <UserProvider.Provider value={{
             boardSummary, setBoardSummary,

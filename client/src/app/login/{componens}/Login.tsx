@@ -96,13 +96,12 @@ const Login = () => {
             [name]: value
         });
 
-        if (error.use) {
-            setError({
-                status: 0,
-                message: '',
-                use: false
-            });
-        }
+        error.use
+        && setError({
+            status: 0,
+            message: '',
+            use: false
+        });
     }
 
     return (
@@ -150,6 +149,8 @@ const Login = () => {
                                    onVerify={() => {
                                        setIsReCaptcha(true);
                                    }}
+                                   theme={'light'}
+                                   language={'ko'}
                         />
                     }
                 </div>

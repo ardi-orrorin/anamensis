@@ -53,14 +53,14 @@ const Row = ({
             </td>
             <td className={'py-2 px-3'}>
                 <div className={'flex flex-col gap-2'}>
-                    <span>{ user.userId }</span>
-                    <span>({ user.name })</span>
+                    <span className={'break-all'}>{ user.userId }</span>
+                    <span className={'break-all'}>({ user.name })</span>
                 </div>
             </td>
             <td className={'py-2 px-3'}>
                 { user.email }
             </td>
-            <td className={'py-2 px-3'}>
+            <td className={'py-2 px-3 break-all'}>
                 { roles }
             </td>
             <td className={'py-2 px-3'}>

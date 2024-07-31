@@ -60,14 +60,17 @@ const HeaderBtn = (props: HeaderBtnProps) => {
                 && isPublic
                 && isLogin
                 && roles.includes(RoleType.ADMIN)
-                && <button className={"w-16 rounded h-full border-2 border-red-200 text-red-400 hover:bg-red-200 hover:text-white py-1 px-3 text-sm duration-300"}
+                && <button className={[
+                    "rounded h-full border-2 border-red-200 text-red-400 whitespace-pre hover:bg-red-200 hover:text-white py-1 px-3 text-sm duration-300",
+                    isBlocked ? 'w-20' : 'w-16'
+                ].join(' ')}
                            onClick={blockClickHandler}
                            disabled={isBlocked}
                 >
                     {
                         isBlocked
-                        ? '제한 됨'
-                        : '제한 하기'
+                        ? '제한된\n게시글'
+                        : '열람\n제한'
                     }
                 </button>
             }

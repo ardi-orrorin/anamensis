@@ -14,8 +14,6 @@ import History from "@/app/user/board-block/{components}/history";
 import Detail from "@/app/user/board-block/{components}/detail";
 import ModalProvider, {ModalI} from "@/app/user/board-block/{services}/modalProvider";
 
-
-
 export default function Page() {
 
     const searchParams = useSearchParams();

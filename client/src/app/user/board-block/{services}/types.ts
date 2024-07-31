@@ -7,7 +7,7 @@ export class Types {
 
     public static readonly list: Types[] = [
         new Types(BoardBlockStatusEnum.STARTED, '접수'),
-        new Types(BoardBlockStatusEnum.ANSWERED, '작성자 답변완료'),
+        new Types(BoardBlockStatusEnum.ANSWERED, '답변완료'),
         new Types(BoardBlockStatusEnum.RESULTED, '처리완료'),
     ];
 

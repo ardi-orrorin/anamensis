@@ -60,14 +60,14 @@ export default function Page() {
     },{});
 
 
-    const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const data: AuthPropsI = {
             sauth: e.target.checked,
             sauthType: userInfo.sauthType !== AuthType.EMAIL ? AuthType.EMAIL : AuthType.NONE
         };
 
         setLoading(true);
-        apiCall<UserInfoI, AuthPropsI>({
+        await apiCall<UserInfoI, AuthPropsI>({
             path: '/api/user/email',
             method: 'PUT',
             body: data,

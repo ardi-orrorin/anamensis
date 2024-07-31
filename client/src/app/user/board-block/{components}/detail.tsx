@@ -53,8 +53,6 @@ const Detail = () => {
         });
     }
 
-
-
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         !isTyping && setIsTyping(true);
         if(e.target.value.length > 500) return;

@@ -2,7 +2,6 @@ import {createContext} from "react";
 import {UserInfoI} from "@/app/user/email/page";
 import {PageI} from "@/app/{commons}/types/commons";
 
-
 export interface BoardBlock {
     id           : number;
     boardPk      : number;

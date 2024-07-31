@@ -8,7 +8,7 @@ const Blocked = (props: BoardListI) => {
             <HeaderComponent {...props} />
             <div className={'p-3 flex flex-col h-full'}>
                 <p className={'line-clamp-[3] text-xs break-all whitespace-pre-line'}>
-                    차단된 게시글입니다.
+                    열람이 제함된 게시글입니다.
                 </p>
             </div>
             <FooterComponent {...props} />

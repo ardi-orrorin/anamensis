@@ -3,9 +3,10 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import Link from "next/link";
 import {
     faAddressCard,
-    faCheckToSlot,
+    faBan,
     faClockRotateLeft,
     faEnvelope,
+    faEnvelopesBulk,
     faFilePowerpoint,
     faGear,
     faKey,
@@ -104,9 +105,9 @@ const LeftNavBar = ({
                           href={item.href}
                           onClick={onChangeDisabledHandler}
                     >
-                        <div className={'w-full p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
+                        <div className={'w-full flex gap-2 p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
                             <FontAwesomeIcon icon={item.icon} width={iconSize} />
-                            <span className={isModalMode ? '' : 'hidden sm:inline'}>&nbsp; {item.name}</span>
+                            <span className={isModalMode ? '' : 'hidden sm:inline'}>{item.name}</span>
                         </div>
                     </Link>
                 </li>
@@ -161,9 +162,9 @@ const LeftNavBar = ({
                     <Link href={'/user'}
                           onClick={onChangeDisabledHandler}
                     >
-                        <div className={'p-3 w-full hover:bg-blue-500 active:bg-blue-800 duration-300'}>
+                        <div className={'p-3 flex gap-2 w-full hover:bg-blue-500 active:bg-blue-800 duration-300'}>
                             <FontAwesomeIcon icon={faAddressCard} width={iconSize} />
-                            <span className={isModalMode ? '' : 'hidden sm:inline'}>&nbsp; 대시보드</span>
+                            <span className={isModalMode ? '' : 'hidden sm:inline'}>대시보드</span>
                         </div>
                     </Link>
                 </li>
@@ -172,9 +173,9 @@ const LeftNavBar = ({
                           href={'/user/history'}
                           onClick={onChangeDisabledHandler}
                     >
-                        <div className={'w-full p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
+                        <div className={'w-full flex gap-2 p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
                             <FontAwesomeIcon icon={faClockRotateLeft} width={iconSize} />
-                            <span className={isModalMode ? '' : 'hidden sm:inline'}>&nbsp; 로그인기록</span>
+                            <span className={isModalMode ? '' : 'hidden sm:inline'}>로그인기록</span>
                         </div>
                     </Link>
                 </li>
@@ -185,9 +186,9 @@ const LeftNavBar = ({
                               href={'/user/email'}
                               onClick={onChangeDisabledHandler}
                         >
-                          <div className={'w-full p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
+                          <div className={'w-full flex gap-2 p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
                             <FontAwesomeIcon icon={faEnvelope} width={iconSize} />
-                            <span className={isModalMode ? '' : 'hidden sm:inline'}>&nbsp; EMAIL</span>
+                            <span className={isModalMode ? '' : 'hidden sm:inline'}>EMAIL</span>
                           </div>
                         </Link>
                     </li>
@@ -198,9 +199,9 @@ const LeftNavBar = ({
                           href={'/user/point-history'}
                           onClick={onChangeDisabledHandler}
                     >
-                        <div className={'w-full p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
+                        <div className={'w-full flex gap-2 p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
                             <FontAwesomeIcon icon={faFilePowerpoint} width={iconSize} />
-                            <span className={isModalMode ? '' : 'hidden sm:inline'}>&nbsp; 포인트 적립 내역</span>
+                            <span className={isModalMode ? '' : 'hidden sm:inline'}>포인트 적립 내역</span>
                         </div>
                     </Link>
                 </li>
@@ -209,9 +210,9 @@ const LeftNavBar = ({
                           href={'/user/smtp'}
                           onClick={onChangeDisabledHandler}
                     >
-                        <div className={'w-full p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
+                        <div className={'w-full flex gap-2 p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
                             <FontAwesomeIcon icon={faEnvelope} width={iconSize} />
-                            <span className={isModalMode ? '' : 'hidden sm:inline'}>&nbsp; SMTP</span>
+                            <span className={isModalMode ? '' : 'hidden sm:inline'}>SMTP</span>
                         </div>
                     </Link>
                 </li>
@@ -220,9 +221,9 @@ const LeftNavBar = ({
                           href={'/user/smtp-history'}
                           onClick={onChangeDisabledHandler}
                     >
-                        <div className={'w-full p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
-                            <FontAwesomeIcon icon={faEnvelope} width={iconSize} />
-                            <span className={isModalMode ? '' : 'hidden sm:inline'}>&nbsp; SMTP 발송 내역</span>
+                        <div className={'w-full flex gap-2 p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
+                            <FontAwesomeIcon icon={faEnvelopesBulk} width={iconSize}/>
+                            <span className={isModalMode ? '' : 'hidden sm:inline'}>SMTP 발송 내역</span>
                         </div>
                     </Link>
                 </li>
@@ -231,9 +232,9 @@ const LeftNavBar = ({
                           href={'/user/board-block'}
                           onClick={onChangeDisabledHandler}
                     >
-                        <div className={'w-full p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
-                            <FontAwesomeIcon icon={faEnvelope} width={iconSize} />
-                            <span className={isModalMode ? '' : 'hidden sm:inline'}>&nbsp; 게시글 제한</span>
+                        <div className={'w-full flex gap-2 p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
+                            <FontAwesomeIcon icon={faBan} width={iconSize} />
+                            <span className={isModalMode ? '' : 'hidden sm:inline'}>열람 제한 내역</span>
                         </div>
                     </Link>
                 </li>
@@ -244,9 +245,9 @@ const LeftNavBar = ({
                               href={'/user/otp'}
                               onClick={onChangeDisabledHandler}
                         >
-                        <div className={'w-full p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
+                        <div className={'w-full flex gap-2 p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
                             <FontAwesomeIcon icon={faKey} width={iconSize} />
-                          <span className={isModalMode ? '' : 'hidden sm:inline'}>&nbsp; OTP</span>
+                          <span className={isModalMode ? '' : 'hidden sm:inline'}>OTP</span>
                         </div>
                     </Link>
                   </li>

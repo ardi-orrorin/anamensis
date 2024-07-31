@@ -65,7 +65,7 @@ const History = () => {
     return (
         <>
             <div className={'flex justify-end h-12 py-2 gap-2'}>
-                <select className={'w-48 border border-solid border-gray-300 rounded-md text-sm px-3 py-1 outline-0'}
+                <select className={'w-28 border border-solid border-gray-300 rounded-md text-sm px-3 py-1 outline-0'}
                         name={'status'}
                         defaultValue={searchParams.get('filterKeyword') || ''}
                         onChange={onFilterHandler}
@@ -80,8 +80,7 @@ const History = () => {
                         })
                     }
                 </select>
-
-                <select className={'w-32 border border-solid border-gray-300 rounded-md text-sm px-3 py-1 outline-0'}
+                <select className={'w-28 border border-solid border-gray-300 rounded-md text-sm px-3 py-1 outline-0'}
                         name={'size'}
                         defaultValue={searchParams.get('size') || '20'}
                         onChange={onChangeSearchParams}

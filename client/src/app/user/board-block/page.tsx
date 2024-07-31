@@ -22,7 +22,6 @@ export default function Page() {
     const [page, setPage] = useState({} as PageI);
     const [modal, setModal] = useState({} as ModalI);
 
-
     const {mutate} = useSWR(['/api/board-block-history', searchParams], async () => {
         return await apiCall<PageResponse<BoardBlockHistoriesI>, any>({
             path: '/api/user/board-block-history',

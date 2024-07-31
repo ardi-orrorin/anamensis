@@ -2,6 +2,7 @@ import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import PageNavigator from "@/app/{commons}/PageNavigator";
 import {PageResponse} from "@/app/{commons}/types/commons";
 import apiCall from "@/app/{commons}/func/api";
+import SizeSelect from "@/app/{commons}/sizeSelect";
 
 interface LoginHistoriesI {
     id: string;
@@ -29,34 +30,10 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
     const maxIndex = data.page.total - ((data.page.page - 1) * data.page.size);
 
     return (
-        <div>
-            <div className={'flex justify-between h-10'}
+        <div className={'flex flex-col gap-2'}>
+            <div className={'flex justify-end h-8'}
             >
-                <div />
-                <form className={'flex gap-3'}
-                      method={'get'}
-                >
-                    <div>
-                        <select className={'w-32 border border-solid border-gray-300 rounded-md text-sm px-3 py-1 outline-0'}
-                                defaultValue={searchParams.size || '20'}
-                                name={'size'}
-                        >
-                            <option value={'10'}>10</option>
-                            <option value={'20'}>20</option>
-                            <option value={'30'}>30</option>
-                            <option value={'50'}>50</option>
-                            <option value={'100'}>100</option>
-                            <option value={'200'}>200</option>
-                        </select>
-                    </div>
-                    <div>
-                        <button className={'w-20 border border-solid border-gray-300 rounded-md text-sm px-3 py-1'}
-                                type={'submit'}
-                        >
-                            조회
-                        </button>
-                    </div>
-                </form>
+                <SizeSelect />
             </div>
             <table className={'w-full'}>
                 <colgroup>

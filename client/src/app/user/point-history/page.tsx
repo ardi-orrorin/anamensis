@@ -4,6 +4,7 @@ import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import apiCall from "@/app/{commons}/func/api";
 import Row from "@/app/user/point-history/{components}/Row";
 import {GetProps} from "@/app/user/history/page";
+import SizeSelect from "@/app/{commons}/sizeSelect";
 
 export interface PointHistoryI {
     id: number
@@ -28,32 +29,8 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
 
     return (
         <div className={'flex flex-col gap-3'}>
-            <div className={'flex justify-between'}>
-                <div></div>
-                <form className={'flex gap-3'}
-                      method={'get'}
-                >
-                    <div>
-                        <select className={'w-32 border border-solid border-gray-300 rounded-md text-sm px-3 py-1 outline-0'}
-                                defaultValue={searchParams.size || '20'}
-                                name={'size'}
-                        >
-                            <option value={'10'}>10</option>
-                            <option value={'20'}>20</option>
-                            <option value={'30'}>30</option>
-                            <option value={'50'}>50</option>
-                            <option value={'100'}>100</option>
-                            <option value={'200'}>200</option>
-                        </select>
-                    </div>
-                    <div>
-                        <button className={'w-20 border border-solid border-gray-300 rounded-md text-sm px-3 py-1 outline-0'}
-                                type={'submit'}
-                        >
-                            조회
-                        </button>
-                    </div>
-                </form>
+            <div className={'flex justify-end'}>
+                <SizeSelect />
             </div>
             <table className={'w-full'}>
                 <colgroup>

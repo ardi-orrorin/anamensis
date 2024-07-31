@@ -6,6 +6,7 @@ import ModalProvider from "@/app/user/board-block/{services}/modalProvider";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowDown91} from "@fortawesome/free-solid-svg-icons";
 import {Types} from "@/app/user/board-block/{services}/types";
+import SizeSelect from "@/app/{commons}/sizeSelect";
 
 const History = () => {
     const searchParams = useSearchParams();
@@ -80,19 +81,7 @@ const History = () => {
                         })
                     }
                 </select>
-                <select className={'w-28 border border-solid border-gray-300 rounded-md text-sm px-3 py-1 outline-0'}
-                        name={'size'}
-                        defaultValue={searchParams.get('size') || '20'}
-                        onChange={onChangeSearchParams}
-                >
-                    <option value={'5'}>5</option>
-                    <option value={'10'}>10</option>
-                    <option value={'20'}>20</option>
-                    <option value={'30'}>30</option>
-                    <option value={'50'}>50</option>
-                    <option value={'100'}>100</option>
-                    <option value={'200'}>200</option>
-                </select>
+                <SizeSelect />
             </div>
             <table className={'w-full'}>
                 <colgroup>

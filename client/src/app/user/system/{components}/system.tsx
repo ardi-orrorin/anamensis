@@ -43,7 +43,7 @@ const System = ({websys}: {websys: WebSysI[]}) => {
                     data?.length > 0 &&
                     data?.map((item, index) => {
                         return (
-                            <Row key={index} props={item} setData={setData} />
+                            <Row key={index} {...{...item, index, setData}} />
                         )
                     })
                 }

@@ -139,13 +139,13 @@ const LeftNavBar = ({
                 </button>
             </div>
             <ul className={'w-full duration-500'}>
-                <li className={'flex justify-center py-4'}>
-                    <Link className={'p-1.5 border-4 border-solid border-blue-300 rounded-full'}
+                <li className={'flex justify-center py-2 sm:py-4'}>
+                    <Link className={'sm:p-1.5 sm:border-4 border-solid border-blue-300 rounded-full'}
                           href={'/user/info'}
                           onClick={onChangeDisabledHandler}
                     >
                         <Image className={[
-                            'rounded-full 4 border-solid duration-500 border-blue-200 hover:border-blue-500',
+                            'rounded-full border-solid duration-500 border-blue-200 hover:border-blue-500',
                             isModalMode ? '' : 'w-[25px] sm:w-[110px] h-[25px] sm:h-[110px]'
                         ].join(' ')}
                                src={process.env.NEXT_PUBLIC_CDN_SERVER + profileImg || NO_IMAGE}

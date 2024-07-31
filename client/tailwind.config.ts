@@ -22,6 +22,10 @@ const config: Config = {
       },
       colors: {
         "main": "#246DCF",
+      },
+      borderWidth: {
+        '5': '5px',
+        '6': '6px',
       }
     },
   },

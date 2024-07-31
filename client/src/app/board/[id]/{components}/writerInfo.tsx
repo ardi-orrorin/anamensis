@@ -17,7 +17,7 @@ const WriterInfo = () => {
 
             return (
                 <Link key={'board_summary' + index}
-                      className={'flex justify-between py-0.5 h-8'}
+                      className={'flex justify-between py-0.5 px-1 h-8 hover:bg-blue-300 hover:text-white duration-300'}
                       href={'/board/' + item.id}
                 >
                     <div className={'flex gap-2 items-center'}>

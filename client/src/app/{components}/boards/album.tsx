@@ -30,8 +30,8 @@ const AlbumBoardComponent = (props: BoardListI) => {
                 <div className={'relative min-w-[90px] max-w-[90px] sm:min-w-[120px] sm:max-w-[120px] h-full'}>
                     <Image className={'w-full h-full object-cover'}
                            src={defaultNoImg(extraValue?.images[extraValue.defaultIndex])}
-                           height={200}
-                           width={200}
+                           height={100}
+                           width={100}
                            alt={''}
                            priority={true}
                            onError={(e) => {

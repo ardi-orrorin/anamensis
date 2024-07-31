@@ -60,19 +60,23 @@ const BoardComponent = (props: BoardListI & {favorites: string[], isLogin: boole
         )?.component(props)
     },[categoryPk, body])
 
+    const highLight = useMemo(() =>
+        (isFavorite || Number(categoryPk) === 1) && !isBlocked
+    ,[]);
+
     return (
         <>
             {
                 isBlocked && !roles.includes(RoleType.ADMIN)
                 ? <span className={
                     'relative flex flex-col justify-between w-full h-[170px] bg-white border-gray-200 border-solid border rounded shadow active:bg-blue-50 duration-300'
-                }
-                >
+                }>
                     { Component }
                 </span>
                 : <Link className={[
                     'relative flex flex-col justify-between w-full h-[170px] border-solid border rounded shadow active:bg-blue-50 hover:shadow-xl  active:shadow-xl duration-300',
-                    isFavorite ? 'border-amber-200 hover:border-amber-500 bg-amber-50' : 'bg-white border-gray-200 hover:border-gray-500'
+                    isFavorite && !isBlocked ? 'border-yellow-300 hover:border-yellow-500 active:bg-yellow-300' : 'bg-white border-gray-200 hover:border-gray-500 active:bg-gray-300',
+                    highLight && 'border-t-5'
                 ].join(' ')}
                         href={`/board/${id}`}
                         prefetch={true}

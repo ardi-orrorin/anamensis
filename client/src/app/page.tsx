@@ -51,8 +51,8 @@ export default function Page() {
 
     const fetchDebounce = createDebounce(100);
 
-    useSWR('/api/board-favorites', async () => {
-        return await apiCall<string[]>({
+    useEffect(() => {
+        apiCall<string[]>({
             path: '/api/board-favorites',
             method: 'GET',
             isReturnData: true
@@ -61,21 +61,19 @@ export default function Page() {
             if(res.length === 0) return;
             setFavorites(res);
         })
-    },{});
+    },[])
 
-
-    useSWR('/api/notice', async () => {
-        return await apiCall<NoticeType[]>({
+    useEffect(() => {
+        apiCall<NoticeType[]>({
             path: '/api/board/notice',
             method: 'GET',
             isReturnData: true
         })
-        .then(res => {
-            if(!res) return;
-            setNoticeList(res);
-        })
-    },{});
-
+            .then(res => {
+                if(!res) return;
+                setNoticeList(res);
+            })
+    },[])
 
     useEffect(() => {
         if(loading) return;

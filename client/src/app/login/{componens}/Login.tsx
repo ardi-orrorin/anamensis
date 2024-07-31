@@ -3,7 +3,6 @@ import {faExclamation} from "@fortawesome/free-solid-svg-icons";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import Link from "next/link";
 import {useContext, useEffect, useMemo, useRef, useState} from "react";
-import axios from "axios";
 import {ErrorResponse, LoginAuth} from "@/app/login/page";
 import LoginProvider, {LoginI} from "@/app/login/{services}/LoginProvider";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -11,6 +10,7 @@ import apiCall from "@/app/{commons}/func/api";
 import {RoleType} from "@/app/user/system/{services}/types";
 import {getProviders, signIn} from "next-auth/react";
 import Image from "next/image";
+import Turnstile from "react-turnstile";
 
 export type LoginType = {
     accessToken: string,
@@ -26,11 +26,8 @@ export type LoginUserType = {
 
 
 const Login = () => {
-
-    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-    const privateKey = process.env.NEXT_PUBLIC_RECAPTCHA_PRIVATE_KEY;
+    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
     const [isRecaptcha, setIsReCaptcha] = useState<boolean>(false);
-    const recaptchaRef = useRef<ReCAPTCHA>(null);
     const [provider, setProvider] = useState<any>({});
 
     const {user, setUser} = useContext(LoginProvider);
@@ -106,23 +103,6 @@ const Login = () => {
                 use: false
             });
         }
-
-        if(!recaptchaRef.current) return;
-
-    }
-
-    const onChangeReCaptchaHandler = async (value: string | null) => {
-        if (!value) return;
-
-        const url = '/api/login/google';
-        const data = {
-            secret: privateKey,
-            response: value || ""
-        };
-
-        await axios.post(url, data).then((res) => {
-            setIsReCaptcha(res.data.success);
-        })
     }
 
     return (
@@ -163,13 +143,13 @@ const Login = () => {
                     </span>
                   }
                 </div>
-                <div className={''}>
+                <div className={'flex justify-center'}>
                     {
                         idCheck && isNext &&
-                        <ReCAPTCHA ref={recaptchaRef}
-                                   sitekey={siteKey || ""}
-                                   onChange={onChangeReCaptchaHandler}
-                                   className={'w-full flex justify-center py-2'}
+                        <Turnstile sitekey={siteKey}
+                                   onVerify={() => {
+                                       setIsReCaptcha(true);
+                                   }}
                         />
                     }
                 </div>

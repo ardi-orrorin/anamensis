@@ -15,7 +15,6 @@ const History = () => {
 
     const maxIndex = useMemo(() => page.total - ((page.page - 1) * page.size),[page]);
 
-
     const router = useRouter();
     const pathname = usePathname();
 
@@ -104,14 +103,14 @@ const History = () => {
                     <col style={{width: '25%'}}/>
                 </colgroup>
                 <thead className={'bg-main text-white h-9 align-middle'}>
-                <tr className={'text-sm border-x border-white border-solid'}>
-                    <th className={'border-x border-white border-solid'}>
-                        <FontAwesomeIcon icon={faArrowDown91} size={'sm'} height={10} />
-                    </th>
-                    <th className={'border-x border-white border-solid'}>제목</th>
-                    <th className={'border-x border-white border-solid'}>상태</th>
-                    <th className={'border-x border-white border-solid'}>최종답변일</th>
-                </tr>
+                    <tr className={'text-sm border-x border-white border-solid'}>
+                        <th className={'border-x border-white border-solid'}>
+                            <FontAwesomeIcon icon={faArrowDown91} size={'sm'} height={10} />
+                        </th>
+                        <th className={'border-x border-white border-solid'}>제목</th>
+                        <th className={'border-x border-white border-solid'}>상태</th>
+                        <th className={'border-x border-white border-solid'}>최종답변일</th>
+                    </tr>
                 </thead>
                 <tbody className={'text-sm'}>
                 {

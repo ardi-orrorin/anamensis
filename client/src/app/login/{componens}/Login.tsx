@@ -142,18 +142,6 @@ const Login = () => {
                     </span>
                   }
                 </div>
-                <div className={'flex justify-center'}>
-                    {
-                        idCheck && isNext &&
-                        <Turnstile sitekey={siteKey}
-                                   onVerify={() => {
-                                       setIsReCaptcha(true);
-                                   }}
-                                   theme={'light'}
-                                   language={'ko'}
-                        />
-                    }
-                </div>
                 <div>
                     <button
                         className={['w-full rounded  duration-300 text-xs text-white my-2 p-2', isNext && isRecaptcha ? 'bg-blue-300 hover:bg-blue-600' : 'bg-gray-400 hover:bg-gray-700'].join(' ')}
@@ -166,6 +154,15 @@ const Login = () => {
                             '로그인'
                     }
                     </button>
+                </div>
+                <div className={'flex justify-center'}>
+                      <Turnstile sitekey={siteKey}
+                                 onVerify={() => {
+                                     setIsReCaptcha(true);
+                                 }}
+                                 theme={'light'}
+                                 language={'ko'}
+                      />
                 </div>
             </div>
             <div className={'flex justify-between px-3'}>
@@ -181,7 +178,8 @@ const Login = () => {
             </div>
             <div className={'flex flex-col gap-2 justify-between px-3'}>
                 {
-                    Object?.values(provider).length > 0
+                    isRecaptcha
+                    && Object?.values(provider).length > 0
                     && Object?.values(provider)?.map((provider) => {
                         const { id, name} = provider as {id: string, name: string};
                         const logoImg = process.env.NEXT_PUBLIC_CDN_SERVER + '/logo/' + id + '-logo.webp';
@@ -195,6 +193,7 @@ const Login = () => {
                                 ].join(' ')}
                                     key={'oauth-login' + id}
                                     onClick={() => signIn(id)}
+                                    disabled={isRecaptcha}
                             >
                                 <Image src={logoImg}
                                        alt={''}
@@ -229,7 +228,5 @@ const oAuthProviders: OAuthProviderType[] = [
     { provider: 'kakao',     bgColor: 'bg-amber-300',  hoverBgColor: 'bg-amber-700',  size: 18,   },
     { provider: 'github',    bgColor: 'bg-gray-600',   hoverBgColor: 'bg-gray-900',   size: 18,   },
 ];
-
-
 
 export default Login;

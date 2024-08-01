@@ -6,6 +6,7 @@ import axios from "axios";
 import {cookies} from "next/headers";
 import {NextRequest} from "next/server";
 import Github from "next-auth/providers/github";
+import loginConstants from "@/app/login/{services}/constants";
 
 interface RouteHandlerContext {
     params: { nextauth: string[] }
@@ -59,27 +60,20 @@ async function handler(req: NextRequest, context: RouteHandlerContext) {
                 }
 
                 try {
-                    const resData = await axios.post(url, loginUser, {
+                    const res = await axios.post(url, loginUser, {
                         headers,
                         withCredentials: true
                     })
-                        .then(res => res.data)
+                    .then(res => res.data)
 
-                    const cookieInit: Partial<ResponseCookie> = {
-                        httpOnly: true,
-                        secure: false,
-                        sameSite: 'lax',
-                        path: '/'
-                    }
-
-                    cookies().set('next.access.token', resData.accessToken, {
-                        ...cookieInit,
-                        maxAge: resData.accessTokenExpiresIn / 1000
+                    cookies().set('next.access.token', res.accessToken, {
+                        ...loginConstants.cookieInit,
+                        maxAge: res.accessTokenExpiresIn
                     });
 
-                    cookies().set('next.refresh.token', resData.refreshToken, {
-                        ...cookieInit,
-                        maxAge: resData.refreshTokenExpiresIn / 1000
+                    cookies().set('next.refresh.token', res.refreshToken, {
+                        ...loginConstants.cookieInit,
+                        maxAge: res.refreshTokenExpiresIn
                     });
 
                     return true;

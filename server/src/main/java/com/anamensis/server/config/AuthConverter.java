@@ -44,8 +44,6 @@ public class AuthConverter implements ServerAuthenticationConverter {
             exchange.getResponse().addCookie(cookie);
         }
 
-
-        log.info("userId: {}", userId);
         return userService.findByUsername(userId)
                 .onErrorMap(e -> new RuntimeException("유저 정보가 없습니다."))
                 .map(u -> new UsernamePasswordAuthenticationToken(u, token, u.getAuthorities()));

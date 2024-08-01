@@ -13,7 +13,6 @@ import com.anamensis.server.mapper.BoardMapper;
 import com.anamensis.server.resultMap.BoardResultMap;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,8 +37,6 @@ public class BoardService {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
-    private final VirtualThreadTaskExecutor virtualThreadTaskExecutor;
-
     public Flux<BoardResponse.List> findAll(
         Page page,
         BoardRequest.Params params,
@@ -51,7 +48,7 @@ public class BoardService {
             : boardMapper.findList(page, params, member);
 
         return Flux.fromIterable(list)
-            .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+            .publishOn(Schedulers.boundedElastic())
             .map(l -> BoardResponse.List.from(l, member));
     }
 
@@ -80,7 +77,7 @@ public class BoardService {
 
     public Mono<Boolean> updateIsBlockedByPk(long boardPk, boolean isBlocked) {
         return Mono.fromCallable(()-> boardMapper.updateIsBlockedByPk(boardPk, isBlocked) > 0)
-            .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+            .publishOn(Schedulers.boundedElastic())
             .doOnNext($ -> updateCacheBoard(boardPk).subscribe());
     }
 
@@ -136,7 +133,7 @@ public class BoardService {
              })
              .flatMapMany(Flux::fromIterable)
              .cast(BoardResponse.SummaryList.class)
-             .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+             .publishOn(Schedulers.boundedElastic())
              .onErrorResume(e -> {
                  if(!e.getMessage().equals("Cannot deserialize")) return Mono.error(e);
                  return updateSummaryList(memberPk)
@@ -144,7 +141,7 @@ public class BoardService {
                      .flatMapMany(Flux::fromIterable)
                      .cast(BoardResponse.SummaryList.class);
              })
-             .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor));
+             .publishOn(Schedulers.boundedElastic());
     }
 
 
@@ -161,7 +158,7 @@ public class BoardService {
         return Mono.fromCallable(()-> boardMapper.save(board))
                 .onErrorMap(RuntimeException::new)
                 .flatMap($ -> Mono.just(board))
-                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext($ -> updateCaches(0, board.getMemberPk()).subscribe());
     }
 
@@ -239,7 +236,7 @@ public class BoardService {
 
     public Mono<Boolean> viewUpdateByPk(long boardPk) {
         return Mono.fromCallable(() -> boardMapper.viewUpdateByPk(boardPk) == 1)
-                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext($ -> onePageCache(boardPk))
                 .onErrorReturn(false);
     }
@@ -247,7 +244,7 @@ public class BoardService {
     public Mono<Boolean> disableByPk(long boardPk, long memberPk) {
         return Mono.just(boardMapper.disableByPk(boardPk, memberPk, LocalDateTime.now()) == 1)
                 .onErrorReturn(false)
-                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext($ -> updateCaches(boardPk, memberPk).subscribe());
     }
 
@@ -255,7 +252,7 @@ public class BoardService {
         board.setUpdateAt(LocalDateTime.now());
         return Mono.fromCallable(() -> boardMapper.updateByPk(board) == 1)
                 .onErrorReturn(false)
-                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext($ -> updateCaches(board.getId(), board.getMemberPk()).subscribe());
     }
 
@@ -275,9 +272,9 @@ public class BoardService {
 
     private Mono<Boolean> updateCaches(long id, long memberPk) {
         return updateSummaryList(memberPk)
-                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext($ -> updateNoticeCache().subscribe())
-                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext($ -> onePageCache(id))
                 .doOnNext($ -> updateCacheBoard(id).subscribe());
     }
@@ -303,7 +300,7 @@ public class BoardService {
         return Mono.fromCallable(() -> redisTemplate.delete("board:summary:member:" + memberPk))
             .flatMapIterable($ -> boardMapper.findByMemberPk(memberPk, page))
             .map(BoardResponse.SummaryList::from)
-            .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+            .publishOn(Schedulers.boundedElastic())
             .doOnNext(list -> {
                 redisTemplate.boundListOps("board:summary:member:" + memberPk)
                     .rightPush(list);

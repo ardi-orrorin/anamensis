@@ -76,7 +76,7 @@ const LeftMenu = ({
     return (
         <div className={'sticky z-30 top-10 left-[5%] xl:left-[13%]'}>
             <div className={'flex flex-col gap-5 items-center xl:items-start'}>
-                <div className={'flex flex-col w-60 gap-2 shadow rounded p-3 bg-white border border-solid border-gray-100 hover:border-gray-500 duration-500'}>
+                <div className={'flex flex-col w-60 gap-2 shadow rounded p-3 bg-white border-t-4 border border-solid border-gray-100 hover:border-gray-500 duration-500'}>
                     <div className={'flex gap-2 justify-center items-center text-sm py-2 font-bold'}>
                         <FontAwesomeIcon icon={faBars} height={'16'} />
                         <span>
@@ -113,7 +113,7 @@ const LeftMenu = ({
                 </div>
                 {
                     roles.length > 0
-                    && <div className={'flex flex-col w-60 shadow rounded p-3 bg-white gap-3 border border-solid border-gray-100 hover:border-gray-500 duration-500'}>
+                    && <div className={'flex flex-col w-60 shadow rounded p-3 bg-white gap-3 border-t-4 border border-solid border-gray-100 hover:border-gray-500 duration-500'}>
                       <div className={'flex gap-2 justify-center items-center text-sm font-bold py-2'}>
                         <FontAwesomeIcon icon={faPen} height={'16'} />
                         <span>
@@ -133,7 +133,7 @@ const LeftMenu = ({
                       </div>
                   </div>
                 }
-                <div className={'flex flex-col w-60 px-3 py-6 gap-2 justify-center items-center shadow rounded border-solid border border-gray-100 hover:border-gray-500 duration-500'}>
+                <div className={'flex flex-col w-60 px-3 py-6 gap-2 justify-center items-center shadow rounded border-t-4 border-solid border border-gray-100 hover:border-gray-500 duration-500'}>
                     <h1 className={'text-sm font-bold'}>단축키</h1>
                     <ul className={'flex flex-col w-full px-5 gap-3 text-xs'}>
                         <li className={'flex justify-between items-center gap-2'}>

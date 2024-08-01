@@ -20,6 +20,9 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuple3;
+import reactor.util.function.Tuples;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -29,7 +32,6 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * 로그인 한 유저의 API 호출 로그 기록 필터
  */
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class LogHistoryFilter implements WebFilter {
@@ -39,20 +41,19 @@ public class LogHistoryFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        AtomicReference<byte[]> bodyByte = new AtomicReference<>();
+        Mono<ServerWebExchange> ex = Mono.just(exchange)
+            .share();
 
-        Mono<ServerWebExchange> fileApi   = fileApi(exchange);
-        Mono<ServerWebExchange> noBodyApi = noBodyApi(exchange);
-        Mono<ServerWebExchange> bodyApi   = bodyApi(exchange, bodyByte);
+        Mono<Void> result = ex.flatMap(chain::filter);
 
-        return Mono.zip(fileApi, noBodyApi, bodyApi)
-                .flatMap(t ->
-                    chain.filter(
-                        bodyByte.get() != null
-                        ? newRequest(bodyByte.get(), exchange)
-                        : exchange
-                    )
-                );
+        Mono<Tuple3<Boolean, Boolean, Boolean>> api = ex.flatMap(ex1 -> {
+            Mono<Boolean> fileApi   = fileApi(ex1);
+            Mono<Boolean> noBodyApi = noBodyApi(ex1);
+            Mono<Boolean> bodyApi   = bodyApi(ex1);
+            return Mono.zip(fileApi, noBodyApi, bodyApi);
+        });
+
+        return Mono.when(result, api);
     }
 
     private boolean isFileApi(ServerWebExchange ex) {
@@ -67,9 +68,9 @@ public class LogHistoryFilter implements WebFilter {
                 && (headers.getContentType() != null && headers.getContentType().getType().contains("multipart"));
     }
 
-    private Mono<ServerWebExchange> fileApi(ServerWebExchange exchange) {
+    private Mono<Boolean> fileApi(ServerWebExchange exchange) {
         if(!this.isFileApi(exchange)) {
-            return Mono.just(exchange);
+            return Mono.just(true);
         }
 
         return exchange.getMultipartData()
@@ -82,47 +83,49 @@ public class LogHistoryFilter implements WebFilter {
                 .subscribeOn(Schedulers.boundedElastic())
                 .onErrorResume(e -> {
                     logWrite("upload File".getBytes(), exchange)
+                            .subscribeOn(Schedulers.boundedElastic())
                             .subscribe();
                     return Mono.empty();
                 })
-                .then(Mono.just(exchange));
+                .then(Mono.just(true));
     }
 
-    private Mono<ServerWebExchange> noBodyApi(ServerWebExchange exchange) {
+    private Mono<Boolean> noBodyApi(ServerWebExchange exchange) {
         if(this.isFileApi(exchange)) {
-            return Mono.just(exchange);
+            return Mono.just(true);
         }
 
         HttpMethod method = exchange.getRequest().getMethod();
         if(!HttpMethod.GET.equals(method) && !HttpMethod.DELETE.equals(method)) {
-            return Mono.just(exchange);
+            return Mono.just(true);
         }
 
         return logWrite(new byte[0], exchange)
                 .subscribeOn(Schedulers.boundedElastic())
-                .then(Mono.just(exchange));
+                .then(Mono.just(true));
     }
 
-    private Mono<ServerWebExchange> bodyApi(ServerWebExchange exchange, AtomicReference<byte[]> bodyByte) {
+    private Mono<Boolean> bodyApi(ServerWebExchange exchange) {
         if(this.isFileApi(exchange)) {
-            return Mono.just(exchange);
+            return Mono.just(true);
         }
 
         HttpMethod method = exchange.getRequest().getMethod();
 
         if(!HttpMethod.PUT.equals(method) && !HttpMethod.POST.equals(method) && !HttpMethod.PATCH.equals(method)) {
-            return Mono.just(exchange);
+            return Mono.just(true);
         }
 
-        Flux<DataBuffer> body = exchange.getRequest().getBody();
-
-        return DataBufferUtils.join(body)
-                .map(this::toBytes)
-                .doOnNext(bodyByte::set)
-                .publishOn(Schedulers.boundedElastic())
-                .flatMap(bytes -> logWrite(bytes, exchange))
-                .map(ex -> newRequest(bodyByte.get(), ex));
-
+        return Mono.just(exchange)
+            .share()
+            .publishOn(Schedulers.boundedElastic())
+            .doOnNext(ex -> {
+                DataBufferUtils.join(ex.getRequest().getBody())
+                    .map(this::toBytes)
+                    .flatMap(bytes -> logWrite(bytes, exchange))
+                    .subscribe();
+            })
+            .flatMap(ex -> Mono.just(true));
     }
 
     private byte[] toBytes (DataBuffer dataBuffer) {
@@ -132,7 +135,7 @@ public class LogHistoryFilter implements WebFilter {
         return bytes;
     }
 
-    private Mono<ServerWebExchange> logWrite(byte[] bytes, ServerWebExchange ex) {
+    private Mono<Boolean> logWrite(byte[] bytes, ServerWebExchange ex) {
         String path = ex.getRequest().getPath().toString();
         String body = new String(bytes, StandardCharsets.UTF_8);
         String header = ex.getRequest().getHeaders().toString();
@@ -162,19 +165,7 @@ public class LogHistoryFilter implements WebFilter {
                             .build()
                 )
                 .flatMap(logHistoryService::save)
-                .then(Mono.just(ex));
-    }
-
-    private ServerWebExchange newRequest(byte[] bytes, ServerWebExchange ex) {
-        ServerHttpRequest request = new ServerHttpRequestDecorator(ex.getRequest()) {
-            @Override
-            public Flux<DataBuffer> getBody() {
-                DataBufferFactory s = ex.getResponse().bufferFactory();
-                return Flux.just(s.wrap(bytes));
-            }
-        };
-
-        return ex.mutate().request(request).build();
+                .flatMap($ -> Mono.just(true));
     }
 }
 

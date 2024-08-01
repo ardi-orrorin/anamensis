@@ -58,6 +58,9 @@
                     <if test="params != null and params.categoryPk != 0">
                         AND b1.category_pk = #{params.categoryPk}
                     </if>
+                    <if test="params != null and params.isFavorite">
+                        AND b1.is_blocked = 0
+                    </if>
                  ORDER BY b1.id DESC
                  LIMIT #{page.offset}, #{page.size}
          ) b3 ON b3.id = b.id

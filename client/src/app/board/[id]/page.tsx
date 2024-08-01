@@ -35,6 +35,7 @@ import {useBoardHotKey} from "@/app/board/[id]/{hooks}/hotkey";
 import TemplateMenu from "@/app/board/[id]/{components}/templateMenu";
 import ModalProvider from "@/app/user/board-block/{services}/modalProvider";
 import BoardblockModal from "@/app/board/[id]/{components}/boardblockModal";
+import {AxiosError} from "axios";
 
 export interface RateInfoI {
     id      : number;
@@ -154,7 +155,16 @@ export default function Page({params}: {params : {id: string}}) {
             }
 
         } catch (e) {
-            alert('저장에 실패했습니다.');
+            const err = e as AxiosError;
+
+            const message = err?.response?.status === 400
+                ? err.response.data
+                : err?.response?.status === 500
+                ? '저장에 실패했습니다.'
+                : '로그인이 필요합니다.';
+
+            alert(message);
+
             setLoading(false);
         }
     }

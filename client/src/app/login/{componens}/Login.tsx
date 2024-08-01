@@ -193,7 +193,7 @@ const Login = () => {
                                 ].join(' ')}
                                     key={'oauth-login' + id}
                                     onClick={() => signIn(id)}
-                                    disabled={isRecaptcha}
+                                    disabled={!isRecaptcha}
                             >
                                 <Image src={logoImg}
                                        alt={''}

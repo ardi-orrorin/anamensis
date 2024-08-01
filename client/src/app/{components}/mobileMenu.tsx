@@ -16,7 +16,26 @@ const MobileMenu = ({
 
     const onChangeCategory = useCallback((value: string) => {
         setSearchParams({ categoryPk: value, page: 1, size: 20 } as BoardListParamsI);
-    },[]);
+    },[searchParams]);
+
+    const onClickMyMenu = useCallback((type: string) => {
+        const isSelf = type === 'isSelf'
+            && {[type]: !searchParams[type], isFavorite: false};
+
+        const isFavorite = type === 'isFavorite'
+            && {[type]: !searchParams[type], isSelf: false};
+
+        const params = {
+            ...searchParams,
+            ...isSelf,
+            ...isFavorite,
+            page: 1, size: 20,
+            add: false
+        } as BoardListParamsI;
+
+        setSearchParams(params);
+        scrollTo(0, 0);
+    },[searchParams]);
 
     const CategoryComponent = useMemo(()=>
         Category.list.map((item, index) => {
@@ -57,6 +76,31 @@ const MobileMenu = ({
              }}
         >
             <div className={'fixed z-30 bottom-28 right-5 p-2 min-w-40 max-h-[400px] border-y-4 border-solid border-main bg-white overflow-y-auto rounded shadow-md'}>
+                {
+                   isLogin
+                   && <>
+                        <div className={'py-4 flex justify-center items-center'}>
+                          <h2 className={'font-bold'}>마이 메뉴</h2>
+                        </div>
+                        <div className={'w-full flex flex-col gap-1 justify-center text-gray-700'}>
+                          <button className={[
+                                    'py-2 w-full text-sm text-center border border-solid border-gray-100 hover:bg-gray-100 duration-300',
+                                    ].join(' ')}
+                                  onClick={() => onClickMyMenu('isSelf')}
+                          >
+                            내가 쓴 글
+                          </button>
+                          <button className={[
+                                    'py-2 w-full text-sm text-center border border-solid border-gray-100 hover:bg-gray-100 duration-300',
+                                    ].join(' ')}
+                                  onClick={() => onClickMyMenu('isFavorite')}
+                          >
+                            즐겨찾기
+                          </button>
+                        </div>
+                    </>
+                }
+
                 <div className={'py-4 flex justify-center items-center'}>
                     <h2 className={'font-bold'}>카테고리</h2>
                 </div>

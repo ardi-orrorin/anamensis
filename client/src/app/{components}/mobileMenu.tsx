@@ -2,12 +2,13 @@ import {Category} from "@/app/board/{services}/types";
 import React, {Dispatch, SetStateAction, useCallback, useContext, useMemo} from "react";
 import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
 import Link from "next/link";
-import {SetState} from "state-local";
 
 const MobileMenu = ({
-    setMenuToggle
+    setMenuToggle,
+    isLogin
 }:{
-    setMenuToggle: Dispatch<SetStateAction<boolean>>
+    isLogin: boolean;
+    setMenuToggle: Dispatch<SetStateAction<boolean>>;
 }) => {
     const {
         searchParams, setSearchParams,
@@ -62,19 +63,25 @@ const MobileMenu = ({
                 <div className={'w-full flex flex-col gap-1 justify-center text-gray-700'}>
                     { CategoryComponent }
                 </div>
-                <div className={'py-4 flex justify-center items-center'}>
-                    <h2 className={'font-bold'}>글쓰기</h2>
-                </div>
-                <div className={'w-full flex flex-col gap-1 justify-center text-gray-700'}>
-                    { WriteComponent }
-                    <Link href={`/board/temp`}
-                          className={[
-                              'py-2 w-full text-sm text-center border border-solid border-gray-100 hover:bg-gray-100 duration-300',
-                          ].join(' ')}
-                    >
-                        새 탬플릿 추가
-                    </Link>
-                </div>
+                {
+                    isLogin
+                    && <>
+                        <div className={'py-4 flex justify-center items-center'}>
+                          <h2 className={'font-bold'}>글쓰기</h2>
+                        </div>
+                        <div className={'w-full flex flex-col gap-1 justify-center text-gray-700'}>
+                            { WriteComponent }
+                          <Link href={`/board/temp`}
+                                className={[
+                                    'py-2 w-full text-sm text-center border border-solid border-gray-100 hover:bg-gray-100 duration-300',
+                                ].join(' ')}
+                          >
+                            새 탬플릿 추가
+                          </Link>
+                        </div>
+                     </>
+                }
+
             </div>
         </div>
 

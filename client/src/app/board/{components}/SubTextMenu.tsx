@@ -22,7 +22,6 @@ const SubTextMenu = ({
 
     const {seq, code, textStyle} = blockService.block;
 
-
     const selectFontStyle = (type: string, value:string) => {
         value = textStyle![type] === value ? '' : value;
         onClickSubTextMenu(type, value)
@@ -42,8 +41,8 @@ const SubTextMenu = ({
         setTimeout(() => {
             blockRef.current[seq]?.focus();
         },100);
-
     }
+
 
     const onClickColorHandler = useCallback((name: ToggleEnum, value: string) => {
         onClickSubTextMenu(name, value);

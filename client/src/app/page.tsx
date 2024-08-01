@@ -207,14 +207,14 @@ export default function Page() {
                 </div>
 
                 <div className={'fixed z-30 sm:hidden bottom-5 right-5'}>
-                    <button className={'w-16 h-16 p-5 rounded-full bg-white shadow-md active:bg-main active:text-white duration-300'}
+                    <button className={'w-14 h-14 p-5 rounded-full bg-white shadow-md active:bg-main active:text-white duration-300'}
                             onClick={()=> setMenuToggle(!menuToggle)}
                     >
                         <FontAwesomeIcon icon={faBars} className={'h-auto'} />
                     </button>
                     {
                         menuToggle
-                        && <MobileMenu setMenuToggle={setMenuToggle} />
+                        && <MobileMenu {...{setMenuToggle, isLogin}} />
                     }
                 </div>
                 <div className={'flex flex-row justify-start sm:justify-center'}>

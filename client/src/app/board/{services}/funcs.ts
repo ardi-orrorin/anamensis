@@ -143,24 +143,27 @@ export const onChangeBlockGlobalHandler = ({
 
     if(block.notAvailDup) return ;
 
-    const list = board.data?.content?.list;
+    const list = [...board.data?.content?.list];
 
-    const newList = list.map((item, index) => {
-        if(code && item.code.slice(0, 3) !== code.slice(0, 3)) {
+    list.map((item, index) => {
+        if(item.seq !== seq) return item;
+
+        if(item.code.slice(0, 3) !== block.code.slice(0, 3)) {
             item.extraValue = {};
             item.textStyle = {};
-        }
-        if (item.seq === seq) {
-            item.code = block.code;
             item.value = '';
         }
+
+        item.code = block.code;
+
         return item;
     });
 
     !blockRef?.current[seq + 1]
-    && newList.push(addBlock(seq + 1, true, '', true));
+    && list.push(addBlock(seq + 1, true, '', true));
 
-    setBoard({...board, data: {...board.data,  content: {list: newList}}});
+
+    setBoard({...board, data: {...board.data,  content: {list}}});
 
     setTimeout(() => {
         if(!blockRef?.current) return;

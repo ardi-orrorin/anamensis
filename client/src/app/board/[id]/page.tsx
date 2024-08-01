@@ -174,7 +174,7 @@ export default function Page({params}: {params : {id: string}}) {
     },[]);
 
     const addBlockHandler = (seq: number, value?: string) => {
-        const list = board.data?.content?.list;
+        const list = [...board.data?.content?.list];
         if (!list) return ;
 
         list.push(addBlock(seq, false, value));
@@ -185,7 +185,7 @@ export default function Page({params}: {params : {id: string}}) {
     }
 
     const onChangeHandler = (e: ChangeEvent<HtmlElements>, seq: number) => {
-        const list = board.data?.content?.list;
+        const list = [...board.data?.content?.list];
         if (!list) return ;
 
         const onChange = onChangeBlockGlobalHandler({
@@ -370,26 +370,28 @@ export default function Page({params}: {params : {id: string}}) {
                         </span>
                     }
                 </div>
-                <div className={'flex justify-between gap-3 h-auto border-b-2 border-solid border-main py-3'}>
-                    {
-                        !isNewBoard
-                        && !isTemplate
-                        && board.isView
-                        && board.data.isPublic
-                        && board.data.isLogin
-                        && <button onClick={onClickFavoriteHandler}>
-                            {
-                                isFavorite
-                                    ? <FontAwesomeIcon icon={faStarSolid} className={'text-yellow-600'} />
-                                    : <FontAwesomeIcon icon={faStarRegular} className={'text-yellow-600'} />
-                            }
-                        </button>
-                    }
-                    <BoardTitle board={board}
-                                newBoard={isNewBoard}
-                                onChange={onChangeTitleHandler}
-                                onKeyDown={e => onKeyDownHandler(e, 0, true)}
-                    />
+                <div className={'flex flex-col sm:flex-row justify-between gap-3 h-auto border-b-2 border-solid border-main py-3'}>
+                    <div className={'flex w-full gap-2'}>
+                        {
+                            !isNewBoard
+                            && !isTemplate
+                            && board.isView
+                            && board.data.isPublic
+                            && board.data.isLogin
+                            && <button onClick={onClickFavoriteHandler}>
+                                {
+                                    isFavorite
+                                        ? <FontAwesomeIcon icon={faStarSolid} className={'text-yellow-600'} />
+                                        : <FontAwesomeIcon icon={faStarRegular} className={'text-yellow-600'} />
+                                }
+                          </button>
+                        }
+                        <BoardTitle board={board}
+                                    newBoard={isNewBoard}
+                                    onChange={onChangeTitleHandler}
+                                    onKeyDown={e => onKeyDownHandler(e, 0, true)}
+                        />
+                    </div>
                     <div className={'flex justify-end sm:justify-start gap-2 h-auto'}>
                         {
                             !isNewBoard

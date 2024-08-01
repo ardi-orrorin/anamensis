@@ -6,6 +6,8 @@ import {ToggleEnum} from "@/app/board/{components}/SubTextMenu";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import {notAvailDupCheck, onChangeBlockGlobalHandler} from "@/app/board/{services}/funcs";
 
+
+// fixme: text 블록 외 다른 블록 선택이 extrablock textstyle 값 삭제됨
 const MenuItem = ({
     seq,
     subMenu,

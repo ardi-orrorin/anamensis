@@ -56,11 +56,11 @@ export default function Page({params}: {params : {id: string}}) {
     } = useContext(BoardProvider);
 
     const {
-        blockService, setSelectedBlock
+        blockService
     } = useContext(BlockProvider);
 
     const {
-        loading, setLoading
+        setLoading
         , commentLoading
     } = useContext(LoadingProvider);
 
@@ -370,7 +370,7 @@ export default function Page({params}: {params : {id: string}}) {
                         </span>
                     }
                 </div>
-                <div className={'flex flex-col sm:flex-row justify-between gap-3 h-auto border-b-2 border-solid border-main py-3'}>
+                <div className={'flex justify-between gap-3 h-auto border-b-2 border-solid border-main py-3'}>
                     {
                         !isNewBoard
                         && !isTemplate
@@ -390,7 +390,7 @@ export default function Page({params}: {params : {id: string}}) {
                                 onChange={onChangeTitleHandler}
                                 onKeyDown={e => onKeyDownHandler(e, 0, true)}
                     />
-                    <div className={'flex justify-end sm:justify-start gap-2 h-10 sm:h-auto'}>
+                    <div className={'flex justify-end sm:justify-start gap-2 h-auto'}>
                         {
                             !isNewBoard
                             && !isTemplate
@@ -407,7 +407,7 @@ export default function Page({params}: {params : {id: string}}) {
                                 && <>
                                     <button
                                       className={[
-                                          'w-16 rounded h-full border-2 py-1 px-3 text-xs duration-300',
+                                          'w-16 rounded h-14 border-2 py-1 px-3 text-xs duration-300',
                                           board.data?.isPublic
                                               ? 'text-blue-600 border-blue-200 hover:bg-blue-200 hover:text-white'
                                               : 'text-red-600 border-red-200 hover:bg-red-200 hover:text-white'
@@ -418,7 +418,7 @@ export default function Page({params}: {params : {id: string}}) {
                                     > { board.data?.isPublic ? '공개' : '비공개' }
                                     </button>
                                     <button className={[
-                                            'w-16 rounded h-full border-2 py-1 px-3 text-xs duration-300 whitespace-pre',
+                                            'w-16 rounded h-14 border-2 py-1 px-3 text-xs duration-300 whitespace-pre',
                                             board.data?.membersOnly
                                                 ? 'text-red-600 border-red-200 hover:bg-red-200 hover:text-white'
                                                 : 'text-blue-600 border-blue-200 hover:bg-blue-200 hover:text-white'
@@ -435,7 +435,7 @@ export default function Page({params}: {params : {id: string}}) {
                                 && <TemplateMenu />
                             }
                             <button
-                                className={'w-14 rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                                className={'w-14 rounded h-14 border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
                                 onClick={() => setFullScreen(!fullScreen)}>
                                 {
                                     fullScreen

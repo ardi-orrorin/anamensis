@@ -23,7 +23,7 @@ const HeaderBtn = (props: HeaderBtnProps) => {
 
     return (
         <>
-        <div className={"w-auto flex gap-1 justify-end"}>
+        <div className={"w-auto h-14 flex gap-1 justify-end"}>
             {
                 !isView
                 && isLogin

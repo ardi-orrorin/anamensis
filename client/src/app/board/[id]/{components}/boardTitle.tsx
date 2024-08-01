@@ -31,7 +31,7 @@ const BoardTitle = (props: {
             board.isView
             && !newBoard
             && <span className={"flex w-full text-lg py-1 break-all"}
-            >{props.board.data.title}
+            >{props.board.data.title} ㄴㅇ랸 어리ㅑ너 이랴ㅓ 니얄 ㅓ닝ㄹ ㅓ닝러 닝러 니어 린야러ㅣㅑㅓ
             </span>
         }
     </div>;

@@ -7,15 +7,15 @@ import BoardComponent, {BoardListI} from "@/app/{components}/boardComponent";
 import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons/faMagnifyingGlass";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import LeftMenu from "@/app/{components}/leftMenu";
-import TopMenu from "@/app/{components}/topMenu";
+import MobileMenu from "@/app/{components}/mobileMenu";
 import {RoleType} from "@/app/user/system/{services}/types";
 import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useRootHotKey} from "@/app/{hooks}/hotKey";
 import Notices, {NoticeType} from "@/app/{components}/boards/notices";
-import useSWR from "swr";
 import SearchInfo from "@/app/{components}/searchInfo";
+import {faBars} from "@fortawesome/free-solid-svg-icons";
 
 export type DynamicPage = {
     isEndOfList: boolean;
@@ -35,6 +35,7 @@ export default function Page() {
         isEndOfList: false,
         isVisible  : false,
     });
+    const [menuToggle, setMenuToggle] = useState(false);
 
     const [favorites, setFavorites] = useState<string[]>([]);
 
@@ -205,8 +206,16 @@ export default function Page() {
                     <SearchInfo />
                 </div>
 
-                <div className={'flex sm:hidden justify-center'}>
-                    <TopMenu />
+                <div className={'fixed z-30 sm:hidden bottom-5 right-5'}>
+                    <button className={'w-16 h-16 p-5 rounded-full bg-white shadow-md active:bg-main active:text-white duration-300'}
+                            onClick={()=> setMenuToggle(!menuToggle)}
+                    >
+                        <FontAwesomeIcon icon={faBars} className={'h-auto'} />
+                    </button>
+                    {
+                        menuToggle
+                        && <MobileMenu setMenuToggle={setMenuToggle} />
+                    }
                 </div>
                 <div className={'flex flex-row justify-start sm:justify-center'}>
                     <div className={'hidden sm:block relative min-w-[300px]'}>

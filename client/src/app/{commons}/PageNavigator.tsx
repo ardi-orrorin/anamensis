@@ -1,13 +1,17 @@
+'use client';
 import {PageI} from "@/app/{commons}/types/commons";
 import Link from "next/link";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {redirect} from "next/navigation";
+import {redirect, usePathname, useRouter, useSearchParams} from "next/navigation";
 import {faAnglesLeft, faAnglesRight} from "@fortawesome/free-solid-svg-icons";
-import {useMemo} from "react";
+import {useCallback, useMemo} from "react";
 
 const PageNavigator = ({
     page, size, total
 }: PageI) => {
+
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
 
     const lastPage = useMemo(() => Math.ceil(total / size), [total, size]);
 
@@ -22,11 +26,17 @@ const PageNavigator = ({
     const skipNextPage = useMemo(() => page + 5 > lastPage ? lastPage : page + 5,[page, lastPage]);
     const skipPrevPage = useMemo(() => page - 5 < 1 ? 1 : page - 5,[page]);
 
+    const createQueryStr = (page: number) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('page', page.toString());
+        return params.toString();
+    }
+
     const pages = useMemo(() =>
         pageNumbers.map((item, index) => {
             return (
                 <Link className={['border border-solid border-gray-300 rounded-md text-sm px-4 py-2', page === item ? 'bg-main text-white' : 'hover:bg-main hover:text-white duration-500'].join(' ')}
-                      href={`?page=${item}&size=${size}`}
+                      href={pathname + '?' + createQueryStr(item)}
                       key={`navi-${index}`}
                       prefetch={true}
                 >
@@ -34,13 +44,7 @@ const PageNavigator = ({
                 </Link>
             )
         })
-    ,[pageNumbers])
-
-    if(total !== 0 && lastPage < page) {
-        redirect(`?page=${lastPage}&size=${size}`);
-    } else if(total !== 0 && page < 1) {
-        redirect(`?page=1&size=${size}`);
-    }
+    ,[searchParams, pageNumbers])
 
     return (
         <div className={'w-full flex justify-center gap-x-2 mt-6'}>

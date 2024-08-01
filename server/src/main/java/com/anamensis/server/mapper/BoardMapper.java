@@ -49,4 +49,6 @@ public interface BoardMapper {
     int viewUpdateByPk(long boardPk);
 
     int updateByPk(Board board);
+
+    int updateIsBlockedByPk(long boardPk, boolean isBlocked);
 }

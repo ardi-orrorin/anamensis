@@ -2,6 +2,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCalendarDays, faCircleExclamation, faEye, faUser} from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import {useMemo} from "react";
+import moment from "moment";
 
 export type NoticeType = {
     id        : number;
@@ -42,20 +43,20 @@ const Row = ({data}: {data: NoticeType}) => {
                 </span>
             </div>
             <div className={'w-auto flex flex-col sm:flex-row text-sm text-gray-600'}>
-                <span className={'w-40 sm:w-24 px-1 flex gap-1 justify-end'}>
+                <span className={'min-w-32 sm:w-24 px-1 flex gap-1 justify-end'}>
                     <span>
                         <FontAwesomeIcon icon={faUser} size={'xs'} />
                     </span>
-                    <span>
+                    <span className={'w-full line-clamp-1'}>
                         {data.writer}
                     </span>
                 </span>
-                <span className={'w-40 px-1 flex justify-end gap-1'}>
+                <span className={'min-w-24 px-1 flex justify-end gap-1'}>
                     <span>
                         <FontAwesomeIcon icon={faCalendarDays} size={'xs'} />
                     </span>
                     <span>
-                        {data.createdAt}
+                        {moment(data.createdAt).format('YYYY-MM-DD') }
                     </span>
                 </span>
             </div>

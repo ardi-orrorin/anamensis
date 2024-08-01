@@ -30,5 +30,5 @@ public class Board implements Serializable {
     private boolean isUse;
     private Boolean isPublic;
     private boolean membersOnly;
-
+    private boolean isBlocked;
 }

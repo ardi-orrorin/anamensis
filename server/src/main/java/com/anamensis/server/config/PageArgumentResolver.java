@@ -36,6 +36,10 @@ public class PageArgumentResolver implements HandlerMethodArgumentResolver {
         String size = params.getFirst("size");
         String criteria = params.getFirst("criteria");
         String order = params.getFirst("order");
+        String search = params.getFirst("search");
+        String keyword = params.getFirst("keyword");
+        String filterType = params.getFirst("filterType");
+        String filterKeyword = params.getFirst("filterKeyword");
 
         Page query = new Page();
 
@@ -43,6 +47,11 @@ public class PageArgumentResolver implements HandlerMethodArgumentResolver {
         query.setSize(Integer.parseInt(size == null ? DEFAULT_SIZE : size));
         query.setCriteria(criteria == null ? "id" : criteria);
         query.setOrder(order == null ? "desc" : order);
+        query.setSearchType(search == null ? "" : search);
+        query.setKeyword(keyword == null ? "" : keyword);
+        query.setFilterKeyword(filterKeyword == null ? "" : filterKeyword);
+        query.setFilterType(filterType == null ? "" : filterType);
+
 
         return Mono.just(query);
     }

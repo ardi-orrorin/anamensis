@@ -8,11 +8,11 @@ import {RoleType} from "@/app/user/system/{services}/types";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 
-const Row = ({
-    props, setData
-} : {
-    props: WebSysI, setData: Dispatch<SetStateAction<WebSysI[]>>
+const Row = (props : WebSysI & {
+    setData : Dispatch<SetStateAction<WebSysI[]>>;
+    index  : number;
 }) => {
+    const {setData, index} = props;
 
     const [webSys, setWebSys] = useState<WebSysI>(props);
 
@@ -92,7 +92,10 @@ const Row = ({
     }
 
     return (
-        <tr className={'h-10 '}>
+        <tr className={[
+            'h-10 border-b border-gray-200 border-solid',
+            index % 2 === 1 ? 'bg-blue-50': '',
+        ].join(' ')}>
             <td className={'px-2'}>
                 <span> {webSys.code} </span>
             </td>

@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
-    const result = await apiCall<UserInfoI>({
+    const result = await apiCall<string>({
         path: '/api/user/profile-img',
         method: 'GET',
         call: 'Server',

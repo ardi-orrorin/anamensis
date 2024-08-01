@@ -10,6 +10,7 @@ const FooterComponent = (props: BoardListI) => {
     const {
         rate , commentCount
         , createdAt, viewCount
+        , isBlocked
     } = props;
 
 
@@ -26,6 +27,8 @@ const FooterComponent = (props: BoardListI) => {
     const commentCountColor = useMemo(() =>
         RateColor.findColor(commentCount)?.getColor
     ,[commentCount])
+
+    if(isBlocked) return <></>
 
     return (
         <div className={'px-3 pb-2 h-[30px] min-h[30px] max-h-[30px] flex justify-between items-center text-xs text-gray-500'}>

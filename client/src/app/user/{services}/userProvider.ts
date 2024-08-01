@@ -34,6 +34,8 @@ export interface UserProviderI {
     setPointSummary: Dispatch<SetStateAction<PointSummaryI[]>>;
     roles: RoleType[];
     setRoles: Dispatch<SetStateAction<RoleType[]>>;
+    profileImg: string;
+    setProfileImg: Dispatch<SetStateAction<string>>;
 }
 
 const UserProvider = createContext<UserProviderI>({} as UserProviderI);

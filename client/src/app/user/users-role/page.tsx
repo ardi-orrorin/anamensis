@@ -157,13 +157,13 @@ export default function Page() {
                     </div>
                 }
             </div>
-            <table className={'w-full'}>
+            <table className={'w-full min-w-[1200px]'}>
                 <colgroup>
                     <col style={{width: '3%'}}/>
                     <col style={{width: '3%'}}/>
+                    <col style={{width: '20%'}}/>
                     <col style={{width: '15%'}}/>
-                    <col style={{width: '15%'}}/>
-                    <col style={{width: '25%'}}/>
+                    <col style={{width: '20%'}}/>
                     <col style={{width: '10%'}}/>
                     <col style={{width: '5%'}}/>
                     <col style={{width: '10%'}}/>

@@ -1,4 +1,4 @@
-import {NextRequest, NextResponse} from "next/server";
+import {NextRequest} from "next/server";
 import {BoardI} from "@/app/board/{services}/types";
 import apiCall from "@/app/{commons}/func/api";
 import {StatusResponse} from "@/app/{commons}/types/commons";
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
         return ExNextResponse({
             body: JSON.stringify({...data, isLogin: getCookies}),
             status: 200,
-            isRoles: false,
+            isRoles: true,
         })
 
     } catch (e: any) {

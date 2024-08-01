@@ -11,6 +11,7 @@ export interface RefBoardI {
     membersOnly: boolean;
     isLogin?   : boolean;
     isWriter?  : boolean;
+    isBlocked  : boolean;
 }
 
 export interface BoardI {
@@ -33,6 +34,7 @@ export interface BoardI {
     // searchText?     : string;
     writerCreatedAt : string;
     userId          : string;
+    isBlocked       : boolean;
 }
 
 export interface BoardTemplate {

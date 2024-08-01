@@ -3,7 +3,6 @@ import {faExclamation} from "@fortawesome/free-solid-svg-icons";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import Link from "next/link";
 import {useContext, useEffect, useMemo, useRef, useState} from "react";
-import axios from "axios";
 import {ErrorResponse, LoginAuth} from "@/app/login/page";
 import LoginProvider, {LoginI} from "@/app/login/{services}/LoginProvider";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -11,6 +10,7 @@ import apiCall from "@/app/{commons}/func/api";
 import {RoleType} from "@/app/user/system/{services}/types";
 import {getProviders, signIn} from "next-auth/react";
 import Image from "next/image";
+import Turnstile from "react-turnstile";
 
 export type LoginType = {
     accessToken: string,
@@ -24,12 +24,10 @@ export type LoginUserType = {
     roles: RoleType[]
 }
 
-const Login = () => {
 
-    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-    const privateKey = process.env.NEXT_PUBLIC_RECAPTCHA_PRIVATE_KEY;
+const Login = () => {
+    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
     const [isRecaptcha, setIsReCaptcha] = useState<boolean>(false);
-    const recaptchaRef = useRef<ReCAPTCHA>(null);
     const [provider, setProvider] = useState<any>({});
 
     const {user, setUser} = useContext(LoginProvider);
@@ -59,7 +57,6 @@ const Login = () => {
         });
     },[]);
 
-
     const goLogin = async () => {
         setLoading(true);
 
@@ -83,16 +80,13 @@ const Login = () => {
         }).finally(() => {
             setLoading(false);
         });
-
     }
-
 
     const [error, setError] = useState<ErrorResponse>({
         status: 0,
         message: '',
         use: false
     });
-
 
     const setProps = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
@@ -102,32 +96,13 @@ const Login = () => {
             [name]: value
         });
 
-        if (error.use) {
-            setError({
-                status: 0,
-                message: '',
-                use: false
-            });
-        }
-
-        if(!recaptchaRef.current) return;
-
+        error.use
+        && setError({
+            status: 0,
+            message: '',
+            use: false
+        });
     }
-
-    const onChangeReCaptchaHandler = async (value: string | null) => {
-        if (!value) return;
-
-        const url = '/api/login/google';
-        const data = {
-            secret: privateKey,
-            response: value || ""
-        };
-
-        await axios.post(url, data).then((res) => {
-            setIsReCaptcha(res.data.success);
-        })
-    }
-
 
     return (
         <div className={"flex flex-col gap-4 border border-solid b border-blue-300 sm:w-4/5 md:w-1/2 xl:w-1/3 w-full rounded pb-5"}>
@@ -167,13 +142,15 @@ const Login = () => {
                     </span>
                   }
                 </div>
-                <div className={''}>
+                <div className={'flex justify-center'}>
                     {
                         idCheck && isNext &&
-                        <ReCAPTCHA ref={recaptchaRef}
-                                   sitekey={siteKey || ""}
-                                   onChange={onChangeReCaptchaHandler}
-                                   className={'w-full flex justify-center py-2'}
+                        <Turnstile sitekey={siteKey}
+                                   onVerify={() => {
+                                       setIsReCaptcha(true);
+                                   }}
+                                   theme={'light'}
+                                   language={'ko'}
                         />
                     }
                 </div>
@@ -202,20 +179,27 @@ const Login = () => {
                    className={'flex justify-center text-xs text-blue-500'}
                 >비밀번호 찾기</Link>
             </div>
-            <div className={'flex justify-between px-3'}>
+            <div className={'flex flex-col gap-2 justify-between px-3'}>
                 {
-                    Object.values(provider).map((provider) => {
-                        const {name, id} = provider as {name: string, id: string};
-                        const logoImg = process.env.NEXT_PUBLIC_CDN_SERVER + '/logo/' + name.toLowerCase() + '-logo.webp';
+                    Object?.values(provider).length > 0
+                    && Object?.values(provider)?.map((provider) => {
+                        const { id, name} = provider as {id: string, name: string};
+                        const logoImg = process.env.NEXT_PUBLIC_CDN_SERVER + '/logo/' + id + '-logo.webp';
+                        const {bgColor, hoverBgColor, size} = oAuthProviders.find(o => o.provider === id)
+                            || {bgColor: 'gray-300', hoverBgColor: 'gray-600'};
+
                         return (
-                            <button className={'w-full flex justify-center items-center gap-1 text-xs text-white p-3 bg-red-300 hover:bg-red-600 rounded duration-300'}
-                                key={name}
-                                onClick={() => signIn(id)}
+                            <button className={[
+                                `w-full h-11 flex justify-center items-center gap-1 text-xs text-white rounded duration-300`,
+                                `${bgColor} hover:${hoverBgColor}`,
+                                ].join(' ')}
+                                    key={'oauth-login' + id}
+                                    onClick={() => signIn(id)}
                             >
                                 <Image src={logoImg}
                                        alt={''}
-                                       width={16}
-                                       height={16}
+                                       width={size}
+                                       height={size}
                                 />
                                 <span className={'font-bold'}>
                                     Sign in with {name}
@@ -228,5 +212,24 @@ const Login = () => {
         </div>
     )
 }
+
+type OAuthProviderType = {
+    provider      : string;
+    bgColor       : string;
+    hoverBgColor  : string;
+    size          : number;
+}
+
+const oAuthProviders: OAuthProviderType[] = [
+    { provider: 'google',    bgColor: 'bg-red-300',    hoverBgColor: 'bg-red-600',    size: 16,   },
+    { provider: 'facebook',  bgColor: 'bg-blue-300',   hoverBgColor: 'bg-blue-600',   size: 16,   },
+    { provider: 'twitter',   bgColor: 'bg-blue-500',   hoverBgColor: 'bg-blue-800',   size: 16,   },
+    { provider: 'instagram', bgColor: 'bg-pink-300',   hoverBgColor: 'bg-pink-600',   size: 16,   },
+    { provider: 'naver',     bgColor: 'bg-green-300',  hoverBgColor: 'bg-green-600',  size: 20,   },
+    { provider: 'kakao',     bgColor: 'bg-amber-300',  hoverBgColor: 'bg-amber-700',  size: 18,   },
+    { provider: 'github',    bgColor: 'bg-gray-600',   hoverBgColor: 'bg-gray-900',   size: 18,   },
+];
+
+
 
 export default Login;

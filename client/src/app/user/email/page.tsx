@@ -10,19 +10,20 @@ import UserProvider from "@/app/user/{services}/userProvider";
 import {RoleType} from "@/app/user/system/{services}/types";
 
 export interface UserInfoI {
-    userId: string;
-    email: string;
-    phone: string;
-    name: string;
-    point: number;
-    sauthType: AuthType;
-    sauth: boolean;
-    [key: string]: any;
+    userId        : string;
+    email         : string;
+    phone         : string;
+    name          : string;
+    point         : number;
+    sauthType     : AuthType;
+    sauth         : boolean;
+    createAt      : string;
+    [key: string] : any;
 }
 
 export interface AuthPropsI {
-    sauthType: AuthType;
-    sauth: boolean;
+    sauthType : AuthType;
+    sauth     : boolean;
 }
 
 export default function Page() {
@@ -59,14 +60,14 @@ export default function Page() {
     },{});
 
 
-    const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const data: AuthPropsI = {
             sauth: e.target.checked,
             sauthType: userInfo.sauthType !== AuthType.EMAIL ? AuthType.EMAIL : AuthType.NONE
         };
 
         setLoading(true);
-        apiCall<UserInfoI, AuthPropsI>({
+        await apiCall<UserInfoI, AuthPropsI>({
             path: '/api/user/email',
             method: 'PUT',
             body: data,

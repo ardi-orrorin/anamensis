@@ -5,6 +5,7 @@ import {ResponseCookie} from "next/dist/compiled/@edge-runtime/cookies";
 import axios from "axios";
 import {cookies} from "next/headers";
 import {NextRequest} from "next/server";
+import Github from "next-auth/providers/github";
 
 interface RouteHandlerContext {
     params: { nextauth: string[] }
@@ -14,21 +15,35 @@ async function handler(req: NextRequest, context: RouteHandlerContext) {
 
     const options: AuthOptions = {
         providers: [
-            Google(({
+            Google({
                 clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
                 clientSecret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET || '',
 
-            }))
+            }),
+            Github({
+                clientId: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID || '',
+                clientSecret: process.env.NEXT_PUBLIC_GITHUB_CLIENT_SECRET || '',
+            }),
+            // Kakao({
+            //     clientId: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID || '',
+            //     clientSecret: process.env.NEXT_PUBLIC_KAKAO_CLIENT_SECRET || '',
+            // }),
+            // Naver({
+            //     clientId: process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || '',
+            //     clientSecret: process.env.NEXT_PUBLIC_NAVER_CLIENT_SECRET || '',
+            // }),
+
         ],
         callbacks: {
             async signIn({account, credentials, user}) {
-                const loginUser  = {} as OAuth2I;
-                if(account?.provider === 'google' && user?.email) {
-                    loginUser.userId = user.id;
-                    loginUser.email = user.email;
-                    loginUser.name = user.name || '';
-                    loginUser.provider = account.provider;
-                }
+                if(!account?.provider) return false;
+
+                const loginUser  = {
+                    userId: user.id,
+                    email: user.email || '',
+                    name: user.name || '',
+                    provider: account.provider,
+                } as OAuth2I;
 
                 const url = process.env.NEXT_PUBLIC_SERVER + '/public/api/user/oauth'
                 const clientIp = req.ip || req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for');

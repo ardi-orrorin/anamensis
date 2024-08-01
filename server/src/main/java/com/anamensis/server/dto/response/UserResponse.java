@@ -15,8 +15,10 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.http.HttpStatus;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class UserResponse {
@@ -61,6 +63,10 @@ public class UserResponse {
     @Getter
     @Setter
     public static class MyPage implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
+
         private String userId;
         private String email;
         private String phone;
@@ -68,6 +74,7 @@ public class UserResponse {
         private long point;
         private Boolean sAuth;
         private AuthType sAuthType;
+        private String createAt;
 
         public static MyPage transToMyPage(MemberResultMap user) {
             MyPage my = new MyPage();
@@ -78,6 +85,7 @@ public class UserResponse {
             my.setPoint(user.getMember().getPoint());
             my.setSAuth(user.getMember().getSAuth());
             my.setSAuthType(user.getMember().getSAuthType());
+            my.setCreateAt(user.getMember().getCreateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             return my;
         }
 

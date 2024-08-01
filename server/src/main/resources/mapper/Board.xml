@@ -177,6 +177,13 @@
            AND is_use     = 1
     </update>
 
+    <update id="updateIsBlockedByPk">
+        UPDATE board
+           SET is_blocked = #{isBlocked}
+         WHERE id         = #{boardPk}
+           AND is_use     = 1
+    </update>
+
     <resultMap id="BoardResultMapBoardNotice" type="com.anamensis.server.resultMap.BoardResultMap$Notice">
         <id property="id" column="board_pk"/>
         <result property="writer" column="writer"/>

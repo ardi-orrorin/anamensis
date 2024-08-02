@@ -1,12 +1,10 @@
 'use client';
 
 import React, {useEffect, useState} from "react";
-import {ModalI} from "@/app/user/system/{services}/modalProvider";
 import LeftNavBar from "@/app/user/{components}/LeftNavBar";
 import Contents from "@/app/user/{components}/Contents";
 import UserProvider, {AttendInfoI, BoardSummaryI, PointSummaryI} from "@/app/user/{services}/userProvider";
 import {RoleType} from "@/app/user/system/{services}/types";
-
 
 export default function Layout({children}: {children: React.ReactNode & {test:'1'}}) {
 

@@ -65,7 +65,7 @@ const LeftNavBar = ({
         });
     },[])
 
-    const initFetch = useSWR('/user/navBar', async () => {
+    useSWR('/user/navBar', async () => {
         await apiCall({
             path: '/api/user/roles',
             method: 'GET',
@@ -76,6 +76,8 @@ const LeftNavBar = ({
                 setRoles(JSON.parse(res.headers['next.user.roles']));
             }
         });
+    },{
+        revalidateOnFocus: false
     });
 
     const openToggle = useCallback(() => {

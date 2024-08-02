@@ -5,6 +5,8 @@ import Error from "@/app/error";
 import {Metadata, Viewport} from "next";
 import Script from "next/script";
 import Footer from "@/app/{components}/mainFooter";
+import {Suspense} from "react";
+import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 
 export const metadata: Metadata = {
     title: 'anamensis',
@@ -45,6 +47,7 @@ export default function RootLayout({
 }) {
 
     const gId = process.env.NEXT_PUBLIC_GID;
+
     
     return (
         <html lang="ko">
@@ -61,6 +64,7 @@ export default function RootLayout({
                 `
             }} />
             <body>
+            <Suspense fallback={<GlobalLoadingSpinner />}>
                 <NavMain />
                 <div className={'min-h-screen h-full'}>
                     <ErrorBoundary errorComponent={Error}>
@@ -68,6 +72,7 @@ export default function RootLayout({
                     </ErrorBoundary>
                 </div>
                 <Footer />
+            </Suspense>
             </body>
         </html>
     )

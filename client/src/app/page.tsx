@@ -16,6 +16,7 @@ import {useRootHotKey} from "@/app/{hooks}/hotKey";
 import Notices, {NoticeType} from "@/app/{components}/boards/notices";
 import SearchInfo from "@/app/{components}/searchInfo";
 import {faBars} from "@fortawesome/free-solid-svg-icons";
+import {Virtuoso} from "react-virtuoso";
 
 export type DynamicPage = {
     isEndOfList: boolean;
@@ -162,13 +163,6 @@ export default function Page() {
 
     useRootHotKey({searchRef})
 
-    const dataComponent = useMemo(() => data.map((item, index) => {
-        if(!item) return;
-        return (
-            <BoardComponent key={'boardsummary' + index} {...{...item, favorites, isLogin, roles}} />
-        )
-    }),[data, favorites]);
-
     return (
         <SearchParamsProvider.Provider value={{
             searchParams, setSearchParams,
@@ -232,11 +226,16 @@ export default function Page() {
                                 && data?.length === 0
                                 && <div className={'text-center text-2xl w-full py-20 text-gray-600'}>검색 결과가 없습니다.</div>
                             }
-                            {
-                                data
-                                && data?.length > 0
-                                && dataComponent
-                            }
+                            <Virtuoso style={{width: '100%', height: '100%', overflow: 'hidden'}}
+                                      totalCount={data.length}
+                                      data={data}
+                                      useWindowScroll
+                                      itemContent={(index, data) =>
+                                          <div className={'py-1.5'}>
+                                              <BoardComponent key={'boardsummary' + index} {...{...data, favorites, isLogin, roles}} />
+                                          </div>
+                                      }
+                            />
                         </div>
                     </div>
                 </div>

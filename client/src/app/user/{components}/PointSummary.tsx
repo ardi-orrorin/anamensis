@@ -7,14 +7,26 @@ import {Table} from "@/app/user/point-history/{services}/types";
 import {RateColor} from "@/app/{commons}/types/rate";
 import useSWR, {preload} from "swr";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import UserProvider from "@/app/user/{services}/userProvider";
+import UserProvider, {PointSummaryI} from "@/app/user/{services}/userProvider";
 import moment from "moment";
-
-
 
 const PointSummary = () => {
 
-    const {pointSummary} = useContext(UserProvider);
+    const {pointSummary, setPointSummary} = useContext(UserProvider);
+
+    useSWR('/api/user/point-history/summary', async () => {
+        return await apiCall<PointSummaryI[]>({
+            path: "/api/user/point-history/summary",
+            params: {page:1, size: 8},
+            method: "GET",
+            isReturnData: true,
+        })
+        .then((data) => {
+            setPointSummary(data);
+        });
+    },{
+        revalidateOnFocus: false
+    });
 
     return (
         <div className={'w-full h-max flex flex-col gap-2 justify-center items-start'}>

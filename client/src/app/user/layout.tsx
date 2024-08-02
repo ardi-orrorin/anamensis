@@ -32,42 +32,6 @@ export default function Layout({children}: {children: React.ReactNode & {test:'1
         setIsModalMode(isModalMode);
     },[isModalMode]);
 
-    useSWR('/user/attend', async () => {
-        return await apiCall<AttendInfoI>({
-            path: "/api/user/attend",
-            method: "GET",
-            isReturnData: true,
-        })
-        .then((data) => {
-            setAttendInfo(data);
-        });
-    })
-
-    useSWR('/api/board/summary', async () => {
-        return await apiCall<BoardSummaryI[]>({
-            path: "/api/board/summary",
-            params: {page:1, size: 8},
-            method: "GET",
-            isReturnData: true
-        })
-        .then((data) => {
-            setBoardSummary(data);
-        });
-    })
-
-
-    useSWR('/api/user/point-history/summary', async () => {
-        return await apiCall<PointSummaryI[]>({
-            path: "/api/user/point-history/summary",
-            params: {page:1, size: 8},
-            method: "GET",
-            isReturnData: true,
-        })
-        .then((data) => {
-            setPointSummary(data);
-        });
-    })
-
     return (
         <UserProvider.Provider value={{
             boardSummary, setBoardSummary,

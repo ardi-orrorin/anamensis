@@ -33,15 +33,6 @@ const History = () => {
         });
     }
 
-    const onChangeSearchParams = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const {name, value} = e.target;
-
-        const params = new URLSearchParams(searchParams.toString());
-        params.set(name, value);
-
-        router.push(pathname + '?' + params.toString());
-    }
-
     const onSearchHandler = () => {
         const params = new URLSearchParams(searchParams.toString());
         params.set('search', 'title');
@@ -64,7 +55,7 @@ const History = () => {
     }
 
     return (
-        <>
+        <div className={'w-full'}>
             <div className={'flex justify-end h-12 py-2 gap-2'}>
                 <select className={'w-28 border border-solid border-gray-300 rounded-md text-sm px-3 py-1 outline-0'}
                         name={'status'}
@@ -130,7 +121,7 @@ const History = () => {
                 >검색
                 </button>
             </div>
-        </>
+        </div>
     )
 }
 

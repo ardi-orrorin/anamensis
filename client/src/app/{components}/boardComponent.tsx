@@ -74,7 +74,7 @@ const BoardComponent = (props: BoardListI & {favorites: string[], isLogin: boole
                     { Component }
                 </span>
                 : <Link className={[
-                    'relative flex flex-col justify-between w-full h-[170px] border-solid border rounded shadow active:bg-blue-50 hover:shadow-xl  active:shadow-xl duration-300',
+                    'relative flex flex-col justify-between w-full h-[170px] border-solid border rounded shadow active:bg-blue-50 hover:shadow-md  active:shadow-md duration-300',
                     isFavorite && !isBlocked ? 'border-yellow-300 hover:border-yellow-500 active:bg-yellow-300' : 'bg-white border-gray-200 hover:border-gray-500 active:bg-gray-300',
                     highLight && 'border-t-5'
                 ].join(' ')}

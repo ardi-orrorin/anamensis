@@ -9,10 +9,21 @@ import UserProvider, {AttendInfoI} from "@/app/user/{services}/userProvider";
 
 export default function AttendInfo() {
 
-    const {attendInfo, setAttendInfo} = useContext(UserProvider)
+    const {attendInfo, setAttendInfo} = useContext(UserProvider);
 
     const [loading, setLoading] = useState<boolean>(false);
     const debounce = createDebounce(500);
+
+    const {mutate} = useSWR('/user/attend', async () => {
+        return await apiCall<AttendInfoI>({
+            path: "/api/user/attend",
+            method: "GET",
+            isReturnData: true,
+        })
+            .then((data) => {
+                setAttendInfo(data);
+            });
+    })
 
     const attend = useCallback(() => {
         setLoading(true);
@@ -28,7 +39,7 @@ export default function AttendInfo() {
                     : '이미 출석하셨습니다. 내일 다시 시도해주세요.';
 
                 alert(message);
-                await mutate('/user/attend');
+                await mutate();
             })
             .finally(() => {
                 setLoading(false);

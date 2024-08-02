@@ -18,6 +18,7 @@ const MobileMenu = ({
 
     const onChangeCategory = useCallback((value: string) => {
         setSearchParams({ categoryPk: value, page: 1, size: 20 } as BoardListParamsI);
+        scrollTo(0, 0);
     },[searchParams]);
 
     const onClickMyMenu = useCallback((type: string) => {

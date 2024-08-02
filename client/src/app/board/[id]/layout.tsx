@@ -134,9 +134,11 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
         setLoading(true);
 
-        fetchBoard();
+        Promise.allSettled([
+            fetchBoard(),
+            fetchRate()
+        ]);
 
-        fetchRate();
     },[params.id]);
 
 
@@ -203,7 +205,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
                     call: 'Proxy',
                     isReturnData: true
                 })
-            );
+            )
 
             setIsFavorite(isFavorite);
 

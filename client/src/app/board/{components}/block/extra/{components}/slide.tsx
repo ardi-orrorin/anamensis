@@ -80,7 +80,7 @@ const Slide = ({
             viewImage: images[selectedIndex],
             viewToggle: true,
         });
-    },[]);
+    },[selectedIndex]);
 
     const imageList = useMemo(()=>
         images?.map((image, index) => {

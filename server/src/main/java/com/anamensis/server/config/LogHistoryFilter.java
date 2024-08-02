@@ -4,9 +4,7 @@ import com.anamensis.server.entity.LogHistory;
 import com.anamensis.server.service.LogHistoryService;
 import com.anamensis.server.service.UserService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -20,9 +18,6 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuple3;
-import reactor.util.function.Tuples;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -158,7 +153,6 @@ public class LogHistoryFilter implements WebFilter {
         String remoteAddr = ex.getRequest().getRemoteAddress().toString();
         String query = ex.getRequest().getQueryParams().toString();
         String URI = ex.getRequest().getURI().toString();
-
 
         return ex.getPrincipal()
                 .flatMap(principal -> userService.findUserByUserId(principal.getName()))

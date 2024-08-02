@@ -17,6 +17,8 @@ import Notices, {NoticeType} from "@/app/{components}/boards/notices";
 import SearchInfo from "@/app/{components}/searchInfo";
 import {faBars} from "@fortawesome/free-solid-svg-icons";
 import {Virtuoso} from "react-virtuoso";
+import {useRouter} from "next/navigation";
+import RightSubMenu from "@/app/{components}/rightSubMenu";
 
 export type DynamicPage = {
     isEndOfList: boolean;
@@ -46,6 +48,7 @@ export default function Page() {
     } as BoardListParamsI);
 
     const [noticeList, setNoticeList] = useState<NoticeType[]>([]);
+
     const isLogin = useMemo(()=> roles.length > 0, [roles]);
 
     const moreRef = React.useRef<HTMLDivElement>(null);
@@ -206,10 +209,8 @@ export default function Page() {
                     >
                         <FontAwesomeIcon icon={faBars} className={'h-auto'} />
                     </button>
-                    {
-                        menuToggle
-                        && <MobileMenu {...{setMenuToggle, isLogin}} />
-                    }
+                    <MobileMenu {...{menuToggle, setMenuToggle, isLogin}} />
+
                 </div>
                 <div className={'flex flex-row justify-start sm:justify-center'}>
                     <div className={'hidden sm:block relative min-w-[300px]'}>
@@ -249,6 +250,7 @@ export default function Page() {
                         }
                     </div>
                 </div>
+                <RightSubMenu {...{isLogin}} />
             </div>
         </SearchParamsProvider.Provider>
     )

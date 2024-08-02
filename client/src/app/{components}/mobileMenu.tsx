@@ -4,10 +4,12 @@ import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchPar
 import Link from "next/link";
 
 const MobileMenu = ({
+    menuToggle,
     setMenuToggle,
     isLogin
 }:{
     isLogin: boolean;
+    menuToggle: boolean;
     setMenuToggle: Dispatch<SetStateAction<boolean>>;
 }) => {
     const {
@@ -70,12 +72,15 @@ const MobileMenu = ({
         }),[searchParams.categoryPk])
 
     return (
-        <div className={'fixed top-0 left-0 z-20 bg-white bg-opacity-0 w-full h-full'}
-             onClick={e => {
+        <div className={'fixed top-0 left-0 z-20 bg-white bg-opacity-0 w-full'}
+             onClick={() => {
                  setMenuToggle(false);
              }}
         >
-            <div className={'fixed z-30 bottom-28 right-5 p-2 min-w-40 max-h-[400px] border-y-4 border-solid border-main bg-white overflow-y-auto rounded shadow-md'}>
+            <div className={[
+                'fixed z-30 bottom-24 right-5 min-w-40 bg-white rounded shadow-md duration-500',
+                menuToggle ? 'max-h-[400px] p-2 border-y-4 border-solid border-main overflow-y-auto' : 'max-h-0 overflow-y-hidden',
+            ].join(' ')}>
                 {
                    isLogin
                    && <>
@@ -125,11 +130,10 @@ const MobileMenu = ({
                         </div>
                      </>
                 }
-
             </div>
         </div>
 
     )
 }
 
-export default MobileMenu;
+export default React.memo(MobileMenu);

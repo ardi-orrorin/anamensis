@@ -1,7 +1,6 @@
 import {Dispatch, SetStateAction, useContext, useState} from "react";
-import axios from "axios";
-import { WebSysI} from "@/app/user/system/page";
-import ModalProvider, {ModalContextType} from "@/app/user/{services}/modalProvider";
+import {WebSysI} from "@/app/user/system/page";
+import ModalProvider, {ModalContextType} from "@/app/user/system/{services}/modalProvider";
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import Message from "@/app/user/system/{components}/message";
 import {RoleType} from "@/app/user/system/{services}/types";

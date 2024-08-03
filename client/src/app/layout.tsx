@@ -7,6 +7,7 @@ import Script from "next/script";
 import Footer from "@/app/{components}/mainFooter";
 import {Suspense} from "react";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
+import ProgressBar from "@/app/{components}/progressBar";
 
 export const metadata: Metadata = {
     title: 'anamensis',
@@ -64,6 +65,7 @@ export default function RootLayout({
                 `
             }} />
             <body>
+            <ProgressBar />
             <Suspense fallback={<GlobalLoadingSpinner />}>
                 <NavMain />
                 <div className={'min-h-screen h-full'}>

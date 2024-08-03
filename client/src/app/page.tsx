@@ -58,6 +58,8 @@ export default function Page() {
 
     const fetchDebounce = createDebounce(100);
 
+
+
     useEffect(()=>{
         const history = localStorage.getItem('searchHistory');
         if(history) setSearchHistory(JSON.parse(history));
@@ -191,6 +193,7 @@ export default function Page() {
         <SearchParamsProvider.Provider value={{
             searchParams, setSearchParams,
         }}>
+
             <div className={'p-5 flex flex-col gap-10'}
                  onClick={()=> {
                      setOnSearchHistory(false)

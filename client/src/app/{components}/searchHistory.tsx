@@ -24,24 +24,24 @@ const SearchHistory = ({
         ].join(' ')}
              onMouseLeave={()=> setOnSearchHistory(false)}
         >
-            <ul className={'flex flex-col bg-white'}>
+            <ul className={'flex flex-col gap-1 bg-white'}>
                 <div className={'h-6'} />
                 {
                     searchHistory.map((keyword, index) => {
                         return (
                             <li key={'searchHistory' + index}
-                                className={'w-full flex text-xs px-2 py-1.5 bg-white hover:bg-gray-300 duration-300'}
+                                className={'w-full flex gap-2 text-xs px-2 h-7 items-center bg-white hover:bg-gray-300 duration-300'}
                             >
-                                <button className={'w-full flex'}
+                                <button className={'w-full h-full flex items-center'}
                                         onClick={(e)=> {
-                                            e.stopPropagation();
+                                            // e.stopPropagation();
                                             setSearchValue(keyword);
                                             onSearchHandler(false, keyword);
                                         }}
                                 >
                                     {keyword}
                                 </button>
-                                <button className={'min-w-5 bg-gray-200'}
+                                <button className={'min-w-8 h-full flex justify-center items-center bg-gray-100 rounded-md'}
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             removeSearchHistory(keyword);

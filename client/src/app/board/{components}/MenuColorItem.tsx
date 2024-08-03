@@ -2,6 +2,7 @@ import {ToggleEnum} from "@/app/board/{components}/SubTextMenu";
 import {useMemo} from "react";
 
 export type MenuSubItemProps = {
+    className?: string;
     toggle: ToggleEnum;
     menuTitle: string;
     name: 'color' | 'backgroundColor';
@@ -9,6 +10,7 @@ export type MenuSubItemProps = {
 }
 
 const MenuColorItem = ({
+    className,
     toggle,
     menuTitle,
     name,
@@ -42,7 +44,11 @@ const MenuColorItem = ({
     ,[onClick]);
 
     return (
-        <div className={`absolute z-30 flex flex-col justify-left items-center w-20 bg-white duration-300 overflow-y-scroll shadow ${toggle === name ? 'max-h-80' : 'max-h-0'}`}>
+        <div className={[
+            `absolute z-30 flex flex-col justify-left items-center w-20 bg-white duration-300 overflow-y-scroll shadow`,
+            toggle === name ? 'max-h-80' : 'max-h-0',
+            className,
+        ].join(' ')}>
             { colorSets }
         </div>
     )
@@ -52,6 +58,15 @@ export default MenuColorItem;
 
 const colorSet  = [
     {color: '#FFFFFF', dark: false},
+
+    {color : '#fee2e2', dark: false},
+    {color : '#fecaca', dark: false},
+    {color : '#fca5a5', dark: false},
+    {color : '#f87171', dark: false},
+    {color : '#ef4444', dark: true},
+    {color : '#dc2626', dark: true},
+    {color : '#7f1d1d', dark: true},
+    {color : '#450a0a', dark: true},
 
     {color: '#FFEAFE', dark: false},
     {color: '#FFC5FD', dark: false},

@@ -74,7 +74,7 @@ const LeftMenu = ({
     }),[roles]);
 
     return (
-        <div className={'sticky z-30 top-10 left-[5%] xl:left-[13%]'}>
+        <div className={'sticky z-30 top-20 left-[5%] xl:left-[13%]'}>
             <div className={'flex flex-col gap-5 items-center xl:items-start'}>
                 <div className={'flex flex-col w-60 gap-2 shadow rounded p-3 bg-white border-t-4 border border-solid border-gray-100 hover:border-gray-500 duration-500'}>
                     <div className={'flex gap-2 justify-center items-center text-sm py-2 font-bold'}>

@@ -17,8 +17,8 @@ import Notices, {NoticeType} from "@/app/{components}/boards/notices";
 import SearchInfo from "@/app/{components}/searchInfo";
 import {faBars} from "@fortawesome/free-solid-svg-icons";
 import {Virtuoso} from "react-virtuoso";
-import {useRouter} from "next/navigation";
 import RightSubMenu from "@/app/{components}/rightSubMenu";
+import SearchHistory from "@/app/{components}/searchHistory";
 
 export type DynamicPage = {
     isEndOfList: boolean;
@@ -48,6 +48,8 @@ export default function Page() {
     } as BoardListParamsI);
 
     const [noticeList, setNoticeList] = useState<NoticeType[]>([]);
+    const [searchHistory, setSearchHistory] = useState<string[]>([]);
+    const [onSearchHistory, setOnSearchHistory] = useState(false);
 
     const isLogin = useMemo(()=> roles.length > 0, [roles]);
 
@@ -55,6 +57,11 @@ export default function Page() {
     const searchRef = useRef<HTMLInputElement>(null);
 
     const fetchDebounce = createDebounce(100);
+
+    useEffect(()=>{
+        const history = localStorage.getItem('searchHistory');
+        if(history) setSearchHistory(JSON.parse(history));
+    },[]);
 
     useEffect(() => {
         apiCall<string[]>({
@@ -132,7 +139,8 @@ export default function Page() {
     },[moreRef?.current, loading]);
 
 
-    const onSearchHandler = useCallback((init: boolean) => {
+    const onSearchHandler = useCallback((init: boolean, keyword?: string) => {
+        window.scrollTo({top: 0});
         const initPage = {page: 1, size: pageSize};
 
         if(init) {
@@ -143,14 +151,21 @@ export default function Page() {
 
         const regex = /[^a-zA-Z0-9ㄱ-ㅎ가-힣\s]/g;
 
-        const value = searchValue.replace(regex, '');
+        const value = keyword || searchValue.replace(regex, ' ') || '';
 
-        const params = searchValue === ''
+        const params = value === ''
         ? {...initPage} as BoardListParamsI
         : {...searchParams, ...initPage, value, type: 'content'};
 
+        console.log(params)
+
         setSearchParams(params);
-    },[searchParams, searchValue]);
+
+        if(searchHistory.some(key => key === value) || value === '') return;
+        localStorage.setItem('searchHistory', JSON.stringify([...searchHistory, value]));
+        setSearchHistory([...searchHistory, value]);
+
+    },[searchParams, searchValue, searchHistory]);
 
     const onEnterHandler = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
         if(e.key === 'Enter') {
@@ -164,27 +179,56 @@ export default function Page() {
         }
     },[searchRef, searchValue]);
 
+    const removeSearchHistory = (keyword: string) => {
+        const newHistory = searchHistory.filter(key => key !== keyword);
+        setSearchHistory(newHistory);
+        localStorage.setItem('searchHistory', JSON.stringify(newHistory));
+    }
+
     useRootHotKey({searchRef})
 
     return (
         <SearchParamsProvider.Provider value={{
             searchParams, setSearchParams,
         }}>
-            <div className={'p-5 flex flex-col gap-10'}>
-                <div className={'px-4 sm:px-10 md:px-20 lg:px-44 w-full flex flex-col justify-center items-center gap-3'}>
-                    <div className={['relative flex justify-center duration-700', searchFocus ? 'w-full sm:w-[70%]' : 'w-70 sm:w-[40%]'].join(' ')}>
-                        <input className={'rounded-full outline-0 border-solid border-gray-200 border text-xs w-full h-10 py-3 pl-4 pr-20 focus:border-gray-500 duration-500'}
+            <div className={'p-5 flex flex-col gap-10'}
+                 onClick={()=> {
+                     setOnSearchHistory(false)
+                     setSearchFocus(false)
+                 }}
+            >
+                <div className={'sticky z-40 top-0 py-3 sm:px-10 md:px-20 lg:px-44 w-full flex flex-col rounded-full justify-center items-center gap-3'}>
+                    <div className={[
+                        'relative flex flex-col justify-center bg-white shadow-md duration-700 rounded-full',
+                        searchFocus ? 'w-full sm:w-[70%]' : 'w-70 sm:w-[40%]',
+                    ].join(' ')}>
+                        <input className={'z-40 rounded-full outline-0 border-solid border-gray-200 border-2 text-xs w-full h-10 py-3 pl-4 pr-20 focus:border-gray-500 focus:border duration-500 bg-white'}
                                ref={searchRef}
                                placeholder={'검색어'}
                                value={searchValue || ''}
+                               onClick={e=> e.stopPropagation()}
                                onChange={(e) => setSearchValue(e.target.value)}
                                onKeyUp={onEnterHandler}
-                               onFocus={() => setSearchFocus(true)}
-                               onBlur={() => setSearchFocus(false)}
+                               onFocus={() => {
+                                   setSearchFocus(true)
+                                   if(searchHistory.length === 0) return;
+                                   setOnSearchHistory(true)
+                               }}
+                               onMouseEnter={(e) => {
+                                   e.stopPropagation();
+                                   e.preventDefault();
+                                   if(!searchFocus) return;
+                                   if(searchHistory.length === 0) return;
+                                   setOnSearchHistory(true)
+                               }}
+                               onBlur={() => {
+                                   if(onSearchHistory) return;
+                                   setSearchFocus(false)
+                               }}
                         />
                         {
                             searchValue.length > 0
-                            && <button className={'absolute right-12 top-1 duration-500'}
+                            && <button className={'absolute z-50 right-12 top-1 duration-500'}
                                        onClick={()=> onSearchHandler(true)}
                           >
                             <FontAwesomeIcon className={'h-4 py-1.5 px-2 text-gray-400 hover:text-red-300 duration-300'}
@@ -192,13 +236,15 @@ export default function Page() {
                             />
                           </button>
                         }
-                        <button className={'absolute right-2 top-1 duration-500'}
+                        <button className={'absolute z-50 right-2 top-1 duration-500'}
                                 onClick={()=> onSearchHandler(false)}
                         >
                             <FontAwesomeIcon className={'h-4 py-1.5 px-2 text-gray-400 hover:text-blue-300 duration-300'}
                                              icon={faMagnifyingGlass}
                             />
                         </button>
+                        <SearchHistory {...{searchHistory, setSearchValue, removeSearchHistory, onSearchHistory, setOnSearchHistory, onSearchHandler}} />
+
                     </div>
                     <SearchInfo />
                 </div>

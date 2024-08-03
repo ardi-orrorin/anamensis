@@ -115,7 +115,8 @@ const SubTextMenu = ({
                     >
                         글자색
                     </button>
-                    <MenuColorItem toggle={toggle}
+                    <MenuColorItem className={'font-bold'}
+                                   toggle={toggle}
                                    menuTitle={'글자색'}
                                    name={'color'}
                                    onClick={onClickColorHandler}

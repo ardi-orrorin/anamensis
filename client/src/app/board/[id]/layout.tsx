@@ -60,7 +60,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
     const searchParams = useSearchParams();
 
     useEffect(() => {
-        if(!isNewBoard && !board?.isView || !isTemplate && !board?.isView || board.isView) return;
+        if(!isNewBoard && !board?.isView || isTemplate && !board?.isView || board.isView) return;
 
         const beforeunload = (e: BeforeUnloadEvent) => {
             e.preventDefault();

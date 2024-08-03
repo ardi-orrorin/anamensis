@@ -19,8 +19,8 @@ const SearchHistory = ({
 }) => {
     return (
         <div className={[
-            'absolute top-6 z-20 w-full flex flex-col bg-white rounded-b-3xl shadow-md duration-700 overflow-y-hidden',
-            onSearchHistory && searchHistory.length > 0 ? 'max-h-52' : 'max-h-0',
+             'absolute top-6 z-20 w-full flex flex-col bg-white rounded-b-3xl shadow-md duration-700 overflow-y-hidden',
+             onSearchHistory && searchHistory.length > 0 ? 'max-h-52' : 'max-h-0',
         ].join(' ')}
              onMouseLeave={()=> setOnSearchHistory(false)}
         >
@@ -34,7 +34,6 @@ const SearchHistory = ({
                             >
                                 <button className={'w-full h-full flex items-center'}
                                         onClick={(e)=> {
-                                            // e.stopPropagation();
                                             setSearchValue(keyword);
                                             onSearchHandler(false, keyword);
                                         }}
@@ -59,4 +58,7 @@ const SearchHistory = ({
     )
 }
 
-export default SearchHistory;
+export default React.memo(SearchHistory, (prev, next) => {
+    return prev.searchHistory === next.searchHistory
+        && prev.onSearchHistory === next.onSearchHistory;
+});

@@ -83,4 +83,6 @@ const RightSubMenu = ({
     )
 }
 
-export default React.memo(RightSubMenu);
+export default React.memo(RightSubMenu, (prev, next) => {
+    return prev.isLogin === next.isLogin;
+});

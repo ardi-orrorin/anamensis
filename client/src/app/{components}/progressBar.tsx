@@ -4,7 +4,6 @@ import React, {useEffect, useState} from "react";
 
 const ProgressBar = () => {
     const [scrollWidth, setScrollWidth] = useState(0);
-
     const updateProgressBar = () => {
         const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
         const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
@@ -29,4 +28,4 @@ const ProgressBar = () => {
     )
 }
 
-export default ProgressBar;
+export default React.memo(ProgressBar, () => true);

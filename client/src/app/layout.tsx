@@ -49,7 +49,6 @@ export default function RootLayout({
 
     const gId = process.env.NEXT_PUBLIC_GID;
 
-    
     return (
         <html lang="ko">
             <Script id={'google-analytics'} async
@@ -65,16 +64,16 @@ export default function RootLayout({
                 `
             }} />
             <body>
-            <ProgressBar />
-            <Suspense fallback={<GlobalLoadingSpinner />}>
-                <NavMain />
-                <div className={'min-h-screen h-full'}>
-                    <ErrorBoundary errorComponent={Error}>
-                        {children}
-                    </ErrorBoundary>
-                </div>
-                <Footer />
-            </Suspense>
+                <ProgressBar />
+                <Suspense fallback={<GlobalLoadingSpinner />}>
+                    <NavMain />
+                    <div className={'min-h-screen h-full'}>
+                        <ErrorBoundary errorComponent={Error}>
+                            {children}
+                        </ErrorBoundary>
+                    </div>
+                    <Footer />
+                </Suspense>
             </body>
         </html>
     )

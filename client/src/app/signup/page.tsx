@@ -120,9 +120,6 @@ export default function Page() {
         });
     },[user]);
 
-
-
-
     const setProps = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
 

@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useMemo, useState} from "react";
+import React, {Dispatch, SetStateAction, useCallback, useContext, useMemo, useState} from "react";
 import {Category} from "@/app/board/{services}/types";
 import Link from "next/link";
 import {faPen} from "@fortawesome/free-solid-svg-icons/faPen";
@@ -14,10 +14,13 @@ import {useRootLeftMenuHotKey} from "@/app/{hooks}/hotKey";
 
 const LeftMenu = ({
     roles,
+    searchParams,
+    setSearchParams,
 }:{
-    roles: RoleType[],
+    roles: RoleType[];
+    searchParams: BoardListParamsI;
+    setSearchParams: Dispatch<SetStateAction<BoardListParamsI>>;
 }) => {
-    const { setSearchParams, searchParams} = useContext(SearchParamsProvider);
     const router = useRouter();
 
     const boardBaseUrl = '/board/new?categoryPk=';
@@ -260,4 +263,9 @@ const CategorySelect = ({
 }
 
 
-export default LeftMenu;
+export default React.memo(LeftMenu, (prev, next) => {
+    return prev.roles === next.roles
+    && prev.searchParams.isSelf === next.searchParams.isSelf
+    && prev.searchParams.isFavorite === next.searchParams.isFavorite
+    && prev.searchParams.categoryPk === next.searchParams.categoryPk
+});

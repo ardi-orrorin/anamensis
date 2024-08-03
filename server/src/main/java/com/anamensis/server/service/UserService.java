@@ -241,6 +241,12 @@ public class UserService implements ReactiveUserDetailsService {
                 .onErrorReturn(false);
     }
 
+    public Mono<Boolean> confirmPassword(String userId, String pwd) {
+        return Mono.justOrEmpty(memberMapper.findMemberByUserId(userId))
+            .switchIfEmpty(Mono.error(new RuntimeException("User not found")))
+            .map(member -> bCryptPasswordEncoder.matches(pwd, member.getPwd()));
+    }
+
     public Mono<Boolean> changeAuthAlertEmail(
         Member member,
         AuthType authType
@@ -309,5 +315,16 @@ public class UserService implements ReactiveUserDetailsService {
             })
             .onErrorReturn(false);
 
+    }
+
+    public Mono<Boolean> changePwd(String userId, String newPwd) {
+        if(newPwd.length() < 8 || newPwd.length() > 255) {
+            return Mono.error(new RuntimeException("Password must be at least 8 characters"));
+        }
+
+        String password = bCryptPasswordEncoder.encode(newPwd);
+
+        return Mono.fromCallable(() -> memberMapper.updatePwd(userId, password, "") > 0)
+                .onErrorReturn(false);
     }
 }

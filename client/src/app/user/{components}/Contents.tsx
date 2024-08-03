@@ -23,7 +23,7 @@ const Contents = ({
 
 
     return (
-        <section className={'w-full flex flex-col justify-center border-s border-solid border-gray-200 p-4'}>
+        <section className={'w-full h-screen flex flex-col border-s border-solid border-gray-200 p-4'}>
             <div className={'w-full flex items-start h-12'}>
                 {
                     isModalMode

@@ -34,7 +34,7 @@ export default function Layout({children}: {children: React.ReactNode & {test:'1
             roles, setRoles,
             profileImg, setProfileImg
         }}>
-            <main className={'flex items-start min-h-screen h-auto'}>
+            <main className={'flex items-start min-h-screen h-screen'}>
                 <LeftNavBar {...{isOpen, setIsOpen, isModalMode, setIsModalMode}}/>
                 <Contents {...{isOpen, setIsOpen, isModalMode}}>
                     {children}

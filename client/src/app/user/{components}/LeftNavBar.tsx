@@ -242,17 +242,19 @@ const LeftNavBar = ({
                 </li>
                 {
                     !isOAuthUser
-                    && <li className={'w-full'}>
+                    && <>
+                      <li className={'w-full'}>
                         <Link className={'text text-white w-full'}
                               href={'/user/otp'}
                               onClick={onChangeDisabledHandler}
-                        >
-                        <div className={'w-full flex gap-2 p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
-                            <FontAwesomeIcon icon={faKey} width={iconSize} />
-                          <span className={isModalMode ? '' : 'hidden sm:inline'}>OTP</span>
-                        </div>
-                    </Link>
-                  </li>
+                            >
+                            <div className={'w-full flex gap-2 p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
+                                <FontAwesomeIcon icon={faKey} width={iconSize} />
+                              <span className={isModalMode ? '' : 'hidden sm:inline'}>OTP</span>
+                            </div>
+                        </Link>
+                      </li>
+                    </>
                 }
                 { roleMenu }
             </ul>

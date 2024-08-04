@@ -12,7 +12,10 @@ import {faArrowDown, faCaretRight} from "@fortawesome/free-solid-svg-icons";
 import UserProvider from "@/app/user/{services}/userProvider";
 import apiCall from "@/app/{commons}/func/api";
 import {RoleType} from "@/app/user/system/{services}/types";
+import TextBox from "@/app/user/board-block/{components}/textBox";
 
+
+// todo: 최동 결과 표시 db result_status 추가 예정
 const Detail = () => {
 
     const { boardBlock, setBoardBlock } = useContext(BoardBlockProvider);
@@ -150,58 +153,6 @@ const Detail = () => {
 
                 </div>
             </div>
-        </div>
-    )
-}
-
-const TextBox = ({
-    name, text, date, onChange, title, status
-}:{
-    name     : string;
-    text     : string;
-    date     : string;
-    title    : string;
-    status  : BoardBlockStatusEnum;
-    onChange : (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-}) => {
-
-    const viewMode = useMemo(()=> {
-        return name === 'answer' && (status === BoardBlockStatusEnum.ANSWERED || status === BoardBlockStatusEnum.RESULTED)
-        || name === 'result' && status === BoardBlockStatusEnum.RESULTED
-    },[name]);
-
-    return (
-        <div className={'w-full min-h-44 flex flex-col gap-2 justify-center'}>
-            <FontAwesomeIcon icon={faArrowDown} size={'lg'} className={'font-extrabold'} />
-            {
-                viewMode
-                ? <div className={'text-sm flex flex-col gap-1'}>
-                    <span className={'text-sm flex gap-2 items-center'}>
-                        <FontAwesomeIcon icon={faCaretRight} />
-                        답변일자 : {date}
-                    </span>
-                    <span>
-                        내용 : {text}
-                    </span>
-                </div>
-                : <div className={'relative w-full flex flex-col gap-1'}>
-                    <label className={'text-sm flex gap-2 items-center'}>
-                        <FontAwesomeIcon icon={faCaretRight} />
-                        {title}
-                    </label>
-                    <textarea className={'w-full border border-gray-300 border-solid rounded p-2 outline-0 text-sm resize-none'}
-                              name={name}
-                              value={text}
-                              maxLength={500}
-                              onChange={onChange}
-                              rows={5}
-                              autoFocus={true}
-                    />
-                    <span className={'absolute right-3 bottom-3'}>
-                        {text.length} / 500
-                    </span>
-                </div>
-            }
         </div>
     )
 }

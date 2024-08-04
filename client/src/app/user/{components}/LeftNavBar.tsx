@@ -154,6 +154,8 @@ const LeftNavBar = ({
                                alt={''}
                                width={110}
                                height={110}
+                               priority={true}
+                               fetchPriority={"high"}
                                onError={e => {
                                      e.currentTarget.src = NO_IMAGE;
                                }}
@@ -269,4 +271,7 @@ const LeftNavBar = ({
     )
 }
 
-export default LeftNavBar;
+export default React.memo(LeftNavBar, (prev, next) => {
+    return prev.isOpen      === next.isOpen
+        && prev.isModalMode === next.isModalMode;
+});

@@ -63,7 +63,7 @@ export default function RootLayout({
                 gtag('config', 'G-${gId}');
                 `
             }} />
-            <body>
+            <body className={'flex flex-col'}>
                 <ProgressBar />
                 <Suspense fallback={<GlobalLoadingSpinner />}>
                     <NavMain />
@@ -72,8 +72,8 @@ export default function RootLayout({
                             {children}
                         </ErrorBoundary>
                     </div>
-                    <Footer />
                 </Suspense>
+                <Footer />
             </body>
         </html>
     )

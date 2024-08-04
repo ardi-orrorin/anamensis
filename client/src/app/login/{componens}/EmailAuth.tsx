@@ -14,7 +14,6 @@ const EmailAuth = () => {
 
     const timer = useTimer(300);
 
-
     const verify = async () => {
         setLoading(true);
         await apiCall<LoginType, LoginI>({

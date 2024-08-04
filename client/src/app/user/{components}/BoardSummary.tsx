@@ -63,4 +63,4 @@ const BoardSummary = () => {
     );
 }
 
-export default BoardSummary;
+export default React.memo(BoardSummary);

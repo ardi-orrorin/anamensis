@@ -11,6 +11,8 @@ import {RoleType} from "@/app/user/system/{services}/types";
 import {getProviders, signIn} from "next-auth/react";
 import Image from "next/image";
 import Turnstile from "react-turnstile";
+import OAuth from "@/app/login/{componens}/OAuth";
+import Footer from "@/app/find-user/{components}/footer";
 
 export type LoginType = {
     accessToken: string,
@@ -28,7 +30,6 @@ export type LoginUserType = {
 const Login = () => {
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
     const [isRecaptcha, setIsReCaptcha] = useState<boolean>(false);
-    const [provider, setProvider] = useState<any>({});
 
     const {user, setUser} = useContext(LoginProvider);
     const [loading, setLoading] = useState<boolean>(false);
@@ -50,12 +51,7 @@ const Login = () => {
         return user.username.length > 5 && user.password.length > 4;
     }, [user]);
 
-    useEffect(() => {
-        getProviders()
-        .then((providers) => {
-            setProvider(providers)
-        });
-    },[]);
+
 
     const goLogin = async () => {
         setLoading(true);
@@ -165,68 +161,18 @@ const Login = () => {
                       />
                 </div>
             </div>
-            <div className={'flex justify-between px-3'}>
-                <Link href={'/find-user'}
-                   className={'flex justify-center text-xs text-blue-500'}
-                >아이디 찾기</Link>
-                <Link href={'/signup'}
-                      className={'flex justify-center text-xs text-blue-500'}
-                >회원 가입</Link>
-                <Link href={'/reset-pwd'}
-                   className={'flex justify-center text-xs text-blue-500'}
-                >비밀번호 찾기</Link>
-            </div>
+            <Footer />
             <div className={'flex flex-col gap-2 justify-between px-3'}>
                 {
                     isRecaptcha
-                    && Object?.values(provider).length > 0
-                    && Object?.values(provider)?.map((provider) => {
-                        const { id, name} = provider as {id: string, name: string};
-                        const logoImg = process.env.NEXT_PUBLIC_CDN_SERVER + '/logo/' + id + '-logo.webp';
-                        const {bgColor, hoverBgColor, size} = oAuthProviders.find(o => o.provider === id)
-                            || {bgColor: 'gray-300', hoverBgColor: 'gray-600'};
-
-                        return (
-                            <button className={[
-                                `w-full h-11 flex justify-center items-center gap-1 text-xs text-white rounded duration-300`,
-                                `${bgColor} hover:${hoverBgColor}`,
-                                ].join(' ')}
-                                    key={'oauth-login' + id}
-                                    onClick={() => signIn(id)}
-                                    disabled={!isRecaptcha}
-                            >
-                                <Image src={logoImg}
-                                       alt={''}
-                                       width={size}
-                                       height={size}
-                                />
-                                <span className={'font-bold'}>
-                                    Sign in with {name}
-                                </span>
-                            </button>
-                        )
-                    })
+                    && <OAuth {...{isRecaptcha}} />
                 }
             </div>
         </div>
     )
 }
 
-type OAuthProviderType = {
-    provider      : string;
-    bgColor       : string;
-    hoverBgColor  : string;
-    size          : number;
-}
 
-const oAuthProviders: OAuthProviderType[] = [
-    { provider: 'google',    bgColor: 'bg-red-300',    hoverBgColor: 'bg-red-600',    size: 16,   },
-    { provider: 'facebook',  bgColor: 'bg-blue-300',   hoverBgColor: 'bg-blue-600',   size: 16,   },
-    { provider: 'twitter',   bgColor: 'bg-blue-500',   hoverBgColor: 'bg-blue-800',   size: 16,   },
-    { provider: 'instagram', bgColor: 'bg-pink-300',   hoverBgColor: 'bg-pink-600',   size: 16,   },
-    { provider: 'naver',     bgColor: 'bg-green-300',  hoverBgColor: 'bg-green-600',  size: 20,   },
-    { provider: 'kakao',     bgColor: 'bg-amber-300',  hoverBgColor: 'bg-amber-700',  size: 18,   },
-    { provider: 'github',    bgColor: 'bg-gray-600',   hoverBgColor: 'bg-gray-900',   size: 18,   },
-];
+
 
 export default Login;

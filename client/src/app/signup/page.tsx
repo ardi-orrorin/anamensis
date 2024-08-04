@@ -10,6 +10,7 @@ import {
     pickFontFileForFallbackGeneration
 } from "next/dist/compiled/@next/font/dist/local/pick-font-file-for-fallback-generation";
 import apiCall from "@/app/{commons}/func/api";
+import Footer from "@/app/find-user/{components}/footer";
 
 export interface UserProps {
     id            : string;
@@ -417,6 +418,7 @@ export default function Page() {
                         </button>
                     </div>
                 </div>
+                <Footer isSignUp={true} />
             </div>
         </main>
     )

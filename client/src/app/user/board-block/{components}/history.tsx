@@ -1,5 +1,5 @@
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
-import {useContext, useMemo, useState} from "react";
+import {useCallback, useContext, useMemo, useState} from "react";
 import BoardBlockProvider, {BoardBlock} from "@/app/user/board-block/{services}/boardBlockProvider";
 import apiCall from "@/app/{commons}/func/api";
 import ModalProvider from "@/app/user/board-block/{services}/modalProvider";
@@ -7,6 +7,10 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowDown91} from "@fortawesome/free-solid-svg-icons";
 import {Types} from "@/app/user/board-block/{services}/types";
 import SizeSelect from "@/app/{commons}/sizeSelect";
+import StatusSelect from "@/app/user/board-block/{components}/statusSelect";
+import {
+    LeftRightDialogHeader
+} from "next/dist/client/components/react-dev-overlay/internal/components/LeftRightDialogHeader";
 
 const History = () => {
     const searchParams = useSearchParams();
@@ -19,7 +23,7 @@ const History = () => {
     const router = useRouter();
     const pathname = usePathname();
 
-    const onClickHandler = async (id: number) => {
+    const onClickHandler = useCallback(async (id: number) => {
         return await apiCall<BoardBlock>({
             path: '/api/user/board-block-history/' + id,
             method: 'GET',
@@ -31,16 +35,16 @@ const History = () => {
                 id, toggle: true
             });
         });
-    }
+    },[]);
 
-    const onSearchHandler = () => {
+    const onSearchHandler = useCallback(() => {
         const params = new URLSearchParams(searchParams.toString());
         params.set('search', 'title');
         params.set('keyword', keyword);
         router.push(pathname + '?' + params.toString());
-    }
+    },[searchParams, keyword]);
 
-    const onFilterHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const onFilterHandler = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
         const {name, value} = e.target;
         const params = new URLSearchParams(searchParams.toString());
         params.set('filterType', name);
@@ -52,26 +56,27 @@ const History = () => {
         }
 
         router.push(pathname + '?' + params.toString());
-    }
+    },[searchParams]);
+
+    const list = useMemo(() =>
+        boardBlockHistories.map((history, index) => {
+            return (
+                <tr key={history.id} className={['border-b border-gray-200 border-solid hover:bg-blue-300 hover:text-white active:bg-blue-700 duration-300', index % 2 === 1 ? 'bg-blue-50': ''].join(' ')}
+                    onClick={() => onClickHandler(history.id)}
+                >
+                    <td className={'py-2 px-3'}>{ maxIndex - index }</td>
+                    <td className={'py-4 px-3'}>{ history.title }</td>
+                    <td className={'py-4 px-3'}>{ Types.find(history.status)?.getKorName() }</td>
+                    <td className={'py-2 px-3'}>{ history.createdAt }</td>
+                </tr>
+            )
+        })
+    ,[boardBlockHistories]);
 
     return (
         <div className={'w-full'}>
             <div className={'flex justify-end h-12 py-2 gap-2'}>
-                <select className={'w-28 border border-solid border-gray-300 rounded-md text-sm px-3 py-1 outline-0'}
-                        name={'status'}
-                        defaultValue={searchParams.get('filterKeyword') || ''}
-                        onChange={onFilterHandler}
-                >
-                    <option value={''}>전체</option>
-                    {
-                        Types.list.map((status, index) => {
-                            return <option key={'index' + status.getStatus()}
-                                           value={status.getStatus()}
-                            >{status.getKorName()}
-                            </option>
-                        })
-                    }
-                </select>
+                <StatusSelect {...{onFilterHandler}} />
                 <SizeSelect />
             </div>
             <table className={'w-full'}>
@@ -92,20 +97,7 @@ const History = () => {
                     </tr>
                 </thead>
                 <tbody className={'text-sm'}>
-                {
-                    boardBlockHistories.map((history, index) => {
-                        return (
-                            <tr key={history.id} className={['border-b border-gray-200 border-solid hover:bg-blue-300 hover:text-white active:bg-blue-700 duration-300', index % 2 === 1 ? 'bg-blue-50': ''].join(' ')}
-                                onClick={() => onClickHandler(history.id)}
-                            >
-                                <td className={'py-2 px-3'}>{ maxIndex - index }</td>
-                                <td className={'py-4 px-3'}>{ history.title }</td>
-                                <td className={'py-4 px-3'}>{ Types.find(history.status)?.getKorName() }</td>
-                                <td className={'py-2 px-3'}>{ history.createdAt }</td>
-                            </tr>
-                        )
-                    })
-                }
+                { list }
                 </tbody>
             </table>
             <div className={'w-full flex gap-1 justify-center py-3 text-xs'}>

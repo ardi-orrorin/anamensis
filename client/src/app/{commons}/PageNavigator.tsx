@@ -4,7 +4,7 @@ import Link from "next/link";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {redirect, usePathname, useRouter, useSearchParams} from "next/navigation";
 import {faAnglesLeft, faAnglesRight} from "@fortawesome/free-solid-svg-icons";
-import {useCallback, useMemo} from "react";
+import React, {useCallback, useMemo} from "react";
 
 const PageNavigator = ({
     page, size, total
@@ -69,4 +69,8 @@ const PageNavigator = ({
     )
 }
 
-export default PageNavigator;
+export default React.memo(PageNavigator, (prev, next) => {
+    return prev.page  === next.page
+        && prev.size  === next.size
+        && prev.total === next.total;
+});

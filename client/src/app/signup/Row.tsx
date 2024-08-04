@@ -1,7 +1,7 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheck} from "@fortawesome/free-solid-svg-icons/faCheck";
 import {CheckProps, CheckType, UserProps} from "@/app/signup/page";
-import {LegacyRef, useState} from "react";
+import React, {useState} from "react";
 
 export type RowProps = {
     className?  : string;
@@ -57,6 +57,10 @@ const Row = (props:RowProps) => {
     )
 };
 
-export default Row;
+export default React.memo(Row,(prev, next) => {
+    return prev.value    === next.value
+        && prev.check    === next.check
+        && prev.disabled === next.disabled;
+});
 
 

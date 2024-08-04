@@ -23,7 +23,7 @@ const Contents = ({
 
 
     return (
-        <section className={'w-full h-screen flex flex-col border-s border-solid border-gray-200 p-4'}>
+        <section className={'w-full h-full flex flex-col border-s border-solid border-gray-200 p-4'}>
             <div className={'w-full flex items-start h-12'}>
                 {
                     isModalMode
@@ -41,7 +41,7 @@ const Contents = ({
                     {/*경로*/}
                 {/*</div>*/}
             </div>
-            <div>
+            <div className={'h-full'}>
                 <Suspense fallback={<GlobalLoadingSpinner />}>
                     {children}
                 </Suspense>

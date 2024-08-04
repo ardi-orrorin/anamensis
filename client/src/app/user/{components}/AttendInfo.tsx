@@ -1,5 +1,5 @@
 'use client';
-import {useCallback, useContext, useState} from "react";
+import React, {useCallback, useContext, useState} from "react";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {useRouter} from "next/navigation";
 import apiCall from "@/app/{commons}/func/api";
@@ -7,7 +7,7 @@ import {createDebounce} from "@/app/{commons}/func/debounce";
 import useSWR, {mutate, preload} from "swr";
 import UserProvider, {AttendInfoI} from "@/app/user/{services}/userProvider";
 
-export default function AttendInfo() {
+const AttendInfo = () => {
 
     const {attendInfo, setAttendInfo} = useContext(UserProvider);
 
@@ -85,4 +85,6 @@ export default function AttendInfo() {
         </div>
     )
 }
+
+export default React.memo(AttendInfo);
 

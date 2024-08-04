@@ -4,6 +4,7 @@ import Link from "next/link";
 import {useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
 import {FindUser, FindUserResponse} from "@/app/reset-pwd/{services}/type";
+import Footer from "@/app/find-user/{components}/footer";
 
 
 export default function Page() {
@@ -118,17 +119,7 @@ export default function Page() {
                         </div>
                     }
                 </div>
-                <div className={'flex justify-between px-3'}>
-                    <Link href={'/find-user'}
-                          className={'flex justify-center text-xs text-blue-500'}
-                    >아이디 찾기</Link>
-                    <Link href={'/signup'}
-                          className={'flex justify-center text-xs text-blue-500'}
-                    >회원 가입</Link>
-                    <Link href={'/reset-pwd'}
-                       className={'flex justify-center text-xs text-blue-500'}
-                    >비밀번호 찾기</Link>
-                </div>
+                <Footer />
             </div>
         </div>
     )

@@ -12,8 +12,6 @@ import {AuthType} from "@/app/login/{services}/types";
 
 export const UserInfo = ({profileInfo}: {profileInfo: UserInfoI}) => {
 
-    console.log(profileInfo)
-
     const [profile, setProfile] = useState<UserInfoI>(profileInfo);
 
     const [loading, setLoading] = useState<LoadingType>({} as LoadingType);

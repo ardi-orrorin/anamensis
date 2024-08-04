@@ -27,4 +27,6 @@ const Footer = ({
     )
 }
 
-export default React.memo(Footer);
+export default React.memo(Footer, (prev, next) => {
+    return prev.isSignUp === next.isSignUp;
+});

@@ -5,19 +5,20 @@ import {
     faAngleUp,
     faPenToSquare,
     faRightFromBracket,
-    faUser, faWindowMaximize
+    faUser, faUserPlus, faWindowMaximize
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import {faWindowMinimize} from "@fortawesome/free-solid-svg-icons/faWindowMinimize";
 import React, {useState} from "react";
 import {useRouter} from "next/navigation";
+import {faRightToBracket} from "@fortawesome/free-solid-svg-icons/faRightToBracket";
 
 const RightSubMenu = ({
     isLogin
 }:{
     isLogin: boolean
 }) => {
-    const router = useRouter();
+
     const [rightMenu, setRightMenu] = useState(true);
 
     return (
@@ -26,53 +27,11 @@ const RightSubMenu = ({
             rightMenu && 'gap-2'
         ].join(' ')}>
             <div className={['duration-500 overflow-y-hidden', rightMenu ? 'max-h-72' : 'max-h-0'].join(' ')}>
-                <div className={'w-full flex flex-col justify-center bg-white shadow'}>
-                  <button className={'p-3 flex justify-center items-center hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
-                          onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
-                  >
-                    <FontAwesomeIcon icon={faAnglesUp} className={'w-5 h-3'} />
-                  </button>
-                  <button className={'p-3 flex justify-center items-center border-y border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
-                          onClick={() => window.scrollTo({top: window.scrollY - window.innerHeight, behavior: 'smooth'})}
-                  >
-                    <FontAwesomeIcon icon={faAngleUp} className={'w-5 h-3'} />
-                  </button>
-                </div>
-                    {
-                        isLogin
-                        && <div className={'w-full flex flex-col justify-center bg-white shadow'}>
-                        <Link className={'p-3 flex justify-center items-center border-t border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
-                              href={'/board/new?categoryPk=2'}
-                        >
-                          <FontAwesomeIcon className={'w-4'} icon={faPenToSquare} />
-                        </Link>
-                        <Link className={'p-3 flex justify-center items-center border-y border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
-                              href={'/user'}
-                        >
-                          <FontAwesomeIcon className={'w-4'} icon={faUser} />
-                        </Link>
-                        <button className={'p-3 flex justify-center items-center border-y border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
-                                onClick={() => {
-                                    if(!confirm('로그아웃 하시겠습니까?')) return;
-                                    router.push('/api/logout')
-                                }}
-                        >
-                          <FontAwesomeIcon className={'w-4'} icon={faRightFromBracket} />
-                        </button>
-                      </div>
-                    }
-                <div className={'w-full flex flex-col justify-center bg-white shadow'}>
-                  <button className={'p-3 flex justify-center items-center border-y border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
-                          onClick={() => window.scrollTo({top: window.scrollY + window.innerHeight, behavior: 'smooth'})}
-                  >
-                    <FontAwesomeIcon icon={faAngleDown} className={'w-5 h-3'} />
-                  </button>
-                  <button className={'p-3 flex justify-center items-center hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
-                          onClick={() => window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})}
-                  >
-                    <FontAwesomeIcon icon={faAnglesDown} className={'w-5 h-3'} />
-                  </button>
-                </div>
+                <TopMenu />
+
+                <MiddleMenu isLogin={isLogin} />
+
+                <BottomMenu />
             </div>
             <button className={'p-3 flex justify-center items-center bg-white text-black hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
                     onClick={() => setRightMenu(!rightMenu)}
@@ -82,6 +41,92 @@ const RightSubMenu = ({
         </div>
     )
 }
+
+const TopMenu = () => {
+    return (
+        <div className={'w-full flex flex-col justify-center bg-white shadow'}>
+            <button className={'p-3 flex justify-center items-center hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
+                    onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
+            >
+                <FontAwesomeIcon icon={faAnglesUp} className={'w-5 h-3'} />
+            </button>
+            <button className={'p-3 flex justify-center items-center border-y border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
+                    onClick={() => window.scrollTo({top: window.scrollY - window.innerHeight, behavior: 'smooth'})}
+            >
+                <FontAwesomeIcon icon={faAngleUp} className={'w-5 h-3'} />
+            </button>
+        </div>
+    )
+}
+
+const BottomMenu = () => {
+    return (
+        <div className={'w-full flex flex-col justify-center bg-white shadow'}>
+            <button className={'p-3 flex justify-center items-center border-y border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
+                    onClick={() => window.scrollTo({top: window.scrollY + window.innerHeight, behavior: 'smooth'})}
+            >
+                <FontAwesomeIcon icon={faAngleDown} className={'w-5 h-3'} />
+            </button>
+            <button className={'p-3 flex justify-center items-center hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
+                    onClick={() => window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})}
+            >
+                <FontAwesomeIcon icon={faAnglesDown} className={'w-5 h-3'} />
+            </button>
+        </div>
+    )
+
+}
+
+
+const MiddleMenu = ({
+    isLogin
+}:{
+    isLogin: boolean
+}) => {
+    const router = useRouter();
+
+    return (
+        <>
+            {
+                isLogin
+                    ? <div className={'w-full flex flex-col justify-center bg-white shadow'}>
+                        <Link className={'p-3 flex justify-center items-center border-t border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
+                              href={'/board/new?categoryPk=2'}
+                        >
+                            <FontAwesomeIcon className={'w-4'} icon={faPenToSquare} />
+                        </Link>
+                        <Link className={'p-3 flex justify-center items-center border-y border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
+                              href={'/user'}
+                        >
+                            <FontAwesomeIcon className={'w-4'} icon={faUser} />
+                        </Link>
+                        <button className={'p-3 flex justify-center items-center border-y border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
+                                onClick={() => {
+                                    if(!confirm('로그아웃 하시겠습니까?')) return;
+                                    router.push('/api/logout')
+                                }}
+                        >
+                            <FontAwesomeIcon className={'w-4'} icon={faRightFromBracket} />
+                        </button>
+                    </div>
+                    : <div className={'w-full flex flex-col justify-center bg-white shadow'}>
+                        <Link className={'p-3 flex justify-center items-center border-t border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
+                              href={'/signup'}
+                        >
+                            <FontAwesomeIcon className={'w-4'} icon={faUserPlus} />
+                        </Link>
+                        <Link className={'p-3 flex justify-center items-center border-t border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
+                              href={'/login'}
+                        >
+                            <FontAwesomeIcon className={'w-4'} icon={faRightToBracket} />
+                        </Link>
+                    </div>
+            }
+        </>
+    )
+}
+
+
 
 export default React.memo(RightSubMenu, (prev, next) => {
     return prev.isLogin === next.isLogin;

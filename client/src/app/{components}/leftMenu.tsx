@@ -167,7 +167,11 @@ const LeftMenu = ({
     )
 }
 
-const CategoryItem = ({item, index, boardBaseUrl}:{item: Category, index: number, boardBaseUrl: string}) => {
+const CategoryItem = ({
+    item, index, boardBaseUrl
+}:{
+    item: Category, index: number, boardBaseUrl: string
+}) => {
 
     return (
         <Link key={'category-write-menu' + index}

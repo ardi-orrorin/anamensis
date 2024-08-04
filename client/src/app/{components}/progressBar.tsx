@@ -1,16 +1,16 @@
 'use client';
 
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 
 const ProgressBar = () => {
     const [scrollWidth, setScrollWidth] = useState(0);
-    const updateProgressBar = () => {
+    const updateProgressBar = useCallback(() => {
         const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
         const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
         const clientHeight = document.documentElement.clientHeight;
         const scrolled = (scrollTop / (scrollHeight - clientHeight)) * 100;
         setScrollWidth(scrolled);
-    };
+    },[]);
 
     useEffect(() => {
         window.addEventListener('scroll', updateProgressBar);

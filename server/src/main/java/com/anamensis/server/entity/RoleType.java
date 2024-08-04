@@ -5,6 +5,5 @@ public enum RoleType {
     OAUTH,
     USER,
     MASTER,
-
     ADMIN;
 }

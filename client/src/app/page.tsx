@@ -52,14 +52,20 @@ export default function Page() {
     const [searchHistory, setSearchHistory] = useState<string[]>([]);
     const [onSearchHistory, setOnSearchHistory] = useState(false);
 
-    const isLogin = useMemo(()=> roles.length > 0, [roles]);
-
-    const moreRef = React.useRef<HTMLDivElement>(null);
+    const moreRef = useRef<HTMLDivElement>(null);
     const searchRef = useRef<HTMLInputElement>(null);
 
+    const isLogin = useMemo(()=> roles.length > 0, [roles]);
+
+    const notFoundResult = useMemo(()=> {
+        return !initLoading && !loading && data?.length === 0
+    },[initLoading, loading, data]);
+
+    const moreToggle = useMemo(() => {
+        return !loading && !dynamicPage.isEndOfList && !dynamicPage.isVisible
+    },[loading, dynamicPage]);
+
     const fetchDebounce = createDebounce(100);
-
-
 
     useEffect(()=>{
         const history = localStorage.getItem('searchHistory');
@@ -235,9 +241,7 @@ export default function Page() {
                         </div>
                         <div className={'w-full flex flex-wrap gap-2'}>
                             {
-                                !initLoading
-                                && !loading
-                                && data?.length === 0
+                                notFoundResult
                                 && <div className={'text-center text-2xl w-full py-20 text-gray-600'}>검색 결과가 없습니다.</div>
                             }
                             <Virtuoso style={{width: '100%', height: '100%', overflow: 'hidden'}}
@@ -256,9 +260,7 @@ export default function Page() {
                 <div className={'relative'}>
                     <div className={'absolute w-full -top-72 flex justify-center text-xs py-5'}>
                         {
-                            !loading
-                            && !dynamicPage.isEndOfList
-                            && !dynamicPage.isVisible
+                            moreToggle
                             && <div ref={moreRef} className={'w-10 h-10'} />
                         }
                     </div>

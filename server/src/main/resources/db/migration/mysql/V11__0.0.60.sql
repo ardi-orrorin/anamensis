@@ -1,0 +1,1 @@
+ALTER TABLE board_block_history add COLUMN result_status VARCHAR(20) NULL;

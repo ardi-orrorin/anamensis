@@ -64,10 +64,14 @@ const BoardComponent = (props: BoardListI & {favorites: string[], isLogin: boole
         (isFavorite || Number(categoryPk) === 1) && !isBlocked
     ,[]);
 
+    const notAdminBlocked = useMemo(() =>
+        isBlocked && !roles.includes(RoleType.ADMIN)
+    ,[isBlocked, roles]);
+
     return (
         <>
             {
-                isBlocked && !roles.includes(RoleType.ADMIN)
+                notAdminBlocked
                 ? <span className={
                     'relative flex flex-col justify-between w-full h-[170px] bg-white border-gray-200 border-solid border rounded shadow active:bg-blue-50 duration-300'
                 }>

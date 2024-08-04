@@ -22,6 +22,8 @@ public class BoardBlockHistory {
     private String answer;
     private String result;
 
+    private BoardBlockResultStatus resultStatus;
+
     private LocalDateTime createdAt;
     private LocalDateTime answerAt;
     private LocalDateTime resultAt;

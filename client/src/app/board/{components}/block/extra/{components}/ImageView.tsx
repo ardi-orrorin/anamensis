@@ -12,7 +12,6 @@ const ImageView = ({
 } : {
     images: string[];
 }) => {
-
     const {albumToggle, setAlbumToggle} = useContext(AlbumProvider);
 
     const prevImage = useCallback((e: React.MouseEvent) => {

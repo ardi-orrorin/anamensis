@@ -282,7 +282,8 @@ const AlbumBlock = (props: ExpendBlockProps) => {
                     >
                         <p>
                             {
-                                uploadProgress?.size !== 0 && uploadProgress?.size === uploadProgress?.progress
+                                uploadProgress?.size !== 0
+                                && uploadProgress?.size === uploadProgress?.progress
                                 ? '이미지 업로드 완료'
                                 : '이미지 업로드 진행중 (최대 30개)'
                             }

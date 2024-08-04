@@ -189,6 +189,7 @@ const Item = ({
     onChangeTemplate: (id: number) => void,
     onRemoveTemplate: (id: number) => void
 }) => {
+
     return (
         <div className={'w-80 p-1 flex gap-5 justify-between text-sm hover:bg-gray-400 hover:text-white duration-300'}>
             <button className={'w-full'}

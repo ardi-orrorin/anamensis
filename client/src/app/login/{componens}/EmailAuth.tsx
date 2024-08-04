@@ -36,7 +36,6 @@ const EmailAuth = () => {
         return `${min}:${sec < 10 ? `0${sec}` : sec}`;
     }
 
-
     return (
         <div className={"flex flex-col gap-4 border border-solid b border-blue-300 sm:w-4/5 md:w-1/2 xl:w-1/3 w-full rounded pb-5"}>
             <div className={'flex flex-col gap-1 bg-blue-300 py-4'}>

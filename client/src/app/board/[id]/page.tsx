@@ -53,7 +53,7 @@ export default function Page({params}: {params : {id: string}}) {
         , isFavorite, setIsFavorite,
         isNewBoard, isTemplate,
         boardTemplate, setBoardTemplate,
-        roles,
+        roles,  summary
     } = useContext(BoardProvider);
 
     const {
@@ -81,6 +81,30 @@ export default function Page({params}: {params : {id: string}}) {
     const categoryName = useMemo(() =>
         Category.findById(board.data?.categoryPk.toString())?.name
     ,[board?.data?.categoryPk]);
+
+    const favoriteConf = useMemo(() =>
+        !isNewBoard
+        && !isTemplate
+        && board.isView
+        && board.data.isPublic
+        && board.data.isLogin
+    ,[isNewBoard, isTemplate, board.isView, board.data?.isPublic, board.data?.isLogin]);
+
+    const newSaveConf = useMemo(() =>
+        isNewBoard || (isTemplate && !boardTemplate?.isApply)
+    ,[isNewBoard, isTemplate, boardTemplate.isApply]);
+
+    const updateSaveConf = useMemo(() =>
+        !isNewBoard
+        && (!isTemplate || boardTemplate.isApply)
+        && !board.isView
+    , [isNewBoard, isTemplate, boardTemplate.isApply, board.isView]);
+
+    const viewBoardInfoConf = useMemo(() =>
+        !isNewBoard
+        && !isTemplate
+        && board.isView
+    ,[isNewBoard, isTemplate, board.isView]);
 
     const router = useRouter();
 
@@ -383,11 +407,7 @@ export default function Page({params}: {params : {id: string}}) {
                 <div className={'flex flex-col sm:flex-row justify-between gap-3 h-auto border-b-2 border-solid border-main py-3'}>
                     <div className={'flex w-full gap-2'}>
                         {
-                            !isNewBoard
-                            && !isTemplate
-                            && board.isView
-                            && board.data.isPublic
-                            && board.data.isLogin
+                            favoriteConf
                             && <button onClick={onClickFavoriteHandler}>
                                 {
                                     isFavorite
@@ -406,11 +426,10 @@ export default function Page({params}: {params : {id: string}}) {
                         {
                             !isNewBoard
                             && !isTemplate
-                            && <HeaderBtn roles={roles}
-                                          submitClickHandler={() => debounce(() => submitHandler(false))}
-                                          editClickHandler={editClickHandler}
+                            && <HeaderBtn submitClickHandler={() => debounce(() => submitHandler(false))}
                                           deleteClickHandler={() => debounce(() => deleteHandler())}
                                           blockClickHandler={() => debounce(() => onBlockClickHandler())}
+                                          {...{roles, board, editClickHandler}}
                             />
                         }
                         <div className={'flex gap-1'}>
@@ -464,10 +483,8 @@ export default function Page({params}: {params : {id: string}}) {
                 </div>
                 <div>
                     {
-                        !isNewBoard
-                        && !isTemplate
-                        && board.isView
-                        && <BoardInfo {...board}/>
+                        viewBoardInfoConf
+                        && <BoardInfo {...board.data}/>
                     }
                 </div>
                 <div className={['flex flex-col', board.isView ? 'gap-2' : 'gap-4'].join(' ')}>
@@ -493,7 +510,7 @@ export default function Page({params}: {params : {id: string}}) {
                 </div>
                 <div>
                     {
-                        (isNewBoard || (isTemplate && !boardTemplate?.isApply))
+                        newSaveConf
                         && <div className={'flex gap-1 justify-end mt-5'}>
                             <button
                               className={'w-full rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
@@ -503,9 +520,7 @@ export default function Page({params}: {params : {id: string}}) {
                         </div>
                     }
                     {
-                        !isNewBoard
-                        && (!isTemplate || boardTemplate.isApply)
-                        && !board.isView
+                        updateSaveConf
                         && <div className={'flex gap-1 justify-end mt-5'}>
                             <button
                               className={'w-full rounded h-10 border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
@@ -517,11 +532,12 @@ export default function Page({params}: {params : {id: string}}) {
                 </div>
                 <Rate newBoard={isNewBoard}
                       onClick={() => debounce(onChangeRateHandler)}
+                      {...{board, rateInfo}}
                 />
                 {
                     !isNewBoard
                     && board.isView
-                    && <WriterInfo />
+                    && <WriterInfo {...{board, summary}} />
                 }
                 {
                     !commentLoading

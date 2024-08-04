@@ -5,9 +5,11 @@ import {cookies} from "next/headers";
 import {faRightToBracket} from "@fortawesome/free-solid-svg-icons/faRightToBracket";
 import Image from "next/image";
 import apiCall from "@/app/{commons}/func/api";
+import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 
 type NavItemProps = {
-    name: string | JSX.Element,
+    icon: IconDefinition
+    name: string,
     url: string
     loginRequired?: boolean,
     prefetch: boolean
@@ -28,25 +30,29 @@ const NavMain = async () => {
 
     const rightMenuItems : NavItemProps[] = [
         {
-            name: <FontAwesomeIcon className={'w-4'} icon={faPenToSquare} />,
+            icon: faPenToSquare,
+            name: '글쓰기',
             url: '/board/new?categoryPk=2',
             loginRequired: true,
             prefetch: true,
         },
         {
-            name: <FontAwesomeIcon className={'w-4'} icon={faUserPlus} />,
+            icon: faUserPlus,
+            name: '회원가입',
             url: '/signup',
             loginRequired: false,
             prefetch: true,
         },
         {
-            name: <FontAwesomeIcon className={'w-4'} icon={faRightToBracket} />,
+            icon: faRightToBracket,
+            name: '로그인',
             url: '/login',
             loginRequired: false,
             prefetch: true,
         },
         {
-            name: <FontAwesomeIcon className={'w-4'} icon={faRightFromBracket} />,
+            icon: faRightFromBracket,
+            name: '로그아웃',
             url: '/api/logout',
             loginRequired: true,
             prefetch: false,
@@ -58,6 +64,7 @@ const NavMain = async () => {
             <div>
                 <Link className={'px-2 h-10 flex justify-center items-center hover:bg-blue-800 rounded duration-500'}
                       href={'/'}
+                      title={'홈'}
                 >
                     <Image src={process.env.NEXT_PUBLIC_CDN_SERVER + '/favicon.jpg'}
                            alt={''}
@@ -81,12 +88,14 @@ const NavMain = async () => {
                         isLogged
                         && process.env.NEXT_PUBLIC_CDN_SERVER
                         && <div className={'flex h-full justify-center items-center px-2 hover:bg-blue-800 rounded duration-500'}>
-                        <Link href={'/user'}>
+                        <Link href={'/user'}
+                              title={'프로필'}
+                        >
                           <Image className={'rounded'}
                                  src={process.env.NEXT_PUBLIC_CDN_SERVER + profileImg}
                                  alt={''}
-                                 width={30}
-                                 height={30}
+                                 width={20}
+                                 height={20}
                           />
                         </Link>
                       </div>
@@ -97,13 +106,18 @@ const NavMain = async () => {
     );
 }
 
-const NavItem = ({name, url, prefetch}: NavItemProps) => {
+const NavItem = ({icon, name, url, prefetch}: NavItemProps) => {
     return (
         <li>
             <Link className={'w-10 h-10 flex justify-center items-center hover:bg-blue-800 rounded duration-500'}
                   href={url}
                   prefetch={prefetch}
-            >{name}
+                  title={name}
+            >
+                <FontAwesomeIcon icon={icon}
+                                 width={20}
+                                 height={20}
+                />
             </Link>
         </li>
     );

@@ -47,11 +47,13 @@ const TopMenu = () => {
         <div className={'w-full flex flex-col justify-center bg-white shadow'}>
             <button className={'p-3 flex justify-center items-center hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
                     onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
+                    title={'맨 위로'}
             >
                 <FontAwesomeIcon icon={faAnglesUp} className={'w-5 h-3'} />
             </button>
             <button className={'p-3 flex justify-center items-center border-y border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
                     onClick={() => window.scrollTo({top: window.scrollY - window.innerHeight, behavior: 'smooth'})}
+                    title={'위로'}
             >
                 <FontAwesomeIcon icon={faAngleUp} className={'w-5 h-3'} />
             </button>
@@ -64,11 +66,13 @@ const BottomMenu = () => {
         <div className={'w-full flex flex-col justify-center bg-white shadow'}>
             <button className={'p-3 flex justify-center items-center border-y border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
                     onClick={() => window.scrollTo({top: window.scrollY + window.innerHeight, behavior: 'smooth'})}
+                    title={'아래로'}
             >
                 <FontAwesomeIcon icon={faAngleDown} className={'w-5 h-3'} />
             </button>
             <button className={'p-3 flex justify-center items-center hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
                     onClick={() => window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})}
+                    title={'맨 아래로'}
             >
                 <FontAwesomeIcon icon={faAnglesDown} className={'w-5 h-3'} />
             </button>
@@ -92,11 +96,13 @@ const MiddleMenu = ({
                     ? <div className={'w-full flex flex-col justify-center bg-white shadow'}>
                         <Link className={'p-3 flex justify-center items-center border-t border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
                               href={'/board/new?categoryPk=2'}
+                              title={'글쓰기'}
                         >
                             <FontAwesomeIcon className={'w-4'} icon={faPenToSquare} />
                         </Link>
                         <Link className={'p-3 flex justify-center items-center border-y border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
                               href={'/user'}
+                              title={'프로필'}
                         >
                             <FontAwesomeIcon className={'w-4'} icon={faUser} />
                         </Link>
@@ -105,6 +111,7 @@ const MiddleMenu = ({
                                     if(!confirm('로그아웃 하시겠습니까?')) return;
                                     router.push('/api/logout')
                                 }}
+                                title={'로그아웃'}
                         >
                             <FontAwesomeIcon className={'w-4'} icon={faRightFromBracket} />
                         </button>
@@ -112,11 +119,13 @@ const MiddleMenu = ({
                     : <div className={'w-full flex flex-col justify-center bg-white shadow'}>
                         <Link className={'p-3 flex justify-center items-center border-t border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
                               href={'/signup'}
+                              title={'회원가입'}
                         >
                             <FontAwesomeIcon className={'w-4'} icon={faUserPlus} />
                         </Link>
                         <Link className={'p-3 flex justify-center items-center border-t border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
                               href={'/login'}
+                              title={'로그인'}
                         >
                             <FontAwesomeIcon className={'w-4'} icon={faRightToBracket} />
                         </Link>

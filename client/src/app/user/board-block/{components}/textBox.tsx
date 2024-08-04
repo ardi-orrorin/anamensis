@@ -19,7 +19,7 @@ const TextBox = ({
     },[name]);
 
     return (
-        <div className={'w-full min-h-44 flex flex-col gap-2 justify-center'}>
+        <div className={'w-full min-h-40 flex flex-col gap-2 justify-center'}>
             <FontAwesomeIcon icon={faArrowDown} size={'lg'} className={'font-extrabold'} />
             {
                 viewMode

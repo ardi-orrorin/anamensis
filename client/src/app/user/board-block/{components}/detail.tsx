@@ -79,7 +79,7 @@ const Detail = () => {
                         </button>
                     </div>
                 </div>
-                <div className={'w-full h-[80%] min-h-[400px] py-2 flex flex-col gap-3 text-sm overflow-x-auto'}>
+                <div className={'w-full h-[80%] min-h-[400px] py-2 flex flex-col gap-1 text-sm overflow-x-auto'}>
                     <div>
                         <label className={'text-sm flex gap-2 items-center'}>
                             <FontAwesomeIcon icon={faCaretRight} />

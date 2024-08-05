@@ -235,10 +235,8 @@ export default function Page() {
                     <div className={'hidden sm:block relative min-w-[300px]'}>
                         <LeftMenu {...{searchParams, setSearchParams, roles}}/>
                     </div>
-                    <div className={'w-[600px] flex flex-col gap-5 justify-start items-center'}>
-                        <div className={'w-full'}>
-                            <Notices data={noticeList} />
-                        </div>
+                    <div className={'w-[600px] flex flex-col justify-start items-center'}>
+                        <Notices data={noticeList} />
                         <div className={'w-full flex flex-wrap gap-2'}>
                             {
                                 notFoundResult

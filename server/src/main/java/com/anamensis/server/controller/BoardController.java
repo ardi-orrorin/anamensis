@@ -128,9 +128,9 @@ public class BoardController {
                     .subscribeOn(Schedulers.boundedElastic())
                     .subscribe();
 
-                boardService.refreshCacheBoard(boardPk)
-                    .subscribeOn(Schedulers.boundedElastic())
-                    .subscribe();
+//                boardService.refreshCacheBoard(boardPk)
+//                    .subscribeOn(Schedulers.boundedElastic())
+//                    .subscribe();
             });
     }
 

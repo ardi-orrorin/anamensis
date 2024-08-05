@@ -29,11 +29,9 @@ import java.util.concurrent.TimeUnit;
 @Transactional
 public class BoardService {
     private static final String BOARD_PK_KEY = "board:pk:%s";
-    private static final CacheExpire boardExpire = new CacheExpire(1, TimeUnit.HOURS);
+    private static final CacheExpire boardExpire = new CacheExpire(5, TimeUnit.MINUTES);
 
     private final BoardMapper boardMapper;
-
-    private final BoardIndexMapper boardIndexMapper;
 
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -89,6 +87,7 @@ public class BoardService {
                 if(!b) {
                     BoardResultMap.Board board = boardMapper.findByPk(boardPk)
                         .orElseThrow(()-> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+
                     redisTemplate.boundValueOps(key).set(board, boardExpire.timeout(), boardExpire.timeUnit());
                 }
 
@@ -160,52 +159,6 @@ public class BoardService {
                 .flatMap($ -> Mono.just(board))
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext($ -> updateCaches(0, board.getMemberPk()).subscribe());
-    }
-
-
-    /**
-     * Save index.
-     * @deprecated Use {@link BoardIndexService#save(Board)}
-     *
-     */
-    public void saveIndex(long boardPk, String content) {
-        BoardIndex boardIndex = new BoardIndex();
-        boardIndex.setBoardId(boardPk);
-        boardIndex.setContent(content);
-        boardIndex.setCreatedAt(LocalDateTime.now());
-        boardIndex.setUpdatedAt(LocalDateTime.now());
-        boardIndexMapper.save(boardIndex);
-    }
-
-    /**
-     * Update index.
-     * @deprecated Use {@link BoardIndexService#update(Board)}
-     *
-     */
-    public void updateIndex(long boardPk, String content) {
-        BoardIndex boardIndex = new BoardIndex();
-        boardIndex.setBoardId(boardPk);
-        boardIndex.setContent(content);
-        boardIndex.setUpdatedAt(LocalDateTime.now());
-
-        try {
-            int result = boardIndexMapper.update(boardIndex);
-            if(result == 0) {
-                saveIndex(boardPk, content);
-            }
-        } catch (Exception e) {
-            saveIndex(boardPk, content);
-        }
-    }
-
-
-    /**
-     * Delete index.
-     * @deprecated Use {@link BoardIndexService#delete(long)}
-     *
-     */
-    public void deleteIndex(long boardPk) {
-        boardIndexMapper.delete(boardPk);
     }
 
     public void onePageCache(long id) {

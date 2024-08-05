@@ -75,7 +75,7 @@ const NavMain = async () => {
                 </Link>
             </div>
             <div className={'w-1/3 h-full'}>
-                <ul className={'flex h-full justify-end'}>
+                <ul className={'flex h-full justify-end gap-2'}>
                     {
                         rightMenuItems.map((item, index) => {
                             if(!item.loginRequired === isLogged) {
@@ -87,15 +87,15 @@ const NavMain = async () => {
                     {
                         isLogged
                         && process.env.NEXT_PUBLIC_CDN_SERVER
-                        && <div className={'flex h-full justify-center items-center px-2 hover:bg-blue-800 rounded duration-500'}>
+                        && <div className={'flex h-full justify-center items-center px-1.5 hover:bg-blue-800 rounded duration-500'}>
                         <Link href={'/user'}
                               title={'프로필'}
                         >
                           <Image className={'rounded'}
                                  src={process.env.NEXT_PUBLIC_CDN_SERVER + profileImg}
                                  alt={''}
-                                 width={20}
-                                 height={20}
+                                 width={30}
+                                 height={30}
                           />
                         </Link>
                       </div>

@@ -26,6 +26,11 @@ export type DynamicPage = {
     isVisible  : boolean;
 }
 
+export type SearchHistoryProps = {
+    toggle: boolean;
+    history: string[];
+}
+
 export default function Page() {
 
     const pageSize = 20;
@@ -49,7 +54,10 @@ export default function Page() {
     } as BoardListParamsI);
 
     const [noticeList, setNoticeList] = useState<NoticeType[]>([]);
-    const [searchHistory, setSearchHistory] = useState<string[]>([]);
+    const [searchHistory, setSearchHistory] = useState<SearchHistoryProps>({
+        toggle: true,
+        history:[] as string[]
+    });
     const [onSearchHistory, setOnSearchHistory] = useState(false);
 
     const moreRef = useRef<HTMLDivElement>(null);
@@ -168,9 +176,9 @@ export default function Page() {
 
         setSearchParams(params);
 
-        if(searchHistory.some(key => key === value) || value === '') return;
-        localStorage.setItem('searchHistory', JSON.stringify([...searchHistory, value]));
-        setSearchHistory([...searchHistory, value]);
+        if(searchHistory.history.some(key => key === value) || value === '') return;
+        localStorage.setItem('searchHistory', JSON.stringify({...searchHistory, history: [...searchHistory.history, value]}));
+        setSearchHistory({...searchHistory, history: [...searchHistory.history, value]});
 
     },[searchParams, searchValue, searchHistory]);
 
@@ -185,12 +193,6 @@ export default function Page() {
             searchRef.current.blur();
         }
     },[searchRef, searchValue]);
-
-    const removeSearchHistory = useCallback((keyword: string) => {
-        const newHistory = searchHistory.filter(key => key !== keyword);
-        setSearchHistory(newHistory);
-        localStorage.setItem('searchHistory', JSON.stringify(newHistory));
-    },[searchHistory]);
 
     useRootHotKey({searchRef})
 
@@ -215,8 +217,9 @@ export default function Page() {
                             setOnSearchHistory
                         }} />
                         <SearchHistory {...{searchHistory, setSearchValue,
-                            removeSearchHistory, onSearchHistory,
+                            setSearchHistory, onSearchHistory,
                             setOnSearchHistory, onSearchHandler
+
                         }}/>
 
                     </div>

@@ -24,22 +24,24 @@ import YoutubeBlock from "@/app/board/{components}/block/file/youtube";
 import CodeBlock from "@/app/board/{components}/block/input/CodeBlock";
 import RefBlock from "@/app/board/{components}/block/extra/refBlock";
 import Separator from "@/app/board/{components}/block/object/separator";
+import ScheduleBlock from "@/app/board/{components}/block/extra/scheduleBlock";
 
 export type BlockType = {
-    code          : string;
-    tag           : string;
-    command       : string;
-    icon          : IconDefinition;
-    label         : string;
-    comment       : string;
-    notAvailDup   : boolean;
     type          : 'text' | 'object' | 'extra';
-    shortcut?     : string;
-    onTemplate    : boolean;
+    code          : string;                 // 식별 코드 5자리
+    tag           : string;                 // 태그명 2차 식별 이름
+    command       : string;                 // input command
+    icon          : IconDefinition;         // 아이콘
+    label         : string;                 // 블록 변경 메뉴에 표시될 이름
+    comment       : string;                 // extra의 경우 게시판 이름
+    notAvailDup   : boolean;                // 게시글 내에 중복 사용 가능 여부 (true: 중복 불가, false: 중복 가능)
+    shortcut?     : string;                 // 단축키
+    onTemplate    : boolean;                // 템플릿 작성시 이용 가능 여부(true: 사용가능, false: 사용불가)
+    subBlock?     : BlockComponentType[];   // 종속 블록
 }
 
 export type BlockComponentType = BlockType & {
-    component         : (props: BlockProps)  => JSX.Element;
+    component         : (props: BlockProps)  => JSX.Element; // 블록 컴포넌트
 }
 
 export const blockTypeList: BlockComponentType[] = [
@@ -299,5 +301,22 @@ export const blockTypeList: BlockComponentType[] = [
         onTemplate        : false,
         component         : (props: BlockProps)  =>
             QuestionBlock({...props, type: 'extra'}),
+    },
+    {
+        code              : '00410',
+        tag               : 'schedule',
+        command           : '/sch',
+        label             : 'schedule',
+        icon              : faCircleQuestion,
+        comment           : '스케줄',
+        type              : 'extra',
+        notAvailDup       : true,
+        onTemplate        : false,
+        component         : (props: BlockProps)  =>
+            ScheduleBlock({...props, type: 'extra'}),
+        subBlock          : [
+            {} as BlockComponentType,
+            {} as BlockComponentType,
+        ],
     },
 ]

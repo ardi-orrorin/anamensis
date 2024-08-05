@@ -44,7 +44,6 @@ export interface RateInfoI {
 }
 
 // fixme: 뒤로가기 등 강제 이동시 파일 삭제 처리 안됨
-
 export default function Page({params}: {params : {id: string}}) {
 
     const {

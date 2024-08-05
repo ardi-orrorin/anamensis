@@ -2,6 +2,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import React, {Dispatch, SetStateAction, useCallback, useRef} from "react";
 import {SearchHistoryProps} from "@/app/page";
+import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons/faMagnifyingGlass";
 
 const SearchHistory = ({
     searchHistory,
@@ -36,7 +37,7 @@ const SearchHistory = ({
     return (
         <div className={[
              'absolute top-5 z-20 w-full flex flex-col bg-white rounded-b-3xl shadow-md duration-700 overflow-y-hidden',
-             onSearchHistory && searchHistory.history.length > 0 ? 'max-h-52' : 'max-h-0',
+             onSearchHistory && searchHistory.history.length > 0 ? 'max-h-80' : 'max-h-0',
         ].join(' ')}
             onMouseEnter={()=> {
                 clearTimeout(timeout.current);
@@ -48,16 +49,18 @@ const SearchHistory = ({
                 }, 500);
              }}
         >
-            <ul className={'flex flex-col gap-1 bg-white'}>
-                <div className={'h-6'} />
+            <div className={'h-10'} />
+            <ul className={'flex flex-col gap-1 bg-white overflow-y-auto'}>
                 {
                     searchHistory.toggle
                     && searchHistory.history?.map((keyword, index) => {
                         return (
                             <li key={'searchHistory' + index}
-                                className={'w-full flex gap-2 text-xs px-2 h-7 items-center bg-white hover:bg-gray-300 duration-300'}
+                                className={'w-full flex gap-2 text-xs px-2 min-h-10 max-h-10 items-center bg-white hover:bg-gray-300 duration-300'}
                             >
-                                <button className={'w-full h-full flex items-center'}
+                                <FontAwesomeIcon icon={faMagnifyingGlass} />
+
+                                <button className={'w-full h-auto flex items-center'}
                                         onClick={(e)=> {
                                             setSearchValue(keyword);
                                             onSearchHandler(false, keyword);
@@ -65,7 +68,7 @@ const SearchHistory = ({
                                 >
                                     {keyword}
                                 </button>
-                                <button className={'min-w-8 h-full flex justify-center items-center bg-gray-100 rounded-md'}
+                                <button className={'min-w-10 h-auto flex justify-center items-center bg-gray-100 rounded-md'}
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             removeSearchHistory(keyword);
@@ -78,7 +81,7 @@ const SearchHistory = ({
                     })
                 }
             </ul>
-            <div className={'flex justify-between p-2'}>
+            <div className={'flex justify-between h-10 p-2'}>
                 <div className="w-full py-2 inline-flex items-center cursor-pointer text-xs gap-2">
                     <input type="checkbox"
                            className={"sr-only peer hidden"}

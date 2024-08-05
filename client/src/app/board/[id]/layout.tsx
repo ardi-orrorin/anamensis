@@ -101,6 +101,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
                 case 3  : return {code: '00303', addBlock: true};
                 case 4  : return {code: '00301', addBlock: true};
                 case 5  : return {code: '00302', addBlock: true};
+                case 6  : return {code: '00410', addBlock: true};
                 default : return {code: '00005', addBlock: false};
             }
         }

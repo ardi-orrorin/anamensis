@@ -49,10 +49,10 @@ export default function Page({params}: {params : {id: string}}) {
     const {
         board, setBoard
         , rateInfo, setRateInfo
-        , isFavorite, setIsFavorite,
-        isNewBoard, isTemplate,
-        boardTemplate, setBoardTemplate,
-        roles,  summary
+        , isFavorite, setIsFavorite
+        , isNewBoard, isTemplate
+        , boardTemplate, setBoardTemplate
+        , roles,  summary
     } = useContext(BoardProvider);
 
     const {

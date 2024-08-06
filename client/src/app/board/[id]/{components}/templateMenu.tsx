@@ -2,11 +2,11 @@ import {useContext, useEffect, useRef, useState} from "react";
 import BoardProvider, {BoardTemplateService} from "@/app/board/{services}/BoardProvider";
 import apiCall from "@/app/{commons}/func/api";
 import {BoardTemplate, boardTemplateList} from "@/app/board/{services}/types";
-import {blockTypeList} from "@/app/board/{components}/block/list";
 import {StatusResponse} from "@/app/{commons}/types/commons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
+import {blockTypeFlatList} from "@/app/board/{components}/block/list";
 
 
 type TemplateMenuOpenProps = {
@@ -69,7 +69,7 @@ const TemplateMenu = () => {
                 isReturnData: true
             })
 
-            const isExtraObj = blockTypeList.find(item =>
+            const isExtraObj = blockTypeFlatList.find(item =>
                 item.code === board.data.content.list[0].code)
                 ?.type === 'extra';
 

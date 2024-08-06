@@ -1,7 +1,7 @@
 export const NO_IMAGE = process.env.NEXT_PUBLIC_CDN_SERVER + '/noimage.jpg'
 export const NO_PROFILE = process.env.NEXT_PUBLIC_CDN_SERVER + '/default_profile.jpg'
 
-export const colorSet  = [
+export const colorSet = [
     {color: '#FFFFFF', dark: false},
 
     {color : '#fee2e2', dark: false},
@@ -86,4 +86,4 @@ export const colorSet  = [
     {color: '#5D5D5D', dark: true},
     {color: '#353535', dark: true},
     {color: '#000000', dark: true},
-]
+] as const

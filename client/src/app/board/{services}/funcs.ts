@@ -1,5 +1,5 @@
 import {BlockI, BoardContentI, BoardI, BoardTemplate} from "@/app/board/{services}/types";
-import {blockTypeList} from "@/app/board/{components}/block/list";
+import {blockTypeFlatList} from "@/app/board/{components}/block/list";
 import {Dispatch, MutableRefObject, SetStateAction} from "react";
 import {TempFileI} from "@/app/board/{services}/TempFileProvider";
 import {BoardService} from "@/app/board/{services}/BoardProvider";
@@ -20,7 +20,7 @@ export const listSort = (list: BlockI[]) => {
 }
 
 export const notAvailDupCheck = (code: string, content: BoardContentI) : boolean => {
-    const findBlock = blockTypeList.find(item => item.code === code);
+    const findBlock = blockTypeFlatList.find(item => item.code === code);
     if(findBlock?.notAvailDup) {
         const isExist = content?.list.find(item => item.code === code);
         if(isExist) return true
@@ -126,7 +126,7 @@ export const onChangeBlockGlobalHandler = ({
 }) => {
     if(!value && !code) return;
 
-    const block = blockTypeList.find(item => {
+    const block = blockTypeFlatList.find(item => {
         return value ? item.command + ' ' === value
                      : code
                      ? item.code === code

@@ -3,7 +3,7 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
 import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
-import {blockTypeList} from "@/app/board/{components}/block/list";
+import {blockTypeFlatList} from "@/app/board/{components}/block/list";
 import {
     BlockProps,
     HtmlElements,
@@ -42,7 +42,9 @@ const Block = (props: BlockProps) => {
     const [contextMenu, setContextMenu] = useState<ContextMenuProps>({} as ContextMenuProps);
 
     const block = useMemo(() =>
-        blockTypeList.find(b => b.code === props.code)
+        blockTypeFlatList.find(b =>
+            b.code === props.code
+        )
     , [props.code]);
 
     const Component = block?.component!;
@@ -122,7 +124,7 @@ const Block = (props: BlockProps) => {
         }
 
         if(type === 'detailView') {
-            const block = blockTypeList.find(b=> b.code === code);
+            const block = blockTypeFlatList.find(b=> b.code === code);
 
             let url = '';
 

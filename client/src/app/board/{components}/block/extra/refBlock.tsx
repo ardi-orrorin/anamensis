@@ -2,12 +2,12 @@ import {BlockProps, ExpendBlockProps} from "@/app/board/{components}/block/type/
 import {useCallback, useMemo, useState} from "react";
 import useSWR from "swr";
 import apiCall from "@/app/{commons}/func/api";
-import {BlockI, BoardI, RefBoardI} from "@/app/board/{services}/types";
-import {blockTypeList} from "@/app/board/{components}/block/list";
+import {BlockI, RefBoardI} from "@/app/board/{services}/types";
 import Link from "next/link";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import moment from "moment";
 import ObjectTemplate from "@/app/board/{components}/block/ObjectTemplate";
+import {blockTypeFlatList} from "@/app/board/{components}/block/list";
 
 
 export type RefBlockExtraValueType = {
@@ -94,7 +94,7 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
     },[value, extraValue]);
 
     const Component = useMemo(()=> {
-        return blockTypeList.find(e => {
+        return blockTypeFlatList.find(e => {
             return e.code === refBlock?.code
         })?.component;
     }, [refBlock, boardValue]);

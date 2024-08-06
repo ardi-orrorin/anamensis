@@ -1,6 +1,7 @@
 import InputBlock from "@/app/board/{components}/block/input/InputBlock";
 import {BlockProps} from "@/app/board/{components}/block/type/Types";
 import {
+    faCalendarDays,
     faCode,
     faHeading,
     faImage,
@@ -24,27 +25,29 @@ import YoutubeBlock from "@/app/board/{components}/block/file/youtube";
 import CodeBlock from "@/app/board/{components}/block/input/CodeBlock";
 import RefBlock from "@/app/board/{components}/block/extra/refBlock";
 import Separator from "@/app/board/{components}/block/object/separator";
-import ScheduleBlock from "@/app/board/{components}/block/extra/scheduleBlock";
+import CalenderBlock from "@/app/board/{components}/block/extra/calenderBlock";
+import EventBlock from "@/app/board/{components}/block/extra/eventBlock";
+
 
 export type BlockType = {
-    type          : 'text' | 'object' | 'extra';
-    code          : string;                 // 식별 코드 5자리
-    tag           : string;                 // 태그명 2차 식별 이름
-    command       : string;                 // input command
-    icon          : IconDefinition;         // 아이콘
-    label         : string;                 // 블록 변경 메뉴에 표시될 이름
-    comment       : string;                 // extra의 경우 게시판 이름
-    notAvailDup   : boolean;                // 게시글 내에 중복 사용 가능 여부 (true: 중복 불가, false: 중복 가능)
-    shortcut?     : string;                 // 단축키
-    onTemplate    : boolean;                // 템플릿 작성시 이용 가능 여부(true: 사용가능, false: 사용불가)
-    subBlock?     : BlockComponentType[];   // 종속 블록
+    type          : 'text' | 'object' | 'extra' | 'subExtra';
+    code          : string;                              // 식별 코드 5자리
+    tag           : string;                              // 태그명 2차 식별 이름
+    command       : string;                              // input command
+    icon          : IconDefinition;                      // 아이콘
+    label         : string;                              // 블록 변경 메뉴에 표시될 이름
+    comment       : string;                              // extra의 경우 게시판 이름
+    notAvailDup   : boolean;                             // 게시글 내에 중복 사용 가능 여부 (true: 중복 불가, false: 중복 가능)
+    shortcut?     : string;                              // 단축키
+    onTemplate    : boolean;                             // 템플릿 작성시 이용 가능 여부(true: 사용가능, false: 사용불가)
+    subBlock?     : ReadonlyArray<BlockComponentType>;   // 종속 블록
 }
 
 export type BlockComponentType = BlockType & {
     component         : (props: BlockProps)  => JSX.Element; // 블록 컴포넌트
 }
 
-export const blockTypeList: BlockComponentType[] = [
+const blockTypeList: ReadonlyArray<BlockComponentType> = [
     {
         code              : '00001',
         tag               : 'h1',
@@ -304,19 +307,43 @@ export const blockTypeList: BlockComponentType[] = [
     },
     {
         code              : '00410',
-        tag               : 'schedule',
-        command           : '/sch',
-        label             : 'schedule',
+        tag               : 'calender',
+        command           : '/cal',
+        label             : 'calender',
         icon              : faCircleQuestion,
-        comment           : '스케줄',
+        comment           : '일정',
         type              : 'extra',
         notAvailDup       : true,
         onTemplate        : false,
         component         : (props: BlockProps)  =>
-            ScheduleBlock({...props, type: 'extra'}),
+            CalenderBlock({...props, type: 'extra'}),
         subBlock          : [
-            {} as BlockComponentType,
-            {} as BlockComponentType,
+            {
+                code: '00411',
+                tag: 'event',
+                command: '/event',
+                label: 'event',
+                icon: faCalendarDays,
+                comment: '일정',
+                type: 'subExtra',
+                notAvailDup: false,
+                onTemplate: false,
+                component: (props: BlockProps) =>
+                    EventBlock({...props, type: 'subExtra'}),
+            },
         ],
     },
 ]
+
+const flatFunc = (list: ReadonlyArray<BlockComponentType>): ReadonlyArray<BlockComponentType> => {
+    return list.flatMap((item: BlockComponentType) =>
+        item.subBlock
+        && item.subBlock.length > 0
+         ? [item, ...flatFunc(item.subBlock)]
+         : [item]
+    );
+}
+
+
+export const blockTypeFlatList: ReadonlyArray<BlockComponentType> = flatFunc(blockTypeList);
+

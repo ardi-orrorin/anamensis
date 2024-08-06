@@ -18,7 +18,6 @@ const CalenderBlock = (props: ExpendBlockProps) => {
         hash, type,
         code, blockRef,
         isView,
-        onChangeValueHandler,
     } = props;
 
     const router = useRouter();
@@ -34,11 +33,6 @@ const CalenderBlock = (props: ExpendBlockProps) => {
         return () => {
             if(setTimer.current) clearTimeout(setTimer.current)
         }
-    },[])
-
-    useEffect(()=> {
-        if(!onChangeValueHandler) return ;
-        onChangeValueHandler('calender');
     },[])
 
     const events = useMemo(()=> {

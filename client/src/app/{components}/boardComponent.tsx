@@ -8,6 +8,7 @@ import QuestionBoardComponent from "@/app/{components}/boards/question";
 import MembersOnlyBody from "@/app/{components}/membersOnlyBody";
 import Blocked from "@/app/{components}/boards/blocked";
 import {RoleType} from "@/app/user/system/{services}/types";
+import CalenderComponent from "@/app/{components}/boards/calender";
 
 export interface BoardListI {
     id           : string;
@@ -45,7 +46,7 @@ const BoardComponent = (props: BoardListI & {favorites: string[], isLogin: boole
         {categoryPk: 3, component: QuestionBoardComponent},
         {categoryPk: 4, component: AlttuelBoardComponent},
         {categoryPk: 5, component: AlbumBoardComponent},
-        {categoryPk: 6, component: DefaultBoardComponent},
+        {categoryPk: 6, component: CalenderComponent},
     ],[membersOnlyBody]);
 
     const isFavorite = useMemo(() =>

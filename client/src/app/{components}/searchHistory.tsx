@@ -1,6 +1,6 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
-import React, {Dispatch, SetStateAction, useCallback, useRef} from "react";
+import React, {Dispatch, SetStateAction, useCallback, useEffect, useRef} from "react";
 import {SearchHistoryProps} from "@/app/page";
 import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons/faMagnifyingGlass";
 
@@ -21,6 +21,14 @@ const SearchHistory = ({
 }) => {
 
     const timeout = useRef<NodeJS.Timeout>();
+
+    useEffect(()=>{
+        return () => {
+            timeout.current
+            && clearTimeout(timeout.current);
+        }
+    },[])
+
     const removeSearchHistory = useCallback((keyword?: string) => {
         if(!keyword) return setSearchHistory({...searchHistory, history: []});
         const newHistory = searchHistory.history.filter(key => key !== keyword);

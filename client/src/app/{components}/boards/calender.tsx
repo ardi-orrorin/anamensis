@@ -13,9 +13,6 @@ const CalenderComponent = (props: BoardListI) => {
         return block.code === '00411'
     }) as BlockI[];
 
-
-
-
     return (
         <>
             <HeaderComponent {...props} />

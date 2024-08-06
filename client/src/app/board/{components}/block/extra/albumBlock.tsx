@@ -93,7 +93,6 @@ const AlbumBlock = (props: ExpendBlockProps) => {
 
         const progress: number[] = [];
 
-
         let size = 0;
 
         for(const file of files) {

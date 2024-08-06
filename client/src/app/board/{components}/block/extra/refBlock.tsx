@@ -7,7 +7,7 @@ import Link from "next/link";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import moment from "moment";
 import ObjectTemplate from "@/app/board/{components}/block/ObjectTemplate";
-import {blockTypeFlatList} from "@/app/board/{components}/block/list";
+import {BlockComponentType, blockTypeFlatList} from "@/app/board/{components}/block/list";
 
 
 export type RefBlockExtraValueType = {
@@ -50,6 +50,14 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
 
             if(block && block.code === code) {
                 alert('참조 블록을 참조 할 수 없습니다.');
+                return ;
+            }
+
+            const calenderBlock = blockTypeFlatList.find(e =>
+                e.label === 'calender') as BlockComponentType;
+
+            if(block && block.code === calenderBlock.code) {
+                alert('캘린더 블록은 참조 할 수 없습니다.');
                 return ;
             }
 

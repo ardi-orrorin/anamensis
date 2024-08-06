@@ -65,7 +65,7 @@ const ImageView = ({
                     <FontAwesomeIcon icon={faXmark} />
                 </button>
                 <Image src={defaultNoImg(albumToggle.viewImage)}
-                       className={'w-auto max-w-[90%] h-auto max-h-[90%] bg-white'}
+                       className={'w-auto max-w-[90%] h-auto max-h-[90%] bg-white shadow-md drop-shadow-md rounded-md'}
                        width={1200}
                        height={1200}
                        priority={true}
@@ -95,7 +95,7 @@ const ImageView = ({
                     </button>
                 </div>
             </div>
-            <div className={'z-10 fixed left-0 top-0 w-full h-full bg-gray-800 opacity-40'} />
+            <div className={'z-10 fixed left-0 top-0 w-full h-full bg-gray-800 opacity-70'} />
         </>
     )
 }

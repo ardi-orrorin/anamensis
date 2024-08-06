@@ -11,9 +11,6 @@ export type EmailTemplateProps = {
 const EmailTemplate = ({
     id, className, emailClickHandler
 }:EmailTemplateProps) => {
-
-    console.log('EmailTemplate rendered');
-
     const emailTemplate = [
         '@gmail.com',
         '@naver.com',

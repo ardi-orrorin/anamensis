@@ -1,7 +1,7 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCalendarDays, faCircleExclamation, faEye, faUser} from "@fortawesome/free-solid-svg-icons";
+import {faCalendarDays, faCircleExclamation, faUser} from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import React, {useMemo} from "react";
+import React from "react";
 import moment from "moment";
 
 export type NoticeType = {

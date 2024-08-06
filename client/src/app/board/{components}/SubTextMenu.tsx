@@ -1,6 +1,6 @@
 'use client';
 
-import React, {MutableRefObject, useCallback, useContext, useMemo, useState} from "react";
+import React, {MutableRefObject, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import {faBold, faItalic, faTextSlash} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
@@ -23,6 +23,14 @@ const SubTextMenu = ({
 
     const {seq, code, textStyle} = blockService.block;
 
+    const timeout = useRef<NodeJS.Timeout>();
+
+    useEffect(() =>{
+        return () => {
+            if(timeout.current) clearTimeout(timeout.current);
+        }
+    },[])
+
     const selectFontStyle = (type: string, value:string) => {
         value = textStyle![type] === value ? '' : value;
         onClickSubTextMenu(type, value)
@@ -39,7 +47,7 @@ const SubTextMenu = ({
         });
 
         setBoard({...board, data: {...board.data, content: {list: newList}}});
-        setTimeout(() => {
+        timeout.current = setTimeout(() => {
             blockRef.current[seq]?.focus();
         },100);
     }
@@ -49,7 +57,7 @@ const SubTextMenu = ({
         onClickSubTextMenu(name, value);
 
         setToggle(name ? '' : name)
-        setTimeout(() => {
+        timeout.current = setTimeout(() => {
             blockRef.current[seq]?.focus();
         },100);
     },[blockRef?.current[seq]]);

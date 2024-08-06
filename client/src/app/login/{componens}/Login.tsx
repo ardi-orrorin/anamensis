@@ -1,15 +1,11 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faExclamation} from "@fortawesome/free-solid-svg-icons";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import Link from "next/link";
-import {useContext, useEffect, useMemo, useRef, useState} from "react";
+import {useContext, useEffect, useMemo, useState} from "react";
 import {ErrorResponse, LoginAuth} from "@/app/login/page";
 import LoginProvider, {LoginI} from "@/app/login/{services}/LoginProvider";
-import ReCAPTCHA from "react-google-recaptcha";
 import apiCall from "@/app/{commons}/func/api";
 import {RoleType} from "@/app/user/system/{services}/types";
-import {getProviders, signIn} from "next-auth/react";
-import Image from "next/image";
 import Turnstile from "react-turnstile";
 import OAuth from "@/app/login/{componens}/OAuth";
 import Footer from "@/app/find-user/{components}/footer";
@@ -25,7 +21,6 @@ export type LoginUserType = {
     username: string,
     roles: RoleType[]
 }
-
 
 const Login = () => {
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
@@ -50,8 +45,6 @@ const Login = () => {
     const isNext = useMemo(() => {
         return user.username.length > 5 && user.password.length > 4;
     }, [user]);
-
-
 
     const goLogin = async () => {
         setLoading(true);

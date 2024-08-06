@@ -74,7 +74,6 @@ export default function Page() {
     }
 
     const sendVerifyCodeHandler = async (body: ResetPwdI) => {
-        console.log(body)
         try {
              const res = await apiCall<ResetPwdResponse, ResetPwdI>({
                  path: '/api/reset-pwd',
@@ -83,7 +82,6 @@ export default function Page() {
                  isReturnData: true
              })
 
-            console.log(res)
             setResponse({
                 ...response,
                 [res.progress.toLowerCase()] : res.verified
@@ -114,8 +112,6 @@ export default function Page() {
             return location.href = '/';
         }
     }
-
-
 
     return (
         <div className={'h-screen flex justify-center items-center'}>

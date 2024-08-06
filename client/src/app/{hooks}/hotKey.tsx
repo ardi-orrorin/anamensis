@@ -66,7 +66,7 @@ export const useRootLeftMenuHotKey = ({
         }
     }, hotkeysOption, [roles]);
 
-    useHotkeys(['shift+1', 'shift+2', 'shift+3', 'shift+4', 'shift+5'], (e, handler) => {
+    useHotkeys(['shift+1', 'shift+2', 'shift+3', 'shift+4', 'shift+5', "shift+6"], (e, handler) => {
         if (roles.length === 0) return;
         const selCate = Category.findById(handler.keys!.join(''))!;
         if (!confirmRole(selCate)) return;

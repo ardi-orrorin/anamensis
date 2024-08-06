@@ -1,23 +1,20 @@
 import {ExpendBlockProps} from "@/app/board/{components}/block/type/Types";
 import {EventInput} from "@fullcalendar/core";
 import ObjectTemplate from "@/app/board/{components}/block/ObjectTemplate";
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import moment from "moment/moment";
-import boardProvider from "@/app/board/{services}/BoardProvider";
 
 export type EventExtraValue = {
     id      : string;
     groupId : string;
     code    : string;
     title   : string;
-    date    : string;
     allDay  : boolean;
     start?  : string;
     end?    : string;
 } extends EventInput ? EventInput : EventInput & EventExtraValue;
 
 const EventBlock = (props: ExpendBlockProps) => {
-
     const {
         hash, type,
         code, seq,
@@ -26,9 +23,24 @@ const EventBlock = (props: ExpendBlockProps) => {
         onChangeExtraValueHandler, onChangeValueHandler,
     } = props;
 
+    const extraValue = props.extraValue as EventExtraValue;
+
     const [more, setMore] = useState(true);
     const [toggle, setToggle] = useState(true);
     const timeout = useRef<NodeJS.Timeout>();
+
+    const timeFormat = useCallback((reserve?: boolean, ko?: boolean) => {
+        const condition = reserve ? !extraValue.allDay : extraValue.allDay;
+        if(ko) return condition ? 'YYYY년 MM월 DD일' : 'YYYY년 MM월 DD일 HH:mm';
+        return condition ? 'YYYY-MM-DD' : 'YYYY-MM-DDTHH:mm';
+    },[extraValue.allDay, isView]);
+
+    const startOfDate = useCallback((date?: string, reverse?: boolean) =>
+        moment(date).startOf('days').format(timeFormat(reverse))
+        ,[timeFormat]) ;
+    const endOfDate = useCallback((date?:string, reverse?: boolean) =>
+        moment(date).endOf('days').format(timeFormat(reverse))
+        ,[timeFormat]) ;
 
     useEffect(()=>{
         return () => {
@@ -44,14 +56,11 @@ const EventBlock = (props: ExpendBlockProps) => {
             groupId: '',
             code,
             title: '',
-            date: '',
             allDay: false,
-            start: moment().startOf('days').format('YYYY-MM-DDTHH:mm'),
-            end: moment().endOf('days').format('YYYY-MM-DDTHH:mm'),
+            start: startOfDate(),
+            end: endOfDate(),
         } as EventExtraValue);
     },[]);
-
-    const extraValue = props.extraValue as EventExtraValue;
 
     const onChangeInputHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
@@ -60,8 +69,16 @@ const EventBlock = (props: ExpendBlockProps) => {
     },[extraValue, isView]);
 
     const onChangeCheckboxHandler = useCallback(() => {
+        if(isView) return;
         if(!onChangeExtraValueHandler) return;
-        onChangeExtraValueHandler({...extraValue, allDay: !extraValue.allDay} as EventExtraValue);
+
+        const value: EventExtraValue = {
+            allDay: !extraValue.allDay,
+            start: startOfDate(extraValue.start as string, true),
+            end: endOfDate(extraValue.end as string, true),
+        };
+
+        onChangeExtraValueHandler({...extraValue, ...value} as EventExtraValue);
     },[extraValue, isView]);
 
     const onChangeValue = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -69,16 +86,17 @@ const EventBlock = (props: ExpendBlockProps) => {
         onChangeValueHandler(e.target.value);
     },[isView]);
 
-    const moreChangeHandler = () => {
+    const moreChangeHandler = useCallback(() => {
         setToggle(!toggle)
-        if(more) {
-            timeout.current = setTimeout(() => {
-                setMore(false)
-            },350);
-        } else {
-            setMore(true);
+
+        if(!more) {
+            return setMore(true);
         }
-    }
+
+        timeout.current = setTimeout(() => {
+            setMore(false)
+        },350);
+    },[more, toggle]);
 
     return (
         <ObjectTemplate {...props}>
@@ -100,7 +118,8 @@ const EventBlock = (props: ExpendBlockProps) => {
                         : <input className={'w-full p-1 outline-0'}
                                  type={'text'}
                                  name={'title'}
-                                 placeholder={'이벤트 이름 입력하세요'}
+                                 maxLength={20}
+                                 placeholder={'이벤트 이름 입력하세요 (최대 20자)'}
                                  value={extraValue.title}
                                  onChange={onChangeInputHandler}
                             />
@@ -124,50 +143,34 @@ const EventBlock = (props: ExpendBlockProps) => {
                                onClick={onChangeCheckboxHandler}
                           />
                         </div>
-                            {
-                                extraValue.allDay
-                                    ? <div className={'flex gap-2 items-center outline-0 text-sm'}>
-                                        <label className={'font-bold'}>날짜 :</label>
-                                        {
-                                            isView
-                                                ? <span>{moment(extraValue.date).format('YYYY-MM-DD')}</span>
-                                                : <input className={'p-1 rounded outline-0'}
-                                                         type={'date'}
-                                                         name={'date'}
-                                                         value={extraValue.date as string}
-                                                         onChange={onChangeInputHandler}
-                                                />
-                                        }
-                                    </div>
-                                    : <div className={'w-full flex gap-2 justify-start text-sm'}>
-                                        <div className={'flex gap-2 items-center outline-0'}>
-                                            <label className={'font-bold'}>시작일 :</label>
-                                            {
-                                                isView
-                                                    ? <span>{moment(extraValue.start as string).format('YYYY년 MM월 DD일 HH:mm')}</span>
-                                                    : <input className={'p-1 rounded outline-0'}
-                                                             type={'datetime-local'}
-                                                             name={'start'}
-                                                             value={extraValue.start as string}
-                                                             onChange={onChangeInputHandler}
-                                                    />
-                                            }
-                                        </div>
-                                        <div className={'flex gap-2 items-center'}>
-                                            <label className={'font-bold'}>종료일 :</label>
-                                            {
-                                                isView
-                                                    ? <span>{moment(extraValue.end as string).format('YYYY년 MM월 DD일 HH:mm')}</span>
-                                                    : <input className={'p-1 rounded outline-0'}
-                                                             type={'datetime-local'}
-                                                             name={'end'}
-                                                             value={extraValue.end as string}
-                                                             onChange={onChangeInputHandler}
-                                                    />
-                                            }
-                                        </div>
-                                    </div>
-                            }
+                            <div className={'w-full flex gap-2 justify-start text-sm'}>
+                                <div className={'flex gap-2 items-center outline-0'}>
+                                    <label className={'font-bold'}>시작일 :</label>
+                                    {
+                                        isView
+                                            ? <span>{moment(extraValue.start as string).format(timeFormat(false, true))}</span>
+                                            : <input className={'p-1 rounded outline-0'}
+                                                     type={extraValue.allDay ? 'date' : 'datetime-local'}
+                                                     name={'start'}
+                                                     value={extraValue.start as string}
+                                                     onChange={onChangeInputHandler}
+                                            />
+                                    }
+                                </div>
+                                <div className={'flex gap-2 items-center'}>
+                                    <label className={'font-bold'}>종료일 :</label>
+                                    {
+                                        isView
+                                            ? <span>{moment(extraValue.end as string).format(timeFormat(false, true))}</span>
+                                            : <input className={'p-1 rounded outline-0'}
+                                                     type={extraValue.allDay ? 'date' : 'datetime-local'}
+                                                     name={'end'}
+                                                     value={extraValue.end as string}
+                                                     onChange={onChangeInputHandler}
+                                            />
+                                    }
+                                </div>
+                            </div>
                         <div className={'flex flex-col gap-2 text-sm'}>
                           <label className={'font-bold'}>내용</label>
                             {

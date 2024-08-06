@@ -4,20 +4,21 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import listGridPlugin from '@fullcalendar/list'
 import interactionPlugin from "@fullcalendar/interaction"
-import {ButtonTextCompoundInput, CalendarOptions, EventChangeArg, EventInput, ToolbarInput} from "@fullcalendar/core";
+import {CalendarOptions, EventChangeArg, EventInput, ToolbarInput} from "@fullcalendar/core";
 import {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import {blockTypeFlatList} from "@/app/board/{components}/block/list";
 import {useRouter} from "next/navigation";
 import {EventExtraValue} from "@/app/board/{components}/block/extra/eventBlock";
 import moment from "moment/moment";
+import koLocale from '@fullcalendar/core/locales/ko';
 
 const CalenderBlock = (props: ExpendBlockProps) => {
     const {
         hash, type,
-        code, seq,
-        value, blockRef,
+        code, blockRef,
         isView,
+        onChangeValueHandler,
     } = props;
 
     const router = useRouter();
@@ -33,6 +34,11 @@ const CalenderBlock = (props: ExpendBlockProps) => {
         return () => {
             if(setTimer.current) clearTimeout(setTimer.current)
         }
+    },[])
+
+    useEffect(()=> {
+        if(!onChangeValueHandler) return ;
+        onChangeValueHandler('calender');
     },[])
 
     const events = useMemo(()=> {
@@ -55,14 +61,15 @@ const CalenderBlock = (props: ExpendBlockProps) => {
     },[isView, viewCalender]);
 
     const onChangeEvent = useCallback((event: EventChangeArg) => {
+        const timeFormat = event.event.allDay ? 'YYYY-MM-DD' : 'YYYY-MM-DDTHH:mm';
+
         const changeEvent: EventExtraValue = {
             id     : event.event.id,
             code   : event.event.extendedProps.code,
             title  : event.event.title,
-            date   : moment(event.event.startStr).format('YYYY-MM-DD'),
             allDay : event.event.allDay,
-            start  : moment(event.event.start).format('YYYY-MM-DDTHH:mm'),
-            end    : moment(event.event.end).format('YYYY-MM-DDTHH:mm'),
+            start  : moment(event.event.start).format(timeFormat),
+            end    : moment(event.event.end || event.event.start).format(timeFormat),
         }
 
         board.data.content.list.map(item => {
@@ -73,7 +80,6 @@ const CalenderBlock = (props: ExpendBlockProps) => {
         });
         setBoard({...board});
     },[board, isView]);
-
 
     return (
         <div id={`block-${hash}`}
@@ -90,11 +96,12 @@ const CalenderBlock = (props: ExpendBlockProps) => {
             {
                 viewCalender
                 && <FullCalendar editable={!isView}
+                                 locale={koLocale}
                                  eventClick={(click) => {
                                     router.push(`#block-${click.event.id}`)
                                  }}
                                  eventChange={onChangeEvent}
-                                 {...{headerToolbar, buttonText, plugins, events, options}}
+                                 {...{headerToolbar, plugins, events, options}}
                 />
             }
             <div className={'w-full h-8 flex flex-col items-center justify-center'}>
@@ -128,14 +135,5 @@ const plugins = [
     dayGridPlugin, timeGridPlugin
     , listGridPlugin, interactionPlugin
 ]
-
-const buttonText: ButtonTextCompoundInput = {
-    today: '오늘',
-    month: '월',
-    week: '주',
-    day: '일',
-    list: '목록',
-    year: '년',
-}
 
 export default CalenderBlock;

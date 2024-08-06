@@ -45,6 +45,7 @@ const BoardComponent = (props: BoardListI & {favorites: string[], isLogin: boole
         {categoryPk: 3, component: QuestionBoardComponent},
         {categoryPk: 4, component: AlttuelBoardComponent},
         {categoryPk: 5, component: AlbumBoardComponent},
+        {categoryPk: 6, component: DefaultBoardComponent},
     ],[membersOnlyBody]);
 
     const isFavorite = useMemo(() =>

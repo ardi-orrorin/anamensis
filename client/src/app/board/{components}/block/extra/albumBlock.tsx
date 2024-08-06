@@ -55,6 +55,8 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         viewToggle: false,
     } as AlbumToggleType);
 
+    const [waitUpload, setWaitUpload] = useState<boolean>(false);
+
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -99,6 +101,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
             file.size > maxFileSize || size++;
         }
 
+        setWaitUpload(true);
         setUploadProgress({
             size,
             progress: 0,
@@ -112,6 +115,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         }
 
         e.target.value = '';
+        setWaitUpload(false);
     }
 
     const upload = async (file: File, fileContent: FileContentType, uploadedImages: string[], size: number, progress: number[]) => {
@@ -277,6 +281,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
                 && extraValue?.images?.length < maxImage
                 && <div className={'w-full flex justify-center'}>
                     <button className={'w-full flex flex-col justify-center items-center gap-3 py-4 px-2 bg-white rounded border border-solid border-gray-200'}
+                            disabled={waitUpload}
                             onClick={() => inputRef.current?.click()}
                     >
                         <p>
@@ -317,7 +322,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
                            onChange={onChangeHandler}
                            ref={inputRef}
                            hidden={true}
-                           disabled={extraValue.images.length >= maxImage}
+                           disabled={waitUpload || extraValue.images.length >= maxImage}
                            max={10}
                     />
                 </div>

@@ -63,8 +63,14 @@ const EventBlock = (props: ExpendBlockProps) => {
     },[]);
 
     const onChangeInputHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = e.target;
+        let {name, value} = e.target;
+
+        if(name === 'end' && moment(extraValue.start).isAfter(value)) {
+            value = extraValue.start as string;
+        }
+
         if(!onChangeExtraValueHandler) return;
+
         onChangeExtraValueHandler({...extraValue, [name]: value});
     },[extraValue, isView]);
 

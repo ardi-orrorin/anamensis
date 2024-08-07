@@ -15,7 +15,7 @@ import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useRootHotKey} from "@/app/{hooks}/hotKey";
 import Notices, {NoticeType} from "@/app/{components}/boards/notices";
 import SearchInfo from "@/app/{components}/searchInfo";
-import {faBars} from "@fortawesome/free-solid-svg-icons";
+import {faBars, faCaretRight} from "@fortawesome/free-solid-svg-icons";
 import {Virtuoso} from "react-virtuoso";
 import RightSubMenu from "@/app/{components}/rightSubMenu";
 import SearchHistory from "@/app/{components}/searchHistory";
@@ -60,6 +60,8 @@ export default function Page() {
     });
     const [onSearchHistory, setOnSearchHistory] = useState(false);
 
+    const [viewNotice, setViewNotice] = useState(false);
+
     const moreRef = useRef<HTMLDivElement>(null);
     const searchRef = useRef<HTMLInputElement>(null);
 
@@ -78,7 +80,12 @@ export default function Page() {
     useEffect(()=>{
         const history = localStorage.getItem('searchHistory');
         if(history) setSearchHistory(JSON.parse(history));
+
+        const viewNotice = localStorage.getItem('viewNotice');
+        if(viewNotice) setViewNotice(JSON.parse(viewNotice));
     },[]);
+
+
 
     useEffect(() => {
         apiCall<string[]>({
@@ -194,6 +201,11 @@ export default function Page() {
         }
     },[searchRef, searchValue]);
 
+    const onChangeNotice = useCallback(() => {
+        setViewNotice(!viewNotice);
+        localStorage.setItem('viewNotice', JSON.stringify(!viewNotice));
+    },[viewNotice]);
+
     useRootHotKey({searchRef})
 
     return (
@@ -239,7 +251,31 @@ export default function Page() {
                         <LeftMenu {...{searchParams, setSearchParams, roles}}/>
                     </div>
                     <div className={'w-[600px] flex flex-col justify-start items-center'}>
-                        <Notices data={noticeList} />
+                        <div className={'w-full flex flex-col gap-3'}>
+                            <div className={'w-full p-2 flex justify-between items-center text-sm border-b border-solid border-gray-400'}>
+                                <div className={'flex gap-1 items-center'}>
+                                    <FontAwesomeIcon icon={faCaretRight}
+                                                     className={['font-bold duration-500', viewNotice ? 'rotate-90' : 'rotate-0'].join(' ')}
+                                                     size={'lg'}
+                                    />
+                                    <button className={'outline-0'}
+                                            onClick={onChangeNotice}
+                                    >
+                                        공지사항
+                                    </button>
+                                </div>
+
+                                <button className={'outline-0'}
+                                        onClick={onChangeNotice}
+                                >
+                                    { viewNotice ? '접기' : '보기' }
+                                </button>
+                            </div>
+                            <div className={['overflow-y-hidden duration-500',viewNotice ? 'max-h-80' : 'max-h-0'].join(' ')}>
+                                <Notices data={noticeList} />
+                            </div>
+                        </div>
+
                         <div className={'w-full flex flex-wrap gap-2'}>
                             {
                                 notFoundResult

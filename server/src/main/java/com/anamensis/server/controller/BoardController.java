@@ -127,10 +127,6 @@ public class BoardController {
                 boardService.viewUpdateByPk(boardPk)
                     .subscribeOn(Schedulers.boundedElastic())
                     .subscribe();
-
-//                boardService.refreshCacheBoard(boardPk)
-//                    .subscribeOn(Schedulers.boundedElastic())
-//                    .subscribe();
             });
     }
 

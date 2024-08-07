@@ -20,7 +20,7 @@ const ProgressBar = () => {
     }, []);
     return (
         <div className={`sticky left-0 top-0 duration-300`}
-             style={{width: '100%', height: '5px', zIndex: 1000, backgroundColor: 'rgba(0,0,0,0.7)'}}
+             style={{width: '100%', height: '0.2rem', zIndex: 1000, backgroundColor: 'rgba(0,0,0,0.7)'}}
         >
             <div className={'bg-blue-400'}
                  style={{width: `${scrollWidth}%`, height: '100%'}} />

@@ -139,7 +139,7 @@
            AND b.is_public   = 1
            AND b.is_use      = 1
          ORDER BY b.id DESC
-         LIMIT 3
+         LIMIT 6
     </select>
     <update id="updateByPk" parameterType="Board">
         UPDATE board

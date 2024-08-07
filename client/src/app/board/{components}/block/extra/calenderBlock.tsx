@@ -4,7 +4,7 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import listGridPlugin from '@fullcalendar/list'
 import interactionPlugin from "@fullcalendar/interaction"
-import {CalendarOptions, EventChangeArg, EventInput, ToolbarInput} from "@fullcalendar/core";
+import {CalendarOptions, DateSelectArg, EventChangeArg, EventInput, ToolbarInput} from "@fullcalendar/core";
 import {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import {blockTypeFlatList} from "@/app/board/{components}/block/list";
@@ -12,6 +12,8 @@ import {useRouter} from "next/navigation";
 import {EventExtraValue} from "@/app/board/{components}/block/extra/eventBlock";
 import moment from "moment/moment";
 import koLocale from '@fullcalendar/core/locales/ko';
+import {initBlock} from "@/app/board/{services}/funcs";
+import {BlockI} from "@/app/board/{services}/types";
 
 const CalenderBlock = (props: ExpendBlockProps) => {
     const {
@@ -41,6 +43,37 @@ const CalenderBlock = (props: ExpendBlockProps) => {
         const blockCodes = subBlocks.map(item => item.code);
         const blockValues = board.data.content.list.filter(item => blockCodes.includes(item.code));
         return blockValues.map(item => item.extraValue as EventInput).filter(item => item.title)
+    },[board]);
+
+    const addEvent = useCallback((event: DateSelectArg) => {
+        const eventCode = blockTypeFlatList.find(item => item.label === 'event')?.code;
+        const lastSeq = board.data.content.list[board.data.content.list.length - 1].seq + 1;
+        const newBlock = initBlock({seq: lastSeq, code: eventCode}) as BlockI;
+        const timeFormat = event.allDay ? 'YYYY-MM-DD' : 'YYYY-MM-DDTHH:mm';
+
+        newBlock.extraValue = {
+            id     : newBlock.hash,
+            code   : eventCode,
+            title  : '새 일정',
+            allDay : event.allDay,
+            start  : moment(event.start).format(timeFormat),
+            end    : moment(event.end || event.start).format(timeFormat)
+        } as EventExtraValue;
+
+        setBoard({
+            ...board,
+            data: {
+                ...board.data,
+                content: {
+                    ...board.data.content,
+                    list: [...board.data.content.list, newBlock]
+                }
+            }
+        });
+
+        setTimer.current = setTimeout(() => {
+            blockRef?.current[lastSeq]?.focus()
+        }, 0);
     },[board]);
 
     const onChangeView = useCallback(()=> {
@@ -73,6 +106,8 @@ const CalenderBlock = (props: ExpendBlockProps) => {
             return item;
         });
         setBoard({...board});
+
+
     },[board, isView]);
 
     return (
@@ -90,12 +125,16 @@ const CalenderBlock = (props: ExpendBlockProps) => {
             {
                 viewCalender
                 && <FullCalendar editable={!isView}
-                                 locale={koLocale}
+                                 selectable={!isView}
+                                 {...{headerToolbar, plugins, events, ...options}}
+                                 select={addEvent}
                                  eventClick={(click) => {
                                     router.push(`#block-${click.event.id}`)
                                  }}
+                                 eventRemove={(remove) => {
+                                     console.log(remove)
+                                 }}
                                  eventChange={onChangeEvent}
-                                 {...{headerToolbar, plugins, events, options}}
                 />
             }
             <div className={'w-full h-8 flex flex-col items-center justify-center'}>
@@ -109,14 +148,13 @@ const CalenderBlock = (props: ExpendBlockProps) => {
 }
 
 const options: CalendarOptions = {
-    initialView: 'dayGridMonth',
-    locale: 'ko',
-    selectable: true,
+    initialView: 'timeGridWeek',
     selectMirror: true,
+    selectOverlap: true,
+    locale: koLocale,
     dayMaxEvents: true,
     weekends: true,
     droppable: true,
-
 }
 
 const headerToolbar: ToolbarInput = {

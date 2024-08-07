@@ -284,6 +284,7 @@ export default function Page({params}: {params : {id: string}}) {
         );
 
         if(!fileBlock) return ;
+        if(!fileBlock?.value) return ;
 
         if(isNewBoard) {
             await apiCall({

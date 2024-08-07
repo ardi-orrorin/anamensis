@@ -35,7 +35,6 @@ const Block = (props: BlockProps) => {
     } = props;
 
     const {board, setBoard, comment, setNewComment, newComment} = useContext(BoardProvider);
-    const {isPublic, membersOnly, title} = board?.data;
 
     const {blockService, setBlockService, commentService, setCommentService, selectedBlock} = useContext(BlockProvider);
     const [contextMenu, setContextMenu] = useState<ContextMenuProps>({} as ContextMenuProps);
@@ -158,7 +157,6 @@ const Block = (props: BlockProps) => {
             }
             return item;
         });
-
         setBoard({...board, data: {...board.data, content: {list: newList}}});
     }
 

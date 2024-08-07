@@ -21,6 +21,7 @@ const EventBlock = (props: ExpendBlockProps) => {
         value, blockRef,
         isView,
         onChangeExtraValueHandler, onChangeValueHandler,
+        onClickDeleteHandler
     } = props;
 
     const extraValue = props.extraValue as EventExtraValue;
@@ -62,7 +63,7 @@ const EventBlock = (props: ExpendBlockProps) => {
         } as EventExtraValue);
     },[]);
 
-    const onChangeInputHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeInputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         let {name, value} = e.target;
 
         if(name === 'end' && moment(extraValue.start).isAfter(value)) {
@@ -72,9 +73,9 @@ const EventBlock = (props: ExpendBlockProps) => {
         if(!onChangeExtraValueHandler) return;
 
         onChangeExtraValueHandler({...extraValue, [name]: value});
-    },[extraValue, isView]);
+    }
 
-    const onChangeCheckboxHandler = useCallback(() => {
+    const onChangeCheckboxHandler = () => {
         if(isView) return;
         if(!onChangeExtraValueHandler) return;
 
@@ -85,12 +86,12 @@ const EventBlock = (props: ExpendBlockProps) => {
         };
 
         onChangeExtraValueHandler({...extraValue, ...value} as EventExtraValue);
-    },[extraValue, isView]);
+    }
 
-    const onChangeValue = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const onChangeValue = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         if(!onChangeValueHandler) return;
         onChangeValueHandler(e.target.value);
-    },[isView]);
+    }
 
     const moreChangeHandler = useCallback(() => {
         setToggle(!toggle)
@@ -104,11 +105,16 @@ const EventBlock = (props: ExpendBlockProps) => {
         },350);
     },[more, toggle]);
 
+    const onClickDelete = useCallback(() => {
+        if(!onClickDeleteHandler) return;
+        onClickDeleteHandler(seq);
+    },[]);
+
     return (
         <ObjectTemplate {...props}>
             <div className={[
                 'flex flex-col w-full p-2 gap-2 overflow-y-hidden duration-300',
-                toggle ? 'max-h-[1000px]' : 'max-h-16',
+                toggle ? 'max-h-[1000px]' : 'max-h-18',
             ].join(' ')}
                  style={{backgroundColor: 'rgba(230,230,230,0.2)'}}
             >
@@ -121,13 +127,17 @@ const EventBlock = (props: ExpendBlockProps) => {
                             </span>
                             <span>{extraValue.title}</span>
                         </div>
-                        : <input className={'w-full p-1 outline-0'}
+                        : <input className={'w-full py-1 px-2 outline-0'}
                                  type={'text'}
                                  name={'title'}
                                  maxLength={20}
                                  placeholder={'이벤트 이름 입력하세요 (최대 20자)'}
                                  value={extraValue.title}
                                  onChange={onChangeInputHandler}
+                                 ref={el => {
+                                     if(isView) return;
+                                     blockRef!.current[seq] = el;
+                                 }}
                             />
                     }
                 </div>
@@ -196,11 +206,19 @@ const EventBlock = (props: ExpendBlockProps) => {
                     </>
                 }
 
-                <div className={'w-full min-h-8 flex flex-col items-center justify-center'}>
-                    <button className={'w-40 h-full rounded-md text-sm text-gray-700'}
+                <div className={'w-full min-h-8 flex gap-3 items-center justify-center'}>
+                    <button className={'w-40 h-full rounded-md text-sm text-gray-700 border-solid border border-gray-400 hover:border-gray-700'}
                             onClick={moreChangeHandler}>
                         { more ? '접기' : '더보기' }
                     </button>
+                    {
+                        !isView
+                        && <button className={'w-40 h-full rounded-md text-sm text-gray-700 border-solid border border-gray-400 hover:border-gray-700'}
+                                   onClick={onClickDelete}
+                        >
+                            블록 삭제
+                        </button>
+                    }
                 </div>
             </div>
         </ObjectTemplate>

@@ -1,17 +1,14 @@
 import {ExpendBlockProps} from "@/app/board/{components}/block/type/Types";
 import {EventInput} from "@fullcalendar/core";
 import ObjectTemplate from "@/app/board/{components}/block/ObjectTemplate";
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import moment from "moment/moment";
+import {colorSet} from "@/app/{services}/constants";
 
 export type EventExtraValue = {
     id      : string;
     groupId : string;
     code    : string;
-    title   : string;
-    allDay  : boolean;
-    start?  : string;
-    end?    : string;
 } extends EventInput ? EventInput : EventInput & EventExtraValue;
 
 const EventBlock = (props: ExpendBlockProps) => {
@@ -110,6 +107,12 @@ const EventBlock = (props: ExpendBlockProps) => {
         onClickDeleteHandler(seq);
     },[]);
 
+    const onChaneColorHandler = (color: string, isBackground: boolean) => {
+        if (!onChangeExtraValueHandler) return;
+        const key = isBackground ? 'backgroundColor' : 'textColor';
+        onChangeExtraValueHandler({...extraValue, [key]: color} as EventExtraValue);
+    }
+
     return (
         <ObjectTemplate {...props}>
             <div className={[
@@ -144,49 +147,67 @@ const EventBlock = (props: ExpendBlockProps) => {
                 {
                     more
                     && <>
-                        <div className={'flex h-10 items-center gap-2'}>
-                          <label className={'text-sm font-bold'}>하루종일</label>
-                          <input type="checkbox"
-                                 className={"sr-only peer hidden"}
-                                 checked={extraValue.allDay}
-                          />
-                          <div className="relative w-11 h-6 ray-200 peer-focus:outline-none peer-focus:ring-4
-                                        peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-300
-                                        peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
-                                        peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px]
-                                        after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5
-                                        after:transition-all dark:border-gray-400 peer-checked:bg-main"
-                               onClick={onChangeCheckboxHandler}
-                          />
-                        </div>
-                            <div className={'w-full flex gap-2 justify-start text-sm'}>
-                                <div className={'flex gap-2 items-center outline-0'}>
-                                    <label className={'font-bold'}>시작일 :</label>
-                                    {
-                                        isView
-                                            ? <span>{moment(extraValue.start as string).format(timeFormat(false, true))}</span>
-                                            : <input className={'p-1 rounded outline-0'}
-                                                     type={extraValue.allDay ? 'date' : 'datetime-local'}
-                                                     name={'start'}
-                                                     value={extraValue.start as string}
-                                                     onChange={onChangeInputHandler}
-                                            />
-                                    }
-                                </div>
-                                <div className={'flex gap-2 items-center'}>
-                                    <label className={'font-bold'}>종료일 :</label>
-                                    {
-                                        isView
-                                            ? <span>{moment(extraValue.end as string).format(timeFormat(false, true))}</span>
-                                            : <input className={'p-1 rounded outline-0'}
-                                                     type={extraValue.allDay ? 'date' : 'datetime-local'}
-                                                     name={'end'}
-                                                     value={extraValue.end as string}
-                                                     onChange={onChangeInputHandler}
-                                            />
-                                    }
-                                </div>
+                        <div className={'flex h-10 items-center gap-4'}>
+                            <div className={'flex gap-2'}>
+                                <label className={'text-sm font-bold'}>하루종일</label>
+                                <input type="checkbox"
+                                       className={"sr-only peer hidden"}
+                                       checked={extraValue.allDay}
+                                />
+                                <div className="relative w-11 h-6 ray-200 peer-focus:outline-none peer-focus:ring-4
+                                            peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-300
+                                            peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
+                                            peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px]
+                                            after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5
+                                            after:transition-all dark:border-gray-400 peer-checked:bg-main"
+                                     onClick={onChangeCheckboxHandler}
+                                />
                             </div>
+                            <div className={'flex gap-2 text-sm items-center'}>
+                                <span className={'font-bold'}>
+                                  배경색
+                                </span>
+                                <ColorPicker color={extraValue.backgroundColor as string}
+                                             onClick={(color) => onChaneColorHandler(color, true)}
+                                />
+                            </div>
+                            <div className={'flex gap-2 text-sm items-center'}>
+                                <span className={'font-bold'}>
+                                  글자색
+                                </span>
+                                <ColorPicker color={extraValue.textColor as string}
+                                             onClick={(color) => onChaneColorHandler(color, false)}
+                                />
+                            </div>
+                        </div>
+                        <div className={'w-full flex gap-2 justify-start text-sm'}>
+                            <div className={'flex gap-2 items-center outline-0'}>
+                                <label className={'font-bold'}>시작일 :</label>
+                                {
+                                    isView
+                                        ? <span>{moment(extraValue.start as string).format(timeFormat(false, true))}</span>
+                                        : <input className={'p-1 rounded outline-0'}
+                                                 type={extraValue.allDay ? 'date' : 'datetime-local'}
+                                                 name={'start'}
+                                                 value={extraValue.start as string}
+                                                 onChange={onChangeInputHandler}
+                                        />
+                                }
+                            </div>
+                            <div className={'flex gap-2 items-center'}>
+                                <label className={'font-bold'}>종료일 :</label>
+                                {
+                                    isView
+                                        ? <span>{moment(extraValue.end as string).format(timeFormat(false, true))}</span>
+                                        : <input className={'p-1 rounded outline-0'}
+                                                 type={extraValue.allDay ? 'date' : 'datetime-local'}
+                                                 name={'end'}
+                                                 value={extraValue.end as string}
+                                                 onChange={onChangeInputHandler}
+                                        />
+                                }
+                            </div>
+                        </div>
                         <div className={'flex flex-col gap-2 text-sm'}>
                           <label className={'font-bold'}>내용</label>
                             {
@@ -223,6 +244,59 @@ const EventBlock = (props: ExpendBlockProps) => {
             </div>
         </ObjectTemplate>
     )
+}
+
+
+const ColorPicker = ({
+    color,
+    onClick
+} : {
+    color: string,
+    onClick: (color: string) => void
+}) => {
+    const [toggle, setToggle] = useState(false);
+
+    const isDark = useMemo(() =>
+        colorSet.find(item => item.color === color)?.dark
+    ,[color]);
+
+    return (
+        <div className={[
+            'relative flex flex-col w-16',
+        ].join(' ')}>
+
+            <button className={'flex w-full p-1 items-center justify-center border border-solid border-gray-400 rounded-md duration-500 hover:border-gray-700'}
+                    onClick={() => setToggle(!toggle)}
+            >
+                <span className={[
+                    'w-full h-4 text-xs px-2 py-1 rounded',
+                    isDark ? 'text-white' : 'text-black'
+                ].join(' ')}
+                      style={{backgroundColor: color || '#000000'}}
+                />
+            </button>
+            <div className={[
+                'absolute w-full top-7 flex flex-col overflow-y-auto duration-500',
+                toggle ? 'max-h-60' : 'max-h-0',
+            ].join(' ')}
+                 onMouseLeave={() => setToggle(false)}
+            >
+                {
+                    colorSet.map((color, index) => {
+                        return (
+                            <button key={'color' + index}
+                                    className={'flex w-full min-h-8 items-center justify-center'}
+                                    style={{backgroundColor: color.color}}
+                                    onClick={() => onClick(color.color)}
+                            />
+                        )
+                    })
+                }
+            </div>
+
+        </div>
+    )
+
 }
 
 export default EventBlock;

@@ -54,20 +54,20 @@ const WriterInfo = ({
 
                         return (
                             <Link key={'board_summary' + index}
-                                  className={'flex justify-between py-0.5 px-1 h-8 hover:bg-blue-300 hover:text-white duration-300'}
+                                  className={'flex justify-between px-1 py-2 sm:py-1 h-10 sm:h-8 hover:bg-blue-300 hover:text-white duration-300'}
                                   href={'/board/' + item.id}
                             >
                                 <div className={'flex gap-2 items-center'}>
-                        <span className={'text-xss py-0.5 px-2 bg-blue-400 text-white'}>
-                            {category?.substring(0, category?.indexOf(' '))}
-                        </span>
-                                    <span className={'text-xs line-clamp-1 w-20 sm:w-40'}>
-                            {item.title}
-                        </span>
+                                    <span className={'text-xs py-1 px-2 bg-blue-400 text-white'}>
+                                        {category?.substring(0, category?.indexOf(' '))}
+                                    </span>
+                                    <span className={'text-xs line-clamp-1 w-40 sm:w-40'}>
+                                        {item.title}
+                                    </span>
                                 </div>
-                                <span className={'text-xs'}>
-                        {moment(item.createdAt).format('YYYY-MM-DD')}
-                    </span>
+                                <span className={'flex items-center text-xs'}>
+                                    {moment(item.createdAt).format('YYYY-MM-DD')}
+                                </span>
                             </Link>
                         )
                     })

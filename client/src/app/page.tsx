@@ -85,8 +85,6 @@ export default function Page() {
         if(viewNotice) setViewNotice(JSON.parse(viewNotice));
     },[]);
 
-
-
     useEffect(() => {
         apiCall<string[]>({
             path: '/api/board-favorites',

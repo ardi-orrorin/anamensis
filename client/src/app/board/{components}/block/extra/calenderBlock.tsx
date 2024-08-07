@@ -149,6 +149,7 @@ const CalenderBlock = (props: ExpendBlockProps) => {
 
 const options: CalendarOptions = {
     initialView: 'timeGridWeek',
+    rerenderDelay: 0,
     selectMirror: true,
     selectOverlap: true,
     locale: koLocale,

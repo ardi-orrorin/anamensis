@@ -75,7 +75,7 @@ const ImageView = ({
                        }}
                 />
                 <div className={'z-40 fixed top-0 left-0 w-full h-full flex justify-between'}>
-                    <button className={'min-w-[25%] w-[25%] h-full flex justify-center items-center shadow-md'}
+                    <button className={'min-w-[25%] w-[25%] h-full flex justify-center items-center'}
                             onClick={prevImage}
                     >
                         <span className={'w-[50px] h-[50px] flex justify-center items-center  bg-white rounded-full'}>

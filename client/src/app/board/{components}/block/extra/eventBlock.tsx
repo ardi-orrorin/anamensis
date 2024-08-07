@@ -114,7 +114,7 @@ const EventBlock = (props: ExpendBlockProps) => {
         <ObjectTemplate {...props}>
             <div className={[
                 'flex flex-col w-full p-2 gap-2 overflow-y-hidden duration-300',
-                toggle ? 'max-h-[1000px]' : 'max-h-18',
+                toggle ? 'max-h-[1000px]' : 'max-h-20',
             ].join(' ')}
                  style={{backgroundColor: 'rgba(230,230,230,0.2)'}}
             >

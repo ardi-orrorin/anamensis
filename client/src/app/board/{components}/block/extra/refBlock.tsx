@@ -21,6 +21,7 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
         isView, code,
         seq, blockRef,
         onChangeExtraValueHandler,
+        onChangeValueHandler,
         onKeyUpHandler,
         onKeyDownHandler,
         onMouseEnterHandler,
@@ -78,7 +79,7 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
         setValid('');
     },[]);
 
-    const onChangeValueHandler = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeValuesHandler = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         if(value === '') return;
         const regExp = /\/board\/(\d+)#block-(\d){13}-(\d+)/i;
 
@@ -91,10 +92,14 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
 
         const blockId = regExp.exec(value)![0].split('#block-')[1];
 
+        if(!onChangeExtraValueHandler) return ;
         onChangeExtraValueHandler!({
             boardId,
             blockId
         } as RefBlockExtraValueType);
+
+        if(!onChangeValueHandler) return;
+        onChangeValueHandler(e.target.value);
 
         setTimeout(async () => {
             await mutate();
@@ -122,7 +127,7 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
                               value={value}
                               placeholder={'링크를 입력하세요.'}
                               onChange={onChangeHandler}
-                              onBlur={onChangeValueHandler}
+                              onBlur={onChangeValuesHandler}
                               onKeyUp={onKeyUpHandler}
                               onKeyDown={onKeyDownHandler}
                               ref={el => {props!.blockRef!.current[props.seq] = el}}

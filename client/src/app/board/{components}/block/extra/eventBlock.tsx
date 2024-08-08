@@ -102,10 +102,10 @@ const EventBlock = (props: ExpendBlockProps) => {
         },350);
     },[more, toggle]);
 
-    const onClickDelete = useCallback(() => {
+    const onClickDelete = () => {
         if(!onClickDeleteHandler) return;
         onClickDeleteHandler(seq);
-    },[]);
+    }
 
     const onChaneColorHandler = (color: string, isBackground: boolean) => {
         if (!onChangeExtraValueHandler) return;
@@ -168,6 +168,7 @@ const EventBlock = (props: ExpendBlockProps) => {
                                   배경색
                                 </span>
                                 <ColorPicker color={extraValue.backgroundColor as string}
+                                             isView={isView || false}
                                              onClick={(color) => onChaneColorHandler(color, true)}
                                 />
                             </div>
@@ -176,6 +177,7 @@ const EventBlock = (props: ExpendBlockProps) => {
                                   글자색
                                 </span>
                                 <ColorPicker color={extraValue.textColor as string}
+                                             isView={isView || false}
                                              onClick={(color) => onChaneColorHandler(color, false)}
                                 />
                             </div>
@@ -248,9 +250,11 @@ const EventBlock = (props: ExpendBlockProps) => {
 
 
 const ColorPicker = ({
+    isView,
     color,
     onClick
 } : {
+    isView: boolean,
     color: string,
     onClick: (color: string) => void
 }) => {
@@ -267,6 +271,7 @@ const ColorPicker = ({
 
             <button className={'flex w-full p-1 items-center justify-center border border-solid border-gray-400 rounded-md duration-500 hover:border-gray-700'}
                     onClick={() => setToggle(!toggle)}
+                    disabled={isView}
             >
                 <span className={[
                     'w-full h-4 text-xs px-2 py-1 rounded',

@@ -1,6 +1,6 @@
 import moment from "moment";
 import Image from "next/image";
-import React, {useMemo} from "react";
+import React from "react";
 import {BoardService} from "@/app/board/{services}/BoardProvider";
 import Link from "next/link";
 import {Category} from "@/app/board/{services}/types";

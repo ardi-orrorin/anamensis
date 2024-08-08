@@ -11,6 +11,7 @@ import Thumbnail from "@/app/board/{components}/block/extra/{components}/thumbna
 import Slide from "@/app/board/{components}/block/extra/{components}/slide";
 import {deleteImage} from "@/app/board/{services}/funcs";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
+import {AxiosError} from "axios";
 
 export type ImageShowProps = {
     defaultIndex: number;
@@ -119,7 +120,6 @@ const AlbumBlock = (props: ExpendBlockProps) => {
     }
 
     const upload = async (file: File, fileContent: FileContentType, uploadedImages: string[], size: number, progress: number[]) => {
-
         if(file.size > maxFileSize) return;
 
         const blob = new Blob([JSON.stringify(fileContent)], {type: 'application/json'})
@@ -139,6 +139,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
                     timeout: 5 * 60 * 1000,
                 });
             } catch (e) {
+                const err = e as AxiosError;
                 return call()
             }
         }

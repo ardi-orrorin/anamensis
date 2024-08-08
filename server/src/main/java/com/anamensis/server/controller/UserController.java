@@ -4,6 +4,7 @@ package com.anamensis.server.controller;
 import com.anamensis.server.dto.*;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.dto.response.LoginHistoryResponse;
+import com.anamensis.server.dto.response.StatusResponse;
 import com.anamensis.server.dto.response.UserResponse;
 import com.anamensis.server.entity.*;
 import com.anamensis.server.provider.TokenProvider;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -410,8 +412,39 @@ public class UserController {
             case CONFIRMED -> sendVerifyEmail(resetPwd);
             case VERIFIED -> verifyEmailCode(resetPwd);
             case RESET -> resetPwd(resetPwd);
-            default -> Mono.just(new UserResponse.ResetPwd(ResetPwdProgress.FAILED, false)).log();
+            default -> Mono.just(new UserResponse.ResetPwd(ResetPwdProgress.FAILED, false));
         };
+    }
+
+    @PostMapping("/change-password")
+    public Mono<StatusResponse> changePassword(
+            @Valid @RequestBody UserRequest.ChangePassword changePwd,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+
+        return userService.confirmPassword(userDetails.getUsername(), changePwd.getCurPwd())
+            .flatMap(b -> {
+                if (!b) return Mono.just(false);
+                return switch (changePwd.getStatus()) {
+                    case READY     -> Mono.just(b);
+                    case CONFIRMED -> this.changePwd(userDetails.getUsername(), changePwd.getNewPwd());
+                    default        -> Mono.just(false);
+                };
+            })
+            .flatMap(b -> {
+                StatusResponse sr = StatusResponse.builder()
+                    .status(b ? StatusType.SUCCESS : StatusType.FAIL)
+                    .message(b ? "Success" : "Failed")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+
+                return Mono.just(sr);
+            });
+    }
+
+    private Mono<Boolean> changePwd(String userId, String newPwd) {
+
+        return userService.changePwd(userId, newPwd);
     }
 
     private Mono<UserResponse.ResetPwd> sendVerifyEmail(UserRequest.ResetPwd resetPwd) {

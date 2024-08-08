@@ -13,7 +13,6 @@ import com.anamensis.server.mapper.BoardMapper;
 import com.anamensis.server.resultMap.BoardResultMap;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,15 +29,11 @@ import java.util.concurrent.TimeUnit;
 @Transactional
 public class BoardService {
     private static final String BOARD_PK_KEY = "board:pk:%s";
-    private static final CacheExpire boardExpire = new CacheExpire(1, TimeUnit.HOURS);
+    private static final CacheExpire boardExpire = new CacheExpire(5, TimeUnit.MINUTES);
 
     private final BoardMapper boardMapper;
 
-    private final BoardIndexMapper boardIndexMapper;
-
     private final RedisTemplate<String, Object> redisTemplate;
-
-    private final VirtualThreadTaskExecutor virtualThreadTaskExecutor;
 
     public Flux<BoardResponse.List> findAll(
         Page page,
@@ -51,7 +46,7 @@ public class BoardService {
             : boardMapper.findList(page, params, member);
 
         return Flux.fromIterable(list)
-            .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+            .publishOn(Schedulers.boundedElastic())
             .map(l -> BoardResponse.List.from(l, member));
     }
 
@@ -80,7 +75,7 @@ public class BoardService {
 
     public Mono<Boolean> updateIsBlockedByPk(long boardPk, boolean isBlocked) {
         return Mono.fromCallable(()-> boardMapper.updateIsBlockedByPk(boardPk, isBlocked) > 0)
-            .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+            .publishOn(Schedulers.boundedElastic())
             .doOnNext($ -> updateCacheBoard(boardPk).subscribe());
     }
 
@@ -92,6 +87,7 @@ public class BoardService {
                 if(!b) {
                     BoardResultMap.Board board = boardMapper.findByPk(boardPk)
                         .orElseThrow(()-> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+
                     redisTemplate.boundValueOps(key).set(board, boardExpire.timeout(), boardExpire.timeUnit());
                 }
 
@@ -136,7 +132,7 @@ public class BoardService {
              })
              .flatMapMany(Flux::fromIterable)
              .cast(BoardResponse.SummaryList.class)
-             .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+             .publishOn(Schedulers.boundedElastic())
              .onErrorResume(e -> {
                  if(!e.getMessage().equals("Cannot deserialize")) return Mono.error(e);
                  return updateSummaryList(memberPk)
@@ -144,7 +140,7 @@ public class BoardService {
                      .flatMapMany(Flux::fromIterable)
                      .cast(BoardResponse.SummaryList.class);
              })
-             .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor));
+             .publishOn(Schedulers.boundedElastic());
     }
 
 
@@ -161,54 +157,8 @@ public class BoardService {
         return Mono.fromCallable(()-> boardMapper.save(board))
                 .onErrorMap(RuntimeException::new)
                 .flatMap($ -> Mono.just(board))
-                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext($ -> updateCaches(0, board.getMemberPk()).subscribe());
-    }
-
-
-    /**
-     * Save index.
-     * @deprecated Use {@link BoardIndexService#save(Board)}
-     *
-     */
-    public void saveIndex(long boardPk, String content) {
-        BoardIndex boardIndex = new BoardIndex();
-        boardIndex.setBoardId(boardPk);
-        boardIndex.setContent(content);
-        boardIndex.setCreatedAt(LocalDateTime.now());
-        boardIndex.setUpdatedAt(LocalDateTime.now());
-        boardIndexMapper.save(boardIndex);
-    }
-
-    /**
-     * Update index.
-     * @deprecated Use {@link BoardIndexService#update(Board)}
-     *
-     */
-    public void updateIndex(long boardPk, String content) {
-        BoardIndex boardIndex = new BoardIndex();
-        boardIndex.setBoardId(boardPk);
-        boardIndex.setContent(content);
-        boardIndex.setUpdatedAt(LocalDateTime.now());
-
-        try {
-            int result = boardIndexMapper.update(boardIndex);
-            if(result == 0) {
-                saveIndex(boardPk, content);
-            }
-        } catch (Exception e) {
-            saveIndex(boardPk, content);
-        }
-    }
-
-
-    /**
-     * Delete index.
-     * @deprecated Use {@link BoardIndexService#delete(long)}
-     *
-     */
-    public void deleteIndex(long boardPk) {
-        boardIndexMapper.delete(boardPk);
     }
 
     public void onePageCache(long id) {
@@ -239,7 +189,7 @@ public class BoardService {
 
     public Mono<Boolean> viewUpdateByPk(long boardPk) {
         return Mono.fromCallable(() -> boardMapper.viewUpdateByPk(boardPk) == 1)
-                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext($ -> onePageCache(boardPk))
                 .onErrorReturn(false);
     }
@@ -247,7 +197,7 @@ public class BoardService {
     public Mono<Boolean> disableByPk(long boardPk, long memberPk) {
         return Mono.just(boardMapper.disableByPk(boardPk, memberPk, LocalDateTime.now()) == 1)
                 .onErrorReturn(false)
-                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext($ -> updateCaches(boardPk, memberPk).subscribe());
     }
 
@@ -255,7 +205,7 @@ public class BoardService {
         board.setUpdateAt(LocalDateTime.now());
         return Mono.fromCallable(() -> boardMapper.updateByPk(board) == 1)
                 .onErrorReturn(false)
-                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext($ -> updateCaches(board.getId(), board.getMemberPk()).subscribe());
     }
 
@@ -275,9 +225,9 @@ public class BoardService {
 
     private Mono<Boolean> updateCaches(long id, long memberPk) {
         return updateSummaryList(memberPk)
-                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext($ -> updateNoticeCache().subscribe())
-                .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+                .publishOn(Schedulers.boundedElastic())
                 .doOnNext($ -> onePageCache(id))
                 .doOnNext($ -> updateCacheBoard(id).subscribe());
     }
@@ -303,7 +253,7 @@ public class BoardService {
         return Mono.fromCallable(() -> redisTemplate.delete("board:summary:member:" + memberPk))
             .flatMapIterable($ -> boardMapper.findByMemberPk(memberPk, page))
             .map(BoardResponse.SummaryList::from)
-            .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
+            .publishOn(Schedulers.boundedElastic())
             .doOnNext(list -> {
                 redisTemplate.boundListOps("board:summary:member:" + memberPk)
                     .rightPush(list);

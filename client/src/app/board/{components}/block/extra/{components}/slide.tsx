@@ -80,9 +80,9 @@ const Slide = ({
             viewImage: images[selectedIndex],
             viewToggle: true,
         });
-    },[]);
+    },[selectedIndex]);
 
-    const imageList = useMemo(()=>
+    const imageList = useMemo(() =>
         images?.map((image, index) => {
             return (
                 <div key={'slide' + index}

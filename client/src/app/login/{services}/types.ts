@@ -3,4 +3,5 @@ export enum AuthType {
     NONE  = 'NONE',
     OTP   = 'OTP',
     EMAIL = 'EMAIL',
+    OAUTH = 'OAUTH',
 }

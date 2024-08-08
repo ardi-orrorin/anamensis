@@ -5,8 +5,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import apiCall from "@/app/{commons}/func/api";
 import {LoginType} from "@/app/login/{componens}/Login";
 
-
-const NoneAuth = ({}) => {
+const NoneAuth = () => {
     const {user} = useContext(LoginProvider);
     useEffect(() => {
         const fetch = async () => {

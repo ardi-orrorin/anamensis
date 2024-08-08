@@ -3,14 +3,14 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
 import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
-import {blockTypeList} from "@/app/board/{components}/block/list";
+import {blockTypeFlatList} from "@/app/board/{components}/block/list";
 import {
     BlockProps,
     HtmlElements,
     MouseEnterHTMLElements,
     MouseLeaveHTMLElements
 } from "@/app/board/{components}/block/type/Types";
-import React, {useCallback, useContext, useMemo, useState} from "react";
+import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import MenuItem from "@/app/board/{components}/MenuItem";
 import BlockProvider, {BlockMenu, BlockService} from "@/app/board/{services}/BlockProvider";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
@@ -35,17 +35,25 @@ const Block = (props: BlockProps) => {
     } = props;
 
     const {board, setBoard, comment, setNewComment, newComment} = useContext(BoardProvider);
-    const {isPublic, membersOnly, title} = board?.data;
 
     const {blockService, setBlockService, commentService, setCommentService, selectedBlock} = useContext(BlockProvider);
-    const [touch, setTouch] = useState(setTimeout(() => false, 0));
     const [contextMenu, setContextMenu] = useState<ContextMenuProps>({} as ContextMenuProps);
 
+    const timeout = useRef<NodeJS.Timeout>();
+
     const block = useMemo(() =>
-        blockTypeList.find(b => b.code === props.code)
+        blockTypeFlatList.find(b =>
+            b.code === props.code
+        )
     , [props.code]);
 
     const Component = block?.component!;
+
+    useEffect(()=> {
+        return () => {
+            if(timeout.current) clearTimeout(timeout.current);
+        }
+    },[])
 
     const onFocusHandler = (e: React.FocusEvent<HtmlElements>) => {
         if (e.currentTarget.ariaRoleDescription !== 'text') {
@@ -122,7 +130,7 @@ const Block = (props: BlockProps) => {
         }
 
         if(type === 'detailView') {
-            const block = blockTypeList.find(b=> b.code === code);
+            const block = blockTypeFlatList.find(b=> b.code === code);
 
             let url = '';
 
@@ -149,7 +157,6 @@ const Block = (props: BlockProps) => {
             }
             return item;
         });
-
         setBoard({...board, data: {...board.data, content: {list: newList}}});
     }
 
@@ -181,7 +188,7 @@ const Block = (props: BlockProps) => {
         navigator.clipboard.writeText(url);
         setContextMenu({...contextMenu, isView: false, mode: 'url'});
 
-        setTimeout(() => {
+        timeout.current = setTimeout(() => {
             setContextMenu({} as ContextMenuProps);
         },700);
     },[contextMenu]);
@@ -191,7 +198,7 @@ const Block = (props: BlockProps) => {
 
         setContextMenu({...contextMenu, isView: false, mode: 'answer'});
 
-        setTimeout(() => {
+        timeout.current = setTimeout(() => {
             if(board.data.isLogin) setNewComment({...newComment, blockSeq: hash});
             setContextMenu({} as ContextMenuProps);
         }, 700);
@@ -203,11 +210,11 @@ const Block = (props: BlockProps) => {
 
         e.preventDefault();
         const touchTime = 400;
-        if(touch) clearTimeout(touch);
+        if(timeout.current) clearTimeout(timeout.current);
 
-        setTouch(setTimeout(() => {
+        timeout.current = setTimeout(() => {
             contextLinkHandler(e);
-        }, touchTime));
+        }, touchTime);
     }
 
     return (
@@ -217,7 +224,7 @@ const Block = (props: BlockProps) => {
         ].join(' ')}
              onContextMenu={contextLinkHandler}
              onTouchStart={shareLinkLongTouchHandler}
-             onTouchEnd={() => clearTimeout(touch)}
+             onTouchEnd={() => clearTimeout(timeout.current)}
         >
             {
                 contextMenu.isView

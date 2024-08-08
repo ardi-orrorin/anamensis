@@ -1,6 +1,8 @@
 import {NextRequest, NextResponse} from "next/server";
 import {WebSysI} from "@/app/user/system/page";
 import apiCall from "@/app/{commons}/func/api";
+import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
+import {AxiosError} from "axios";
 
 export async function GET() {
     try {
@@ -12,13 +14,18 @@ export async function GET() {
             isReturnData: true,
         });
 
-        return new NextResponse(JSON.stringify(res), {
+        return ExNextResponse({
+            body: JSON.stringify(res),
             status: 200,
         });
-    } catch (error) {
-        return new NextResponse('권한이 없습니다.', {
-            status: 403,
-        });
+
+    } catch (e) {
+        const err = e as AxiosError;
+        const message = err.status == 403 ? '권한이 없습니다.' : '서버 오류입니다.';
+        return ExNextResponse({
+            body: JSON.stringify({message}),
+            status: err.status || 500,
+        })
     }
 
 }

@@ -1,11 +1,10 @@
 import {useHotkeys} from "react-hotkeys-hook";
 import {Options} from "react-hotkeys-hook/src/types";
-import {blockTypeList} from "@/app/board/{components}/block/list";
 import {BlockI} from "@/app/board/{services}/types";
-import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {BlockService} from "@/app/board/{services}/BlockProvider";
 import {BoardService} from "@/app/board/{services}/BoardProvider";
 import {Dispatch, SetStateAction} from "react";
+import {blockTypeFlatList} from "@/app/board/{components}/block/list";
 
 export const useBoardHotKey = ({
     blockService,
@@ -35,7 +34,7 @@ export const useBoardHotKey = ({
         const seq = document.activeElement?.parentElement?.id.split('-')[2];
         if(!seq) return;
 
-        const block = blockTypeList.find(item => item.shortcut === 'mod+' + handler.keys?.join(''));
+        const block = blockTypeFlatList.find(item => item.shortcut === 'mod+' + handler.keys?.join(''));
         if(!block) return;
 
         const newList = board.data?.content?.list.map((item, index) => {

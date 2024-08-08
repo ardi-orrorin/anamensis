@@ -20,9 +20,9 @@ public class TokenProvider {
 
     private SecretKey SECRET_KEY;
 
-    // 일 * 시 * 분 * 초 * 밀리초
-    public final long ACCESS_EXP  =  1 * 30 * 60 * 1000;
-    public final long REFRESH_EXP = 30 * 24 * 60 * 60 * 1000;
+    // 일 * 시 * 분 * 초
+    public final long ACCESS_EXP  =      24 * 60 * 60;
+    public final long REFRESH_EXP = 30 * 24 * 60 * 60;
 
     public String generateToken(String userId, boolean isRefresh) {
         SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
@@ -35,7 +35,7 @@ public class TokenProvider {
         return Jwts.builder()
             .claims(claims.build())
             .expiration(
-                new Timestamp(Instant.now().toEpochMilli() + exp)
+                new Timestamp(Instant.now().toEpochMilli() + exp * 1000)
             )
             .signWith(SECRET_KEY)
             .compact();

@@ -69,10 +69,10 @@ public class BoardController {
         if(condition) {
             list = boardService.findOnePage();
         } else {
-            list = (user != null)
-                ? userService.findUserByUserId(user.getUsername())
-                    .flatMapMany(u -> boardService.findAll(page, params, u))
-                : boardService.findAll(page, params, new Member());
+            list = user == null
+                ? boardService.findAll(page, params, new Member())
+                : userService.findUserByUserId(user.getUsername())
+                    .flatMapMany(u -> boardService.findAll(page, params, u));
         }
 
         return list
@@ -98,7 +98,7 @@ public class BoardController {
                 .subscribeOn(Schedulers.boundedElastic())
                 .share();
 
-        Mono<BoardResultMap.Board> content = (user == null)
+        Mono<BoardResultMap.Board> content = user == null
             ? boardService.findByPk(boardPk)
             : member.flatMap(u -> boardService.cacheFindByPk(boardPk));
 
@@ -125,10 +125,6 @@ public class BoardController {
             .map(Tuple2::getT1)
             .doOnNext($ -> {
                 boardService.viewUpdateByPk(boardPk)
-                    .subscribeOn(Schedulers.boundedElastic())
-                    .subscribe();
-
-                boardService.refreshCacheBoard(boardPk)
                     .subscribeOn(Schedulers.boundedElastic())
                     .subscribe();
             });
@@ -187,8 +183,8 @@ public class BoardController {
         @AuthenticationPrincipal UserDetails user
     ) {
         if(board.getCategoryPk() == 1) {
-            if(!user.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ADMIN")))
-                return Mono.error(new RuntimeException("권한이 없습니다."));
+            if(user.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ADMIN")))
+                return Mono.error(new RuntimeException("공지사항은 관리자 권한이 필요합니다."));
         }
 
         Mono<PointCode> pointCode = pointService.selectByIdOrTableName("board")

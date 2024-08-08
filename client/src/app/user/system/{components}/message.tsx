@@ -1,4 +1,4 @@
-import ModalProvider, {ModalI} from "@/app/user/{services}/modalProvider";
+import ModalProvider, {ModalI} from "@/app/user/system/{services}/modalProvider";
 import React, {useContext, useEffect, useMemo, useState} from "react";
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
@@ -18,6 +18,7 @@ export interface SysMessageI {
     extra4: string;
     extra5: string;
     isUse: boolean;
+    [key: string]: string | boolean;
 }
 
 export type LoadingType = {
@@ -178,15 +179,15 @@ const Message = () => {
     const textareaStyle = `resize-none outline-0 text-sm p-2 rounded h-12 overflow-y-hidden focus:bg-blue-100 focus:h-52 focus:overflow-y-auto duration-500`
 
     return (
-        <div className={'absolute z-20 w-full min-h-screen flex justify-center items-center duration-1000'}
+        <div className={'fixed z-30 top-0 left-0 w-full min-h-screen flex justify-center items-center duration-500 bg-gray-600 bg-opacity-50'}
              onClick={modalClose}
         >
-            <div className={['absolute z-10 lg:w-2/3 lg:h-[800px] w-full h-screen bg-white flex flex-col rounded drop-shadow-2xl p-10 overflow-y-auto duration-500'].join(' ')}
+            <div className={['absolute z-10 lg:w-2/3 lg:h-[800px] w-full h-screen bg-white flex flex-col gap-4 rounded drop-shadow-2xl p-5 overflow-y-auto duration-500'].join(' ')}
                 onClick={stopPropagation}
             >
-                <header className={'flex w-full py-3 justify-between items-center'}>
+                <header className={'flex w-full justify-between items-center'}>
                     <span className={'text-xl font-bold'}>
-                        TITLE
+                        시스템 메시지 수정 및 추가
                     </span>
                     <button onClick={modalClose}>
                         <FontAwesomeIcon icon={faXmark} height={8} className={'text-xl hover:text-blue-600 duration-300'} />
@@ -216,86 +217,50 @@ const Message = () => {
                                       onChange={onChangeHandler}
                             />
                         </div>
-                        <div className={'flex flex-col gap-2'}>
-                            <span>
-                                추가1
-                            </span>
-                            <textarea className={textareaStyle}
-                                      placeholder={'메시지 내용을 입력하세요'}
-                                      name={'extra1'}
-                                      value={message.extra1}
-                                      onChange={onChangeHandler}
-                            />
-                        </div>
-                        <div className={'flex flex-col gap-2'}>
-                            <span>
-                                추가2
-                            </span>
-                            <textarea className={textareaStyle}
-                                      placeholder={'메시지 내용을 입력하세요'}
-                                      name={'extra2'}
-                                      value={message.extra2}
-                                      onChange={onChangeHandler}
-                            />
-                        </div>
-                        <div className={'flex flex-col gap-2'}>
-                            <span>
-                                추가3
-                            </span>
-                            <textarea className={textareaStyle}
-                                      placeholder={'메시지 내용을 입력하세요'}
-                                      name={'extra3'}
-                                      value={message.extra3}
-                                      onChange={onChangeHandler}
-
-                            />
-                        </div>
-                        <div className={'flex flex-col gap-2'}>
-                            <span>
-                                추가4
-                            </span>
-                            <textarea className={'outline-0 text-sm p-2 rounded h-12 overflow-y-hidden focus:bg-blue-100 focus:h-52 focus:overflow-y-auto duration-500'}
-                                      placeholder={'메시지 내용을 입력하세요'}
-                                      name={'extra4'}
-                                      value={message.extra4}
-                                      onChange={onChangeHandler}
-                            />
-                        </div>
-                        <div className={'flex flex-col gap-2'}>
-                            <span>
-                                추가5
-                            </span>
-                            <textarea className={'outline-0 text-sm p-2 rounded h-12 overflow-y-hidden focus:bg-blue-100 focus:h-52 focus:overflow-y-auto duration-500'}
-                                      placeholder={'메시지 내용을 입력하세요'}
-                                      name={'extra5'}
-                                      value={message.extra5}
-                                      onChange={onChangeHandler}
-                            />
-                        </div>
+                        {
+                            Array.from({length: 5}, (_, index) => {
+                                const extra = `extra${index+1}`;
+                                return (
+                                    <div key={extra} className={'flex flex-col gap-2'}>
+                                        <span>
+                                            추가{index + 1}
+                                        </span>
+                                        <textarea className={textareaStyle}
+                                                  placeholder={'메시지 내용을 입력하세요'}
+                                                  name={extra}
+                                                  value={message[extra] as string}
+                                                  onChange={onChangeHandler}
+                                        />
+                                    </div>
+                                )
+                            })
+                        }
                         <div className={'flex gap-3 duration-300'}>
                             {
-                                init &&
-                                <button className={'w-full bg-blue-300 hover:bg-blue-600 text-white p-2 rounded duration-300'}
+                                init
+                                && <button className={'w-full bg-blue-300 hover:bg-blue-600 text-white p-2 rounded duration-300'}
                                         onClick={()=>submitMessageHandler(true, false)}
                                 >
-                                  등록
+                                    등록
                                 </button>
                             }
                             {
-                                edit && !init &&
-                              <button className={'w-full bg-blue-300 hover:bg-blue-600 text-white p-2 rounded duration-300'}
+                                edit
+                                && !init
+                                && <button className={'w-full bg-blue-300 hover:bg-blue-600 text-white p-2 rounded duration-300'}
                                       onClick={()=>submitMessageHandler(false, false)}
-                              >
-                                수정
-                              </button>
+                                >
+                                    수정
+                                </button>
                             }
                             {
-                                edit && !init &&
-                              <button className={'w-full bg-red-300 hover:bg-red-600 text-white p-2 rounded duration-300'}
+                                edit
+                                && !init
+                                && <button className={'w-full bg-red-300 hover:bg-red-600 text-white p-2 rounded duration-300'}
                                       onClick={()=>submitMessageHandler(false, true)}
-                              >
-                                삭제
-                              </button>
+                                >
+                                    삭제
+                                </button>
                             }
                         </div>
                         {

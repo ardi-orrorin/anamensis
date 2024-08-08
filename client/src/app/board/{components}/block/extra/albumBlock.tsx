@@ -32,7 +32,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
     }: ExpendBlockProps = props;
 
     const maxImage = 30;
-    const oneFileLength = 5;
+    const oneFileLength = 30;
     const maxFileSize = 5 * 1024 * 1024;
 
     const extraValue = props.extraValue as ImageShowProps;
@@ -55,6 +55,8 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         viewToggle: false,
     } as AlbumToggleType);
 
+    const [waitUpload, setWaitUpload] = useState<boolean>(false);
+
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -69,7 +71,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         } as ImageShowProps);
     },[]);
 
-    const onChangeHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if(!files) return;
         if(files.length > oneFileLength) {
@@ -93,26 +95,30 @@ const AlbumBlock = (props: ExpendBlockProps) => {
 
         const progress: number[] = [];
 
-
         let size = 0;
 
         for(const file of files) {
             file.size > maxFileSize || size++;
         }
 
+        setWaitUpload(true);
         setUploadProgress({
             size,
             progress: 0,
         });
 
-        for(const file of files) {
-            upload(file, fileContent, uploadedImages, size, progress);
+        for(let i = 0 ; i < files.length ; i += 2) {
+            await Promise.allSettled([
+                upload(files[i], fileContent, uploadedImages, size, progress),
+                upload(files[i + 1], fileContent, uploadedImages, size, progress),
+            ]);
         }
 
         e.target.value = '';
-    },[extraValue, isView, title, membersOnly, isPublic]);
+        setWaitUpload(false);
+    }
 
-    const upload = useCallback(async (file: File, fileContent: FileContentType, uploadedImages: string[], size: number, progress: number[]) => {
+    const upload = async (file: File, fileContent: FileContentType, uploadedImages: string[], size: number, progress: number[]) => {
 
         if(file.size > maxFileSize) return;
 
@@ -161,7 +167,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
             ...extraValue,
             images: [...extraValue.images, ...uploadedImages],
         } as ImageShowProps);
-    },[extraValue, isView, title, membersOnly, isPublic]);
+    }
 
 
     const onChangeModeHandler = useCallback((mode: string) => {
@@ -229,7 +235,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         defaultIndex : extraValue?.defaultIndex ?? 0,
         deleteImageHandler,
         onChaneDefaultIndexHandler,
-    }),[isView, extraValue]);
+    }),[isView, extraValue, title]);
 
     const modes = useMemo(() => [
         {icon: faBorderAll, mode: 'thumbnail', component: <Thumbnail {...componentProps}/>},
@@ -275,11 +281,13 @@ const AlbumBlock = (props: ExpendBlockProps) => {
                 && extraValue?.images?.length < maxImage
                 && <div className={'w-full flex justify-center'}>
                     <button className={'w-full flex flex-col justify-center items-center gap-3 py-4 px-2 bg-white rounded border border-solid border-gray-200'}
+                            disabled={waitUpload}
                             onClick={() => inputRef.current?.click()}
                     >
                         <p>
                             {
-                                uploadProgress?.size === uploadProgress?.progress
+                                uploadProgress?.size !== 0
+                                && uploadProgress?.size === uploadProgress?.progress
                                 ? '이미지 업로드 완료'
                                 : '이미지 업로드 진행중 (최대 30개)'
                             }
@@ -314,7 +322,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
                            onChange={onChangeHandler}
                            ref={inputRef}
                            hidden={true}
-                           disabled={extraValue.images.length >= maxImage}
+                           disabled={waitUpload || extraValue.images.length >= maxImage}
                            max={10}
                     />
                 </div>

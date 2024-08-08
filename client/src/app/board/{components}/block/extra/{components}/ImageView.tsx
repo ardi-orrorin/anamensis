@@ -12,7 +12,6 @@ const ImageView = ({
 } : {
     images: string[];
 }) => {
-
     const {albumToggle, setAlbumToggle} = useContext(AlbumProvider);
 
     const prevImage = useCallback((e: React.MouseEvent) => {
@@ -66,7 +65,7 @@ const ImageView = ({
                     <FontAwesomeIcon icon={faXmark} />
                 </button>
                 <Image src={defaultNoImg(albumToggle.viewImage)}
-                       className={'w-auto max-w-[90%] h-auto max-h-[90%] bg-white'}
+                       className={'w-auto max-w-[90%] h-auto max-h-[90%] bg-white shadow-md drop-shadow-md rounded-md'}
                        width={1200}
                        height={1200}
                        priority={true}
@@ -76,7 +75,7 @@ const ImageView = ({
                        }}
                 />
                 <div className={'z-40 fixed top-0 left-0 w-full h-full flex justify-between'}>
-                    <button className={'min-w-[25%] w-[25%] h-full flex justify-center items-center shadow-md'}
+                    <button className={'min-w-[25%] w-[25%] h-full flex justify-center items-center'}
                             onClick={prevImage}
                     >
                         <span className={'w-[50px] h-[50px] flex justify-center items-center  bg-white rounded-full'}>
@@ -96,7 +95,7 @@ const ImageView = ({
                     </button>
                 </div>
             </div>
-            <div className={'z-10 fixed left-0 top-0 w-full h-full bg-gray-800 opacity-40'} />
+            <div className={'z-10 fixed left-0 top-0 w-full h-full bg-gray-800 opacity-70'} />
         </>
     )
 }

@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.annotation.NonNull;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -38,7 +39,6 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
-@Slf4j
 public class UserService implements ReactiveUserDetailsService {
 
     @Value("${db.setting.user.attendance_point_code_prefix}")
@@ -76,7 +76,6 @@ public class UserService implements ReactiveUserDetailsService {
 
 
     public Mono<Member> findUserByUserId(String userId) {
-        log.info("findUserByUserId: {}", userId);
         return Mono.justOrEmpty(memberMapper.findMemberByUserId(userId))
                 .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
     }
@@ -242,6 +241,12 @@ public class UserService implements ReactiveUserDetailsService {
                 .onErrorReturn(false);
     }
 
+    public Mono<Boolean> confirmPassword(String userId, String pwd) {
+        return Mono.justOrEmpty(memberMapper.findMemberByUserId(userId))
+            .switchIfEmpty(Mono.error(new RuntimeException("User not found")))
+            .map(member -> bCryptPasswordEncoder.matches(pwd, member.getPwd()));
+    }
+
     public Mono<Boolean> changeAuthAlertEmail(
         Member member,
         AuthType authType
@@ -310,5 +315,16 @@ public class UserService implements ReactiveUserDetailsService {
             })
             .onErrorReturn(false);
 
+    }
+
+    public Mono<Boolean> changePwd(String userId, String newPwd) {
+        if(newPwd.length() < 8 || newPwd.length() > 255) {
+            return Mono.error(new RuntimeException("Password must be at least 8 characters"));
+        }
+
+        String password = bCryptPasswordEncoder.encode(newPwd);
+
+        return Mono.fromCallable(() -> memberMapper.updatePwd(userId, password, "") > 0)
+                .onErrorReturn(false);
     }
 }

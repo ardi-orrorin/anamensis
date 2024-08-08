@@ -1,4 +1,4 @@
-import axios, {AxiosError, AxiosHeaders, AxiosRequestConfig, AxiosResponse} from "axios";
+import axios, {AxiosHeaders, AxiosRequestConfig, AxiosResponse} from "axios";
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export type Call = 'Proxy' | 'Server';
@@ -20,8 +20,6 @@ export type ApiCallProps = {
 async function apiCall<R = any, I = any>(props: ApiCallProps & { isReturnData: true }): Promise<R>;
 async function apiCall<R = any, I = any>(props: ApiCallProps & { isReturnData: false}): Promise<AxiosResponse<R>>;
 async function apiCall<R = any, I = any>(props: ApiCallProps): Promise<AxiosResponse<R>>;
-
-
 
 async function apiCall <R = any, I = any>(props: ApiCallProps): Promise<R | AxiosResponse<R>> {
     const {path, method

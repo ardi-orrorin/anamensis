@@ -38,14 +38,12 @@ public class AuthConverter implements ServerAuthenticationConverter {
         String userId = claims.get("user", String.class);
         if(claims.get("type").equals("refresh")) {
             ResponseCookie cookie = ResponseCookie.from("next.access.token", tokenProvider.generateToken(userId, true))
-                    .maxAge(tokenProvider.ACCESS_EXP / 1000)
+                    .maxAge(tokenProvider.ACCESS_EXP)
                     .build();
 
             exchange.getResponse().addCookie(cookie);
         }
 
-
-        log.info("userId: {}", userId);
         return userService.findByUsername(userId)
                 .onErrorMap(e -> new RuntimeException("유저 정보가 없습니다."))
                 .map(u -> new UsernamePasswordAuthenticationToken(u, token, u.getAuthorities()));

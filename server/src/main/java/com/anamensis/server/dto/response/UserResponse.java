@@ -75,6 +75,7 @@ public class UserResponse {
         private Boolean sAuth;
         private AuthType sAuthType;
         private String createAt;
+        private Boolean isOAuth;
 
         public static MyPage transToMyPage(MemberResultMap user) {
             MyPage my = new MyPage();
@@ -86,6 +87,7 @@ public class UserResponse {
             my.setSAuth(user.getMember().getSAuth());
             my.setSAuthType(user.getMember().getSAuthType());
             my.setCreateAt(user.getMember().getCreateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            my.setIsOAuth(user.getMember().isOAuth());
             return my;
         }
 
@@ -98,6 +100,7 @@ public class UserResponse {
             my.setPoint(users.getPoint());
             my.setSAuth(users.getSAuth());
             my.setSAuthType(users.getSAuthType());
+            my.setIsOAuth(users.isOAuth());
             return my;
         }
     }

@@ -1,7 +1,7 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCalendarDays, faCircleExclamation, faEye, faUser} from "@fortawesome/free-solid-svg-icons";
+import {faCalendarDays, faCircleExclamation, faUser} from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import {useMemo} from "react";
+import React from "react";
 import moment from "moment";
 
 export type NoticeType = {
@@ -14,20 +14,17 @@ export type NoticeType = {
 
 const Notices = ({data}: {data: NoticeType[]}) => {
 
-    const list = useMemo(()=>
-        data.map((notice, index) => {
-            return <Row key={'notice' + notice.id} data={notice} />
-        })
-    ,[data])
+    if(data.length === 0) return <></>
     return (
-        <div className={'w-full flex-col flex gap-3'}>
-            { list }
+        <div className={'w-full flex-col flex gap-3 pb-3'}>
+            {
+                data.map((notice, index) => {
+                    return <Row key={'notice' + notice.id} data={notice} />
+                })
+            }
         </div>
     )
 }
-
-export default Notices;
-
 
 const Row = ({data}: {data: NoticeType}) => {
     return (
@@ -63,3 +60,8 @@ const Row = ({data}: {data: NoticeType}) => {
         </Link>
     )
 }
+
+export default React.memo(Notices, (prevProps, nextProps) => {
+    return prevProps.data === nextProps.data;
+});
+

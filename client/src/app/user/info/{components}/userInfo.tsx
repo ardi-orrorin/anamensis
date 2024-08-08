@@ -1,12 +1,14 @@
 'use client';
 
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {LoadingType} from "@/app/user/info/page";
 import {UserInfoI} from "@/app/user/email/page";
 import moment from "moment";
+import Link from "next/link";
+import {AuthType} from "@/app/login/{services}/types";
 
 export const UserInfo = ({profileInfo}: {profileInfo: UserInfoI}) => {
 
@@ -108,7 +110,7 @@ export const UserInfo = ({profileInfo}: {profileInfo: UserInfoI}) => {
                     </span>
             </div>
             <div>
-                <button className={'w-full rounded bg-blue-300 text-white py-2'}
+                <button className={'w-full rounded bg-blue-300 text-white py-2 text-sm'}
                         onClick={onSubmitHandler}
                 >
                     {
@@ -118,6 +120,15 @@ export const UserInfo = ({profileInfo}: {profileInfo: UserInfoI}) => {
                     }
                 </button>
             </div>
+            {
+                !profile?.isOAuth
+                && <Link className={'w-full flex justify-center items-center rounded bg-blue-300 text-white py-2 text-sm'}
+                         href={'/user/info/change-password'}
+              >
+                비밀번호 변경
+              </Link>
+            }
+
         </div>
     );
 }

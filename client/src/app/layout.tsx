@@ -5,6 +5,9 @@ import Error from "@/app/error";
 import {Metadata, Viewport} from "next";
 import Script from "next/script";
 import Footer from "@/app/{components}/mainFooter";
+import {Suspense} from "react";
+import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
+import ProgressBar from "@/app/{components}/progressBar";
 
 export const metadata: Metadata = {
     title: 'anamensis',
@@ -45,7 +48,7 @@ export default function RootLayout({
 }) {
 
     const gId = process.env.NEXT_PUBLIC_GID;
-    
+
     return (
         <html lang="ko">
             <Script id={'google-analytics'} async
@@ -60,13 +63,16 @@ export default function RootLayout({
                 gtag('config', 'G-${gId}');
                 `
             }} />
-            <body>
-                <NavMain />
-                <div className={'min-h-screen h-full'}>
-                    <ErrorBoundary errorComponent={Error}>
-                        {children}
-                    </ErrorBoundary>
-                </div>
+            <body className={'flex flex-col'}>
+                <ProgressBar />
+                <Suspense fallback={<GlobalLoadingSpinner />}>
+                    <NavMain />
+                    <div className={'min-h-screen h-full'}>
+                        <ErrorBoundary errorComponent={Error}>
+                            {children}
+                        </ErrorBoundary>
+                    </div>
+                </Suspense>
                 <Footer />
             </body>
         </html>

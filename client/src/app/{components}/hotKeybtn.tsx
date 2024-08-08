@@ -1,3 +1,5 @@
+import React from "react";
+
 const HotKeyBtn = ({hotkey}: {hotkey: string[]}) => {
     return (
         <div className={'flex gap-1'}>
@@ -14,4 +16,4 @@ const HotKeyBtn = ({hotkey}: {hotkey: string[]}) => {
     )
 }
 
-export default HotKeyBtn;
+export default React.memo(HotKeyBtn, () => true);

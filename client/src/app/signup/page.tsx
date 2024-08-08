@@ -5,11 +5,8 @@ import Row from "@/app/signup/Row";
 import EmailTemplate from "@/app/signup/EmailTemplate";
 import {useRouter} from "next/navigation";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import axios from "axios";
-import {
-    pickFontFileForFallbackGeneration
-} from "next/dist/compiled/@next/font/dist/local/pick-font-file-for-fallback-generation";
 import apiCall from "@/app/{commons}/func/api";
+import Footer from "@/app/find-user/{components}/footer";
 
 export interface UserProps {
     id            : string;
@@ -63,6 +60,7 @@ export default function Page() {
     const [emailSelect, setEmailSelect] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [timer, setTimer] = useState<number>(-1);
+    const timeout = useRef<NodeJS.Timeout>();
 
     const [user, setUser] = useState<UserProps>({
         id         : '',
@@ -94,6 +92,12 @@ export default function Page() {
         phone      : '휴대폰 번호를 입력하세요. ex) 010-1234-5678',
     });
 
+    useEffect(()=>{
+        return () => {
+            clearInterval(timeout.current);
+        }
+    },[])
+
     useEffect(() => {
         const {id, pwd, pwdCheck, name, email, emailCheck, phone} = user;
 
@@ -119,9 +123,6 @@ export default function Page() {
             phone      : phone.length === 0 ? 'uncheck' : check.phone,
         });
     },[user]);
-
-
-
 
     const setProps = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
@@ -277,7 +278,6 @@ export default function Page() {
     }
 
     const verifyCode = async () => {
-
         await apiCall<any, {email: string, code: string}>({
             path: '/api/signup/verify',
             method: 'POST',
@@ -296,9 +296,9 @@ export default function Page() {
     const checkTimer = () => {
         let time = 10 * 60; // unit : second
         setTimer(time);
-        const interval = setInterval(() => {
+        timeout.current = setInterval(() => {
             if(time === 0) {
-                clearInterval(interval);
+                clearInterval(timeout.current);
             }
             time--;
             setTimer(time);
@@ -420,6 +420,7 @@ export default function Page() {
                         </button>
                     </div>
                 </div>
+                <Footer isSignUp={true} />
             </div>
         </main>
     )

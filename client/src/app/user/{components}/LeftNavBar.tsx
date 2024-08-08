@@ -65,7 +65,7 @@ const LeftNavBar = ({
         });
     },[])
 
-    const initFetch = useSWR('/user/navBar', async () => {
+    useSWR('/user/navBar', async () => {
         await apiCall({
             path: '/api/user/roles',
             method: 'GET',
@@ -76,6 +76,8 @@ const LeftNavBar = ({
                 setRoles(JSON.parse(res.headers['next.user.roles']));
             }
         });
+    },{
+        revalidateOnFocus: false
     });
 
     const openToggle = useCallback(() => {
@@ -152,6 +154,8 @@ const LeftNavBar = ({
                                alt={''}
                                width={110}
                                height={110}
+                               priority={true}
+                               fetchPriority={"high"}
                                onError={e => {
                                      e.currentTarget.src = NO_IMAGE;
                                }}
@@ -240,17 +244,19 @@ const LeftNavBar = ({
                 </li>
                 {
                     !isOAuthUser
-                    && <li className={'w-full'}>
+                    && <>
+                      <li className={'w-full'}>
                         <Link className={'text text-white w-full'}
                               href={'/user/otp'}
                               onClick={onChangeDisabledHandler}
-                        >
-                        <div className={'w-full flex gap-2 p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
-                            <FontAwesomeIcon icon={faKey} width={iconSize} />
-                          <span className={isModalMode ? '' : 'hidden sm:inline'}>OTP</span>
-                        </div>
-                    </Link>
-                  </li>
+                            >
+                            <div className={'w-full flex gap-2 p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
+                                <FontAwesomeIcon icon={faKey} width={iconSize} />
+                              <span className={isModalMode ? '' : 'hidden sm:inline'}>OTP</span>
+                            </div>
+                        </Link>
+                      </li>
+                    </>
                 }
                 { roleMenu }
             </ul>
@@ -265,4 +271,7 @@ const LeftNavBar = ({
     )
 }
 
-export default LeftNavBar;
+export default React.memo(LeftNavBar, (prev, next) => {
+    return prev.isOpen      === next.isOpen
+        && prev.isModalMode === next.isModalMode;
+});

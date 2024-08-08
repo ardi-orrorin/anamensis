@@ -35,6 +35,7 @@ import {useBoardHotKey} from "@/app/board/[id]/{hooks}/hotkey";
 import TemplateMenu from "@/app/board/[id]/{components}/templateMenu";
 import ModalProvider from "@/app/user/board-block/{services}/modalProvider";
 import BoardblockModal from "@/app/board/[id]/{components}/boardblockModal";
+import {AxiosError} from "axios";
 
 export interface RateInfoI {
     id      : number;
@@ -43,24 +44,23 @@ export interface RateInfoI {
 }
 
 // fixme: 뒤로가기 등 강제 이동시 파일 삭제 처리 안됨
-
 export default function Page({params}: {params : {id: string}}) {
 
     const {
         board, setBoard
         , rateInfo, setRateInfo
-        , isFavorite, setIsFavorite,
-        isNewBoard, isTemplate,
-        boardTemplate, setBoardTemplate,
-        roles,
+        , isFavorite, setIsFavorite
+        , isNewBoard, isTemplate
+        , boardTemplate, setBoardTemplate
+        , roles,  summary
     } = useContext(BoardProvider);
 
     const {
-        blockService, setSelectedBlock
+        blockService
     } = useContext(BlockProvider);
 
     const {
-        loading, setLoading
+        setLoading
         , commentLoading
     } = useContext(LoadingProvider);
 
@@ -80,6 +80,30 @@ export default function Page({params}: {params : {id: string}}) {
     const categoryName = useMemo(() =>
         Category.findById(board.data?.categoryPk.toString())?.name
     ,[board?.data?.categoryPk]);
+
+    const favoriteConf = useMemo(() =>
+        !isNewBoard
+        && !isTemplate
+        && board.isView
+        && board.data.isPublic
+        && board.data.isLogin
+    ,[isNewBoard, isTemplate, board.isView, board.data?.isPublic, board.data?.isLogin]);
+
+    const newSaveConf = useMemo(() =>
+        isNewBoard || (isTemplate && !boardTemplate?.isApply)
+    ,[isNewBoard, isTemplate, boardTemplate.isApply]);
+
+    const updateSaveConf = useMemo(() =>
+        !isNewBoard
+        && (!isTemplate || boardTemplate.isApply)
+        && !board.isView
+    , [isNewBoard, isTemplate, boardTemplate.isApply, board.isView]);
+
+    const viewBoardInfoConf = useMemo(() =>
+        !isNewBoard
+        && !isTemplate
+        && board.isView
+    ,[isNewBoard, isTemplate, board.isView]);
 
     const router = useRouter();
 
@@ -154,7 +178,16 @@ export default function Page({params}: {params : {id: string}}) {
             }
 
         } catch (e) {
-            alert('저장에 실패했습니다.');
+            const err = e as AxiosError;
+
+            const message = err?.response?.status === 400
+                ? err.response.data
+                : err?.response?.status === 500
+                ? '저장에 실패했습니다.'
+                : '로그인이 필요합니다.';
+
+            alert(message);
+
             setLoading(false);
         }
     }
@@ -174,7 +207,7 @@ export default function Page({params}: {params : {id: string}}) {
     },[]);
 
     const addBlockHandler = (seq: number, value?: string) => {
-        const list = board.data?.content?.list;
+        const list = [...board.data?.content?.list];
         if (!list) return ;
 
         list.push(addBlock(seq, false, value));
@@ -185,7 +218,7 @@ export default function Page({params}: {params : {id: string}}) {
     }
 
     const onChangeHandler = (e: ChangeEvent<HtmlElements>, seq: number) => {
-        const list = board.data?.content?.list;
+        const list = [...board.data?.content?.list];
         if (!list) return ;
 
         const onChange = onChangeBlockGlobalHandler({
@@ -251,6 +284,7 @@ export default function Page({params}: {params : {id: string}}) {
         );
 
         if(!fileBlock) return ;
+        if(!fileBlock?.value) return ;
 
         if(isNewBoard) {
             await apiCall({
@@ -371,34 +405,31 @@ export default function Page({params}: {params : {id: string}}) {
                     }
                 </div>
                 <div className={'flex flex-col sm:flex-row justify-between gap-3 h-auto border-b-2 border-solid border-main py-3'}>
-                    {
-                        !isNewBoard
-                        && !isTemplate
-                        && board.isView
-                        && board.data.isPublic
-                        && board.data.isLogin
-                        && <button onClick={onClickFavoriteHandler}>
-                            {
-                                isFavorite
-                                    ? <FontAwesomeIcon icon={faStarSolid} className={'text-yellow-600'} />
-                                    : <FontAwesomeIcon icon={faStarRegular} className={'text-yellow-600'} />
-                            }
-                        </button>
-                    }
-                    <BoardTitle board={board}
-                                newBoard={isNewBoard}
-                                onChange={onChangeTitleHandler}
-                                onKeyDown={e => onKeyDownHandler(e, 0, true)}
-                    />
-                    <div className={'flex justify-end sm:justify-start gap-2 h-10 sm:h-auto'}>
+                    <div className={'flex w-full gap-2'}>
+                        {
+                            favoriteConf
+                            && <button onClick={onClickFavoriteHandler}>
+                                {
+                                    isFavorite
+                                        ? <FontAwesomeIcon icon={faStarSolid} className={'text-yellow-600'} />
+                                        : <FontAwesomeIcon icon={faStarRegular} className={'text-yellow-600'} />
+                                }
+                          </button>
+                        }
+                        <BoardTitle board={board}
+                                    newBoard={isNewBoard}
+                                    onChange={onChangeTitleHandler}
+                                    onKeyDown={e => onKeyDownHandler(e, 0, true)}
+                        />
+                    </div>
+                    <div className={'flex justify-end sm:justify-start gap-2 h-auto'}>
                         {
                             !isNewBoard
                             && !isTemplate
-                            && <HeaderBtn roles={roles}
-                                          submitClickHandler={() => debounce(() => submitHandler(false))}
-                                          editClickHandler={editClickHandler}
+                            && <HeaderBtn submitClickHandler={() => debounce(() => submitHandler(false))}
                                           deleteClickHandler={() => debounce(() => deleteHandler())}
                                           blockClickHandler={() => debounce(() => onBlockClickHandler())}
+                                          {...{roles, board, editClickHandler}}
                             />
                         }
                         <div className={'flex gap-1'}>
@@ -407,7 +438,7 @@ export default function Page({params}: {params : {id: string}}) {
                                 && <>
                                     <button
                                       className={[
-                                          'w-16 rounded h-full border-2 py-1 px-3 text-xs duration-300',
+                                          'w-16 rounded h-14 border-2 py-1 px-3 text-xs duration-300',
                                           board.data?.isPublic
                                               ? 'text-blue-600 border-blue-200 hover:bg-blue-200 hover:text-white'
                                               : 'text-red-600 border-red-200 hover:bg-red-200 hover:text-white'
@@ -418,7 +449,7 @@ export default function Page({params}: {params : {id: string}}) {
                                     > { board.data?.isPublic ? '공개' : '비공개' }
                                     </button>
                                     <button className={[
-                                            'w-16 rounded h-full border-2 py-1 px-3 text-xs duration-300 whitespace-pre',
+                                            'w-16 rounded h-14 border-2 py-1 px-3 text-xs duration-300 whitespace-pre',
                                             board.data?.membersOnly
                                                 ? 'text-red-600 border-red-200 hover:bg-red-200 hover:text-white'
                                                 : 'text-blue-600 border-blue-200 hover:bg-blue-200 hover:text-white'
@@ -435,7 +466,7 @@ export default function Page({params}: {params : {id: string}}) {
                                 && <TemplateMenu />
                             }
                             <button
-                                className={'w-14 rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
+                                className={'w-14 rounded h-14 border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
                                 onClick={() => setFullScreen(!fullScreen)}>
                                 {
                                     fullScreen
@@ -452,10 +483,8 @@ export default function Page({params}: {params : {id: string}}) {
                 </div>
                 <div>
                     {
-                        !isNewBoard
-                        && !isTemplate
-                        && board.isView
-                        && <BoardInfo {...board}/>
+                        viewBoardInfoConf
+                        && <BoardInfo {...board.data}/>
                     }
                 </div>
                 <div className={['flex flex-col', board.isView ? 'gap-2' : 'gap-4'].join(' ')}>
@@ -481,7 +510,7 @@ export default function Page({params}: {params : {id: string}}) {
                 </div>
                 <div>
                     {
-                        (isNewBoard || (isTemplate && !boardTemplate?.isApply))
+                        newSaveConf
                         && <div className={'flex gap-1 justify-end mt-5'}>
                             <button
                               className={'w-full rounded h-full border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
@@ -491,9 +520,7 @@ export default function Page({params}: {params : {id: string}}) {
                         </div>
                     }
                     {
-                        !isNewBoard
-                        && (!isTemplate || boardTemplate.isApply)
-                        && !board.isView
+                        updateSaveConf
                         && <div className={'flex gap-1 justify-end mt-5'}>
                             <button
                               className={'w-full rounded h-10 border-2 border-blue-200 hover:bg-blue-200 hover:text-white py-1 px-3 text-sm duration-300'}
@@ -505,11 +532,12 @@ export default function Page({params}: {params : {id: string}}) {
                 </div>
                 <Rate newBoard={isNewBoard}
                       onClick={() => debounce(onChangeRateHandler)}
+                      {...{board, rateInfo}}
                 />
                 {
                     !isNewBoard
                     && board.isView
-                    && <WriterInfo />
+                    && <WriterInfo {...{board, summary}} />
                 }
                 {
                     !commentLoading

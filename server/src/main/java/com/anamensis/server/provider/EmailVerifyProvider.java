@@ -2,13 +2,11 @@ package com.anamensis.server.provider;
 
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Random;
 
 @Component
-@Slf4j
 @RequiredArgsConstructor
 public class EmailVerifyProvider {
 

@@ -1,5 +1,4 @@
 import {Dispatch, SetStateAction, useState} from "react";
-import axios from "axios";
 import {WebSysI} from "@/app/user/system/page";
 import {RoleType} from "@/app/user/system/{services}/types";
 import apiCall from "@/app/{commons}/func/api";

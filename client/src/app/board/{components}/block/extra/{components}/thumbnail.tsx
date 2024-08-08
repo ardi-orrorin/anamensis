@@ -1,4 +1,4 @@
-import React, {CSSProperties, useContext, useEffect, useMemo, useRef, useState} from "react";
+import React, {CSSProperties, useContext, useMemo, useRef, useState} from "react";
 import AlbumProvider from "@/app/board/{components}/block/extra/providers/albumProvier";
 import {defaultNoImg} from "@/app/{commons}/func/image";
 import DeleteOverlay from "@/app/board/{components}/block/extra/{components}/deleteOverlay";
@@ -23,7 +23,7 @@ const Thumbnail = ({
     const [columnToggle, setColumnToggle] = useState<boolean>(false);
     const divRef = useRef<HTMLDivElement>(null);
 
-    const { albumToggle, setAlbumToggle } = useContext(AlbumProvider);
+    const { setAlbumToggle } = useContext(AlbumProvider);
 
     const arrays = useMemo(() =>
         Array.from({length: 4}, (_, index) => {
@@ -68,10 +68,12 @@ const Thumbnail = ({
                            }}
                     />
                     {
-                        !isView && <DeleteOverlay {...{index, image, deleteImageHandler, setAlbumToggle, onChaneDefaultIndexHandler}} />
+                        !isView
+                        && <DeleteOverlay {...{index, image, deleteImageHandler, setAlbumToggle, onChaneDefaultIndexHandler}} />
                     }
                     {
-                        index === defaultIndex && <DefaultLabel />
+                        index === defaultIndex
+                        && <DefaultLabel />
                     }
                 </div>
             )

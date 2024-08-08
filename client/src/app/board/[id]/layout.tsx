@@ -60,7 +60,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
     const searchParams = useSearchParams();
 
     useEffect(() => {
-        if(!isNewBoard && !board?.isView || !isTemplate && !board?.isView || board.isView) return;
+        if(!isNewBoard && !board?.isView || isTemplate && !board?.isView || board.isView) return;
 
         const beforeunload = (e: BeforeUnloadEvent) => {
             e.preventDefault();
@@ -101,6 +101,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
                 case 3  : return {code: '00303', addBlock: true};
                 case 4  : return {code: '00301', addBlock: true};
                 case 5  : return {code: '00302', addBlock: true};
+                case 6  : return {code: '00410', addBlock: true};
                 default : return {code: '00005', addBlock: false};
             }
         }
@@ -134,9 +135,11 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
         setLoading(true);
 
-        fetchBoard();
+        Promise.allSettled([
+            fetchBoard(),
+            fetchRate()
+        ]);
 
-        fetchRate();
     },[params.id]);
 
 
@@ -203,7 +206,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
                     call: 'Proxy',
                     isReturnData: true
                 })
-            );
+            )
 
             setIsFavorite(isFavorite);
 

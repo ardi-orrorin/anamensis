@@ -1,5 +1,5 @@
 import {BlockI, BoardContentI, BoardI, BoardTemplate} from "@/app/board/{services}/types";
-import {blockTypeList} from "@/app/board/{components}/block/list";
+import {blockTypeFlatList} from "@/app/board/{components}/block/list";
 import {Dispatch, MutableRefObject, SetStateAction} from "react";
 import {TempFileI} from "@/app/board/{services}/TempFileProvider";
 import {BoardService} from "@/app/board/{services}/BoardProvider";
@@ -20,7 +20,7 @@ export const listSort = (list: BlockI[]) => {
 }
 
 export const notAvailDupCheck = (code: string, content: BoardContentI) : boolean => {
-    const findBlock = blockTypeList.find(item => item.code === code);
+    const findBlock = blockTypeFlatList.find(item => item.code === code);
     if(findBlock?.notAvailDup) {
         const isExist = content?.list.find(item => item.code === code);
         if(isExist) return true
@@ -126,7 +126,7 @@ export const onChangeBlockGlobalHandler = ({
 }) => {
     if(!value && !code) return;
 
-    const block = blockTypeList.find(item => {
+    const block = blockTypeFlatList.find(item => {
         return value ? item.command + ' ' === value
                      : code
                      ? item.code === code
@@ -143,24 +143,27 @@ export const onChangeBlockGlobalHandler = ({
 
     if(block.notAvailDup) return ;
 
-    const list = board.data?.content?.list;
+    const list = [...board.data?.content?.list];
 
-    const newList = list.map((item, index) => {
-        if(code && item.code.slice(0, 3) !== code.slice(0, 3)) {
+    list.map((item, index) => {
+        if(item.seq !== seq) return item;
+
+        if(item.code.slice(0, 3) !== block.code.slice(0, 3)) {
             item.extraValue = {};
             item.textStyle = {};
-        }
-        if (item.seq === seq) {
-            item.code = block.code;
             item.value = '';
         }
+
+        item.code = block.code;
+
         return item;
     });
 
     !blockRef?.current[seq + 1]
-    && newList.push(addBlock(seq + 1, true, '', true));
+    && list.push(addBlock(seq + 1, true, '', true));
 
-    setBoard({...board, data: {...board.data,  content: {list: newList}}});
+
+    setBoard({...board, data: {...board.data,  content: {list}}});
 
     setTimeout(() => {
         if(!blockRef?.current) return;

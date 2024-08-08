@@ -1,15 +1,15 @@
 import {NextRequest} from "next/server";
-import {PageResponse} from "@/app/{commons}/types/commons";
 import apiCall from "@/app/{commons}/func/api";
 import {AxiosError} from "axios";
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
 import {BoardBlock, BoardBlockHistoriesI} from "@/app/user/board-block/{services}/boardBlockProvider";
+import {Common} from "@/app/{commons}/types/commons";
 
 export async function GET(req: NextRequest){
     const params = req.nextUrl.searchParams;
 
     try {
-        const res = await apiCall<PageResponse<BoardBlockHistoriesI>, any>({
+        const res = await apiCall<Common.PageResponse<BoardBlockHistoriesI>, any>({
             path: '/api/board-block-history',
             method: 'GET',
             params,

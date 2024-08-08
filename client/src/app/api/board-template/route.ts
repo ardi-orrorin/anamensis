@@ -1,8 +1,8 @@
 import {NextRequest} from "next/server";
 import {BoardTemplate, boardTemplateList} from "@/app/board/{services}/types";
 import apiCall from "@/app/{commons}/func/api";
-import {StatusResponse} from "@/app/{commons}/types/commons";
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
+import {Common} from "@/app/{commons}/types/commons";
 
 export async function GET() {
     try{
@@ -32,7 +32,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
     const body = await req.json() as BoardTemplate;
 
-    const result = await apiCall<StatusResponse, BoardTemplate>({
+    const result = await apiCall<Common.StatusResponse, BoardTemplate>({
         path: '/api/board-template',
         method: 'POST',
         call: 'Server',
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
 export async function PUT(req:NextRequest) {
     const body = await req.json() as BoardTemplate;
 
-    const result = await apiCall<StatusResponse, BoardTemplate>({
+    const result = await apiCall<Common.StatusResponse, BoardTemplate>({
         path: '/api/board-template/',
         method: 'PUT',
         call: 'Server',

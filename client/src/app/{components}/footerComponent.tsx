@@ -2,11 +2,11 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faComment, faEye} from "@fortawesome/free-solid-svg-icons";
 import {RateColor} from "@/app/{commons}/types/rate";
 import {faHeart} from "@fortawesome/free-solid-svg-icons/faHeart";
-import {BoardListI} from "@/app/{components}/boardComponent";
 import moment from "moment";
 import {useMemo} from "react";
+import {Root} from "@/app/{services}/types";
 
-const FooterComponent = (props: BoardListI) => {
+const FooterComponent = (props: Root.BoardListI) => {
     const {
         rate , commentCount
         , createdAt, viewCount

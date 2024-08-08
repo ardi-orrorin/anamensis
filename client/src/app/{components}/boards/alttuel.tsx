@@ -3,11 +3,11 @@ import HeaderComponent from "@/app/{components}/headerComponent";
 import Image from "next/image";
 import {defaultNoImg} from "@/app/{commons}/func/image";
 import FooterComponent from "@/app/{components}/footerComponent";
-import React, {useCallback, useContext, useMemo} from "react";
-import {BoardListI} from "@/app/{components}/boardComponent";
+import React from "react";
 import {NO_IMAGE} from "@/app/{services}/constants";
+import {Root} from "@/app/{services}/types";
 
-const AlttuelBoardComponent = (props: BoardListI) => {
+const AlttuelBoardComponent = (props: Root.BoardListI) => {
     const { body} = props;
 
     const alttuelBlock =body?.filter((block) =>

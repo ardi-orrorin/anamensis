@@ -1,12 +1,12 @@
-import {BoardListI} from "@/app/{components}/boardComponent";
 import FooterComponent from "@/app/{components}/footerComponent";
 import React from "react";
 import HeaderComponent from "@/app/{components}/headerComponent";
 import {BlockI} from "@/app/board/{services}/types";
 import {EventExtraValue} from "@/app/board/{components}/block/extra/eventBlock";
 import moment from "moment/moment";
+import {Root} from "@/app/{services}/types";
 
-const CalenderComponent = (props: BoardListI) => {
+const CalenderComponent = (props: Root.BoardListI) => {
     const { body } = props;
 
     const eventBlocks = body?.filter((block) => {

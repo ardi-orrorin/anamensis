@@ -1,6 +1,5 @@
 import {createContext} from "react";
-import {UserInfoI} from "@/app/user/email/page";
-import {PageI} from "@/app/{commons}/types/commons";
+import {Common} from "@/app/{commons}/types/commons";
 
 export interface BoardBlock {
     id           : number;
@@ -42,8 +41,8 @@ export interface BoardBlockProviderI {
     setBoardBlock: React.Dispatch<React.SetStateAction<BoardBlock>>;
     boardBlockHistories: BoardBlockHistoriesI[];
     setBoardBlockHistories: React.Dispatch<React.SetStateAction<BoardBlockHistoriesI[]>>;
-    page: PageI;
-    setPage: React.Dispatch<React.SetStateAction<PageI>>;
+    page: Common.PageI;
+    setPage: React.Dispatch<React.SetStateAction<Common.PageI>>;
 }
 
 const BoardBlockProvider = createContext({} as BoardBlockProviderI);

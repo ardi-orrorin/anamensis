@@ -2,11 +2,11 @@ import {useContext, useEffect, useRef, useState} from "react";
 import BoardProvider, {BoardTemplateService} from "@/app/board/{services}/BoardProvider";
 import apiCall from "@/app/{commons}/func/api";
 import {BoardTemplate, boardTemplateList} from "@/app/board/{services}/types";
-import {StatusResponse} from "@/app/{commons}/types/commons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {blockTypeFlatList} from "@/app/board/{components}/block/list";
+import {Common} from "@/app/{commons}/types/commons";
 
 
 type TemplateMenuOpenProps = {
@@ -113,7 +113,7 @@ const TemplateMenu = () => {
     const onRemoveTemplate = async (id: number) => {
         setLoading(true);
         try {
-            const res = await apiCall<StatusResponse>({
+            const res = await apiCall<Common.StatusResponse>({
                 path: '/api/board-template/' + id,
                 method: 'DELETE',
                 isReturnData: true

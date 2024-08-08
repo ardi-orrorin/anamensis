@@ -1,10 +1,10 @@
-import {BoardListI} from "@/app/{components}/boardComponent";
 import {QuestionBlockExtraValueType} from "@/app/board/{components}/block/extra/questionBlock";
 import HeaderComponent from "@/app/{components}/headerComponent";
 import React from "react";
 import FooterComponent from "@/app/{components}/footerComponent";
+import {Root} from "@/app/{services}/types";
 
-const QuestionBoardComponent = (props: BoardListI) => {
+const QuestionBoardComponent = (props: Root.BoardListI) => {
     const { body} = props;
 
     const alttuelBlock = body?.filter((block) =>

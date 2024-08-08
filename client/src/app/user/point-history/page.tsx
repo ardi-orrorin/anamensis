@@ -1,10 +1,10 @@
 import PageNavigator from "@/app/{commons}/PageNavigator";
-import {PageResponse} from "@/app/{commons}/types/commons";
 import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import apiCall from "@/app/{commons}/func/api";
 import Row from "@/app/user/point-history/{components}/Row";
 import {GetProps} from "@/app/user/history/page";
 import SizeSelect from "@/app/{commons}/sizeSelect";
+import {Common} from "@/app/{commons}/types/commons";
 
 export interface PointHistoryI {
     id: number
@@ -78,7 +78,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
 
 
 const getData = async (req: URLSearchParams) => {
-    return await apiCall<PageResponse<PointHistoryI>, URLSearchParams>({
+    return await apiCall<Common.PageResponse<PointHistoryI>, URLSearchParams>({
         path: '/api/point-histories',
         method: 'GET',
         call: 'Server',

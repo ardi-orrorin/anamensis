@@ -19,7 +19,6 @@ export const useRootHotKey = ({
     })
 };
 
-
 export const useRootLeftMenuHotKey = ({
     router,
     roles,
@@ -27,11 +26,11 @@ export const useRootLeftMenuHotKey = ({
     confirmRole,
     onChangeParamsHandler,
 }: {
-    boardBaseUrl: string,
-    roles: RoleType[],
-    router: AppRouterInstance,
-    confirmRole: (item: { roles: RoleType[] }) => RoleType | undefined
-    onChangeParamsHandler: ({type, value}: { type: string, value: string | number | boolean }) => void,
+    boardBaseUrl          : string,
+    roles                 : RoleType[],
+    router                : AppRouterInstance,
+    confirmRole           : (item: { roles: RoleType[] }) => RoleType | undefined
+    onChangeParamsHandler : ({type, value}: { type: string, value: string | number | boolean }) => void,
 }) => {
 
     const hotkeysOption: Options = {

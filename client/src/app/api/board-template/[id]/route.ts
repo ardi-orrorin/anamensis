@@ -1,9 +1,8 @@
-import {NextRequest, NextResponse} from "next/server";
+import {NextRequest} from "next/server";
 import {BoardI, BoardTemplate} from "@/app/board/{services}/types";
 import apiCall from "@/app/{commons}/func/api";
-import {StatusResponse} from "@/app/{commons}/types/commons";
-import {cookies} from "next/headers";
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
+import {Common} from "@/app/{commons}/types/commons";
 
 export async function GET(req: NextRequest) {
 
@@ -38,7 +37,7 @@ export async function PUT(req:NextRequest) {
 
     const id = req.nextUrl.pathname.split('/')[req.nextUrl.pathname.split('/').length - 1];
 
-    const result = await apiCall<StatusResponse, BoardTemplate>({
+    const result = await apiCall<Common.StatusResponse, BoardTemplate>({
         path: '/api/board-template/' + id,
         method: 'PUT',
         call: 'Server',

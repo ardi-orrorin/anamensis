@@ -1,7 +1,7 @@
 import {Category} from "@/app/board/{services}/types";
-import React, {Dispatch, SetStateAction, useCallback, useContext, useMemo} from "react";
-import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
+import React, {Dispatch, SetStateAction, useCallback} from "react";
 import Link from "next/link";
+import {Root} from "@/app/{services}/types";
 
 const MobileMenu = ({
     menuToggle,
@@ -10,15 +10,15 @@ const MobileMenu = ({
     searchParams,
     setSearchParams,
 }:{
-    isLogin: boolean;
-    menuToggle: boolean;
-    searchParams: BoardListParamsI;
-    setSearchParams: Dispatch<SetStateAction<BoardListParamsI>>;
-    setMenuToggle: Dispatch<SetStateAction<boolean>>;
+    isLogin         : boolean;
+    menuToggle      : boolean;
+    searchParams    : Root.BoardListParamsI;
+    setSearchParams : Dispatch<SetStateAction<Root.BoardListParamsI>>;
+    setMenuToggle   : Dispatch<SetStateAction<boolean>>;
 }) => {
 
     const onChangeCategory = useCallback((value: string) => {
-        setSearchParams({ categoryPk: value, page: 1, size: 20 } as BoardListParamsI);
+        setSearchParams({ categoryPk: value, page: 1, size: 20 } as Root.BoardListParamsI);
         scrollTo(0, 0);
     },[searchParams]);
 
@@ -35,7 +35,7 @@ const MobileMenu = ({
             ...isFavorite,
             page: 1, size: 20,
             add: false
-        } as BoardListParamsI;
+        } as Root.BoardListParamsI;
 
         setSearchParams(params);
         scrollTo(0, 0);

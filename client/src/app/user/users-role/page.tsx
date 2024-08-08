@@ -2,13 +2,13 @@
 
 import React, {useCallback, useMemo, useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
-import {PageI, PageResponse} from "@/app/{commons}/types/commons";
 import {AxiosError} from "axios";
 import {useSearchParams} from "next/navigation";
 import PageNavigator from "@/app/{commons}/PageNavigator";
 import {RoleType} from "@/app/user/system/{services}/types";
 import useSWR from "swr";
 import Row from "@/app/user/users-role/{components}/row";
+import {Common} from "@/app/{commons}/types/commons";
 
 export type UsersRole = {
     id       : number
@@ -25,14 +25,14 @@ export default function Page() {
     const searchParams = useSearchParams();
 
     const [users, setUsers] = useState<UsersRole[]>([]);
-    const [page, setPage] = useState<PageI>({} as PageI);
+    const [page, setPage] = useState({} as Common.PageI);
     const [select, setSelect] = useState<number[]>([]);
     const [role, setRole] = useState<RoleType>('' as RoleType);
 
     const maxIndex = useMemo(()=> page.total - ((page.page - 1) * page.size), [page]);
 
     const {mutate} = useSWR(['/api/user/users-role', searchParams], async () => {
-        return await apiCall<PageResponse<UsersRole>>({
+        return await apiCall<Common.PageResponse<UsersRole>>({
             path : '/api/user/users-role',
             method : 'GET',
             params : {

@@ -5,16 +5,8 @@ import {cookies} from "next/headers";
 import {faRightToBracket} from "@fortawesome/free-solid-svg-icons/faRightToBracket";
 import Image from "next/image";
 import apiCall from "@/app/{commons}/func/api";
-import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
+import {Root} from "@/app/{services}/types";
 
-type NavItemProps = {
-    icon: IconDefinition
-    name: string,
-    url: string
-    loginRequired?: boolean,
-    prefetch: boolean
-    onClick?: () => void
-}
 
 const NavMain = async () => {
 
@@ -28,7 +20,7 @@ const NavMain = async () => {
         isReturnData: true,
     });
 
-    const rightMenuItems : NavItemProps[] = [
+    const rightMenuItems : Root.NavItemProps[] = [
         {
             icon: faPenToSquare,
             name: '글쓰기',
@@ -106,7 +98,7 @@ const NavMain = async () => {
     );
 }
 
-const NavItem = ({icon, name, url, prefetch}: NavItemProps) => {
+const NavItem = ({icon, name, url, prefetch}: Root.NavItemProps) => {
     return (
         <li>
             <Link className={'w-10 h-10 flex justify-center items-center hover:bg-blue-800 rounded duration-500'}

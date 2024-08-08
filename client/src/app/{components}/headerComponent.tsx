@@ -2,10 +2,10 @@ import {Category} from "@/app/board/{services}/types";
 import Image from "next/image";
 import {defaultProfile} from "@/app/{commons}/func/image";
 import React, {useMemo} from "react";
-import {BoardListI} from "@/app/{components}/boardComponent";
 import {NO_PROFILE} from "@/app/{services}/constants";
+import {Root} from "@/app/{services}/types";
 
-const HeaderComponent = (props: BoardListI) => {
+const HeaderComponent = (props: Root.BoardListI) => {
     const {
         title, categoryPk
         , isPublic, profileImage

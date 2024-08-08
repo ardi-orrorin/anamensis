@@ -1,8 +1,8 @@
 import FooterComponent from "@/app/{components}/footerComponent";
 import HeaderComponent from "@/app/{components}/headerComponent";
-import {BoardListI} from "@/app/{components}/boardComponent";
+import {Root} from "@/app/{services}/types";
 
-const DefaultBoardComponent = (props: BoardListI) => {
+const DefaultBoardComponent = (props: Root.BoardListI) => {
     const { body} = props;
 
     let text = '';

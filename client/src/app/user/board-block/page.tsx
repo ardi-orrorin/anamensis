@@ -1,7 +1,6 @@
 'use client';
 
 import PageNavigator from "@/app/{commons}/PageNavigator";
-import {PageI, PageResponse} from "@/app/{commons}/types/commons";
 import apiCall from "@/app/{commons}/func/api";
 import {useState} from "react";
 import {useSearchParams} from "next/navigation";
@@ -13,17 +12,18 @@ import BoardBlockProvider, {
 import History from "@/app/user/board-block/{components}/history";
 import Detail from "@/app/user/board-block/{components}/detail";
 import ModalProvider, {ModalI} from "@/app/user/board-block/{services}/modalProvider";
+import {Common} from "@/app/{commons}/types/commons";
 
 export default function Page() {
 
     const searchParams = useSearchParams();
     const [boardBlockHistories, setBoardBlockHistories] = useState<BoardBlockHistoriesI[]>([]);
     const [boardBlock, setBoardBlock] = useState({} as BoardBlock);
-    const [page, setPage] = useState({} as PageI);
+    const [page, setPage] = useState({} as Common.PageI);
     const [modal, setModal] = useState({} as ModalI);
 
     preload(['/api/board-block-history', searchParams], async () => {
-        return await apiCall<PageResponse<BoardBlockHistoriesI>, any>({
+        return await apiCall<Common.PageResponse<BoardBlockHistoriesI>, any>({
             path: '/api/user/board-block-history',
             method: 'GET',
             params: {

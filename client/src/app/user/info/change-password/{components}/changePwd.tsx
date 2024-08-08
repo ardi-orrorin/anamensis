@@ -6,7 +6,7 @@ import PasswordProvider, {
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEye} from "@fortawesome/free-solid-svg-icons";
 import apiCall from "@/app/{commons}/func/api";
-import {StatusResponse, StatusResponseStatusEnum} from "@/app/{commons}/types/commons";
+import {Common} from "@/app/{commons}/types/commons";
 
 
 type PwdType = {
@@ -82,14 +82,14 @@ const ChangePwd = () => {
         }
 
         try {
-            const res = await apiCall<StatusResponse, ChangePasswordI>({
+            const res = await apiCall<Common.StatusResponse, ChangePasswordI>({
                 path: '/api/user/change-password',
                 method: 'POST',
                 body,
                 isReturnData: true,
             });
 
-            res.status === StatusResponseStatusEnum.SUCCESS
+            res.status === Common.StatusResponseStatusEnum.SUCCESS
             ? setChangePwd({
                 ...changePwd,
                 status: ChangePasswordStatus.SUCCESS

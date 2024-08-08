@@ -1,20 +1,9 @@
 import {createContext, Dispatch, SetStateAction} from "react";
-
-export interface BoardListParamsI {
-    page        : number;
-    size        : number;
-    type?       : string;
-    value?      : string;
-    categoryPk? : string;
-    isSelf      : boolean;
-    add         : boolean;
-    isFavorite  : boolean;
-    [key: string]: string | number | undefined | boolean;
-}
+import {Root} from "@/app/{services}/types";
 
 export interface TempFileProviderI {
-    searchParams: BoardListParamsI;
-    setSearchParams: Dispatch<SetStateAction<BoardListParamsI>>;
+    searchParams    : Root.BoardListParamsI;
+    setSearchParams : Dispatch<SetStateAction<Root.BoardListParamsI>>;
 }
 
 const SearchParamsProvider = createContext<TempFileProviderI>({} as TempFileProviderI);

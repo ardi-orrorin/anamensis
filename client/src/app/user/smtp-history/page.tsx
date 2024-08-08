@@ -1,10 +1,10 @@
 import PageNavigator from "@/app/{commons}/PageNavigator";
-import {PageResponse} from "@/app/{commons}/types/commons";
 import Row from "@/app/user/smtp-history/{components}/Row";
 import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import {GetProps} from "@/app/user/history/page";
 import apiCall from "@/app/{commons}/func/api";
 import SizeSelect from "@/app/{commons}/sizeSelect";
+import {Common} from "@/app/{commons}/types/commons";
 
 export interface SmtpHistoryI {
     id: number;
@@ -79,7 +79,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
 
 
 const getData = async (req: URLSearchParams) => {
-    return await apiCall<PageResponse<SmtpHistoryI>, URLSearchParams>({
+    return await apiCall<Common.PageResponse<SmtpHistoryI>, URLSearchParams>({
         path: '/api/smtp-push-history',
         method: 'GET',
         call: 'Server',

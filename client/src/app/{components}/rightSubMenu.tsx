@@ -18,7 +18,6 @@ const RightSubMenu = ({
 }:{
     isLogin: boolean
 }) => {
-
     const [rightMenu, setRightMenu] = useState(true);
 
     return (

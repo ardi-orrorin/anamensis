@@ -15,8 +15,8 @@ import moment from "moment";
 import {QuestionBlockExtraValueType} from "@/app/board/{components}/block/extra/questionBlock";
 import {updateBoard} from "@/app/board/{services}/funcs";
 import {useSearchParams} from "next/navigation";
-import {PageI, PageResponse} from "@/app/{commons}/types/commons";
 import PageNavigator from "@/app/{commons}/PageNavigator";
+import {Common} from "@/app/{commons}/types/commons";
 
 export type SaveComment = {
     boardPk   : string;
@@ -39,10 +39,10 @@ const Comment = ({
 
     const {newComment, setNewComment} = useContext(BoardProvider);
 
-    const [page, setPage] = useState<PageI>({
+    const [page, setPage] = useState<Common.PageI>({
         page: 1,
         size: 10,
-    } as PageI);
+    } as Common.PageI);
 
     const [loading, setLoading] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
@@ -50,7 +50,7 @@ const Comment = ({
     preload([`/api/board/comment/${board.data.id}`, searchParams], async () => {
         if(isNewBoard || isTemplate) return;
 
-        return await apiCall<PageResponse<CommentI>>({
+        return await apiCall<Common.PageResponse<CommentI>>({
             path: '/api/board/comment',
             method: 'GET',
             params: {boardPk: params.id, page: searchParams.get('page') || 1, size: searchParams.get('size') || 10},

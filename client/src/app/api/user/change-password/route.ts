@@ -3,13 +3,13 @@ import apiCall from "@/app/{commons}/func/api";
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
 import {AxiosError} from "axios";
 import {ChangePasswordI} from "@/app/user/info/change-password/{services}/passwordProvider";
-import {StatusResponse} from "@/app/{commons}/types/commons";
+import {Common} from "@/app/{commons}/types/commons";
 
 export async function POST(req: NextRequest) {
     const body = await req.json() as ChangePasswordI;
 
     try {
-        const res = await apiCall<StatusResponse, ChangePasswordI>({
+        const res = await apiCall<Common.StatusResponse, ChangePasswordI>({
             path: '/api/user/change-password',
             method: 'POST',
             call: 'Server',

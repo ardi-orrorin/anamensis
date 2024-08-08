@@ -1,46 +1,35 @@
 'use client';
 
 import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
-import {PageResponse} from "@/app/{commons}/types/commons";
 import apiCall from "@/app/{commons}/func/api";
-import BoardComponent, {BoardListI} from "@/app/{components}/boardComponent";
-import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons/faMagnifyingGlass";
+import BoardComponent from "@/app/{components}/boardComponent";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import LeftMenu from "@/app/{components}/leftMenu";
 import MobileMenu from "@/app/{components}/mobileMenu";
 import {RoleType} from "@/app/user/system/{services}/types";
-import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
-import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
+import SearchParamsProvider from "@/app/{services}/SearchParamsProvider";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useRootHotKey} from "@/app/{hooks}/hotKey";
-import Notices, {NoticeType} from "@/app/{components}/boards/notices";
+import Notices from "@/app/{components}/boards/notices";
 import SearchInfo from "@/app/{components}/searchInfo";
 import {faBars, faCaretRight} from "@fortawesome/free-solid-svg-icons";
 import {Virtuoso} from "react-virtuoso";
 import RightSubMenu from "@/app/{components}/rightSubMenu";
 import SearchHistory from "@/app/{components}/searchHistory";
 import SearchBox from "@/app/{components}/searchBox";
-
-export type DynamicPage = {
-    isEndOfList: boolean;
-    isVisible  : boolean;
-}
-
-export type SearchHistoryProps = {
-    toggle: boolean;
-    history: string[];
-}
+import {Root} from "@/app/{services}/types";
+import {Common} from "@/app/{commons}/types/commons";
 
 export default function Page() {
 
     const pageSize = 20;
     const [initLoading, setInitLoading] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [data, setData] = useState<BoardListI[]>([]);
+    const [data, setData] = useState<Root.BoardListI[]>([]);
     const [roles, setRoles] = useState<RoleType[]>([]);
     const [searchValue, setSearchValue] = useState('');
     const [searchFocus, setSearchFocus] = useState(false);
-    const [dynamicPage, setDynamicPage] = useState<DynamicPage>({
+    const [dynamicPage, setDynamicPage] = useState<Root.DynamicPage>({
         isEndOfList: false,
         isVisible  : false,
     });
@@ -48,13 +37,13 @@ export default function Page() {
 
     const [favorites, setFavorites] = useState<string[]>([]);
 
-    const [searchParams, setSearchParams] = useState<BoardListParamsI>({
+    const [searchParams, setSearchParams] = useState<Root.BoardListParamsI>({
         page: 1,
         size: pageSize,
-    } as BoardListParamsI);
+    } as Root.BoardListParamsI);
 
-    const [noticeList, setNoticeList] = useState<NoticeType[]>([]);
-    const [searchHistory, setSearchHistory] = useState<SearchHistoryProps>({
+    const [noticeList, setNoticeList] = useState<Root.NoticeType[]>([]);
+    const [searchHistory, setSearchHistory] = useState<Root.SearchHistoryProps>({
         toggle: true,
         history:[] as string[]
     });
@@ -98,7 +87,7 @@ export default function Page() {
     },[])
 
     useEffect(() => {
-        apiCall<NoticeType[]>({
+        apiCall<Root.NoticeType[]>({
             path: '/api/board/notice',
             method: 'GET',
             isReturnData: true
@@ -112,7 +101,7 @@ export default function Page() {
     useEffect(() => {
         if(loading) return;
         setLoading(true);
-        apiCall<PageResponse<BoardListI>, BoardListParamsI>({
+        apiCall<Common.PageResponse<Root.BoardListI>, Root.BoardListParamsI>({
             path: '/api/board',
             method: 'GET',
             params: searchParams
@@ -167,7 +156,7 @@ export default function Page() {
 
         if(init) {
             setSearchValue('')
-            setSearchParams(initPage as BoardListParamsI);
+            setSearchParams(initPage as Root.BoardListParamsI);
             return;
         }
 
@@ -176,7 +165,7 @@ export default function Page() {
         const value = keyword || searchValue.replace(regex, ' ') || '';
 
         const params = value === ''
-        ? {...initPage} as BoardListParamsI
+        ? {...initPage} as Root.BoardListParamsI
         : {...searchParams, ...initPage, value, type: 'content'};
 
         setSearchParams(params);

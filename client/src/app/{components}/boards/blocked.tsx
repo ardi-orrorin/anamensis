@@ -1,8 +1,8 @@
 import HeaderComponent from "@/app/{components}/headerComponent";
 import FooterComponent from "@/app/{components}/footerComponent";
-import {BoardListI} from "@/app/{components}/boardComponent";
+import {Root} from "@/app/{services}/types";
 
-const Blocked = (props: BoardListI) => {
+const Blocked = (props: Root.BoardListI) => {
     return (
         <>
             <HeaderComponent {...props} />

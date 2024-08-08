@@ -4,10 +4,10 @@ import PasswordProvider, {
     ChangePasswordStatus
 } from "@/app/user/info/change-password/{services}/passwordProvider";
 import apiCall from "@/app/{commons}/func/api";
-import {StatusResponse, StatusResponseStatusEnum} from "@/app/{commons}/types/commons";
-import axios, {AxiosError} from "axios";
 import {faEye} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {Common} from "@/app/{commons}/types/commons";
+import {AxiosError} from "axios";
 
 enum Statue {
     READY,
@@ -31,13 +31,13 @@ const Confirm = () => {
     const onSubmit = async () => {
 
         try {
-            const res = await apiCall<StatusResponse, ChangePasswordI>({
+            const res = await apiCall<Common.StatusResponse, ChangePasswordI>({
                 path: '/api/user/change-password',
                 method: 'POST',
                 body: changePwd
             });
 
-            res.data.status === StatusResponseStatusEnum.SUCCESS
+            res.data.status === Common.StatusResponseStatusEnum.SUCCESS
             ? setChangePwd({
                 ...changePwd,
                 status: ChangePasswordStatus.CONFIRMED

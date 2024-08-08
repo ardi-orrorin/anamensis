@@ -11,10 +11,12 @@ import {User} from "@/app/login/{services}/types";
 
 const Login = () => {
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
-    const [isRecaptcha, setIsReCaptcha] = useState<boolean>(false);
 
     const {user, setUser} = useContext(LoginProvider);
-    const [loading, setLoading] = useState<boolean>(false);
+
+    const [isRecaptcha, setIsReCaptcha] = useState(false);
+
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (user.username.length < 4) {

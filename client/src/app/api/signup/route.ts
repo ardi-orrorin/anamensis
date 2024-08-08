@@ -1,10 +1,10 @@
 import {NextRequest, NextResponse} from "next/server";
-import {UserProps} from "@/app/signup/page";
 import apiCall from "@/app/{commons}/func/api";
+import {SignUp} from "@/app/signup/{services}/types";
 
 export async function POST(req: NextRequest) {
 
-    const response = await apiCall<UserProps>({
+    const response = await apiCall<SignUp.UserProps>({
         path: '/public/api/user/signup',
         method: 'POST',
         body: await req.json(),

@@ -8,9 +8,9 @@ import {User} from "@/app/login/{services}/types";
 
 const EmailAuth = () => {
 
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState(false);
 
-    const { user, setUser } = useContext<LoginProviderI>(LoginProvider);
+    const { user, setUser } = useContext(LoginProvider);
 
     const timer = useTimer(300);
 

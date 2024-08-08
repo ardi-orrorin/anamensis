@@ -8,7 +8,7 @@ import {User} from "@/app/login/{services}/types";
 
 const OTPAuth = () => {
     const { user, setUser } = useContext<LoginProviderI>(LoginProvider);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState(false);
 
     const timer = useTimer(300);
 

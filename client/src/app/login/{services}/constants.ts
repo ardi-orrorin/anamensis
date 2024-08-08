@@ -7,7 +7,6 @@ const cookieInit: Partial<ResponseCookie> = {
     path: '/'
 }
 
-
 const loginConstants = {
     cookieInit
 }

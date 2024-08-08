@@ -1,6 +1,5 @@
 'use client';
 
-import Link from "next/link";
 import {useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
 import {FindUser, FindUserResponse} from "@/app/reset-pwd/{services}/type";

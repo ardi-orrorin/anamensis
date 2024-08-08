@@ -8,7 +8,6 @@ import {LoadingType} from "@/app/user/info/page";
 import {UserInfoI} from "@/app/user/email/page";
 import moment from "moment";
 import Link from "next/link";
-import {AuthType} from "@/app/login/{services}/types";
 
 export const UserInfo = ({profileInfo}: {profileInfo: UserInfoI}) => {
 

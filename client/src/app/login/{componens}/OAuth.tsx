@@ -1,6 +1,7 @@
 import {getProviders, signIn} from "next-auth/react";
 import Image from "next/image";
 import React, {useEffect, useState} from "react";
+import {User} from "@/app/login/{services}/types";
 
 const OAuth = ({
     isRecaptcha
@@ -49,15 +50,10 @@ const OAuth = ({
     )
 }
 
-type OAuthProviderType = {
-    provider      : string;
-    bgColor       : string;
-    hoverBgColor  : string;
-    size          : number;
-}
 
 
-const oAuthProviders: OAuthProviderType[] = [
+
+const oAuthProviders: User.OAuthProvider[] = [
     { provider: 'google',    bgColor: 'bg-red-300',    hoverBgColor: 'bg-red-600',    size: 16,   },
     { provider: 'facebook',  bgColor: 'bg-blue-300',   hoverBgColor: 'bg-blue-600',   size: 16,   },
     { provider: 'twitter',   bgColor: 'bg-blue-500',   hoverBgColor: 'bg-blue-800',   size: 16,   },

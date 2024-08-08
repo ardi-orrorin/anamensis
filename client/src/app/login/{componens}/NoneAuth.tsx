@@ -1,16 +1,16 @@
 import React, {useContext, useEffect} from "react";
-import LoginProvider, {LoginI} from "@/app/login/{services}/LoginProvider";
+import LoginProvider from "@/app/login/{services}/LoginProvider";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import apiCall from "@/app/{commons}/func/api";
-import {LoginType} from "@/app/login/{componens}/Login";
+import {User} from "@/app/login/{services}/types";
 
 const NoneAuth = () => {
     const {user} = useContext(LoginProvider);
     useEffect(() => {
         const fetch = async () => {
             try {
-                await apiCall<LoginType, LoginI>({
+                await apiCall<User.LoginResponse, User.Login>({
                     path: '/api/login/verify',
                     method: 'POST',
                     body: user,

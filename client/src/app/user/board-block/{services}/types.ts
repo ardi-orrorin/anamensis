@@ -29,6 +29,4 @@ export class Types {
             str.getStatus() === status.toUpperCase()
         );
     }
-
-
 }

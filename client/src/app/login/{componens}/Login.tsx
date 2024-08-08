@@ -2,25 +2,12 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faExclamation} from "@fortawesome/free-solid-svg-icons";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {useContext, useEffect, useMemo, useState} from "react";
-import {ErrorResponse, LoginAuth} from "@/app/login/page";
-import LoginProvider, {LoginI} from "@/app/login/{services}/LoginProvider";
+import LoginProvider from "@/app/login/{services}/LoginProvider";
 import apiCall from "@/app/{commons}/func/api";
-import {RoleType} from "@/app/user/system/{services}/types";
 import Turnstile from "react-turnstile";
 import OAuth from "@/app/login/{componens}/OAuth";
 import Footer from "@/app/find-user/{components}/footer";
-
-export type LoginType = {
-    accessToken: string,
-    accessTokenExpiresIn: number,
-    refreshToken: string,
-    refreshTokenExpiresIn: number,
-} & LoginUserType
-
-export type LoginUserType = {
-    username: string,
-    roles: RoleType[]
-}
+import {User} from "@/app/login/{services}/types";
 
 const Login = () => {
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
@@ -49,7 +36,7 @@ const Login = () => {
     const goLogin = async () => {
         setLoading(true);
 
-        await apiCall<LoginAuth, LoginI>({
+        await apiCall<User.Auth, User.Login>({
             path: '/api/login',
             method: 'POST',
             body: user,
@@ -71,7 +58,7 @@ const Login = () => {
         });
     }
 
-    const [error, setError] = useState<ErrorResponse>({
+    const [error, setError] = useState<User.ErrorResponse>({
         status: 0,
         message: '',
         use: false

@@ -1,6 +1,5 @@
 'use client';
 import React, {useContext, useEffect, useMemo, useState} from "react";
-import {AuthType} from "@/app/login/{services}/types";
 import apiCall from "@/app/{commons}/func/api";
 import {useRouter} from "next/navigation";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -8,6 +7,7 @@ import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import useSWR from "swr";
 import UserProvider from "@/app/user/{services}/userProvider";
 import {RoleType} from "@/app/user/system/{services}/types";
+import {User} from "@/app/login/{services}/types";
 
 export interface UserInfoI {
     userId        : string;
@@ -15,7 +15,7 @@ export interface UserInfoI {
     phone         : string;
     name          : string;
     point         : number;
-    sauthType     : AuthType;
+    sauthType     : User.AuthType;
     sauth         : boolean;
     createAt      : string;
     isOAuth       : boolean;
@@ -23,7 +23,7 @@ export interface UserInfoI {
 }
 
 export interface AuthPropsI {
-    sauthType : AuthType;
+    sauthType : User.AuthType;
     sauth     : boolean;
 }
 
@@ -33,7 +33,7 @@ export default function Page() {
     const [userInfo, setUserInfo] = useState<UserInfoI>({} as UserInfoI);
     const [loading, setLoading] = useState<boolean>(false);
     const isSAuthEmail = useMemo(() => {
-        return userInfo.sauthType === AuthType.EMAIL && userInfo.sauth;
+        return userInfo.sauthType === User.AuthType.EMAIL && userInfo.sauth;
     },[userInfo]);
 
     const isOAuthUser = useMemo(() =>
@@ -64,7 +64,7 @@ export default function Page() {
     const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const data: AuthPropsI = {
             sauth: e.target.checked,
-            sauthType: userInfo.sauthType !== AuthType.EMAIL ? AuthType.EMAIL : AuthType.NONE
+            sauthType: userInfo.sauthType !== User.AuthType.EMAIL ? User.AuthType.EMAIL : User.AuthType.NONE
         };
 
         setLoading(true);

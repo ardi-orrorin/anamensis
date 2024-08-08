@@ -19,12 +19,14 @@ interface StatusResponseT {
     timestamp : string;
 }
 
+enum StatusResponseStatusEnumT {
+    SUCCESS = "SUCCESS",
+    FAIL    = "FAIL",
+}
+
 export namespace Common {
     export type PageResponse<T>          = PageResponseT<T>;
     export type PageI                    = Page;
     export type StatusResponse           = StatusResponseT;
-    export enum StatusResponseStatusEnum {
-        SUCCESS = "SUCCESS",
-        FAIL    = "FAIL",
-    }
+    export import StatusResponseStatusEnum = StatusResponseStatusEnumT;
 }

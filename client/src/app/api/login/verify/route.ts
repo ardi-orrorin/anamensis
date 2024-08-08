@@ -1,16 +1,14 @@
 import {NextRequest, NextResponse} from "next/server";
 import axios from "axios";
-import {LoginI, OAuth2I} from "@/app/login/{services}/LoginProvider";
-import {ResponseCookie} from "next/dist/compiled/@edge-runtime/cookies";
-import {ErrorResponse} from "@/app/login/page";
 import loginConstants from "@/app/login/{services}/constants";
+import {User} from "@/app/login/{services}/types";
 
 export async function POST(req: NextRequest){
 
     const reqBody = await req.json();
     const user = reqBody?.provider
-        ? await reqBody as OAuth2I
-        : await reqBody as LoginI;
+        ? await reqBody as User.OAuth2
+        : await reqBody as User.Login;
 
     const url = process.env.NEXT_PUBLIC_SERVER + (
         reqBody?.provider
@@ -55,7 +53,7 @@ export async function POST(req: NextRequest){
         return next;
 
     } catch (err: any) {
-        const errResponse: ErrorResponse = {
+        const errResponse: User.ErrorResponse = {
             status: err.response.status,
             message: err.response.data.message,
             use: true

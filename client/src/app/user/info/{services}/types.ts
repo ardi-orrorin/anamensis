@@ -1,19 +1,7 @@
 interface ChangePasswordI {
     curPwd: string;
     newPwd: string;
-    status: ChangePasswordStatusEnum;
-}
-
-enum ChangePasswordStatusEnum {
-    READY     = 'READY',
-    CONFIRMED = 'CONFIRMED',
-    SUCCESS   = 'SUCCESS',
-}
-
-enum StatueEnum {
-    READY,
-    CONFIRMED,
-    FAILED
+    status: UserInfoSpace.ChangePasswordStatus;
 }
 
 type LoadingT = {
@@ -31,9 +19,20 @@ type PwdT = {
 
 
 export namespace UserInfoSpace {
-    export import Statue               = StatueEnum;
-    export import ChangePasswordStatus = ChangePasswordStatusEnum;
-    export type ChangePassword         = ChangePasswordI;
-    export type Loading                = LoadingT;
-    export type Pwd                    = PwdT;
+    export type ChangePassword = ChangePasswordI;
+    export type Loading        = LoadingT;
+    export type Pwd            = PwdT;
+
+    export enum ChangePasswordStatus {
+        READY     = 'READY',
+        CONFIRMED = 'CONFIRMED',
+        SUCCESS   = 'SUCCESS',
+    }
+
+    export enum Statue {
+        READY,
+        CONFIRMED,
+        FAILED
+    }
+
 }

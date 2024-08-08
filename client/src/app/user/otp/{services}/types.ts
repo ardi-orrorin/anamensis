@@ -16,15 +16,12 @@ interface InfoI {
     createAt: string
 }
 
-enum OTPStepEnum {
-    INIT   = 'init',
-    OTP    = 'otp',
-    VERIFY = 'verify',
-}
-
-
 export namespace OTP {
     export type Props     = PropsI;
     export type Info      = InfoI;
-    export import OTPStep = OTPStepEnum;
+    export enum OTPStep {
+        INIT   = 'init',
+        OTP    = 'otp',
+        VERIFY = 'verify',
+    }
 }

@@ -8,8 +8,6 @@ import apiCall, {ApiCallProps} from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {System} from "@/app/user/system/{services}/types";
 
-
-
 const Message = () => {
     const {modal, setModal} = useContext(ModalProvider);
 

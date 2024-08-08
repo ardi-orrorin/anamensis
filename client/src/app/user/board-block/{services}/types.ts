@@ -1,40 +1,36 @@
-interface BoardBlockI {
+import BoardBlockStatus = BoardBlocking.BoardBlockStatus;
+import BoardBlockResultStatus = BoardBlocking.BoardBlockResultStatus;
+
+interface CommonI {
     id           : number;
     boardPk      : number;
     title        : string;
-    status       : BoardBlockStatusEnum;
-    reason       : string;
-    answer       : string;
-    result       : string;
+    status       : BoardBlockStatus;
     createdAt    : string;
     answerAt     : string;
     resultAt     : string;
-    resultStatus : BoardBlockResultStatusEnum;
-}
-interface BoardBlockHistoriesI {
-    id        : number;
-    boardPk   : number;
-    title     : string;
-    status    : BoardBlockStatusEnum;
-    createdAt : string;
-    answerAt  : string;
-    resultAt  : string;
 }
 
-enum BoardBlockStatusEnum {
-    STARTED  = 'STARTED',
-    ANSWERED = 'ANSWERED',
-    RESULTED = 'RESULTED',
-}
-
-enum BoardBlockResultStatusEnum {
-    UNBLOCKING = 'UNBLOCKING',
-    BLOCKING   = 'BLOCKING',
+interface BoardBlockI extends CommonI {
+    reason       : string;
+    answer       : string;
+    result       : string;
+    resultStatus : BoardBlockResultStatus;
 }
 
 export namespace BoardBlocking {
-    export type BoardBlock               = BoardBlockI;
-    export type BoardBlockHistories      = BoardBlockHistoriesI;
-    export import BoardBlockStatus       = BoardBlockStatusEnum;
-    export import BoardBlockResultStatus = BoardBlockResultStatusEnum;
+    export type BoardBlock           = BoardBlockI;
+    export type BoardBlockHistories  = CommonI;
+
+
+    export enum BoardBlockStatus {
+        STARTED  = 'STARTED',
+        ANSWERED = 'ANSWERED',
+        RESULTED = 'RESULTED',
+    }
+
+    export enum BoardBlockResultStatus {
+        UNBLOCKING = 'UNBLOCKING',
+        BLOCKING   = 'BLOCKING',
+    }
 }

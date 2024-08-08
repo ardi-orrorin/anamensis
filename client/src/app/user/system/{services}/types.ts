@@ -1,11 +1,3 @@
-enum RoleType {
-    ADMIN  = 'ADMIN',
-    USER   = 'USER',
-    MASTER = 'MASTER',
-    GUEST  = 'GUEST',
-    OAUTH  = 'OAUTH',
-}
-
 interface WebSysI {
     code: string;
     name: string;
@@ -37,6 +29,13 @@ type LoadingT = {
 export namespace System {
     export type WebSys     = WebSysI;
     export type SysMessage = SysMessageI;
-    export import Role     = RoleType;
     export type Loading    = LoadingT;
+
+    export enum Role {
+        ADMIN  = 'ADMIN',
+        USER   = 'USER',
+        MASTER = 'MASTER',
+        GUEST  = 'GUEST',
+        OAUTH  = 'OAUTH',
+    }
 }

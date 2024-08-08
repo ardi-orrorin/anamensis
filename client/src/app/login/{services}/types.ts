@@ -1,17 +1,10 @@
 import {System} from "@/app/user/system/{services}/types";
+import ResetPwdProgress = User.ResetPwdProgress;
 
 interface UserI {
     userId   : string;
     name     : string;
     email    : string;
-}
-
-enum AuthTypeE {
-    INTRO = 'INTRO',
-    NONE  = 'NONE',
-    OTP   = 'OTP',
-    EMAIL = 'EMAIL',
-    OAUTH = 'OAUTH',
 }
 
 interface LoginI {
@@ -28,22 +21,22 @@ interface OAuth2I extends UserI {
 }
 
 interface LoginAuthI {
-    verity: boolean;
-    authType: User.AuthType;
+    verity   : boolean;
+    authType : User.AuthType;
 }
 
 interface ErrorResponseI {
-    status: number;
-    message: string;
-    use: boolean
+    status   : number;
+    message  : string;
+    use      : boolean
 }
 
 
 type LoginResponseT = {
-    accessToken: string,
-    accessTokenExpiresIn: number,
-    refreshToken: string,
-    refreshTokenExpiresIn: number,
+    accessToken           : string,
+    accessTokenExpiresIn  : number,
+    refreshToken          : string,
+    refreshTokenExpiresIn : number,
 } & LoginUserInfoT
 
 type LoginUserInfoT = {
@@ -70,16 +63,8 @@ type FindUserResponseT = {
     userId     : string;
 }
 
-
-enum ResetPwdProgressEnum {
-    CONFIRMED = 'CONFIRMED',
-    VERIFIED  = 'VERIFIED',
-    RESET     = 'RESET',
-    FAIL      = 'fail'
-}
-
 interface ResetPwdII {
-    progress      : ResetPwdProgressEnum;
+    progress      : ResetPwdProgress;
     userId        : string;
     email         : string;
     verifyCode?   : string;
@@ -88,7 +73,7 @@ interface ResetPwdII {
 }
 
 type ResetPwdResponseT = {
-    progress: ResetPwdProgressEnum;
+    progress: ResetPwdProgress;
     verified: boolean;
 }
 
@@ -100,8 +85,8 @@ type ResetPwdVerifiedT = {
 }
 
 type PasswordT = {
-    pwd: string;
-    pwdCheck: string;
+    pwd        : string;
+    pwdCheck   : string;
 }
 
 interface UserInfoI extends UserI{
@@ -121,8 +106,6 @@ interface AuthPropsI {
 
 
 export namespace User {
-    export import AuthType         = AuthTypeE;
-    export import ResetPwdProgress = ResetPwdProgressEnum;
     export type Login              = LoginI;
     export type OAuth2             = OAuth2I;
     export type Auth               = LoginAuthI;
@@ -138,4 +121,20 @@ export namespace User {
     export type Password           = PasswordT;
     export type UserInfo           = UserInfoI;
     export type AuthProps          = AuthPropsI;
+
+
+    export enum ResetPwdProgress {
+        CONFIRMED = 'CONFIRMED',
+        VERIFIED  = 'VERIFIED',
+        RESET     = 'RESET',
+        FAIL      = 'fail'
+    }
+
+    export enum AuthType {
+        INTRO = 'INTRO',
+        NONE  = 'NONE',
+        OTP   = 'OTP',
+        EMAIL = 'EMAIL',
+        OAUTH = 'OAUTH',
+    }
 }

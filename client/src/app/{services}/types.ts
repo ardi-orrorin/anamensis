@@ -1,7 +1,7 @@
 import {BlockI} from "@/app/board/{services}/types";
-import {RoleType} from "@/app/user/system/{services}/types";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import React from "react";
+import {System} from "@/app/user/system/{services}/types";
 
 type DynamicPageT = {
     isEndOfList : boolean;
@@ -26,7 +26,7 @@ interface BoardListT {
     isPublic      : boolean;
     membersOnly   : boolean;
     isBlocked     : boolean;
-    roles         : RoleType[];
+    roles         : System.Role[];
 }
 
 interface BoardListParamsT {

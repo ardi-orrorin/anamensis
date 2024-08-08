@@ -6,8 +6,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import useSWR from "swr";
 import UserProvider from "@/app/user/{services}/userProvider";
-import {RoleType} from "@/app/user/system/{services}/types";
 import {User} from "@/app/login/{services}/types";
+import {System} from "@/app/user/system/{services}/types";
 
 export default function Page() {
 
@@ -19,7 +19,7 @@ export default function Page() {
     },[userInfo]);
 
     const isOAuthUser = useMemo(() =>
-        roles.some((role) => role === RoleType.OAUTH)
+        roles.some((role) => role === System.Role.OAUTH)
         ,[roles]);
 
     const router = useRouter();

@@ -6,34 +6,18 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import apiCall, {ApiCallProps} from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
+import {System} from "@/app/user/system/{services}/types";
 
-export interface SysMessageI {
-    id: string;
-    webSysPk: string;
-    subject: string;
-    content: string;
-    extra1: string;
-    extra2: string;
-    extra3: string;
-    extra4: string;
-    extra5: string;
-    isUse: boolean;
-    [key: string]: string | boolean;
-}
 
-export type LoadingType = {
-    loading: boolean;
-    listLoading: boolean;
-}
 
 const Message = () => {
     const {modal, setModal} = useContext(ModalProvider);
 
-    const [messageList, setMessageList] = useState<SysMessageI[]>([]);
-    const [message, setMessage] = useState<SysMessageI>({} as SysMessageI);
-    const [loading, setLoading] = useState<LoadingType>({}as LoadingType);
-    const [edit, setEdit] = useState<boolean>(false);
-    const [init, setInit] = useState<boolean>(true);
+    const [messageList, setMessageList] = useState<System.SysMessage[]>([]);
+    const [message, setMessage] = useState({} as System.SysMessage);
+    const [loading, setLoading] = useState({}as System.Loading);
+    const [edit, setEdit] = useState(false);
+    const [init, setInit] = useState(true);
 
     const debounce = createDebounce(500);
 
@@ -137,7 +121,7 @@ const Message = () => {
             extra4: '',
             extra5: '',
             isUse: false
-        } as SysMessageI);
+        } as System.SysMessage);
         setInit(true);
         setEdit(false);
     }

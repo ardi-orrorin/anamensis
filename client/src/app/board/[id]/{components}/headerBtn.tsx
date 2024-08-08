@@ -1,9 +1,9 @@
-import {RoleType} from "@/app/user/system/{services}/types";
-import React, {useContext} from "react";
-import BoardProvider, {BoardService} from "@/app/board/{services}/BoardProvider";
+import React from "react";
+import {BoardService} from "@/app/board/{services}/BoardProvider";
+import {System} from "@/app/user/system/{services}/types";
 
 type HeaderBtnProps = {
-    roles    : RoleType[];
+    roles    : System.Role[];
     board    : BoardService;
     submitClickHandler: () => void;
     editClickHandler: () => void;
@@ -57,7 +57,7 @@ const HeaderBtn = ({
                 isView
                 && isPublic
                 && isLogin
-                && roles.includes(RoleType.ADMIN)
+                && roles.includes(System.Role.ADMIN)
                 && <button className={[
                     "rounded h-full border-2 border-red-200 text-red-400 whitespace-pre hover:bg-red-200 hover:text-white py-1 px-3 text-sm duration-300",
                     isBlocked ? 'w-20' : 'w-16'

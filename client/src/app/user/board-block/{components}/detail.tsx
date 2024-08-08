@@ -7,9 +7,9 @@ import ModalProvider, {ModalI} from "@/app/user/board-block/{services}/modalProv
 import {faCaretRight} from "@fortawesome/free-solid-svg-icons";
 import UserProvider from "@/app/user/{services}/userProvider";
 import apiCall from "@/app/{commons}/func/api";
-import {RoleType} from "@/app/user/system/{services}/types";
 import TextBox from "@/app/user/board-block/{components}/textBox";
 import {BoardBlocking} from "@/app/user/board-block/{services}/types";
+import {System} from "@/app/user/system/{services}/types";
 
 const Detail = () => {
 
@@ -20,8 +20,8 @@ const Detail = () => {
     const [isTyping, setIsTyping] = useState(false);
 
     const resultCondition = useMemo(() => {
-        return boardBlock.status === BoardBlocking.BoardBlockStatus.ANSWERED && roles.includes(RoleType.ADMIN)
-        || boardBlock.status === BoardBlocking.BoardBlockStatus.RESULTED && roles.includes(RoleType.USER)
+        return boardBlock.status === BoardBlocking.BoardBlockStatus.ANSWERED && roles.includes(System.Role.ADMIN)
+        || boardBlock.status === BoardBlocking.BoardBlockStatus.RESULTED && roles.includes(System.Role.USER)
     },[boardBlock.status]);
 
     useEffect(()=> {
@@ -98,8 +98,8 @@ const Detail = () => {
                     />
                     {
                         boardBlock.status === BoardBlocking.BoardBlockStatus.ANSWERED
-                        && roles.includes(RoleType.USER)
-                        && !roles.includes(RoleType.ADMIN)
+                        && roles.includes(System.Role.USER)
+                        && !roles.includes(System.Role.ADMIN)
                         && <div className={'w-full flex gap-2'}>
                             <label className={'text-sm flex gap-2 items-center'}>
                                 <FontAwesomeIcon icon={faCaretRight} />
@@ -119,7 +119,7 @@ const Detail = () => {
                     }
                     {
                         boardBlock.status === BoardBlocking.BoardBlockStatus.RESULTED
-                        && (roles.includes(RoleType.USER) || roles.includes(RoleType.ADMIN))
+                        && (roles.includes(System.Role.USER) || roles.includes(System.Role.ADMIN))
                         && <div className={'w-full flex gap-2'}>
                             <label className={'text-sm flex gap-2 items-center'}>
                                 <FontAwesomeIcon icon={faCaretRight}/>
@@ -130,7 +130,7 @@ const Detail = () => {
                 </div>
                 <div className={'w-full flex gap-2 justify-center'}>
                     {
-                        roles.includes(RoleType.ADMIN)
+                        roles.includes(System.Role.ADMIN)
                         && boardBlock.status === BoardBlocking.BoardBlockStatus.ANSWERED
                             ? <Btn btnText1={'제한 해제'}
                                    onClick1={()=> onSubmitHandler(BoardBlocking.BoardBlockResultStatus.UNBLOCKING)}

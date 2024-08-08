@@ -2,20 +2,14 @@ import {useState} from "react";
 import {preload} from "swr";
 import apiCall from "@/app/{commons}/func/api";
 import {User} from "@/app/login/{services}/types";
-
-export interface OtpInfoI {
-    id: number
-    sAuth: boolean
-    sauthType: User.AuthType
-    createAt: string
-}
+import {OTP} from "@/app/user/otp/{services}/types";
 
 const InitStep = () => {
 
-    const [otpInfo, setOtpInfo] = useState<OtpInfoI>();
+    const [otpInfo, setOtpInfo] = useState<OTP.Info>();
 
     preload('/api/user/otp', async () => {
-       return await apiCall<OtpInfoI>({
+       return await apiCall<OTP.Info>({
            path: '/api/user/otp',
            method: 'GET',
            isReturnData: true,

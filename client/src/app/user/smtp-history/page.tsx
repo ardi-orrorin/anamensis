@@ -5,15 +5,7 @@ import {GetProps} from "@/app/user/history/page";
 import apiCall from "@/app/{commons}/func/api";
 import SizeSelect from "@/app/{commons}/sizeSelect";
 import {Common} from "@/app/{commons}/types/commons";
-
-export interface SmtpHistoryI {
-    id: number;
-    subject: string;
-    status: string;
-    message: string;
-    createAt: string;
-}
-
+import {SMTP} from "@/app/user/smtp/{services}/types";
 
 const getServerSideProps: GetServerSideProps<GetProps> = async (context) => {
     const searchParams = new URLSearchParams(context.query as any);
@@ -79,7 +71,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
 
 
 const getData = async (req: URLSearchParams) => {
-    return await apiCall<Common.PageResponse<SmtpHistoryI>, URLSearchParams>({
+    return await apiCall<Common.PageResponse<SMTP.History>, URLSearchParams>({
         path: '/api/smtp-push-history',
         method: 'GET',
         call: 'Server',

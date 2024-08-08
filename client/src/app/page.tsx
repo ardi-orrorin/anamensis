@@ -6,7 +6,6 @@ import BoardComponent from "@/app/{components}/boardComponent";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import LeftMenu from "@/app/{components}/leftMenu";
 import MobileMenu from "@/app/{components}/mobileMenu";
-import {RoleType} from "@/app/user/system/{services}/types";
 import SearchParamsProvider from "@/app/{services}/SearchParamsProvider";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useRootHotKey} from "@/app/{hooks}/hotKey";
@@ -19,6 +18,7 @@ import SearchHistory from "@/app/{components}/searchHistory";
 import SearchBox from "@/app/{components}/searchBox";
 import {Root} from "@/app/{services}/types";
 import {Common} from "@/app/{commons}/types/commons";
+import {System} from "@/app/user/system/{services}/types";
 
 export default function Page() {
 
@@ -26,7 +26,7 @@ export default function Page() {
     const [initLoading, setInitLoading] = useState(true);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState<Root.BoardListI[]>([]);
-    const [roles, setRoles] = useState<RoleType[]>([]);
+    const [roles, setRoles] = useState<System.Role[]>([]);
     const [searchValue, setSearchValue] = useState('');
     const [searchFocus, setSearchFocus] = useState(false);
     const [dynamicPage, setDynamicPage] = useState<Root.DynamicPage>({

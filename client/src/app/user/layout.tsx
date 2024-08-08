@@ -4,14 +4,14 @@ import React, {useEffect, useState} from "react";
 import LeftNavBar from "@/app/user/{components}/LeftNavBar";
 import Contents from "@/app/user/{components}/Contents";
 import UserProvider, {AttendInfoI, BoardSummaryI, PointSummaryI} from "@/app/user/{services}/userProvider";
-import {RoleType} from "@/app/user/system/{services}/types";
+import {System} from "@/app/user/system/{services}/types";
 
 export default function Layout({children}: {children: React.ReactNode & {test:'1'}}) {
 
     const [boardSummary, setBoardSummary] = useState<BoardSummaryI[]>([]);
     const [attendInfo, setAttendInfo] = useState<AttendInfoI>({} as AttendInfoI);
     const [pointSummary, setPointSummary] = useState<PointSummaryI[]>([]);
-    const [roles, setRoles] = React.useState<RoleType[]>([]);
+    const [roles, setRoles] = React.useState<System.Role[]>([]);
     const [profileImg, setProfileImg] = React.useState<string>('');
 
     const [isOpen, setIsOpen] = useState<boolean>(false);

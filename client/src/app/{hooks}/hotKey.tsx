@@ -2,8 +2,8 @@ import {useHotkeys} from 'react-hotkeys-hook';
 import {RefObject} from 'react';
 import {Category} from "@/app/board/{services}/types";
 import {Options} from "react-hotkeys-hook/src/types";
-import {RoleType} from "@/app/user/system/{services}/types";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
+import {System} from "@/app/user/system/{services}/types";
 
 export const useRootHotKey = ({
     searchRef,
@@ -27,15 +27,15 @@ export const useRootLeftMenuHotKey = ({
     onChangeParamsHandler,
 }: {
     boardBaseUrl          : string,
-    roles                 : RoleType[],
+    roles                 : System.Role[],
     router                : AppRouterInstance,
-    confirmRole           : (item: { roles: RoleType[] }) => RoleType | undefined
+    confirmRole           : (item: { roles: System.Role[] }) => System.Role | undefined
     onChangeParamsHandler : ({type, value}: { type: string, value: string | number | boolean }) => void,
 }) => {
 
     const hotkeysOption: Options = {
-        preventDefault: true,
-        enableOnFormTags: false,
+        preventDefault   : true,
+        enableOnFormTags : false,
     }
 
     useHotkeys(['0', '9'], (_, handler) => {
@@ -68,6 +68,7 @@ export const useRootLeftMenuHotKey = ({
     useHotkeys(['shift+1', 'shift+2', 'shift+3', 'shift+4', 'shift+5', "shift+6"], (e, handler) => {
         if (roles.length === 0) return;
         const selCate = Category.findById(handler.keys!.join(''))!;
+
         if (!confirmRole(selCate)) return;
         router.push(boardBaseUrl + selCate.id);
     }, hotkeysOption, [roles]);

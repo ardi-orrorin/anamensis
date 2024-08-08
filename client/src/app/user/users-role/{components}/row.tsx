@@ -1,7 +1,7 @@
 import moment from "moment/moment";
-import {RoleType} from "@/app/user/system/{services}/types";
 import {UsersRole} from "@/app/user/users-role/page";
 import React, {useMemo} from "react";
+import {System} from "@/app/user/system/{services}/types";
 
 const Row = ({
     user,
@@ -16,7 +16,7 @@ const Row = ({
     maxIndex: number
     select: number[]
     onSelectHandler: (id: number) => void
-    onChangeRole: (mode: 'add' | 'delete', user: UsersRole, selRole : RoleType) => void
+    onChangeRole: (mode: 'add' | 'delete', user: UsersRole, selRole : System.Role) => void
 }) => {
 
     const rolesOption = useMemo(()=>
@@ -70,7 +70,7 @@ const Row = ({
                 { user.isUse ? '사용' : '비사용' }
             </td>
             <td className={'py-2 px-3'}>
-                <select className={'w-full bg-none outline-0'} onChange={e => onChangeRole('add', user, e.target.value as RoleType)}>
+                <select className={'w-full bg-none outline-0'} onChange={e => onChangeRole('add', user, e.target.value as System.Role)}>
                     <option value={''}>선택</option>
                     {
                         !user.roles.includes('ADMIN')
@@ -83,7 +83,7 @@ const Row = ({
                 </select>
             </td>
             <td className={'py-2 px-3'}>
-                <select className={'w-full bg-none outline-0'} onChange={e => onChangeRole('delete', user, e.target.value as RoleType)}>
+                <select className={'w-full bg-none outline-0'} onChange={e => onChangeRole('delete', user, e.target.value as System.Role)}>
                     <option value={''}>선택</option>
                     { rolesOption }
                 </select>

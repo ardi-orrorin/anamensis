@@ -6,9 +6,9 @@ import AlbumBoardComponent from "@/app/{components}/boards/album";
 import QuestionBoardComponent from "@/app/{components}/boards/question";
 import MembersOnlyBody from "@/app/{components}/membersOnlyBody";
 import Blocked from "@/app/{components}/boards/blocked";
-import {RoleType} from "@/app/user/system/{services}/types";
 import CalenderComponent from "@/app/{components}/boards/calender";
 import {Root} from "@/app/{services}/types";
+import {System} from "@/app/user/system/{services}/types";
 
 const BoardComponent = (props: Root.BoardListI & {favorites: string[], isLogin: boolean}) => {
     const {
@@ -50,7 +50,7 @@ const BoardComponent = (props: Root.BoardListI & {favorites: string[], isLogin: 
     ,[]);
 
     const notAdminBlocked = useMemo(() =>
-        isBlocked && !roles.includes(RoleType.ADMIN)
+        isBlocked && !roles.includes(System.Role.ADMIN)
     ,[isBlocked, roles]);
 
     return (

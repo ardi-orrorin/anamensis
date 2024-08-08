@@ -12,12 +12,12 @@ import LoadingProvider from "@/app/board/{services}/LoadingProvider";
 import useSWR, {preload} from "swr";
 import {initBlock} from "@/app/board/{services}/funcs";
 import {BoardSummaryI} from "@/app/user/{services}/userProvider";
-import {RoleType} from "@/app/user/system/{services}/types";
+import {System} from "@/app/user/system/{services}/types";
 
 
 export default function Page({children, params} : {children: ReactNode, params: {id: string}}) {
 
-    const [roles, setRoles] = useState<RoleType[]>([]);
+    const [roles, setRoles] = useState<System.Role[]>([]);
 
     const [board, setBoard] = useState<BoardService>({} as BoardService);
 
@@ -174,7 +174,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
             if(roles) setRoles(JSON.parse(roles));
 
-            if(res.data.isBlocked && !roles?.includes(RoleType.ADMIN)) {
+            if(res.data.isBlocked && !roles?.includes(System.Role.ADMIN)) {
                 alert('차단된 게시물입니다.');
                 location.href = '/';
                 return ;

@@ -1,10 +1,8 @@
 import {useContext, useState} from "react";
 import OTPProvider from "@/app/user/otp/{services}/OTPProvider";
-import axios from "axios";
 import {useRouter} from "next/navigation";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import apiCall from "@/app/{commons}/func/api";
-import Image from "next/image";
 
 const OTPGenerate = () => {
 

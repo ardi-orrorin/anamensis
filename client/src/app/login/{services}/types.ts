@@ -1,4 +1,4 @@
-import {RoleType} from "@/app/user/system/{services}/types";
+import {System} from "@/app/user/system/{services}/types";
 
 interface UserI {
     userId   : string;
@@ -48,7 +48,7 @@ type LoginResponseT = {
 
 type LoginUserInfoT = {
     username : string,
-    roles    : RoleType[]
+    roles    : System.Role[]
 }
 
 type OAuthProviderT = {
@@ -73,9 +73,9 @@ type FindUserResponseT = {
 
 enum ResetPwdProgressEnum {
     CONFIRMED = 'CONFIRMED',
-    VERIFIED = 'VERIFIED',
-    RESET = 'RESET',
-    FAIL = 'fail'
+    VERIFIED  = 'VERIFIED',
+    RESET     = 'RESET',
+    FAIL      = 'fail'
 }
 
 interface ResetPwdII {

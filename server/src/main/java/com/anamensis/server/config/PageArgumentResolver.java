@@ -1,6 +1,7 @@
 package com.anamensis.server.config;
 
 import com.anamensis.server.dto.Page;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;
 import org.springframework.util.MultiValueMap;
@@ -9,6 +10,7 @@ import org.springframework.web.reactive.result.method.HandlerMethodArgumentResol
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 public class PageArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Value("${pageable.page}")

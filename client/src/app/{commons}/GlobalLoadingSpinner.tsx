@@ -1,5 +1,4 @@
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import React from "react";
 
 const GlobalLoadingSpinner = () => {
     return (
@@ -9,4 +8,4 @@ const GlobalLoadingSpinner = () => {
     );
 }
 
-export default React.memo(GlobalLoadingSpinner);
+export default GlobalLoadingSpinner;

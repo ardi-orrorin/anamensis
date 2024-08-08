@@ -1,10 +1,8 @@
 'use client';
 
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
-import React from "react";
 
 const SizeSelect = () => {
-
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
@@ -34,4 +32,4 @@ const SizeSelect = () => {
     )
 }
 
-export default React.memo(SizeSelect);
+export default SizeSelect;

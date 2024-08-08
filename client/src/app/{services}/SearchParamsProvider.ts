@@ -1,4 +1,5 @@
 import {createContext, Dispatch, SetStateAction} from "react";
+import {DynamicPage} from "@/app/page";
 
 export interface BoardListParamsI {
     page        : number;

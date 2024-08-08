@@ -6,7 +6,6 @@ import com.anamensis.server.dto.StatusType;
 import com.anamensis.server.dto.request.BoardBlockHistoryRequest;
 import com.anamensis.server.dto.response.BoardBlockHistoryResponse;
 import com.anamensis.server.dto.response.StatusResponse;
-import com.anamensis.server.entity.BoardBlockResultStatus;
 import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.service.BoardBlockHistoryService;
@@ -110,7 +109,7 @@ public class BoardBlockHistoryController {
     ) {
         return boardBlockHistoryService.update(request.toEntity())
                 .doOnNext($ -> {
-                    if(request.getResultStatus() != null && request.getResultStatus() == BoardBlockResultStatus.UNBLOCKING) {
+                    if(request.getResultStatus() != null && request.getResultStatus() == BoardBlockHistoryRequest.ResultStatus.UNBLOCKING) {
                         boardBlockHistoryService.findByPk(request.getId())
                             .subscribeOn(Schedulers.boundedElastic())
                             .doOnNext(b -> {

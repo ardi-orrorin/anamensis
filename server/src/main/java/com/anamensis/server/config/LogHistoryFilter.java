@@ -4,7 +4,9 @@ import com.anamensis.server.entity.LogHistory;
 import com.anamensis.server.service.LogHistoryService;
 import com.anamensis.server.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -27,6 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * 로그인 한 유저의 API 호출 로그 기록 필터
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class LogHistoryFilter implements WebFilter {
@@ -36,21 +39,20 @@ public class LogHistoryFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        AtomicReference<byte[]> bodyByte = new AtomicReference<>();
 
-        AtomicReference<byte[]> body = new AtomicReference<>();
-        Mono<ServerWebExchange> fileApi   = fileApi(exchange)
-                .subscribeOn(Schedulers.boundedElastic());
-        Mono<ServerWebExchange> noBodyApi = noBodyApi(exchange)
-            .subscribeOn(Schedulers.boundedElastic());
-        Mono<ServerWebExchange> bodyApi   = bodyApi(exchange, body)
-            .subscribeOn(Schedulers.boundedElastic());
+        Mono<ServerWebExchange> fileApi   = fileApi(exchange);
+        Mono<ServerWebExchange> noBodyApi = noBodyApi(exchange);
+        Mono<ServerWebExchange> bodyApi   = bodyApi(exchange, bodyByte);
 
         return Mono.zip(fileApi, noBodyApi, bodyApi)
-                .flatMap(t -> {
-                    if(body.get() == null) return chain.filter(exchange);
-
-                    return chain.filter(replaceBody(t.getT3(), body.get()));
-                });
+                .flatMap(t ->
+                    chain.filter(
+                        bodyByte.get() != null
+                        ? newRequest(bodyByte.get(), exchange)
+                        : exchange
+                    )
+                );
     }
 
     private boolean isFileApi(ServerWebExchange ex) {
@@ -80,7 +82,6 @@ public class LogHistoryFilter implements WebFilter {
                 .subscribeOn(Schedulers.boundedElastic())
                 .onErrorResume(e -> {
                     logWrite("upload File".getBytes(), exchange)
-                            .subscribeOn(Schedulers.boundedElastic())
                             .subscribe();
                     return Mono.empty();
                 })
@@ -102,7 +103,7 @@ public class LogHistoryFilter implements WebFilter {
                 .then(Mono.just(exchange));
     }
 
-    private Mono<ServerWebExchange> bodyApi(ServerWebExchange exchange, AtomicReference<byte[]> body) {
+    private Mono<ServerWebExchange> bodyApi(ServerWebExchange exchange, AtomicReference<byte[]> bodyByte) {
         if(this.isFileApi(exchange)) {
             return Mono.just(exchange);
         }
@@ -113,15 +114,14 @@ public class LogHistoryFilter implements WebFilter {
             return Mono.just(exchange);
         }
 
-        return Mono.just(exchange)
-            .publishOn(Schedulers.boundedElastic())
-            .flatMap(ex ->
-                DataBufferUtils.join(ex.getRequest().getBody())
-                    .map(this::toBytes)
-                    .doOnNext(body::set)
-                    .flatMap(bytes -> logWrite(bytes, exchange))
-            )
-            .then(Mono.just(exchange));
+        Flux<DataBuffer> body = exchange.getRequest().getBody();
+
+        return DataBufferUtils.join(body)
+                .map(this::toBytes)
+                .doOnNext(bodyByte::set)
+                .publishOn(Schedulers.boundedElastic())
+                .flatMap(bytes -> logWrite(bytes, exchange))
+                .map(ex -> newRequest(bodyByte.get(), ex));
 
     }
 
@@ -132,19 +132,7 @@ public class LogHistoryFilter implements WebFilter {
         return bytes;
     }
 
-    private ServerWebExchange replaceBody(ServerWebExchange exchange, byte[] bytes) {
-        ServerHttpRequest request = new ServerHttpRequestDecorator(exchange.getRequest()) {
-            @Override
-            public Flux<DataBuffer> getBody() {
-                DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
-                return Flux.just(buffer);
-            }
-        };
-
-        return exchange.mutate().request(request).build();
-    }
-
-    private Mono<Void> logWrite(byte[] bytes, ServerWebExchange ex) {
+    private Mono<ServerWebExchange> logWrite(byte[] bytes, ServerWebExchange ex) {
         String path = ex.getRequest().getPath().toString();
         String body = new String(bytes, StandardCharsets.UTF_8);
         String header = ex.getRequest().getHeaders().toString();
@@ -153,6 +141,7 @@ public class LogHistoryFilter implements WebFilter {
         String remoteAddr = ex.getRequest().getRemoteAddress().toString();
         String query = ex.getRequest().getQueryParams().toString();
         String URI = ex.getRequest().getURI().toString();
+
 
         return ex.getPrincipal()
                 .flatMap(principal -> userService.findUserByUserId(principal.getName()))
@@ -172,7 +161,20 @@ public class LogHistoryFilter implements WebFilter {
                             .createAt(LocalDateTime.now())
                             .build()
                 )
-                .flatMap(logHistoryService::save);
+                .flatMap(logHistoryService::save)
+                .then(Mono.just(ex));
+    }
+
+    private ServerWebExchange newRequest(byte[] bytes, ServerWebExchange ex) {
+        ServerHttpRequest request = new ServerHttpRequestDecorator(ex.getRequest()) {
+            @Override
+            public Flux<DataBuffer> getBody() {
+                DataBufferFactory s = ex.getResponse().bufferFactory();
+                return Flux.just(s.wrap(bytes));
+            }
+        };
+
+        return ex.mutate().request(request).build();
     }
 }
 

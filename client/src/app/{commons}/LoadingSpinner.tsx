@@ -12,4 +12,4 @@ const LoadingSpinner = ({size}:{size : number}) => {
     );
 }
 
-export default React.memo(LoadingSpinner);
+export default LoadingSpinner;

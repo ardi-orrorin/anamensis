@@ -101,7 +101,6 @@ export class Category {
         new Category("3", "Q & A", [RoleType.ADMIN, RoleType.USER, RoleType.MASTER]),
         new Category("4", "알뜰 게시판", [RoleType.ADMIN, RoleType.USER, RoleType.MASTER]),
         new Category("5", "이미지 게시판", [RoleType.ADMIN, RoleType.USER, RoleType.MASTER]),
-        new Category("6", "스케쥴 게시판", [RoleType.ADMIN, RoleType.USER, RoleType.MASTER]),
     ];
 
     constructor(id: string, name: string, roles: RoleType[] = []) {

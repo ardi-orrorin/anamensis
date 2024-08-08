@@ -36,7 +36,6 @@ const Comment = ({
         comment,setComment,
         board, isNewBoard, isTemplate
     } = useContext(BoardProvider);
-
     const {newComment, setNewComment} = useContext(BoardProvider);
 
     const [page, setPage] = useState<PageI>({

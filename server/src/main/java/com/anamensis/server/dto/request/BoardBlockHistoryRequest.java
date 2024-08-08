@@ -1,7 +1,6 @@
 package com.anamensis.server.dto.request;
 
 import com.anamensis.server.entity.BoardBlockHistory;
-import com.anamensis.server.entity.BoardBlockResultStatus;
 import com.anamensis.server.entity.BoardBlockStatus;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,12 +33,11 @@ public class BoardBlockHistoryRequest {
         private long id;
         private String answer;
         private String result;
-        private BoardBlockResultStatus resultStatus;
+        private ResultStatus resultStatus;
 
         public BoardBlockHistory toEntity() {
             BoardBlockHistory boardBlockHistory = new BoardBlockHistory();
             boardBlockHistory.setId(id);
-            boardBlockHistory.setResultStatus(resultStatus);
 
             if(answer != null && !answer.isEmpty()) {
                 boardBlockHistory.setAnswer(answer);
@@ -61,7 +59,11 @@ public class BoardBlockHistoryRequest {
                 return;
             }
 
-            this.resultStatus = BoardBlockResultStatus.valueOf(resultStatus);
+            this.resultStatus = ResultStatus.valueOf(resultStatus);
         }
+    }
+
+    public enum ResultStatus {
+        UNBLOCKING, BLOCKING
     }
 }

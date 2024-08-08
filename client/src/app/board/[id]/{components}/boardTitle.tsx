@@ -1,17 +1,18 @@
 import {BoardService} from "@/app/board/{services}/BoardProvider";
-import React from "react";
 
-const BoardTitle = ({
-    newBoard,
-    board,
-    onChange,
-    onKeyDown
-}: {
-    newBoard  : boolean
+const BoardTitle = (props: {
     board     : BoardService,
     onChange  : (e: React.ChangeEvent<HTMLInputElement>) => void,
-    onKeyDown : (e: any) => void,
+    onKeyDown   : (e: any) => void,
+    newBoard  : boolean
 }) => {
+
+    const {
+        board,
+        onChange,
+        onKeyDown,
+        newBoard
+    } = props;
 
     return <div className={"font-bold flex w-full items-center"}>
         {
@@ -30,13 +31,10 @@ const BoardTitle = ({
             board.isView
             && !newBoard
             && <span className={"flex w-full text-lg py-1 break-all"}
-            >{ board.data.title }
+            >{props.board.data.title}
             </span>
         }
     </div>;
 }
 
-export default React.memo(BoardTitle, (prev, next) => {
-    return prev.newBoard === next.newBoard
-        && prev.board    === next.board;
-});
+export default BoardTitle;

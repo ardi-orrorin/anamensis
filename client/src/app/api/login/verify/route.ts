@@ -3,7 +3,6 @@ import axios from "axios";
 import {LoginI, OAuth2I} from "@/app/login/{services}/LoginProvider";
 import {ResponseCookie} from "next/dist/compiled/@edge-runtime/cookies";
 import {ErrorResponse} from "@/app/login/page";
-import loginConstants from "@/app/login/{services}/constants";
 
 export async function POST(req: NextRequest){
 
@@ -31,25 +30,32 @@ export async function POST(req: NextRequest){
     }
 
     try {
-        const res = await axios.post(url, user, {
+        const resData = await axios.post(url, user, {
             headers,
             withCredentials: true
         })
-        const next = new NextResponse(JSON.stringify(res.data), {
+        const next = new NextResponse(JSON.stringify(resData.data), {
             status: 200,
             headers: {
                 'Content-Type': 'application/json',
             },
         });
 
-        next.cookies.set('next.access.token', res.data.accessToken, {
-            ...loginConstants.cookieInit,
-            maxAge: res.data.accessTokenExpiresIn
+        const cookieInit: Partial<ResponseCookie> = {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            path: '/'
+        }
+
+        next.cookies.set('next.access.token', resData.data.accessToken, {
+            ...cookieInit,
+            maxAge: resData.data.accessTokenExpiresIn / 1000
         });
 
-        next.cookies.set('next.refresh.token', res.data.refreshToken, {
-            ...loginConstants.cookieInit,
-            maxAge: res.data.refreshTokenExpiresIn
+        next.cookies.set('next.refresh.token', resData.data.refreshToken, {
+            ...cookieInit,
+            maxAge: resData.data.refreshTokenExpiresIn / 1000
         });
 
         return next;

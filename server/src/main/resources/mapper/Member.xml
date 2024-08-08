@@ -160,9 +160,7 @@
         UPDATE member
            SET pwd     = #{pwd}
          WHERE user_id = #{userId}
-           <if test="email != null and email != ''">
-               AND email   = #{email}
-          </if>
+           AND email   = #{email}
            AND is_use  = 1
     </update>
 

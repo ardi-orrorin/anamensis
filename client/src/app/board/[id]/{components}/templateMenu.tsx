@@ -2,11 +2,11 @@ import {useContext, useEffect, useRef, useState} from "react";
 import BoardProvider, {BoardTemplateService} from "@/app/board/{services}/BoardProvider";
 import apiCall from "@/app/{commons}/func/api";
 import {BoardTemplate, boardTemplateList} from "@/app/board/{services}/types";
+import {blockTypeList} from "@/app/board/{components}/block/list";
 import {StatusResponse} from "@/app/{commons}/types/commons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import {blockTypeFlatList} from "@/app/board/{components}/block/list";
 
 
 type TemplateMenuOpenProps = {
@@ -69,7 +69,7 @@ const TemplateMenu = () => {
                 isReturnData: true
             })
 
-            const isExtraObj = blockTypeFlatList.find(item =>
+            const isExtraObj = blockTypeList.find(item =>
                 item.code === board.data.content.list[0].code)
                 ?.type === 'extra';
 
@@ -189,7 +189,6 @@ const Item = ({
     onChangeTemplate: (id: number) => void,
     onRemoveTemplate: (id: number) => void
 }) => {
-
     return (
         <div className={'w-80 p-1 flex gap-5 justify-between text-sm hover:bg-gray-400 hover:text-white duration-300'}>
             <button className={'w-full'}

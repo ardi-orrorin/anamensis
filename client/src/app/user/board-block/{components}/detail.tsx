@@ -1,4 +1,3 @@
-
 import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -9,11 +8,10 @@ import BoardBlockProvider, {
     BoardBlockStatusEnum
 } from "@/app/user/board-block/{services}/boardBlockProvider";
 import ModalProvider, {ModalI} from "@/app/user/board-block/{services}/modalProvider";
-import {faCaretRight} from "@fortawesome/free-solid-svg-icons";
+import {faArrowDown, faCaretRight} from "@fortawesome/free-solid-svg-icons";
 import UserProvider from "@/app/user/{services}/userProvider";
 import apiCall from "@/app/{commons}/func/api";
 import {RoleType} from "@/app/user/system/{services}/types";
-import TextBox from "@/app/user/board-block/{components}/textBox";
 
 const Detail = () => {
 
@@ -69,7 +67,7 @@ const Detail = () => {
                  onClick={e=> e.stopPropagation()}
             >
                 <div className={'w-full h-10 flex'}>
-                    <div className={'w-[95%] py-2 border-b-2 border-solid border-gray-800 font-bold'}>
+                    <div className={'w-[90%] py-2 border-b-2 border-solid border-gray-800 font-bold'}>
                         <span className={'line-clamp-1'}>
                             {boardBlock.title}
                         </span>
@@ -80,7 +78,7 @@ const Detail = () => {
                         </button>
                     </div>
                 </div>
-                <div className={'w-full h-[80%] min-h-[400px] py-2 flex flex-col gap-1 text-sm overflow-x-auto'}>
+                <div className={'w-full h-[70%] min-h-[400px] flex flex-col gap-3 text-sm'}>
                     <div>
                         <label className={'text-sm flex gap-2 items-center'}>
                             <FontAwesomeIcon icon={faCaretRight} />
@@ -119,70 +117,92 @@ const Detail = () => {
                                     onChange={onChangeHandler}
                         />
                     }
-                    {
-                        boardBlock.status === BoardBlockStatusEnum.RESULTED
-                        && (roles.includes(RoleType.USER) || roles.includes(RoleType.ADMIN))
-                        && <div className={'w-full flex gap-2'}>
-                            <label className={'text-sm flex gap-2 items-center'}>
-                                <FontAwesomeIcon icon={faCaretRight}/>
-                                처리 결과 : {boardBlock.resultStatus === BoardBlockResultStatusEnum.BLOCKING ? '게시글 제한' : '제한 해제'}
-                            </label>
-                        </div>
-                    }
                 </div>
                 <div className={'w-full flex gap-2 justify-center'}>
                     {
-                        roles.includes(RoleType.ADMIN)
-                        && boardBlock.status === BoardBlockStatusEnum.ANSWERED
-                            ? <Btn btnText1={'제한 해제'}
-                                   onClick1={()=> onSubmitHandler(BoardBlockResultStatusEnum.UNBLOCKING)}
-                                   btnText2={'거부'}
-                                   onClick2={onSubmitHandler}
-                            />
-                            : boardBlock.status === BoardBlockStatusEnum.RESULTED
-                            ? <Btn btnText1={'닫기'}
-                                   onClick1={onCloseHandler}
-                            />
-                            : <Btn btnText1={'확인'}
-                                   onClick1={onSubmitHandler}
-                                   btnText2={'취소'}
-                                   onClick2={onCloseHandler}
-                            />
+                        boardBlock.status === BoardBlockStatusEnum.ANSWERED
+                        && roles.includes(RoleType.ADMIN)
+                        ? <>
+                            <button className={'w-[45%] md:w-20 h-12 md:h-8 rounded bg-main text-white text-sm'}
+                                    onClick={() => onSubmitHandler(BoardBlockResultStatusEnum.UNBLOCKING)}
+                            >
+                                제한 해제
+                            </button>
+                            <button className={'w-[45%] md:w-20 h-12 md:h-8 rounded bg-red-500 text-white text-sm'}
+                                    onClick={() => onSubmitHandler()}
+                            >
+                                거부
+                            </button>
+                        </>
+                        : <>
+                            <button className={'w-[45%] md:w-20 h-12 md:h-8 rounded bg-main text-white text-sm'}
+                                    onClick={() => onSubmitHandler()}
+                            >
+                                저장
+                            </button>
+                            <button className={'w-[45%] md:w-20 h-12 md:h-8 rounded bg-red-700 text-white text-sm'}
+                                    onClick={onCloseHandler}
+                            >
+                                취소
+                            </button>
+                        </>
                     }
+
                 </div>
             </div>
         </div>
     )
 }
 
-
-const Btn = ({
-    btnText1,
-    btnText2,
-    onClick1,
-    onClick2
+const TextBox = ({
+    name, text, date, onChange, title, status
 }:{
-    btnText1  : string;
-    btnText2? : string;
-    onClick1  : (status?: BoardBlockResultStatusEnum) => void;
-    onClick2? : (status?: BoardBlockResultStatusEnum) => void;
+    name     : string;
+    text     : string;
+    date     : string;
+    title    : string;
+    status  : BoardBlockStatusEnum;
+    onChange : (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }) => {
+
+    const viewMode = useMemo(()=> {
+        return name === 'answer' && (status === BoardBlockStatusEnum.ANSWERED || status === BoardBlockStatusEnum.RESULTED)
+        || name === 'result' && status === BoardBlockStatusEnum.RESULTED
+    },[name]);
+
     return (
-        <>
-            <button className={'w-[45%] md:w-20 h-12 md:h-8 rounded bg-main text-white text-sm'}
-                    onClick={() => onClick1()}
-            >
-                { btnText1 }
-            </button>
+        <div className={'w-full min-h-44 flex flex-col gap-2 justify-center'}>
+            <FontAwesomeIcon icon={faArrowDown} size={'lg'} className={'font-extrabold'} />
             {
-                btnText2 && onClick2 &&
-                <button className={'w-[45%] md:w-20 h-12 md:h-8 rounded bg-red-500 text-white text-sm'}
-                        onClick={() => onClick2()}
-                >
-                    { btnText2 }
-                </button>
+                viewMode
+                ? <div className={'text-sm flex flex-col gap-1'}>
+                    <span className={'text-sm flex gap-2 items-center'}>
+                        <FontAwesomeIcon icon={faCaretRight} />
+                        답변일자 : {date}
+                    </span>
+                    <span>
+                        내용 : {text}
+                    </span>
+                </div>
+                : <div className={'relative w-full flex flex-col gap-1'}>
+                    <label className={'text-sm flex gap-2 items-center'}>
+                        <FontAwesomeIcon icon={faCaretRight} />
+                        {title}
+                    </label>
+                    <textarea className={'w-full border border-gray-300 border-solid rounded p-2 outline-0 text-sm resize-none'}
+                              name={name}
+                              value={text}
+                              maxLength={500}
+                              onChange={onChange}
+                              rows={5}
+                              autoFocus={true}
+                    />
+                    <span className={'absolute right-3 bottom-3'}>
+                        {text.length} / 500
+                    </span>
+                </div>
             }
-        </>
+        </div>
     )
 }
 

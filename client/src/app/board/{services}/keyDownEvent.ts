@@ -113,9 +113,8 @@ const backspace = (args: KeyEventType) => {
 
     setBoard({...board, data: {...board.data, content: {list: newList}}});
 
-    const timeout = setTimeout(() => {
-        clearTimeout(timeout);
-        if(blockRef?.current[seq - 1]?.ariaRoleDescription !== 'text') return;
+    setTimeout(() => {
+        if(blockRef?.current[seq - 1]?.ariaRoleDescription === 'object') return;
         const prevRef = blockRef.current[seq - 1] as HTMLInputElement;
         const position = prevRef.value.length - afterText.length;
         prevRef.setSelectionRange(position, position);

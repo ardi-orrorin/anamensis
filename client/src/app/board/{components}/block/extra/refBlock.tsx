@@ -2,12 +2,12 @@ import {BlockProps, ExpendBlockProps} from "@/app/board/{components}/block/type/
 import {useCallback, useMemo, useState} from "react";
 import useSWR from "swr";
 import apiCall from "@/app/{commons}/func/api";
-import {BlockI, RefBoardI} from "@/app/board/{services}/types";
+import {BlockI, BoardI, RefBoardI} from "@/app/board/{services}/types";
+import {blockTypeList} from "@/app/board/{components}/block/list";
 import Link from "next/link";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import moment from "moment";
 import ObjectTemplate from "@/app/board/{components}/block/ObjectTemplate";
-import {BlockComponentType, blockTypeFlatList} from "@/app/board/{components}/block/list";
 
 
 export type RefBlockExtraValueType = {
@@ -21,7 +21,6 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
         isView, code,
         seq, blockRef,
         onChangeExtraValueHandler,
-        onChangeValueHandler,
         onKeyUpHandler,
         onKeyDownHandler,
         onMouseEnterHandler,
@@ -54,14 +53,6 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
                 return ;
             }
 
-            const calenderBlock = blockTypeFlatList.find(e =>
-                e.label === 'calender') as BlockComponentType;
-
-            if(block && block.code === calenderBlock.code) {
-                alert('캘린더 블록은 참조 할 수 없습니다.');
-                return ;
-            }
-
             setRefBlock(block as BlockI);
         })
         .catch(e => {
@@ -79,7 +70,7 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
         setValid('');
     },[]);
 
-    const onChangeValuesHandler = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeValueHandler = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         if(value === '') return;
         const regExp = /\/board\/(\d+)#block-(\d){13}-(\d+)/i;
 
@@ -92,14 +83,10 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
 
         const blockId = regExp.exec(value)![0].split('#block-')[1];
 
-        if(!onChangeExtraValueHandler) return ;
         onChangeExtraValueHandler!({
             boardId,
             blockId
         } as RefBlockExtraValueType);
-
-        if(!onChangeValueHandler) return;
-        onChangeValueHandler(e.target.value);
 
         setTimeout(async () => {
             await mutate();
@@ -107,7 +94,7 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
     },[value, extraValue]);
 
     const Component = useMemo(()=> {
-        return blockTypeFlatList.find(e => {
+        return blockTypeList.find(e => {
             return e.code === refBlock?.code
         })?.component;
     }, [refBlock, boardValue]);
@@ -127,7 +114,7 @@ const RefBlock = (props: ExpendBlockProps & {code: string}) => {
                               value={value}
                               placeholder={'링크를 입력하세요.'}
                               onChange={onChangeHandler}
-                              onBlur={onChangeValuesHandler}
+                              onBlur={onChangeValueHandler}
                               onKeyUp={onKeyUpHandler}
                               onKeyDown={onKeyDownHandler}
                               ref={el => {props!.blockRef!.current[props.seq] = el}}

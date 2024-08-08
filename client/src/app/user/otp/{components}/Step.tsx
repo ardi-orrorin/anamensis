@@ -4,6 +4,7 @@ export enum OTPStepEnum {
     INIT   = 'init',
     OTP    = 'otp',
     VERIFY = 'verify',
+
 }
 
 const OTPStep = ({step}: {step: OTPStepEnum}) => {

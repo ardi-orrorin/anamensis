@@ -16,10 +16,11 @@ export async function middleware(req: NextRequest) {
         const next = NextResponse.next();
 
         next.headers.set('Set-Cookie', result + '; SameSite=lax; path=/; httponly;');
+        next.headers.set('Set-Cookie', result + '; SameSite=lax; path=/; httponly;');
         return next;
     }
 
-    if (!accessToken && !refreshToken) {
+    if (!accessToken) {
         url.pathname = '/';
         url.search = '';
         return NextResponse.redirect(url)
@@ -44,7 +45,8 @@ const generateRefreshToken = async (refreshToken: RequestCookie, userAgent: stri
         }
     });
 
-    return accessToken || '';
+    // @ts-ignore
+    return accessToken;
 }
 
 export const config = {

@@ -77,9 +77,7 @@ jobs:
       - name: Docker deploy
         run: |
           ssh -o StrictHostKeyChecking=no -i anamensis.pem ${{ secrets.AWS_EC2_INSTANCE }} << 'EOF'
-          cd ./config
-          sudo ./site-docker-secret.sh ${{ env.VERSION }}
-          cd ..
+          cd ./config && sudo ./site-docker-secret.sh ${{ env.VERSION }}
           sudo ./deploy.sh ${{ env.SERVICE }} ${{ env.VERSION }} ${{ secrets.EC2_INSTANCE_PORT }} ${{ secrets.DOCKER_ID }}
           rm -rf *
           EOF

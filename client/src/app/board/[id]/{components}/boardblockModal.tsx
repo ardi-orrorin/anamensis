@@ -6,12 +6,13 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {faCaretRight} from "@fortawesome/free-solid-svg-icons";
 import {BoardBlock} from "@/app/user/board-block/{services}/boardBlockProvider";
 import apiCall from "@/app/{commons}/func/api";
+import {useRouter} from "next/navigation";
 
 const BoardBlockModal = () => {
-
     const {setModal} = useContext(ModalProvider);
     const {board} = useContext(BoardProvider);
     const [reason, setReason] = useState('');
+    const router = useRouter();
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setReason(e.target.value);

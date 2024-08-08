@@ -1,11 +1,12 @@
+import {BoardService} from "@/app/board/{services}/BoardProvider";
 import {BoardI} from "@/app/board/{services}/types";
-import React from "react";
 
-const BoardInfo = ({
-    updatedAt, viewCount,
-    isPublic, membersOnly,
-    writer
-}: BoardI) => {
+const data = (props: BoardService) => {
+    const {
+        updatedAt, viewCount,
+        isPublic, membersOnly,
+        writer
+    }: BoardI = props.data;
 
     return (
         <div className={"flex justify-between px-2"}>
@@ -43,10 +44,4 @@ const BoardInfo = ({
     );
 }
 
-export default React.memo(BoardInfo, (prev, next) => {
-    return prev.updatedAt   === next.updatedAt
-        && prev.viewCount   === next.viewCount
-        && prev.isPublic    === next.isPublic
-        && prev.membersOnly === next.membersOnly
-        && prev.writer      === next.writer
-});
+export default data;

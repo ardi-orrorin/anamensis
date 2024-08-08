@@ -53,4 +53,4 @@ const DeleteOverlay = ({
     )
 }
 
-export default React.memo(DeleteOverlay);
+export default DeleteOverlay;

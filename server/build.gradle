@@ -25,6 +25,7 @@ repositories {
 
 ext {
     set('springCloudVersion', "2023.0.3")
+    set('flywaydb','10.16.0')
     set('awsSpring', '3.1.1')
     set('jsonwebtoken', '0.12.6')
 }
@@ -34,8 +35,8 @@ dependencies {
     implementation 'net.coobird:thumbnailator:0.4.20'
     implementation 'com.warrenstrange:googleauth:1.5.0'
 
-    implementation "org.flywaydb:flyway-core"
-    implementation "org.flywaydb:flyway-mysql"
+    implementation "org.flywaydb:flyway-core:${flywaydb}"
+    implementation "org.flywaydb:flyway-mysql:${flywaydb}"
 
     implementation "io.awspring.cloud:spring-cloud-aws-starter-s3:${awsSpring}"
     implementation "io.awspring.cloud:spring-cloud-aws-starter-ses:${awsSpring}"

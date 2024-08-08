@@ -1,4 +1,4 @@
-import React, {useMemo} from "react";
+import {useMemo} from "react";
 
 export type EmailTemplateProps = {
     className? : string;
@@ -20,9 +20,9 @@ const EmailTemplate = ({
         '@kakao.com',
         '@outlook.com',
     ];
-    const emailToId = useMemo(()=>
-        id.split('@')[0]
-    ,[id])
+    const emailToId = useMemo(()=> {
+            return id.split('@')[0]}
+        ,[id]) ;
 
 
     return (
@@ -42,7 +42,4 @@ const EmailTemplate = ({
     )
 };
 
-export default React.memo(EmailTemplate, (prev, next) => {
-    return prev.id     === next.id
-        && prev.domain === next.domain
-});
+export default EmailTemplate;

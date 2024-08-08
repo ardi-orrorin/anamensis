@@ -56,15 +56,14 @@
         UPDATE board_block_history
         <set>
             <if test="answer != null and answer != '' and answerAt != null">
-                answer        = #{answer},
-                answer_at     = #{answerAt},
+                answer    = #{answer},
+                answer_at = #{answerAt},
             </if>
             <if test="result != null and result != '' and resultAt != null">
-                result        = #{result},
-                result_at     = #{resultAt},
+                result    = #{result},
+                result_at = #{resultAt},
             </if>
-                status        = #{status},
-                result_status = #{resultStatus},
+                status    = #{status},
         </set>
          WHERE id = #{id};
     </update>

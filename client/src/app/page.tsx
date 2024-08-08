@@ -7,28 +7,19 @@ import BoardComponent, {BoardListI} from "@/app/{components}/boardComponent";
 import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons/faMagnifyingGlass";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import LeftMenu from "@/app/{components}/leftMenu";
-import MobileMenu from "@/app/{components}/mobileMenu";
+import TopMenu from "@/app/{components}/topMenu";
 import {RoleType} from "@/app/user/system/{services}/types";
 import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useRootHotKey} from "@/app/{hooks}/hotKey";
 import Notices, {NoticeType} from "@/app/{components}/boards/notices";
+import useSWR from "swr";
 import SearchInfo from "@/app/{components}/searchInfo";
-import {faBars, faCaretRight} from "@fortawesome/free-solid-svg-icons";
-import {Virtuoso} from "react-virtuoso";
-import RightSubMenu from "@/app/{components}/rightSubMenu";
-import SearchHistory from "@/app/{components}/searchHistory";
-import SearchBox from "@/app/{components}/searchBox";
 
 export type DynamicPage = {
     isEndOfList: boolean;
     isVisible  : boolean;
-}
-
-export type SearchHistoryProps = {
-    toggle: boolean;
-    history: string[];
 }
 
 export default function Page() {
@@ -44,7 +35,6 @@ export default function Page() {
         isEndOfList: false,
         isVisible  : false,
     });
-    const [menuToggle, setMenuToggle] = useState(false);
 
     const [favorites, setFavorites] = useState<string[]>([]);
 
@@ -54,36 +44,12 @@ export default function Page() {
     } as BoardListParamsI);
 
     const [noticeList, setNoticeList] = useState<NoticeType[]>([]);
-    const [searchHistory, setSearchHistory] = useState<SearchHistoryProps>({
-        toggle: true,
-        history:[] as string[]
-    });
-    const [onSearchHistory, setOnSearchHistory] = useState(false);
-
-    const [viewNotice, setViewNotice] = useState(false);
-
-    const moreRef = useRef<HTMLDivElement>(null);
-    const searchRef = useRef<HTMLInputElement>(null);
-
     const isLogin = useMemo(()=> roles.length > 0, [roles]);
 
-    const notFoundResult = useMemo(()=> {
-        return !initLoading && !loading && data?.length === 0
-    },[initLoading, loading, data]);
-
-    const moreToggle = useMemo(() => {
-        return !loading && !dynamicPage.isEndOfList && !dynamicPage.isVisible
-    },[loading, dynamicPage]);
+    const moreRef = React.useRef<HTMLDivElement>(null);
+    const searchRef = useRef<HTMLInputElement>(null);
 
     const fetchDebounce = createDebounce(100);
-
-    useEffect(()=>{
-        const history = localStorage.getItem('searchHistory');
-        if(history) setSearchHistory(JSON.parse(history));
-
-        const viewNotice = localStorage.getItem('viewNotice');
-        if(viewNotice) setViewNotice(JSON.parse(viewNotice));
-    },[]);
 
     useEffect(() => {
         apiCall<string[]>({
@@ -161,8 +127,7 @@ export default function Page() {
     },[moreRef?.current, loading]);
 
 
-    const onSearchHandler = useCallback((init: boolean, keyword?: string) => {
-        window.scrollTo({top: 0});
+    const onSearchHandler = useCallback((init: boolean) => {
         const initPage = {page: 1, size: pageSize};
 
         if(init) {
@@ -173,19 +138,14 @@ export default function Page() {
 
         const regex = /[^a-zA-Z0-9ㄱ-ㅎ가-힣\s]/g;
 
-        const value = keyword || searchValue.replace(regex, ' ') || '';
+        const value = searchValue.replace(regex, '');
 
-        const params = value === ''
+        const params = searchValue === ''
         ? {...initPage} as BoardListParamsI
         : {...searchParams, ...initPage, value, type: 'content'};
 
         setSearchParams(params);
-
-        if(searchHistory.history.some(key => key === value) || value === '') return;
-        localStorage.setItem('searchHistory', JSON.stringify({...searchHistory, history: [...searchHistory.history, value]}));
-        setSearchHistory({...searchHistory, history: [...searchHistory.history, value]});
-
-    },[searchParams, searchValue, searchHistory]);
+    },[searchParams, searchValue]);
 
     const onEnterHandler = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
         if(e.key === 'Enter') {
@@ -199,108 +159,88 @@ export default function Page() {
         }
     },[searchRef, searchValue]);
 
-    const onChangeNotice = useCallback(() => {
-        setViewNotice(!viewNotice);
-        localStorage.setItem('viewNotice', JSON.stringify(!viewNotice));
-    },[viewNotice]);
-
     useRootHotKey({searchRef})
+
+    const dataComponent = useMemo(() => data.map((item, index) => {
+        if(!item) return;
+        return (
+            <BoardComponent key={'boardsummary' + index} {...{...item, favorites, isLogin, roles}} />
+        )
+    }),[data, favorites]);
 
     return (
         <SearchParamsProvider.Provider value={{
             searchParams, setSearchParams,
         }}>
-            <div className={'p-5 flex flex-col gap-10'}
-                 onClick={()=> {
-                     setOnSearchHistory(false)
-                     setSearchFocus(false)
-                 }}
-            >
-                <div className={'sticky z-40 top-0 py-3 sm:px-10 md:px-20 lg:px-44 w-full flex flex-col rounded-full justify-center items-center gap-3'}>
-                    <div className={[
-                        'relative flex flex-col justify-center bg-white shadow-md duration-700 rounded-full',
-                        searchFocus ? 'w-full sm:w-[70%]' : 'w-70 sm:w-[40%]',
-                    ].join(' ')}>
-                        <SearchBox {...{searchValue, setSearchValue, searchRef,
-                            searchHistory, onSearchHandler, onEnterHandler,
-                            searchFocus, setSearchFocus, onSearchHistory,
-                            setOnSearchHistory
-                        }} />
-                        <SearchHistory {...{searchHistory, setSearchValue,
-                            setSearchHistory, onSearchHistory,
-                            setOnSearchHistory, onSearchHandler
-
-                        }}/>
-
+            <div className={'p-5 flex flex-col gap-10'}>
+                <div className={'px-4 sm:px-10 md:px-20 lg:px-44 w-full flex flex-col justify-center items-center gap-3'}>
+                    <div className={['relative flex justify-center duration-700', searchFocus ? 'w-full sm:w-[70%]' : 'w-70 sm:w-[40%]'].join(' ')}>
+                        <input className={'rounded-full outline-0 border-solid border-gray-200 border text-xs w-full h-10 py-3 pl-4 pr-20 focus:border-gray-500 duration-500'}
+                               ref={searchRef}
+                               placeholder={'검색어'}
+                               value={searchValue || ''}
+                               onChange={(e) => setSearchValue(e.target.value)}
+                               onKeyUp={onEnterHandler}
+                               onFocus={() => setSearchFocus(true)}
+                               onBlur={() => setSearchFocus(false)}
+                        />
+                        {
+                            searchValue.length > 0
+                            && <button className={'absolute right-12 top-1 duration-500'}
+                                       onClick={()=> onSearchHandler(true)}
+                          >
+                            <FontAwesomeIcon className={'h-4 py-1.5 px-2 text-gray-400 hover:text-red-300 duration-300'}
+                                             icon={faXmark}
+                            />
+                          </button>
+                        }
+                        <button className={'absolute right-2 top-1 duration-500'}
+                                onClick={()=> onSearchHandler(false)}
+                        >
+                            <FontAwesomeIcon className={'h-4 py-1.5 px-2 text-gray-400 hover:text-blue-300 duration-300'}
+                                             icon={faMagnifyingGlass}
+                            />
+                        </button>
                     </div>
                     <SearchInfo />
                 </div>
 
-                <div className={'fixed z-30 sm:hidden bottom-5 right-5'}>
-                    <button className={'w-14 h-14 p-5 rounded-full bg-white shadow-md active:bg-main active:text-white duration-300'}
-                            onClick={()=> setMenuToggle(!menuToggle)}
-                    >
-                        <FontAwesomeIcon icon={faBars} className={'h-auto'} />
-                    </button>
-                    <MobileMenu {...{menuToggle, setMenuToggle, isLogin, searchParams, setSearchParams}} />
+                <div className={'flex sm:hidden justify-center'}>
+                    <TopMenu />
                 </div>
                 <div className={'flex flex-row justify-start sm:justify-center'}>
                     <div className={'hidden sm:block relative min-w-[300px]'}>
-                        <LeftMenu {...{searchParams, setSearchParams, roles}}/>
+                        <LeftMenu roles={roles}/>
                     </div>
-                    <div className={'w-[600px] flex flex-col justify-start items-center'}>
-                        <div className={'w-full flex flex-col gap-3'}>
-                            <div className={'w-full p-2 flex justify-between items-center text-sm border-b border-solid border-gray-400'}>
-                                <div className={'flex gap-1 items-center'}>
-                                    <FontAwesomeIcon icon={faCaretRight}
-                                                     className={['font-bold duration-500', viewNotice ? 'rotate-90' : 'rotate-0'].join(' ')}
-                                                     size={'lg'}
-                                    />
-                                    <button className={'outline-0'}
-                                            onClick={onChangeNotice}
-                                    >
-                                        공지사항
-                                    </button>
-                                </div>
-
-                                <button className={'outline-0'}
-                                        onClick={onChangeNotice}
-                                >
-                                    { viewNotice ? '접기' : '보기' }
-                                </button>
-                            </div>
-                            <div className={['overflow-y-hidden duration-500',viewNotice ? 'max-h-80' : 'max-h-0'].join(' ')}>
-                                <Notices data={noticeList} />
-                            </div>
+                    <div className={'w-[600px] flex flex-col gap-5 justify-start items-center'}>
+                        <div className={'w-full'}>
+                            <Notices data={noticeList} />
                         </div>
-
                         <div className={'w-full flex flex-wrap gap-2'}>
                             {
-                                notFoundResult
+                                !initLoading
+                                && !loading
+                                && data?.length === 0
                                 && <div className={'text-center text-2xl w-full py-20 text-gray-600'}>검색 결과가 없습니다.</div>
                             }
-                            <Virtuoso style={{width: '100%', height: '100%', overflow: 'hidden'}}
-                                      totalCount={data.length}
-                                      data={data}
-                                      useWindowScroll
-                                      itemContent={(index, data) =>
-                                          <div className={'py-1.5'}>
-                                              <BoardComponent key={'boardsummary' + index} {...{...data, favorites, isLogin, roles}} />
-                                          </div>
-                                      }
-                            />
+                            {
+                                data
+                                && data?.length > 0
+                                && dataComponent
+                            }
                         </div>
                     </div>
                 </div>
                 <div className={'relative'}>
                     <div className={'absolute w-full -top-72 flex justify-center text-xs py-5'}>
                         {
-                            moreToggle
+                            !loading
+                            && !dynamicPage.isEndOfList
+                            && !dynamicPage.isVisible
                             && <div ref={moreRef} className={'w-10 h-10'} />
                         }
                     </div>
                 </div>
-                <RightSubMenu {...{isLogin}} />
             </div>
         </SearchParamsProvider.Provider>
     )

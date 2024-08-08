@@ -1,6 +1,5 @@
 package com.anamensis.server.dto.response;
 
-import com.anamensis.server.entity.BoardBlockResultStatus;
 import com.anamensis.server.entity.BoardBlockStatus;
 import com.anamensis.server.resultMap.BoardBlockHistoryResultMap;
 import lombok.Getter;
@@ -25,7 +24,6 @@ public class BoardBlockHistoryResponse {
 
         private String title;
         private BoardBlockStatus status;
-        private BoardBlockResultStatus resultStatus;
 
         private String createdAt;
         private String answerAt;
@@ -38,7 +36,6 @@ public class BoardBlockHistoryResponse {
             list.setBoardPk(resultMap.getBoard().getId());
             list.setTitle(resultMap.getBoard().getTitle());
             list.setStatus(resultMap.getBoardBlockHistory().getStatus());
-            list.setResultStatus(resultMap.getBoardBlockHistory().getResultStatus());
             list.setCreatedAt(resultMap.getBoardBlockHistory().getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
             if(resultMap.getBoardBlockHistory().getAnswerAt() != null) {
@@ -73,7 +70,6 @@ public class BoardBlockHistoryResponse {
         private String result;
 
         private BoardBlockStatus status;
-        private BoardBlockResultStatus resultStatus;
 
         private String createdAt;
         private String answerAt;
@@ -87,7 +83,6 @@ public class BoardBlockHistoryResponse {
             detail.setTitle(resultMap.getBoard().getTitle());
             detail.setStatus(resultMap.getBoardBlockHistory().getStatus());
             detail.setReason(resultMap.getBoardBlockHistory().getReason());
-            detail.setResultStatus(resultMap.getBoardBlockHistory().getResultStatus());
             detail.setCreatedAt(resultMap.getBoardBlockHistory().getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
             detail.setAnswer(

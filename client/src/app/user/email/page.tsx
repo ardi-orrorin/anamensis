@@ -18,7 +18,6 @@ export interface UserInfoI {
     sauthType     : AuthType;
     sauth         : boolean;
     createAt      : string;
-    isOAuth       : boolean;
     [key: string] : any;
 }
 

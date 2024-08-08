@@ -144,7 +144,7 @@ const ProfileImg = () => {
             }
             <input ref={inputRef}
                    type={'file'}
-                   accept={'image/jpeg, image/png'}
+                   accept={'image/*'}
                    onChange={onChangeHandler}
                    multiple={false}
                    hidden={true}

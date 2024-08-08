@@ -8,7 +8,9 @@ export type ModalContextType = {
 export interface ModalI {
     route: string;
     id: string;
+    params: any;
     isOpen: boolean;
+    component: React.ReactNode;
 }
 
 const ModalProvider = createContext<ModalContextType>({} as ModalContextType);

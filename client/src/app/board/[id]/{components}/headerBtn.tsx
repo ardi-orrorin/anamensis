@@ -1,27 +1,29 @@
 import {RoleType} from "@/app/user/system/{services}/types";
-import React, {useContext} from "react";
-import BoardProvider, {BoardService} from "@/app/board/{services}/BoardProvider";
+import {useContext} from "react";
+import BoardProvider from "@/app/board/{services}/BoardProvider";
 
 type HeaderBtnProps = {
     roles    : RoleType[];
-    board    : BoardService;
     submitClickHandler: () => void;
     editClickHandler: () => void;
     deleteClickHandler: () => void;
     blockClickHandler: () => void;
 }
 
-const HeaderBtn = ({
-    roles, board
-    , submitClickHandler, editClickHandler
-    , deleteClickHandler, blockClickHandler
-}: HeaderBtnProps) => {
+const HeaderBtn = (props: HeaderBtnProps) => {
+    const {
+        roles
+        , submitClickHandler, editClickHandler
+        , deleteClickHandler, blockClickHandler
+    } = props;
+
+    const {board} = useContext(BoardProvider);
     const isView = board.isView;
     const {isWriter, isPublic, isBlocked, isLogin} = board.data;
 
     return (
         <>
-        <div className={"w-auto h-14 flex gap-1 justify-end"}>
+        <div className={"w-auto flex gap-1 justify-end"}>
             {
                 !isView
                 && isLogin
@@ -77,7 +79,4 @@ const HeaderBtn = ({
     );
 }
 
-export default React.memo(HeaderBtn, (prev, next) => {
-    return prev.roles === next.roles
-        && prev.board === next.board
-});
+export default HeaderBtn;

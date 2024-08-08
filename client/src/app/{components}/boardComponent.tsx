@@ -8,7 +8,6 @@ import QuestionBoardComponent from "@/app/{components}/boards/question";
 import MembersOnlyBody from "@/app/{components}/membersOnlyBody";
 import Blocked from "@/app/{components}/boards/blocked";
 import {RoleType} from "@/app/user/system/{services}/types";
-import CalenderComponent from "@/app/{components}/boards/calender";
 
 export interface BoardListI {
     id           : string;
@@ -46,7 +45,6 @@ const BoardComponent = (props: BoardListI & {favorites: string[], isLogin: boole
         {categoryPk: 3, component: QuestionBoardComponent},
         {categoryPk: 4, component: AlttuelBoardComponent},
         {categoryPk: 5, component: AlbumBoardComponent},
-        {categoryPk: 6, component: CalenderComponent},
     ],[membersOnlyBody]);
 
     const isFavorite = useMemo(() =>
@@ -66,21 +64,17 @@ const BoardComponent = (props: BoardListI & {favorites: string[], isLogin: boole
         (isFavorite || Number(categoryPk) === 1) && !isBlocked
     ,[]);
 
-    const notAdminBlocked = useMemo(() =>
-        isBlocked && !roles.includes(RoleType.ADMIN)
-    ,[isBlocked, roles]);
-
     return (
         <>
             {
-                notAdminBlocked
+                isBlocked && !roles.includes(RoleType.ADMIN)
                 ? <span className={
                     'relative flex flex-col justify-between w-full h-[170px] bg-white border-gray-200 border-solid border rounded shadow active:bg-blue-50 duration-300'
                 }>
                     { Component }
                 </span>
                 : <Link className={[
-                    'relative flex flex-col justify-between w-full h-[170px] border-solid border rounded shadow active:bg-blue-50 hover:shadow-md  active:shadow-md duration-300',
+                    'relative flex flex-col justify-between w-full h-[170px] border-solid border rounded shadow active:bg-blue-50 hover:shadow-xl  active:shadow-xl duration-300',
                     isFavorite && !isBlocked ? 'border-yellow-300 hover:border-yellow-500 active:bg-yellow-300' : 'bg-white border-gray-200 hover:border-gray-500 active:bg-gray-300',
                     highLight && 'border-t-5'
                 ].join(' ')}

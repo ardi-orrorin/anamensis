@@ -1,6 +1,6 @@
 'use client';
 
-import React, {MutableRefObject, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
+import React, {MutableRefObject, useCallback, useContext, useMemo, useState} from "react";
 import {faBold, faItalic, faTextSlash} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
@@ -16,20 +16,12 @@ const SubTextMenu = ({
 }: {
     blockRef  : MutableRefObject<HTMLElement[] | null[]>;
 }) => {
-
     const [toggle, setToggle] = useState<ToggleEnum>('');
     const {blockService, setBlockService} = useContext(BlockProvider);
     const {board, setBoard} = useContext(BoardProvider);
 
     const {seq, code, textStyle} = blockService.block;
 
-    const timeout = useRef<NodeJS.Timeout>();
-
-    useEffect(() =>{
-        return () => {
-            if(timeout.current) clearTimeout(timeout.current);
-        }
-    },[])
 
     const selectFontStyle = (type: string, value:string) => {
         value = textStyle![type] === value ? '' : value;
@@ -47,17 +39,17 @@ const SubTextMenu = ({
         });
 
         setBoard({...board, data: {...board.data, content: {list: newList}}});
-        timeout.current = setTimeout(() => {
+        setTimeout(() => {
             blockRef.current[seq]?.focus();
         },100);
-    }
 
+    }
 
     const onClickColorHandler = useCallback((name: ToggleEnum, value: string) => {
         onClickSubTextMenu(name, value);
 
         setToggle(name ? '' : name)
-        timeout.current = setTimeout(() => {
+        setTimeout(() => {
             blockRef.current[seq]?.focus();
         },100);
     },[blockRef?.current[seq]]);
@@ -124,8 +116,7 @@ const SubTextMenu = ({
                     >
                         글자색
                     </button>
-                    <MenuColorItem className={'font-bold'}
-                                   toggle={toggle}
+                    <MenuColorItem toggle={toggle}
                                    menuTitle={'글자색'}
                                    name={'color'}
                                    onClick={onClickColorHandler}

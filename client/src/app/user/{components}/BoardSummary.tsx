@@ -1,31 +1,15 @@
 'use client';
 
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext} from "react";
 import Link from "next/link";
 import {RateColor} from "@/app/{commons}/types/rate";
-import UserProvider, {BoardSummaryI} from "@/app/user/{services}/userProvider";
+import UserProvider from "@/app/user/{services}/userProvider";
 import moment from "moment";
-import useSWR, {preload} from "swr";
-import apiCall from "@/app/{commons}/func/api";
 
 
 const BoardSummary = () => {
 
-    const {boardSummary, setBoardSummary} = useContext(UserProvider);
-
-    useSWR('/api/board/summary', async () => {
-        return await apiCall<BoardSummaryI[]>({
-            path: "/api/board/summary",
-            params: {page:1, size: 8},
-            method: "GET",
-            isReturnData: true
-        })
-        .then((data) => {
-            setBoardSummary(data);
-        });
-    },{
-        revalidateOnFocus: false
-    })
+    const {boardSummary} = useContext(UserProvider);
 
     return (
         <div className={'w-full h-max flex justify-center items-start overflow-y-hidden'}>

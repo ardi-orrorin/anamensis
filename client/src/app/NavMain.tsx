@@ -1,15 +1,14 @@
 import Link from "next/link";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPenToSquare, faRightFromBracket, faUserPlus} from "@fortawesome/free-solid-svg-icons";
+import {faPenToSquare, faRightFromBracket, faUser, faUserPlus} from "@fortawesome/free-solid-svg-icons";
 import {cookies} from "next/headers";
 import {faRightToBracket} from "@fortawesome/free-solid-svg-icons/faRightToBracket";
 import Image from "next/image";
+import {NO_IMAGE} from "@/app/{services}/constants";
 import apiCall from "@/app/{commons}/func/api";
-import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 
 type NavItemProps = {
-    icon: IconDefinition
-    name: string,
+    name: string | JSX.Element,
     url: string
     loginRequired?: boolean,
     prefetch: boolean
@@ -30,29 +29,25 @@ const NavMain = async () => {
 
     const rightMenuItems : NavItemProps[] = [
         {
-            icon: faPenToSquare,
-            name: '글쓰기',
+            name: <FontAwesomeIcon className={'w-4'} icon={faPenToSquare} />,
             url: '/board/new?categoryPk=2',
             loginRequired: true,
             prefetch: true,
         },
         {
-            icon: faUserPlus,
-            name: '회원가입',
+            name: <FontAwesomeIcon className={'w-4'} icon={faUserPlus} />,
             url: '/signup',
             loginRequired: false,
             prefetch: true,
         },
         {
-            icon: faRightToBracket,
-            name: '로그인',
+            name: <FontAwesomeIcon className={'w-4'} icon={faRightToBracket} />,
             url: '/login',
             loginRequired: false,
             prefetch: true,
         },
         {
-            icon: faRightFromBracket,
-            name: '로그아웃',
+            name: <FontAwesomeIcon className={'w-4'} icon={faRightFromBracket} />,
             url: '/api/logout',
             loginRequired: true,
             prefetch: false,
@@ -64,7 +59,6 @@ const NavMain = async () => {
             <div>
                 <Link className={'px-2 h-10 flex justify-center items-center hover:bg-blue-800 rounded duration-500'}
                       href={'/'}
-                      title={'홈'}
                 >
                     <Image src={process.env.NEXT_PUBLIC_CDN_SERVER + '/favicon.jpg'}
                            alt={''}
@@ -75,7 +69,7 @@ const NavMain = async () => {
                 </Link>
             </div>
             <div className={'w-1/3 h-full'}>
-                <ul className={'flex h-full justify-end gap-2'}>
+                <ul className={'flex h-full justify-end'}>
                     {
                         rightMenuItems.map((item, index) => {
                             if(!item.loginRequired === isLogged) {
@@ -87,10 +81,8 @@ const NavMain = async () => {
                     {
                         isLogged
                         && process.env.NEXT_PUBLIC_CDN_SERVER
-                        && <div className={'flex h-full justify-center items-center px-1.5 hover:bg-blue-800 rounded duration-500'}>
-                        <Link href={'/user'}
-                              title={'프로필'}
-                        >
+                        && <div className={'flex h-full justify-center items-center px-2 hover:bg-blue-800 rounded duration-500'}>
+                        <Link href={'/user'}>
                           <Image className={'rounded'}
                                  src={process.env.NEXT_PUBLIC_CDN_SERVER + profileImg}
                                  alt={''}
@@ -106,18 +98,13 @@ const NavMain = async () => {
     );
 }
 
-const NavItem = ({icon, name, url, prefetch}: NavItemProps) => {
+const NavItem = ({name, url, prefetch}: NavItemProps) => {
     return (
         <li>
             <Link className={'w-10 h-10 flex justify-center items-center hover:bg-blue-800 rounded duration-500'}
                   href={url}
                   prefetch={prefetch}
-                  title={name}
-            >
-                <FontAwesomeIcon icon={icon}
-                                 width={20}
-                                 height={20}
-                />
+            >{name}
             </Link>
         </li>
     );

@@ -77,7 +77,7 @@ public class SecurityConfig implements WebFluxConfigurer {
             CorsConfiguration corsConfiguration = new CorsConfiguration();
 //            corsConfiguration.setAllowedOriginPatterns(List.of("*"));
 //            corsConfiguration.setAllowedOriginPatterns(List.of("http://192.168.0.49:8080", "http://192.168.0.49:3000", "http://localhost:8080", "http://localhost:3000"));
-            corsConfiguration.setAllowedOrigins(List.of("http://192.168.0.49:3000", "http://localhost:3000"));
+            corsConfiguration.setAllowedOrigins(List.of("http://192.168.0.49:8080", "http://192.168.0.49:3000", "http://localhost:8080", "http://localhost:3000"));
             corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
             corsConfiguration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Device", "Location"));
             corsConfiguration.setAllowCredentials(true);

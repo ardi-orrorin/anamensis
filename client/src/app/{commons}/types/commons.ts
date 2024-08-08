@@ -14,12 +14,7 @@ export interface PageI {
 }
 
 export interface StatusResponse {
-    status: StatusResponseStatusEnum;
+    status: string;
     message: string;
     timestamp: string;
-}
-
-export enum StatusResponseStatusEnum {
-    SUCCESS = "SUCCESS",
-    FAIL = "FAIL",
 }

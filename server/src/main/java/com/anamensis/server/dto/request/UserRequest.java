@@ -1,17 +1,13 @@
 package com.anamensis.server.dto.request;
 
-import com.anamensis.server.dto.ChangePwdStatus;
 import com.anamensis.server.dto.ResetPwdProgress;
 import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.RoleType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import org.springframework.validation.annotation.Validated;
+import lombok.*;
+import org.hibernate.validator.constraints.pl.NIP;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -196,24 +192,4 @@ public class UserRequest {
             this.role = RoleType.valueOf(role.toUpperCase());
         }
     }
-
-    @Getter
-    @Setter
-    @ToString
-    public static class ChangePassword {
-
-        @NotNull(message = "Current password is required")
-        @Size(min = 8, max = 255, message = "Password must be between 8 and 255 characters")
-        private String curPwd;
-
-        private String newPwd;
-
-        private ChangePwdStatus status;
-
-        public void setStatus(String status) {
-            this.status = ChangePwdStatus.valueOf(status.toUpperCase());
-        }
-
-    }
-
 }

@@ -5,25 +5,23 @@ import apiCall from "@/app/{commons}/func/api";
 import {useState} from "react";
 import {useSearchParams} from "next/navigation";
 import {preload} from "swr";
-import BoardBlockProvider, {
-    BoardBlock,
-    BoardBlockHistoriesI
-} from "@/app/user/board-block/{services}/boardBlockProvider";
+import BoardBlockProvider from "@/app/user/board-block/{services}/boardBlockProvider";
 import History from "@/app/user/board-block/{components}/history";
 import Detail from "@/app/user/board-block/{components}/detail";
 import ModalProvider, {ModalI} from "@/app/user/board-block/{services}/modalProvider";
 import {Common} from "@/app/{commons}/types/commons";
+import {BoardBlocking} from "@/app/user/board-block/{services}/types";
 
 export default function Page() {
 
     const searchParams = useSearchParams();
-    const [boardBlockHistories, setBoardBlockHistories] = useState<BoardBlockHistoriesI[]>([]);
-    const [boardBlock, setBoardBlock] = useState({} as BoardBlock);
+    const [boardBlockHistories, setBoardBlockHistories] = useState<BoardBlocking.BoardBlockHistories[]>([]);
+    const [boardBlock, setBoardBlock] = useState({} as BoardBlocking.BoardBlock);
     const [page, setPage] = useState({} as Common.PageI);
     const [modal, setModal] = useState({} as ModalI);
 
     preload(['/api/board-block-history', searchParams], async () => {
-        return await apiCall<Common.PageResponse<BoardBlockHistoriesI>, any>({
+        return await apiCall<Common.PageResponse<BoardBlocking.BoardBlockHistories>, any>({
             path: '/api/user/board-block-history',
             method: 'GET',
             params: {

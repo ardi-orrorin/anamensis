@@ -1,6 +1,5 @@
 import {createContext} from "react";
 
-
 export interface ModalI {
     id     : number;
     toggle : boolean;

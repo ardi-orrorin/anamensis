@@ -1,6 +1,6 @@
-import {Types} from "@/app/user/board-block/{services}/types";
 import {useSearchParams} from "next/navigation";
 import React from "react";
+import {BoardBlockStatus} from "@/app/user/board-block/{services}/objects";
 
 const StatusSelect = ({
     onFilterHandler
@@ -17,7 +17,7 @@ const StatusSelect = ({
         >
             <option value={''}>전체</option>
             {
-                Types.list.map((status, index) => {
+                BoardBlockStatus.list.map((status, index) => {
                     return <option key={'index' + status.getStatus()}
                                    value={status.getStatus()}
                     >{status.getKorName()}

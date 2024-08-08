@@ -9,29 +9,11 @@ import UserProvider from "@/app/user/{services}/userProvider";
 import {RoleType} from "@/app/user/system/{services}/types";
 import {User} from "@/app/login/{services}/types";
 
-export interface UserInfoI {
-    userId        : string;
-    email         : string;
-    phone         : string;
-    name          : string;
-    point         : number;
-    sauthType     : User.AuthType;
-    sauth         : boolean;
-    createAt      : string;
-    isOAuth       : boolean;
-    [key: string] : any;
-}
-
-export interface AuthPropsI {
-    sauthType : User.AuthType;
-    sauth     : boolean;
-}
-
 export default function Page() {
 
     const {roles} = useContext(UserProvider);
-    const [userInfo, setUserInfo] = useState<UserInfoI>({} as UserInfoI);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [userInfo, setUserInfo] = useState({} as User.UserInfo);
+    const [loading, setLoading] = useState(false);
     const isSAuthEmail = useMemo(() => {
         return userInfo.sauthType === User.AuthType.EMAIL && userInfo.sauth;
     },[userInfo]);
@@ -50,7 +32,7 @@ export default function Page() {
 
 
     const { mutate } = useSWR('/api/user/info', async () => {
-        return await apiCall<UserInfoI>({
+        return await apiCall<User.UserInfo>({
             path: '/api/user/info',
             method: 'GET',
             isReturnData: true,
@@ -62,13 +44,13 @@ export default function Page() {
 
 
     const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const data: AuthPropsI = {
+        const data: User.AuthProps = {
             sauth: e.target.checked,
             sauthType: userInfo.sauthType !== User.AuthType.EMAIL ? User.AuthType.EMAIL : User.AuthType.NONE
         };
 
         setLoading(true);
-        await apiCall<UserInfoI, AuthPropsI>({
+        await apiCall<User.UserInfo, User.AuthProps>({
             path: '/api/user/email',
             method: 'PUT',
             body: data,

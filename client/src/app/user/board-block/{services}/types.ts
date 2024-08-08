@@ -1,32 +1,40 @@
-import {BoardBlockStatusEnum} from "@/app/user/board-block/{services}/boardBlockProvider";
+interface BoardBlockI {
+    id           : number;
+    boardPk      : number;
+    title        : string;
+    status       : BoardBlockStatusEnum;
+    reason       : string;
+    answer       : string;
+    result       : string;
+    createdAt    : string;
+    answerAt     : string;
+    resultAt     : string;
+    resultStatus : BoardBlockResultStatusEnum;
+}
+interface BoardBlockHistoriesI {
+    id        : number;
+    boardPk   : number;
+    title     : string;
+    status    : BoardBlockStatusEnum;
+    createdAt : string;
+    answerAt  : string;
+    resultAt  : string;
+}
 
-export class Types {
+enum BoardBlockStatusEnum {
+    STARTED  = 'STARTED',
+    ANSWERED = 'ANSWERED',
+    RESULTED = 'RESULTED',
+}
 
-    private readonly status: BoardBlockStatusEnum;
-    private readonly korName: string;
+enum BoardBlockResultStatusEnum {
+    UNBLOCKING = 'UNBLOCKING',
+    BLOCKING   = 'BLOCKING',
+}
 
-    public static readonly list: Types[] = [
-        new Types(BoardBlockStatusEnum.STARTED, '접수'),
-        new Types(BoardBlockStatusEnum.ANSWERED, '답변완료'),
-        new Types(BoardBlockStatusEnum.RESULTED, '처리완료'),
-    ];
-
-    constructor(status: BoardBlockStatusEnum, korName: string) {
-        this.status = status;
-        this.korName = korName;
-    }
-
-    public getStatus(): string {
-        return this.status;
-    }
-
-    public getKorName(): string {
-        return this.korName;
-    }
-
-    public static find(status: string): Types | undefined {
-        return this.list.find((str) =>
-            str.getStatus() === status.toUpperCase()
-        );
-    }
+export namespace BoardBlocking {
+    export type BoardBlock               = BoardBlockI;
+    export type BoardBlockHistories      = BoardBlockHistoriesI;
+    export import BoardBlockStatus       = BoardBlockStatusEnum;
+    export import BoardBlockResultStatus = BoardBlockResultStatusEnum;
 }

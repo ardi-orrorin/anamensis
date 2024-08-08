@@ -1,29 +1,27 @@
-
 import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
-import BoardBlockProvider, {
-    BoardBlock,
-    BoardBlockResultStatusEnum,
-    BoardBlockStatusEnum
-} from "@/app/user/board-block/{services}/boardBlockProvider";
+import BoardBlockProvider from "@/app/user/board-block/{services}/boardBlockProvider";
 import ModalProvider, {ModalI} from "@/app/user/board-block/{services}/modalProvider";
 import {faCaretRight} from "@fortawesome/free-solid-svg-icons";
 import UserProvider from "@/app/user/{services}/userProvider";
 import apiCall from "@/app/{commons}/func/api";
 import {RoleType} from "@/app/user/system/{services}/types";
 import TextBox from "@/app/user/board-block/{components}/textBox";
+import {BoardBlocking} from "@/app/user/board-block/{services}/types";
 
 const Detail = () => {
 
     const { boardBlock, setBoardBlock } = useContext(BoardBlockProvider);
     const { setModal } = useContext(ModalProvider);
+    const { roles } = useContext(UserProvider);
+
     const [isTyping, setIsTyping] = useState(false);
-    const {roles} = useContext(UserProvider);
+
     const resultCondition = useMemo(() => {
-        return boardBlock.status === BoardBlockStatusEnum.ANSWERED && roles.includes(RoleType.ADMIN)
-        || boardBlock.status === BoardBlockStatusEnum.RESULTED && roles.includes(RoleType.USER)
+        return boardBlock.status === BoardBlocking.BoardBlockStatus.ANSWERED && roles.includes(RoleType.ADMIN)
+        || boardBlock.status === BoardBlocking.BoardBlockStatus.RESULTED && roles.includes(RoleType.USER)
     },[boardBlock.status]);
 
     useEffect(()=> {
@@ -36,21 +34,21 @@ const Detail = () => {
     const onCloseHandler = useCallback(() => {
         if(isTyping && !confirm('저장하지 않은 내용은 사라집니다. 정말 닫으시겠습니까?')) return;
         setModal({} as ModalI);
-        setBoardBlock({} as BoardBlock);
+        setBoardBlock({} as BoardBlocking.BoardBlock);
     },[isTyping]);
 
-    const onSubmitHandler = async (status?: BoardBlockResultStatusEnum) => {
+    const onSubmitHandler = async (status?: BoardBlocking.BoardBlockResultStatus) => {
 
-        const body = {...boardBlock, resultStatus: status ?? BoardBlockResultStatusEnum.BLOCKING } as BoardBlock
+        const body = {...boardBlock, resultStatus: status ?? BoardBlocking.BoardBlockResultStatus.BLOCKING } as BoardBlocking.BoardBlock
 
-        await apiCall<any, BoardBlock>({
+        await apiCall<any, BoardBlocking.BoardBlock>({
             path: '/api/user/board-block-history/',
             method: 'PUT',
             body,
             isReturnData: true,
         })
-        .then(res => {
-            setBoardBlock({} as BoardBlock);
+        .then(_ => {
+            setBoardBlock({} as BoardBlocking.BoardBlock);
             setModal({} as ModalI);
         });
     }
@@ -99,7 +97,7 @@ const Detail = () => {
                              onChange={onChangeHandler}
                     />
                     {
-                        boardBlock.status === BoardBlockStatusEnum.ANSWERED
+                        boardBlock.status === BoardBlocking.BoardBlockStatus.ANSWERED
                         && roles.includes(RoleType.USER)
                         && !roles.includes(RoleType.ADMIN)
                         && <div className={'w-full flex gap-2'}>
@@ -120,12 +118,12 @@ const Detail = () => {
                         />
                     }
                     {
-                        boardBlock.status === BoardBlockStatusEnum.RESULTED
+                        boardBlock.status === BoardBlocking.BoardBlockStatus.RESULTED
                         && (roles.includes(RoleType.USER) || roles.includes(RoleType.ADMIN))
                         && <div className={'w-full flex gap-2'}>
                             <label className={'text-sm flex gap-2 items-center'}>
                                 <FontAwesomeIcon icon={faCaretRight}/>
-                                처리 결과 : {boardBlock.resultStatus === BoardBlockResultStatusEnum.BLOCKING ? '게시글 제한' : '제한 해제'}
+                                처리 결과 : {boardBlock.resultStatus === BoardBlocking.BoardBlockResultStatus.BLOCKING ? '게시글 제한' : '제한 해제'}
                             </label>
                         </div>
                     }
@@ -133,13 +131,13 @@ const Detail = () => {
                 <div className={'w-full flex gap-2 justify-center'}>
                     {
                         roles.includes(RoleType.ADMIN)
-                        && boardBlock.status === BoardBlockStatusEnum.ANSWERED
+                        && boardBlock.status === BoardBlocking.BoardBlockStatus.ANSWERED
                             ? <Btn btnText1={'제한 해제'}
-                                   onClick1={()=> onSubmitHandler(BoardBlockResultStatusEnum.UNBLOCKING)}
+                                   onClick1={()=> onSubmitHandler(BoardBlocking.BoardBlockResultStatus.UNBLOCKING)}
                                    btnText2={'거부'}
                                    onClick2={onSubmitHandler}
                             />
-                            : boardBlock.status === BoardBlockStatusEnum.RESULTED
+                            : boardBlock.status === BoardBlocking.BoardBlockStatus.RESULTED
                             ? <Btn btnText1={'닫기'}
                                    onClick1={onCloseHandler}
                             />
@@ -164,8 +162,8 @@ const Btn = ({
 }:{
     btnText1  : string;
     btnText2? : string;
-    onClick1  : (status?: BoardBlockResultStatusEnum) => void;
-    onClick2? : (status?: BoardBlockResultStatusEnum) => void;
+    onClick1  : (status?: BoardBlocking.BoardBlockResultStatus) => void;
+    onClick2? : (status?: BoardBlocking.BoardBlockResultStatus) => void;
 }) => {
     return (
         <>

@@ -2,7 +2,7 @@ import {NextRequest} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
 import {AxiosError} from "axios";
-import {ChangePasswordI} from "@/app/user/info/change-password/{services}/passwordProvider";
+import {ChangePasswordI} from "@/app/user/info/{services}/passwordProvider";
 import {Common} from "@/app/{commons}/types/commons";
 
 export async function POST(req: NextRequest) {

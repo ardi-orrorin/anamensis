@@ -1,43 +1,26 @@
 import React, {useContext, useMemo, useState} from "react";
-import PasswordProvider, {
-    ChangePasswordI,
-    ChangePasswordStatus
-} from "@/app/user/info/change-password/{services}/passwordProvider";
+import PasswordProvider from "@/app/user/info/{services}/passwordProvider";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEye} from "@fortawesome/free-solid-svg-icons";
 import apiCall from "@/app/{commons}/func/api";
 import {Common} from "@/app/{commons}/types/commons";
-
-
-type PwdType = {
-    newPwd: string
-    isNewPwd: boolean;
-    confirmPwd: string;
-    isConfirmPwd: boolean;
-    [key: string]: string | boolean;
-}
-
-enum Statue {
-    READY,
-    CONFIRMED,
-    FAILED
-}
+import {UserInfoSpace} from "@/app/user/info/{services}/types";
 
 const ChangePwd = () => {
 
     const {changePwd, setChangePwd} = useContext(PasswordProvider);
 
-    const [pwd, setPwd] = useState<PwdType>({
+    const [pwd, setPwd] = useState<UserInfoSpace.Pwd>({
         newPwd: '',
         isNewPwd: false,
         confirmPwd: '',
         isConfirmPwd: false,
     });
 
-    const [status, setStatus] = useState(Statue.READY);
+    const [status, setStatus] = useState(UserInfoSpace.Statue.READY);
 
     const isConfirmed = useMemo(()=>
-        pwd.newPwd.length > 8 && Statue.CONFIRMED === status
+        pwd.newPwd.length > 8 && UserInfoSpace.Statue.CONFIRMED === status
     , [pwd, status]);
 
 
@@ -52,14 +35,14 @@ const ChangePwd = () => {
 
         if(name === 'newPwd' && pwd.confirmPwd.length > 0) {
             pwd.confirmPwd === value
-                ? setStatus(Statue.CONFIRMED)
-                : setStatus(Statue.FAILED);
+                ? setStatus(UserInfoSpace.Statue.CONFIRMED)
+                : setStatus(UserInfoSpace.Statue.FAILED);
         }
 
         if(name === 'confirmPwd' && pwd.newPwd.length > 0) {
             pwd.newPwd === value
-                ? setStatus(Statue.CONFIRMED)
-                : setStatus(Statue.FAILED);
+                ? setStatus(UserInfoSpace.Statue.CONFIRMED)
+                : setStatus(UserInfoSpace.Statue.FAILED);
         }
     };
 
@@ -76,13 +59,13 @@ const ChangePwd = () => {
             newPwd: pwd.newPwd,
         })
 
-        const body: ChangePasswordI = {
+        const body = {
             ...changePwd,
             newPwd: pwd.newPwd,
-        }
+        } as UserInfoSpace.ChangePassword
 
         try {
-            const res = await apiCall<Common.StatusResponse, ChangePasswordI>({
+            const res = await apiCall<Common.StatusResponse, UserInfoSpace.ChangePassword>({
                 path: '/api/user/change-password',
                 method: 'POST',
                 body,
@@ -92,9 +75,9 @@ const ChangePwd = () => {
             res.status === Common.StatusResponseStatusEnum.SUCCESS
             ? setChangePwd({
                 ...changePwd,
-                status: ChangePasswordStatus.SUCCESS
+                status: UserInfoSpace.ChangePasswordStatus.SUCCESS
             })
-            : setStatus(Statue.FAILED);
+            : setStatus(UserInfoSpace.Statue.FAILED);
         } catch (e) {
             const err = e as Error;
             console.log(err);
@@ -135,7 +118,7 @@ const ChangePwd = () => {
                 </button>
             </div>
             <div className={'text-red-500 text-xs'}>
-                {status === Statue.FAILED ? '비밀번호가 일치하지 않습니다.' : ''}
+                {status === UserInfoSpace.Statue.FAILED ? '비밀번호가 일치하지 않습니다.' : ''}
             </div>
             <button className={'w-32 p-2 rounded bg-blue-400 text-white text-xs disabled:bg-gray-600 hover:bg-main transition-colors duration-500'}
                     onClick={onSubmit}

@@ -2,14 +2,14 @@ import {NextRequest} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
 import {AxiosError} from "axios";
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
-import {BoardBlock, BoardBlockHistoriesI} from "@/app/user/board-block/{services}/boardBlockProvider";
 import {Common} from "@/app/{commons}/types/commons";
+import {BoardBlocking} from "@/app/user/board-block/{services}/types";
 
 export async function GET(req: NextRequest){
     const params = req.nextUrl.searchParams;
 
     try {
-        const res = await apiCall<Common.PageResponse<BoardBlockHistoriesI>, any>({
+        const res = await apiCall<Common.PageResponse<BoardBlocking.BoardBlockHistories>, any>({
             path: '/api/board-block-history',
             method: 'GET',
             params,
@@ -34,12 +34,12 @@ export async function GET(req: NextRequest){
 }
 
 export async function POST(req: NextRequest) {
-    const body = await req.json() as BoardBlock;
+    const body = await req.json() as BoardBlocking.BoardBlock;
 
     console.log(body)
 
     try {
-        const res = await apiCall<any, BoardBlock>({
+        const res = await apiCall<any, BoardBlocking.BoardBlock>({
             path: '/admin/api/board-block-history',
             method: 'POST',
             body,
@@ -63,10 +63,10 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-    const body = await req.json() as BoardBlock;
+    const body = await req.json() as BoardBlocking.BoardBlock;
 
     try {
-        const res = await apiCall<any, BoardBlock>({
+        const res = await apiCall<any, BoardBlocking.BoardBlock>({
             path: '/api/board-block-history',
             method: 'PUT',
             body,

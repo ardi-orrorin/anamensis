@@ -1,5 +1,11 @@
 import {RoleType} from "@/app/user/system/{services}/types";
 
+interface UserI {
+    userId   : string;
+    name     : string;
+    email    : string;
+}
+
 enum AuthTypeE {
     INTRO = 'INTRO',
     NONE  = 'NONE',
@@ -17,10 +23,7 @@ interface LoginI {
     oauth2?   : boolean;
 }
 
-interface OAuth2I {
-    userId   : string;
-    name     : string;
-    email    : string;
+interface OAuth2I extends UserI {
     provider : string;
 }
 
@@ -101,15 +104,31 @@ type PasswordT = {
     pwdCheck: string;
 }
 
+interface UserInfoI extends UserI{
+    phone         : string;
+    point         : number;
+    sauthType     : User.AuthType;
+    sauth         : boolean;
+    createAt      : string;
+    isOAuth       : boolean;
+    [key: string] : any;
+}
+
+interface AuthPropsI {
+    sauthType : User.AuthType;
+    sauth     : boolean;
+}
+
+
 export namespace User {
-    export import AuthType = AuthTypeE;
+    export import AuthType         = AuthTypeE;
     export import ResetPwdProgress = ResetPwdProgressEnum;
     export type Login              = LoginI;
     export type OAuth2             = OAuth2I;
     export type Auth               = LoginAuthI;
     export type ErrorResponse      = ErrorResponseI;
     export type LoginResponse      = LoginResponseT;
-    export type UserInfo           = LoginUserInfoT;
+    export type LoginUserInfo      = LoginUserInfoT;
     export type OAuthProvider      = OAuthProviderT;
     export type FindUser           = FindUserT;
     export type FindUserResponse   = FindUserResponseT;
@@ -117,6 +136,6 @@ export namespace User {
     export type ResetPwdResponse   = ResetPwdResponseT;
     export type ResetPwdVerified   = ResetPwdVerifiedT;
     export type Password           = PasswordT;
-
-
+    export type UserInfo           = UserInfoI;
+    export type AuthProps          = AuthPropsI;
 }

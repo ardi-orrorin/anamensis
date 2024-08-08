@@ -1,20 +1,18 @@
 'use client';
 
-import PasswordProvider, {
-    ChangePasswordI,
-    ChangePasswordStatus
-} from "@/app/user/info/change-password/{services}/passwordProvider";
+import PasswordProvider from "@/app/user/info/{services}/passwordProvider";
 import {useState} from "react";
 import Confirm from "@/app/user/info/change-password/{components}/confirm";
 import ChangePwd from "@/app/user/info/change-password/{components}/changePwd";
 import Success from "@/app/user/info/change-password/{components}/success";
+import {UserInfoSpace} from "@/app/user/info/{services}/types";
 
 export default function Page() {
 
-    const [changePwd, setChangePwd] = useState<ChangePasswordI>({
+    const [changePwd, setChangePwd] = useState<UserInfoSpace.ChangePassword>({
         curPwd: '',
         newPwd: '',
-        status: ChangePasswordStatus.READY
+        status: UserInfoSpace.ChangePasswordStatus.READY
     })
 
     return (
@@ -26,11 +24,11 @@ export default function Page() {
                     비밀번호 변경
                 </h1>
                 {
-                    ChangePasswordStatus.READY === changePwd.status
+                    UserInfoSpace.ChangePasswordStatus.READY === changePwd.status
                     ? <Confirm />
-                    : ChangePasswordStatus.CONFIRMED === changePwd.status
+                    : UserInfoSpace.ChangePasswordStatus.CONFIRMED === changePwd.status
                     ? <ChangePwd />
-                    : ChangePasswordStatus.SUCCESS === changePwd.status
+                    : UserInfoSpace.ChangePasswordStatus.SUCCESS === changePwd.status
                     ? <Success />
                     : <></>
                 }

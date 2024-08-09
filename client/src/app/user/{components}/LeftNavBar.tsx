@@ -21,7 +21,7 @@ import useSWR from "swr";
 import apiCall from "@/app/{commons}/func/api";
 import UserProvider from "@/app/user/{services}/userProvider";
 import Image from "next/image";
-import {NO_IMAGE} from "@/app/{services}/constants";
+import {NO_IMAGE, NO_PROFILE} from "@/app/{services}/constants";
 import {System} from "@/app/user/system/{services}/types";
 
 type MenuItemType = {
@@ -157,7 +157,7 @@ const LeftNavBar = ({
                                priority={true}
                                fetchPriority={"high"}
                                onError={e => {
-                                     e.currentTarget.src = NO_IMAGE;
+                                     e.currentTarget.src = NO_PROFILE;
                                }}
                         />
                     </Link>

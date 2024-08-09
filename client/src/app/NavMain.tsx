@@ -7,6 +7,8 @@ import Image from "next/image";
 import apiCall from "@/app/{commons}/func/api";
 import {Root} from "@/app/{services}/types";
 import ScheduleAlert from "@/app/{components}/scheduleAlert";
+import React from "react";
+import CustomImage from "@/app/{components}/customImage";
 
 
 const NavMain = async () => {
@@ -88,12 +90,7 @@ const NavMain = async () => {
                         <Link href={'/user'}
                               title={'프로필'}
                         >
-                          <Image className={'rounded'}
-                                 src={process.env.NEXT_PUBLIC_CDN_SERVER + profileImg}
-                                 alt={''}
-                                 width={30}
-                                 height={30}
-                          />
+                          <CustomImage src={profileImg || ''} />
                         </Link>
                       </div>
                     }

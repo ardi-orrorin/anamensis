@@ -14,7 +14,7 @@
           JOIN (SELECT sa1.id
                   FROM schedule_alert sa1
                  WHERE user_id = #{userId}
-                   AND DATE (alert_time) <![CDATA[<=]]> DATE(current_timestamp)
+                   AND alert_time <![CDATA[<=]]> current_timestamp
                    AND is_read = 0
              ) sa1 ON sa.id    = sa1.id
           JOIN board b ON b.id = sa.board_id

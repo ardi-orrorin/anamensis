@@ -1,6 +1,6 @@
 package com.anamensis.server.controller;
 
-import com.anamensis.server.entity.ScheduleAlert;
+import com.anamensis.server.dto.response.ScheduleAlertResponse;
 import com.anamensis.server.service.ScheduleAlertService;
 import com.anamensis.server.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class ScheduleAlertController {
     private final UserService userService;
 
     @GetMapping("")
-    public Mono<List<ScheduleAlert>> findAllByUserId(
+    public Mono<List<ScheduleAlertResponse.List>> findAllByUserId(
         @AuthenticationPrincipal UserDetails user
 
     ) {

@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class ScheduleAlertService {
@@ -25,11 +28,39 @@ public class ScheduleAlertService {
         page.setPage(1);
         page.setSize(30);
         return Flux.fromIterable(scheduleAlertMapper.findAllByUserId(page, userId))
-            .map(ScheduleAlertResponse.List::fromEntity);
+            .map(ScheduleAlertResponse.List::from);
     }
 
     public Mono<Boolean> save(ScheduleAlert scheduleAlert) {
         return Mono.fromCallable(() -> scheduleAlertMapper.save(scheduleAlert) > 0);
+    }
+
+    public Mono<Boolean> saveAll(List<ScheduleAlert> scheduleAlerts) {
+        return Mono.fromCallable(() -> scheduleAlertMapper.saveAll(scheduleAlerts) > 0);
+    }
+
+    public Mono<Boolean> updateAll(List<ScheduleAlert> nextSchAlert, long boardId, String userId) {
+        return Flux.fromIterable(scheduleAlertMapper.findAllByBoardId(userId, boardId))
+            .doOnNext(prevSchAlert -> {
+                Optional<ScheduleAlert> findSchAlert = nextSchAlert.stream().filter(alert ->
+                    alert.getHashId().equals(prevSchAlert.getHashId())
+                    && alert.getBoardId() == prevSchAlert.getBoardId()
+                ).findFirst();
+
+                findSchAlert.map(scheduleAlert -> {
+                    updateScheduleAlert(prevSchAlert, scheduleAlert);
+                    return nextSchAlert.remove(scheduleAlert);
+                }).orElseGet(() ->
+                    scheduleAlertMapper.delete(prevSchAlert.getId()) > 0
+                );
+            })
+            .then(saveAll(nextSchAlert));
+    }
+
+    private void updateScheduleAlert(ScheduleAlert prevSchAlert, ScheduleAlert nextSchAlert) {
+        nextSchAlert.setId(prevSchAlert.getId());
+        nextSchAlert.setUserId(prevSchAlert.getUserId());
+        scheduleAlertMapper.update(nextSchAlert);
     }
 
     public Mono<Boolean> saveToCache(String userId) {

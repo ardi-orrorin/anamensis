@@ -69,7 +69,10 @@ const NavMain = async () => {
             </div>
             <div className={'w-1/3 h-full'}>
                 <ul className={'flex h-full justify-end gap-2'}>
-                    <ScheduleAlert />
+                    {
+                        isLogged
+                        && <ScheduleAlert />
+                    }
                     {
                         rightMenuItems.map((item, index) => {
                             if(!item.loginRequired === isLogged) {

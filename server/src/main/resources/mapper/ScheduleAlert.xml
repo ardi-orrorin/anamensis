@@ -4,21 +4,22 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.anamensis.server.mapper.ScheduleAlertMapper">
-    <select id="findByUserId" resultMap="scheduleAlertResultMap">
+    <select id="findAllByUserId" resultMap="scheduleAlertResultMap">
         SELECT *
              , sa.id As id
              , sa.id AS sch_id
              , b.id  AS board_id
+             , b.title AS board_title
           FROM schedule_alert sa
           JOIN (SELECT sa1.id
                   FROM schedule_alert sa1
                  WHERE user_id = #{userId}
                    AND DATE (alert_time) <![CDATA[<=]]> DATE(current_timestamp)
-                 ORDER BY alert_time DESC
-                 LIMIT #{page.offset}, #{page.limit}
+                   AND is_read = 0
              ) sa1 ON sa.id    = sa1.id
           JOIN board b ON b.id = sa.board_id
            AND b.is_use        = 1
+         ORDER BY alert_time
     </select>
 
     <select id="findAllByBoardId">
@@ -40,7 +41,7 @@
 
     <insert id="saveAll">
         INSERT INTO schedule_alert
-            (hash_id, board_id, user_id, title, alert_time)
+               (hash_id, board_id, user_id, title, alert_time)
         VALUES
             <foreach collection="list" item="item" separator=",">
                 (#{item.hashId}, #{item.boardId}, #{item.userId}, #{item.title}, #{item.alertTime})
@@ -52,6 +53,14 @@
            SET title      = #{title},
                alert_time = #{alertTime}
          WHERE id         = #{id}
+    </update>
+
+    <update id="updateIsRead">
+        UPDATE schedule_alert
+           SET is_read = 1
+         WHERE id      = #{id}
+           AND user_id = #{userId}
+           AND DATE(alert_time) <![CDATA[<=]]> DATE(current_timestamp)
     </update>
 
     <delete id="delete">
@@ -72,6 +81,7 @@
 
     <resultMap id="boardEntity" type="Board" autoMapping="true">
         <id property="id" column="board_id" />
+        <result property="title" column="board_title" />
         <result property="content" column="content" typeHandler="JsonObjectTypeHandler"/>
     </resultMap>
 </mapper>

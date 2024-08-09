@@ -24,10 +24,7 @@ public class ScheduleAlertService {
     private final static String SCHEDULE_ALERT_KEY = "schedule:alert:memberId:%s";
 
     public Flux<ScheduleAlertResponse.List> findAllByUserId(String userId) {
-        Page page = new Page();
-        page.setPage(1);
-        page.setSize(30);
-        return Flux.fromIterable(scheduleAlertMapper.findAllByUserId(page, userId))
+        return Flux.fromIterable(scheduleAlertMapper.findAllByUserId(userId))
             .map(ScheduleAlertResponse.List::from);
     }
 
@@ -57,10 +54,8 @@ public class ScheduleAlertService {
             .then(saveAll(nextSchAlert));
     }
 
-    private void updateScheduleAlert(ScheduleAlert prevSchAlert, ScheduleAlert nextSchAlert) {
-        nextSchAlert.setId(prevSchAlert.getId());
-        nextSchAlert.setUserId(prevSchAlert.getUserId());
-        scheduleAlertMapper.update(nextSchAlert);
+    public Mono<Boolean> updateIsRead(long id, String userId) {
+        return Mono.fromCallable(() -> scheduleAlertMapper.updateIsRead(id, userId) > 0);
     }
 
     public Mono<Boolean> saveToCache(String userId) {
@@ -73,6 +68,11 @@ public class ScheduleAlertService {
             .map(aBoolean -> true);
     }
 
+    private void updateScheduleAlert(ScheduleAlert prevSchAlert, ScheduleAlert nextSchAlert) {
+        nextSchAlert.setId(prevSchAlert.getId());
+        nextSchAlert.setUserId(prevSchAlert.getUserId());
+        scheduleAlertMapper.update(nextSchAlert);
+    }
 
 
 

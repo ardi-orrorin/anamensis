@@ -72,6 +72,16 @@ type SearchBoxPropsT = {
     setOnSearchHistory : (value: boolean) => void;
 }
 
+type ScheduleAlertT = {
+    id         : number;
+    hashId     : string;
+    BoardTitle : string;
+    boardId    : number;
+    title      : string;
+    alertTime  : string;
+    isRead     : boolean;
+}
+
 export namespace Root {
     export type DynamicPage          = DynamicPageT;
     export type SearchHistoryProps   = SearchHistoryPropsT;
@@ -80,4 +90,5 @@ export namespace Root {
     export type NavItemProps         = NavItemPropsT;
     export type NoticeType           = NoticeTypeT;
     export type SearchBoxProps       = SearchBoxPropsT;
+    export type ScheduleAlert        = ScheduleAlertT;
 }

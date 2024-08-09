@@ -1,5 +1,6 @@
 package com.anamensis.server.dto.response;
 
+import com.anamensis.server.entity.Board;
 import com.anamensis.server.entity.ScheduleAlert;
 import com.anamensis.server.resultMap.ScheduleAlertResultMap;
 import lombok.Builder;
@@ -22,6 +23,8 @@ public class ScheduleAlertResponse {
         public String title;
         public String alertTime;
 
+        public Boolean isRead;
+
         public static List from(ScheduleAlert entity) {
             return List.builder()
                 .id(entity.getId())
@@ -29,6 +32,7 @@ public class ScheduleAlertResponse {
                 .boardId(entity.getBoardId())
                 .title(entity.getTitle())
                 .alertTime(entity.getAlertTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .isRead(entity.isRead())
                 .build();
         }
 
@@ -40,8 +44,10 @@ public class ScheduleAlertResponse {
                 .boardId(resultMap.getBoard().getId())
                 .title(resultMap.getScheduleAlert().getTitle())
                 .alertTime(resultMap.getScheduleAlert().getAlertTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .isRead(resultMap.getScheduleAlert().isRead())
                 .build();
         }
 
     }
 }
+

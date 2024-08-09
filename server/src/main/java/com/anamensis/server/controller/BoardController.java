@@ -24,6 +24,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -340,7 +341,6 @@ public class BoardController {
                                 return boardService.addSelectAnswerQueue(saqdto);
                             })
                             .onErrorReturn(false)
-
                     )
                     .subscribe();
             });
@@ -477,11 +477,16 @@ public class BoardController {
 
             if(!"00411".equals(code)) continue;
             ScheduleAlert scheduleAlert = new ScheduleAlert();
+
+            LocalDateTime alertTime = extraValue.getBoolean("allDay")
+                ? LocalDate.parse(extraValue.getString("start")).atStartOfDay()
+                : LocalDateTime.parse(extraValue.getString("start"));
+
             scheduleAlert.setBoardId(boardPk);
             scheduleAlert.setUserId(userId);
             scheduleAlert.setHashId(extraValue.getString("id"));
             scheduleAlert.setTitle(extraValue.getString("title"));
-            scheduleAlert.setAlertTime(LocalDateTime.parse(extraValue.getString("start")));
+            scheduleAlert.setAlertTime(alertTime);
             scheduleAlerts.add(scheduleAlert);
         }
 

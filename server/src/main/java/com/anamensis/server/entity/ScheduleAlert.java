@@ -20,4 +20,6 @@ public class ScheduleAlert {
     private String title;
 
     private LocalDateTime alertTime;
+
+    private boolean isRead;
 }

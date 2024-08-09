@@ -6,6 +6,7 @@ import {faRightToBracket} from "@fortawesome/free-solid-svg-icons/faRightToBrack
 import Image from "next/image";
 import apiCall from "@/app/{commons}/func/api";
 import {Root} from "@/app/{services}/types";
+import ScheduleAlert from "@/app/{components}/scheduleAlert";
 
 
 const NavMain = async () => {
@@ -68,6 +69,7 @@ const NavMain = async () => {
             </div>
             <div className={'w-1/3 h-full'}>
                 <ul className={'flex h-full justify-end gap-2'}>
+                    <ScheduleAlert />
                     {
                         rightMenuItems.map((item, index) => {
                             if(!item.loginRequired === isLogged) {

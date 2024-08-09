@@ -1,9 +1,9 @@
-import {LoginI} from "@/app/login/{services}/LoginProvider";
 import {ChangeEvent, Dispatch, SetStateAction} from "react";
+import {User} from "@/app/login/{services}/types";
 
 export const onChange = (
     e: ChangeEvent<HTMLInputElement>,
-    setUser: Dispatch<SetStateAction<LoginI>>
+    setUser: Dispatch<SetStateAction<User.Login>>
 ) => {
     setUser((prevState) => ({
         ...prevState,

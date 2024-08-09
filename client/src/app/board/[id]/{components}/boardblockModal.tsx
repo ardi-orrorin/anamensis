@@ -4,8 +4,8 @@ import BoardProvider from "@/app/board/{services}/BoardProvider";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {faCaretRight} from "@fortawesome/free-solid-svg-icons";
-import {BoardBlock} from "@/app/user/board-block/{services}/boardBlockProvider";
 import apiCall from "@/app/{commons}/func/api";
+import {BoardBlocking} from "@/app/user/board-block/{services}/types";
 
 const BoardBlockModal = () => {
 
@@ -21,8 +21,8 @@ const BoardBlockModal = () => {
         const body = {
             boardPk: Number(board.data.id),
             reason,
-        } as BoardBlock;
-        await apiCall<any, BoardBlock>({
+        } as BoardBlocking.BoardBlock;
+        await apiCall<any, BoardBlocking.BoardBlock>({
             path: '/api/user/board-block-history',
             body,
             method: 'POST',

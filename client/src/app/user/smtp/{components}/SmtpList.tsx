@@ -1,10 +1,11 @@
-import SmtpCard, {SmtpCardProps} from "@/app/user/smtp/{components}/SmtpCard";
+import SmtpCard from "@/app/user/smtp/{components}/SmtpCard";
 import React from "react";
-import {PageResponse} from "@/app/{commons}/types/commons";
 import apiCall from "@/app/{commons}/func/api";
+import {Common} from "@/app/{commons}/types/commons";
+import {SMTP} from "@/app/user/smtp/{services}/types";
 
 const SmtpList = async () => {
-    const data = await apiCall<PageResponse<SmtpCardProps>>({
+    const data = await apiCall<Common.PageResponse<SMTP.CardProps>>({
         path: '/api/user-config-smtp',
         method: 'GET',
         call: 'Server',

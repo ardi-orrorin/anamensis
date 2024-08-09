@@ -24,8 +24,9 @@ const config: Config = {
         "main": "#246DCF",
       },
       borderWidth: {
-        '5': '5px',
-        '6': '6px',
+        '5'  : '5px',
+        '6'  : '6px',
+        '12' : '12px',
       }
     },
   },

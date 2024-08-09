@@ -1,9 +1,9 @@
 import apiCall from "@/app/{commons}/func/api";
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
-import {UserInfoI} from "@/app/user/email/page";
+import {User} from "@/app/login/{services}/types";
 
 export async function GET() {
-    const result = await apiCall<UserInfoI>({
+    const result = await apiCall<User.UserInfo>({
         path: '/api/user/get-point',
         method: 'GET',
         call: 'Server',

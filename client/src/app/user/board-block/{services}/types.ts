@@ -1,34 +1,36 @@
-import {BoardBlockStatusEnum} from "@/app/user/board-block/{services}/boardBlockProvider";
+import BoardBlockStatus = BoardBlocking.BoardBlockStatus;
+import BoardBlockResultStatus = BoardBlocking.BoardBlockResultStatus;
 
-export class Types {
+interface CommonI {
+    id           : number;
+    boardPk      : number;
+    title        : string;
+    status       : BoardBlockStatus;
+    createdAt    : string;
+    answerAt     : string;
+    resultAt     : string;
+}
 
-    private readonly status: BoardBlockStatusEnum;
-    private readonly korName: string;
+interface BoardBlockI extends CommonI {
+    reason       : string;
+    answer       : string;
+    result       : string;
+    resultStatus : BoardBlockResultStatus;
+}
 
-    public static readonly list: Types[] = [
-        new Types(BoardBlockStatusEnum.STARTED, '접수'),
-        new Types(BoardBlockStatusEnum.ANSWERED, '답변완료'),
-        new Types(BoardBlockStatusEnum.RESULTED, '처리완료'),
-    ];
+export namespace BoardBlocking {
+    export type BoardBlock           = BoardBlockI;
+    export type BoardBlockHistories  = CommonI;
 
-    constructor(status: BoardBlockStatusEnum, korName: string) {
-        this.status = status;
-        this.korName = korName;
+
+    export enum BoardBlockStatus {
+        STARTED  = 'STARTED',
+        ANSWERED = 'ANSWERED',
+        RESULTED = 'RESULTED',
     }
 
-    public getStatus(): string {
-        return this.status;
+    export enum BoardBlockResultStatus {
+        UNBLOCKING = 'UNBLOCKING',
+        BLOCKING   = 'BLOCKING',
     }
-
-    public getKorName(): string {
-        return this.korName;
-    }
-
-    public static find(status: string): Types | undefined {
-        return this.list.find((str) =>
-            str.getStatus() === status.toUpperCase()
-        );
-    }
-
-
 }

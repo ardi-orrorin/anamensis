@@ -1,16 +1,14 @@
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {useCallback, useContext, useMemo, useState} from "react";
-import BoardBlockProvider, {BoardBlock} from "@/app/user/board-block/{services}/boardBlockProvider";
+import BoardBlockProvider from "@/app/user/board-block/{services}/boardBlockProvider";
 import apiCall from "@/app/{commons}/func/api";
 import ModalProvider from "@/app/user/board-block/{services}/modalProvider";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowDown91} from "@fortawesome/free-solid-svg-icons";
-import {Types} from "@/app/user/board-block/{services}/types";
 import SizeSelect from "@/app/{commons}/sizeSelect";
 import StatusSelect from "@/app/user/board-block/{components}/statusSelect";
-import {
-    LeftRightDialogHeader
-} from "next/dist/client/components/react-dev-overlay/internal/components/LeftRightDialogHeader";
+import {BoardBlockStatus} from "@/app/user/board-block/{services}/objects";
+import {BoardBlocking} from "@/app/user/board-block/{services}/types";
 
 const History = () => {
     const searchParams = useSearchParams();
@@ -24,7 +22,7 @@ const History = () => {
     const pathname = usePathname();
 
     const onClickHandler = useCallback(async (id: number) => {
-        return await apiCall<BoardBlock>({
+        return await apiCall<BoardBlocking.BoardBlock>({
             path: '/api/user/board-block-history/' + id,
             method: 'GET',
             isReturnData: true,
@@ -66,7 +64,7 @@ const History = () => {
                 >
                     <td className={'py-2 px-3'}>{ maxIndex - index }</td>
                     <td className={'py-4 px-3'}>{ history.title }</td>
-                    <td className={'py-4 px-3'}>{ Types.find(history.status)?.getKorName() }</td>
+                    <td className={'py-4 px-3'}>{ BoardBlockStatus.find(history.status)?.getKorName() }</td>
                     <td className={'py-2 px-3'}>{ history.createdAt }</td>
                 </tr>
             )

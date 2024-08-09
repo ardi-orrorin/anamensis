@@ -1,17 +1,16 @@
 import {NextRequest} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
-import {PageResponse} from "@/app/{commons}/types/commons";
-import {BoardListI} from "@/app/{components}/boardComponent";
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
-import {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
 import {AxiosError} from "axios";
+import {Root} from "@/app/{services}/types";
+import {Common} from "@/app/{commons}/types/commons";
 
 export async function GET(req: NextRequest) {
     const searchParams = new URLSearchParams(req.nextUrl.searchParams);
     const { page, size
         , type, value, categoryPk
         , isSelf, isFavorite
-    } = Object.fromEntries(searchParams.entries()) as BoardListParamsI;
+    } = Object.fromEntries(searchParams.entries()) as Root.BoardListParamsI;
     const params = {
         page,
         size,
@@ -22,9 +21,8 @@ export async function GET(req: NextRequest) {
         isSelf,
     }
 
-
     try {
-        const result = await apiCall<PageResponse<BoardListI>, URLSearchParams>({
+        const result = await apiCall<Common.PageResponse<Root.BoardListI>, URLSearchParams>({
             path: '/public/api/boards',
             method: 'GET',
             params,

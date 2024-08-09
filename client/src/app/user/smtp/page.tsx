@@ -6,33 +6,7 @@ import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import {useRouter} from "next/navigation";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
-
-
-export interface SmtpProps {
-    id?: number;
-    host: string;
-    port: string;
-    username: string;
-    password: string;
-    fromEmail: string;
-    fromName: string;
-    options: string[];
-}
-
-export interface SmtpI {
-    host: string;
-    port: string;
-    username: string;
-    password: string;
-    fromEmail: string;
-    fromName: string;
-    useSSL: boolean;
-    isDefault: boolean;
-}
-export interface SmtpTestProps {
-    result: boolean;
-    message: string;
-}
+import {SMTP} from "@/app/user/smtp/{services}/types";
 
 interface SmtpPropsI {
     searchParams: URLQuery;
@@ -56,17 +30,17 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
     const {searchParams} = props;
     const router = useRouter();
 
-    const [hasTest, setHasTest] = useState<boolean>(false)
-    const [smtp, setSmtp] = useState<SmtpProps>({} as SmtpProps);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [testResult, setTestResult] = useState<SmtpTestProps>({} as SmtpTestProps);
+    const [hasTest, setHasTest] = useState(false)
+    const [smtp, setSmtp] = useState({} as SMTP.Props);
+    const [loading, setLoading] = useState(false);
+    const [testResult, setTestResult] = useState({} as SMTP.TestResponse);
 
     const debounce = createDebounce(500);
 
     useEffect(() => {
         if(!searchParams?.id) return;
         const fetch = async () => {
-            await apiCall<SmtpProps>({
+            await apiCall<SMTP.Props>({
                 path: '/api/user/smtp',
                 method: 'GET',
                 call: 'Proxy',
@@ -87,7 +61,7 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
         setSmtp({...smtp, [e.target.name]: e.target.value})
     }
 
-    const transformSmtp = (smtp: SmtpProps): SmtpI => {
+    const transformSmtp = (smtp: SMTP.Props): SMTP.FullProps => {
         const options: string[] = Object.keys(smtp);
         return {
             ...smtp,
@@ -127,14 +101,14 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
         const data = transformSmtp(smtp);
 
         const fetch = async () => {
-            await apiCall<any, SmtpI>({
+            await apiCall<any, SMTP.FullProps>({
                 path: '/api/user/smtp',
                 method: 'POST',
                 call: 'Proxy',
                 body: data,
             })
             .then(res => {
-                setSmtp({} as SmtpProps);
+                setSmtp({} as SMTP.Props);
                 router.refresh();
             })
             .finally(() => {
@@ -151,7 +125,7 @@ export default function Page(props: InferGetServerSidePropsType<typeof getServer
 
     const init = () => {
         router.push('./smtp');
-        setSmtp({} as SmtpProps);
+        setSmtp({} as SMTP.Props);
     }
 
     const inputStyle = 'w-full outline-0 focus:bg-blue-50 p-2 text-sm rounded duration-500';

@@ -1,10 +1,10 @@
-import {ExistProps} from "@/app/signup/page";
 import {NextRequest, NextResponse} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
+import {SignUp} from "@/app/signup/{services}/types";
 
 export async function POST(req: NextRequest) {
 
-    const body = await req.json() as ExistProps;
+    const body = await req.json() as SignUp.ExistProps;
 
     try {
         const res = await apiCall<any>({

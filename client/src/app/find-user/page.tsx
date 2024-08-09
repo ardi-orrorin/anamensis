@@ -1,17 +1,15 @@
 'use client';
 
-import Link from "next/link";
 import {useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
-import {FindUser, FindUserResponse} from "@/app/reset-pwd/{services}/type";
 import Footer from "@/app/find-user/{components}/footer";
-
+import {User} from "@/app/login/{services}/types";
 
 export default function Page() {
 
-    const [findUser, setFindUser] = useState<FindUser>({} as FindUser);
-    const [sendCode, setSendCode] = useState<boolean>(false);
-    const [responseId, setResponseId] = useState<FindUserResponse>({} as FindUserResponse);
+    const [findUser, setFindUser] = useState({} as User.FindUser);
+    const [sendCode, setSendCode] = useState(false);
+    const [responseId, setResponseId] = useState({} as User.FindUserResponse);
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
@@ -25,7 +23,7 @@ export default function Page() {
     }
 
     const sendVerifyCodeHandler = async () => {
-        apiCall<boolean, FindUser>({
+        apiCall<boolean, User.FindUser>({
             path: '/api/find-user',
             method: 'POST',
             body: findUser,
@@ -40,7 +38,7 @@ export default function Page() {
     }
 
     const confirmVerifyCodeHandler = async () => {
-        apiCall<FindUserResponse, FindUser>({
+        apiCall<User.FindUserResponse, User.FindUser>({
             path: '/api/find-user/id-confirm',
             method: 'POST',
             body: findUser,

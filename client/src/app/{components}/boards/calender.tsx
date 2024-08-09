@@ -1,12 +1,12 @@
-import {BoardListI} from "@/app/{components}/boardComponent";
 import FooterComponent from "@/app/{components}/footerComponent";
 import React from "react";
 import HeaderComponent from "@/app/{components}/headerComponent";
 import {BlockI} from "@/app/board/{services}/types";
 import {EventExtraValue} from "@/app/board/{components}/block/extra/eventBlock";
 import moment from "moment/moment";
+import {Root} from "@/app/{services}/types";
 
-const CalenderComponent = (props: BoardListI) => {
+const CalenderComponent = (props: Root.BoardListI) => {
     const { body } = props;
 
     const eventBlocks = body?.filter((block) => {
@@ -32,14 +32,14 @@ const CalenderComponent = (props: BoardListI) => {
 
                                 return (
                                     <tr key={'event' + eventBlock.hash + index}
-                                        className={'w-full h-6'}
+                                        className={'w-full flex h-6'}
                                     >
-                                        <td className={'flex gap-1'}>
-                                            <span className={'flex w-20'}>{start}</span>
-                                            <span className={'flex w-5 justify-start'}>~</span>
-                                            <span className={'flex w-20'}>{end}</span>
+                                        <td className={'flex gap-1 items-center'}>
+                                            <span className={'flex w-20 h-full items-center'}>{start}</span>
+                                            <span className={'flex w-5 h-full justify-start items-center'}>~</span>
+                                            <span className={'flex w-20 h-full items-center'}>{end}</span>
                                         </td>
-                                        <td className={'font-bold'}>
+                                        <td className={'flex min-w-full font-bold items-center'}>
                                             {eventBlock.value}
                                         </td>
                                     </tr>

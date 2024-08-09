@@ -1,8 +1,7 @@
-import BoardProvider, {BoardService} from "@/app/board/{services}/BoardProvider";
+import {BoardService} from "@/app/board/{services}/BoardProvider";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faHeart} from "@fortawesome/free-solid-svg-icons/faHeart";
-import React, {useContext, useMemo} from "react";
-import {BoardSummaryI} from "@/app/user/{services}/userProvider";
+import React, {useMemo} from "react";
 import {RateInfoI} from "@/app/board/[id]/page";
 
 const Rate = (props: {

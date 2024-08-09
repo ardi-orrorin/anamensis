@@ -1,43 +1,25 @@
 'use client';
 import React, {useContext, useEffect, useMemo, useState} from "react";
-import {AuthType} from "@/app/login/{services}/types";
 import apiCall from "@/app/{commons}/func/api";
 import {useRouter} from "next/navigation";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import useSWR from "swr";
 import UserProvider from "@/app/user/{services}/userProvider";
-import {RoleType} from "@/app/user/system/{services}/types";
-
-export interface UserInfoI {
-    userId        : string;
-    email         : string;
-    phone         : string;
-    name          : string;
-    point         : number;
-    sauthType     : AuthType;
-    sauth         : boolean;
-    createAt      : string;
-    isOAuth       : boolean;
-    [key: string] : any;
-}
-
-export interface AuthPropsI {
-    sauthType : AuthType;
-    sauth     : boolean;
-}
+import {User} from "@/app/login/{services}/types";
+import {System} from "@/app/user/system/{services}/types";
 
 export default function Page() {
 
     const {roles} = useContext(UserProvider);
-    const [userInfo, setUserInfo] = useState<UserInfoI>({} as UserInfoI);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [userInfo, setUserInfo] = useState({} as User.UserInfo);
+    const [loading, setLoading] = useState(false);
     const isSAuthEmail = useMemo(() => {
-        return userInfo.sauthType === AuthType.EMAIL && userInfo.sauth;
+        return userInfo.sauthType === User.AuthType.EMAIL && userInfo.sauth;
     },[userInfo]);
 
     const isOAuthUser = useMemo(() =>
-        roles.some((role) => role === RoleType.OAUTH)
+        roles.some((role) => role === System.Role.OAUTH)
         ,[roles]);
 
     const router = useRouter();
@@ -50,7 +32,7 @@ export default function Page() {
 
 
     const { mutate } = useSWR('/api/user/info', async () => {
-        return await apiCall<UserInfoI>({
+        return await apiCall<User.UserInfo>({
             path: '/api/user/info',
             method: 'GET',
             isReturnData: true,
@@ -62,13 +44,13 @@ export default function Page() {
 
 
     const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const data: AuthPropsI = {
+        const data: User.AuthProps = {
             sauth: e.target.checked,
-            sauthType: userInfo.sauthType !== AuthType.EMAIL ? AuthType.EMAIL : AuthType.NONE
+            sauthType: userInfo.sauthType !== User.AuthType.EMAIL ? User.AuthType.EMAIL : User.AuthType.NONE
         };
 
         setLoading(true);
-        await apiCall<UserInfoI, AuthPropsI>({
+        await apiCall<User.UserInfo, User.AuthProps>({
             path: '/api/user/email',
             method: 'PUT',
             body: data,

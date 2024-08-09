@@ -4,17 +4,16 @@ import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import React, {useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
-import {LoadingType} from "@/app/user/info/page";
-import {UserInfoI} from "@/app/user/email/page";
 import moment from "moment";
 import Link from "next/link";
-import {AuthType} from "@/app/login/{services}/types";
+import {User} from "@/app/login/{services}/types";
+import {UserInfoSpace} from "@/app/user/info/{services}/types";
 
-export const UserInfo = ({profileInfo}: {profileInfo: UserInfoI}) => {
+export const UserInfo = ({profileInfo}: {profileInfo: User.UserInfo}) => {
 
-    const [profile, setProfile] = useState<UserInfoI>(profileInfo);
+    const [profile, setProfile] = useState<User.UserInfo>(profileInfo);
 
-    const [loading, setLoading] = useState<LoadingType>({} as LoadingType);
+    const [loading, setLoading] = useState({} as UserInfoSpace.Loading);
 
     const debounce = createDebounce(500);
 

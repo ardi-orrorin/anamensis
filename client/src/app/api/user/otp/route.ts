@@ -1,11 +1,11 @@
 import {NextRequest} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
-import {OtpInfoI} from "@/app/user/otp/{components}/InitStep";
+import {OTP} from "@/app/user/otp/{services}/types";
 
 export async function GET() {
 
     try {
-        const res = await apiCall<OtpInfoI>({
+        const res = await apiCall<OTP.Info>({
             path: '/api/otp',
             method: 'GET',
             call: 'Server',
@@ -24,7 +24,7 @@ export async function GET() {
             id: 0,
             sAuth: false,
             createAt: '',
-        } as OtpInfoI;
+        } as OTP.Info;
 
         return new Response(JSON.stringify(res), {
             status: 200,
@@ -33,9 +33,6 @@ export async function GET() {
             }
         });
     }
-
-
-
 }
 
 export async function POST(req: NextRequest) {

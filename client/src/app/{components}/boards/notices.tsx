@@ -3,16 +3,9 @@ import {faCalendarDays, faCircleExclamation, faUser} from "@fortawesome/free-sol
 import Link from "next/link";
 import React from "react";
 import moment from "moment";
+import {Root} from "@/app/{services}/types";
 
-export type NoticeType = {
-    id        : number;
-    title     : string;
-    writer    : string;
-    viewCount : number;
-    createdAt : string;
-}
-
-const Notices = ({data}: {data: NoticeType[]}) => {
+const Notices = ({data}: {data: Root.NoticeType[]}) => {
 
     if(data.length === 0) return <></>
     return (
@@ -26,7 +19,7 @@ const Notices = ({data}: {data: NoticeType[]}) => {
     )
 }
 
-const Row = ({data}: {data: NoticeType}) => {
+const Row = ({data}: {data: Root.NoticeType}) => {
     return (
         <Link className={'w-full py-2 px-4 flex justify-between shadow hover:shadow-md duration-300 border-solid border border-gray-200 hover:border-gray-500 rounded'}
               href={'/board/' + data.id}

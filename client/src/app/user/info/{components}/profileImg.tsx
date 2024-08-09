@@ -6,16 +6,16 @@ import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import React, {useContext, useEffect, useRef, useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
-import {LoadingType} from "@/app/user/info/page";
 import UserProvider from "@/app/user/{services}/userProvider";
+import {UserInfoSpace} from "@/app/user/info/{services}/types";
 
 const ProfileImg = () => {
 
     const {profileImg, setProfileImg} = useContext(UserProvider);
 
     const inputRef = useRef<HTMLInputElement>(null);
-    const [loading, setLoading] = useState<LoadingType>({} as LoadingType);
-    const [profileEnter, setProfileEnter] = useState<boolean>(false);
+    const [loading, setLoading] = useState({} as UserInfoSpace.Loading);
+    const [profileEnter, setProfileEnter] = useState(false);
     const debounce = createDebounce(500);
 
     useEffect(()=> {

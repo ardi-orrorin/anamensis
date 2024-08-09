@@ -1,14 +1,14 @@
 'use client';
-import {PageI} from "@/app/{commons}/types/commons";
 import Link from "next/link";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {redirect, usePathname, useRouter, useSearchParams} from "next/navigation";
+import {usePathname, useSearchParams} from "next/navigation";
 import {faAnglesLeft, faAnglesRight} from "@fortawesome/free-solid-svg-icons";
-import React, {useCallback, useMemo} from "react";
+import React, {useMemo} from "react";
+import {Common} from "@/app/{commons}/types/commons";
 
 const PageNavigator = ({
     page, size, total
-}: PageI) => {
+}: Common.PageI) => {
 
     const searchParams = useSearchParams();
     const pathname = usePathname();

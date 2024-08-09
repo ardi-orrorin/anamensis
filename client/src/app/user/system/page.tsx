@@ -9,27 +9,20 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
 import ModalProvider, {ModalI} from "@/app/user/system/{services}/modalProvider";
 import Message from "@/app/user/system/{components}/message";
-
-export interface WebSysI {
-    code: string;
-    name: string;
-    description: string;
-    permission: string;
-    edit: boolean;
-}
+import {System} from "@/app/user/system/{services}/types";
 
 export default function Page(){
 
-    const [data, setData] = useState<WebSysI[]>([]);
-    const [modal, setModal] = useState<ModalI>({} as ModalI);
-    const [add, setAdd] = useState<boolean>(false);
+    const [data, setData] = useState<System.WebSys[]>([]);
+    const [modal, setModal] = useState({} as ModalI);
+    const [add, setAdd] = useState(false);
 
     const addHandler = () => {
         setAdd(true);
     }
 
     preload('/api/user/system', async () => {
-        return await apiCall<WebSysI[]>({
+        return await apiCall<System.WebSys[]>({
             path: `/api/user/system`,
             method: 'GET',
             isReturnData: true,
@@ -75,14 +68,14 @@ export default function Page(){
                 </tbody>
             </table>
             {
-                !add &&
-              <div className={'flex justify-center items-center w-full'}>
-                <button className={'h-10 w-10 bg-blue-300 text-white rounded-full hover:bg-blue-600 duration-500'}
-                        onClick={addHandler}
-                >
-                  <FontAwesomeIcon icon={faPlus} height={20} className={'h-[20px]'} />
-                </button>
-              </div>
+                !add
+                && <div className={'flex justify-center items-center w-full'}>
+                    <button className={'h-10 w-10 bg-blue-300 text-white rounded-full hover:bg-blue-600 duration-500'}
+                            onClick={addHandler}
+                    >
+                      <FontAwesomeIcon icon={faPlus} height={20} className={'h-[20px]'} />
+                    </button>
+                </div>
             }
             {
                 modal.isOpen

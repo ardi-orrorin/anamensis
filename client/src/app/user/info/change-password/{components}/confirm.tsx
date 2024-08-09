@@ -1,24 +1,16 @@
 import {useContext, useState} from "react";
-import PasswordProvider, {
-    ChangePasswordI,
-    ChangePasswordStatus
-} from "@/app/user/info/change-password/{services}/passwordProvider";
+import PasswordProvider from "@/app/user/info/{services}/passwordProvider";
 import apiCall from "@/app/{commons}/func/api";
-import {StatusResponse, StatusResponseStatusEnum} from "@/app/{commons}/types/commons";
-import axios, {AxiosError} from "axios";
 import {faEye} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-
-enum Statue {
-    READY,
-    CONFIRMED,
-    FAILED
-}
-
+import {Common} from "@/app/{commons}/types/commons";
+import {AxiosError} from "axios";
+import {UserInfoSpace} from "@/app/user/info/{services}/types";
 const Confirm = () => {
 
     const {changePwd, setChangePwd} = useContext(PasswordProvider);
-    const [status, setStatus] = useState(Statue.READY);
+
+    const [status, setStatus] = useState(UserInfoSpace.Statue.READY);
     const [pwdView, setPwdView] = useState(false);
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,18 +23,18 @@ const Confirm = () => {
     const onSubmit = async () => {
 
         try {
-            const res = await apiCall<StatusResponse, ChangePasswordI>({
+            const res = await apiCall<Common.StatusResponse, UserInfoSpace.ChangePassword>({
                 path: '/api/user/change-password',
                 method: 'POST',
                 body: changePwd
             });
 
-            res.data.status === StatusResponseStatusEnum.SUCCESS
+            res.data.status === Common.StatusResponseStatusEnum.SUCCESS
             ? setChangePwd({
                 ...changePwd,
-                status: ChangePasswordStatus.CONFIRMED
+                status: UserInfoSpace.ChangePasswordStatus.CONFIRMED
             })
-            : setStatus(Statue.FAILED);
+            : setStatus(UserInfoSpace.Statue.FAILED);
         } catch (e) {
             const err = e as AxiosError;
             console.log(err);
@@ -54,7 +46,7 @@ const Confirm = () => {
             ...changePwd,
             curPwd: e.target.value
         })
-        setStatus(Statue.READY);
+        setStatus(UserInfoSpace.Statue.READY);
     }
 
     return (
@@ -76,7 +68,7 @@ const Confirm = () => {
                 </button>
             </div>
             <div className={'text-red-500 text-xs'}>
-                {status === Statue.FAILED ? '비밀번호가 일치하지 않습니다.' : ''}
+                {status === UserInfoSpace.Statue.FAILED ? '비밀번호가 일치하지 않습니다.' : ''}
             </div>
             <button className={'w-32 p-2 rounded bg-blue-400 text-white text-xs disabled:bg-gray-600 hover:bg-main transition-colors duration-500'}
                     onClick={onSubmit}

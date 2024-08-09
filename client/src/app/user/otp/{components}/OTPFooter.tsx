@@ -1,13 +1,13 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowLeft, faArrowRight} from "@fortawesome/free-solid-svg-icons";
-import {OTPStepEnum} from "@/app/user/otp/{components}/Step";
 import {useRouter} from "next/navigation";
+import {OTP} from "@/app/user/otp/{services}/types";
 
-const OTPFooter = ({cur} : {cur: OTPStepEnum}) => {
+const OTPFooter = ({cur} : {cur: OTP.OTPStep}) => {
 
     const router = useRouter();
 
-    const stepSort = [OTPStepEnum.INIT, OTPStepEnum.OTP, OTPStepEnum.VERIFY];
+    const stepSort = [OTP.OTPStep.INIT, OTP.OTPStep.OTP, OTP.OTPStep.VERIFY];
 
     const prevStep = () => {
         const currentStep = stepSort.indexOf(cur);

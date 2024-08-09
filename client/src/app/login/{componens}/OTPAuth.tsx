@@ -1,21 +1,21 @@
 import {useContext, useEffect, useState} from "react";
-import LoginProvider, {LoginI, LoginProviderI} from "@/app/login/{services}/LoginProvider";
+import LoginProvider, {LoginProviderI} from "@/app/login/{services}/LoginProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import apiCall from "@/app/{commons}/func/api";
-import {LoginType} from "@/app/login/{componens}/Login";
 import useTimer from "@/app/login/{services}/useTimer";
 import {onChange} from "@/app/login/{services}/funcs";
+import {User} from "@/app/login/{services}/types";
 
 const OTPAuth = () => {
     const { user, setUser } = useContext<LoginProviderI>(LoginProvider);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState(false);
 
     const timer = useTimer(300);
 
     const verify = async () => {
         setLoading(true);
 
-        await apiCall<LoginType, LoginI>({
+        await apiCall<User.LoginResponse, User.Login>({
             path: '/api/login/verify',
             method: 'POST',
             body: user,

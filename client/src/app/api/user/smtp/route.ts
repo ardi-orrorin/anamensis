@@ -1,6 +1,6 @@
 import {NextRequest, NextResponse} from "next/server";
-import {SmtpI} from "@/app/user/smtp/page";
 import apiCall from "@/app/{commons}/func/api";
+import {SMTP} from "@/app/user/smtp/{services}/types";
 
 export async function GET(req: NextRequest) {
 
@@ -24,9 +24,9 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
 
-    const data = await req.json() as SmtpI;
+    const data = await req.json() as SMTP.FullProps;
 
-    const result = await apiCall<SmtpI>({
+    const result = await apiCall<SMTP.FullProps>({
         path: '/api/user-config-smtp',
         method: 'POST',
         call: 'Server',

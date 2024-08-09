@@ -1,26 +1,9 @@
 import {createContext, Dispatch, SetStateAction} from "react";
-import {AuthType} from "@/app/login/{services}/types";
-
-
-export interface LoginI {
-    username : string;
-    password : string;
-    verify?: boolean;
-    authType?: AuthType;
-    code?: number;
-    oauth2?: boolean;
-}
-
-export interface OAuth2I {
-    userId   : string;
-    name     : string;
-    email    : string;
-    provider : string;
-}
+import {User} from "@/app/login/{services}/types";
 
 export interface LoginProviderI {
-    user: LoginI
-    setUser: Dispatch<SetStateAction<LoginI>>
+    user: User.Login
+    setUser: Dispatch<SetStateAction<User.Login>>
 }
 
 const LoginProvider = createContext<LoginProviderI>({} as LoginProviderI);

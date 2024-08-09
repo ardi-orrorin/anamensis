@@ -12,6 +12,7 @@ import com.anamensis.server.exception.AuthorizationException;
 import com.anamensis.server.resultMap.BoardResultMap;
 import com.anamensis.server.service.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,9 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +35,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @RestController
 @RequestMapping("api/boards")
 @RequiredArgsConstructor
+@Slf4j
 public class BoardController {
 
     private final BoardService boardService;
@@ -44,6 +48,8 @@ public class BoardController {
     private final BoardCommentService boardCommentService;
     private final MemberConfigSmtpService memberConfigSmtpService;
     private final BoardIndexService boardIndexService;
+    private final ScheduleAlertService scheduleAlertService;
+
 
     @PublicAPI
     @GetMapping("")
@@ -249,7 +255,12 @@ public class BoardController {
                         .subscribeOn(Schedulers.boundedElastic())
                         .subscribe();
                 })
-            ;
+                .doOnNext(b -> {
+                    if(b.getCategoryPk() != 6) return;
+                    findSchedule(new JSONObject(board.getContent()), user.getUsername(), b.getId())
+                        .flatMap(scheduleAlertService::saveAll)
+                        .subscribe();
+                });
     }
 
     @PutMapping("/{id}")
@@ -275,6 +286,15 @@ public class BoardController {
                                 .subscribeOn(Schedulers.boundedElastic())
                                 .subscribe()
                         );
+            })
+            .doOnNext(r -> {
+                if(r.getStatus() != StatusType.SUCCESS) return;
+                if(board.getCategoryPk() != 6) return;
+                findSchedule(new JSONObject(board.getContent()), user.getUsername(), boardPk)
+                    .flatMap(scheduleAlerts ->
+                        scheduleAlertService.updateAll(scheduleAlerts, boardPk, user.getUsername())
+                    )
+                    .subscribe();
             });
     }
 
@@ -321,7 +341,6 @@ public class BoardController {
                                 return boardService.addSelectAnswerQueue(saqdto);
                             })
                             .onErrorReturn(false)
-
                     )
                     .subscribe();
             });
@@ -366,6 +385,7 @@ public class BoardController {
                 .doOnNext(r -> {
                     if(r.getStatus() != StatusType.SUCCESS) return;
                     if(boardAtomic.get().getCategoryPk() != 3) return;
+
                     findPoint(boardAtomic.get().getContent())
                         .flatMap(p -> {
                             if(p.state == PointCommentExtraValueStatus.COMPLETED) return Mono.just(p);
@@ -373,6 +393,8 @@ public class BoardController {
                                 .flatMap($ -> insertQnAPointHistory(boardAtomic.get().getMemberPk(),(int) p.point));
                         })
                         .subscribe();
+
+
                 });
     }
 
@@ -426,10 +448,7 @@ public class BoardController {
 
     private Mono<PointComment> findPoint(JSONObject content) {
 
-        JSONArray list = content.getJSONArray("list");
-        if(list.isNull(0)) return Mono.error(new RuntimeException("객체를 찾을 수 없습니다."));
-        if(list.getJSONObject(0).isNull("extraValue")) return Mono.error(new RuntimeException("객체를 찾을 수 없습니다."));
-        JSONObject extraValue = list.getJSONObject(0).getJSONObject("extraValue");
+        JSONObject extraValue = getExtraValue(content);
 
         long selectCommentId = extraValue.get("selectId").equals("")
             ? 0
@@ -440,6 +459,45 @@ public class BoardController {
         PointCommentExtraValueStatus state = PointCommentExtraValueStatus.valueOf(extraValue.get("state").toString().toUpperCase());
 
         return Mono.just(new PointComment(selectCommentId, point, state));
+    }
+
+    private Mono<List<ScheduleAlert>> findSchedule(JSONObject content, String userId, long boardPk) {
+        JSONArray list = content.getJSONArray("list");
+
+        List<ScheduleAlert> scheduleAlerts = new ArrayList<>();
+
+        for (int i = 0; i < list.length(); i++) {
+            JSONObject obj = list.getJSONObject(i);
+
+            if(obj.isNull("extraValue")) continue;
+            JSONObject extraValue = obj.getJSONObject("extraValue");
+
+            if(extraValue.isNull("code")) continue;
+            String code = extraValue.getString("code");
+
+            if(!"00411".equals(code)) continue;
+            ScheduleAlert scheduleAlert = new ScheduleAlert();
+
+            LocalDateTime alertTime = extraValue.getBoolean("allDay")
+                ? LocalDate.parse(extraValue.getString("start")).atStartOfDay()
+                : LocalDateTime.parse(extraValue.getString("start"));
+
+            scheduleAlert.setBoardId(boardPk);
+            scheduleAlert.setUserId(userId);
+            scheduleAlert.setHashId(extraValue.getString("id"));
+            scheduleAlert.setTitle(extraValue.getString("title"));
+            scheduleAlert.setAlertTime(alertTime);
+            scheduleAlerts.add(scheduleAlert);
+        }
+
+        return Mono.just(scheduleAlerts);
+    }
+
+    private JSONObject getExtraValue(JSONObject content) {
+        JSONArray list = content.getJSONArray("list");
+        if(list.isNull(0)) throw new RuntimeException("객체를 찾을 수 없습니다.");
+        if(list.getJSONObject(0).isNull("extraValue")) throw new RuntimeException("객체를 찾을 수 없습니다.");
+        return list.getJSONObject(0).getJSONObject("extraValue");
     }
 
     private record PointComment(

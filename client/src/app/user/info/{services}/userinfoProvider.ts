@@ -1,11 +1,11 @@
 import {createContext} from "react";
-import {UserInfoI} from "@/app/user/email/page";
+import {User} from "@/app/login/{services}/types";
 
 export interface UserinfoProviderI {
-    img: string;
-    setImg: React.Dispatch<React.SetStateAction<string>>;
-    profile: UserInfoI;
-    setProfile: React.Dispatch<React.SetStateAction<UserInfoI>>;
+    img        : string;
+    setImg     : React.Dispatch<React.SetStateAction<string>>;
+    profile    : User.UserInfo;
+    setProfile : React.Dispatch<React.SetStateAction<User.UserInfo>>;
 }
 
 const UserinfoProvider = createContext({} as UserinfoProviderI);

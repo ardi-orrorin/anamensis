@@ -1,17 +1,9 @@
 import {createContext, Dispatch, SetStateAction} from "react";
+import {OTP} from "@/app/user/otp/{services}/types";
 
 export interface OTPContextI {
-    otp : OTPProps;
-    setOtp: Dispatch<SetStateAction<OTPProps>>
-}
-
-export interface OTPProps {
-    existOtp        : boolean;
-    otpQRLink       : string;
-    isViewOtpQRCode : boolean;
-    callApiReq      : boolean;
-    verifyCode      : string;
-    verifyState?    : boolean;
+    otp : OTP.Props;
+    setOtp: Dispatch<SetStateAction<OTP.Props>>
 }
 
 const OTPProvider = createContext<OTPContextI>({} as OTPContextI);

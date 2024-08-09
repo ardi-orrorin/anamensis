@@ -2,16 +2,13 @@ import React from "react";
 import UserInfo from "@/app/user/info/{components}/userInfo";
 import ProfileImg from "@/app/user/info/{components}/profileImg";
 import apiCall from "@/app/{commons}/func/api";
-import {UserInfoI} from "@/app/user/email/page";
+import {User} from "@/app/login/{services}/types";
 
-export type LoadingType = {
-    profile : boolean,
-    img     : boolean
-}
+
 
 export default async function Page() {
 
-    const profile = await apiCall<UserInfoI>({
+    const profile = await apiCall<User.UserInfo>({
         path: '/api/user/info',
         method: 'GET',
         call: 'Server',

@@ -1,8 +1,8 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import React, {Dispatch, SetStateAction, useCallback, useEffect, useRef} from "react";
-import {SearchHistoryProps} from "@/app/page";
 import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons/faMagnifyingGlass";
+import {Root} from "@/app/{services}/types";
 
 const SearchHistory = ({
     searchHistory,
@@ -12,12 +12,12 @@ const SearchHistory = ({
     onSearchHandler,
     setSearchHistory,
 }: {
-    searchHistory: SearchHistoryProps;
-    setSearchValue: Dispatch<SetStateAction<string>>;
-    setSearchHistory: Dispatch<SetStateAction<SearchHistoryProps>>;
-    onSearchHistory: boolean;
-    setOnSearchHistory: Dispatch<SetStateAction<boolean>>;
-    onSearchHandler: (init: boolean, keyword?: string) => void;
+    searchHistory      : Root.SearchHistoryProps;
+    setSearchValue     : Dispatch<SetStateAction<string>>;
+    setSearchHistory   : Dispatch<SetStateAction<Root.SearchHistoryProps>>;
+    onSearchHistory    : boolean;
+    setOnSearchHistory : Dispatch<SetStateAction<boolean>>;
+    onSearchHandler    : (init: boolean, keyword?: string) => void;
 }) => {
 
     const timeout = useRef<NodeJS.Timeout>();

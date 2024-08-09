@@ -1,7 +1,7 @@
-import {BoardBlockStatusEnum} from "@/app/user/board-block/{services}/boardBlockProvider";
 import React, {useMemo} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowDown, faCaretRight} from "@fortawesome/free-solid-svg-icons";
+import {BoardBlocking} from "@/app/user/board-block/{services}/types";
 
 const TextBox = ({
     name, text, date, onChange, title, status
@@ -10,12 +10,12 @@ const TextBox = ({
     text     : string;
     date     : string;
     title    : string;
-    status  : BoardBlockStatusEnum;
+    status  : BoardBlocking.BoardBlockStatus;
     onChange : (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }) => {
     const viewMode = useMemo(()=> {
-        return name === 'answer' && (status === BoardBlockStatusEnum.ANSWERED || status === BoardBlockStatusEnum.RESULTED)
-            || name === 'result' && status === BoardBlockStatusEnum.RESULTED
+        return name === 'answer' && (status === BoardBlocking.BoardBlockStatus.ANSWERED || status === BoardBlocking.BoardBlockStatus.RESULTED)
+            || name === 'result' && status === BoardBlocking.BoardBlockStatus.RESULTED
     },[name]);
 
     return (

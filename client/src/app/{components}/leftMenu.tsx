@@ -4,22 +4,23 @@ import Link from "next/link";
 import {faPen} from "@fortawesome/free-solid-svg-icons/faPen";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBars} from "@fortawesome/free-solid-svg-icons";
-import {RoleType} from "@/app/user/system/{services}/types";
-import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
+import SearchParamsProvider from "@/app/{services}/SearchParamsProvider";
 import {useHotkeys} from "react-hotkeys-hook";
 import {useRouter} from "next/navigation";
 import {Options} from "react-hotkeys-hook/src/types";
 import HotKeybtn from "@/app/{components}/hotKeybtn";
 import {useRootLeftMenuHotKey} from "@/app/{hooks}/hotKey";
+import {Root} from "@/app/{services}/types";
+import {System} from "@/app/user/system/{services}/types";
 
 const LeftMenu = ({
     roles,
     searchParams,
     setSearchParams,
 }:{
-    roles: RoleType[];
-    searchParams: BoardListParamsI;
-    setSearchParams: Dispatch<SetStateAction<BoardListParamsI>>;
+    roles           : System.Role[];
+    searchParams    : Root.BoardListParamsI;
+    setSearchParams : Dispatch<SetStateAction<Root.BoardListParamsI>>;
 }) => {
     const router = useRouter();
 
@@ -43,13 +44,13 @@ const LeftMenu = ({
             ...isFavorite,
             page: 1, size: 20,
             add: false
-        } as BoardListParamsI;
+        } as Root.BoardListParamsI;
 
         setSearchParams(params);
         scrollTo(0, 0);
     },[searchParams]);
 
-    const confirmRole = useCallback((item: { roles: RoleType[] }) => {
+    const confirmRole = useCallback((item: { roles: System.Role[] }) => {
         return item.roles.find(r =>
             roles.find(roles => roles === r)
         );

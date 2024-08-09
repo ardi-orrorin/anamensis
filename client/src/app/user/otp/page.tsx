@@ -1,22 +1,22 @@
 'use client';
 
 import React, {useContext, useEffect, useMemo, useState} from "react";
-import OTPStep, {OTPStepEnum} from "@/app/user/otp/{components}/Step";
+import OTPStep from "@/app/user/otp/{components}/Step";
 import {useRouter, useSearchParams} from "next/navigation";
-import OTPProvider, {OTPProps} from "@/app/user/otp/{services}/OTPProvider";
+import OTPProvider from "@/app/user/otp/{services}/OTPProvider";
 import OTPMain from "@/app/user/otp/{components}/OTPMain";
 import apiCall from "@/app/{commons}/func/api";
 import UserProvider from "@/app/user/{services}/userProvider";
-import {RoleType} from "@/app/user/system/{services}/types";
-
+import {OTP} from "@/app/user/otp/{services}/types";
+import {System} from "@/app/user/system/{services}/types";
 
 export default function Page() {
 
-    const step = useSearchParams().get('step') as OTPStepEnum || OTPStepEnum.INIT;
+    const step = useSearchParams().get('step') as OTP.OTPStep || OTP.OTPStep.INIT;
     const {roles} = useContext(UserProvider);
 
-    const [otp, setOtp] = useState<OTPProps>({} as OTPProps);
-    const isOAuthUser = useMemo(()=> roles.some((role) => role === RoleType.OAUTH),[roles])
+    const [otp, setOtp] = useState({} as OTP.Props);
+    const isOAuthUser = useMemo(()=> roles.some((role) => role === System.Role.OAUTH),[roles])
     const router = useRouter();
 
     useEffect(()=>{

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import {BlockI} from "@/app/board/{services}/types";
 import React, {useMemo} from "react";
 import DefaultBoardComponent from "@/app/{components}/boards/default";
 import AlttuelBoardComponent from "@/app/{components}/boards/alttuel";
@@ -7,27 +6,11 @@ import AlbumBoardComponent from "@/app/{components}/boards/album";
 import QuestionBoardComponent from "@/app/{components}/boards/question";
 import MembersOnlyBody from "@/app/{components}/membersOnlyBody";
 import Blocked from "@/app/{components}/boards/blocked";
-import {RoleType} from "@/app/user/system/{services}/types";
 import CalenderComponent from "@/app/{components}/boards/calender";
+import {Root} from "@/app/{services}/types";
+import {System} from "@/app/user/system/{services}/types";
 
-export interface BoardListI {
-    id           : string;
-    categoryPk   : string;
-    title        : string;
-    viewCount    : number;
-    rate         : number;
-    writer       : string;
-    profileImage?: string;
-    createdAt    : string;
-    commentCount : number;
-    body?        : BlockI[];
-    isPublic     : boolean;
-    membersOnly  : boolean;
-    isBlocked    : boolean;
-    roles        : RoleType[];
-}
-
-const BoardComponent = (props: BoardListI & {favorites: string[], isLogin: boolean}) => {
+const BoardComponent = (props: Root.BoardListI & {favorites: string[], isLogin: boolean}) => {
     const {
        id, body,
         categoryPk, favorites,
@@ -67,7 +50,7 @@ const BoardComponent = (props: BoardListI & {favorites: string[], isLogin: boole
     ,[]);
 
     const notAdminBlocked = useMemo(() =>
-        isBlocked && !roles.includes(RoleType.ADMIN)
+        isBlocked && !roles.includes(System.Role.ADMIN)
     ,[isBlocked, roles]);
 
     return (

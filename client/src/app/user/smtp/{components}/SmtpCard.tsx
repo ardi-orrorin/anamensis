@@ -7,19 +7,9 @@ import Link from "next/link";
 import apiCall from "@/app/{commons}/func/api";
 import {useRouter} from "next/navigation";
 import React from "react";
+import {SMTP} from "@/app/user/smtp/{services}/types";
 
-export interface SmtpCardProps {
-    id: number;
-    host: string;
-    port: number;
-    username: string;
-    fromEmail: string;
-    fromName: string;
-    useSSL: boolean;
-    isDefault: boolean;
-    isUse: boolean;
-}
-const SmtpCard = (smtpCardProps: SmtpCardProps) => {
+const SmtpCard = (smtpCardProps: SMTP.CardProps) => {
 
     const router = useRouter();
 

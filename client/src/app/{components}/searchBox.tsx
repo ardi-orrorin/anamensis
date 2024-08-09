@@ -2,21 +2,9 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons/faMagnifyingGlass";
 import React from "react";
-import {SearchHistoryProps} from "@/app/page";
+import {Root} from "@/app/{services}/types";
 
-type SearchBoxProps = {
-    searchValue: string;
-    setSearchValue: (value: string) => void;
-    searchRef: React.RefObject<HTMLInputElement>;
-    searchHistory: SearchHistoryProps;
-    onSearchHandler: (isSearch: boolean) => void;
-    onEnterHandler: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-    searchFocus: boolean;
-    setSearchFocus: (value: boolean) => void;
-    onSearchHistory: boolean;
-    setOnSearchHistory: (value: boolean) => void;
-}
-const SearchBox = (props: SearchBoxProps) => {
+const SearchBox = (props: Root.SearchBoxProps) => {
     const {
         searchValue,
         setSearchValue,

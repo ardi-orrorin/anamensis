@@ -1,7 +1,5 @@
 import NextAuth, {AuthOptions} from "next-auth";
 import Google from "next-auth/providers/google";
-import {OAuth2I} from "@/app/login/{services}/LoginProvider";
-import {ResponseCookie} from "next/dist/compiled/@edge-runtime/cookies";
 import axios from "axios";
 import {cookies} from "next/headers";
 import {NextRequest} from "next/server";
@@ -9,6 +7,7 @@ import Github from "next-auth/providers/github";
 import loginConstants from "@/app/login/{services}/constants";
 import Kakao from "next-auth/providers/kakao";
 import Naver from "next-auth/providers/naver";
+import {User} from "@/app/login/{services}/types";
 
 interface RouteHandlerContext {
     params: { nextauth: string[] }
@@ -58,7 +57,7 @@ async function handler(req: NextRequest, context: RouteHandlerContext) {
                     email: user.email || '',
                     name: user.name || '',
                     provider: account.provider,
-                } as OAuth2I;
+                } as User.OAuth2;
 
                 const url = process.env.NEXT_PUBLIC_SERVER + '/public/api/user/oauth'
                 const clientIp = req.ip || req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for');

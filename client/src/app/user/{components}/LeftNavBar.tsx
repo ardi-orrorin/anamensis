@@ -16,19 +16,19 @@ import {
 import React, {useCallback, useContext, useEffect, useMemo} from "react";
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import {faTableList} from "@fortawesome/free-solid-svg-icons/faTableList";
-import {RoleType} from "@/app/user/system/{services}/types";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import useSWR from "swr";
 import apiCall from "@/app/{commons}/func/api";
 import UserProvider from "@/app/user/{services}/userProvider";
 import Image from "next/image";
 import {NO_IMAGE} from "@/app/{services}/constants";
+import {System} from "@/app/user/system/{services}/types";
 
 type MenuItemType = {
     name: string,
     href: string,
     icon: IconDefinition,
-    role: RoleType
+    role: System.Role
 }
 
 const LeftNavBar = ({
@@ -44,12 +44,12 @@ const LeftNavBar = ({
 }) => {
 
     const { roles, setRoles, profileImg, setProfileImg } = useContext(UserProvider);
-    const isOAuthUser = useMemo(() => roles.find(role => role === RoleType.OAUTH), [roles]);
+    const isOAuthUser = useMemo(() => roles.find(role => role === System.Role.OAUTH), [roles]);
 
     const iconSize = 16;
     const menuItems: MenuItemType[] = [
-        {name: 'SYSTEM', href:'/user/system', icon: faGear, role: RoleType.ADMIN},
-        {name: '권한관리', href:'/user/users-role', icon: faUserGear, role: RoleType.MASTER},
+        {name: 'SYSTEM', href:'/user/system', icon: faGear, role: System.Role.ADMIN},
+        {name: '권한관리', href:'/user/users-role', icon: faUserGear, role: System.Role.MASTER},
     ]
 
     useEffect(()=> {

@@ -1,25 +1,31 @@
-export interface PageResponse<T> {
-    page: PageI;
-    content: T[];
+interface PageResponseT<T> {
+    page    : Common.PageI;
+    content : T[];
 }
 
-export interface PageI {
-    page: number;
-    size: number;
-    total: number;
-    criteria: string;
-    order?: string;
-    endPage: boolean;
-    getOffset: number;
+interface Page {
+    page      : number;
+    size      : number;
+    total     : number;
+    criteria  : string;
+    order?    : string;
+    endPage   : boolean;
+    getOffset : number;
 }
 
-export interface StatusResponse {
-    status: StatusResponseStatusEnum;
-    message: string;
-    timestamp: string;
+interface StatusResponseT {
+    status    : Common.StatusResponseStatusEnum;
+    message   : string;
+    timestamp : string;
 }
 
-export enum StatusResponseStatusEnum {
-    SUCCESS = "SUCCESS",
-    FAIL = "FAIL",
+export namespace Common {
+    export type PageResponse<T>          = PageResponseT<T>;
+    export type PageI                    = Page;
+    export type StatusResponse           = StatusResponseT;
+
+    export enum StatusResponseStatusEnum {
+        SUCCESS = "SUCCESS",
+        FAIL    = "FAIL",
+    }
 }

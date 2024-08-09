@@ -1,15 +1,14 @@
 import {Dispatch, SetStateAction, useState} from "react";
-import {WebSysI} from "@/app/user/system/page";
-import {RoleType} from "@/app/user/system/{services}/types";
 import apiCall from "@/app/{commons}/func/api";
+import {System} from "@/app/user/system/{services}/types";
 
 const Add = ({
     setAdd, data
 }: {
     setAdd: Dispatch<SetStateAction<boolean>>,
-    data: WebSysI[]
+    data: System.WebSys[]
 }) => {
-    const [webSys, setWebSys] = useState<WebSysI>({permission: RoleType.ADMIN} as WebSysI);
+    const [webSys, setWebSys] = useState({permission: System.Role.ADMIN} as System.WebSys);
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         if(e.target.name === 'code') {
@@ -30,14 +29,14 @@ const Add = ({
     }
 
     const onSaveHandler = async () => {
-        await apiCall<WebSysI>({
+        await apiCall<System.WebSys>({
             path: '/api/user/system',
             method: 'POST',
             body: webSys,
             call: 'Proxy'
         })
         .then(res => {
-            setWebSys({permission: RoleType.ADMIN} as WebSysI);
+            setWebSys({permission: System.Role.ADMIN} as System.WebSys);
             alert('추가 완료');
             setAdd(false);
         })
@@ -47,7 +46,7 @@ const Add = ({
     }
 
     const onCancelHandler = () => {
-        setWebSys({permission: RoleType.ADMIN} as WebSysI);
+        setWebSys({permission: System.Role.ADMIN} as System.WebSys);
     }
 
     return (
@@ -79,10 +78,10 @@ const Add = ({
                         value={webSys.permission}
                         onChange={onChangeHandler}
                 >
-                    <option value={RoleType.MASTER}>{RoleType.MASTER}</option>
-                    <option value={RoleType.ADMIN}>{RoleType.ADMIN}</option>
-                    <option value={RoleType.USER}>{RoleType.USER}</option>
-                    <option value={RoleType.GUEST}>{RoleType.GUEST}</option>
+                    <option value={System.Role.MASTER}>{System.Role.MASTER}</option>
+                    <option value={System.Role.ADMIN}>{System.Role.ADMIN}</option>
+                    <option value={System.Role.USER}>{System.Role.USER}</option>
+                    <option value={System.Role.GUEST}>{System.Role.GUEST}</option>
                 </select>
             </td>
             <td className={'px-2'}>

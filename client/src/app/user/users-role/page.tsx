@@ -2,13 +2,13 @@
 
 import React, {useCallback, useMemo, useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
-import {PageI, PageResponse} from "@/app/{commons}/types/commons";
 import {AxiosError} from "axios";
 import {useSearchParams} from "next/navigation";
 import PageNavigator from "@/app/{commons}/PageNavigator";
-import {RoleType} from "@/app/user/system/{services}/types";
 import useSWR from "swr";
 import Row from "@/app/user/users-role/{components}/row";
+import {Common} from "@/app/{commons}/types/commons";
+import {System} from "@/app/user/system/{services}/types";
 
 export type UsersRole = {
     id       : number
@@ -25,14 +25,14 @@ export default function Page() {
     const searchParams = useSearchParams();
 
     const [users, setUsers] = useState<UsersRole[]>([]);
-    const [page, setPage] = useState<PageI>({} as PageI);
+    const [page, setPage] = useState({} as Common.PageI);
     const [select, setSelect] = useState<number[]>([]);
-    const [role, setRole] = useState<RoleType>('' as RoleType);
+    const [role, setRole] = useState('' as System.Role);
 
     const maxIndex = useMemo(()=> page.total - ((page.page - 1) * page.size), [page]);
 
     const {mutate} = useSWR(['/api/user/users-role', searchParams], async () => {
-        return await apiCall<PageResponse<UsersRole>>({
+        return await apiCall<Common.PageResponse<UsersRole>>({
             path : '/api/user/users-role',
             method : 'GET',
             params : {
@@ -55,7 +55,7 @@ export default function Page() {
     })
 
 
-    const onChangeRole = useCallback(async (mode: 'add' | 'delete', user: UsersRole, selRole : RoleType) => {
+    const onChangeRole = useCallback(async (mode: 'add' | 'delete', user: UsersRole, selRole : System.Role) => {
         if(selRole as string === '') return;
         if(mode === 'delete' && user.roles.length === 1) {
             return alert('최소 한 개 이상의 권한은 보유해야 합니다.')
@@ -121,7 +121,7 @@ export default function Page() {
             if(!res) return;
             await mutate();
             setSelect([]);
-            setRole('' as RoleType);
+            setRole('' as System.Role);
         } catch (e) {
             const err = e as AxiosError
             console.log(err)
@@ -138,7 +138,7 @@ export default function Page() {
                         <span>
                           선택 : {select.length}
                         </span>
-                        <select className={'w-20 outline-0'} onChange={e => {setRole(e.target.value as RoleType)}}>
+                        <select className={'w-20 outline-0'} onChange={e => {setRole(e.target.value as System.Role)}}>
                             <option value={''}>선택</option>
                             <option value={'ADMIN'}>ADMIN</option>
                             <option value={'USER'}>USER</option>

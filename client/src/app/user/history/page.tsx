@@ -1,8 +1,8 @@
 import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import PageNavigator from "@/app/{commons}/PageNavigator";
-import {PageResponse} from "@/app/{commons}/types/commons";
 import apiCall from "@/app/{commons}/func/api";
 import SizeSelect from "@/app/{commons}/sizeSelect";
+import {Common} from "@/app/{commons}/types/commons";
 
 interface LoginHistoriesI {
     id: string;
@@ -74,7 +74,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
 }
 
 const getData = async (req: URLSearchParams) => {
-    return apiCall<PageResponse<LoginHistoriesI>, any>({
+    return apiCall<Common.PageResponse<LoginHistoriesI>, any>({
         path: '/api/user/histories',
         method: 'GET',
         params: req,

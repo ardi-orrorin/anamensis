@@ -26,6 +26,7 @@ const SearchBox = (props: Root.SearchBoxProps) => {
                    value={searchValue || ''}
                    onClick={e=> e.stopPropagation()}
                    onChange={(e) => setSearchValue(e.target.value)}
+                   data-testid={'search-input'}
                    onKeyUp={onEnterHandler}
                    onFocus={() => {
                        setSearchFocus(true)
@@ -48,6 +49,7 @@ const SearchBox = (props: Root.SearchBoxProps) => {
                 searchValue.length > 0
                 && <button className={'absolute z-50 right-12 top-1 duration-500'}
                            onClick={()=> onSearchHandler(true)}
+                           data-testid={'search-init'}
               >
                 <FontAwesomeIcon className={'h-4 py-1.5 px-2 text-gray-400 hover:text-red-300 duration-300'}
                                  icon={faXmark}
@@ -56,6 +58,7 @@ const SearchBox = (props: Root.SearchBoxProps) => {
             }
             <button className={'absolute z-50 right-2 top-1 duration-500'}
                     onClick={()=> onSearchHandler(false)}
+                    data-testid={'search'}
             >
                 <FontAwesomeIcon className={'h-4 py-1.5 px-2 text-gray-400 hover:text-blue-300 duration-300'}
                                  icon={faMagnifyingGlass}

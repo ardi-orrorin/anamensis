@@ -25,7 +25,9 @@ const RightSubMenu = ({
             'fixed z-20 bottom-1/4 right-5 flex flex-col bg-green-600 border-y-4 border-solid border-green-600 rounded-md shadow-md ',
             rightMenu && 'gap-2'
         ].join(' ')}>
-            <div className={['duration-500 overflow-y-hidden', rightMenu ? 'max-h-72' : 'max-h-0'].join(' ')}>
+            <div className={['duration-500 overflow-y-hidden', rightMenu ? 'max-h-72' : 'max-h-0'].join(' ')}
+                 data-testid={'right-menu'}
+            >
                 <TopMenu />
 
                 <MiddleMenu isLogin={isLogin} />
@@ -34,6 +36,7 @@ const RightSubMenu = ({
             </div>
             <button className={'p-3 flex justify-center items-center bg-white text-black hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
                     onClick={() => setRightMenu(!rightMenu)}
+                    data-testid={'right-menu-toggle'}
             >
                 <FontAwesomeIcon icon={rightMenu ? faWindowMinimize : faWindowMaximize} className={'w-5 h-3 outline-0'} />
             </button>

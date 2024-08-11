@@ -21,7 +21,9 @@ const EmailTemplate = ({
 
 
     return (
-        <div className={['w-full duration-300 overflow-y-scroll', className].join(' ')}>
+        <div className={['w-full duration-300 overflow-y-scroll', className].join(' ')}
+             data-testid={'email-template'}
+        >
             {
                 emailTemplate.map((domain, index) => {
                     return (

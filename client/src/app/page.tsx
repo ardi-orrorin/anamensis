@@ -247,6 +247,7 @@ export default function Page() {
                                     />
                                     <button className={'outline-0'}
                                             onClick={onChangeNotice}
+                                            data-testid={'notice-toggle'}
                                     >
                                         공지사항
                                     </button>
@@ -254,6 +255,7 @@ export default function Page() {
 
                                 <button className={'outline-0'}
                                         onClick={onChangeNotice}
+                                        data-testid={'notice-toggle-view'}
                                 >
                                     { viewNotice ? '접기' : '보기' }
                                 </button>
@@ -266,7 +268,9 @@ export default function Page() {
                         <div className={'w-full flex flex-wrap gap-2'}>
                             {
                                 notFoundResult
-                                && <div className={'text-center text-2xl w-full py-20 text-gray-600'}>검색 결과가 없습니다.</div>
+                                && <div className={'text-center text-2xl w-full py-20 text-gray-600'}
+                                        data-testid={'not-found-result'}
+                                >검색 결과가 없습니다.</div>
                             }
                             <Virtuoso style={{width: '100%', height: '100%', overflow: 'hidden'}}
                                       totalCount={data.length}

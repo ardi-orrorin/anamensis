@@ -9,7 +9,9 @@ const Notices = ({data}: {data: Root.NoticeType[]}) => {
 
     if(data.length === 0) return <></>
     return (
-        <div className={'w-full flex-col flex gap-3 pb-3'}>
+        <div className={'w-full flex-col flex gap-3 pb-3'}
+             data-testid={'notices'}
+        >
             {
                 data.map((notice, index) => {
                     return <Row key={'notice' + notice.id} data={notice} />

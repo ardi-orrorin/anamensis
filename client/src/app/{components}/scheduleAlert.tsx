@@ -7,6 +7,7 @@ import {faBell} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import moment from "moment/moment";
 import {useRouter} from "next/navigation";
+import {AxiosError} from "axios";
 
 const ScheduleAlert = () => {
 
@@ -38,18 +39,24 @@ const ScheduleAlert = () => {
     },[])
 
     const onClickAlert = useCallback(async (sch: Root.ScheduleAlert) => {
-        apiCall({
-            method: 'GET',
-            path: `/api/schedule/alert/${sch.id}`,
-        })
-        .then((_) => {
+        try {
+            await apiCall({
+                method: 'GET',
+                path: `/api/schedule/alert/${sch.id}`,
+            })
+
             setToggle(false);
-        });
 
-        const list = alert.filter(v => v.id !== sch.id);
-        setAlert(list);
 
-        router.push(`/board/${sch.boardId}#block-${sch.hashId}`);
+            const list = alert.filter(v => v.id !== sch.id);
+            setAlert(list);
+
+            router.push(`/board/${sch.boardId}#block-${sch.hashId}`);
+        } catch (e) {
+            const err = e as AxiosError;
+            console.error(e);
+        }
+
     },[alert]);
 
     return (

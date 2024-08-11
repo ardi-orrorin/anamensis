@@ -17,6 +17,8 @@ export const useRootHotKey = ({
             searchRef.current.focus();
         }
     })
+
+
 };
 
 export const useRootLeftMenuHotKey = ({
@@ -50,17 +52,23 @@ export const useRootLeftMenuHotKey = ({
         }
     }, hotkeysOption);
 
-    useHotkeys(['shift+o', 'shift+l', 'shift+i'], (e, handler) => {
+    useHotkeys(['shift+o', 'shift+i'], (e, handler) => {
         if (roles.length === 0) return;
         switch (handler.keys?.join('')) {
             case 'o':
                 router.push('/api/logout');
                 break;
-            case 'l':
-                router.push('/login');
-                break;
             case 'i':
                 router.push('/user');
+                break;
+        }
+    }, hotkeysOption, [roles]);
+
+    useHotkeys(['shift+l'], (e, handler) => {
+        if (roles.length !== 0) return;
+        switch (handler.keys?.join('')) {
+            case 'l':
+                router.push('/login');
                 break;
         }
     }, hotkeysOption, [roles]);

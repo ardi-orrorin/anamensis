@@ -80,7 +80,9 @@ const LeftMenu = ({
     return (
         <div className={'sticky z-30 top-20 left-[5%] xl:left-[13%]'}>
             <div className={'flex flex-col gap-5 items-center xl:items-start'}>
-                <div className={'flex flex-col w-60 gap-2 shadow rounded p-3 bg-white border-t-4 border border-solid border-gray-100 hover:border-gray-500 duration-500'}>
+                <div className={'flex flex-col w-60 gap-2 shadow rounded p-3 bg-white border-t-4 border border-solid border-gray-100 hover:border-gray-500 duration-500'}
+                     data-testid={'left-menu'}
+                >
                     <div className={'flex gap-2 justify-center items-center text-sm py-2 font-bold'}>
                         <FontAwesomeIcon icon={faBars} height={'16'} />
                         <span>
@@ -244,7 +246,9 @@ const CategorySelect = ({
         <div className={[
             'relative w-auto text-xs bg-gray-50 hover:border-gray-500 duration-500',
             selectToggle ? 'rounded-t-sm' : 'rounded-sm'
-        ].join(' ')}>
+        ].join(' ')}
+             data-testid={'category-select'}
+        >
             <button className={['flex gap-3 w-full justify-between py-2 px-3 border-solid border border-white focus:outline-none'].join(' ')}
                     onClick={onToggleHandler}
             >
@@ -259,8 +263,8 @@ const CategorySelect = ({
             <div className={[
                 'absolute z-10 flex flex-col w-full bg-gray-50 overflow-y-hidden duration-500',
                 selectToggle ? 'max-h-80 rounded-b-sm shadow-md' : 'max-h-0',
-            ].join(' ')
-            }>
+            ].join(' ')}
+            >
                 { CategoryList }
             </div>
         </div>

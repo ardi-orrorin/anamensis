@@ -8,23 +8,14 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import moment from "moment/moment";
 import {useRouter} from "next/navigation";
 import {AxiosError} from "axios";
+import {useQuery, useQueryClient} from "@tanstack/react-query";
+import rootApiService from "@/app/{services}/rootApiService";
 
 const ScheduleAlert = () => {
 
-    const [alert, setAlert] = useState<Root.ScheduleAlert[]>([]);
+    const {data: alert, refetch} = useQuery(rootApiService.scheduleAlert());
     const [toggle ,setToggle] = useState<boolean>(false);
     const router = useRouter();
-
-    useEffect(()=>{
-        apiCall<Root.ScheduleAlert[]>({
-            method: 'GET',
-            path: '/api/schedule/alert',
-            isReturnData: true
-        })
-        .then(res => {
-            setAlert(res);
-        });
-    },[]);
 
     const alertText = useCallback((alertTime: string)=> {
         const prevSecond = moment().diff(moment(alertTime), 'seconds');
@@ -47,10 +38,7 @@ const ScheduleAlert = () => {
 
             setToggle(false);
 
-
-            const list = alert.filter(v => v.id !== sch.id);
-            setAlert(list);
-
+            await refetch();
             router.push(`/board/${sch.boardId}#block-${sch.hashId}`);
         } catch (e) {
             const err = e as AxiosError;

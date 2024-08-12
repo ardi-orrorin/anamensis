@@ -15,5 +15,6 @@ export async function GET() {
     next.cookies.delete('_ga_undefined');
     next.cookies.delete('_ga');
 
+
     return next;
 }

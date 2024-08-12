@@ -66,6 +66,8 @@ const profileImg = () => {
                 isReturnData: true,
             })
         },
+        initialData: '',
+        initialDataUpdatedAt: 1,
     })
 }
 

@@ -15,14 +15,6 @@ const NavMain = async () => {
 
     const isLogged = (cookies()?.get('next.access.token')  || cookies()?.get('next.refresh.token')) !== undefined;
 
-    const profileImg = isLogged && await apiCall<string>({
-        path: '/api/user/profile-img',
-        method: 'GET',
-        call: 'Server',
-        setAuthorization: true,
-        isReturnData: true,
-    });
-
     const rightMenuItems : Root.NavItemProps[] = [
         {
             icon: faPenToSquare,
@@ -90,7 +82,7 @@ const NavMain = async () => {
                         <Link href={'/user'}
                               title={'프로필'}
                         >
-                          <CustomImage src={profileImg || ''} />
+                          <CustomImage />
                         </Link>
                       </div>
                     }

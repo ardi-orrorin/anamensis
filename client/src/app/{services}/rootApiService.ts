@@ -1,6 +1,7 @@
 import apiCall from "@/app/{commons}/func/api";
 import {queryOptions} from "@tanstack/react-query";
 import {System} from "@/app/user/system/{services}/types";
+import {Root} from "@/app/{services}/types";
 
 const userRole = () => {
     return queryOptions({
@@ -16,10 +17,28 @@ const userRole = () => {
         initialDataUpdatedAt: 1,
     })
 }
+const scheduleAlert = () => {
+    return queryOptions({
+        queryKey: ['scheduleAlert'],
+        queryFn: async () => {
+            return await apiCall<Root.ScheduleAlert[]>({
+                method: 'GET',
+                path: '/api/schedule/alert',
+                isReturnData: true
+            });
+        },
+        initialData: [],
+        initialDataUpdatedAt: 1,
+        refetchIntervalInBackground: true,
+        refetchInterval: 60 * 1000,
+        staleTime: 60 * 1000,
+    })
+}
 
 
 const rootApiService = {
-    userRole
+    userRole,
+    scheduleAlert,
 }
 
 export default rootApiService;

@@ -19,11 +19,13 @@ import SearchBox from "@/app/{components}/searchBox";
 import {Root} from "@/app/{services}/types";
 import {Common} from "@/app/{commons}/types/commons";
 import {System} from "@/app/user/system/{services}/types";
-import {useQuery} from "@tanstack/react-query";
+import {useQuery, useQueryClient} from "@tanstack/react-query";
 import rootApiService from "@/app/{services}/rootApiService";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 
 export default function Page() {
+
+    const roles = useQueryClient().getQueryData(['userRole']) as System.Role[];
 
     const pageSize = 20;
     const [initLoading, setInitLoading] = useState(true);
@@ -55,8 +57,6 @@ export default function Page() {
 
     const moreRef = useRef<HTMLDivElement>(null);
     const searchRef = useRef<HTMLInputElement>(null);
-
-    const {data: roles, isLoading} = useQuery(rootApiService.userRole())
 
     const isLogin = useMemo(()=> roles?.length > 0, [roles]);
 
@@ -96,10 +96,10 @@ export default function Page() {
             method: 'GET',
             isReturnData: true
         })
-            .then(res => {
-                if(!res) return;
-                setNoticeList(res);
-            })
+        .then(res => {
+            if(!res) return;
+            setNoticeList(res);
+        })
     },[])
 
     useEffect(() => {
@@ -114,10 +114,6 @@ export default function Page() {
             if(!res) return;
             setLoading(false);
             setInitLoading(false);
-
-            // const roles = res.headers['next.user.roles'] || ''
-            //
-            // if(roles) setRoles(JSON.parse(roles));
 
             const condition = res.data.content.length < searchParams.size;
 
@@ -199,7 +195,7 @@ export default function Page() {
 
     useRootHotKey({searchRef})
 
-    if(isLoading && isLogin) return <GlobalLoadingSpinner />
+    // if(isLoading && isLogin) return <GlobalLoadingSpinner />
 
     return (
         <SearchParamsProvider.Provider value={{

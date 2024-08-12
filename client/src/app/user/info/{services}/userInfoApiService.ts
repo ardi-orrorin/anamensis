@@ -12,6 +12,8 @@ const profile = () => {
                 isReturnData: true,
             });
         },
+        initialData: {} as User.UserInfo,
+        initialDataUpdatedAt: 1,
     })
 }
 

@@ -11,16 +11,12 @@ import {BoardBlocking} from "@/app/user/board-block/{services}/types";
 import {System} from "@/app/user/system/{services}/types";
 import {useQuery} from "@tanstack/react-query";
 import rootApiService from "@/app/{services}/rootApiService";
-import boardBlockApiService from "@/app/user/board-block/{services}/boardBlockApiService";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 
 const Detail = () => {
 
     const { boardBlock, setBoardBlock } = useContext(BoardBlockProvider);
     const { modal, setModal } = useContext(ModalProvider);
-    const { data, isLoading } = useQuery(boardBlockApiService.boardDetail(modal.id));
-
-    setBoardBlock(data!);
 
     const {data: roles} = useQuery(rootApiService.userRole());
 
@@ -65,8 +61,6 @@ const Detail = () => {
         if(e.target.value.length > 500) return;
         setBoardBlock({...boardBlock, [e.target.name]: e.target.value});
     }
-
-    if(isLoading) return <GlobalLoadingSpinner />
 
     return (
         <div className={'fixed z-[40] top-0 left-0 w-full h-full flex justify-center items-center bg-gray-700 bg-opacity-20'}

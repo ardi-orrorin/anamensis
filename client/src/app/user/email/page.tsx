@@ -17,7 +17,7 @@ export default function Page() {
     const {data: userInfo, refetch} = useQuery(emailApiService.userInfo());
 
     const isOAuthUser = useMemo(() =>
-        (roles as System.Role[])?.some((role) => role === System.Role.OAUTH)
+        roles?.some((role) => role === System.Role.OAUTH)
         ,[roles]);
 
     const router = useRouter();

@@ -14,7 +14,8 @@ export default function Page() {
         <main className={'flex flex-col gap-7 w-full justify-center items-center'}>
             <ProfileImg />
             {
-                profile && <UserInfo profileInfo={profile} />
+                profile?.name
+                && <UserInfo profileInfo={profile} />
             }
         </main>
     )

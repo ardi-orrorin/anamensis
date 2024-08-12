@@ -2,7 +2,7 @@ import apiCall from "@/app/{commons}/func/api";
 import {queryOptions} from "@tanstack/react-query";
 import {User} from "@/app/login/{services}/types";
 
-const userInfo = () => {
+const userInfo = () =>  {
     return queryOptions({
         queryKey: ['userInfo'],
         queryFn: async () => {
@@ -12,6 +12,8 @@ const userInfo = () => {
                 isReturnData: true,
             })
         },
+        initialData: {} as User.UserInfo,
+        initialDataUpdatedAt: 1,
     })
 }
 

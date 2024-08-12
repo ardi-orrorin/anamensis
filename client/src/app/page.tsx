@@ -29,7 +29,6 @@ export default function Page() {
     const [initLoading, setInitLoading] = useState(true);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState<Root.BoardListI[]>([]);
-    // const [roles, setRoles] = useState<System.Role[]>([]);
     const [searchValue, setSearchValue] = useState('');
     const [searchFocus, setSearchFocus] = useState(false);
     const [dynamicPage, setDynamicPage] = useState<Root.DynamicPage>({

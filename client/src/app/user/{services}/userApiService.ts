@@ -12,6 +12,8 @@ const attend = () => {
                 isReturnData: true,
             })
         },
+        initialData: {} as AttendInfoI,
+        initialDataUpdatedAt: 1,
     })
 }
 
@@ -33,6 +35,8 @@ const boardSummery = () => {
                 isReturnData: true
             })
         },
+        initialData: [],
+        initialDataUpdatedAt: 1,
     })
 }
 
@@ -47,6 +51,8 @@ const pointSummary = () => {
                 isReturnData: true,
             })
         },
+        initialData: [],
+        initialDataUpdatedAt: 1,
     })
 }
 

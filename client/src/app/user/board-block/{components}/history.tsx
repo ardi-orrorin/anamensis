@@ -7,11 +7,13 @@ import {faArrowDown91} from "@fortawesome/free-solid-svg-icons";
 import SizeSelect from "@/app/{commons}/sizeSelect";
 import StatusSelect from "@/app/user/board-block/{components}/statusSelect";
 import {BoardBlockStatus} from "@/app/user/board-block/{services}/objects";
+import {BoardBlocking} from "@/app/user/board-block/{services}/types";
+import apiCall from "@/app/{commons}/func/api";
 
 const History = () => {
     const searchParams = useSearchParams();
-    const {boardBlockHistories, page, boardBlock, setBoardBlock} = useContext(BoardBlockProvider);
-    const {modal, setModal} = useContext(ModalProvider);
+    const {boardBlockHistories, page, setBoardBlock} = useContext(BoardBlockProvider);
+    const {setModal} = useContext(ModalProvider);
     const [keyword, setKeyword] = useState('');
 
     const maxIndex = useMemo(() => page.total - ((page.page - 1) * page.size),[page]);
@@ -20,6 +22,13 @@ const History = () => {
     const pathname = usePathname();
 
     const onClickHandler = useCallback(async (id: number) => {
+        await apiCall<BoardBlocking.BoardBlock>({
+            path: '/api/user/board-block-history/' + id,
+            method: 'GET',
+            isReturnData: true,
+        })
+        .then(data => setBoardBlock(data));
+
         setModal({
             id, toggle: true
         });

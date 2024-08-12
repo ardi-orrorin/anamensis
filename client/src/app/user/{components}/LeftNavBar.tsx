@@ -140,7 +140,9 @@ const LeftNavBar = ({
                     <FontAwesomeIcon icon={faXmark} className={'text-white text-xl'} />
                 </button>
             </div>
-            <ul className={'w-full duration-500'}>
+            <ul className={'w-full duration-500'}
+                data-testid={'left-nav-bar'}
+            >
                 <li className={'flex justify-center py-2 sm:py-4'}>
                     <Link className={'sm:p-1.5 sm:border-4 border-solid border-blue-300 rounded-full'}
                           href={'/user/info'}

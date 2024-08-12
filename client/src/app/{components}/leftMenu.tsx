@@ -126,7 +126,9 @@ const LeftMenu = ({
                               글쓰기
                         </span>
                       </div>
-                      <div className={'w-full flex flex-col items-center text-xs'}>
+                      <div className={'w-full flex flex-col items-center text-xs'}
+                           data-testid={'write-menu'}
+                      >
                           { categoryList }
                           <Link href={'/board/temp'}
                                 className={'py-2 px-5 w-full items-center gap-1 hover:bg-gray-100 duration-300'}

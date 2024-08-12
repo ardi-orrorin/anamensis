@@ -114,6 +114,7 @@ const Login = () => {
                   {
                     error.use &&
                     <span className={'text-xs text-red-500 my-2 px-2'}
+                          data-testid={'error-message'}
                     >
                         <FontAwesomeIcon height={12} icon={faExclamation}/>
                         &nbsp; {error.message}
@@ -126,6 +127,7 @@ const Login = () => {
                         disabled={!isNext || loading || !isRecaptcha}
                         onSubmit={goLogin}
                         onClick={goLogin}
+                        data-testid={'login'}
                     >{
                         loading ?
                             <LoadingSpinner size={12}/> :

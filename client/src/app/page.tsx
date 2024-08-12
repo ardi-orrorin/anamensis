@@ -19,6 +19,9 @@ import SearchBox from "@/app/{components}/searchBox";
 import {Root} from "@/app/{services}/types";
 import {Common} from "@/app/{commons}/types/commons";
 import {System} from "@/app/user/system/{services}/types";
+import {useQuery} from "@tanstack/react-query";
+import rootApiService from "@/app/{services}/rootApiService";
+import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 
 export default function Page() {
 
@@ -26,7 +29,7 @@ export default function Page() {
     const [initLoading, setInitLoading] = useState(true);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState<Root.BoardListI[]>([]);
-    const [roles, setRoles] = useState<System.Role[]>([]);
+    // const [roles, setRoles] = useState<System.Role[]>([]);
     const [searchValue, setSearchValue] = useState('');
     const [searchFocus, setSearchFocus] = useState(false);
     const [dynamicPage, setDynamicPage] = useState<Root.DynamicPage>({
@@ -54,7 +57,9 @@ export default function Page() {
     const moreRef = useRef<HTMLDivElement>(null);
     const searchRef = useRef<HTMLInputElement>(null);
 
-    const isLogin = useMemo(()=> roles.length > 0, [roles]);
+    const {data: roles, isLoading} = useQuery(rootApiService.userRole())
+
+    const isLogin = useMemo(()=> roles?.length > 0, [roles]);
 
     const notFoundResult = useMemo(()=> {
         return !initLoading && !loading && data?.length === 0
@@ -111,9 +116,9 @@ export default function Page() {
             setLoading(false);
             setInitLoading(false);
 
-            const roles = res.headers['next.user.roles'] || ''
-
-            if(roles) setRoles(JSON.parse(roles));
+            // const roles = res.headers['next.user.roles'] || ''
+            //
+            // if(roles) setRoles(JSON.parse(roles));
 
             const condition = res.data.content.length < searchParams.size;
 
@@ -194,6 +199,8 @@ export default function Page() {
     },[viewNotice]);
 
     useRootHotKey({searchRef})
+
+    if(isLoading && isLogin) return <GlobalLoadingSpinner />
 
     return (
         <SearchParamsProvider.Provider value={{

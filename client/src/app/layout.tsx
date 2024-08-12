@@ -8,6 +8,8 @@ import Footer from "@/app/{components}/mainFooter";
 import {Suspense} from "react";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 import ProgressBar from "@/app/{components}/progressBar";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import Providers from "@/app/Provider";
 
 export const metadata: Metadata = {
     title: 'anamensis',
@@ -64,6 +66,7 @@ export default function RootLayout({
                 `
             }} />
             <body className={'flex flex-col'}>
+            <Providers>
                 <ProgressBar />
                 <Suspense fallback={<GlobalLoadingSpinner />}>
                     <NavMain />
@@ -74,6 +77,7 @@ export default function RootLayout({
                     </div>
                 </Suspense>
                 <Footer />
+            </Providers>
             </body>
         </html>
     )

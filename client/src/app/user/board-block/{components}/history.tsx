@@ -1,14 +1,12 @@
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {useCallback, useContext, useMemo, useState} from "react";
 import BoardBlockProvider from "@/app/user/board-block/{services}/boardBlockProvider";
-import apiCall from "@/app/{commons}/func/api";
 import ModalProvider from "@/app/user/board-block/{services}/modalProvider";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowDown91} from "@fortawesome/free-solid-svg-icons";
 import SizeSelect from "@/app/{commons}/sizeSelect";
 import StatusSelect from "@/app/user/board-block/{components}/statusSelect";
 import {BoardBlockStatus} from "@/app/user/board-block/{services}/objects";
-import {BoardBlocking} from "@/app/user/board-block/{services}/types";
 
 const History = () => {
     const searchParams = useSearchParams();
@@ -22,18 +20,11 @@ const History = () => {
     const pathname = usePathname();
 
     const onClickHandler = useCallback(async (id: number) => {
-        return await apiCall<BoardBlocking.BoardBlock>({
-            path: '/api/user/board-block-history/' + id,
-            method: 'GET',
-            isReturnData: true,
-        })
-        .then(res => {
-            setBoardBlock(res);
-            setModal({
-                id, toggle: true
-            });
+        setModal({
+            id, toggle: true
         });
     },[]);
+
 
     const onSearchHandler = useCallback(() => {
         const params = new URLSearchParams(searchParams.toString());
@@ -95,7 +86,7 @@ const History = () => {
                     </tr>
                 </thead>
                 <tbody className={'text-sm'}>
-                { list }
+                    { list }
                 </tbody>
             </table>
             <div className={'w-full flex gap-1 justify-center py-3 text-xs'}>

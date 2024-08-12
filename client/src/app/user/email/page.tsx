@@ -1,25 +1,23 @@
 'use client';
-import React, {useContext, useEffect, useMemo, useState} from "react";
-import apiCall from "@/app/{commons}/func/api";
+import React, {useEffect, useMemo, useState} from "react";
 import {useRouter} from "next/navigation";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
-import useSWR from "swr";
-import UserProvider from "@/app/user/{services}/userProvider";
 import {User} from "@/app/login/{services}/types";
 import {System} from "@/app/user/system/{services}/types";
+import {useQuery} from "@tanstack/react-query";
+import rootApiService from "@/app/{services}/rootApiService";
+import emailApiService from "@/app/user/email/{services}/emailApiService";
 
 export default function Page() {
 
-    const {roles} = useContext(UserProvider);
-    const [userInfo, setUserInfo] = useState({} as User.UserInfo);
     const [loading, setLoading] = useState(false);
-    const isSAuthEmail = useMemo(() => {
-        return userInfo.sauthType === User.AuthType.EMAIL && userInfo.sauth;
-    },[userInfo]);
+
+    const {data: roles} = useQuery(rootApiService.userRole());
+    const {data: userInfo, refetch} = useQuery(emailApiService.userInfo());
 
     const isOAuthUser = useMemo(() =>
-        roles.some((role) => role === System.Role.OAUTH)
+        (roles as System.Role[])?.some((role) => role === System.Role.OAUTH)
         ,[roles]);
 
     const router = useRouter();
@@ -30,33 +28,21 @@ export default function Page() {
         router.push('/user');
     },[roles]);
 
-
-    const { mutate } = useSWR('/api/user/info', async () => {
-        return await apiCall<User.UserInfo>({
-            path: '/api/user/info',
-            method: 'GET',
-            isReturnData: true,
-        })
-        .then(res => {
-            setUserInfo(res);
-        });
-    },{});
-
+    const isSAuthEmail = useMemo(() => {
+        return userInfo?.sauthType === User.AuthType.EMAIL && userInfo.sauth;
+    },[userInfo?.sauthType, userInfo?.sauth]);
 
     const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const data: User.AuthProps = {
             sauth: e.target.checked,
-            sauthType: userInfo.sauthType !== User.AuthType.EMAIL ? User.AuthType.EMAIL : User.AuthType.NONE
+            sauthType: userInfo?.sauthType !== User.AuthType.EMAIL ? User.AuthType.EMAIL : User.AuthType.NONE
         };
 
         setLoading(true);
-        await apiCall<User.UserInfo, User.AuthProps>({
-            path: '/api/user/email',
-            method: 'PUT',
-            body: data,
-            isReturnData: true,
-        }).then(async (res) => {
-            await mutate();
+
+        emailApiService.toggleSAuth(data)
+            .then(async (res) => {
+            await refetch();
         }).catch(err => {
             console.log(err);
         }).finally(() => {
@@ -74,7 +60,7 @@ export default function Page() {
                         이메일
                     </h1>
                     <span className={'h-5 text-blue-700'}>
-                        {userInfo.email}
+                        {userInfo?.email}
                     </span>
                 </div>
 
@@ -104,15 +90,15 @@ export default function Page() {
                         사용 중인 인증 방식
                     </h1>
                     <span className={'h-5 text-blue-700'}>
-                       {userInfo.sauthType}
+                       {userInfo?.sauthType}
                     </span>
                 </div>
             </div>
             {
-                loading &&
-              <div className={'w-full h-screen bg-gray-400 opacity-25 absolute left-0 top-0 flex justify-center items-center'}>
-                <FontAwesomeIcon className={'animate-spin h-12'} icon={faSpinner} />
-              </div>
+                loading
+                && <div className={'w-full h-screen bg-gray-400 opacity-25 absolute left-0 top-0 flex justify-center items-center'}>
+                    <FontAwesomeIcon className={'animate-spin h-12'} icon={faSpinner} />
+                </div>
             }
         </div>
     )

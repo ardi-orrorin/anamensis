@@ -9,29 +9,18 @@ import useSWR, {preload} from "swr";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import UserProvider, {PointSummaryI} from "@/app/user/{services}/userProvider";
 import moment from "moment";
+import {useQuery} from "@tanstack/react-query";
+import userApiService from "@/app/user/{services}/userApiService";
 
 const PointSummary = () => {
-
-    const {pointSummary, setPointSummary} = useContext(UserProvider);
-
-    useSWR('/api/user/point-history/summary', async () => {
-        return await apiCall<PointSummaryI[]>({
-            path: "/api/user/point-history/summary",
-            params: {page:1, size: 8},
-            method: "GET",
-            isReturnData: true,
-        })
-        .then((data) => {
-            setPointSummary(data);
-        });
-    },{
-        revalidateOnFocus: false
-    });
+    const {data: pointSummary } = useQuery(userApiService.pointSummary());
 
     return (
         <div className={'w-full h-max flex flex-col gap-2 justify-center items-start'}>
             {
-                pointSummary.map((e, i) => (
+                pointSummary
+                && pointSummary?.length > 0
+                && pointSummary.map((e, i) => (
                     <div key={`summary-${i}`}
                         className={`flex gap-3 text-sm w-full`}
                     >

@@ -5,24 +5,31 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import BoardBlockProvider from "@/app/user/board-block/{services}/boardBlockProvider";
 import ModalProvider, {ModalI} from "@/app/user/board-block/{services}/modalProvider";
 import {faCaretRight} from "@fortawesome/free-solid-svg-icons";
-import UserProvider from "@/app/user/{services}/userProvider";
 import apiCall from "@/app/{commons}/func/api";
 import TextBox from "@/app/user/board-block/{components}/textBox";
 import {BoardBlocking} from "@/app/user/board-block/{services}/types";
 import {System} from "@/app/user/system/{services}/types";
+import {useQuery} from "@tanstack/react-query";
+import rootApiService from "@/app/{services}/rootApiService";
+import boardBlockApiService from "@/app/user/board-block/{services}/boardBlockApiService";
+import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 
 const Detail = () => {
 
     const { boardBlock, setBoardBlock } = useContext(BoardBlockProvider);
-    const { setModal } = useContext(ModalProvider);
-    const { roles } = useContext(UserProvider);
+    const { modal, setModal } = useContext(ModalProvider);
+    const { data, isLoading } = useQuery(boardBlockApiService.boardDetail(modal.id));
+
+    setBoardBlock(data!);
+
+    const {data: roles} = useQuery(rootApiService.userRole());
 
     const [isTyping, setIsTyping] = useState(false);
 
     const resultCondition = useMemo(() => {
-        return boardBlock.status === BoardBlocking.BoardBlockStatus.ANSWERED && roles.includes(System.Role.ADMIN)
-        || boardBlock.status === BoardBlocking.BoardBlockStatus.RESULTED && roles.includes(System.Role.USER)
-    },[boardBlock.status]);
+        return boardBlock?.status === BoardBlocking.BoardBlockStatus.ANSWERED && roles.includes(System.Role.ADMIN)
+        || boardBlock?.status === BoardBlocking.BoardBlockStatus.RESULTED && roles.includes(System.Role.USER)
+    },[boardBlock?.status]);
 
     useEffect(()=> {
         bodyScrollToggle(false);
@@ -59,6 +66,8 @@ const Detail = () => {
         setBoardBlock({...boardBlock, [e.target.name]: e.target.value});
     }
 
+    if(isLoading) return <GlobalLoadingSpinner />
+
     return (
         <div className={'fixed z-[40] top-0 left-0 w-full h-full flex justify-center items-center bg-gray-700 bg-opacity-20'}
              onClick={onCloseHandler}
@@ -69,7 +78,7 @@ const Detail = () => {
                 <div className={'w-full h-10 flex'}>
                     <div className={'w-[95%] py-2 border-b-2 border-solid border-gray-800 font-bold'}>
                         <span className={'line-clamp-1'}>
-                            {boardBlock.title}
+                            {boardBlock?.title}
                         </span>
                     </div>
                     <div className={'w-[10%] flex justify-end'}>
@@ -82,22 +91,22 @@ const Detail = () => {
                     <div>
                         <label className={'text-sm flex gap-2 items-center'}>
                             <FontAwesomeIcon icon={faCaretRight} />
-                            제한일자 : {boardBlock.createdAt}
+                            제한일자 : {boardBlock?.createdAt}
                         </label>
                         <span>
-                            내용 : {boardBlock.reason}
+                            내용 : {boardBlock?.reason}
                         </span>
                     </div>
 
                     <TextBox name={'answer'}
                              title={'답변 내용'}
-                             status={boardBlock.status}
-                             text={boardBlock.answer}
-                             date={boardBlock.answerAt}
+                             status={boardBlock?.status}
+                             text={boardBlock?.answer}
+                             date={boardBlock?.answerAt}
                              onChange={onChangeHandler}
                     />
                     {
-                        boardBlock.status === BoardBlocking.BoardBlockStatus.ANSWERED
+                        boardBlock?.status === BoardBlocking.BoardBlockStatus.ANSWERED
                         && roles.includes(System.Role.USER)
                         && !roles.includes(System.Role.ADMIN)
                         && <div className={'w-full flex gap-2'}>
@@ -111,19 +120,19 @@ const Detail = () => {
                         resultCondition
                         && <TextBox name={'result'}
                                     title={'처리 결과'}
-                                    status={boardBlock.status}
-                                    text={boardBlock.result}
-                                    date={boardBlock.resultAt}
+                                    status={boardBlock?.status}
+                                    text={boardBlock?.result}
+                                    date={boardBlock?.resultAt}
                                     onChange={onChangeHandler}
                         />
                     }
                     {
-                        boardBlock.status === BoardBlocking.BoardBlockStatus.RESULTED
+                        boardBlock?.status === BoardBlocking.BoardBlockStatus.RESULTED
                         && (roles.includes(System.Role.USER) || roles.includes(System.Role.ADMIN))
                         && <div className={'w-full flex gap-2'}>
                             <label className={'text-sm flex gap-2 items-center'}>
                                 <FontAwesomeIcon icon={faCaretRight}/>
-                                처리 결과 : {boardBlock.resultStatus === BoardBlocking.BoardBlockResultStatus.BLOCKING ? '게시글 제한' : '제한 해제'}
+                                처리 결과 : {boardBlock?.resultStatus === BoardBlocking.BoardBlockResultStatus.BLOCKING ? '게시글 제한' : '제한 해제'}
                             </label>
                         </div>
                     }
@@ -131,13 +140,13 @@ const Detail = () => {
                 <div className={'w-full flex gap-2 justify-center'}>
                     {
                         roles.includes(System.Role.ADMIN)
-                        && boardBlock.status === BoardBlocking.BoardBlockStatus.ANSWERED
+                        && boardBlock?.status === BoardBlocking.BoardBlockStatus.ANSWERED
                             ? <Btn btnText1={'제한 해제'}
                                    onClick1={()=> onSubmitHandler(BoardBlocking.BoardBlockResultStatus.UNBLOCKING)}
                                    btnText2={'거부'}
                                    onClick2={onSubmitHandler}
                             />
-                            : boardBlock.status === BoardBlocking.BoardBlockStatus.RESULTED
+                            : boardBlock?.status === BoardBlocking.BoardBlockStatus.RESULTED
                             ? <Btn btnText1={'닫기'}
                                    onClick1={onCloseHandler}
                             />

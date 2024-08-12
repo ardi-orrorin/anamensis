@@ -22,6 +22,7 @@ const LeftMenu = ({
     searchParams    : Root.BoardListParamsI;
     setSearchParams : Dispatch<SetStateAction<Root.BoardListParamsI>>;
 }) => {
+
     const router = useRouter();
 
     const boardBaseUrl = '/board/new?categoryPk=';
@@ -51,8 +52,8 @@ const LeftMenu = ({
     },[searchParams]);
 
     const confirmRole = useCallback((item: { roles: System.Role[] }) => {
-        return item.roles.find(r =>
-            roles.find(roles => roles === r)
+        return item.roles?.find(r =>
+            roles?.find(roles => roles === r)
         );
     },[roles]);
 
@@ -91,7 +92,7 @@ const LeftMenu = ({
                     </div>
                     <div>
                         {
-                            roles.length > 0
+                            roles?.length > 0
                             && <button className={'flex py-2 px-5 w-full justify-between items-center text-xs hover:bg-gray-100 duration-500'}
                                        onClick={() => onChangeParamsHandler({type: 'isSelf', value: true})}
                             >
@@ -102,7 +103,7 @@ const LeftMenu = ({
                             </button>
                         }
                         {
-                            roles.length > 0
+                            roles?.length > 0
                             && <button className={'flex py-2 px-5 w-full justify-between items-center text-xs text-amber-600 hover:bg-amber-50 duration-500 outline-0'}
                                        onClick={() => onChangeParamsHandler({type: 'isFavorite', value: true})}
                             >
@@ -118,7 +119,7 @@ const LeftMenu = ({
                     </div>
                 </div>
                 {
-                    roles.length > 0
+                    roles?.length > 0
                     && <div className={'flex flex-col w-60 shadow rounded p-3 bg-white gap-3 border-t-4 border border-solid border-gray-100 hover:border-gray-500 duration-500'}>
                       <div className={'flex gap-2 justify-center items-center text-sm font-bold py-2'}>
                         <FontAwesomeIcon icon={faPen} height={'16'} />
@@ -149,7 +150,7 @@ const LeftMenu = ({
                             <HotKeybtn hotkey={['SHIFT', 'F']} />
                         </li>
                         {
-                            roles.length > 0
+                            roles?.length > 0
                             ? <>
                                 <li className={'flex justify-between items-center gap-2'}>
                                     <span>로그아웃</span>

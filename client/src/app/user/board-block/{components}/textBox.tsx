@@ -46,7 +46,7 @@ const TextBox = ({
                                   autoFocus={true}
                         />
                         <span className={'absolute right-3 bottom-3'}>
-                        {text.length} / 500
+                        {text?.length} / 500
                     </span>
                     </div>
             }

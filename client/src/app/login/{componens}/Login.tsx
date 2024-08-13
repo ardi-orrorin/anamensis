@@ -14,7 +14,7 @@ const Login = () => {
 
     const {user, setUser} = useContext(LoginProvider);
 
-    const [isRecaptcha, setIsReCaptcha] = useState(false);
+    const [isRecaptcha, setIsReCaptcha] = useState(true);
 
     const [loading, setLoading] = useState(false);
 

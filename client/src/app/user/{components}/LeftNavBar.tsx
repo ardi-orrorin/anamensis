@@ -70,6 +70,11 @@ const LeftNavBar = ({
         localStorage.setItem('isModalMode', JSON.stringify(!isModalMode));
     },[isModalMode, isOpen]);
 
+    const closeToggle = useCallback(() => {
+        bodyScrollToggle(false, true);
+        setIsOpen(false);
+        localStorage.setItem('isModalMode', JSON.stringify(false));
+    },[isModalMode, isOpen]);
 
     const onChangeDisabledHandler = useCallback(() => {
         bodyScrollToggle(false, true);
@@ -105,21 +110,32 @@ const LeftNavBar = ({
         <nav className={['z-30 min-h-dvh bg-main py-2 duration-500'
             , isOpen || !isModalMode  ? 'translate-x-0 shadow-outset-lg' : 'translate-x-[-1000px]'
             , isModalMode ? 'fixed w-[220px]': 'w-[40px] sm:min-w-[200px]'
-        ].join(' ')}>
+        ].join(' ')}
+             data-testid={'left-nav-bar-container'}
+        >
             <div className={[
                 'flex justify-between',
                 isModalMode ? 'gap-0 px-5': 'flex-col sm:flex-row px-0 gap-4 sm:gap-0 sm:px-5 py-2'
             ].join(' ')}>
-                <button onClick={openToggle} className={'text-white'}>
+                <button onClick={openToggle}
+                        className={'text-white'}
+                        data-testid={'fixed-toggle'}
+                >
                     {
                         isModalMode
                         ? <FontAwesomeIcon icon={faRectangleList} />
                         : <FontAwesomeIcon icon={faTableList} />
                     }
                 </button>
-                <button onClick={openToggle}>
-                    <FontAwesomeIcon icon={faXmark} className={'text-white text-xl'} />
-                </button>
+                {
+                    isModalMode
+                    && <button onClick={closeToggle}
+                               data-testid={'left-nav-bar-close'}
+                    >
+                        <FontAwesomeIcon icon={faXmark} className={'text-white text-xl'} />
+                    </button>
+                }
+
             </div>
             <ul className={'w-full duration-500'}
                 data-testid={'left-nav-bar'}

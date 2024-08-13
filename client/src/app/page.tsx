@@ -37,6 +37,7 @@ export default function Page() {
         isEndOfList: false,
         isVisible  : false,
     });
+
     const [menuToggle, setMenuToggle] = useState(false);
 
     const [favorites, setFavorites] = useState<string[]>([]);

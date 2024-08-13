@@ -26,6 +26,7 @@ import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 export default function Page() {
 
     const roles = useQueryClient().getQueryData(['userRole']) as System.Role[];
+    const {data: noticeList} = useQuery(rootApiService.getNotices());
 
     const pageSize = 20;
     const [initLoading, setInitLoading] = useState(true);
@@ -47,7 +48,7 @@ export default function Page() {
         size: pageSize,
     } as Root.BoardListParamsI);
 
-    const [noticeList, setNoticeList] = useState<Root.NoticeType[]>([]);
+    // const [noticeList, setNoticeList] = useState<Root.NoticeType[]>([]);
     const [searchHistory, setSearchHistory] = useState<Root.SearchHistoryProps>({
         toggle: true,
         history:[] as string[]
@@ -88,18 +89,6 @@ export default function Page() {
         .then(res => {
             if(res.length === 0) return;
             setFavorites(res);
-        })
-    },[])
-
-    useEffect(() => {
-        apiCall<Root.NoticeType[]>({
-            path: '/api/board/notice',
-            method: 'GET',
-            isReturnData: true
-        })
-        .then(res => {
-            if(!res) return;
-            setNoticeList(res);
         })
     },[])
 
@@ -195,8 +184,6 @@ export default function Page() {
     },[viewNotice]);
 
     useRootHotKey({searchRef})
-
-    // if(isLoading && isLogin) return <GlobalLoadingSpinner />
 
     return (
         <SearchParamsProvider.Provider value={{

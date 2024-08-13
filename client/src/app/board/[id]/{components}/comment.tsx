@@ -17,6 +17,8 @@ import {updateBoard} from "@/app/board/{services}/funcs";
 import {useSearchParams} from "next/navigation";
 import PageNavigator from "@/app/{commons}/PageNavigator";
 import {Common} from "@/app/{commons}/types/commons";
+import {useQuery} from "@tanstack/react-query";
+import boardApiService from "@/app/board/{services}/boardApiService";
 
 export type SaveComment = {
     boardPk   : string;
@@ -33,37 +35,22 @@ const Comment = ({
     const searchParams = useSearchParams();
 
     const {
-        comment,setComment,
+        // comment,setComment,
         board, isNewBoard, isTemplate
     } = useContext(BoardProvider);
 
     const {newComment, setNewComment} = useContext(BoardProvider);
 
-    const [page, setPage] = useState<Common.PageI>({
-        page: 1,
-        size: 10,
-    } as Common.PageI);
+    const {data, refetch} = useQuery(boardApiService.getComments({
+        isEdit: isNewBoard || isTemplate,
+        boardPk: Number(board.data.id),
+        searchParams,
+    }));
+
+    const {page, content: comment} = data || {page:{page:1, size: 10}} as Common.PageResponse<CommentI>;
 
     const [loading, setLoading] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
-
-    preload([`/api/board/comment/${board.data.id}`, searchParams], async () => {
-        if(isNewBoard || isTemplate) return;
-
-        return await apiCall<Common.PageResponse<CommentI>>({
-            path: '/api/board/comment',
-            method: 'GET',
-            params: {boardPk: params.id, page: searchParams.get('page') || 1, size: searchParams.get('size') || 10},
-        })
-    })
-    .then(res => {
-        if(!res) return;
-        setPage(res.data.page);
-        setComment(res.data.content);
-    })
-
-    const reload = () => mutate([`/api/board/comment/${board.data.id}`, searchParams]);
-
     const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setNewComment({...newComment, content: e.target.value});
     }
@@ -86,7 +73,7 @@ const Comment = ({
                 isReturnData: true,
             })
 
-            await reload();
+            await refetch();
 
             setNewComment({
                 boardPk: board.data.id,
@@ -108,9 +95,9 @@ const Comment = ({
     }
 
     const comments = useMemo(() =>
-        comment.map((item, index) => {
+        comment?.map((item, index) => {
             return (
-                <CommentItem key={index} {...item} reload={reload} />
+                <CommentItem key={index} {...item} refetch={refetch} />
             )
         })
     ,[comment])
@@ -128,7 +115,7 @@ const Comment = ({
                         댓글
                     </h2>
                     <span>
-                        ({page.total})
+                        ({page?.total})
                     </span>
                 </div>
             </div>
@@ -168,20 +155,20 @@ const Comment = ({
                 { comments }
             </div>
             {
-                page.total > 10
+                page?.total > 10
                 && <PageNavigator {...page} />
             }
         </div>
     )
 }
 
-const CommentItem = (props: CommentI & {reload: ()=> Promise<any>}) => {
+const CommentItem = (props: CommentI & {refetch: ()=> Promise<any>}) => {
     const {
         blockSeq, content
         , writer, profileImage
         , createdAt, children
         , isWriter
-        , id, reload
+        , id, refetch
     } = props;
 
     const {board} = useContext(BoardProvider);
@@ -215,7 +202,7 @@ const CommentItem = (props: CommentI & {reload: ()=> Promise<any>}) => {
             alert(err.response.data.message);
         } finally {
             setLoading(false);
-            await reload();
+            await refetch();
             setDeleteComment({confirm: false});
         }
     }

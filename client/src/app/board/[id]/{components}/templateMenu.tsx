@@ -1,13 +1,14 @@
 import {useContext, useEffect, useRef, useState} from "react";
 import BoardProvider, {BoardTemplateService} from "@/app/board/{services}/BoardProvider";
 import apiCall from "@/app/{commons}/func/api";
-import {BoardTemplate, boardTemplateList} from "@/app/board/{services}/types";
+import {BoardTemplate} from "@/app/board/{services}/types";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {blockTypeFlatList} from "@/app/board/{components}/block/list";
 import {Common} from "@/app/{commons}/types/commons";
-
+import {useQuery} from "@tanstack/react-query";
+import boardApiService from "@/app/board/{services}/boardApiService";
 
 type TemplateMenuOpenProps = {
     clientX: number;
@@ -15,8 +16,8 @@ type TemplateMenuOpenProps = {
     open: boolean;
 }
 
-
 const TemplateMenu = () => {
+    const {data, isSuccess, refetch} = useQuery(boardApiService.getTemplates());
 
     const {board, setBoard, boardTemplate, setBoardTemplate, isTemplate} = useContext(BoardProvider);
     const [open, setOpen] = useState({} as TemplateMenuOpenProps);
@@ -24,26 +25,11 @@ const TemplateMenu = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(()=>{
-        getBoardTemplate();
-    },[])
-
-    const getBoardTemplate = async () => {
-        return await apiCall<boardTemplateList[]>({
-            path: '/api/board-template',
-            method: 'GET',
-            isReturnData: true,
+        setBoardTemplate({
+            ...boardTemplate,
+            list: data
         })
-        .then((data) => {
-            setBoardTemplate({
-                ...boardTemplate,
-                list: data
-            } as BoardTemplateService);
-        })
-        .finally(() => {
-            setLoading(false);
-        })
-    }
-
+    },[data])
 
     const openTemplateMenu = async () => {
         if(!ref?.current) return ;
@@ -103,6 +89,7 @@ const TemplateMenu = () => {
                 templates: [...boardTemplate.templates, res]
             })
 
+            await refetch();
         } catch (e) {
             console.log(e)
         } finally {
@@ -120,7 +107,7 @@ const TemplateMenu = () => {
             })
 
             res.status === 'SUCCESS'
-            && await getBoardTemplate();
+            && await refetch();
         } catch (e) {
             console.log(e)
         } finally {

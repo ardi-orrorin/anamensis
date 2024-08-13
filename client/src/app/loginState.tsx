@@ -3,6 +3,7 @@ import {usePrefetchQuery} from "@tanstack/react-query";
 import userApiService from "@/app/user/{services}/userApiService";
 import rootApiService from "@/app/{services}/rootApiService";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
+import React from "react";
 
 const LoginState = () => {
 
@@ -13,4 +14,4 @@ const LoginState = () => {
     return <></>
 }
 
-export default LoginState;
+export default React.memo(LoginState);

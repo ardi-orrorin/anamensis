@@ -29,6 +29,7 @@
                                      FROM table_code tc
                                     WHERE tc.table_name = 'member')
            AND f.is_use         = 1
+         ORDER BY bc1.id;
     </select>
 
 <!--    <select id="findAllByBoardPk" resultMap="boardCommentListResultMap">-->

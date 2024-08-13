@@ -17,6 +17,24 @@ const userRole = () => {
         initialDataUpdatedAt: 1,
     })
 }
+
+const getNotices = () => {
+    return queryOptions({
+        queryKey: ['notieces'],
+        queryFn: async () => {
+            return await apiCall<Root.NoticeType[]>({
+                path: '/api/board/notice',
+                method: 'GET',
+                isReturnData: true
+            });
+        },
+        initialData: [],
+        initialDataUpdatedAt: 1,
+        staleTime: 5 * 60 * 1000,
+    })
+}
+
+
 const scheduleAlert = () => {
     return queryOptions({
         queryKey: ['scheduleAlert'],
@@ -39,6 +57,7 @@ const scheduleAlert = () => {
 const rootApiService = {
     userRole,
     scheduleAlert,
+    getNotices
 }
 
 export default rootApiService;

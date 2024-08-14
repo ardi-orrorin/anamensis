@@ -41,7 +41,7 @@ export const useRootLeftMenuHotKey = ({
     }
 
     useHotkeys(['0', '9'], (_, handler) => {
-        if (roles.length === 0) return;
+        if (roles?.length === 0) return;
         switch (handler.keys?.join('')) {
             case '0':
                 onChangeParamsHandler({type: 'isSelf', value: true})
@@ -53,7 +53,7 @@ export const useRootLeftMenuHotKey = ({
     }, hotkeysOption);
 
     useHotkeys(['shift+o', 'shift+i'], (e, handler) => {
-        if (roles.length === 0) return;
+        if (roles?.length === 0) return;
         switch (handler.keys?.join('')) {
             case 'o':
                 router.push('/api/logout');
@@ -65,7 +65,7 @@ export const useRootLeftMenuHotKey = ({
     }, hotkeysOption, [roles]);
 
     useHotkeys(['shift+l'], (e, handler) => {
-        if (roles.length !== 0) return;
+        if (roles?.length !== 0 && roles) return;
         switch (handler.keys?.join('')) {
             case 'l':
                 router.push('/login');
@@ -74,7 +74,7 @@ export const useRootLeftMenuHotKey = ({
     }, hotkeysOption, [roles]);
 
     useHotkeys(['shift+1', 'shift+2', 'shift+3', 'shift+4', 'shift+5', "shift+6"], (e, handler) => {
-        if (roles.length === 0) return;
+        if (roles?.length === 0) return;
         const selCate = Category.findById(handler.keys!.join(''))!;
 
         if (!confirmRole(selCate)) return;
@@ -82,7 +82,7 @@ export const useRootLeftMenuHotKey = ({
     }, hotkeysOption, [roles]);
 
     useHotkeys(['shift+0'], (e, handler) => {
-        if (roles.length === 0) return;
+        if (roles?.length === 0) return;
         router.push('/board/temp');
     }, hotkeysOption, [roles]);
 

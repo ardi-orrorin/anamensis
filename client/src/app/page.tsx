@@ -160,9 +160,9 @@ export default function Page() {
 
         setSearchParams(params);
 
-        if(searchHistory.history.some(key => key === value) || value === '') return;
-        localStorage.setItem('searchHistory', JSON.stringify({...searchHistory, history: [...searchHistory.history, value]}));
-        setSearchHistory({...searchHistory, history: [...searchHistory.history, value]});
+        if(searchHistory.history?.some(key => key === value) || value === '') return;
+        localStorage.setItem('searchHistory', JSON.stringify({...searchHistory, history: [...searchHistory?.history, value]}));
+        setSearchHistory({...searchHistory, history: [...searchHistory?.history, value]});
 
     },[searchParams, searchValue, searchHistory]);
 

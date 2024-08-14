@@ -33,7 +33,7 @@ const SearchHistory = ({
         if(!keyword) return setSearchHistory({...searchHistory, history: []});
         const newHistory = searchHistory.history.filter(key => key !== keyword);
         setSearchHistory({...searchHistory, history: newHistory});
-        localStorage.setItem('searchHistory', JSON.stringify(newHistory));
+        localStorage.setItem('searchHistory', JSON.stringify({...searchHistory, history: newHistory}));
     },[searchHistory]);
 
     const onChangeToggle = useCallback(() => {
@@ -45,7 +45,7 @@ const SearchHistory = ({
     return (
         <div className={[
              'absolute top-5 z-20 w-full flex flex-col bg-white rounded-b-3xl shadow-md duration-700 overflow-y-hidden',
-             onSearchHistory && searchHistory.history.length > 0 ? 'max-h-80' : 'max-h-0',
+             onSearchHistory && searchHistory?.history?.length > 0 ? 'max-h-80' : 'max-h-0',
         ].join(' ')}
             onMouseEnter={()=> {
                 clearTimeout(timeout.current);
@@ -57,7 +57,7 @@ const SearchHistory = ({
                 }, 500);
              }}
         >
-            <div className={'h-10'} />
+            <div className={'min-h-6'} />
             <ul className={'flex flex-col gap-1 bg-white overflow-y-auto'}>
                 {
                     searchHistory.toggle
@@ -76,7 +76,7 @@ const SearchHistory = ({
                                 >
                                     {keyword}
                                 </button>
-                                <button className={'min-w-10 h-auto flex justify-center items-center bg-gray-100 rounded-md'}
+                                <button className={'min-w-10 h-6 flex justify-center items-center bg-gray-100 rounded-md'}
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             removeSearchHistory(keyword);

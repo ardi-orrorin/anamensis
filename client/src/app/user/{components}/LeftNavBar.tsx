@@ -107,14 +107,14 @@ const LeftNavBar = ({
 
     return (
         <>
-        <nav className={['z-30 min-h-dvh bg-main py-2 duration-500'
+        <nav className={['sticky top-0 flex flex-col min-h-screen z-30 bg-main py-2 duration-500'
             , isOpen || !isModalMode  ? 'translate-x-0 shadow-outset-lg' : 'translate-x-[-1000px]'
             , isModalMode ? 'fixed w-[220px]': 'w-[40px] sm:min-w-[200px]'
         ].join(' ')}
              data-testid={'left-nav-bar-container'}
         >
             <div className={[
-                'flex justify-between',
+                'flex justify-between h-full',
                 isModalMode ? 'gap-0 px-5': 'flex-col sm:flex-row px-0 gap-4 sm:gap-0 sm:px-5 py-2'
             ].join(' ')}>
                 <button onClick={openToggle}
@@ -137,7 +137,7 @@ const LeftNavBar = ({
                 }
 
             </div>
-            <ul className={'w-full duration-500'}
+            <ul className={'w-full h-full duration-500'}
                 data-testid={'left-nav-bar'}
             >
                 <li className={'flex justify-center py-2 sm:py-4'}>

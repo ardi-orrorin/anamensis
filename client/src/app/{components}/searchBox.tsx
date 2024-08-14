@@ -20,7 +20,7 @@ const SearchBox = (props: Root.SearchBoxProps) => {
 
     return (
         <>
-            <input className={'z-40 rounded-full outline-0 border-solid border-gray-200 border-2 text-xs w-full h-10 py-3 pl-4 pr-20 focus:border-gray-500 focus:border duration-500 bg-white'}
+            <input className={'z-40 rounded-full outline-0 border-solid border-gray-100 border text-xs w-full h-10 py-3 pl-4 pr-20 focus:border-gray-500 focus:border focus:shadow-sm duration-500 bg-white'}
                    ref={searchRef}
                    placeholder={'검색어'}
                    value={searchValue || ''}

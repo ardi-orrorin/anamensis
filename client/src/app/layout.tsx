@@ -74,12 +74,12 @@ export default function RootLayout({
                 <ProgressBar />
                 <Suspense fallback={<GlobalLoadingSpinner />}>
                     <NavMain />
-                    <div className={'min-h-screen h-full'}>
-                        <ErrorBoundary errorComponent={Error}>
+                    <ErrorBoundary errorComponent={Error}>
+                        <main className={'min-h-screen'}>
                             {children}
-                        </ErrorBoundary>
-                    </div>
-                </Suspense>
+                        </main>
+                    </ErrorBoundary>
+                    </Suspense>
                 <Footer />
             </Providers>
             </body>

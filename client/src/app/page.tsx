@@ -22,6 +22,9 @@ import {System} from "@/app/user/system/{services}/types";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import rootApiService from "@/app/{services}/rootApiService";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
+import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
+import rootFunc from "@/app/{services}/funcs";
+import RightMenu from "@/app/{components}/rightMenu";
 
 export default function Page() {
 
@@ -189,31 +192,12 @@ export default function Page() {
         <SearchParamsProvider.Provider value={{
             searchParams, setSearchParams,
         }}>
-            <div className={'flex flex-col gap-2 bg-gray-50'}
+            <div className={'w-auto flex flex-col gap-2 bg-gray-50'}
                  onClick={()=> {
                      setOnSearchHistory(false)
                      setSearchFocus(false)
                  }}
             >
-                <div className={'sticky z-40 top-0 py-3 sm:px-10 md:px-20 lg:px-44 w-full flex flex-col rounded-full justify-center items-center gap-3 '}>
-                    <div className={[
-                        'relative flex flex-col justify-center bg-white shadow-md duration-700 rounded-full',
-                        searchFocus ? 'w-full sm:w-[70%]' : 'w-70 sm:w-[40%]',
-                    ].join(' ')}>
-                        <SearchBox {...{searchValue, setSearchValue, searchRef,
-                            searchHistory, onSearchHandler, onEnterHandler,
-                            searchFocus, setSearchFocus, onSearchHistory,
-                            setOnSearchHistory
-                        }} />
-                        <SearchHistory {...{searchHistory, setSearchValue,
-                            setSearchHistory, onSearchHistory,
-                            setOnSearchHistory, onSearchHandler
-
-                        }}/>
-
-                    </div>
-                    <SearchInfo />
-                </div>
                 <div className={'w-full border-t border-solid border-t-gray-200'}>
                     <div className={'fixed z-30 sm:hidden bottom-5 right-5'}>
                         <button className={'w-14 h-14 p-5 rounded-full bg-white shadow-md active:bg-main active:text-white duration-300'}
@@ -224,11 +208,29 @@ export default function Page() {
                         <MobileMenu {...{menuToggle, setMenuToggle, isLogin, searchParams, setSearchParams}} />
                     </div>
                     <div className={'flex flex-row justify-start'}>
-                        <div className={'hidden sm:block relative min-w-[250px] min-h-svh'}>
+                        <div className={'hidden sm:block relative min-w-[300px] min-h-screen'}>
                             <LeftMenu {...{searchParams, setSearchParams, roles}}/>
                         </div>
-                        <div className={'w-full flex justify-center mt-5'}>
-                            <div className={'w-[600px] px-4 flex flex-col justify-start items-center'}>
+                        <div className={'w-full flex flex-col justify-start items-center mt-2'}>
+                            <div className={'sticky z-40 top-0 py-3 w-full flex flex-col rounded-full justify-center items-center gap-3'}>
+                                <div className={[
+                                    'relative flex flex-col justify-center bg-white shadow-sm duration-700 rounded-full',
+                                    searchFocus ? 'w-full sm:w-[70%]' : 'w-70 sm:w-[50%]',
+                                ].join(' ')}>
+                                    <SearchBox {...{searchValue, setSearchValue, searchRef,
+                                        searchHistory, onSearchHandler, onEnterHandler,
+                                        searchFocus, setSearchFocus, onSearchHistory,
+                                        setOnSearchHistory
+                                    }} />
+                                    <SearchHistory {...{searchHistory, setSearchValue,
+                                        setSearchHistory, onSearchHistory,
+                                        setOnSearchHistory, onSearchHandler
+
+                                    }}/>
+                                </div>
+                                <SearchInfo />
+                            </div>
+                            <div className={'w-full min-w-[500px] max-w-[600px] px-4 flex flex-col justify-start items-center'}>
                                 <div className={'w-full flex flex-col gap-3'}>
                                     <div className={'w-full p-2 flex justify-between items-center text-sm border-b border-solid border-gray-400'}>
                                         <div className={'flex gap-1 items-center'}>
@@ -255,7 +257,6 @@ export default function Page() {
                                         <Notices data={noticeList} />
                                     </div>
                                 </div>
-
                                 <div className={'w-full flex flex-wrap gap-2'}>
                                     {
                                         notFoundResult
@@ -275,6 +276,9 @@ export default function Page() {
                                     />
                                 </div>
                             </div>
+                        </div>
+                        <div className={'hidden lg:flex lg:flex-col min-w-[300px] px-3 max-w-[400px] border-l border-solid border-l-gray-200 bg-gray-50'}>
+                            <RightMenu {...{searchHistory, setSearchValue, onSearchHandler, setSearchHistory}} />
                         </div>
                     </div>
                 </div>

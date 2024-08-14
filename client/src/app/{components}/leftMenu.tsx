@@ -3,7 +3,7 @@ import {Category} from "@/app/board/{services}/types";
 import Link from "next/link";
 import {faPen} from "@fortawesome/free-solid-svg-icons/faPen";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faBars} from "@fortawesome/free-solid-svg-icons";
+import {faBars, faKeyboard} from "@fortawesome/free-solid-svg-icons";
 import SearchParamsProvider from "@/app/{services}/SearchParamsProvider";
 import {useHotkeys} from "react-hotkeys-hook";
 import {useRouter} from "next/navigation";
@@ -12,6 +12,11 @@ import HotKeybtn from "@/app/{components}/hotKeybtn";
 import {useRootLeftMenuHotKey} from "@/app/{hooks}/hotKey";
 import {Root} from "@/app/{services}/types";
 import {System} from "@/app/user/system/{services}/types";
+import userApiService from "@/app/user/{services}/userApiService";
+import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
+import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
+import Image from "next/image";
+import {useQuery} from "@tanstack/react-query";
 
 const LeftMenu = ({
     roles,
@@ -79,19 +84,23 @@ const LeftMenu = ({
     }),[roles]);
 
     return (
-        <div className={'sticky z-30 top-0 left-[5%] xl:left-[13%] min-h-svh px-2 border-r border-solid border-r-gray-200 bg-gray-100'}>
-            <div className={'sticky z-30 top-8 flex flex-col gap-5 items-center xl:items-start'}>
-                <div className={'flex flex-col w-full gap-2 duration-500'}
+        <div className={'sticky z-30 top-0 left-[5%] xl:left-[13%] min-h-screen px-2 border-r border-solid border-r-gray-200 bg-gray-100'}>
+            <div className={'sticky z-30 top-2 py-3 px-2 flex flex-col gap-5 items-center xl:items-start'}>
+                {
+                    roles?.length > 0
+                    && <ProfileInfo />
+                }
+                <div className={'pb-4 flex flex-col w-full gap-2 duration-500 border-b border-solid border-b-gray-200'}
                      data-testid={'left-menu'}
                 >
-                    <div className={'flex gap-2 justify-center items-center text-sm pt-4 font-bold'}>
+                    <div className={'flex gap-2 items-center text-sm font-bold'}>
                         <FontAwesomeIcon icon={faBars} height={'16'} />
-                        <span> 메뉴 </span>
+                        <span> 카테고리 </span>
                     </div>
-                    <div className={'w-full px-2'}>
+                    <div className={'w-full'}>
                         {
                             roles?.length > 0
-                            && <button className={'flex py-2 w-full justify-between items-center text-xs hover:bg-gray-100 duration-500'}
+                            && <button className={'flex p-2 w-full justify-between items-center text-xs hover:bg-gray-200 duration-500'}
                                        onClick={() => onChangeParamsHandler({type: 'isSelf', value: true})}
                             >
                                 <span>
@@ -102,7 +111,7 @@ const LeftMenu = ({
                         }
                         {
                             roles?.length > 0
-                            && <button className={'flex py-2 w-full justify-between items-center text-xs text-amber-600 hover:bg-amber-50 duration-500 outline-0'}
+                            && <button className={'flex p-2 w-full justify-between items-center text-xs text-amber-600 hover:bg-amber-50 duration-500 outline-0'}
                                        onClick={() => onChangeParamsHandler({type: 'isFavorite', value: true})}
                             >
                                 <span>
@@ -118,21 +127,21 @@ const LeftMenu = ({
                 </div>
                 {
                     roles?.length > 0
-                    && <div className={'flex flex-col w-full'}>
-                      <div className={'flex gap-2 justify-center items-center text-sm font-bold py-2'}>
+                    && <div className={'pb-4 flex flex-col w-full border-b border-solid border-b-gray-200'}>
+                      <div className={'flex gap-2 items-center text-sm font-bold py-2'}>
                         <FontAwesomeIcon icon={faPen} height={'16'} />
                         <span>
                               글쓰기
                         </span>
                       </div>
-                      <div className={'w-full flex flex-col items-center text-xs px-2'}
+                      <div className={'w-full flex flex-col items-center text-xs'}
                            data-testid={'write-menu'}
                       >
                           { categoryList }
                           <Link href={'/board/temp'}
-                                className={'py-2 w-full items-center gap-1 hover:bg-gray-100 duration-300'}
+                                className={'p-2 w-full items-center gap-1 hover:bg-gray-100 duration-300'}
                           >
-                              <div className={'flex justify-between items-center b'}>
+                              <div className={'flex justify-between items-center'}>
                                  <span> 새 템플릿 </span>
                                  <HotKeybtn hotkey={['SHIFT','0']} />
                               </div>
@@ -140,9 +149,14 @@ const LeftMenu = ({
                       </div>
                   </div>
                 }
-                <div className={'flex flex-col w-60 px-3 py-6 gap-2 justify-center items-center'}>
-                    <h1 className={'text-sm font-bold'}>단축키</h1>
-                    <ul className={'flex flex-col w-full gap-3 text-xs'}>
+                <div className={'pb-4 w-full flex flex-col gap-2 border-b border-solid border-b-gray-200'}>
+                    <div className={'flex gap-2 items-center text-sm font-bold'}>
+                        <FontAwesomeIcon icon={faKeyboard} height={'16'} />
+                        <span>
+                            단축키
+                        </span>
+                    </div>
+                    <ul className={'flex px-2 flex-col w-full gap-3 text-xs'}>
                         <li className={'flex justify-between items-center gap-2'}>
                             <span>검색</span>
                             <HotKeybtn hotkey={['SHIFT', 'F']} />
@@ -171,6 +185,66 @@ const LeftMenu = ({
     )
 }
 
+const ProfileInfo = () => {
+    const router = useRouter()
+    const {data: profileImg, isLoading} = useQuery(userApiService.profileImg());
+
+    const {data: userinfo} = useQuery(userInfoApiService.profile())
+
+    return (
+        <div className={'pb-4 w-full flex flex-col gap-2 border-b border-solid border-b-gray-200'}>
+            <div className={'flex justify-between items-end text-sm'}>
+                <span className={'font-bold'}>
+                    프로필
+                </span>
+                <Link className={'flex justify-end text-xs text-blue-500'}
+                      href={'/user/info'}
+                >
+                    수정
+                </Link>
+            </div>
+            <div className={'flex gap-4'}>
+                <div className={'flex flex-col gap-2'}>
+                    <button className={'w-[95px] h-[95px] p-1.5 flex justify-center items-center border-4 border-solid border-main rounded-full hover:border-amber-500 duration-500'}>
+                        {
+                            (isLoading || profileImg === '')
+                                ? <LoadingSpinner size={20} />
+                                : <Image src={process.env.NEXT_PUBLIC_CDN_SERVER + profileImg}
+                                         alt={''}
+                                         height={90}
+                                         width={90}
+                                         className={'shadow rounded-full'}
+                                         onClick={()=> router.push('/user/info')}
+                                />
+                        }
+                    </button>
+                </div>
+                <div>
+                    <div className={'flex flex-col gap-2'}>
+                        <div className={'flex'}>
+                            <span className={'text-xs min-w-10 font-bold'}>ID</span>
+                            <span className={'text-xs'}>{userinfo?.userId}</span>
+                        </div>
+                        <div className={'flex'}>
+                            <span className={'text-xs min-w-10 font-bold'}>이름</span>
+                            <span className={'text-xs'}>{userinfo?.name}</span>
+                        </div>
+                        <div className={'flex'}>
+                            <span className={'text-xs min-w-10 font-bold'}>이메일</span>
+                            <span className={'text-xs'}>{userinfo?.email}</span>
+                        </div>
+                        <div className={'flex'}>
+                            <span className={'text-xs min-w-10 font-bold'}>포인트</span>
+                            <span className={'text-xs'}>{userinfo?.point}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    )
+}
+
 const CategoryItem = ({
     item, index, boardBaseUrl
 }:{
@@ -180,9 +254,9 @@ const CategoryItem = ({
     return (
         <Link key={'category-write-menu' + index}
               href={boardBaseUrl + item.id}
-              className={'py-2 w-full items-center gap-1 hover:bg-gray-100 duration-300'}
+              className={'p-2 w-full items-center gap-1 hover:bg-gray-200 duration-300'}
         >
-            <div className={'flex justify-between items-center b'}>
+            <div className={'flex justify-between items-center'}>
                   <span>
                     {item.name}
                   </span>
@@ -230,7 +304,7 @@ const CategorySelect = ({
     const CategoryList = useMemo(() => Category.list.map((item, index) => {
         return (
             <button key={'category-menu-selectbox' + index}
-                    className={'py-2 px-6 flex justify-between items-center border-solid border border-white focus:outline-none'}
+                    className={'py-2 px-6 flex justify-between bg-gray-100 items-center border-solid border border-gray-200 hover:bg-gray-200 focus:outline-none'}
                     onClick={() => selectHandler(item.id)}
             >
                 <span>{item.name}</span>
@@ -250,7 +324,7 @@ const CategorySelect = ({
         ].join(' ')}
              data-testid={'category-select'}
         >
-            <button className={['flex gap-3 w-full justify-between py-2 px-3 focus:outline-none'].join(' ')}
+            <button className={['flex gap-3 w-full justify-between p-2 bg-gray-200 focus:outline-none'].join(' ')}
                     onClick={onToggleHandler}
             >
                 <div />

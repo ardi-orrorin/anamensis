@@ -4,7 +4,6 @@ import {faPenToSquare, faRightFromBracket, faUserPlus} from "@fortawesome/free-s
 import {cookies} from "next/headers";
 import {faRightToBracket} from "@fortawesome/free-solid-svg-icons/faRightToBracket";
 import Image from "next/image";
-import apiCall from "@/app/{commons}/func/api";
 import {Root} from "@/app/{services}/types";
 import ScheduleAlert from "@/app/{components}/scheduleAlert";
 import React from "react";
@@ -47,7 +46,7 @@ const NavMain = async () => {
     ];
 
     return (
-        <nav className={'w-full p-1 flex justify-between items-center bg-main text-white h-12'}>
+        <nav className={'w-full min-w-full p-1 flex justify-between items-center bg-main text-white h-12'}>
             <div>
                 <Link className={'px-2 h-10 flex justify-center items-center hover:bg-blue-800 rounded duration-500'}
                       href={'/'}

@@ -21,7 +21,7 @@ export default function Layout({children}: {children: React.ReactNode & {test:'1
     },[isModalMode]);
 
     return (
-        <main className={'flex items-start min-h-screen h-full'}>
+        <main className={'flex items-start h-full min-h-max'}>
             <LeftNavBar {...{isOpen, setIsOpen, isModalMode, setIsModalMode}}/>
             <Contents {...{isOpen, setIsOpen, isModalMode}}>
                 {children}

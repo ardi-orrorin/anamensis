@@ -3,6 +3,7 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import React, {Dispatch, SetStateAction, useCallback, useEffect, useRef} from "react";
 import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons/faMagnifyingGlass";
 import {Root} from "@/app/{services}/types";
+import rootFunc from "@/app/{services}/funcs";
 
 const SearchHistory = ({
     searchHistory,
@@ -31,9 +32,7 @@ const SearchHistory = ({
 
     const removeSearchHistory = useCallback((keyword?: string) => {
         if(!keyword) return setSearchHistory({...searchHistory, history: []});
-        const newHistory = searchHistory.history.filter(key => key !== keyword);
-        setSearchHistory({...searchHistory, history: newHistory});
-        localStorage.setItem('searchHistory', JSON.stringify({...searchHistory, history: newHistory}));
+        rootFunc.removeSearchHistory({searchHistory, setSearchHistory, keyword});
     },[searchHistory]);
 
     const onChangeToggle = useCallback(() => {

@@ -6,7 +6,6 @@ import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import React from "react";
 
 const LoginState = () => {
-
     usePrefetchQuery(userApiService.profileImg());
     usePrefetchQuery(rootApiService.userRole());
     usePrefetchQuery(userInfoApiService.profile());

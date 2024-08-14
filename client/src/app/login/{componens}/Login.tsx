@@ -12,9 +12,12 @@ import {User} from "@/app/login/{services}/types";
 const Login = () => {
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
 
+    const isTest = process.env.NEXT_PUBLIC_TEST?.toLowerCase() === 'true';
+
+
     const {user, setUser} = useContext(LoginProvider);
 
-    const [isRecaptcha, setIsReCaptcha] = useState(true);
+    const [isRecaptcha, setIsReCaptcha] = useState(isTest);
 
     const [loading, setLoading] = useState(false);
 

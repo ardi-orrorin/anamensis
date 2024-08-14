@@ -189,13 +189,13 @@ export default function Page() {
         <SearchParamsProvider.Provider value={{
             searchParams, setSearchParams,
         }}>
-            <div className={'p-5 flex flex-col gap-10'}
+            <div className={'flex flex-col gap-2 bg-gray-50'}
                  onClick={()=> {
                      setOnSearchHistory(false)
                      setSearchFocus(false)
                  }}
             >
-                <div className={'sticky z-40 top-0 py-3 sm:px-10 md:px-20 lg:px-44 w-full flex flex-col rounded-full justify-center items-center gap-3'}>
+                <div className={'sticky z-40 top-0 py-3 sm:px-10 md:px-20 lg:px-44 w-full flex flex-col rounded-full justify-center items-center gap-3 '}>
                     <div className={[
                         'relative flex flex-col justify-center bg-white shadow-md duration-700 rounded-full',
                         searchFocus ? 'w-full sm:w-[70%]' : 'w-70 sm:w-[40%]',
@@ -214,64 +214,67 @@ export default function Page() {
                     </div>
                     <SearchInfo />
                 </div>
-
-                <div className={'fixed z-30 sm:hidden bottom-5 right-5'}>
-                    <button className={'w-14 h-14 p-5 rounded-full bg-white shadow-md active:bg-main active:text-white duration-300'}
-                            onClick={()=> setMenuToggle(!menuToggle)}
-                    >
-                        <FontAwesomeIcon icon={faBars} className={'h-auto'} />
-                    </button>
-                    <MobileMenu {...{menuToggle, setMenuToggle, isLogin, searchParams, setSearchParams}} />
-                </div>
-                <div className={'flex flex-row justify-start sm:justify-center'}>
-                    <div className={'hidden sm:block relative min-w-[300px]'}>
-                        <LeftMenu {...{searchParams, setSearchParams, roles}}/>
+                <div className={'w-full border-t border-solid border-t-gray-200'}>
+                    <div className={'fixed z-30 sm:hidden bottom-5 right-5'}>
+                        <button className={'w-14 h-14 p-5 rounded-full bg-white shadow-md active:bg-main active:text-white duration-300'}
+                                onClick={()=> setMenuToggle(!menuToggle)}
+                        >
+                            <FontAwesomeIcon icon={faBars} className={'h-auto'} />
+                        </button>
+                        <MobileMenu {...{menuToggle, setMenuToggle, isLogin, searchParams, setSearchParams}} />
                     </div>
-                    <div className={'w-[600px] flex flex-col justify-start items-center'}>
-                        <div className={'w-full flex flex-col gap-3'}>
-                            <div className={'w-full p-2 flex justify-between items-center text-sm border-b border-solid border-gray-400'}>
-                                <div className={'flex gap-1 items-center'}>
-                                    <FontAwesomeIcon icon={faCaretRight}
-                                                     className={['font-bold duration-500', viewNotice ? 'rotate-90' : 'rotate-0'].join(' ')}
-                                                     size={'lg'}
-                                    />
-                                    <button className={'outline-0'}
-                                            onClick={onChangeNotice}
-                                            data-testid={'notice-toggle'}
-                                    >
-                                        공지사항
-                                    </button>
+                    <div className={'flex flex-row justify-start'}>
+                        <div className={'hidden sm:block relative min-w-[250px] min-h-svh'}>
+                            <LeftMenu {...{searchParams, setSearchParams, roles}}/>
+                        </div>
+                        <div className={'w-full flex justify-center mt-5'}>
+                            <div className={'w-[600px] px-4 flex flex-col justify-start items-center'}>
+                                <div className={'w-full flex flex-col gap-3'}>
+                                    <div className={'w-full p-2 flex justify-between items-center text-sm border-b border-solid border-gray-400'}>
+                                        <div className={'flex gap-1 items-center'}>
+                                            <FontAwesomeIcon icon={faCaretRight}
+                                                             className={['font-bold duration-500', viewNotice ? 'rotate-90' : 'rotate-0'].join(' ')}
+                                                             size={'lg'}
+                                            />
+                                            <button className={'outline-0'}
+                                                    onClick={onChangeNotice}
+                                                    data-testid={'notice-toggle'}
+                                            >
+                                                공지사항
+                                            </button>
+                                        </div>
+
+                                        <button className={'outline-0'}
+                                                onClick={onChangeNotice}
+                                                data-testid={'notice-toggle-view'}
+                                        >
+                                            { viewNotice ? '접기' : '보기' }
+                                        </button>
+                                    </div>
+                                    <div className={['overflow-y-hidden duration-500',viewNotice ? 'max-h-80' : 'max-h-0'].join(' ')}>
+                                        <Notices data={noticeList} />
+                                    </div>
                                 </div>
 
-                                <button className={'outline-0'}
-                                        onClick={onChangeNotice}
-                                        data-testid={'notice-toggle-view'}
-                                >
-                                    { viewNotice ? '접기' : '보기' }
-                                </button>
+                                <div className={'w-full flex flex-wrap gap-2'}>
+                                    {
+                                        notFoundResult
+                                        && <div className={'text-center text-2xl w-full py-20 text-gray-600'}
+                                                data-testid={'not-found-result'}
+                                        >검색 결과가 없습니다.</div>
+                                    }
+                                    <Virtuoso style={{width: '100%', height: '100%', overflow: 'hidden'}}
+                                              totalCount={data.length}
+                                              data={data}
+                                              useWindowScroll
+                                              itemContent={(index, data) =>
+                                                  <div className={'py-1.5'}>
+                                                      <BoardComponent key={'boardsummary' + index} {...{...data, favorites, isLogin, roles}} />
+                                                  </div>
+                                              }
+                                    />
+                                </div>
                             </div>
-                            <div className={['overflow-y-hidden duration-500',viewNotice ? 'max-h-80' : 'max-h-0'].join(' ')}>
-                                <Notices data={noticeList} />
-                            </div>
-                        </div>
-
-                        <div className={'w-full flex flex-wrap gap-2'}>
-                            {
-                                notFoundResult
-                                && <div className={'text-center text-2xl w-full py-20 text-gray-600'}
-                                        data-testid={'not-found-result'}
-                                >검색 결과가 없습니다.</div>
-                            }
-                            <Virtuoso style={{width: '100%', height: '100%', overflow: 'hidden'}}
-                                      totalCount={data.length}
-                                      data={data}
-                                      useWindowScroll
-                                      itemContent={(index, data) =>
-                                          <div className={'py-1.5'}>
-                                              <BoardComponent key={'boardsummary' + index} {...{...data, favorites, isLogin, roles}} />
-                                          </div>
-                                      }
-                            />
                         </div>
                     </div>
                 </div>

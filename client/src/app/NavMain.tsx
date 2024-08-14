@@ -61,8 +61,8 @@ const NavMain = async () => {
                     />
                 </Link>
             </div>
-            <div className={'w-1/3 h-full'}>
-                <ul className={'flex h-full justify-end gap-2'}>
+            <div className={'w-full h-full flex justify-end'}>
+                <ul className={'flex w-full h-full justify-end gap-2'}>
                     {
                         isLogged
                         && <ScheduleAlert />

@@ -58,7 +58,9 @@ const SearchHistory = ({
              }}
         >
             <div className={'min-h-6'} />
-            <ul className={'flex flex-col gap-1 bg-white overflow-y-auto'}>
+            <ul className={'flex flex-col gap-1 bg-white overflow-y-auto'}
+                data-testid={'search-history-container'}
+            >
                 {
                     searchHistory.toggle
                     && searchHistory.history?.map((keyword, index) => {
@@ -107,9 +109,11 @@ const SearchHistory = ({
                          }}
                     />
                     <button onClick={e =>{
-                        e.stopPropagation();
-                        onChangeToggle();
-                    }}>
+                                e.stopPropagation();
+                                onChangeToggle();
+                            }}
+                            data-testid={'search-hisotry-toggle'}
+                    >
                         검색 기록
                     </button>
                 </div>

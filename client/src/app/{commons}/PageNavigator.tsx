@@ -49,21 +49,21 @@ const PageNavigator = ({
     return (
         <div className={'w-full flex justify-center gap-x-2 mt-6'}>
             {
-                page !== 1 &&
-                  <Link className={['border border-solid border-gray-300 rounded-md text-sm px-4 py-2 hover:bg-main hover:text-white duration-500'].join(' ')}
+                page !== 1
+                && <Link className={['border border-solid border-gray-300 rounded-md text-sm px-4 py-2 hover:bg-main hover:text-white duration-500'].join(' ')}
                         href={`?page=${skipPrevPage}&size=${size}`}
-                  >
+                >
                     <FontAwesomeIcon icon={faAnglesLeft} />
-                  </Link>
+                </Link>
             }
             { pages }
             {
-                page !== lastPage && lastPage !== 0 && total !== 0 &&
-                  <Link className={'border border-solid border-gray-300 rounded-md text-sm px-4 py-2 hover:bg-main hover:text-white duration-500'}
+                page !== lastPage && lastPage !== 0 && total !== 0
+                && <Link className={'border border-solid border-gray-300 rounded-md text-sm px-4 py-2 hover:bg-main hover:text-white duration-500'}
                         href={`?page=${skipNextPage}&size=${size}`}
-                  >
+                >
                     <FontAwesomeIcon icon={faAnglesRight} />
-                  </Link>
+                </Link>
             }
         </div>
     )

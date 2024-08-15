@@ -28,7 +28,6 @@ import Separator from "@/app/board/{components}/block/object/separator";
 import CalenderBlock from "@/app/board/{components}/block/extra/calenderBlock";
 import EventBlock from "@/app/board/{components}/block/extra/eventBlock";
 
-
 export type BlockType = {
     type          : 'text' | 'object' | 'extra' | 'subExtra';
     code          : string;                              // 식별 코드 5자리
@@ -65,7 +64,6 @@ const blockTypeList: ReadonlyArray<BlockComponentType> = [
             letterSpacing : '0.03rem',
             padding       : '0.5rem',
         }),
-
     },
     {
         code              : '00002',

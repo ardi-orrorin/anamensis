@@ -107,8 +107,8 @@ const LeftNavBar = ({
 
     return (
         <>
-        <nav className={['sticky top-0 flex flex-col min-h-screen z-30 bg-main py-2 duration-500'
-            , isOpen || !isModalMode  ? 'translate-x-0 shadow-outset-lg' : 'translate-x-[-1000px]'
+        <nav className={['top-0 flex flex-col min-h-screen z-30 bg-main py-2 duration-500'
+            , isOpen || !isModalMode  ? 'sticky translate-x-0 shadow-outset-lg' : 'translate-x-[-1000px]'
             , isModalMode ? 'fixed w-[220px]': 'w-[40px] sm:min-w-[200px]'
         ].join(' ')}
              data-testid={'left-nav-bar-container'}

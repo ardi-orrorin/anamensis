@@ -1,6 +1,5 @@
 'use client';
 
-import Block from "@/app/board/{components}/Block";
 import {ChangeEvent, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import {HtmlElements} from "@/app/board/{components}/block/type/Types";
 import {BlockI, BoardI, Category} from "@/app/board/{services}/types";
@@ -36,12 +35,18 @@ import TemplateMenu from "@/app/board/[id]/{components}/templateMenu";
 import ModalProvider from "@/app/user/board-block/{services}/modalProvider";
 import BoardblockModal from "@/app/board/[id]/{components}/boardblockModal";
 import {AxiosError} from "axios";
+import dynamic from "next/dynamic";
 
 export interface RateInfoI {
     id      : number;
     count   : number;
     status  : boolean;
 }
+
+
+const DynamicBlock = dynamic(() => import('@/app/board/{components}/Block'), {
+    loading: () => <div className={'h-[25] flex items-center'} />,
+});
 
 // fixme: 뒤로가기 등 강제 이동시 파일 삭제 처리 안됨
 export default function Page({params}: {params : {id: string}}) {
@@ -490,7 +495,7 @@ export default function Page({params}: {params : {id: string}}) {
                 <div className={['flex flex-col', board.isView ? 'gap-2' : 'gap-4'].join(' ')}>
                     {
                         board.data?.content?.list.map((item, index) =>
-                            <Block key={'block' + index}
+                            <DynamicBlock key={'block' + index}
                                    blockRef={blockRef}
                                    onChangeHandler={e => {
                                        onChangeHandler(e, item.seq)

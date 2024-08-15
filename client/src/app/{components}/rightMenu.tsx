@@ -34,7 +34,9 @@ const SearchHistory = ({
     onSearchHandler    : (init: boolean, keyword?: string) => void;
 }) => {
     return (
-        <div className={'flex flex-col gap-2'}>
+        <div className={'flex flex-col gap-2'}
+             data-testid={'right-menu-search-history-container'}
+        >
             <h4 className={'text-sm font-bold'}>최근 검색 내역</h4>
             <div className={'flex flex-wrap items-center gap-2'}>
                 {

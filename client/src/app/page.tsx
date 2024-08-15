@@ -4,12 +4,10 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
 import BoardComponent from "@/app/{components}/boardComponent";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import LeftMenu from "@/app/{components}/leftMenu";
 import MobileMenu from "@/app/{components}/mobileMenu";
 import SearchParamsProvider from "@/app/{services}/SearchParamsProvider";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useRootHotKey} from "@/app/{hooks}/hotKey";
-import Notices from "@/app/{components}/boards/notices";
 import SearchInfo from "@/app/{components}/searchInfo";
 import {faBars, faCaretRight} from "@fortawesome/free-solid-svg-icons";
 import {Virtuoso} from "react-virtuoso";
@@ -21,10 +19,14 @@ import {Common} from "@/app/{commons}/types/commons";
 import {System} from "@/app/user/system/{services}/types";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 import rootApiService from "@/app/{services}/rootApiService";
-import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
-import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
-import rootFunc from "@/app/{services}/funcs";
+import dynamic from "next/dynamic";
+import LeftMenu from "@/app/{components}/leftMenu";
+import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import RightMenu from "@/app/{components}/rightMenu";
+
+const DynamicNotice = dynamic(() => import('@/app/{components}/boards/notices'), {
+    loading: () => <div className={'w-full h-[300px] flex justify-center items-center'}><LoadingSpinner size={50}/></div>,
+    });
 
 export default function Page() {
 
@@ -254,7 +256,7 @@ export default function Page() {
                                         </button>
                                     </div>
                                     <div className={['overflow-y-hidden duration-500',viewNotice ? 'max-h-80' : 'max-h-0'].join(' ')}>
-                                        <Notices data={noticeList} />
+                                        <DynamicNotice data={noticeList} />
                                     </div>
                                 </div>
                                 <div className={'w-full flex flex-wrap gap-2'}>

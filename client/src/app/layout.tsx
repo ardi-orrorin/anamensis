@@ -5,8 +5,6 @@ import Error from "@/app/error";
 import {Metadata, Viewport} from "next";
 import Script from "next/script";
 import Footer from "@/app/{components}/mainFooter";
-import {Suspense} from "react";
-import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 import ProgressBar from "@/app/{components}/progressBar";
 import Providers from "@/app/Provider";
 import {cookies} from "next/headers";
@@ -70,16 +68,14 @@ export default function RootLayout({
             }} />
             <body className={'flex flex-col'}>
             <Providers>
-                {isLogin && <LoginState />}
+                { isLogin && <LoginState /> }
                 <ProgressBar />
-                <Suspense fallback={<GlobalLoadingSpinner />}>
-                    <NavMain />
-                    <ErrorBoundary errorComponent={Error}>
-                        <main className={'min-h-screen'}>
-                            {children}
-                        </main>
-                    </ErrorBoundary>
-                    </Suspense>
+                <NavMain />
+                <ErrorBoundary errorComponent={Error}>
+                    <main className={'min-h-screen'}>
+                        {children}
+                    </main>
+                </ErrorBoundary>
                 <Footer />
             </Providers>
             </body>

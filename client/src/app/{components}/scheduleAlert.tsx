@@ -38,8 +38,9 @@ const ScheduleAlert = () => {
 
             setToggle(false);
 
-            await refetch();
             router.push(`/board/${sch.boardId}#block-${sch.hashId}`);
+
+            await refetch();
         } catch (e) {
             const err = e as AxiosError;
             console.error(e);

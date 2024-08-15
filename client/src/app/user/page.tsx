@@ -41,14 +41,15 @@ export default function Page() {
                 ))
     ,[windowList])
 
-    const toggle = useMemo(()=>
-        windowList.filter(e => !e.open).length > 0
-            ? <button className={'w-[50px] h-10 bg-main text-white rounded'} onClick={()=> windowToggle(true)}>
-                <FontAwesomeIcon icon={faWindowRestore} />
-            </button>
-            : <button className={'w-[50px] h-10 bg-main text-white rounded'} onClick={()=> windowToggle(false)}>
-                <FontAwesomeIcon icon={faWindowMinimize} />
-            </button>
+    const minimizedSize = useMemo(() => windowList.filter(e => !e.open).length > 0, [windowList]);
+
+    const toggle = useMemo(() =>
+        <button className={'w-[50px] h-10 bg-main text-white rounded'}
+                onClick={()=> windowToggle(minimizedSize)}
+                data-testid={'toggle-window'}
+        >
+            <FontAwesomeIcon icon={minimizedSize ? faWindowRestore : faWindowMinimize} />
+        </button>
     ,[windowList]);
 
     const maximizeWindows = useMemo(() =>
@@ -62,7 +63,9 @@ export default function Page() {
 
     return (
         <main className={'flex flex-col gap-3'}>
-            <div className={'flex gap-4 flex-wrap duration-300'}>
+            <div className={'flex gap-4 flex-wrap duration-300'}
+                 data-testid={'minimize-window'}
+            >
                 { minimizeWindows }
                 { toggle }
             </div>

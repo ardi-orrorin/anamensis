@@ -8,6 +8,8 @@ import moment from "moment";
 import Link from "next/link";
 import {User} from "@/app/login/{services}/types";
 import {UserInfoSpace} from "@/app/user/info/{services}/types";
+import {useQuery} from "@tanstack/react-query";
+import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 
 export const UserInfo = ({profileInfo}: {profileInfo: User.UserInfo}) => {
 
@@ -16,6 +18,8 @@ export const UserInfo = ({profileInfo}: {profileInfo: User.UserInfo}) => {
     const [loading, setLoading] = useState({} as UserInfoSpace.Loading);
 
     const debounce = createDebounce(500);
+
+
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setProfile({...profile, [e.target.name]: e.target.value})

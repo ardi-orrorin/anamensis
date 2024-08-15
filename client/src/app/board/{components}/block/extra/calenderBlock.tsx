@@ -27,7 +27,6 @@ const CalenderBlock = (props: ExpendBlockProps) => {
     const { board, setBoard } = useContext(BoardProvider);
 
     const [more, setMore] = useState<boolean>(true);
-    const [viewCalender, setViewCalender] = useState<boolean>(true);
 
     const setTimer = useRef<NodeJS.Timeout>();
 
@@ -76,17 +75,6 @@ const CalenderBlock = (props: ExpendBlockProps) => {
         }, 0);
     },[board]);
 
-    const onChangeView = useCallback(()=> {
-        setMore(!more)
-        if(more) {
-            setTimer.current = setTimeout(() => {
-                setViewCalender(!viewCalender)
-            }, 600)
-        } else {
-            setViewCalender(!viewCalender)
-        }
-    },[isView, viewCalender]);
-
     const onChangeEvent = useCallback((event: EventChangeArg) => {
         const timeFormat = event.event.allDay ? 'YYYY-MM-DD' : 'YYYY-MM-DDTHH:mm';
 
@@ -114,8 +102,8 @@ const CalenderBlock = (props: ExpendBlockProps) => {
     return (
         <div id={`block-${hash}`}
              className={[
-                 'w-full flex flex-col justify-start overflow-y-hidden duration-700',
-                 more ? 'max-h-[1000px] gap-4' : 'max-h-8',
+                 'w-full flex flex-col justify-start',
+
              ].join(' ')}
              aria-roledescription={type}
              ref={el => {
@@ -123,24 +111,26 @@ const CalenderBlock = (props: ExpendBlockProps) => {
                  blockRef!.current[props.seq] = el
              }}
         >
-            {
-                viewCalender
-                && <FullCalendar editable={!isView}
-                                 selectable={!isView}
-                                 {...{headerToolbar, plugins, events, ...options}}
-                                 select={addEvent}
-                                 eventClick={(click) => {
-                                    router.push(`#block-${click.event.id}`)
-                                 }}
-                                 eventRemove={(remove) => {
-                                     console.log(remove)
-                                 }}
-                                 eventChange={onChangeEvent}
+            <div className={[
+                'overflow-y-hidden duration-700',
+                more ? 'max-h-[1000px] gap-4' : 'max-h-10',
+            ].join(' ')}>
+                <FullCalendar editable={!isView}
+                              selectable={!isView}
+                              {...{headerToolbar, plugins, events, ...options}}
+                              select={addEvent}
+                              eventClick={(click) => {
+                                  router.push(`#block-${click.event.id}`)
+                              }}
+                              eventRemove={(remove) => {
+                                  console.log(remove)
+                              }}
+                              eventChange={onChangeEvent}
                 />
-            }
+            </div>
             <div className={'w-full h-8 flex flex-col items-center justify-center'}>
                 <button className={'w-40 h-full bg-white rounded-md text-sm text-gray-500'}
-                        onClick={onChangeView}>
+                        onClick={() => setMore(!more)}>
                      캘린더 { more ? '접기' : '더보기' }
                 </button>
             </div>

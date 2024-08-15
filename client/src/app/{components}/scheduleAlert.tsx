@@ -7,23 +7,15 @@ import {faBell} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import moment from "moment/moment";
 import {useRouter} from "next/navigation";
+import {AxiosError} from "axios";
+import {useQuery, useQueryClient} from "@tanstack/react-query";
+import rootApiService from "@/app/{services}/rootApiService";
 
 const ScheduleAlert = () => {
 
-    const [alert, setAlert] = useState<Root.ScheduleAlert[]>([]);
+    const {data: alert, refetch} = useQuery(rootApiService.scheduleAlert());
     const [toggle ,setToggle] = useState<boolean>(false);
     const router = useRouter();
-
-    useEffect(()=>{
-        apiCall<Root.ScheduleAlert[]>({
-            method: 'GET',
-            path: '/api/schedule/alert',
-            isReturnData: true
-        })
-        .then(res => {
-            setAlert(res);
-        });
-    },[]);
 
     const alertText = useCallback((alertTime: string)=> {
         const prevSecond = moment().diff(moment(alertTime), 'seconds');
@@ -38,18 +30,20 @@ const ScheduleAlert = () => {
     },[])
 
     const onClickAlert = useCallback(async (sch: Root.ScheduleAlert) => {
-        apiCall({
-            method: 'GET',
-            path: `/api/schedule/alert/${sch.id}`,
-        })
-        .then((_) => {
+        try {
+            await apiCall({
+                method: 'GET',
+                path: `/api/schedule/alert/${sch.id}`,
+            })
+
             setToggle(false);
-        });
 
-        router.push(`/board/${sch.boardId}#block-${sch.hashId}`);
-
-        const list = alert.filter(v => v.id !== sch.id);
-        setAlert(list);
+            await refetch();
+            router.push(`/board/${sch.boardId}#block-${sch.hashId}`);
+        } catch (e) {
+            const err = e as AxiosError;
+            console.error(e);
+        }
 
     },[alert]);
 
@@ -64,42 +58,49 @@ const ScheduleAlert = () => {
                 </span>
             </button>
             <div className={[
-                'absolute z-50 top-12 w-60 flex flex-col duration-300 bg-white overflow-y-auto text-xs border-solid border-y-amber-500 rounded shadow-md',
-                toggle ? 'max-h-60 border-y-2' : 'max-h-0 '
+                'absolute z-50 top-12 w-80 flex flex-col bg-white  text-xs border-solid border-y-main rounded shadow-md overflow-y-auto',
+                toggle ? 'border-y-2' : 'border-y-0'
             ].join(' ')}>
-                {
-                    alert.length === 0
-                    && <button className={'w-full min-h-9 px-2 flex justify-center items-center gap-1 text-black border-y border-solid border-gray-400'}
-                               onClick={() => setToggle(!toggle)}
-                    >
+                <div className={[
+                    ' duration-300',
+                    toggle ? 'max-h-60' : 'max-h-0 '
+                ].join(' ')}>
+                    {
+                        alert.length === 0
+                        && <button className={'w-full min-h-9 px-2 flex justify-center items-center gap-1 text-black border-y border-solid border-gray-400'}
+                                   onClick={() => setToggle(!toggle)}
+                      >
                         알림이 없습니다.
-                    </button>
-                }
-                {
-                    alert.length > 0
-                    && alert.map((sch,i)=> (
-                        <button key={'schAlert'+ i}
-                                className={'w-full min-h-9 px-2 flex justify-between items-center gap-1 text-black hover:bg-yellow-400 hover:text-white duration-300'}
-                                onClick={() => onClickAlert(sch)}
-                        >
-                            <div className={'flex gap-1'}>
-                                <span>
+                      </button>
+                    }
+                    {
+                        alert.length > 0
+                        && alert.map((sch,i)=> (
+                            <button key={'schAlert'+ i}
+                                    className={'w-full min-h-9 p-2 flex flex-col justify-center items-start gap-1 text-black hover:bg-blue-400 hover:text-white duration-300'}
+                                    onClick={() => onClickAlert(sch)}
+                            >
+                                <div className={'w-full flex justify-start'}>
+                                <span className={'line-clamp-1'}>
                                     {sch.title}
-                                </span>
-                                <div className={'flex'}>
-                                    <span>(</span>
-                                    <span className={'max-w-32 line-clamp-1'}>
+                               </span>
+                                </div>
+                                <div className={'w-full flex justify-between gap-1'}>
+                                    <div className={'flex'}>
+                                        <span>(</span>
+                                        <span className={'max-w-32 line-clamp-1'}>
                                         {sch.BoardTitle}
                                     </span>
-                                    <span>)</span>
+                                        <span>)</span>
+                                    </div>
+                                    <span>
+                                    {alertText(sch.alertTime)}
+                                </span>
                                 </div>
-                            </div>
-                            <span>
-                                {alertText(sch.alertTime)}
-                            </span>
-                        </button>
-                   ))
-                }
+                            </button>
+                        ))
+                    }
+                </div>
             </div>
             {
                 toggle

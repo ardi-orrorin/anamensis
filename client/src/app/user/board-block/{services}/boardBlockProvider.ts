@@ -6,9 +6,9 @@ export interface BoardBlockProviderI {
     boardBlock: BoardBlocking.BoardBlock;
     setBoardBlock: React.Dispatch<React.SetStateAction<BoardBlocking.BoardBlock>>;
     boardBlockHistories: BoardBlocking.BoardBlockHistories[];
-    setBoardBlockHistories: React.Dispatch<React.SetStateAction<BoardBlocking.BoardBlockHistories[]>>;
+    // setBoardBlockHistories: React.Dispatch<React.SetStateAction<BoardBlocking.BoardBlockHistories[]>>;
     page: Common.PageI;
-    setPage: React.Dispatch<React.SetStateAction<Common.PageI>>;
+    // setPage: React.Dispatch<React.SetStateAction<Common.PageI>>;
 }
 
 const BoardBlockProvider = createContext({} as BoardBlockProviderI);

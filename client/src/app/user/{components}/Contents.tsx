@@ -21,25 +21,20 @@ const Contents = ({
         setIsOpen(!isOpen);
     },[isOpen]);
 
-
     return (
         <section className={'w-full h-full flex flex-col border-s border-solid border-gray-200 p-4'}>
             <div className={'w-full flex items-start h-12'}>
                 {
                     isModalMode
                     && <div className={['w-1/3 flex'].join(' ')}>
-                    <button className={[isOpen ? 'hidden' : ''].join(' ')} onClick={openToggle}>
-                      <FontAwesomeIcon icon={faBars} />
-                    </button>
-                  </div>
+                        <button className={[isOpen ? 'hidden' : ''].join(' ')} onClick={openToggle}
+                                data-testid={'open-toggle'}
+                        >
+                          <FontAwesomeIcon icon={faBars} />
+                        </button>
+                    </div>
                 }
 
-                {/*<div className={'w-1/3 flex justify-center text-lg'}>*/}
-                    {/*<h1>로그인</h1>*/}
-                {/*</div>*/}
-                {/*<div className={'w-1/3 flex justify-end'}>*/}
-                    {/*경로*/}
-                {/*</div>*/}
             </div>
             <div className={'h-full'}>
                 <Suspense fallback={<GlobalLoadingSpinner />}>

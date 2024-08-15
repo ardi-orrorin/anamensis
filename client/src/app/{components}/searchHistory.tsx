@@ -3,6 +3,7 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import React, {Dispatch, SetStateAction, useCallback, useEffect, useRef} from "react";
 import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons/faMagnifyingGlass";
 import {Root} from "@/app/{services}/types";
+import rootFunc from "@/app/{services}/funcs";
 
 const SearchHistory = ({
     searchHistory,
@@ -31,9 +32,7 @@ const SearchHistory = ({
 
     const removeSearchHistory = useCallback((keyword?: string) => {
         if(!keyword) return setSearchHistory({...searchHistory, history: []});
-        const newHistory = searchHistory.history.filter(key => key !== keyword);
-        setSearchHistory({...searchHistory, history: newHistory});
-        localStorage.setItem('searchHistory', JSON.stringify(newHistory));
+        rootFunc.removeSearchHistory({searchHistory, setSearchHistory, keyword});
     },[searchHistory]);
 
     const onChangeToggle = useCallback(() => {
@@ -45,7 +44,7 @@ const SearchHistory = ({
     return (
         <div className={[
              'absolute top-5 z-20 w-full flex flex-col bg-white rounded-b-3xl shadow-md duration-700 overflow-y-hidden',
-             onSearchHistory && searchHistory.history.length > 0 ? 'max-h-80' : 'max-h-0',
+             onSearchHistory && searchHistory?.history?.length > 0 ? 'max-h-80' : 'max-h-0',
         ].join(' ')}
             onMouseEnter={()=> {
                 clearTimeout(timeout.current);
@@ -57,8 +56,10 @@ const SearchHistory = ({
                 }, 500);
              }}
         >
-            <div className={'h-10'} />
-            <ul className={'flex flex-col gap-1 bg-white overflow-y-auto'}>
+            <div className={'min-h-6'} />
+            <ul className={'flex flex-col gap-1 bg-white overflow-y-auto'}
+                data-testid={'search-history-container'}
+            >
                 {
                     searchHistory.toggle
                     && searchHistory.history?.map((keyword, index) => {
@@ -76,7 +77,7 @@ const SearchHistory = ({
                                 >
                                     {keyword}
                                 </button>
-                                <button className={'min-w-10 h-auto flex justify-center items-center bg-gray-100 rounded-md'}
+                                <button className={'min-w-10 h-6 flex justify-center items-center bg-gray-100 rounded-md'}
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             removeSearchHistory(keyword);
@@ -107,9 +108,11 @@ const SearchHistory = ({
                          }}
                     />
                     <button onClick={e =>{
-                        e.stopPropagation();
-                        onChangeToggle();
-                    }}>
+                                e.stopPropagation();
+                                onChangeToggle();
+                            }}
+                            data-testid={'search-hisotry-toggle'}
+                    >
                         검색 기록
                     </button>
                 </div>

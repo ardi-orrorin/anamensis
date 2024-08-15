@@ -8,6 +8,9 @@ import Footer from "@/app/{components}/mainFooter";
 import {Suspense} from "react";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";
 import ProgressBar from "@/app/{components}/progressBar";
+import Providers from "@/app/Provider";
+import {cookies} from "next/headers";
+import LoginState from "@/app/loginState";
 
 export const metadata: Metadata = {
     title: 'anamensis',
@@ -49,6 +52,8 @@ export default function RootLayout({
 
     const gId = process.env.NEXT_PUBLIC_GID;
 
+    const isLogin = (cookies()?.get('next.access.token')  || cookies()?.get('next.refresh.token')) !== undefined;
+
     return (
         <html lang="ko">
             <Script id={'google-analytics'} async
@@ -64,16 +69,19 @@ export default function RootLayout({
                 `
             }} />
             <body className={'flex flex-col'}>
+            <Providers>
+                {isLogin && <LoginState />}
                 <ProgressBar />
                 <Suspense fallback={<GlobalLoadingSpinner />}>
                     <NavMain />
-                    <div className={'min-h-screen h-full'}>
-                        <ErrorBoundary errorComponent={Error}>
+                    <ErrorBoundary errorComponent={Error}>
+                        <main className={'min-h-screen'}>
                             {children}
-                        </ErrorBoundary>
-                    </div>
-                </Suspense>
+                        </main>
+                    </ErrorBoundary>
+                    </Suspense>
                 <Footer />
+            </Providers>
             </body>
         </html>
     )

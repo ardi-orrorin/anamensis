@@ -50,7 +50,7 @@ const BoardComponent = (props: Root.BoardListI & {favorites: string[], isLogin: 
     ,[]);
 
     const notAdminBlocked = useMemo(() =>
-        isBlocked && !roles.includes(System.Role.ADMIN)
+        isBlocked && !roles?.includes(System.Role.ADMIN)
     ,[isBlocked, roles]);
 
     return (

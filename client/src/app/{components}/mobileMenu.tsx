@@ -120,13 +120,13 @@ const MobileMenu = ({
                                     )
                                 })
                             }
-                          <Link href={`/board/temp`}
-                                className={[
+                            <Link href={`/board/temp`}
+                                  className={[
                                     'py-2 w-full text-sm text-center border border-solid border-gray-100 hover:bg-gray-100 duration-300',
-                                ].join(' ')}
-                          >
-                            새 탬플릿 추가
-                          </Link>
+                                 ].join(' ')}
+                            >
+                                새 탬플릿 추가
+                            </Link>
                         </div>
                      </>
                 }

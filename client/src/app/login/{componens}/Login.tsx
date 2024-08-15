@@ -12,9 +12,12 @@ import {User} from "@/app/login/{services}/types";
 const Login = () => {
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
 
+    const isTest = process.env.NEXT_PUBLIC_TEST?.toLowerCase() === 'true';
+
+
     const {user, setUser} = useContext(LoginProvider);
 
-    const [isRecaptcha, setIsReCaptcha] = useState(false);
+    const [isRecaptcha, setIsReCaptcha] = useState(isTest);
 
     const [loading, setLoading] = useState(false);
 
@@ -114,6 +117,7 @@ const Login = () => {
                   {
                     error.use &&
                     <span className={'text-xs text-red-500 my-2 px-2'}
+                          data-testid={'error-message'}
                     >
                         <FontAwesomeIcon height={12} icon={faExclamation}/>
                         &nbsp; {error.message}
@@ -126,6 +130,7 @@ const Login = () => {
                         disabled={!isNext || loading || !isRecaptcha}
                         onSubmit={goLogin}
                         onClick={goLogin}
+                        data-testid={'login'}
                     >{
                         loading ?
                             <LoadingSpinner size={12}/> :

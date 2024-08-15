@@ -30,12 +30,20 @@ const Row = (props: SignUp.RowProps) => {
             {
                 check[name] !== 'uncheck'
                 && <span className={['flex flex-col justify-center w-5 ms-2', inputCheck(check[name])].join(' ')}
-                ><FontAwesomeIcon icon={faCheck}/>
+                         data-testid={`${name}-check`}
+                >
+                    <FontAwesomeIcon icon={faCheck}/>
                 </span>
             }
             {
                 description
-                && <span className={['absolute z-10 left-2 -bottom-5 w-50 duration-300 text-xs bg-blue-400 text-white rounded p-2', isFocus ? 'flex items-center' : 'hidden '].join(' ')}>
+                && check[name] === 'check'
+                && <span className={[
+                            'absolute z-10 left-2 -bottom-5 w-50 duration-300 text-xs bg-blue-400 text-white rounded p-2',
+                            isFocus ? 'flex items-center' : 'hidden '
+                        ].join(' ')}
+                         data-testid={`${name}-description`}
+                >
                     {description}
                 </span>
             }

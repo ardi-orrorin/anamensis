@@ -22,7 +22,9 @@ const SearchInfo = () => {
     ,[searchParams.categoryPk])
 
     return (
-        <div className={'flex gap-2'}>
+        <div className={'flex gap-2'}
+             data-testid={'search-info'}
+        >
             {
                 searchParams.isSelf
                 && <DisabledBtn {...{name: '내 글 보기', type: 'isSelf', onChangeSearchHandler}} />
@@ -53,7 +55,7 @@ const DisabledBtn =  ({
         <button className={'px-3 py-1.5 rounded text-xs2 border border-solid border-blue-600 text-blue-600 bg-white hover:bg-blue-600 hover:text-white'}
                 onClick={()=> onChangeSearchHandler(type)}
         >
-            {name} X
+            {`${name} X`}
         </button>
     )
 }

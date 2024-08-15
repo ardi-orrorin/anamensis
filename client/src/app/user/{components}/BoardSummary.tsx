@@ -7,31 +7,20 @@ import UserProvider, {BoardSummaryI} from "@/app/user/{services}/userProvider";
 import moment from "moment";
 import useSWR, {preload} from "swr";
 import apiCall from "@/app/{commons}/func/api";
-
+import {useQuery} from "@tanstack/react-query";
+import userApiService from "@/app/user/{services}/userApiService";
 
 const BoardSummary = () => {
 
-    const {boardSummary, setBoardSummary} = useContext(UserProvider);
-
-    useSWR('/api/board/summary', async () => {
-        return await apiCall<BoardSummaryI[]>({
-            path: "/api/board/summary",
-            params: {page:1, size: 8},
-            method: "GET",
-            isReturnData: true
-        })
-        .then((data) => {
-            setBoardSummary(data);
-        });
-    },{
-        revalidateOnFocus: false
-    })
+    const {data: boardSummary} = useQuery(userApiService.boardSummery());
 
     return (
         <div className={'w-full h-max flex justify-center items-start overflow-y-hidden'}>
             <div className={'w-full flex flex-col text-sm'}>
                 {
-                    boardSummary.map((e, i) => {
+                    boardSummary
+                    && boardSummary?.length > 0
+                    && boardSummary?.map((e, i) => {
                         return (
                             <Link key={`summary-${i}`}
                                   href={`/board/${e.id}`}

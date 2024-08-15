@@ -4,22 +4,15 @@ import {faPenToSquare, faRightFromBracket, faUserPlus} from "@fortawesome/free-s
 import {cookies} from "next/headers";
 import {faRightToBracket} from "@fortawesome/free-solid-svg-icons/faRightToBracket";
 import Image from "next/image";
-import apiCall from "@/app/{commons}/func/api";
 import {Root} from "@/app/{services}/types";
 import ScheduleAlert from "@/app/{components}/scheduleAlert";
+import React from "react";
+import CustomImage from "@/app/{components}/customImage";
 
 
 const NavMain = async () => {
 
     const isLogged = (cookies()?.get('next.access.token')  || cookies()?.get('next.refresh.token')) !== undefined;
-
-    const profileImg = isLogged && await apiCall<string>({
-        path: '/api/user/profile-img',
-        method: 'GET',
-        call: 'Server',
-        setAuthorization: true,
-        isReturnData: true,
-    });
 
     const rightMenuItems : Root.NavItemProps[] = [
         {
@@ -53,7 +46,7 @@ const NavMain = async () => {
     ];
 
     return (
-        <nav className={'w-full p-1 flex justify-between items-center bg-main text-white h-12'}>
+        <nav className={'w-full min-w-full p-1 flex justify-between items-center bg-main text-white h-12'}>
             <div>
                 <Link className={'px-2 h-10 flex justify-center items-center hover:bg-blue-800 rounded duration-500'}
                       href={'/'}
@@ -67,8 +60,8 @@ const NavMain = async () => {
                     />
                 </Link>
             </div>
-            <div className={'w-1/3 h-full'}>
-                <ul className={'flex h-full justify-end gap-2'}>
+            <div className={'w-full h-full flex justify-end'}>
+                <ul className={'flex w-full h-full justify-end gap-2'}>
                     {
                         isLogged
                         && <ScheduleAlert />
@@ -88,12 +81,7 @@ const NavMain = async () => {
                         <Link href={'/user'}
                               title={'프로필'}
                         >
-                          <Image className={'rounded'}
-                                 src={process.env.NEXT_PUBLIC_CDN_SERVER + profileImg}
-                                 alt={''}
-                                 width={30}
-                                 height={30}
-                          />
+                          <CustomImage />
                         </Link>
                       </div>
                     }

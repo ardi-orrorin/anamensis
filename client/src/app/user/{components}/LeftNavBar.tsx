@@ -13,16 +13,18 @@ import {
     faRectangleList,
     faUserGear,
 } from "@fortawesome/free-solid-svg-icons";
-import React, {useCallback, useContext, useEffect, useMemo} from "react";
+import React, {useCallback, useMemo} from "react";
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import {faTableList} from "@fortawesome/free-solid-svg-icons/faTableList";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
-import useSWR from "swr";
-import apiCall from "@/app/{commons}/func/api";
-import UserProvider from "@/app/user/{services}/userProvider";
 import Image from "next/image";
-import {NO_IMAGE} from "@/app/{services}/constants";
+import {NO_IMAGE, NO_PROFILE} from "@/app/{services}/constants";
 import {System} from "@/app/user/system/{services}/types";
+import {usePrefetchQuery, useQueries, useQuery} from "@tanstack/react-query";
+import rootApiService from "@/app/{services}/rootApiService";
+import userApiService from "@/app/user/{services}/userApiService";
+import emailApiService from "@/app/user/email/{services}/emailApiService";
+import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 
 type MenuItemType = {
     name: string,
@@ -43,42 +45,23 @@ const LeftNavBar = ({
     setIsModalMode: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
 
-    const { roles, setRoles, profileImg, setProfileImg } = useContext(UserProvider);
-    const isOAuthUser = useMemo(() => roles.find(role => role === System.Role.OAUTH), [roles]);
+    usePrefetchQuery(emailApiService.userInfo());
+    usePrefetchQuery(userInfoApiService.profile());
+
+
+    const {data: roles} = useQuery(rootApiService.userRole());
+    const {data: profileImg} = useQuery(userApiService.profileImg());
+
+    const isOAuthUser = useMemo(() =>
+            roles && (roles as System.Role[])?.find(role =>
+            role === System.Role.OAUTH)
+        , [roles]);
 
     const iconSize = 16;
     const menuItems: MenuItemType[] = [
         {name: 'SYSTEM', href:'/user/system', icon: faGear, role: System.Role.ADMIN},
         {name: '권한관리', href:'/user/users-role', icon: faUserGear, role: System.Role.MASTER},
     ]
-
-    useEffect(()=> {
-        if(profileImg) return;
-
-        apiCall<string>({
-            path: '/api/user/info/profile-img',
-            method: 'GET',
-            isReturnData: true,
-        })
-        .then(res => {
-            setProfileImg(res);
-        });
-    },[])
-
-    useSWR('/user/navBar', async () => {
-        await apiCall({
-            path: '/api/user/roles',
-            method: 'GET',
-        })
-        .then(res => {
-            const roles = res.headers['next.user.roles'] || ''
-            if(roles) {
-                setRoles(JSON.parse(res.headers['next.user.roles']));
-            }
-        });
-    },{
-        revalidateOnFocus: false
-    });
 
     const openToggle = useCallback(() => {
         bodyScrollToggle(false, false);
@@ -87,6 +70,11 @@ const LeftNavBar = ({
         localStorage.setItem('isModalMode', JSON.stringify(!isModalMode));
     },[isModalMode, isOpen]);
 
+    const closeToggle = useCallback(() => {
+        bodyScrollToggle(false, true);
+        setIsOpen(false);
+        localStorage.setItem('isModalMode', JSON.stringify(false));
+    },[isModalMode, isOpen]);
 
     const onChangeDisabledHandler = useCallback(() => {
         bodyScrollToggle(false, true);
@@ -95,7 +83,7 @@ const LeftNavBar = ({
 
     const roleMenu = useMemo(()=>
         menuItems.map((item, index) => {
-            if(!item.role || !roles.find(role => role === item.role)) {
+            if(!item.role || !(roles as System.Role[])?.find(role => role === item.role)) {
                 return null;
             }
 
@@ -117,30 +105,41 @@ const LeftNavBar = ({
         })
     , [menuItems, roles]);
 
-    if(roles.length === 0) return <></>
-
     return (
         <>
-        <nav className={['z-30 min-h-dvh bg-main py-2 duration-500'
+        <nav className={['sticky top-0 flex flex-col min-h-screen z-30 bg-main py-2 duration-500'
             , isOpen || !isModalMode  ? 'translate-x-0 shadow-outset-lg' : 'translate-x-[-1000px]'
             , isModalMode ? 'fixed w-[220px]': 'w-[40px] sm:min-w-[200px]'
-        ].join(' ')}>
+        ].join(' ')}
+             data-testid={'left-nav-bar-container'}
+        >
             <div className={[
-                'flex justify-between',
+                'flex justify-between h-full',
                 isModalMode ? 'gap-0 px-5': 'flex-col sm:flex-row px-0 gap-4 sm:gap-0 sm:px-5 py-2'
             ].join(' ')}>
-                <button onClick={openToggle} className={'text-white'}>
+                <button onClick={openToggle}
+                        className={'text-white'}
+                        data-testid={'fixed-toggle'}
+                >
                     {
                         isModalMode
                         ? <FontAwesomeIcon icon={faRectangleList} />
                         : <FontAwesomeIcon icon={faTableList} />
                     }
                 </button>
-                <button onClick={openToggle}>
-                    <FontAwesomeIcon icon={faXmark} className={'text-white text-xl'} />
-                </button>
+                {
+                    isModalMode
+                    && <button onClick={closeToggle}
+                               data-testid={'left-nav-bar-close'}
+                    >
+                        <FontAwesomeIcon icon={faXmark} className={'text-white text-xl'} />
+                    </button>
+                }
+
             </div>
-            <ul className={'w-full duration-500'}>
+            <ul className={'w-full h-full duration-500'}
+                data-testid={'left-nav-bar'}
+            >
                 <li className={'flex justify-center py-2 sm:py-4'}>
                     <Link className={'sm:p-1.5 sm:border-4 border-solid border-blue-300 rounded-full'}
                           href={'/user/info'}
@@ -150,14 +149,14 @@ const LeftNavBar = ({
                             'rounded-full border-solid duration-500 border-blue-200 hover:border-blue-500',
                             isModalMode ? '' : 'w-[25px] sm:w-[110px] h-[25px] sm:h-[110px]'
                         ].join(' ')}
-                               src={process.env.NEXT_PUBLIC_CDN_SERVER + profileImg || NO_IMAGE}
+                               src={process.env.NEXT_PUBLIC_CDN_SERVER + profileImg! || NO_IMAGE}
                                alt={''}
                                width={110}
                                height={110}
                                priority={true}
                                fetchPriority={"high"}
                                onError={e => {
-                                     e.currentTarget.src = NO_IMAGE;
+                                     e.currentTarget.src = NO_PROFILE;
                                }}
                         />
                     </Link>

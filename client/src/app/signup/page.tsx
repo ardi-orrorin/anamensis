@@ -356,6 +356,7 @@ export default function Page() {
                                 ].join(' ')}
                                 disabled={timer >= 0 || check.email !== 'check'}
                                 onClick={sendVerifyCode}
+                                data-testid={'send-verify-code'}
                         >
                             {timer >= 0 ? transToTimerMinuteAndSecond() : '인증번호 받기'}
                         </button>

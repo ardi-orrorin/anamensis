@@ -1,6 +1,6 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
-import React, {Dispatch, SetStateAction, useCallback} from "react";
+import React, {useCallback} from "react";
 import {Root} from "@/app/{services}/types";
 import {useQuery} from "@tanstack/react-query";
 import rootApiService from "@/app/{services}/rootApiService";
@@ -9,22 +9,19 @@ import apiCall from "@/app/{commons}/func/api";
 import {AxiosError} from "axios";
 import {useRouter} from "next/navigation";
 import {useSearchHistory} from "@/app/{hooks}/searchHisotryHook";
+import {useCusSearchParams} from "@/app/{hooks}/searchParamsHook";
 
 interface RightMenuProps {
     isLogin            : boolean;
-    setSearchValue     : Dispatch<SetStateAction<string>>;
-    onSearchHandler    : (init: boolean, keyword?: string) => void;
 }
 
 const RightMenu = ({
     isLogin,
-    setSearchValue,
-    onSearchHandler,
 }: RightMenuProps) => {
     return (
         <div className={'sticky z-30 top-4 mt-4 flex flex-col gap-6'}>
             {isLogin && <Alert /> }
-            <SearchHistory {...{setSearchValue, onSearchHandler}} />
+            <SearchHistory />
         </div>
     );
 }
@@ -108,15 +105,11 @@ const Alert = () => {
     )
 }
 
-const SearchHistory = ({
-   setSearchValue,
-   onSearchHandler,
-}: {
-    setSearchValue     : Dispatch<SetStateAction<string>>;
-    onSearchHandler    : (init: boolean, keyword?: string) => void;
-}) => {
+const SearchHistory = () => {
 
     const {searchHistory, removeSearchHistories} = useSearchHistory();
+
+    const {setSearchValue, onSearchHandler} = useCusSearchParams();
 
     return (
         <div className={'flex flex-col gap-2'}
@@ -131,7 +124,7 @@ const SearchHistory = ({
                                     className={'max-w-[270px] px-2 py-1 text-xs text-blue-500 flex items-center gap-1 border rounded-full border-solid border-blue-400'}
                                     onClick={()=> {
                                         setSearchValue(keyword);
-                                        onSearchHandler(false, keyword);
+                                        onSearchHandler({init: false, keyword});
                                     }}
                             >
                                 <button className={'h-full flex items-center'}

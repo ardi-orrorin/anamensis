@@ -9,8 +9,8 @@ import ProgressBar from "@/app/{components}/progressBar";
 import Providers from "@/app/Provider";
 import {cookies} from "next/headers";
 import LoginState from "@/app/loginState";
-import {SearchHistoryContext, SearchHistoryProvider} from "@/app/{hooks}/searchHisotryHook";
-import SearchHistory from "@/app/{components}/searchHistory";
+import {SearchHistoryProvider} from "@/app/{hooks}/searchHisotryHook";
+import {SearchParamsProvider} from "@/app/{hooks}/searchParamsHook";
 
 export const metadata: Metadata = {
     title: 'anamensis',
@@ -75,9 +75,11 @@ export default function RootLayout({
                 <NavMain />
                 <ErrorBoundary errorComponent={Error}>
                     <SearchHistoryProvider>
-                        <main className={'w-full min-h-screen'}>
-                            {children}
-                        </main>
+                        <SearchParamsProvider>
+                            <main className={'w-full min-h-screen'}>
+                                {children}
+                            </main>
+                        </SearchParamsProvider>
                     </SearchHistoryProvider>
                 </ErrorBoundary>
                 <Footer />

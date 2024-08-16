@@ -3,20 +3,26 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons/faMagnifyingGlass";
 import React from "react";
 import {Root} from "@/app/{services}/types";
+import {useCusSearchParams} from "@/app/{hooks}/searchParamsHook";
+import {useSearchHistory} from "@/app/{hooks}/searchHisotryHook";
 
-const SearchBox = (props: Root.SearchBoxProps) => {
+const SearchBox = ({
+    searchRef,
+}: Root.SearchBoxProps) => {
     const {
         searchValue,
         setSearchValue,
-        searchRef,
-        searchHistory,
         onSearchHandler,
         onEnterHandler,
         searchFocus,
         setSearchFocus,
         onSearchHistory,
         setOnSearchHistory,
-    } = props;
+    } = useCusSearchParams();
+
+    const {
+        searchHistory, setHistories
+    } = useSearchHistory();
 
     return (
         <>
@@ -27,7 +33,7 @@ const SearchBox = (props: Root.SearchBoxProps) => {
                    onClick={e=> e.stopPropagation()}
                    onChange={(e) => setSearchValue(e.target.value)}
                    data-testid={'search-input'}
-                   onKeyUp={onEnterHandler}
+                   onKeyUp={(event) => onEnterHandler({event, searchRef, setHistories})}
                    onFocus={() => {
                        setSearchFocus(true)
                        if(searchHistory?.history?.length === 0) return;
@@ -48,7 +54,7 @@ const SearchBox = (props: Root.SearchBoxProps) => {
             {
                 searchValue.length > 0
                 && <button className={'absolute z-50 right-12 top-1 duration-500'}
-                           onClick={()=> onSearchHandler(true)}
+                           onClick={()=> onSearchHandler({init: true})}
                            data-testid={'search-init'}
               >
                 <FontAwesomeIcon className={'h-4 py-1.5 px-2 text-gray-400 hover:text-red-300 duration-300'}
@@ -57,7 +63,7 @@ const SearchBox = (props: Root.SearchBoxProps) => {
               </button>
             }
             <button className={'absolute z-50 right-2 top-1 duration-500'}
-                    onClick={()=> onSearchHandler(false)}
+                    onClick={()=> onSearchHandler({init: false, setHistories})}
                     data-testid={'search'}
             >
                 <FontAwesomeIcon className={'h-4 py-1.5 px-2 text-gray-400 hover:text-blue-300 duration-300'}
@@ -68,9 +74,4 @@ const SearchBox = (props: Root.SearchBoxProps) => {
     );
 }
 
-export default React.memo(SearchBox, (prev, next) => {
-    return prev.searchValue     === next.searchValue
-        && prev.searchFocus     === next.searchFocus
-        && prev.onSearchHistory === next.onSearchHistory
-        && prev.searchHistory   === next.searchHistory;
-});
+export default React.memo(SearchBox, (prev, next) => prev.searchRef === next.searchRef);

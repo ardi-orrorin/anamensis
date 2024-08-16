@@ -1,9 +1,9 @@
-import {useCallback, useContext, useMemo} from "react";
-import SearchParamsProvider from "@/app/{services}/SearchParamsProvider";
+import {useCallback, useMemo} from "react";
+import {useCusSearchParams} from "@/app/{hooks}/searchParamsHook";
 import {Category} from "@/app/board/{services}/types";
 
 const SearchInfo = () => {
-    const {searchParams, setSearchParams} = useContext(SearchParamsProvider);
+    const {searchParams, setSearchParams} = useCusSearchParams();
 
     const onChangeSearchHandler = useCallback((type:string) => {
         const isCategory = type === 'categoryPk';

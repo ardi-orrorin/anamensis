@@ -1,24 +1,19 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
-import React, {Dispatch, SetStateAction, useContext, useEffect, useRef} from "react";
+import React, {useEffect, useRef} from "react";
 import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons/faMagnifyingGlass";
-import {SearchHistoryContext, useSearchHistory} from "@/app/{hooks}/searchHisotryHook";
+import {useSearchHistory} from "@/app/{hooks}/searchHisotryHook";
+import {useCusSearchParams} from "@/app/{hooks}/searchParamsHook";
 
-const SearchHistory = ({
-    setSearchValue,
-    onSearchHistory,
-    setOnSearchHistory,
-    onSearchHandler,
-}: {
-    setSearchValue     : Dispatch<SetStateAction<string>>;
-    onSearchHistory    : boolean;
-    setOnSearchHistory : Dispatch<SetStateAction<boolean>>;
-    onSearchHandler    : (init: boolean, keyword?: string) => void;
-}) => {
+const SearchHistory = () => {
 
     const timeout = useRef<NodeJS.Timeout>();
 
     const {searchHistory, removeSearchHistories, onChangeToggle } = useSearchHistory();
+    const {
+        onSearchHistory, setOnSearchHistory
+        , onSearchHandler, setSearchValue
+    } = useCusSearchParams();
 
     useEffect(()=>{
         return () => {
@@ -58,7 +53,7 @@ const SearchHistory = ({
                                 <button className={'w-full h-auto flex items-center'}
                                         onClick={(e)=> {
                                             setSearchValue(keyword);
-                                            onSearchHandler(false, keyword);
+                                            onSearchHandler({init: false, keyword});
                                         }}
                                 >
                                     {keyword}
@@ -116,6 +111,4 @@ const SearchHistory = ({
     )
 }
 
-export default React.memo(SearchHistory, (prev, next) => {
-    return prev.onSearchHistory === next.onSearchHistory;
-});
+export default React.memo(SearchHistory);

@@ -1,7 +1,6 @@
 'use client';
-import {createContext, Dispatch, SetStateAction, useCallback, useContext, useEffect, useState} from "react";
+import {createContext, useCallback, useContext, useEffect, useState} from "react";
 import {Root} from "@/app/{services}/types";
-import SearchParamsProvider from "@/app/{services}/SearchParamsProvider";
 
 interface SearchHistoryProviderI {
     searchHistory   : Root.SearchHistoryProps;
@@ -63,6 +62,7 @@ export const SearchHistoryProvider = ({children}: {children: React.ReactNode}) =
 
 export const useSearchHistory = () => {
     const context = useContext(SearchHistoryContext);
+
     if (!context) throw new Error('useSearchHistory must be used within a SearchHistoryProvider');
     return context;
 }

@@ -60,16 +60,7 @@ export type NoticeTypeT = {
 
 
 type SearchBoxPropsT = {
-    searchValue        : string;
-    setSearchValue     : (value: string) => void;
     searchRef          : React.RefObject<HTMLInputElement>;
-    searchHistory      : Root.SearchHistoryProps;
-    onSearchHandler    : (isSearch: boolean) => void;
-    onEnterHandler     : (e: React.KeyboardEvent<HTMLInputElement>) => void;
-    searchFocus        : boolean;
-    setSearchFocus     : (value: boolean) => void;
-    onSearchHistory    : boolean;
-    setOnSearchHistory : (value: boolean) => void;
 }
 
 type ScheduleAlertT = {

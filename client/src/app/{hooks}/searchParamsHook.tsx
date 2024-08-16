@@ -13,6 +13,7 @@ export interface SearchParamsProviderI {
     setOnSearchHistory : Dispatch<SetStateAction<boolean>>;
     onSearchHandler    : (props: onSearchHandlerParams) => void;
     onEnterHandler     : (props: onEnterHandlerParams) => void;
+    initSearchHandler  : () => void;
 }
 
 type onSearchHandlerParams = {init: boolean, keyword?: string, setHistories?: (keyword: string) => void};
@@ -58,6 +59,7 @@ export const SearchParamsProvider = ({children}: {children: React.ReactNode}) =>
 
     const onEnterHandler = useCallback((props: onEnterHandlerParams) => {
         const {event, searchRef, setHistories} = props;
+        if(event.nativeEvent.isComposing) return;
 
         if(event.key === 'Enter') {
             onSearchHandler({init: false, setHistories});
@@ -70,13 +72,17 @@ export const SearchParamsProvider = ({children}: {children: React.ReactNode}) =>
         }
     },[searchValue]);
 
+    const initSearchHandler = useCallback(() => {
+        onSearchHandler({init: true});
+    },[]);
     return (
         <SearchParamsContext.Provider value={{
-            searchParams, setSearchParams,
-            searchValue, setSearchValue,
-            searchFocus, setSearchFocus,
-            onSearchHistory, setOnSearchHistory,
-            onSearchHandler, onEnterHandler
+            searchParams    , setSearchParams,
+            searchValue     , setSearchValue,
+            searchFocus     , setSearchFocus,
+            onSearchHistory , setOnSearchHistory,
+            onSearchHandler , onEnterHandler,
+            initSearchHandler
         }}>
             {children}
         </SearchParamsContext.Provider>

@@ -37,8 +37,6 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
     const [rateInfo, setRateInfo] = useState<RateInfoI>({} as RateInfoI);
 
-    const [isFavorite, setIsFavorite] = useState<boolean>(false);
-
     const [blockService, setBlockService] = useState<BlockService>({} as BlockService);
 
     const [waitUploadFiles, setWaitUploadFiles] = useState<TempFileI[]>([]);
@@ -197,19 +195,6 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
             setSummary(summaryRes);
 
-            if(!res?.data?.isLogin) return;
-
-            const isFavorite = await preload(`/api/board-favorites/${params.id}`, async () =>
-                await apiCall<boolean>({
-                    path: '/api/board-favorites/' + params.id,
-                    method: 'GET',
-                    call: 'Proxy',
-                    isReturnData: true
-                })
-            )
-
-            setIsFavorite(isFavorite);
-
         } catch (e: any) {
             alert(e.response.data);
             location.href = '/';
@@ -244,7 +229,6 @@ export default function Page({children, params} : {children: ReactNode, params: 
                 deleteComment, setDeleteComment,
                 summary, setSummary,
                 myPoint, setMyPoint,
-                isFavorite, setIsFavorite,
                 isTemplate, isNewBoard,
                 boardTemplate, setBoardTemplate,
                 roles

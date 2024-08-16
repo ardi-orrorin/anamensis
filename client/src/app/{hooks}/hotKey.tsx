@@ -17,8 +17,6 @@ export const useRootHotKey = ({
             searchRef.current.focus();
         }
     })
-
-
 };
 
 export const useRootLeftMenuHotKey = ({

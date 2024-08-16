@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import MobileMenu from "@/app/{components}/mobileMenu";
@@ -8,7 +8,7 @@ import {useCusSearchParams} from "@/app/{hooks}/searchParamsHook";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useRootHotKey} from "@/app/{hooks}/hotKey";
 import SearchInfo from "@/app/{components}/searchInfo";
-import {faBars, faCaretRight} from "@fortawesome/free-solid-svg-icons";
+import {faBars} from "@fortawesome/free-solid-svg-icons";
 import {Virtuoso} from "react-virtuoso";
 import RightSubMenu from "@/app/{components}/rightSubMenu";
 import SearchHistory from "@/app/{components}/searchHistory";
@@ -21,10 +21,7 @@ import dynamic from "next/dynamic";
 import LeftMenu from "@/app/{components}/leftMenu";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import RightMenu from "@/app/{components}/rightMenu";
-
-const DynamicNotice = dynamic(() => import('@/app/{components}/boards/notices'), {
-    loading: () => <Loading />,
-});
+import Notices from "@/app/{components}/boards/notices";
 
 const DynamicBoardComponent = dynamic(() => import('@/app/{components}/boardComponent'), {
     loading: () => <Loading />
@@ -48,13 +45,11 @@ export default function Page() {
 
     const [menuToggle, setMenuToggle] = useState(false);
 
-    const [favorites, setFavorites] = useState<string[]>([]);
-
-    const [viewNotice, setViewNotice] = useState(false);
+    const {data: favorites} = useQuery(rootApiService.favorites());
 
     const {
         searchParams, setSearchParams,
-        setOnSearchHistory,
+        setOnSearchHistory, initSearchHandler,
         searchFocus, setSearchFocus,
     } = useCusSearchParams();
 
@@ -73,22 +68,11 @@ export default function Page() {
 
     const fetchDebounce = createDebounce(100);
 
-    useEffect(()=>{
-        const viewNotice = localStorage.getItem('viewNotice');
-        if(viewNotice) setViewNotice(JSON.parse(viewNotice));
+    useEffect(()=> {
+        return () => {
+            initSearchHandler();
+        }
     },[]);
-
-    useEffect(() => {
-        apiCall<string[]>({
-            path: '/api/board-favorites',
-            method: 'GET',
-            isReturnData: true
-        })
-        .then(res => {
-            if(res.length === 0) return;
-            setFavorites(res);
-        })
-    },[])
 
     useEffect(() => {
         if(loading) return;
@@ -137,11 +121,6 @@ export default function Page() {
         return () => ob.disconnect();
     },[moreRef?.current, loading]);
 
-    const onChangeNotice = useCallback(() => {
-        setViewNotice(!viewNotice);
-        localStorage.setItem('viewNotice', JSON.stringify(!viewNotice));
-    },[viewNotice]);
-
     useRootHotKey({searchRef})
 
     return (
@@ -176,32 +155,7 @@ export default function Page() {
                             <SearchInfo />
                         </div>
                         <div className={'w-full min-w-[350px] max-w-[600px] px-4 flex flex-col justify-start items-center'}>
-                            <div className={'w-full flex flex-col gap-3'}>
-                                <div className={'w-full p-2 flex justify-between items-center text-sm border-b border-solid border-gray-400'}>
-                                    <div className={'flex gap-1 items-center'}>
-                                        <FontAwesomeIcon icon={faCaretRight}
-                                                         className={['font-bold duration-500', viewNotice ? 'rotate-90' : 'rotate-0'].join(' ')}
-                                                         size={'lg'}
-                                        />
-                                        <button className={'outline-0'}
-                                                onClick={onChangeNotice}
-                                                data-testid={'notice-toggle'}
-                                        >
-                                            공지사항
-                                        </button>
-                                    </div>
-
-                                    <button className={'outline-0'}
-                                            onClick={onChangeNotice}
-                                            data-testid={'notice-toggle-view'}
-                                    >
-                                        { viewNotice ? '접기' : '보기' }
-                                    </button>
-                                </div>
-                                <div className={['overflow-y-hidden duration-500',viewNotice ? 'max-h-80' : 'max-h-0'].join(' ')}>
-                                    <DynamicNotice data={noticeList} />
-                                </div>
-                            </div>
+                            <Notices data={noticeList} />
                             <div className={'w-full flex flex-wrap gap-2'}>
                                 {
                                     notFoundResult

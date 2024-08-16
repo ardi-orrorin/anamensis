@@ -10,8 +10,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import {faStar as faStarRegular} from "@fortawesome/free-regular-svg-icons";
-
-
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import apiCall, {ApiCallProps} from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
@@ -36,6 +34,8 @@ import ModalProvider from "@/app/user/board-block/{services}/modalProvider";
 import BoardblockModal from "@/app/board/[id]/{components}/boardblockModal";
 import {AxiosError} from "axios";
 import dynamic from "next/dynamic";
+import {useQuery} from "@tanstack/react-query";
+import rootApiService from "@/app/{services}/rootApiService";
 
 export interface RateInfoI {
     id      : number;
@@ -54,7 +54,6 @@ export default function Page({params}: {params : {id: string}}) {
     const {
         board, setBoard
         , rateInfo, setRateInfo
-        , isFavorite, setIsFavorite
         , isNewBoard, isTemplate
         , boardTemplate, setBoardTemplate
         , roles,  summary
@@ -79,6 +78,13 @@ export default function Page({params}: {params : {id: string}}) {
     const [modal, setModal] = useState({toggle: false, id: 0});
 
     const blockRef = useRef<HTMLElement[] | null[]>([]);
+
+    const {data: favories, refetch: refetchFavories} = useQuery(rootApiService.favorites());
+
+    const isFavorite = useMemo(() =>
+            favories?.some(item => item === board?.data?.id.toString())
+        , [favories, board?.data?.id]);
+
 
     const debounce = createDebounce(300);
 
@@ -363,8 +369,11 @@ export default function Page({params}: {params : {id: string}}) {
                 body: {id: params.id},
                 isReturnData: true
             }
+
             await apiCall(options);
-            setIsFavorite(!isFavorite);
+            // setIsFavorite(!isFavorite);
+
+            await refetchFavories();
 
         } catch (e: any) {
             console.log(e)

@@ -32,8 +32,6 @@ export interface BoardProviderI {
     setSummary: Dispatch<SetStateAction<BoardSummaryI[]>>;
     myPoint: number;
     setMyPoint: Dispatch<SetStateAction<number>>;
-    isFavorite: boolean;
-    setIsFavorite: Dispatch<SetStateAction<boolean>>;
     isNewBoard: boolean;
     isTemplate: boolean;
     boardTemplate: BoardTemplateService;

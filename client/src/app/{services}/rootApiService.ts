@@ -70,11 +70,28 @@ const scheduleAlertToday = () => {
 }
 
 
+const favorites = () => {
+    return queryOptions({
+        queryKey: ['favorites'],
+        queryFn: async () => {
+            return await apiCall<string[]>({
+                path: '/api/board-favorites',
+                method: 'GET',
+                isReturnData: true
+            })
+        },
+        initialData: [],
+        initialDataUpdatedAt: 1,
+    })
+}
+
+
 const rootApiService = {
     userRole,
     scheduleAlert,
     getNotices,
     scheduleAlertToday,
+    favorites
 }
 
 export default rootApiService;

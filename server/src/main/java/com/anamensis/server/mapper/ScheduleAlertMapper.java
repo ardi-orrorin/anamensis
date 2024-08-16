@@ -16,6 +16,8 @@ public interface ScheduleAlertMapper {
         long boardId
     );
 
+    List<ScheduleAlertResultMap> findAllTodayByUserId(String userId);
+
     int save(ScheduleAlert scheduleAlert);
 
     int saveAll(List<ScheduleAlert> list);

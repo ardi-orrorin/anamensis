@@ -52,7 +52,7 @@ const DisabledBtn =  ({
     onChangeSearchHandler: (type:string) => void
 }) => {
     return (
-        <button className={'px-3 py-1.5 rounded text-xs2 border border-solid border-blue-600 text-blue-600 bg-white hover:bg-blue-600 hover:text-white'}
+        <button className={'px-3 py-1.5 rounded text-xs2 border border-solid border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white'}
                 onClick={()=> onChangeSearchHandler(type)}
         >
             {`${name} X`}

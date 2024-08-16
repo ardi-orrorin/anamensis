@@ -1,6 +1,5 @@
 package com.anamensis.server.dto.response;
 
-import com.anamensis.server.entity.Board;
 import com.anamensis.server.entity.ScheduleAlert;
 import com.anamensis.server.resultMap.ScheduleAlertResultMap;
 import lombok.Builder;
@@ -17,7 +16,7 @@ public class ScheduleAlertResponse {
         public long id;
         public String hashId;
 
-        public String BoardTitle;
+        public String boardTitle;
         public long boardId;
 
         public String title;
@@ -40,14 +39,13 @@ public class ScheduleAlertResponse {
             return List.builder()
                 .id(resultMap.getId())
                 .hashId(resultMap.getScheduleAlert().getHashId())
-                .BoardTitle(resultMap.getBoard().getTitle())
+                .boardTitle(resultMap.getBoard().getTitle())
                 .boardId(resultMap.getBoard().getId())
                 .title(resultMap.getScheduleAlert().getTitle())
                 .alertTime(resultMap.getScheduleAlert().getAlertTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .isRead(resultMap.getScheduleAlert().isRead())
                 .build();
         }
-
     }
 }
 

@@ -72,7 +72,7 @@ export default function RootLayout({
                 <ProgressBar />
                 <NavMain />
                 <ErrorBoundary errorComponent={Error}>
-                    <main className={'min-h-screen'}>
+                    <main className={'w-full min-h-screen'}>
                         {children}
                     </main>
                 </ErrorBoundary>

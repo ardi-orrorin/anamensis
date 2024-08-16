@@ -31,7 +31,7 @@ const BoardSummary = () => {
                                 >{e.rate}</span>
 
                                 <div className={'flex justify-between w-full'}>
-                                <div className={'py-0.5 w-40 line-clamp-1'}>
+                                <div className={'py-0.5 w-24 sm:w-40 line-clamp-1'}>
                                     { e.title }
                                 </div>
                                     <div className={'flex justify-end'}>

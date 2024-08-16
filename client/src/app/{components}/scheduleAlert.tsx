@@ -90,7 +90,7 @@ const ScheduleAlert = () => {
                                     <div className={'flex'}>
                                         <span>(</span>
                                         <span className={'max-w-32 line-clamp-1'}>
-                                        {sch.BoardTitle}
+                                        {sch.boardTitle}
                                     </span>
                                         <span>)</span>
                                     </div>

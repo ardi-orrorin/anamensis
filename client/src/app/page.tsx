@@ -2,7 +2,6 @@
 
 import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
-import BoardComponent from "@/app/{components}/boardComponent";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import MobileMenu from "@/app/{components}/mobileMenu";
 import SearchParamsProvider from "@/app/{services}/SearchParamsProvider";
@@ -25,12 +24,18 @@ import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import RightMenu from "@/app/{components}/rightMenu";
 
 const DynamicNotice = dynamic(() => import('@/app/{components}/boards/notices'), {
-    loading: () => <div className={'w-full h-[300px] flex justify-center items-center'}><LoadingSpinner size={50}/></div>,
-    });
+    loading: () => <Loading />,
+});
+
+const DynamicBoardComponent = dynamic(() => import('@/app/{components}/boardComponent'), {
+    loading: () => <Loading />
+});
+
+const Loading = () => <div className={'w-full h-[300px] flex justify-center items-center'}><LoadingSpinner size={50}/></div>
 
 export default function Page() {
 
-    const roles = useQueryClient().getQueryData(['userRole']) as System.Role[];
+    const {data: roles} = useQuery(rootApiService.userRole());
     const {data: noticeList} = useQuery(rootApiService.getNotices());
 
     const pageSize = 20;
@@ -232,7 +237,7 @@ export default function Page() {
                                 </div>
                                 <SearchInfo />
                             </div>
-                            <div className={'w-full min-w-[500px] max-w-[600px] px-4 flex flex-col justify-start items-center'}>
+                            <div className={'w-full min-w-[300px] max-w-[600px] px-4 flex flex-col justify-start items-center'}>
                                 <div className={'w-full flex flex-col gap-3'}>
                                     <div className={'w-full p-2 flex justify-between items-center text-sm border-b border-solid border-gray-400'}>
                                         <div className={'flex gap-1 items-center'}>
@@ -272,7 +277,7 @@ export default function Page() {
                                               useWindowScroll
                                               itemContent={(index, data) =>
                                                   <div className={'py-1.5'}>
-                                                      <BoardComponent key={'boardsummary' + index} {...{...data, favorites, isLogin, roles}} />
+                                                      <DynamicBoardComponent key={'boardsummary' + index} {...{...data, favorites, isLogin, roles}} />
                                                   </div>
                                               }
                                     />
@@ -280,7 +285,7 @@ export default function Page() {
                             </div>
                         </div>
                         <div className={'hidden lg:flex lg:flex-col min-w-[300px] px-3 max-w-[400px] border-l border-solid border-l-gray-200 bg-gray-50'}>
-                            <RightMenu {...{searchHistory, setSearchValue, onSearchHandler, setSearchHistory}} />
+                            <RightMenu {...{isLogin, searchHistory, setSearchValue, onSearchHandler, setSearchHistory}} />
                         </div>
                     </div>
                 </div>

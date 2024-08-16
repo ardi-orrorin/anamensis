@@ -80,7 +80,7 @@ export default function Page() {
     ,[windowList])
 
     return (
-        <main className={'flex flex-col gap-3'}>
+        <main className={'w-full flex flex-col gap-3'}>
             <div className={'flex gap-4 flex-wrap duration-300'}
                  data-testid={'minimize-window'}
             >

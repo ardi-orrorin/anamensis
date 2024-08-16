@@ -53,11 +53,28 @@ const scheduleAlert = () => {
     })
 }
 
+const scheduleAlertToday = () => {
+    return queryOptions({
+        queryKey: ['scheduleAlertToday'],
+        queryFn: async () => {
+            return await apiCall<Root.ScheduleAlert[]>({
+                method: 'GET',
+                path: '/api/schedule/alert/today',
+                isReturnData: true
+            });
+        },
+        initialData: [],
+        initialDataUpdatedAt: 1,
+        refetchOnMount: 'always',
+    })
+}
+
 
 const rootApiService = {
     userRole,
     scheduleAlert,
-    getNotices
+    getNotices,
+    scheduleAlertToday,
 }
 
 export default rootApiService;

@@ -22,7 +22,7 @@ const RightSubMenu = ({
 
     return (
         <div className={[
-            'fixed z-20 bottom-1/4 right-5 flex flex-col bg-green-600 border-y-4 border-solid border-green-600 rounded-md shadow-md ',
+            'fixed z-30 bottom-1/4 right-5 flex flex-col bg-green-600 border-y-4 border-solid border-green-600 rounded-md shadow-md ',
             rightMenu && 'gap-2'
         ].join(' ')}>
             <div className={['duration-500 overflow-y-hidden', rightMenu ? 'max-h-72' : 'max-h-0'].join(' ')}

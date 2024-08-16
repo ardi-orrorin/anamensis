@@ -30,6 +30,14 @@ public class ScheduleAlertController {
             .collectList();
     }
 
+    @GetMapping("today")
+    public Mono<List<ScheduleAlertResponse.List>> findAllTodayByUserId(
+        @AuthenticationPrincipal UserDetails user
+    ) {
+        return scheduleAlertService.findAllTodayByUserId(user.getUsername())
+            .collectList();
+    }
+
     @GetMapping("read/{id}")
     public Mono<Boolean> updateIsRead(
         @AuthenticationPrincipal UserDetails user,

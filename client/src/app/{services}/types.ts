@@ -75,7 +75,7 @@ type SearchBoxPropsT = {
 type ScheduleAlertT = {
     id         : number;
     hashId     : string;
-    BoardTitle : string;
+    boardTitle : string;
     boardId    : number;
     title      : string;
     alertTime  : string;

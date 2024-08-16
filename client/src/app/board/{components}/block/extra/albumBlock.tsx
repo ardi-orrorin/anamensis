@@ -12,6 +12,7 @@ import Slide from "@/app/board/{components}/block/extra/{components}/slide";
 import {deleteImage} from "@/app/board/{services}/funcs";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import {AxiosError} from "axios";
+import dynamic from "next/dynamic";
 
 export type ImageShowProps = {
     defaultIndex: number;

@@ -30,14 +30,14 @@ const SearchBox = (props: Root.SearchBoxProps) => {
                    onKeyUp={onEnterHandler}
                    onFocus={() => {
                        setSearchFocus(true)
-                       if(searchHistory.history?.length === 0) return;
+                       if(searchHistory?.history?.length === 0) return;
                        setOnSearchHistory(true)
                    }}
                    onMouseEnter={(e) => {
                        e.stopPropagation();
                        e.preventDefault();
                        if(!searchFocus) return;
-                       if(searchHistory.history?.length === 0) return;
+                       if(searchHistory?.history?.length === 0) return;
                        setOnSearchHistory(true)
                    }}
                    onBlur={() => {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import MobileMenu from "@/app/{components}/mobileMenu";
@@ -15,13 +15,13 @@ import SearchHistory from "@/app/{components}/searchHistory";
 import SearchBox from "@/app/{components}/searchBox";
 import {Root} from "@/app/{services}/types";
 import {Common} from "@/app/{commons}/types/commons";
-import {System} from "@/app/user/system/{services}/types";
-import {useQuery, useQueryClient} from "@tanstack/react-query";
+import {useQuery} from "@tanstack/react-query";
 import rootApiService from "@/app/{services}/rootApiService";
 import dynamic from "next/dynamic";
 import LeftMenu from "@/app/{components}/leftMenu";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import RightMenu from "@/app/{components}/rightMenu";
+import {SearchHistoryContext, SearchHistoryProvider, useSearchHistory} from "@/app/{hooks}/searchHisotryHook";
 
 const DynamicNotice = dynamic(() => import('@/app/{components}/boards/notices'), {
     loading: () => <Loading />,
@@ -58,11 +58,8 @@ export default function Page() {
         size: pageSize,
     } as Root.BoardListParamsI);
 
-    // const [noticeList, setNoticeList] = useState<Root.NoticeType[]>([]);
-    const [searchHistory, setSearchHistory] = useState<Root.SearchHistoryProps>({
-        toggle: true,
-        history:[] as string[]
-    });
+    const {searchHistory, setHistories} = useContext(SearchHistoryContext);
+
     const [onSearchHistory, setOnSearchHistory] = useState(false);
 
     const [viewNotice, setViewNotice] = useState(false);
@@ -83,9 +80,6 @@ export default function Page() {
     const fetchDebounce = createDebounce(100);
 
     useEffect(()=>{
-        const history = localStorage.getItem('searchHistory');
-        if(history) setSearchHistory(JSON.parse(history));
-
         const viewNotice = localStorage.getItem('viewNotice');
         if(viewNotice) setViewNotice(JSON.parse(viewNotice));
     },[]);
@@ -149,7 +143,6 @@ export default function Page() {
         return () => ob.disconnect();
     },[moreRef?.current, loading]);
 
-
     const onSearchHandler = useCallback((init: boolean, keyword?: string) => {
         window.scrollTo({top: 0});
         const initPage = {page: 1, size: pageSize};
@@ -170,11 +163,9 @@ export default function Page() {
 
         setSearchParams(params);
 
-        if(searchHistory.history?.some(key => key === value) || value === '') return;
-        localStorage.setItem('searchHistory', JSON.stringify({...searchHistory, history: [...searchHistory?.history, value]}));
-        setSearchHistory({...searchHistory, history: [...searchHistory?.history, value]});
+        setHistories && setHistories(value);
 
-    },[searchParams, searchValue, searchHistory]);
+    },[searchParams, searchValue, searchHistory, setHistories]);
 
     const onEnterHandler = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
         if(e.key === 'Enter') {
@@ -229,11 +220,7 @@ export default function Page() {
                                         searchFocus, setSearchFocus, onSearchHistory,
                                         setOnSearchHistory
                                     }} />
-                                    <SearchHistory {...{searchHistory, setSearchValue,
-                                        setSearchHistory, onSearchHistory,
-                                        setOnSearchHistory, onSearchHandler
-
-                                    }}/>
+                                    <SearchHistory {...{setSearchValue, onSearchHistory, setOnSearchHistory, onSearchHandler}}/>
                                 </div>
                                 <SearchInfo />
                             </div>
@@ -284,8 +271,8 @@ export default function Page() {
                                 </div>
                             </div>
                         </div>
-                        <div className={'hidden lg:flex lg:flex-col min-w-[300px] px-3 max-w-[400px] border-l border-solid border-l-gray-200 bg-gray-50'}>
-                            <RightMenu {...{isLogin, searchHistory, setSearchValue, onSearchHandler, setSearchHistory}} />
+                        <div className={'hidden lg:flex lg:flex-col min-w-[300px] px-3 max-w-[300px] border-l border-solid border-l-gray-200 bg-gray-50'}>
+                            <RightMenu {...{isLogin, setSearchValue, onSearchHandler}} />
                         </div>
                     </div>
                 </div>

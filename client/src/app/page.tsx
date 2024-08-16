@@ -237,7 +237,7 @@ export default function Page() {
                                 </div>
                                 <SearchInfo />
                             </div>
-                            <div className={'w-full min-w-[300px] max-w-[600px] px-4 flex flex-col justify-start items-center'}>
+                            <div className={'w-full min-w-[350px] max-w-[600px] px-4 flex flex-col justify-start items-center'}>
                                 <div className={'w-full flex flex-col gap-3'}>
                                     <div className={'w-full p-2 flex justify-between items-center text-sm border-b border-solid border-gray-400'}>
                                         <div className={'flex gap-1 items-center'}>

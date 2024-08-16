@@ -77,7 +77,7 @@ const Alert = () => {
                                 <div className={'w-full flex flex-col gap-0.5'}>
                                     <div className={'flex gap-1'}>
                                         <span className={[
-                                                'flex w-12',
+                                                'flex w-14',
                                                 alert.isRead ? 'text-red-600' : 'text-blue-700'
                                               ].join(' ')}>
                                             [ {alert.isRead ? '읽음' : '안읽음'} ]
@@ -87,7 +87,7 @@ const Alert = () => {
                                         </h4>
                                     </div>
                                     <div className={'flex gap-1'}>
-                                        <strong className={'flex font-mono w-12'}>
+                                        <strong className={'flex font-mono w-14'}>
                                             {moment(alert.alertTime).format("HH:mm")}
                                         </strong>
                                         <span>

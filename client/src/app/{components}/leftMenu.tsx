@@ -1,4 +1,4 @@
-import React, {Dispatch, SetStateAction, useCallback, useContext, useMemo, useState} from "react";
+import React, {useCallback, useMemo, useState} from "react";
 import {Category} from "@/app/board/{services}/types";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBars, faKeyboard} from "@fortawesome/free-solid-svg-icons";
@@ -7,7 +7,6 @@ import {useRouter} from "next/navigation";
 import {Options} from "react-hotkeys-hook/src/types";
 import HotKeybtn from "@/app/{components}/hotKeybtn";
 import {useRootLeftMenuHotKey} from "@/app/{hooks}/hotKey";
-import {Root} from "@/app/{services}/types";
 import {System} from "@/app/user/system/{services}/types";
 import dynamic from "next/dynamic";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
@@ -23,37 +22,13 @@ const DynamicWriteMenu = dynamic(() => import('@/app/{components}/writeMenu'), {
 const LeftMenu = ({
     roles,
 }:{
-    roles           : System.Role[];
+    roles : System.Role[];
 }) => {
 
-    const {searchParams, setSearchParams} = useCusSearchParams();
+    const {onChangeParamsHandler} = useCusSearchParams();
     const router = useRouter();
 
     const boardBaseUrl = '/board/new?categoryPk=';
-
-    const onChangeParamsHandler = useCallback(({type, value}: {type: string, value: string | number | boolean}) => {
-
-        const category = type === 'categoryPk'
-            && {[type]: searchParams[type]?.toString() === value ? 0 : Number(value)}
-
-        const isSelf = type === 'isSelf'
-            && {[type]: !searchParams[type], isFavorite: false};
-
-        const isFavorite = type === 'isFavorite'
-            && {[type]: !searchParams[type], isSelf: false};
-
-        const params = {
-            ...searchParams,
-            ...category,
-            ...isSelf,
-            ...isFavorite,
-            page: 1, size: 20,
-            add: false
-        } as Root.BoardListParamsI;
-
-        setSearchParams(params);
-        scrollTo(0, 0);
-    },[searchParams]);
 
     const confirmRole = useCallback((item: { roles: System.Role[] }) => {
         return item.roles?.find(r =>

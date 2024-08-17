@@ -29,9 +29,9 @@ const OAuth = ({
 
             return (
                 <button className={[
-                    `w-full h-11 flex justify-center items-center gap-1 text-xs text-white rounded duration-300`,
-                    `${bgColor} hover:${hoverBgColor}`,
-                ].join(' ')}
+                            `w-full h-11 flex justify-center items-center gap-1 text-xs text-white rounded duration-300`,
+                            `${bgColor} hover:${hoverBgColor}`,
+                        ].join(' ')}
                         key={'oauth-login' + id}
                         onClick={() => signIn(id)}
                         disabled={!isRecaptcha}
@@ -42,15 +42,13 @@ const OAuth = ({
                            height={size}
                     />
                     <span className={'font-bold'}>
-                                    Sign in with {name}
-                                </span>
+                        Sign in with {name}
+                    </span>
                 </button>
             )
         })
     )
 }
-
-
 
 
 const oAuthProviders: User.OAuthProvider[] = [

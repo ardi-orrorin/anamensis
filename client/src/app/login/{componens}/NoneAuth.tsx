@@ -1,22 +1,15 @@
-import React, {useContext, useEffect} from "react";
-import LoginProvider from "@/app/login/{services}/LoginProvider";
+import React, {useEffect} from "react";
+import {useLogin} from "@/app/login/{hooks}/LoginProvider";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import apiCall from "@/app/{commons}/func/api";
-import {User} from "@/app/login/{services}/types";
-import {QueryCache, QueryClient, usePrefetchQuery, useQuery, useQueryClient} from "@tanstack/react-query";
-import rootApiService from "@/app/{services}/rootApiService";
-import loginApiService from "@/app/login/{services}/loginApiService";
-import {useRouter} from "next/navigation";
 
 const NoneAuth = () => {
-    const {user} = useContext(LoginProvider);
 
-    const { isSuccess, isError } = useQuery(loginApiService.verify(user))
+    const { verify } = useLogin();
 
-    isSuccess && window.location.replace('/');
-
-    isError && window.location.replace('/login');
+    useEffect(() => {
+        verify();
+    }, []);
 
     return (
         <div className={'w-full flex flex-col items-center gap-40 text-gray-400'}>

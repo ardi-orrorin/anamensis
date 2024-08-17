@@ -15,13 +15,14 @@ import SearchHistory from "@/app/{components}/searchHistory";
 import SearchBox from "@/app/{components}/searchBox";
 import {Root} from "@/app/{services}/types";
 import {Common} from "@/app/{commons}/types/commons";
-import {useQuery} from "@tanstack/react-query";
+import {useQuery, useQueryClient} from "@tanstack/react-query";
 import rootApiService from "@/app/{services}/rootApiService";
 import dynamic from "next/dynamic";
 import LeftMenu from "@/app/{components}/leftMenu";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import RightMenu from "@/app/{components}/rightMenu";
 import Notices from "@/app/{components}/boards/notices";
+import {System} from "@/app/user/system/{services}/types";
 
 const DynamicBoardComponent = dynamic(() => import('@/app/{components}/boardComponent'), {
     loading: () => <Loading />
@@ -31,8 +32,9 @@ const Loading = () => <div className={'w-full h-[300px] flex justify-center item
 
 export default function Page() {
 
-    const {data: roles} = useQuery(rootApiService.userRole());
+    const roles = useQueryClient().getQueryData(['userRole']) as System.Role[];
     const {data: noticeList} = useQuery(rootApiService.getNotices());
+    const {data: favorites} = useQuery(rootApiService.favorites());
 
     const [initLoading, setInitLoading] = useState(true);
     const [loading, setLoading] = useState(false);
@@ -44,8 +46,6 @@ export default function Page() {
     });
 
     const [menuToggle, setMenuToggle] = useState(false);
-
-    const {data: favorites} = useQuery(rootApiService.favorites());
 
     const {
         searchParams, setSearchParams,
@@ -137,7 +137,7 @@ export default function Page() {
                     >
                         <FontAwesomeIcon icon={faBars} className={'h-auto'} />
                     </button>
-                    <MobileMenu {...{menuToggle, setMenuToggle, isLogin, searchParams, setSearchParams}} />
+                    <MobileMenu {...{menuToggle, setMenuToggle, isLogin}} />
                 </div>
                 <div className={'flex flex-row justify-start'}>
                     <div className={'hidden sm:block relative min-w-[300px] min-h-screen'}>

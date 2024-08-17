@@ -52,6 +52,7 @@ const Thumbnail = ({
                            height={200}
                            priority={true}
                            alt={'thumbnail'}
+                           placeholder={'empty'}
                            onError={(e) => {
                                e.currentTarget.src = NO_IMAGE;
                            }}

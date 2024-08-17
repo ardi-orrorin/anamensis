@@ -14,6 +14,8 @@ export interface SearchParamsProviderI {
     onSearchHandler    : (props: onSearchHandlerParams) => void;
     onEnterHandler     : (props: onEnterHandlerParams) => void;
     initSearchHandler  : () => void;
+    onChangeParamsHandler: ({type, value}: {type: string, value?: string | number | boolean}) => void;
+    onChangeCategory   : (value: string) => void;
 }
 
 type onSearchHandlerParams = {init: boolean, keyword?: string, setHistories?: (keyword: string) => void};
@@ -31,6 +33,40 @@ export const SearchParamsProvider = ({children}: {children: React.ReactNode}) =>
     const [searchValue, setSearchValue] = useState('');
     const [searchFocus, setSearchFocus] = useState(false);
     const [onSearchHistory, setOnSearchHistory] = useState(false);
+
+
+    const onChangeParamsHandler = useCallback(({type, value}: {type: string, value?: string | number | boolean}) => {
+        const isSelf = type === 'isSelf'
+            && {[type]: !searchParams[type], isFavorite: false};
+
+        const isFavorite = type === 'isFavorite'
+            && {[type]: !searchParams[type], isSelf: false};
+
+        const params = {
+            ...searchParams,
+            ...isSelf,
+            ...isFavorite,
+            page: 1, size: 20,
+            add: false
+        } as Root.BoardListParamsI;
+
+        if(value) {
+            const category = type === 'categoryPk'
+                && {[type]: searchParams[type]?.toString() === value ? 0 : Number(value)}
+
+            setSearchParams({...params, ...category} as Root.BoardListParamsI);
+        } else {
+            setSearchParams(params);
+        }
+
+        scrollTo(0, 0);
+
+    },[searchParams]);
+
+    const onChangeCategory = useCallback((value: string) => {
+        setSearchParams({ categoryPk: value, page: 1, size: 20 } as Root.BoardListParamsI);
+        scrollTo(0, 0);
+    },[searchParams]);
 
     const onSearchHandler = useCallback((props: onSearchHandlerParams) => {
         const {init, keyword, setHistories} = props;
@@ -57,6 +93,7 @@ export const SearchParamsProvider = ({children}: {children: React.ReactNode}) =>
 
     },[searchParams, searchValue]);
 
+
     const onEnterHandler = useCallback((props: onEnterHandlerParams) => {
         const {event, searchRef, setHistories} = props;
         if(event.nativeEvent.isComposing) return;
@@ -75,14 +112,16 @@ export const SearchParamsProvider = ({children}: {children: React.ReactNode}) =>
     const initSearchHandler = useCallback(() => {
         onSearchHandler({init: true});
     },[]);
+
     return (
         <SearchParamsContext.Provider value={{
-            searchParams    , setSearchParams,
-            searchValue     , setSearchValue,
-            searchFocus     , setSearchFocus,
-            onSearchHistory , setOnSearchHistory,
-            onSearchHandler , onEnterHandler,
-            initSearchHandler
+            searchParams      , setSearchParams,
+            searchValue       , setSearchValue,
+            searchFocus       , setSearchFocus,
+            onSearchHistory   , setOnSearchHistory,
+            onSearchHandler   , onEnterHandler,
+            initSearchHandler , onChangeParamsHandler,
+            onChangeCategory  ,
         }}>
             {children}
         </SearchParamsContext.Provider>

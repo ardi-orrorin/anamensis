@@ -1,34 +1,20 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faExclamation} from "@fortawesome/free-solid-svg-icons";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import {useContext, useEffect, useMemo, useState} from "react";
-import LoginProvider from "@/app/login/{services}/LoginProvider";
-import apiCall from "@/app/{commons}/func/api";
+import {useMemo, useState} from "react";
+import {useLogin} from "@/app/login/{hooks}/LoginProvider";
 import Turnstile from "react-turnstile";
 import OAuth from "@/app/login/{componens}/OAuth";
 import Footer from "@/app/find-user/{components}/footer";
-import {User} from "@/app/login/{services}/types";
 
 const Login = () => {
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
 
     const isTest = process.env.NEXT_PUBLIC_TEST?.toLowerCase() === 'true';
 
-
-    const {user, setUser} = useContext(LoginProvider);
+    const {user, goLogin, setProps, error, loading} = useLogin();
 
     const [isRecaptcha, setIsReCaptcha] = useState(isTest);
-
-    const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        if (user.username.length < 4) {
-            setUser({
-                ...user,
-                password: ''
-            });
-        }
-    }, [user.username]);
 
     const idCheck = useMemo(() => {
         return user.username.length > 5;
@@ -37,53 +23,6 @@ const Login = () => {
     const isNext = useMemo(() => {
         return user.username.length > 5 && user.password.length > 4;
     }, [user]);
-
-    const goLogin = async () => {
-        setLoading(true);
-
-        await apiCall<User.Auth, User.Login>({
-            path: '/api/login',
-            method: 'POST',
-            body: user,
-            call: 'Proxy'
-        }).then(res => {
-            setUser({
-                ...user,
-                verify: res.data.verity,
-                authType: res.data.authType
-            });
-        }).catch(err => {
-            setError({
-                status: err.response.status,
-                message: err.response.data,
-                use: true
-            });
-        }).finally(() => {
-            setLoading(false);
-        });
-    }
-
-    const [error, setError] = useState<User.ErrorResponse>({
-        status: 0,
-        message: '',
-        use: false
-    });
-
-    const setProps = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = e.target;
-
-        setUser({
-            ...user,
-            [name]: value
-        });
-
-        error.use
-        && setError({
-            status: 0,
-            message: '',
-            use: false
-        });
-    }
 
     return (
         <div className={"flex flex-col gap-4 border border-solid b border-blue-300 sm:w-4/5 md:w-1/2 xl:w-1/3 w-full rounded pb-5"}>
@@ -158,8 +97,5 @@ const Login = () => {
         </div>
     )
 }
-
-
-
 
 export default Login;

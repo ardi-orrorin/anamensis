@@ -22,9 +22,8 @@ import BoardInfo from "@/app/board/[id]/{components}/boardInfo";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import BlockProvider from "@/app/board/{services}/BlockProvider";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
-import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import KeyDownEvent from "@/app/board/{services}/keyDownEvent";
-import {deleteImage, initBlock, listSort, onChangeBlockGlobalHandler, updateBoard} from "@/app/board/{services}/funcs";
+import {initBlock, listSort, onChangeBlockGlobalHandler, updateBoard} from "@/app/board/{services}/funcs";
 import WriterInfo from "@/app/board/[id]/{components}/writerInfo";
 import {useRouter} from "next/navigation";
 import HotKeyInfo from "@/app/board/[id]/{components}/hotKeyInfo";
@@ -37,6 +36,8 @@ import dynamic from "next/dynamic";
 import {useQuery} from "@tanstack/react-query";
 import rootApiService from "@/app/{services}/rootApiService";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
+import {usePendingFiles} from "@/app/board/{hooks}/usePendingFiles";
+import BoardApiService from "@/app/board/{services}/boardApiService";
 
 export interface RateInfoI {
     id      : number;
@@ -72,9 +73,10 @@ export default function Page({params}: {params : {id: string}}) {
     } = useContext(LoadingProvider);
 
     const {
-        waitUploadFiles, setWaitUploadFiles,
-        waitRemoveFiles, setWaitRemoveFiles
-    } = useContext(TempFileProvider);
+        waitUploadFiles,
+        waitRemoveFiles,
+        deleteDummyFiles , deleteImage,
+    } = usePendingFiles();
 
 
     const [fullScreen, setFullScreen] = useState<boolean>(false);
@@ -122,6 +124,21 @@ export default function Page({params}: {params : {id: string}}) {
     useEffect(() => {
         window.scrollTo(0, 0);
     },[]);
+
+    useEffect(() => {
+        if(!isNewBoard && !board?.isView || isTemplate && !board?.isView || board.isView) return;
+
+        const beforeunload = (e: BeforeUnloadEvent) => {
+            e.preventDefault();
+            deleteDummyFiles();
+        }
+
+        window.addEventListener('beforeunload', beforeunload)
+
+        return () => {
+            window.removeEventListener('beforeunload', beforeunload);
+        }
+    },[waitUploadFiles])
 
     const addBlock = useCallback((seq: number, init: boolean, value?: string, cusSeq?: boolean) => {
         const block: BlockI = initBlock({seq: cusSeq ? seq : 0});
@@ -289,7 +306,6 @@ export default function Page({params}: {params : {id: string}}) {
         });
 
         if(newList.length === 0) addBlockHandler(0);
-
     }
 
     const fileDeleteHandler = useCallback(async (blockList: BlockI[], seq: number) => {
@@ -302,18 +318,9 @@ export default function Page({params}: {params : {id: string}}) {
         if(!fileBlock?.value) return ;
 
         if(isNewBoard) {
-            await apiCall({
-                path: '/api/file/delete/filename',
-                method: 'PUT',
-                body: {fileUri: fileBlock.value as string},
-                isReturnData: true
-            });
+            await BoardApiService.deleteFile(fileBlock.value as string);
         } else {
-            deleteImage({
-                absolutePath: fileBlock.value as string,
-                setWaitUploadFiles,
-                setWaitRemoveFiles
-            });
+            deleteImage(fileBlock.value as string);
         }
 
     },[board.isView, board.data?.content?.list, waitUploadFiles, waitRemoveFiles])

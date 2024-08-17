@@ -2,7 +2,6 @@ import {ExpendBlockProps, FileContentType} from "@/app/board/{components}/block/
 import React, {ChangeEvent, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import Image from "next/image";
 import axios from "axios";
-import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {defaultNoImg} from "@/app/{commons}/func/image";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -10,6 +9,8 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import apiCall from "@/app/{commons}/func/api";
 import {NO_IMAGE} from "@/app/{services}/constants";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
+import {usePendingFiles} from "@/app/board/{hooks}/usePendingFiles";
+import boardApiService from "@/app/board/{services}/boardApiService";
 
 
 export type AlttuelBlockProps = {
@@ -36,7 +37,7 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
 
     const maxFileSize = 5 * 1024 * 1024;
     const extraValue = props.extraValue as AlttuelBlockProps;
-    const {setWaitUploadFiles, setWaitRemoveFiles} = useContext(TempFileProvider);
+    const {setWaitUploadFiles, setWaitRemoveFiles} = usePendingFiles();
     const { board } = useContext(BoardProvider);
 
     const imageRef = useRef<HTMLInputElement>(null);
@@ -117,17 +118,12 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
             if(extraValue?.img) {
                 const filename = extraValue.img.substring(extraValue.img.lastIndexOf('/') + 1);
 
-                await apiCall({
-                    path: '/api/file/delete/filename',
-                    method: 'PUT',
-                    body: {fileUri: extraValue.img},
-                    isReturnData: false,
-                })
-                .then(() => {
-                    setWaitRemoveFiles(prevState =>
-                        [...prevState.filter(file => file.fileName !== filename)]
-                    );
-                })
+                await boardApiService.deleteFile(extraValue.img)
+                    .then(() => {
+                        setWaitRemoveFiles(prevState =>
+                            [...prevState.filter(file => file.fileName !== filename)]
+                        );
+                    })
 
             } else {
                 setWaitUploadFiles(prevState => [
@@ -160,7 +156,6 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
             props.onChangeValueHandler(value);
             return;
         }
-
 
         const condition = value.startsWith('0') && value !== '0';
         const money = condition ? value.replace(/^0+/, '') : value;

@@ -1,6 +1,5 @@
 import {ExpendBlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
 import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
-import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBorderAll, faImage} from "@fortawesome/free-solid-svg-icons";
 import AlbumProvider, {AlbumToggleType} from "@/app/board/{components}/block/extra/providers/albumProvier";
@@ -9,10 +8,10 @@ import {FileContentI} from "@/app/api/file/img/route";
 import ImageView from "@/app/board/{components}/block/extra/{components}/ImageView";
 import Thumbnail from "@/app/board/{components}/block/extra/{components}/thumbnail";
 import Slide from "@/app/board/{components}/block/extra/{components}/slide";
-import {deleteImage} from "@/app/board/{services}/funcs";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import {AxiosError} from "axios";
-import dynamic from "next/dynamic";
+import {usePendingFiles} from "@/app/board/{hooks}/usePendingFiles";
+import boardApiService from "@/app/board/{services}/boardApiService";
 
 export type ImageShowProps = {
     defaultIndex: number;
@@ -39,11 +38,11 @@ const AlbumBlock = (props: ExpendBlockProps) => {
 
     const extraValue = props.extraValue as ImageShowProps;
     const {
-        waitUploadFiles, setWaitUploadFiles,
-        waitRemoveFiles, setWaitRemoveFiles
-    } = useContext(TempFileProvider);
+        setWaitUploadFiles,
+        deleteImage,
+    } = usePendingFiles();
 
-    const {board} = useContext(BoardProvider);
+    const {board, isNewBoard} = useContext(BoardProvider);
     const {title, isPublic, membersOnly} = board?.data;
 
     const [viewMode, setViewMode] = useState<string>(extraValue?.mode || 'thumbnail');
@@ -192,19 +191,10 @@ const AlbumBlock = (props: ExpendBlockProps) => {
 
     const deleteImageHandler = async (absolutePath: string, index: number) => {
         try {
-            const res = await apiCall({
-                path: '/api/file/delete/filename',
-                method: 'PUT',
-                body: {fileUri: absolutePath},
-                contentType: 'application/json',
-            });
-
-            if(!res) return;
+            isNewBoard
+            && await boardApiService.deleteFile(absolutePath);
 
             if(!onChangeExtraValueHandler) return;
-
-            const fileName = absolutePath.substring(absolutePath.lastIndexOf('/') + 1);
-            const filePath = absolutePath.substring(0, absolutePath.lastIndexOf('/') + 1);
 
             onChangeExtraValueHandler({
                 ...extraValue,
@@ -212,19 +202,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
                 defaultIndex: extraValue.defaultIndex === index ? 0 : extraValue.defaultIndex,
             } as ImageShowProps);
 
-            deleteImage({
-                absolutePath,
-                setWaitUploadFiles,
-                setWaitRemoveFiles,
-            });
-
-            setWaitUploadFiles(prevState => {
-                return prevState.filter(item => item.fileName !== fileName);
-            });
-
-            setWaitRemoveFiles(prevState => {
-                return [...prevState, {id: 0, fileName, filePath}];
-            });
+            deleteImage(absolutePath);
 
         } catch (e) {
             console.error(e);

@@ -16,7 +16,9 @@ const BoardSummary = () => {
 
     return (
         <div className={'w-full h-max flex justify-center items-start overflow-y-hidden'}>
-            <div className={'w-full flex flex-col text-sm'}>
+            <div className={'w-full flex flex-col text-sm'}
+                 data-testid={'board-summary'}
+            >
                 {
                     boardSummary
                     && boardSummary?.length > 0

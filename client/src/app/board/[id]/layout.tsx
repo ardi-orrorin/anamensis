@@ -5,19 +5,17 @@ import BlockProvider, {BlockService, CommentService} from "@/app/board/{services
 import {BlockI, BoardI, CommentI, DeleteCommentI} from "@/app/board/{services}/types";
 import {SaveComment} from "@/app/board/[id]/{components}/comment";
 import {RateInfoI} from "@/app/board/[id]/page";
-import TempFileProvider, {TempFileI} from "@/app/board/{services}/TempFileProvider";
 import apiCall from "@/app/{commons}/func/api";
 import {useSearchParams} from "next/navigation";
 import LoadingProvider from "@/app/board/{services}/LoadingProvider";
-import useSWR, {preload} from "swr";
+import {preload} from "swr";
 import {initBlock} from "@/app/board/{services}/funcs";
 import {BoardSummaryI} from "@/app/user/{services}/userProvider";
 import {System} from "@/app/user/system/{services}/types";
 import {useQuery} from "@tanstack/react-query";
-import userApiService from "@/app/user/{services}/userApiService";
-import userinfoProvider from "@/app/user/info/{services}/userinfoProvider";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import rootApiService from "@/app/{services}/rootApiService";
+import {TempFileProvider} from "@/app/board/{hooks}/usePendingFiles";
 
 
 export default function Page({children, params} : {children: ReactNode, params: {id: string}}) {
@@ -46,8 +44,8 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
     const [blockService, setBlockService] = useState<BlockService>({} as BlockService);
 
-    const [waitUploadFiles, setWaitUploadFiles] = useState<TempFileI[]>([]);
-    const [waitRemoveFiles, setWaitRemoveFiles] = useState<TempFileI[]>([]);
+    // const [waitUploadFiles, setWaitUploadFiles] = useState<TempFileI[]>([]);
+    // const [waitRemoveFiles, setWaitRemoveFiles] = useState<TempFileI[]>([]);
 
     const [boardTemplate, setBoardTemplate] = useState<BoardTemplateService>({
         isApply: false,
@@ -63,33 +61,6 @@ export default function Page({children, params} : {children: ReactNode, params: 
     const isTemplate = useMemo(() => !params.id || params.id === 'temp',[params.id]);
 
     const searchParams = useSearchParams();
-
-    useEffect(() => {
-        if(!isNewBoard && !board?.isView || isTemplate && !board?.isView || board.isView) return;
-
-        const beforeunload = (e: BeforeUnloadEvent) => {
-            e.preventDefault();
-            deleteDummyFiles(waitUploadFiles);
-        }
-
-        window.addEventListener('beforeunload', beforeunload)
-
-        return () => {
-            window.removeEventListener('beforeunload', beforeunload);
-        }
-    },[waitUploadFiles])
-
-    const deleteDummyFiles = useCallback((waitUploadFiles: TempFileI[]) =>  {
-        waitUploadFiles.forEach(file => {
-            const fileUri = file.filePath + file.fileName;
-            apiCall({
-                path: '/api/file/delete/filename',
-                method: 'PUT',
-                body: {fileUri},
-                isReturnData: true
-            });
-        })
-    },[]);
 
     useEffect(() => {
         if(!isNewBoard && !isTemplate) return ;
@@ -228,10 +199,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
                 boardTemplate, setBoardTemplate,
                 roles
             }}>
-                <TempFileProvider.Provider value={{
-                    waitUploadFiles, setWaitUploadFiles,
-                    waitRemoveFiles, setWaitRemoveFiles,
-                }}>
+                <TempFileProvider>
                     <BlockProvider.Provider value={{
                         blockService, setBlockService,
                         commentService, setCommentService,
@@ -239,7 +207,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
                     }}>
                         {children}
                     </BlockProvider.Provider>
-                </TempFileProvider.Provider>
+                </TempFileProvider>
             </BoardProvider.Provider>
         </LoadingProvider.Provider>
     )

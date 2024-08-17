@@ -49,7 +49,6 @@ const MobileMenu = ({
                         </div>
                     </>
                 }
-
                 <div className={'py-4 flex justify-center items-center'}>
                     <h2 className={'font-bold'}>카테고리</h2>
                 </div>

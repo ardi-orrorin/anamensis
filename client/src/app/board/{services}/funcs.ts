@@ -1,8 +1,8 @@
 import {BlockI, BoardContentI, BoardI, BoardTemplate} from "@/app/board/{services}/types";
 import {blockTypeFlatList} from "@/app/board/{components}/block/list";
 import {Dispatch, MutableRefObject, SetStateAction} from "react";
-import {TempFileI} from "@/app/board/{services}/TempFileProvider";
 import {BoardService} from "@/app/board/{services}/BoardProvider";
+import {TempFileI} from "@/app/board/{hooks}/usePendingFiles";
 
 export function findElement(ele: HTMLElement) {
     if(ele?.parentElement?.id.includes('block')) return ele.parentElement;
@@ -85,29 +85,6 @@ export function updateBoard(params: BoardUpdateProps) : BoardI | BoardTemplate {
         removeFiles,
         // searchText
     };
-}
-
-export const deleteImage = (props: {
-    absolutePath: string,
-    setWaitUploadFiles: Dispatch<SetStateAction<TempFileI[]>>,
-    setWaitRemoveFiles: Dispatch<SetStateAction<TempFileI[]>>,
-}) => {
-
-    const {
-        absolutePath, setWaitUploadFiles, setWaitRemoveFiles
-    } = props;
-
-    const fileName = absolutePath.substring(absolutePath.lastIndexOf('/') + 1);
-    const filePath = absolutePath.substring(0, absolutePath.lastIndexOf('/') + 1);
-
-
-    setWaitUploadFiles(prevState => {
-        return prevState.filter(item => item.fileName !== fileName);
-    });
-
-    setWaitRemoveFiles(prevState => {
-        return [...prevState, {id: 0, fileName, filePath}];
-    });
 }
 
 export const onChangeBlockGlobalHandler = ({

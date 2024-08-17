@@ -50,11 +50,20 @@ const getComments = ({
     })
 }
 
+const deleteFile = async (fileUri: string) => {
+    return await apiCall({
+        path: '/api/file/delete/filename',
+        method: 'PUT',
+        body: {fileUri},
+        contentType: 'application/json',
+    });
+}
 
 
 const boardApiService = {
     getTemplates,
     getComments,
+    deleteFile,
 }
 
 export default boardApiService;

@@ -1,13 +1,9 @@
 package com.anamensis.server.controller;
 
 import com.anamensis.server.dto.response.AttendResponse;
-import com.anamensis.server.entity.Member;
-import com.anamensis.server.entity.PointCode;
-import com.anamensis.server.entity.PointHistory;
-import com.anamensis.server.entity.TableCode;
+import com.anamensis.server.entity.*;
 import com.anamensis.server.service.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,7 +34,21 @@ public class AttendanceController {
     public Mono<AttendResponse.AttendInfo> info(
         @AuthenticationPrincipal UserDetails user
     ) {
-        return attendanceService.findAttendInfo(user.getUsername());
+
+        Mono<Member> member = userService.findUserByUserId(user.getUsername())
+                .share()
+                .subscribeOn(Schedulers.boundedElastic());
+
+        Mono<Attendance> attendance = member
+                .flatMap(u -> attendanceService.findByMemberPk(u.getId()))
+                .subscribeOn(Schedulers.boundedElastic());
+
+        return Mono.zip(member, attendance)
+                .flatMap(t ->
+                    Mono.just(AttendResponse.AttendInfo.mergeUserAndAttendance(t.getT1(), t.getT2()))
+                );
+
+//        return attendanceService.findAttendInfo(user.getUsername());
     }
 
 
@@ -67,8 +77,8 @@ public class AttendanceController {
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(b -> {
                     if(!b) return;
-                    attendanceService.addAttendInfoCache(user.getUsername())
-                            .subscribe();
+//                    attendanceService.addAttendInfoCache(user.getUsername())
+//                            .subscribe();
                     userService.addUserInfoCache(user.getUsername())
                         .subscribe();
                 })

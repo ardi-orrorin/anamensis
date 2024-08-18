@@ -3,16 +3,14 @@ import {BoardService} from "@/app/board/{services}/BoardProvider";
 import {Dispatch, MutableRefObject, SetStateAction} from "react";
 
 export type KeyEventType = {
-    seq: number;
-    board?: BoardService;
-    setBoard?: Dispatch<SetStateAction<BoardService>>;
-    blockRef?: MutableRefObject<HTMLElement[] |null[]>;
-    event?: React.KeyboardEvent<HTMLElement>;
-    addBlock?: (seq: number, init: boolean, value?: string, cusSeq?: boolean) => BlockI;
-    addBlockHandler?: (seq: number, value?: string) => void;
+    seq              : number;
+    board?           : BoardService;
+    setBoard?        : Dispatch<SetStateAction<BoardService>>;
+    blockRef?        : MutableRefObject<HTMLElement[] |null[]>;
+    event?           : React.KeyboardEvent<HTMLElement>;
+    addBlock?        : (seq: number, init: boolean, value?: string, cusSeq?: boolean) => BlockI;
+    addBlockHandler? : (seq: number, value?: string) => void;
 }
-
-
 const enter = (args: KeyEventType) => {
     const {
         seq, board,

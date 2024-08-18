@@ -10,8 +10,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import {faStar as faStarRegular} from "@fortawesome/free-regular-svg-icons";
-
-
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import apiCall, {ApiCallProps} from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
@@ -22,11 +20,8 @@ import BoardTitle from "@/app/board/[id]/{components}/boardTitle";
 import HeaderBtn from "@/app/board/[id]/{components}/headerBtn";
 import BoardInfo from "@/app/board/[id]/{components}/boardInfo";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
-import BlockProvider from "@/app/board/{services}/BlockProvider";
-import LoadingProvider from "@/app/board/{services}/LoadingProvider";
-import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import KeyDownEvent from "@/app/board/{services}/keyDownEvent";
-import {deleteImage, initBlock, listSort, onChangeBlockGlobalHandler, updateBoard} from "@/app/board/{services}/funcs";
+import {initBlock, listSort, onChangeBlockGlobalHandler, updateBoard} from "@/app/board/{services}/funcs";
 import WriterInfo from "@/app/board/[id]/{components}/writerInfo";
 import {useRouter} from "next/navigation";
 import HotKeyInfo from "@/app/board/[id]/{components}/hotKeyInfo";
@@ -36,13 +31,17 @@ import ModalProvider from "@/app/user/board-block/{services}/modalProvider";
 import BoardblockModal from "@/app/board/[id]/{components}/boardblockModal";
 import {AxiosError} from "axios";
 import dynamic from "next/dynamic";
+import {useQuery} from "@tanstack/react-query";
+import rootApiService from "@/app/{services}/rootApiService";
+import {usePendingFiles} from "@/app/board/[id]/{hooks}/usePendingFiles";
+import BoardApiService from "@/app/board/{services}/boardApiService";
+import {useBlockEvent} from "@/app/board/[id]/{hooks}/useBlockEvent";
 
 export interface RateInfoI {
     id      : number;
     count   : number;
     status  : boolean;
 }
-
 
 const DynamicBlock = dynamic(() => import('@/app/board/{components}/Block'), {
     loading: () => <div className={'h-[25] flex items-center'} />,
@@ -51,34 +50,34 @@ const DynamicBlock = dynamic(() => import('@/app/board/{components}/Block'), {
 // fixme: 뒤로가기 등 강제 이동시 파일 삭제 처리 안됨
 export default function Page({params}: {params : {id: string}}) {
 
+    const {data: favories, refetch: refetchFavories} = useQuery(rootApiService.favorites());
+
     const {
         board, setBoard
         , rateInfo, setRateInfo
-        , isFavorite, setIsFavorite
         , isNewBoard, isTemplate
         , boardTemplate, setBoardTemplate
-        , roles,  summary
+        , summary
     } = useContext(BoardProvider);
 
     const {
-        blockService
-    } = useContext(BlockProvider);
+        waitUploadFiles,
+        waitRemoveFiles,
+        deleteDummyFiles , deleteImage,
+    } = usePendingFiles();
 
     const {
-        setLoading
-        , commentLoading
-    } = useContext(LoadingProvider);
-
-    const {
-        waitUploadFiles, setWaitUploadFiles,
-        waitRemoveFiles, setWaitRemoveFiles
-    } = useContext(TempFileProvider);
-
+        blockService, setSelectedBlock,
+    } = useBlockEvent();
 
     const [fullScreen, setFullScreen] = useState<boolean>(false);
     const [modal, setModal] = useState({toggle: false, id: 0});
 
     const blockRef = useRef<HTMLElement[] | null[]>([]);
+
+    const isFavorite = useMemo(() =>
+            favories?.some(item => item === board?.data?.id?.toString())
+        , [favories, board?.data?.id]);
 
     const debounce = createDebounce(300);
 
@@ -116,6 +115,25 @@ export default function Page({params}: {params : {id: string}}) {
         window.scrollTo(0, 0);
     },[]);
 
+    useEffect(() => {
+        setSelectedBlock(window.location.hash.replace('#block-', '') || '');
+    },[]);
+
+    useEffect(() => {
+        if(!isNewBoard && !board?.isView || isTemplate && !board?.isView || board.isView) return;
+
+        const beforeunload = (e: BeforeUnloadEvent) => {
+            e.preventDefault();
+            deleteDummyFiles();
+        }
+
+        window.addEventListener('beforeunload', beforeunload)
+
+        return () => {
+            window.removeEventListener('beforeunload', beforeunload);
+        }
+    },[waitUploadFiles])
+
     const addBlock = useCallback((seq: number, init: boolean, value?: string, cusSeq?: boolean) => {
         const block: BlockI = initBlock({seq: cusSeq ? seq : 0});
         if(!init) block.seq = seq + 0.1;
@@ -134,8 +152,6 @@ export default function Page({params}: {params : {id: string}}) {
             alert('내용을 입력해주세요');
             return ;
         }
-
-        setLoading(true);
 
         try {
             const body = isTemplate
@@ -192,13 +208,10 @@ export default function Page({params}: {params : {id: string}}) {
                 : '로그인이 필요합니다.';
 
             alert(message);
-
-            setLoading(false);
         }
     }
 
     const deleteHandler = useCallback(async () => {
-        setLoading(true);
         try {
             await apiCall({
                 path: '/api/board/' + params.id,
@@ -279,7 +292,6 @@ export default function Page({params}: {params : {id: string}}) {
         });
 
         if(newList.length === 0) addBlockHandler(0);
-
     }
 
     const fileDeleteHandler = useCallback(async (blockList: BlockI[], seq: number) => {
@@ -292,18 +304,9 @@ export default function Page({params}: {params : {id: string}}) {
         if(!fileBlock?.value) return ;
 
         if(isNewBoard) {
-            await apiCall({
-                path: '/api/file/delete/filename',
-                method: 'PUT',
-                body: {fileUri: fileBlock.value as string},
-                isReturnData: true
-            });
+            await BoardApiService.deleteFile(fileBlock.value as string);
         } else {
-            deleteImage({
-                absolutePath: fileBlock.value as string,
-                setWaitUploadFiles,
-                setWaitRemoveFiles
-            });
+            deleteImage(fileBlock.value as string);
         }
 
     },[board.isView, board.data?.content?.list, waitUploadFiles, waitRemoveFiles])
@@ -363,8 +366,10 @@ export default function Page({params}: {params : {id: string}}) {
                 body: {id: params.id},
                 isReturnData: true
             }
+
             await apiCall(options);
-            setIsFavorite(!isFavorite);
+
+            await refetchFavories();
 
         } catch (e: any) {
             console.log(e)
@@ -434,7 +439,7 @@ export default function Page({params}: {params : {id: string}}) {
                             && <HeaderBtn submitClickHandler={() => debounce(() => submitHandler(false))}
                                           deleteClickHandler={() => debounce(() => deleteHandler())}
                                           blockClickHandler={() => debounce(() => onBlockClickHandler())}
-                                          {...{roles, board, editClickHandler}}
+                                          {...{board, editClickHandler}}
                             />
                         }
                         <div className={'flex gap-1'}>
@@ -544,10 +549,8 @@ export default function Page({params}: {params : {id: string}}) {
                     && board.isView
                     && <WriterInfo {...{board, summary}} />
                 }
-                {
-                    !commentLoading
-                    && <Comment params={params} />
-                }
+
+                <Comment />
             </div>
             <div>
                 {

@@ -38,7 +38,9 @@ const AttendInfo = () => {
     },[]);
 
     return (
-        <div className={'w-full h-full flex flex-col gap-5 justify-center items-start'}>
+        <div className={'w-full h-full flex flex-col gap-5 justify-center items-start'}
+             data-testid={'attend-info'}
+        >
             <div>
                 <label>아이디 : </label>
                 <span>{attendInfo?.userId}</span>
@@ -63,6 +65,7 @@ const AttendInfo = () => {
                 <button className={'w-full bg-main text-white p-2 rounded hover:bg-blue-700 duration-500 shadow'}
                         onClick={attend}
                         disabled={loading}
+                        data-testid={'attend-btn'}
                 >
                     {
                         loading

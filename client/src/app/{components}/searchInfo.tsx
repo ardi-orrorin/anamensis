@@ -1,9 +1,9 @@
-import {useCallback, useContext, useMemo} from "react";
-import SearchParamsProvider from "@/app/{services}/SearchParamsProvider";
+import {useCallback, useMemo} from "react";
+import {useCusSearchParams} from "@/app/{hooks}/searchParamsHook";
 import {Category} from "@/app/board/{services}/types";
 
 const SearchInfo = () => {
-    const {searchParams, setSearchParams} = useContext(SearchParamsProvider);
+    const {searchParams, setSearchParams} = useCusSearchParams();
 
     const onChangeSearchHandler = useCallback((type:string) => {
         const isCategory = type === 'categoryPk';
@@ -52,7 +52,7 @@ const DisabledBtn =  ({
     onChangeSearchHandler: (type:string) => void
 }) => {
     return (
-        <button className={'px-3 py-1.5 rounded text-xs2 border border-solid border-blue-600 text-blue-600 bg-white hover:bg-blue-600 hover:text-white'}
+        <button className={'px-3 py-1.5 rounded text-xs2 border border-solid border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white'}
                 onClick={()=> onChangeSearchHandler(type)}
         >
             {`${name} X`}

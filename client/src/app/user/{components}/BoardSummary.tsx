@@ -16,7 +16,9 @@ const BoardSummary = () => {
 
     return (
         <div className={'w-full h-max flex justify-center items-start overflow-y-hidden'}>
-            <div className={'w-full flex flex-col text-sm'}>
+            <div className={'w-full flex flex-col text-sm'}
+                 data-testid={'board-summary'}
+            >
                 {
                     boardSummary
                     && boardSummary?.length > 0
@@ -31,7 +33,7 @@ const BoardSummary = () => {
                                 >{e.rate}</span>
 
                                 <div className={'flex justify-between w-full'}>
-                                <div className={'py-0.5 w-40 line-clamp-1'}>
+                                <div className={'py-0.5 w-24 sm:w-40 line-clamp-1'}>
                                     { e.title }
                                 </div>
                                     <div className={'flex justify-end'}>

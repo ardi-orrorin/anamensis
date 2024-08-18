@@ -53,11 +53,45 @@ const scheduleAlert = () => {
     })
 }
 
+const scheduleAlertToday = () => {
+    return queryOptions({
+        queryKey: ['scheduleAlertToday'],
+        queryFn: async () => {
+            return await apiCall<Root.ScheduleAlert[]>({
+                method: 'GET',
+                path: '/api/schedule/alert/today',
+                isReturnData: true
+            });
+        },
+        initialData: [],
+        initialDataUpdatedAt: 1,
+        refetchOnMount: 'always',
+    })
+}
+
+
+const favorites = () => {
+    return queryOptions({
+        queryKey: ['favorites'],
+        queryFn: async () => {
+            return await apiCall<string[]>({
+                path: '/api/board-favorites',
+                method: 'GET',
+                isReturnData: true
+            })
+        },
+        initialData: [],
+        initialDataUpdatedAt: 1,
+    })
+}
+
 
 const rootApiService = {
     userRole,
     scheduleAlert,
-    getNotices
+    getNotices,
+    scheduleAlertToday,
+    favorites
 }
 
 export default rootApiService;

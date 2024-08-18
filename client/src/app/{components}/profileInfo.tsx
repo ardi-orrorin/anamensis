@@ -46,6 +46,8 @@ const ProfileInfo = () => {
                                          height={90}
                                          width={90}
                                          className={'shadow rounded-full'}
+                                         placeholder={'blur'}
+                                         blurDataURL={NO_PROFILE}
                                          onError={(e) => {
                                              e.currentTarget.src = NO_PROFILE
                                          }}

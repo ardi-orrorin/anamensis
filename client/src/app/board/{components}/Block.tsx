@@ -12,11 +12,10 @@ import {
 } from "@/app/board/{components}/block/type/Types";
 import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import MenuItem from "@/app/board/{components}/MenuItem";
-import BlockProvider, {BlockMenu, BlockService} from "@/app/board/{services}/BlockProvider";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
-import {BlockI, CommentI, ExtraValueI} from "@/app/board/{services}/types";
+import {BlockI, ExtraValueI} from "@/app/board/{services}/types";
 import SubObjectMenu from "@/app/board/{components}/SubObjectMenu";
-import {findElement} from "@/app/board/{services}/funcs";
+import {useBlockEvent} from "@/app/board/[id]/{hooks}/useBlockEvent";
 
 type ContextMenuProps = {
     clientX: number;
@@ -36,7 +35,12 @@ const Block = (props: BlockProps) => {
 
     const {board, setBoard, comment, setNewComment, newComment} = useContext(BoardProvider);
 
-    const {blockService, setBlockService, commentService, setCommentService, selectedBlock} = useContext(BlockProvider);
+    const {
+        blockService, selectedBlock,
+        onFocus, onMouseEnter,
+        onMouseLeave, openMenuToggle,
+    } = useBlockEvent();
+
     const [contextMenu, setContextMenu] = useState<ContextMenuProps>({} as ContextMenuProps);
 
     const timeout = useRef<NodeJS.Timeout>();
@@ -47,7 +51,7 @@ const Block = (props: BlockProps) => {
         )
     , [props.code]);
 
-    const Component = block?.component!;
+    const Component = useMemo(()=>block?.component!,[block]);
 
     useEffect(()=> {
         return () => {
@@ -56,71 +60,33 @@ const Block = (props: BlockProps) => {
     },[])
 
     const onFocusHandler = (e: React.FocusEvent<HtmlElements>) => {
-        if (e.currentTarget.ariaRoleDescription !== 'text') {
-            return setBlockService({} as BlockService);
-        }
+        const block = {seq, code, value, textStyle, hash} as BlockI;
 
-        const rect = e.target.getBoundingClientRect();
-        const blockMenu: BlockMenu = 'openTextMenu';
-        const positionX = rect.x + 550 > window.innerWidth ? 50 : rect.x + 120;
-        const positionY = rect.y - 45
-
-        const block: BlockI = {seq, code, value, textStyle, hash};
-
-        setBlockService({
-            ...blockService,
-            block,
-            blockMenu,
-            screenX: positionX,
-            screenY: positionY,
-        })
+        onFocus({event: e, block});
     }
 
     const onMouseEnterHandler = (e: React.MouseEvent<MouseEnterHTMLElements> ) => {
-        if(e.currentTarget.ariaRoleDescription === 'object') {
-            const blockMenu: BlockMenu = 'openObjectMenu';
+        const block = {
+            seq, code, value
+            , textStyle, hash
+        } as BlockI;
 
-            const block: BlockI = {
-                seq, code, value
-                , textStyle, hash
-            };
-            setBlockService({
-                block,
-                blockMenu: blockMenu,
-                screenX: 0,
-                screenY: 0,
-            })
-        }
-
-        let ele = findElement(e.currentTarget);
-        const rect = ele.getBoundingClientRect();
-        const blockSeq = ele.id.replaceAll('block-', '');
-        const comments: CommentI[] = comment.filter(c => c.blockSeq === blockSeq);
-        setCommentService({
-            commentMenu: true,
-            screenX: rect.x + 550 > window.innerWidth ? 50 : rect.x + 120,
-            screenY: rect.y - 45,
-            blockSeq: ele.id.replaceAll('block-', ''),
-            comments: comments,
-        })
+        onMouseEnter({event: e, block, content: comment});
     }
 
     const onMouseLeaveHandler = useCallback((e: React.MouseEvent<MouseLeaveHTMLElements> ) => {
-        setBlockService({blockMenu: '', block: {} as BlockI, screenX: 0, screenY: 0});
-        setCommentService({commentMenu: false, screenX: 0, screenY: 0, blockSeq: '', comments: []});
+        onMouseLeave();
     },[]);
 
-    const openMenuToggle  = () => {
-        if(blockService.blockMenu !== 'openMenu' || blockService.block.seq !== seq) {
-            setBlockService({...blockService, blockMenu: 'openMenu', block: {seq, code, value, textStyle, hash}});
-            return ;
-        }
+    const openMenuToggleHandler = useCallback(() => {
+        const block = {
+            seq, code, value
+            , textStyle, hash
+        } as BlockI;
 
-        setBlockService({...blockService, blockMenu: '', block: {
-                seq: 0, code: '', value: '', hash: '',
-            }
-        });
-    }
+        openMenuToggle({block});
+
+    },[seq, code, value, hash]);
 
     const onClickObjectMenu = (type: string) => {
         if(type === 'delete') {
@@ -145,7 +111,9 @@ const Block = (props: BlockProps) => {
                     url = '';
                     break;
             }
+
             window.open(url, '_blank');
+
             return ;
         }
     }
@@ -276,7 +244,7 @@ const Block = (props: BlockProps) => {
                 !board.isView
                 && block?.type !== 'extra'
                 && <button className={'min-w-8 w-8 h-full flex justify-center items-center text-gray-600 hover:text-gray-950'}
-                           onClick={()=> openMenuToggle()}
+                           onClick={()=> openMenuToggleHandler()}
                 >
                   <FontAwesomeIcon icon={faEllipsisVertical} height={20} />
                 </button>

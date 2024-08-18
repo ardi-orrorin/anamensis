@@ -252,6 +252,10 @@ public class BoardController {
                             insertQnAPointHistory(b.getMemberPk(),(int) -p.point)
                                 .subscribe();
                         })
+                        .doOnNext($ -> {
+                            userService.addUserInfoCache(user.getUsername())
+                                .subscribe();
+                        })
                         .subscribeOn(Schedulers.boundedElastic())
                         .subscribe();
                 })
@@ -380,6 +384,9 @@ public class BoardController {
                             .subscribe();
 
                     boardIndexService.delete(boardPk)
+                        .subscribe();
+
+                    userService.addUserInfoCache(user.getUsername())
                         .subscribe();
                 })
                 .doOnNext(r -> {

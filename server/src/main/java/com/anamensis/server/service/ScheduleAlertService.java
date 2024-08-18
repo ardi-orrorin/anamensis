@@ -28,6 +28,11 @@ public class ScheduleAlertService {
             .map(ScheduleAlertResponse.List::from);
     }
 
+    public Flux<ScheduleAlertResponse.List> findAllTodayByUserId(String userId) {
+        return Flux.fromIterable(scheduleAlertMapper.findAllTodayByUserId(userId))
+            .map(ScheduleAlertResponse.List::from);
+    }
+
     public Mono<Boolean> save(ScheduleAlert scheduleAlert) {
         return Mono.fromCallable(() -> scheduleAlertMapper.save(scheduleAlert) > 0);
     }

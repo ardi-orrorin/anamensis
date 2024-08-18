@@ -1,7 +1,7 @@
-import React, {useContext} from "react";
-import BlockProvider from "@/app/board/{services}/BlockProvider";
+import React from "react";
 import {faEye, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {useBlockEvent} from "@/app/board/[id]/{hooks}/useBlockEvent";
 
 const SubObjectMenu = ({
     onClick,
@@ -13,7 +13,7 @@ const SubObjectMenu = ({
     onClick: (type: string, value: string) => void;
 }) => {
 
-    const {blockService, setBlockService} = useContext(BlockProvider);
+    const {blockService, setBlockService} = useBlockEvent();
 
     return (
         <div className={'absolute bottom-[5%] right-[5%] bg-gray-100 z-10 max-h-80 duration-500 rounded shadow-md'}>

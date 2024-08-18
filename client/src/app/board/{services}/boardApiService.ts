@@ -2,6 +2,7 @@ import {queryOptions} from "@tanstack/react-query";
 import apiCall from "@/app/{commons}/func/api";
 import {boardTemplateList, CommentI} from "@/app/board/{services}/types";
 import {Common} from "@/app/{commons}/types/commons";
+import {RateInfoI} from "@/app/board/[id]/page";
 
 const getTemplates = () => {
     return queryOptions({
@@ -50,11 +51,28 @@ const getComments = ({
     })
 }
 
+const deleteFile = async (fileUri: string) => {
+    return await apiCall({
+        path: '/api/file/delete/filename',
+        method: 'PUT',
+        body: {fileUri},
+        contentType: 'application/json',
+    });
+}
 
+ const getRateInfo = async (boardId: string) => {
+     return await apiCall<RateInfoI>({
+         path: '/api/board/rate/' + boardId,
+         method: 'GET',
+         call: 'Proxy'
+     })
+ }
 
 const boardApiService = {
     getTemplates,
     getComments,
+    deleteFile,
+    getRateInfo,
 }
 
 export default boardApiService;

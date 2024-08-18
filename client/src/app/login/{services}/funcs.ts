@@ -1,12 +1,9 @@
-import {ChangeEvent, Dispatch, SetStateAction} from "react";
-import {User} from "@/app/login/{services}/types";
+const transMinSec = (time: number) => {
+    const min = Math.floor(time / 60);
+    const sec = time % 60;
+    return `${min}:${sec < 10 ? `0${sec}` : sec}`;
+}
 
-export const onChange = (
-    e: ChangeEvent<HTMLInputElement>,
-    setUser: Dispatch<SetStateAction<User.Login>>
-) => {
-    setUser((prevState) => ({
-        ...prevState,
-        [e.target.name]: e.target.value
-    }))
+export const loginFunc = {
+    transMinSec
 }

@@ -1,27 +1,19 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
-import React, {Dispatch, SetStateAction, useCallback, useEffect, useRef} from "react";
+import React, {useEffect, useRef} from "react";
 import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons/faMagnifyingGlass";
-import {Root} from "@/app/{services}/types";
-import rootFunc from "@/app/{services}/funcs";
+import {useSearchHistory} from "@/app/{hooks}/searchHisotryHook";
+import {useCusSearchParams} from "@/app/{hooks}/searchParamsHook";
 
-const SearchHistory = ({
-    searchHistory,
-    setSearchValue,
-    onSearchHistory,
-    setOnSearchHistory,
-    onSearchHandler,
-    setSearchHistory,
-}: {
-    searchHistory      : Root.SearchHistoryProps;
-    setSearchValue     : Dispatch<SetStateAction<string>>;
-    setSearchHistory   : Dispatch<SetStateAction<Root.SearchHistoryProps>>;
-    onSearchHistory    : boolean;
-    setOnSearchHistory : Dispatch<SetStateAction<boolean>>;
-    onSearchHandler    : (init: boolean, keyword?: string) => void;
-}) => {
+const SearchHistory = () => {
 
     const timeout = useRef<NodeJS.Timeout>();
+
+    const {searchHistory, removeSearchHistories, onChangeToggle } = useSearchHistory();
+    const {
+        onSearchHistory, setOnSearchHistory
+        , onSearchHandler, setSearchValue
+    } = useCusSearchParams();
 
     useEffect(()=>{
         return () => {
@@ -29,17 +21,6 @@ const SearchHistory = ({
             && clearTimeout(timeout.current);
         }
     },[])
-
-    const removeSearchHistory = useCallback((keyword?: string) => {
-        if(!keyword) return setSearchHistory({...searchHistory, history: []});
-        rootFunc.removeSearchHistory({searchHistory, setSearchHistory, keyword});
-    },[searchHistory]);
-
-    const onChangeToggle = useCallback(() => {
-        const newValue = {...searchHistory, toggle: !searchHistory.toggle};
-        setSearchHistory(newValue);
-        localStorage.setItem('searchHistory', JSON.stringify(newValue));
-    },[searchHistory]);
 
     return (
         <div className={[
@@ -72,7 +53,7 @@ const SearchHistory = ({
                                 <button className={'w-full h-auto flex items-center'}
                                         onClick={(e)=> {
                                             setSearchValue(keyword);
-                                            onSearchHandler(false, keyword);
+                                            onSearchHandler({init: false, keyword});
                                         }}
                                 >
                                     {keyword}
@@ -80,7 +61,7 @@ const SearchHistory = ({
                                 <button className={'min-w-10 h-6 flex justify-center items-center bg-gray-100 rounded-md'}
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            removeSearchHistory(keyword);
+                                            removeSearchHistories(keyword);
                                         }}
                                 >
                                     <FontAwesomeIcon icon={faXmark} />
@@ -119,7 +100,7 @@ const SearchHistory = ({
                 {
                     searchHistory.toggle
                     && <button className={'w-20 h-7 text-xs bg-white rounded hover:bg-gray-300 duration-300'}
-                               onClick={() => removeSearchHistory()}
+                               onClick={() => removeSearchHistories()}
                     >
                         전체삭제
                     </button>
@@ -130,7 +111,4 @@ const SearchHistory = ({
     )
 }
 
-export default React.memo(SearchHistory, (prev, next) => {
-    return prev.searchHistory === next.searchHistory
-        && prev.onSearchHistory === next.onSearchHistory;
-});
+export default React.memo(SearchHistory);

@@ -2,44 +2,18 @@ import {Category} from "@/app/board/{services}/types";
 import React, {Dispatch, SetStateAction, useCallback} from "react";
 import Link from "next/link";
 import {Root} from "@/app/{services}/types";
+import {useCusSearchParams} from "@/app/{hooks}/searchParamsHook";
 
 const MobileMenu = ({
     menuToggle,
     setMenuToggle,
     isLogin,
-    searchParams,
-    setSearchParams,
 }:{
     isLogin         : boolean;
     menuToggle      : boolean;
-    searchParams    : Root.BoardListParamsI;
-    setSearchParams : Dispatch<SetStateAction<Root.BoardListParamsI>>;
     setMenuToggle   : Dispatch<SetStateAction<boolean>>;
 }) => {
-
-    const onChangeCategory = useCallback((value: string) => {
-        setSearchParams({ categoryPk: value, page: 1, size: 20 } as Root.BoardListParamsI);
-        scrollTo(0, 0);
-    },[searchParams]);
-
-    const onClickMyMenu = useCallback((type: string) => {
-        const isSelf = type === 'isSelf'
-            && {[type]: !searchParams[type], isFavorite: false};
-
-        const isFavorite = type === 'isFavorite'
-            && {[type]: !searchParams[type], isSelf: false};
-
-        const params = {
-            ...searchParams,
-            ...isSelf,
-            ...isFavorite,
-            page: 1, size: 20,
-            add: false
-        } as Root.BoardListParamsI;
-
-        setSearchParams(params);
-        scrollTo(0, 0);
-    },[searchParams]);
+    const { searchParams, onChangeCategory, onChangeParamsHandler } = useCusSearchParams();
 
     return (
         <div className={'fixed top-0 left-0 z-20 bg-white bg-opacity-0 w-full'}
@@ -61,21 +35,20 @@ const MobileMenu = ({
                           <button className={[
                                     'py-2 w-full text-sm text-center border border-solid border-gray-100 hover:bg-gray-100 duration-300',
                                     ].join(' ')}
-                                  onClick={() => onClickMyMenu('isSelf')}
+                                  onClick={() => onChangeParamsHandler({type: 'isSelf'})}
                           >
                             내가 쓴 글
                           </button>
                           <button className={[
                                     'py-2 w-full text-sm text-center border border-solid border-gray-100 hover:bg-gray-100 duration-300',
                                     ].join(' ')}
-                                  onClick={() => onClickMyMenu('isFavorite')}
+                                  onClick={() => onChangeParamsHandler({type: 'isFavorite'})}
                           >
                             즐겨찾기
                           </button>
                         </div>
                     </>
                 }
-
                 <div className={'py-4 flex justify-center items-center'}>
                     <h2 className={'font-bold'}>카테고리</h2>
                 </div>
@@ -138,7 +111,4 @@ const MobileMenu = ({
 export default React.memo(MobileMenu, (prev, next) => {
     return prev.menuToggle === next.menuToggle
         && prev.isLogin    === next.isLogin
-        && prev.searchParams.categoryPk === next.searchParams.categoryPk
-        && prev.searchParams.isSelf     === next.searchParams.isSelf
-        && prev.searchParams.isFavorite === next.searchParams.isFavorite;
 });

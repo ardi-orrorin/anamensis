@@ -109,12 +109,12 @@ const LeftNavBar = ({
         <>
         <nav className={['top-0 flex flex-col min-h-screen z-30 bg-main py-2 duration-500'
             , isOpen || !isModalMode  ? 'sticky translate-x-0 shadow-outset-lg' : 'translate-x-[-1000px]'
-            , isModalMode ? 'fixed w-[220px]': 'w-[40px] sm:min-w-[200px]'
+            , isModalMode ? 'fixed min-w-[200px]': 'w-[40px] sm:min-w-[200px]'
         ].join(' ')}
              data-testid={'left-nav-bar-container'}
         >
             <div className={[
-                'flex justify-between h-full',
+                'flex justify-between h-full duration-500',
                 isModalMode ? 'gap-0 px-5': 'flex-col sm:flex-row px-0 gap-4 sm:gap-0 sm:px-5 py-2'
             ].join(' ')}>
                 <button onClick={openToggle}

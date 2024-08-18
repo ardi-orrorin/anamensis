@@ -1,39 +1,13 @@
-import {useContext, useEffect, useState} from "react";
-import LoginProvider, {LoginProviderI} from "@/app/login/{services}/LoginProvider";
+import {useLogin} from "@/app/login/{hooks}/LoginProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import apiCall from "@/app/{commons}/func/api";
-import useTimer from "@/app/login/{services}/useTimer";
-import {onChange} from "@/app/login/{services}/funcs";
-import {User} from "@/app/login/{services}/types";
+import useTimer from "@/app/login/{hooks}/useTimer";
+import {loginFunc} from "@/app/login/{services}/funcs";
 
 const OTPAuth = () => {
-    const { user, setUser } = useContext<LoginProviderI>(LoginProvider);
-    const [loading, setLoading] = useState(false);
+
+    const {user, loading, verify, onChange} = useLogin();
 
     const timer = useTimer(300);
-
-    const verify = async () => {
-        setLoading(true);
-
-        await apiCall<User.LoginResponse, User.Login>({
-            path: '/api/login/verify',
-            method: 'POST',
-            body: user,
-            call: 'Proxy'
-        }).then(res => {
-            window.location.replace('/');
-        }).catch(err => {
-            console.log(err)
-        }).finally(() => {
-            setLoading(false);
-        });
-    }
-
-    const transMinSec = (time: number) => {
-        const min = Math.floor(time / 60);
-        const sec = time % 60;
-        return `${min}:${sec < 10 ? `0${sec}` : sec}`;
-    }
 
     return (
         <div className={"flex flex-col gap-4 border border-solid b border-blue-300 sm:w-4/5 md:w-1/2 xl:w-1/3 w-full rounded pb-5"}>
@@ -48,7 +22,7 @@ const OTPAuth = () => {
                         placeholder={'인증번호를 입력하세요'}
                         name={'code'}
                         value={user.code}
-                        onChange={(e) => onChange(e, setUser)}
+                        onChange={onChange}
                     />
                 </div>
                 <div>
@@ -59,7 +33,7 @@ const OTPAuth = () => {
                     >{
                         loading ?
                             <LoadingSpinner size={12}/> :
-                            `인증 ${transMinSec(timer.timer)}`
+                            `인증 ${loginFunc.transMinSec(timer.timer)}`
                     }
                     </button>
                 </div>

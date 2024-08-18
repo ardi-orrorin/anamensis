@@ -1,9 +1,9 @@
 import React from "react";
 import {BoardService} from "@/app/board/{services}/BoardProvider";
 import {System} from "@/app/user/system/{services}/types";
+import {useQueryClient} from "@tanstack/react-query";
 
 type HeaderBtnProps = {
-    roles    : System.Role[];
     board    : BoardService;
     submitClickHandler: () => void;
     editClickHandler: () => void;
@@ -12,11 +12,15 @@ type HeaderBtnProps = {
 }
 
 const HeaderBtn = ({
-    roles, board
+    board
     , submitClickHandler, editClickHandler
     , deleteClickHandler, blockClickHandler
 }: HeaderBtnProps) => {
+
+    const roles = useQueryClient().getQueryData<System.Role[]>(['userRole']) || [];
+
     const isView = board.isView;
+
     const {isWriter, isPublic, isBlocked, isLogin} = board.data;
 
     return (
@@ -78,6 +82,5 @@ const HeaderBtn = ({
 }
 
 export default React.memo(HeaderBtn, (prev, next) => {
-    return prev.roles === next.roles
-        && prev.board === next.board
+    return prev.board === next.board
 });

@@ -15,7 +15,6 @@ export type QuestionBlockExtraValueType = {
 const QuestionBlock = (props: ExpendBlockProps) => {
     const {
         hash, onChangeExtraValueHandler, type,
-        isView
     }: ExpendBlockProps = props;
 
     const {board, myPoint, comment} = useContext(BoardProvider);

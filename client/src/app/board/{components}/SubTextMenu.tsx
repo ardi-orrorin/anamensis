@@ -3,11 +3,11 @@
 import React, {MutableRefObject, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import {faBold, faItalic, faTextSlash} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import BlockProvider from "@/app/board/{services}/BlockProvider";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import MenuColorItem from "@/app/board/{components}/MenuColorItem";
 import MenuFontsizeItem from "@/app/board/{components}/MenuFontsizeItem";
 import MenuItem from "@/app/board/{components}/MenuItem";
+import {useBlockEvent} from "@/app/board/[id]/{hooks}/useBlockEvent";
 
 export type ToggleEnum = 'blockMenu' | 'fontSize' | 'color' | 'backgroundColor' | 'fontStyle' | '';
 
@@ -17,8 +17,9 @@ const SubTextMenu = ({
     blockRef  : MutableRefObject<HTMLElement[] | null[]>;
 }) => {
 
+    const { blockService } = useBlockEvent();
+
     const [toggle, setToggle] = useState<ToggleEnum>('');
-    const {blockService, setBlockService} = useContext(BlockProvider);
     const {board, setBoard} = useContext(BoardProvider);
 
     const {seq, code, textStyle} = blockService.block;
@@ -51,7 +52,6 @@ const SubTextMenu = ({
             blockRef.current[seq]?.focus();
         },100);
     }
-
 
     const onClickColorHandler = useCallback((name: ToggleEnum, value: string) => {
         onClickSubTextMenu(name, value);

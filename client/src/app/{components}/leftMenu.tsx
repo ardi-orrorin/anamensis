@@ -1,17 +1,16 @@
-import React, {Dispatch, SetStateAction, useCallback, useContext, useMemo, useState} from "react";
+import React, {useCallback, useMemo, useState} from "react";
 import {Category} from "@/app/board/{services}/types";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBars, faKeyboard} from "@fortawesome/free-solid-svg-icons";
-import SearchParamsProvider from "@/app/{services}/SearchParamsProvider";
 import {useHotkeys} from "react-hotkeys-hook";
 import {useRouter} from "next/navigation";
 import {Options} from "react-hotkeys-hook/src/types";
 import HotKeybtn from "@/app/{components}/hotKeybtn";
 import {useRootLeftMenuHotKey} from "@/app/{hooks}/hotKey";
-import {Root} from "@/app/{services}/types";
 import {System} from "@/app/user/system/{services}/types";
 import dynamic from "next/dynamic";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
+import {useCusSearchParams} from "@/app/{hooks}/searchParamsHook";
 
 const DynamicProfileInfo = dynamic(() => import('@/app/{components}/profileInfo'), {
     loading: () => <div className={'h-[140px] flex items-center'}><LoadingSpinner size={30}/></div>,
@@ -22,40 +21,14 @@ const DynamicWriteMenu = dynamic(() => import('@/app/{components}/writeMenu'), {
 
 const LeftMenu = ({
     roles,
-    searchParams,
-    setSearchParams,
 }:{
-    roles           : System.Role[];
-    searchParams    : Root.BoardListParamsI;
-    setSearchParams : Dispatch<SetStateAction<Root.BoardListParamsI>>;
+    roles : System.Role[];
 }) => {
+
+    const {onChangeParamsHandler} = useCusSearchParams();
     const router = useRouter();
 
     const boardBaseUrl = '/board/new?categoryPk=';
-
-    const onChangeParamsHandler = useCallback(({type, value}: {type: string, value: string | number | boolean}) => {
-
-        const category = type === 'categoryPk'
-            && {[type]: searchParams[type]?.toString() === value ? 0 : Number(value)}
-
-        const isSelf = type === 'isSelf'
-            && {[type]: !searchParams[type], isFavorite: false};
-
-        const isFavorite = type === 'isFavorite'
-            && {[type]: !searchParams[type], isSelf: false};
-
-        const params = {
-            ...searchParams,
-            ...category,
-            ...isSelf,
-            ...isFavorite,
-            page: 1, size: 20,
-            add: false
-        } as Root.BoardListParamsI;
-
-        setSearchParams(params);
-        scrollTo(0, 0);
-    },[searchParams]);
 
     const confirmRole = useCallback((item: { roles: System.Role[] }) => {
         return item.roles?.find(r =>
@@ -160,7 +133,7 @@ const CategorySelect = ({
 }) => {
     
     const [selectToggle, setSelectToggle] = useState(false);
-    const {searchParams} = useContext(SearchParamsProvider);
+    const {searchParams} = useCusSearchParams();
 
     const onToggleHandler = () => {
         setSelectToggle(!selectToggle);
@@ -236,7 +209,4 @@ const CategorySelect = ({
 
 export default React.memo(LeftMenu, (prev, next) => {
     return prev.roles === next.roles
-    && prev.searchParams.isSelf === next.searchParams.isSelf
-    && prev.searchParams.isFavorite === next.searchParams.isFavorite
-    && prev.searchParams.categoryPk === next.searchParams.categoryPk
 });

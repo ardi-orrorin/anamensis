@@ -17,9 +17,7 @@ const SubTextMenu = ({
     blockRef  : MutableRefObject<HTMLElement[] | null[]>;
 }) => {
 
-    const {
-        blockService
-    } = useBlockEvent();
+    const { blockService } = useBlockEvent();
 
     const [toggle, setToggle] = useState<ToggleEnum>('');
     const {board, setBoard} = useContext(BoardProvider);

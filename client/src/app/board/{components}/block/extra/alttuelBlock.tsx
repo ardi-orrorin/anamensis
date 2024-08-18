@@ -1,14 +1,12 @@
 import {ExpendBlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
-import React, {ChangeEvent, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
+import React, {ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import Image from "next/image";
 import axios from "axios";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {defaultNoImg} from "@/app/{commons}/func/image";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
-import apiCall from "@/app/{commons}/func/api";
 import {NO_IMAGE} from "@/app/{services}/constants";
-import BoardProvider from "@/app/board/{services}/BoardProvider";
 import {usePendingFiles} from "@/app/board/[id]/{hooks}/usePendingFiles";
 import boardApiService from "@/app/board/{services}/boardApiService";
 
@@ -38,7 +36,6 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
     const maxFileSize = 5 * 1024 * 1024;
     const extraValue = props.extraValue as AlttuelBlockProps;
     const {setWaitUploadFiles, setWaitRemoveFiles} = usePendingFiles();
-    const { board } = useContext(BoardProvider);
 
     const imageRef = useRef<HTMLInputElement>(null);
     const [imgViewProps, setImgViewProps] = useState<ImgViewProps>({

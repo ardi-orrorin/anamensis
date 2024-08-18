@@ -18,7 +18,9 @@ const HeaderBtn = ({
 }: HeaderBtnProps) => {
 
     const roles = useQueryClient().getQueryData<System.Role[]>(['userRole']) || [];
+
     const isView = board.isView;
+
     const {isWriter, isPublic, isBlocked, isLogin} = board.data;
 
     return (

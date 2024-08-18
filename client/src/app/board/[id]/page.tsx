@@ -33,7 +33,6 @@ import {AxiosError} from "axios";
 import dynamic from "next/dynamic";
 import {useQuery} from "@tanstack/react-query";
 import rootApiService from "@/app/{services}/rootApiService";
-import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import {usePendingFiles} from "@/app/board/[id]/{hooks}/usePendingFiles";
 import BoardApiService from "@/app/board/{services}/boardApiService";
 import {useBlockEvent} from "@/app/board/[id]/{hooks}/useBlockEvent";
@@ -51,7 +50,6 @@ const DynamicBlock = dynamic(() => import('@/app/board/{components}/Block'), {
 // fixme: 뒤로가기 등 강제 이동시 파일 삭제 처리 안됨
 export default function Page({params}: {params : {id: string}}) {
 
-    const {refetch : reFetchProfile} = useQuery(userInfoApiService.profile());
     const {data: favories, refetch: refetchFavories} = useQuery(rootApiService.favorites());
 
     const {
@@ -193,9 +191,6 @@ export default function Page({params}: {params : {id: string}}) {
             isNewBoard && isSave
                 ? router.push('/board/' + result?.id)
                 : location.reload();
-
-
-            board?.data.categoryPk === 3 && reFetchProfile();
 
             if(isTemplate) {
                 const message = board.data.title + (isSave ? `을(를) 템플릿 저장되었습니다.` : '이(가) 템플릿에 수정했습니다.');

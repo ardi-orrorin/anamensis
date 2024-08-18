@@ -11,19 +11,18 @@ import {preload} from "swr";
 import {initBlock} from "@/app/board/{services}/funcs";
 import {BoardSummaryI} from "@/app/user/{services}/userProvider";
 import {System} from "@/app/user/system/{services}/types";
-import {useQuery} from "@tanstack/react-query";
-import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
-import rootApiService from "@/app/{services}/rootApiService";
+import {useQueryClient} from "@tanstack/react-query";
 import {TempFileProvider} from "@/app/board/[id]/{hooks}/usePendingFiles";
 import boardApiService from "@/app/board/{services}/boardApiService";
 import {BlockEventProvider} from "@/app/board/[id]/{hooks}/useBlockEvent";
+import {User} from "@/app/login/{services}/types";
 
 
 export default function Page({children, params} : {children: ReactNode, params: {id: string}}) {
 
-    const {data: profile} = useQuery(userInfoApiService.profile());
+    const profile = useQueryClient().getQueryData<User.UserInfo>(['userProfile']);
 
-    const {data: roles} = useQuery(rootApiService.userRole());
+    const roles = useQueryClient().getQueryData<System.Role[]>(['userRoles']) || [];
 
     const [board, setBoard] = useState<BoardService>({} as BoardService);
 

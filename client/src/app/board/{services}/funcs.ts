@@ -2,7 +2,7 @@ import {BlockI, BoardContentI, BoardI, BoardTemplate} from "@/app/board/{service
 import {blockTypeFlatList} from "@/app/board/{components}/block/list";
 import {Dispatch, MutableRefObject, SetStateAction} from "react";
 import {BoardService} from "@/app/board/{services}/BoardProvider";
-import {TempFileI} from "@/app/board/{hooks}/usePendingFiles";
+import {TempFileI} from "@/app/board/[id]/{hooks}/usePendingFiles";
 
 export function findElement(ele: HTMLElement) {
     if(ele?.parentElement?.id.includes('block')) return ele.parentElement;

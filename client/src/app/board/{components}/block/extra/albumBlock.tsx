@@ -10,7 +10,7 @@ import Thumbnail from "@/app/board/{components}/block/extra/{components}/thumbna
 import Slide from "@/app/board/{components}/block/extra/{components}/slide";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import {AxiosError} from "axios";
-import {usePendingFiles} from "@/app/board/{hooks}/usePendingFiles";
+import {usePendingFiles} from "@/app/board/[id]/{hooks}/usePendingFiles";
 import boardApiService from "@/app/board/{services}/boardApiService";
 
 export type ImageShowProps = {

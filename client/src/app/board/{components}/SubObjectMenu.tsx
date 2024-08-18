@@ -1,7 +1,7 @@
 import React from "react";
 import {faEye, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {useBlockEvent} from "@/app/board/{hooks}/useBlockEvent";
+import {useBlockEvent} from "@/app/board/[id]/{hooks}/useBlockEvent";
 
 const SubObjectMenu = ({
     onClick,

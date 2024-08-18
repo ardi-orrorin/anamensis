@@ -15,7 +15,7 @@ import MenuItem from "@/app/board/{components}/MenuItem";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import {BlockI, ExtraValueI} from "@/app/board/{services}/types";
 import SubObjectMenu from "@/app/board/{components}/SubObjectMenu";
-import {useBlockEvent} from "@/app/board/{hooks}/useBlockEvent";
+import {useBlockEvent} from "@/app/board/[id]/{hooks}/useBlockEvent";
 
 type ContextMenuProps = {
     clientX: number;
@@ -51,7 +51,7 @@ const Block = (props: BlockProps) => {
         )
     , [props.code]);
 
-    const Component = block?.component!;
+    const Component = useMemo(()=>block?.component!,[block]);
 
     useEffect(()=> {
         return () => {
@@ -111,7 +111,9 @@ const Block = (props: BlockProps) => {
                     url = '';
                     break;
             }
+
             window.open(url, '_blank');
+
             return ;
         }
     }

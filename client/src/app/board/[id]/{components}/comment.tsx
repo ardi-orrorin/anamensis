@@ -17,7 +17,7 @@ import PageNavigator from "@/app/{commons}/PageNavigator";
 import {Common} from "@/app/{commons}/types/commons";
 import {useQuery} from "@tanstack/react-query";
 import boardApiService from "@/app/board/{services}/boardApiService";
-import {useBlockEvent} from "@/app/board/{hooks}/useBlockEvent";
+import {useBlockEvent} from "@/app/board/[id]/{hooks}/useBlockEvent";
 
 export type SaveComment = {
     boardPk   : string;
@@ -26,11 +26,7 @@ export type SaveComment = {
     parentPk? : string;
 }
 
-const Comment = ({
-    params
-} : {
-    params: {id: string};
-}) => {
+const Comment = () => {
     const searchParams = useSearchParams();
 
     const {

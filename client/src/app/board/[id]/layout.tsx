@@ -14,9 +14,9 @@ import {System} from "@/app/user/system/{services}/types";
 import {useQuery} from "@tanstack/react-query";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import rootApiService from "@/app/{services}/rootApiService";
-import {TempFileProvider} from "@/app/board/{hooks}/usePendingFiles";
+import {TempFileProvider} from "@/app/board/[id]/{hooks}/usePendingFiles";
 import boardApiService from "@/app/board/{services}/boardApiService";
-import {BlockEventProvider} from "@/app/board/{hooks}/useBlockEvent";
+import {BlockEventProvider} from "@/app/board/[id]/{hooks}/useBlockEvent";
 
 
 export default function Page({children, params} : {children: ReactNode, params: {id: string}}) {
@@ -168,7 +168,6 @@ export default function Page({children, params} : {children: ReactNode, params: 
                 myPoint, setMyPoint,
                 isTemplate, isNewBoard,
                 boardTemplate, setBoardTemplate,
-                roles
             }}>
                 <TempFileProvider>
                     <BlockEventProvider>

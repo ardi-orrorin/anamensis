@@ -7,7 +7,7 @@ import BoardProvider from "@/app/board/{services}/BoardProvider";
 import MenuColorItem from "@/app/board/{components}/MenuColorItem";
 import MenuFontsizeItem from "@/app/board/{components}/MenuFontsizeItem";
 import MenuItem from "@/app/board/{components}/MenuItem";
-import {useBlockEvent} from "@/app/board/{hooks}/useBlockEvent";
+import {useBlockEvent} from "@/app/board/[id]/{hooks}/useBlockEvent";
 
 export type ToggleEnum = 'blockMenu' | 'fontSize' | 'color' | 'backgroundColor' | 'fontStyle' | '';
 

@@ -4,7 +4,7 @@ import {BlockI} from "@/app/board/{services}/types";
 import {BoardService} from "@/app/board/{services}/BoardProvider";
 import {Dispatch, SetStateAction} from "react";
 import {blockTypeFlatList} from "@/app/board/{components}/block/list";
-import {BlockService} from "@/app/board/{hooks}/useBlockEvent";
+import {BlockService} from "@/app/board/[id]/{hooks}/useBlockEvent";
 
 export const useBoardHotKey = ({
     blockService,

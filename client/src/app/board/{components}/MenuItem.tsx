@@ -5,7 +5,7 @@ import {ToggleEnum} from "@/app/board/{components}/SubTextMenu";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import {notAvailDupCheck, onChangeBlockGlobalHandler} from "@/app/board/{services}/funcs";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
-import {useBlockEvent} from "@/app/board/{hooks}/useBlockEvent";
+import {useBlockEvent} from "@/app/board/[id]/{hooks}/useBlockEvent";
 
 const MenuItem = ({
     seq,

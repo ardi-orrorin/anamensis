@@ -34,9 +34,9 @@ import dynamic from "next/dynamic";
 import {useQuery} from "@tanstack/react-query";
 import rootApiService from "@/app/{services}/rootApiService";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
-import {usePendingFiles} from "@/app/board/{hooks}/usePendingFiles";
+import {usePendingFiles} from "@/app/board/[id]/{hooks}/usePendingFiles";
 import BoardApiService from "@/app/board/{services}/boardApiService";
-import {useBlockEvent} from "@/app/board/{hooks}/useBlockEvent";
+import {useBlockEvent} from "@/app/board/[id]/{hooks}/useBlockEvent";
 
 export interface RateInfoI {
     id      : number;
@@ -59,7 +59,7 @@ export default function Page({params}: {params : {id: string}}) {
         , rateInfo, setRateInfo
         , isNewBoard, isTemplate
         , boardTemplate, setBoardTemplate
-        , roles,  summary
+        , summary
     } = useContext(BoardProvider);
 
     const {
@@ -70,7 +70,6 @@ export default function Page({params}: {params : {id: string}}) {
 
     const {
         blockService, setSelectedBlock,
-
     } = useBlockEvent();
 
     const [fullScreen, setFullScreen] = useState<boolean>(false);
@@ -445,7 +444,7 @@ export default function Page({params}: {params : {id: string}}) {
                             && <HeaderBtn submitClickHandler={() => debounce(() => submitHandler(false))}
                                           deleteClickHandler={() => debounce(() => deleteHandler())}
                                           blockClickHandler={() => debounce(() => onBlockClickHandler())}
-                                          {...{roles, board, editClickHandler}}
+                                          {...{board, editClickHandler}}
                             />
                         }
                         <div className={'flex gap-1'}>
@@ -556,7 +555,7 @@ export default function Page({params}: {params : {id: string}}) {
                     && <WriterInfo {...{board, summary}} />
                 }
 
-                <Comment params={params} />
+                <Comment />
             </div>
             <div>
                 {

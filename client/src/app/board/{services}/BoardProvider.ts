@@ -3,7 +3,6 @@ import {createContext, Dispatch, SetStateAction} from "react";
 import {RateInfoI} from "@/app/board/[id]/page";
 import {SaveComment} from "@/app/board/[id]/{components}/comment";
 import {BoardSummaryI} from "@/app/user/{services}/userProvider";
-import {System} from "@/app/user/system/{services}/types";
 
 export interface BoardService {
     data: BoardI;
@@ -36,7 +35,6 @@ export interface BoardProviderI {
     isTemplate: boolean;
     boardTemplate: BoardTemplateService;
     setBoardTemplate: Dispatch<SetStateAction<BoardTemplateService>>;
-    roles: System.Role[];
 }
 
 const BoardProvider = createContext<BoardProviderI>({} as BoardProviderI);

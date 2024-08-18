@@ -4,7 +4,7 @@ import {useRef, useState} from "react";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import axios from "axios";
 import {BlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
-import {usePendingFiles} from "@/app/board/{hooks}/usePendingFiles";
+import {usePendingFiles} from "@/app/board/[id]/{hooks}/usePendingFiles";
 
 export type FileUploadProps = {
     onUploadFileUrl: (url: string) => void;

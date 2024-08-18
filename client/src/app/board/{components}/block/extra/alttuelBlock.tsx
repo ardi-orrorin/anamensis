@@ -9,7 +9,7 @@ import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import apiCall from "@/app/{commons}/func/api";
 import {NO_IMAGE} from "@/app/{services}/constants";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
-import {usePendingFiles} from "@/app/board/{hooks}/usePendingFiles";
+import {usePendingFiles} from "@/app/board/[id]/{hooks}/usePendingFiles";
 import boardApiService from "@/app/board/{services}/boardApiService";
 
 

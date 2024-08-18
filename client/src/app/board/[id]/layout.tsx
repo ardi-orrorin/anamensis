@@ -1,13 +1,12 @@
 'use client';
+
 import {ReactNode, useCallback, useEffect, useMemo, useState} from "react";
 import BoardProvider, {BoardService, BoardTemplateService} from "@/app/board/{services}/BoardProvider";
-import BlockProvider, {BlockService, CommentService} from "@/app/board/{services}/BlockProvider";
 import {BlockI, BoardI, CommentI, DeleteCommentI} from "@/app/board/{services}/types";
 import {SaveComment} from "@/app/board/[id]/{components}/comment";
 import {RateInfoI} from "@/app/board/[id]/page";
 import apiCall from "@/app/{commons}/func/api";
 import {useSearchParams} from "next/navigation";
-import LoadingProvider from "@/app/board/{services}/LoadingProvider";
 import {preload} from "swr";
 import {initBlock} from "@/app/board/{services}/funcs";
 import {BoardSummaryI} from "@/app/user/{services}/userProvider";
@@ -16,6 +15,8 @@ import {useQuery} from "@tanstack/react-query";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import rootApiService from "@/app/{services}/rootApiService";
 import {TempFileProvider} from "@/app/board/{hooks}/usePendingFiles";
+import boardApiService from "@/app/board/{services}/boardApiService";
+import {BlockEventProvider} from "@/app/board/{hooks}/useBlockEvent";
 
 
 export default function Page({children, params} : {children: ReactNode, params: {id: string}}) {
@@ -30,10 +31,6 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
     const [summary, setSummary] = useState<BoardSummaryI[]>([]);
 
-    const [selectedBlock, setSelectedBlock] = useState<String>('');
-
-    const [commentService, setCommentService] = useState<CommentService>({} as CommentService);
-
     const [deleteComment, setDeleteComment] = useState<DeleteCommentI>({} as DeleteCommentI);
 
     const [newComment, setNewComment] = useState<SaveComment>({} as SaveComment);
@@ -42,20 +39,12 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
     const [rateInfo, setRateInfo] = useState<RateInfoI>({} as RateInfoI);
 
-    const [blockService, setBlockService] = useState<BlockService>({} as BlockService);
-
-    // const [waitUploadFiles, setWaitUploadFiles] = useState<TempFileI[]>([]);
-    // const [waitRemoveFiles, setWaitRemoveFiles] = useState<TempFileI[]>([]);
-
     const [boardTemplate, setBoardTemplate] = useState<BoardTemplateService>({
         isApply: false,
         templateId: 0,
         list: [],
         templates: []
     });
-
-    const [loading, setLoading] = useState<boolean>(false);
-    const [commentLoading, setCommentLoading] = useState<boolean>(false);
 
     const isNewBoard = useMemo(() => !params.id || params.id === 'new',[params.id]);
     const isTemplate = useMemo(() => !params.id || params.id === 'temp',[params.id]);
@@ -101,15 +90,8 @@ export default function Page({children, params} : {children: ReactNode, params: 
         });
     },[params.id]);
 
-
-    useEffect(() => {
-        setSelectedBlock(window.location.hash.replace('#block-', '') || '');
-    },[]);
-
     useEffect(() => {
         if(isNewBoard || isTemplate) return ;
-
-        setLoading(true);
 
         Promise.allSettled([
             fetchBoard(),
@@ -165,28 +147,17 @@ export default function Page({children, params} : {children: ReactNode, params: 
             alert(e.response.data);
             location.href = '/';
         } finally {
-            setLoading(false);
         }
     },[params.id, board.isView]);
 
     const fetchRate = useCallback(() => {
-        preload(`/api/board/rate/${params.id}`, async () => {
-            return await apiCall<RateInfoI>({
-                path: '/api/board/rate/' + params.id,
-                method: 'GET',
-                call: 'Proxy'
-            })
-        })
+        boardApiService.getRateInfo(params.id)
         .then(res => {
             setRateInfo(res.data);
         });
     },[params.id]);
 
     return (
-        <LoadingProvider.Provider value={{
-            loading, setLoading,
-            commentLoading, setCommentLoading
-        }}>
             <BoardProvider.Provider value={{
                 board, setBoard,
                 comment, setComment,
@@ -200,15 +171,10 @@ export default function Page({children, params} : {children: ReactNode, params: 
                 roles
             }}>
                 <TempFileProvider>
-                    <BlockProvider.Provider value={{
-                        blockService, setBlockService,
-                        commentService, setCommentService,
-                        selectedBlock, setSelectedBlock,
-                    }}>
+                    <BlockEventProvider>
                         {children}
-                    </BlockProvider.Provider>
+                    </BlockEventProvider>
                 </TempFileProvider>
             </BoardProvider.Provider>
-        </LoadingProvider.Provider>
     )
 }

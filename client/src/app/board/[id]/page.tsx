@@ -20,8 +20,6 @@ import BoardTitle from "@/app/board/[id]/{components}/boardTitle";
 import HeaderBtn from "@/app/board/[id]/{components}/headerBtn";
 import BoardInfo from "@/app/board/[id]/{components}/boardInfo";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
-import BlockProvider from "@/app/board/{services}/BlockProvider";
-import LoadingProvider from "@/app/board/{services}/LoadingProvider";
 import KeyDownEvent from "@/app/board/{services}/keyDownEvent";
 import {initBlock, listSort, onChangeBlockGlobalHandler, updateBoard} from "@/app/board/{services}/funcs";
 import WriterInfo from "@/app/board/[id]/{components}/writerInfo";
@@ -38,6 +36,7 @@ import rootApiService from "@/app/{services}/rootApiService";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import {usePendingFiles} from "@/app/board/{hooks}/usePendingFiles";
 import BoardApiService from "@/app/board/{services}/boardApiService";
+import {useBlockEvent} from "@/app/board/{hooks}/useBlockEvent";
 
 export interface RateInfoI {
     id      : number;
@@ -64,20 +63,15 @@ export default function Page({params}: {params : {id: string}}) {
     } = useContext(BoardProvider);
 
     const {
-        blockService
-    } = useContext(BlockProvider);
-
-    const {
-        setLoading
-        , commentLoading
-    } = useContext(LoadingProvider);
-
-    const {
         waitUploadFiles,
         waitRemoveFiles,
         deleteDummyFiles , deleteImage,
     } = usePendingFiles();
 
+    const {
+        blockService, setSelectedBlock,
+
+    } = useBlockEvent();
 
     const [fullScreen, setFullScreen] = useState<boolean>(false);
     const [modal, setModal] = useState({toggle: false, id: 0});
@@ -87,7 +81,6 @@ export default function Page({params}: {params : {id: string}}) {
     const isFavorite = useMemo(() =>
             favories?.some(item => item === board?.data?.id?.toString())
         , [favories, board?.data?.id]);
-
 
     const debounce = createDebounce(300);
 
@@ -126,6 +119,10 @@ export default function Page({params}: {params : {id: string}}) {
     },[]);
 
     useEffect(() => {
+        setSelectedBlock(window.location.hash.replace('#block-', '') || '');
+    },[]);
+
+    useEffect(() => {
         if(!isNewBoard && !board?.isView || isTemplate && !board?.isView || board.isView) return;
 
         const beforeunload = (e: BeforeUnloadEvent) => {
@@ -158,8 +155,6 @@ export default function Page({params}: {params : {id: string}}) {
             alert('내용을 입력해주세요');
             return ;
         }
-
-        setLoading(true);
 
         try {
             const body = isTemplate
@@ -219,13 +214,10 @@ export default function Page({params}: {params : {id: string}}) {
                 : '로그인이 필요합니다.';
 
             alert(message);
-
-            setLoading(false);
         }
     }
 
     const deleteHandler = useCallback(async () => {
-        setLoading(true);
         try {
             await apiCall({
                 path: '/api/board/' + params.id,
@@ -382,7 +374,6 @@ export default function Page({params}: {params : {id: string}}) {
             }
 
             await apiCall(options);
-            // setIsFavorite(!isFavorite);
 
             await refetchFavories();
 
@@ -564,10 +555,8 @@ export default function Page({params}: {params : {id: string}}) {
                     && board.isView
                     && <WriterInfo {...{board, summary}} />
                 }
-                {
-                    !commentLoading
-                    && <Comment params={params} />
-                }
+
+                <Comment params={params} />
             </div>
             <div>
                 {

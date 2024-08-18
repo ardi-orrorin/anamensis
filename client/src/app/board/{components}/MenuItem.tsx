@@ -1,11 +1,11 @@
 import {BlockType, blockTypeFlatList} from "@/app/board/{components}/block/list";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import React, {MutableRefObject, useContext, useMemo} from "react";
-import BlockProvider from "@/app/board/{services}/BlockProvider";
 import {ToggleEnum} from "@/app/board/{components}/SubTextMenu";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import {notAvailDupCheck, onChangeBlockGlobalHandler} from "@/app/board/{services}/funcs";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
+import {useBlockEvent} from "@/app/board/{hooks}/useBlockEvent";
 
 const MenuItem = ({
     seq,
@@ -18,7 +18,11 @@ const MenuItem = ({
     toggle?  : ToggleEnum,
     subMenu? : boolean,
 }) => {
-    const {blockService, setBlockService} = useContext(BlockProvider);
+    const {
+        onClose, setInitBlock,
+        setInitBlockMenu,
+    } = useBlockEvent();
+
     const {board, setBoard,isTemplate} = useContext(BoardProvider);
 
     const curCode = useMemo(() => {
@@ -26,10 +30,6 @@ const MenuItem = ({
         return item?.code;
     },[board.data?.content?.list, seq]) as string;
 
-    const onCloseHandler = (e: React.MouseEvent<HTMLDivElement>) => {
-        e.stopPropagation();
-        setBlockService({...blockService, blockMenu: ''})
-    }
     const openMenuClick = (code: string) => {
         if(!code || code === '') return ;
 
@@ -42,15 +42,7 @@ const MenuItem = ({
             isTemplate,
         });
 
-        setBlockService({
-            ...blockService,
-            blockMenu : '',
-            block: {
-                seq   : 0,
-                code  : '',
-                value : '',
-                hash  : '',
-        }});
+        setInitBlock();
     };
 
     const blockMenu = useMemo(() =>
@@ -122,12 +114,12 @@ const MenuItem = ({
             {
                 !subMenu &&
                 <div className={'fixed left-0 top-0 w-full h-full'}
-                     onClick={onCloseHandler}
+                     onClick={onClose}
                 />
             }
 
             <div className={'z-[10] fixed w-full h-full'}
-                 onClick={() => setBlockService({...blockService, blockMenu: ''})}
+                 onClick={() => setInitBlockMenu()}
             ></div>
         </>
     )

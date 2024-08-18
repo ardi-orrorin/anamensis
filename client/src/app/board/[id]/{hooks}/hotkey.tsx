@@ -1,10 +1,10 @@
 import {useHotkeys} from "react-hotkeys-hook";
 import {Options} from "react-hotkeys-hook/src/types";
 import {BlockI} from "@/app/board/{services}/types";
-import {BlockService} from "@/app/board/{services}/BlockProvider";
 import {BoardService} from "@/app/board/{services}/BoardProvider";
 import {Dispatch, SetStateAction} from "react";
 import {blockTypeFlatList} from "@/app/board/{components}/block/list";
+import {BlockService} from "@/app/board/{hooks}/useBlockEvent";
 
 export const useBoardHotKey = ({
     blockService,
@@ -14,13 +14,14 @@ export const useBoardHotKey = ({
     setFullScreen,
     blockRef
 }:{
-    blockService: BlockService,
-    board: BoardService,
-    setBoard: Dispatch<SetStateAction<BoardService>>,
-    fullScreen: boolean,
-    setFullScreen: React.Dispatch<React.SetStateAction<boolean>>,
-    blockRef: React.MutableRefObject<HTMLElement[] | null[]>,
+    board         : BoardService,
+    setBoard      : Dispatch<SetStateAction<BoardService>>,
+    blockService  : BlockService,
+    fullScreen    : boolean,
+    setFullScreen : React.Dispatch<React.SetStateAction<boolean>>,
+    blockRef      : React.MutableRefObject<HTMLElement[] | null[]>,
 }) => {
+
     const hotkeyOption: Options = {
         preventDefault: true,
         enableOnFormTags: true,

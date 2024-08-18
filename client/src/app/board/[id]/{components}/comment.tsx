@@ -7,10 +7,8 @@ import {faComment} from "@fortawesome/free-solid-svg-icons";
 import apiCall from "@/app/{commons}/func/api";
 import Link from "next/link";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
-import BlockProvider from "@/app/board/{services}/BlockProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {defaultProfile} from "@/app/{commons}/func/image";
-import {mutate, preload} from "swr";
 import moment from "moment";
 import {QuestionBlockExtraValueType} from "@/app/board/{components}/block/extra/questionBlock";
 import {updateBoard} from "@/app/board/{services}/funcs";
@@ -19,6 +17,7 @@ import PageNavigator from "@/app/{commons}/PageNavigator";
 import {Common} from "@/app/{commons}/types/commons";
 import {useQuery} from "@tanstack/react-query";
 import boardApiService from "@/app/board/{services}/boardApiService";
+import {useBlockEvent} from "@/app/board/{hooks}/useBlockEvent";
 
 export type SaveComment = {
     boardPk   : string;
@@ -35,7 +34,6 @@ const Comment = ({
     const searchParams = useSearchParams();
 
     const {
-        // comment,setComment,
         board, isNewBoard, isTemplate
     } = useContext(BoardProvider);
 
@@ -172,7 +170,9 @@ const CommentItem = (props: CommentI & {refetch: ()=> Promise<any>}) => {
     } = props;
 
     const {board} = useContext(BoardProvider);
-    const {setSelectedBlock} = useContext(BlockProvider);
+
+    const {setSelectedBlock} = useBlockEvent();
+
     const {deleteComment, setDeleteComment} = useContext(BoardProvider);
     const [loading, setLoading] = useState(false);
 

@@ -3,16 +3,14 @@ import {BoardService} from "@/app/board/{services}/BoardProvider";
 import {Dispatch, MutableRefObject, SetStateAction} from "react";
 
 export type KeyEventType = {
-    seq: number;
-    board?: BoardService;
-    setBoard?: Dispatch<SetStateAction<BoardService>>;
-    blockRef?: MutableRefObject<HTMLElement[] |null[]>;
-    event?: React.KeyboardEvent<HTMLElement>;
-    addBlock?: (seq: number, init: boolean, value?: string) => BlockI;
-    addBlockHandler?: (seq: number, value?: string) => void;
+    seq              : number;
+    board?           : BoardService;
+    setBoard?        : Dispatch<SetStateAction<BoardService>>;
+    blockRef?        : MutableRefObject<HTMLElement[] |null[]>;
+    event?           : React.KeyboardEvent<HTMLElement>;
+    addBlock?        : (seq: number, init: boolean, value?: string, cusSeq?: boolean) => BlockI;
+    addBlockHandler? : (seq: number, value?: string) => void;
 }
-
-
 const enter = (args: KeyEventType) => {
     const {
         seq, board,
@@ -24,7 +22,9 @@ const enter = (args: KeyEventType) => {
 
     event.preventDefault();
 
-    seq === 0 && event?.currentTarget?.getAttribute('name') === 'title' && blockRef.current[0]?.focus();
+    if(seq === 0 && event?.currentTarget?.getAttribute('name') === 'title'){
+        return blockRef.current[0]?.focus();
+    }
 
     const list = board.data?.content?.list;
 
@@ -66,6 +66,7 @@ const backspace = (args: KeyEventType) => {
 
     const curRef = blockRef.current[seq] as HTMLInputElement;
 
+    if(curRef.selectionStart !== curRef.selectionEnd) return;
 
     const initCondition = seq === 1 && blockRef?.current[seq - 1]?.ariaRoleDescription === 'extra';
     const initSeq =  initCondition ? 1 : 0;
@@ -75,15 +76,16 @@ const backspace = (args: KeyEventType) => {
     if(seq === initSeq && initBlockRef.value === '') {
         const newList = list.map((item, index) => {
             if (item.seq !== initSeq) return item;
-            return addBlock(initSeq, true);
+            return addBlock(initSeq, true, '', true);
         });
+
         setBoard({...board, data: {...board.data, content: {list: newList}}});
     }
 
     if(seq === initSeq) {
         setTimeout(() => {
             blockRef.current[initSeq]?.focus();
-        },0);
+        },100);
         return;
     }
 
@@ -109,7 +111,9 @@ const backspace = (args: KeyEventType) => {
 
     setBoard({...board, data: {...board.data, content: {list: newList}}});
 
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
+        clearTimeout(timeout);
+        if(blockRef?.current[seq - 1]?.ariaRoleDescription !== 'text') return;
         const prevRef = blockRef.current[seq - 1] as HTMLInputElement;
         const position = prevRef.value.length - afterText.length;
         prevRef.setSelectionRange(position, position);
@@ -132,9 +136,12 @@ const arrowUp = (args: KeyEventType) => {
 
     if(!prevRef) return;
 
-    const prevPosition = curRef.selectionStart! > prevRef.value.length ? prevRef.value.length : curRef.selectionStart;
-    prevRef.setSelectionRange(prevPosition, prevPosition);
-    prevRef.focus();
+    const prevPosition = curRef?.selectionStart! > prevRef?.value?.length ? prevRef?.value?.length : curRef?.selectionStart;
+
+    if(!prevRef?.setSelectionRange || !prevRef?.focus) return;
+
+    prevRef?.setSelectionRange(prevPosition, prevPosition);
+    prevRef?.focus();
 }
 
 const arrowDown = (args: any) => {
@@ -147,8 +154,6 @@ const arrowDown = (args: any) => {
     const nextRef = blockRef.current[seq + 1]?.ariaRoleDescription === 'object'
         ? seq + 2 < board.data.content.list.length && blockRef.current[seq + 2] as HTMLInputElement
         : blockRef.current[seq + 1] as HTMLInputElement;
-
-
 
     if(!nextRef) return;
 

@@ -1,15 +1,14 @@
 import {ExpendBlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
-import React, {ChangeEvent, CSSProperties, useContext, useEffect, useMemo, useRef, useState} from "react";
+import React, {ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import Image from "next/image";
-import Link from "next/link";
 import axios from "axios";
-import TempFileProvider from "@/app/board/{services}/TempFileProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {defaultNoImg} from "@/app/{commons}/func/image";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
-import apiCall from "@/app/{commons}/func/api";
 import {NO_IMAGE} from "@/app/{services}/constants";
+import {usePendingFiles} from "@/app/board/[id]/{hooks}/usePendingFiles";
+import boardApiService from "@/app/board/{services}/boardApiService";
 
 
 export type AlttuelBlockProps = {
@@ -35,9 +34,8 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
     }: ExpendBlockProps = props;
 
     const maxFileSize = 5 * 1024 * 1024;
-
     const extraValue = props.extraValue as AlttuelBlockProps;
-    const {setWaitUploadFiles, setWaitRemoveFiles} = useContext(TempFileProvider);
+    const {setWaitUploadFiles, setWaitRemoveFiles} = usePendingFiles();
 
     const imageRef = useRef<HTMLInputElement>(null);
     const [imgViewProps, setImgViewProps] = useState<ImgViewProps>({
@@ -64,16 +62,16 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
         return defaultNoImg(extraValue?.img);
     }, [extraValue?.img])
 
-    const addCommasToNumber = (number: number)  => {
+    const addCommasToNumber = useCallback((number: number)  => {
         if(Number(number) === 0) return '무료';
         const money = number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         return `${money}원`;
-    }
+    },[]);
 
-    const onChangeImageHandler = () => {
+    const onChangeImageHandler = useCallback(() => {
         if(!imageRef.current) return;
         imageRef.current.click();
-    }
+    },[imageRef?.current]);
 
     const onChangeFileHandler = async (e: ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
@@ -117,17 +115,12 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
             if(extraValue?.img) {
                 const filename = extraValue.img.substring(extraValue.img.lastIndexOf('/') + 1);
 
-                await apiCall({
-                    path: '/api/file/delete/filename',
-                    method: 'PUT',
-                    body: {fileUri: extraValue.img},
-                    isReturnData: false,
-                })
-                .then(() => {
-                    setWaitRemoveFiles(prevState =>
-                        [...prevState.filter(file => file.fileName !== filename)]
-                    );
-                })
+                await boardApiService.deleteFile(extraValue.img)
+                    .then(() => {
+                        setWaitRemoveFiles(prevState =>
+                            [...prevState.filter(file => file.fileName !== filename)]
+                        );
+                    })
 
             } else {
                 setWaitUploadFiles(prevState => [
@@ -160,7 +153,6 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
             props.onChangeValueHandler(value);
             return;
         }
-
 
         const condition = value.startsWith('0') && value !== '0';
         const money = condition ? value.replace(/^0+/, '') : value;
@@ -207,12 +199,24 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
         onChangeExtraValueHandler(newValue);
     }
 
+    const tags = useMemo(() =>
+        Array.from(extraValue?.tags ?? [])
+            .map((tag, index) =>
+                <Tag key={index}
+                     {...{tag, deleteTagHandler, isView: isView!}}
+                />
+            )
+    ,[extraValue?.tags, isView])
+
 
     return (
         <div id={`block-${hash}`}
              className={'w-full'}
              aria-roledescription={type}
-             ref={el => {props!.blockRef!.current[props.seq] = el}}
+             ref={el => {
+                 if(!props.blockRef?.current) return ;
+                 props!.blockRef!.current[props.seq] = el
+            }}
         >
             <div className={[
                 'flex flex-col sm:flex-row w-full items-center gap-4 outline-0 break-all',
@@ -244,14 +248,7 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
                             && extraValue?.tags
                             && extraValue?.tags?.length > 0
                             && <div className={'flex py-2 gap-2 text-sm text-blue-700'}>
-                                {
-                                    Array.from(extraValue?.tags ?? [])
-                                        .map((tag, index) =>
-                                            <Tag key={index}
-                                                 {...{tag, deleteTagHandler, isView: isView!}}
-                                            />
-                                        )
-                                }
+                                { tags }
                           </div>
                         }
                     </div>

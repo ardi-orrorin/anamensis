@@ -1,10 +1,12 @@
 import {NextRequest, NextResponse} from "next/server";
-import {WebSysI} from "@/app/user/system/page";
 import apiCall from "@/app/{commons}/func/api";
+import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
+import {AxiosError} from "axios";
+import {System} from "@/app/user/system/{services}/types";
 
 export async function GET() {
     try {
-        const res = await apiCall<WebSysI[]>({
+        const res = await apiCall<System.WebSys[]>({
             path: `/admin/api/web-sys`,
             method: 'GET',
             call: 'Server',
@@ -12,19 +14,23 @@ export async function GET() {
             isReturnData: true,
         });
 
-        return new NextResponse(JSON.stringify(res), {
+        return ExNextResponse({
+            body: JSON.stringify(res),
             status: 200,
         });
-    } catch (error) {
-        return new NextResponse('권한이 없습니다.', {
-            status: 403,
-        });
-    }
 
+    } catch (e) {
+        const err = e as AxiosError;
+        const message = err.status == 403 ? '권한이 없습니다.' : '서버 오류입니다.';
+        return ExNextResponse({
+            body: JSON.stringify({message}),
+            status: err.status || 500,
+        })
+    }
 }
 
 export async function POST(req: NextRequest) {
-    const body = await req.json() as WebSysI;
+    const body = await req.json() as System.WebSys;
 
     await apiCall<any>({
         path: '/admin/api/web-sys',
@@ -40,7 +46,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-    const body = await req.json() as WebSysI;
+    const body = await req.json() as System.WebSys;
 
     await apiCall<any>({
         path: '/admin/api/web-sys',

@@ -3,6 +3,7 @@
 import React, {CSSProperties, useEffect} from "react";
 import {ExpendBlockProps} from "@/app/board/{components}/block/type/Types";
 import apiCall from "@/app/{commons}/func/api";
+import ObjectTemplate from "@/app/board/{components}/block/ObjectTemplate";
 
 type OGType = {
     title       : string;
@@ -17,8 +18,9 @@ const LinkBlock = (props: ExpendBlockProps) => {
         value, type,
         isView, hash,
         onChangeValueHandler, onKeyUpHandler,
-        onKeyDownHandler, onMouseEnterHandler,
+        onMouseEnterHandler, onMouseLeaveHandler,
         onFocusHandler, onChangeExtraValueHandler,
+        onKeyDownHandler
     }: ExpendBlockProps = props;
 
     const extraValue = props.extraValue as OGType;
@@ -29,7 +31,9 @@ const LinkBlock = (props: ExpendBlockProps) => {
 
 
     const onKeyDownChangeHandler = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if(e.key !== 'Enter') return ;
+        if(e.key !== 'Enter') {
+            return onKeyDownHandler!(e);
+        }
 
         const urlRegex = new RegExp(/(http(s)?:\/\/)([a-z0-9\w]+\.*)+[a-z0-9]{2,5}/gi);
 
@@ -65,14 +69,11 @@ const LinkBlock = (props: ExpendBlockProps) => {
     }
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-        onChangeValueHandler!(e.target.value);
+        onChangeValueHandler!(e?.target?.value);
     }
 
     return (
-        <div id={`block-${hash}`}
-             className={['w-full'].join(' ')}
-             aria-roledescription={type}
-        >
+        <ObjectTemplate {...{hash, seq, type, isView, blockRef, onMouseEnterHandler, onMouseLeaveHandler}}>
             {
                 !extraValue || !extraValue.title
                 ? <input className={'w-full p-2 break-all text-blue-700 outline-0'}
@@ -84,15 +85,20 @@ const LinkBlock = (props: ExpendBlockProps) => {
                          onKeyDown={onKeyDownChangeHandler}
                          onFocus={onFocusHandler}
                          disabled={isView}
-                         ref={el => {blockRef!.current[seq] = el}}
+                         ref={el => {
+                             if(!blockRef?.current) return;
+                             blockRef!.current[seq] = el
+                         }}
                 />
                 : <a className={'flex justify-between w-full p-4 gap-2'}
                      style={{backgroundColor: 'rgba(230,230,230,0.2)'}}
                      href={value}
                      target={'_blank'}
-                     onMouseEnter={onMouseEnterHandler}
                      aria-roledescription={'object'}
-                     ref={el => {blockRef!.current[seq] = el}}
+                     ref={el => {
+                         if(!blockRef?.current) return;
+                         blockRef!.current[seq] = el
+                     }}
                 >
                     <div className={'flex flex-col gap-1 justify-between p-1'}
                     >
@@ -108,7 +114,7 @@ const LinkBlock = (props: ExpendBlockProps) => {
                     />
                 </a>
             }
-        </div>
+        </ObjectTemplate>
     )
 }
 

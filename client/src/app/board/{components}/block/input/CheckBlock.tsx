@@ -2,6 +2,7 @@
 
 import React, {CSSProperties, useMemo} from "react";
 import {ExpendBlockProps} from "@/app/board/{components}/block/type/Types";
+import ObjectTemplate from "@/app/board/{components}/block/ObjectTemplate";
 
 type TodoType = {
     check : boolean;
@@ -14,7 +15,8 @@ const CheckBlock = (props: ExpendBlockProps) => {
         type,
         onChangeValueHandler, onChangeExtraValueHandler,
         onKeyUpHandler, onKeyDownHandler,
-        onFocusHandler
+        onFocusHandler,
+        onMouseEnterHandler, onMouseLeaveHandler,
     }: ExpendBlockProps = props;
 
     const checked = useMemo(()=>(extraValue as TodoType)?.check || false,[extraValue])
@@ -23,7 +25,6 @@ const CheckBlock = (props: ExpendBlockProps) => {
     const onCheckChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         const data:TodoType  = {check : e.target.checked};
         onChangeExtraValueHandler && onChangeExtraValueHandler(data);
-
     }
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,10 +32,7 @@ const CheckBlock = (props: ExpendBlockProps) => {
     }
 
     return (
-        <div id={`block-${hash}`}
-             className={'w-full'}
-             aria-roledescription={type}
-        >
+        <ObjectTemplate {...{hash, seq, type, isView, blockRef, onMouseEnterHandler, onMouseLeaveHandler}}>
             <div className={'flex w-full break-all p-2 gap-2'}
                  style={{backgroundColor: isView ? '' : 'rgba(230,230,230,0.2)'}}
             >
@@ -46,6 +44,10 @@ const CheckBlock = (props: ExpendBlockProps) => {
                              value={''}
                              checked={checked || false}
                              onChange={onCheckChangeHandler}
+                             ref={el => {
+                                 if(!blockRef?.current) return;
+                                 blockRef!.current[seq] = el
+                             }}
                     />
                     : <p className={[
                         'w-auto py-0.5 text-sm outline-0 break-all',
@@ -79,7 +81,7 @@ const CheckBlock = (props: ExpendBlockProps) => {
                     />
                 }
             </div>
-        </div>
+        </ObjectTemplate>
     )
 }
 

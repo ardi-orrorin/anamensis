@@ -14,4 +14,5 @@ public interface AttendanceMapper {
 
     Optional<Attendance> findByMemberPk(long memberPk);
 
+    boolean exist(long memberPk);
 }

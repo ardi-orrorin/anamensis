@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.function.Tuple3;
 
 import java.util.List;
 
@@ -43,14 +44,11 @@ public class BoardCommentController {
                 .map(board -> BoardCommentResponse.Comment.fromResultMap(board, userId))
                 .collectList()
                 .zipWith(count)
-                .map(t -> {
+                .flatMap(t -> {
                     page.setTotal(t.getT2());
-                    return new PageResponse<>(
-                            page,
-                            t.getT1()
-                        );
-                    }
-                );
+                    PageResponse<BoardCommentResponse.Comment> res = new PageResponse<>(page, t.getT1());
+                    return Mono.just(res);
+                });
     }
 
     @PostMapping("")
@@ -76,26 +74,10 @@ public class BoardCommentController {
                 .doOnNext($ -> {
                     Mono.zip(pointCode, tableCode, member)
                         .publishOn(Schedulers.boundedElastic())
-                            .doOnNext(t -> {
-                                userService.updatePoint(t.getT3().getId(), (int) t.getT1().getPoint())
-                                        .subscribeOn(Schedulers.boundedElastic())
-                                        .subscribe();
-
-                                PointHistory ph = new PointHistory();
-                                ph.setMemberPk(t.getT3().getId());
-                                ph.setPointCodePk(t.getT1().getId());
-                                ph.setTableCodePk(t.getT2().getId());
-                                ph.setCreateAt(bc.getCreateAt());
-                                ph.setTableRefPk(bc.getId());
-
-                                pointHistoryService.insert(ph)
-                                        .subscribeOn(Schedulers.boundedElastic())
-                                        .subscribe();
-                            })
+                            .doOnNext(t -> processPoint(bc, t))
                             .subscribe();
                 });
     }
-
     @DeleteMapping("/{id}")
     public Mono<Boolean> delete(
             @PathVariable long id,
@@ -103,5 +85,23 @@ public class BoardCommentController {
     ) {
         return boardCommentService.delete(id, user.getUsername());
     }
+
+    private void processPoint(BoardComment bc, Tuple3<PointCode, TableCode, Member> t) {
+        userService.updatePoint(t.getT3().getId(), (int) t.getT1().getPoint())
+                .subscribeOn(Schedulers.boundedElastic())
+                .subscribe();
+
+        PointHistory ph = new PointHistory();
+        ph.setMemberPk(t.getT3().getId());
+        ph.setPointCodePk(t.getT1().getId());
+        ph.setTableCodePk(t.getT2().getId());
+        ph.setCreateAt(bc.getCreateAt());
+        ph.setTableRefPk(bc.getId());
+
+        pointHistoryService.insert(ph)
+                .subscribeOn(Schedulers.boundedElastic())
+                .subscribe();
+    }
+
 
 }

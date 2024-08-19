@@ -1,5 +1,5 @@
 import OTPProvider, {OTPContextI} from "@/app/user/otp/{services}/OTPProvider";
-import {useContext, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {useRouter} from "next/navigation";
 import apiCall from "@/app/{commons}/func/api";
@@ -11,6 +11,14 @@ const OTPVerify = () => {
     const {otp, setOtp} = useContext<OTPContextI>(OTPProvider);
 
     const [loading, setLoading] = useState(false);
+
+    const timeout = useRef<NodeJS.Timeout>();
+
+    useEffect(()=> {
+        return () => {
+            if(timeout.current) clearTimeout(timeout.current);
+        }
+    },[])
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         setOtp({...otp, verifyCode: e.target.value});
@@ -31,7 +39,8 @@ const OTPVerify = () => {
                 verifyState: res
             });
 
-            res && setTimeout(()=> {
+            if(!res) return;
+            timeout.current = setTimeout(()=> {
                 router.push('/user/otp');
             }, 1500)
 

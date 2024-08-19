@@ -2,14 +2,18 @@ package com.anamensis.server.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@ToString
-public class File {
+public class File implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private long id;
 
     private long tableCodePk;

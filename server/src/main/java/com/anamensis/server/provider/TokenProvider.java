@@ -1,7 +1,7 @@
 package com.anamensis.server.provider;
 
-import com.anamensis.server.entity.AuthType;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ClaimsBuilder;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -20,22 +20,22 @@ public class TokenProvider {
 
     private SecretKey SECRET_KEY;
 
-    // 시 * 분 * 초 * 밀리초
-    public final long ACCESS_EXP  =  1 * 30 * 60 * 1000;
-    public final long REFRESH_EXP = 24 * 60 * 60 * 1000;
+    // 일 * 시 * 분 * 초
+    public final long ACCESS_EXP  =      24 * 60 * 60;
+    public final long REFRESH_EXP = 30 * 24 * 60 * 60;
 
     public String generateToken(String userId, boolean isRefresh) {
         SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
         long exp = isRefresh ? REFRESH_EXP : ACCESS_EXP;
         String type = isRefresh ? "refresh" : "access";
-        Claims claims = Jwts.claims();
-        claims.put("user", userId);
-        claims.put("type", type);
+        ClaimsBuilder claims = Jwts.claims();
+        claims.add("user", userId);
+        claims.add("type", type);
 
         return Jwts.builder()
-            .setClaims(claims)
-            .setExpiration(
-                new Timestamp(Instant.now().toEpochMilli() + exp)
+            .claims(claims.build())
+            .expiration(
+                new Timestamp(Instant.now().toEpochMilli() + exp * 1000)
             )
             .signWith(SECRET_KEY)
             .compact();
@@ -43,10 +43,10 @@ public class TokenProvider {
 
     public Claims getClaims(String token){
         SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
-        JwtParser jwts =  Jwts.parserBuilder()
-                .setSigningKey(SECRET_KEY)
+        JwtParser jwts =  Jwts.parser()
+                .verifyWith(SECRET_KEY)
                 .build();
-        return jwts.parseClaimsJws(token)
-                .getBody();
+        return jwts.parseSignedClaims(token)
+                .getPayload();
     }
 }

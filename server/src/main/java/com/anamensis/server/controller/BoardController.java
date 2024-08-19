@@ -12,6 +12,7 @@ import com.anamensis.server.exception.AuthorizationException;
 import com.anamensis.server.resultMap.BoardResultMap;
 import com.anamensis.server.service.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -23,14 +24,18 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
 @RequestMapping("api/boards")
 @RequiredArgsConstructor
+@Slf4j
 public class BoardController {
 
     private final BoardService boardService;
@@ -43,6 +48,8 @@ public class BoardController {
     private final BoardCommentService boardCommentService;
     private final MemberConfigSmtpService memberConfigSmtpService;
     private final BoardIndexService boardIndexService;
+    private final ScheduleAlertService scheduleAlertService;
+
 
     @PublicAPI
     @GetMapping("")
@@ -60,6 +67,7 @@ public class BoardController {
             && params.getCategoryPk() == 0
             && params.getType() == null
             && params.getValue() == null
+            && params.getIsSelf() != null
             && !params.getIsSelf()
             && params.getIsFavorite() != null
             && !params.getIsFavorite();
@@ -67,10 +75,10 @@ public class BoardController {
         if(condition) {
             list = boardService.findOnePage();
         } else {
-            list = (user != null)
-                ? userService.findUserByUserId(user.getUsername())
-                    .flatMapMany(u -> boardService.findAll(page, params, u))
-                : boardService.findAll(page, params, new Member());
+            list = user == null
+                ? boardService.findAll(page, params, new Member())
+                : userService.findUserByUserId(user.getUsername())
+                    .flatMapMany(u -> boardService.findAll(page, params, u));
         }
 
         return list
@@ -96,9 +104,9 @@ public class BoardController {
                 .subscribeOn(Schedulers.boundedElastic())
                 .share();
 
-        Mono<BoardResultMap.Board> content = (user == null)
+        Mono<BoardResultMap.Board> content = user == null
             ? boardService.findByPk(boardPk)
-            : member.flatMap(u -> boardService.findByPk(boardPk));
+            : member.flatMap(u -> boardService.cacheFindByPk(boardPk));
 
         Mono<Long> count = rateService.countRate(boardPk)
             .subscribeOn(Schedulers.boundedElastic());
@@ -128,6 +136,24 @@ public class BoardController {
             });
     }
 
+
+    @PublicAPI
+    @GetMapping("/ref/{id}")
+    public Mono<BoardResponse.RefContent> findRefByPk(
+        @PathVariable(name = "id") long boardPk,
+        @AuthenticationPrincipal UserDetails user
+    ) {
+        return boardService.cacheFindByPk(boardPk)
+            .flatMap(board -> {
+                if(Objects.isNull(user)) {
+                    return Mono.just(BoardResponse.RefContent.from(board, null));
+                }
+
+                return userService.findUserByUserId(user.getUsername())
+                    .flatMap(u -> Mono.just(BoardResponse.RefContent.from(board, u)));
+            });
+    }
+
     @GetMapping("summary")
     public Mono<List<BoardResponse.SummaryList>> findByMemberPk(
         @AuthenticationPrincipal UserDetails user
@@ -140,7 +166,6 @@ public class BoardController {
                 )
                 .collectList();
     }
-
 
     @PublicAPI
     @GetMapping("summary/{userId}")
@@ -164,8 +189,8 @@ public class BoardController {
         @AuthenticationPrincipal UserDetails user
     ) {
         if(board.getCategoryPk() == 1) {
-            if(!user.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ADMIN")))
-                return Mono.error(new RuntimeException("권한이 없습니다."));
+            if(user.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ADMIN")))
+                return Mono.error(new RuntimeException("공지사항은 관리자 권한이 필요합니다."));
         }
 
         Mono<PointCode> pointCode = pointService.selectByIdOrTableName("board")
@@ -227,10 +252,19 @@ public class BoardController {
                             insertQnAPointHistory(b.getMemberPk(),(int) -p.point)
                                 .subscribe();
                         })
+                        .doOnNext($ -> {
+                            userService.addUserInfoCache(user.getUsername())
+                                .subscribe();
+                        })
                         .subscribeOn(Schedulers.boundedElastic())
                         .subscribe();
                 })
-            ;
+                .doOnNext(b -> {
+                    if(b.getCategoryPk() != 6) return;
+                    findSchedule(new JSONObject(board.getContent()), user.getUsername(), b.getId())
+                        .flatMap(scheduleAlertService::saveAll)
+                        .subscribe();
+                });
     }
 
     @PutMapping("/{id}")
@@ -256,6 +290,15 @@ public class BoardController {
                                 .subscribeOn(Schedulers.boundedElastic())
                                 .subscribe()
                         );
+            })
+            .doOnNext(r -> {
+                if(r.getStatus() != StatusType.SUCCESS) return;
+                if(board.getCategoryPk() != 6) return;
+                findSchedule(new JSONObject(board.getContent()), user.getUsername(), boardPk)
+                    .flatMap(scheduleAlerts ->
+                        scheduleAlertService.updateAll(scheduleAlerts, boardPk, user.getUsername())
+                    )
+                    .subscribe();
             });
     }
 
@@ -302,14 +345,10 @@ public class BoardController {
                                 return boardService.addSelectAnswerQueue(saqdto);
                             })
                             .onErrorReturn(false)
-
                     )
                     .subscribe();
-
             });
     }
-
-
 
     @DeleteMapping("/{id}")
     public Mono<StatusResponse> disableByPk(
@@ -346,10 +385,14 @@ public class BoardController {
 
                     boardIndexService.delete(boardPk)
                         .subscribe();
+
+                    userService.addUserInfoCache(user.getUsername())
+                        .subscribe();
                 })
                 .doOnNext(r -> {
                     if(r.getStatus() != StatusType.SUCCESS) return;
                     if(boardAtomic.get().getCategoryPk() != 3) return;
+
                     findPoint(boardAtomic.get().getContent())
                         .flatMap(p -> {
                             if(p.state == PointCommentExtraValueStatus.COMPLETED) return Mono.just(p);
@@ -357,6 +400,8 @@ public class BoardController {
                                 .flatMap($ -> insertQnAPointHistory(boardAtomic.get().getMemberPk(),(int) p.point));
                         })
                         .subscribe();
+
+
                 });
     }
 
@@ -410,12 +455,9 @@ public class BoardController {
 
     private Mono<PointComment> findPoint(JSONObject content) {
 
-        JSONArray list = content.getJSONArray("list");
-        if(list.isNull(0)) return Mono.error(new RuntimeException("객체를 찾을 수 없습니다."));
-        if(list.getJSONObject(0).isNull("extraValue")) return Mono.error(new RuntimeException("객체를 찾을 수 없습니다."));
-        JSONObject extraValue = list.getJSONObject(0).getJSONObject("extraValue");
+        JSONObject extraValue = getExtraValue(content);
 
-        long selectCommentId = extraValue.get("selectId") == ""
+        long selectCommentId = extraValue.get("selectId").equals("")
             ? 0
             : Long.parseLong(extraValue.get("selectId").toString());
 
@@ -424,6 +466,45 @@ public class BoardController {
         PointCommentExtraValueStatus state = PointCommentExtraValueStatus.valueOf(extraValue.get("state").toString().toUpperCase());
 
         return Mono.just(new PointComment(selectCommentId, point, state));
+    }
+
+    private Mono<List<ScheduleAlert>> findSchedule(JSONObject content, String userId, long boardPk) {
+        JSONArray list = content.getJSONArray("list");
+
+        List<ScheduleAlert> scheduleAlerts = new ArrayList<>();
+
+        for (int i = 0; i < list.length(); i++) {
+            JSONObject obj = list.getJSONObject(i);
+
+            if(obj.isNull("extraValue")) continue;
+            JSONObject extraValue = obj.getJSONObject("extraValue");
+
+            if(extraValue.isNull("code")) continue;
+            String code = extraValue.getString("code");
+
+            if(!"00411".equals(code)) continue;
+            ScheduleAlert scheduleAlert = new ScheduleAlert();
+
+            LocalDateTime alertTime = extraValue.getBoolean("allDay")
+                ? LocalDate.parse(extraValue.getString("start")).atStartOfDay()
+                : LocalDateTime.parse(extraValue.getString("start"));
+
+            scheduleAlert.setBoardId(boardPk);
+            scheduleAlert.setUserId(userId);
+            scheduleAlert.setHashId(extraValue.getString("id"));
+            scheduleAlert.setTitle(extraValue.getString("title"));
+            scheduleAlert.setAlertTime(alertTime);
+            scheduleAlerts.add(scheduleAlert);
+        }
+
+        return Mono.just(scheduleAlerts);
+    }
+
+    private JSONObject getExtraValue(JSONObject content) {
+        JSONArray list = content.getJSONArray("list");
+        if(list.isNull(0)) throw new RuntimeException("객체를 찾을 수 없습니다.");
+        if(list.getJSONObject(0).isNull("extraValue")) throw new RuntimeException("객체를 찾을 수 없습니다.");
+        return list.getJSONObject(0).getJSONObject("extraValue");
     }
 
     private record PointComment(

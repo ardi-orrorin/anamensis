@@ -1,32 +1,15 @@
-import React, {useContext, useEffect} from "react";
-import LoginProvider, {LoginI} from "@/app/login/{services}/LoginProvider";
+import React, {useEffect} from "react";
+import {useLogin} from "@/app/login/{hooks}/LoginProvider";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import apiCall from "@/app/{commons}/func/api";
-import {LoginType} from "@/app/login/{componens}/Login";
 
+const NoneAuth = () => {
 
-const NoneAuth = ({}) => {
-    const {user} = useContext(LoginProvider);
+    const { verify } = useLogin();
+
     useEffect(() => {
-        const fetch = async () => {
-            try {
-                await apiCall<LoginType, LoginI>({
-                    path: '/api/login/verify',
-                    method: 'POST',
-                    body: user,
-                    call: 'Proxy'
-                }).then(res => {
-                    window.location.replace('/');
-                })
-            } catch (e) {
-                console.log(e);
-            }
-        }
-
-        fetch();
-
-    },[]);
+        verify();
+    }, []);
 
     return (
         <div className={'w-full flex flex-col items-center gap-40 text-gray-400'}>

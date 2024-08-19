@@ -1,4 +1,5 @@
 import {createContext, Dispatch, SetStateAction} from "react";
+import {System} from "@/app/user/system/{services}/types";
 
 export interface BoardSummaryI {
     id          : number;
@@ -30,7 +31,11 @@ export interface UserProviderI {
     attendInfo: AttendInfoI;
     setAttendInfo: Dispatch<SetStateAction<AttendInfoI>>;
     pointSummary: PointSummaryI[];
-    setPointSummary: Dispatch<SetStateAction<PointSummaryI[]>>
+    setPointSummary: Dispatch<SetStateAction<PointSummaryI[]>>;
+    roles: System.Role[];
+    setRoles: Dispatch<SetStateAction<System.Role[]>>;
+    profileImg: string;
+    setProfileImg: Dispatch<SetStateAction<string>>;
 }
 
 const UserProvider = createContext<UserProviderI>({} as UserProviderI);

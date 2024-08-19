@@ -1,9 +1,9 @@
 package com.anamensis.server.dto.request;
 
+import com.anamensis.server.dto.SerializedJSONObject;
 import com.anamensis.server.entity.Board;
 import lombok.Getter;
 import lombok.Setter;
-import org.json.JSONObject;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -46,7 +46,7 @@ public class BoardRequest {
             board.setCategoryPk(categoryPk);
             board.setMemberPk(memberPk);
             board.setTitle(title);
-            board.setContent(new JSONObject(content));
+            board.setContent(new SerializedJSONObject(content));
             board.setRate(rate);
             board.setViewCount(viewCount);
             board.setCreateAt(createAt);

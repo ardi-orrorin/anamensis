@@ -5,52 +5,9 @@ import Row from "@/app/signup/Row";
 import EmailTemplate from "@/app/signup/EmailTemplate";
 import {useRouter} from "next/navigation";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import axios from "axios";
-import {
-    pickFontFileForFallbackGeneration
-} from "next/dist/compiled/@next/font/dist/local/pick-font-file-for-fallback-generation";
 import apiCall from "@/app/{commons}/func/api";
-
-export interface UserProps {
-    id            : string;
-    pwd           : string;
-    pwdCheck      : string;
-    name          : string;
-    email         : string;
-    emailCheck    : string;
-    phone         : string;
-    [key: string] : string;
-}
-
-export type CheckProps = {
-    id            : CheckType;
-    pwd           : CheckType;
-    pwdCheck      : CheckType;
-    name          : CheckType;
-    email         : CheckType;
-    emailCheck    : CheckType;
-    phone         : CheckType;
-    [key: string] : CheckType;
-}
-export type DescriptionProps = {
-    id            : string;
-    pwd           : string;
-    pwdCheck      : string;
-    name          : string;
-    email         : string;
-    emailCheck    : string;
-    phone         : string;
-    [key: string] : string;
-}
-
-export type ExistProps = {
-    type         : string;
-    value        : string;
-    [key: string]: string;
-}
-
-export type CheckType = 'check' | 'uncheck' | 'notCheck';
-
+import Footer from "@/app/find-user/{components}/footer";
+import {SignUp} from "@/app/signup/{services}/types";
 export default function Page() {
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -60,11 +17,12 @@ export default function Page() {
 
     const router = useRouter();
 
-    const [emailSelect, setEmailSelect] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [timer, setTimer] = useState<number>(-1);
+    const [emailSelect, setEmailSelect] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [timer, setTimer] = useState(-1);
+    const timeout = useRef<NodeJS.Timeout>();
 
-    const [user, setUser] = useState<UserProps>({
+    const [user, setUser] = useState<SignUp.UserProps>({
         id         : '',
         pwd        : '',
         pwdCheck   : '',
@@ -74,7 +32,7 @@ export default function Page() {
         phone      : '',
     });
 
-    const [check, setCheck] = useState<CheckProps>({
+    const [check, setCheck] = useState<SignUp.CheckProps>({
         id         : 'uncheck',
         pwd        : 'uncheck',
         pwdCheck   : 'uncheck',
@@ -84,7 +42,7 @@ export default function Page() {
         phone      : 'uncheck',
     });
 
-    const [description, setDescription] = useState<DescriptionProps>({
+    const [description, setDescription] = useState<SignUp.DescriptionProps>({
         id         : '아이디는 5자리 이상 20자리 이하로 입력하세요.',
         pwd        : '비밀번호는 8자리 이상이어야 합니다. 영 대소문자 + 숫자를 포함해야 합니다.',
         pwdCheck   : '비밀번호를 다시 입력하세요.',
@@ -93,6 +51,12 @@ export default function Page() {
         emailCheck : '이메일로 전송된 6자리 인증번호를 입력하세요.',
         phone      : '휴대폰 번호를 입력하세요. ex) 010-1234-5678',
     });
+
+    useEffect(()=>{
+        return () => {
+            clearInterval(timeout.current);
+        }
+    },[])
 
     useEffect(() => {
         const {id, pwd, pwdCheck, name, email, emailCheck, phone} = user;
@@ -119,9 +83,6 @@ export default function Page() {
             phone      : phone.length === 0 ? 'uncheck' : check.phone,
         });
     },[user]);
-
-
-
 
     const setProps = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
@@ -209,7 +170,7 @@ export default function Page() {
         }
     }
 
-    const inputCheck = (checkType: CheckType) => {
+    const inputCheck = (checkType: SignUp.CheckType) => {
         return checkType === 'uncheck' ? ''
             : checkType === 'check' ? 'text-blue-500'
             : checkType === 'notCheck' ? 'text-red-500'
@@ -230,7 +191,7 @@ export default function Page() {
     const submitHandler = async () => {
         await setLoading(true);
 
-        await apiCall<any, UserProps>({
+        await apiCall<any, SignUp.UserProps>({
             path: '/api/signup',
             method: 'POST',
             body: user,
@@ -251,8 +212,8 @@ export default function Page() {
         });
     }
 
-    const checkHandler = async (data: ExistProps) => {
-        return await apiCall<any, ExistProps>({
+    const checkHandler = async (data: SignUp.ExistProps) => {
+        return await apiCall<any, SignUp.ExistProps>({
             path: '/api/signup/exists',
             method: 'POST',
             body: data,
@@ -277,7 +238,6 @@ export default function Page() {
     }
 
     const verifyCode = async () => {
-
         await apiCall<any, {email: string, code: string}>({
             path: '/api/signup/verify',
             method: 'POST',
@@ -296,9 +256,9 @@ export default function Page() {
     const checkTimer = () => {
         let time = 10 * 60; // unit : second
         setTimer(time);
-        const interval = setInterval(() => {
+        timeout.current = setInterval(() => {
             if(time === 0) {
-                clearInterval(interval);
+                clearInterval(timeout.current);
             }
             time--;
             setTimer(time);
@@ -326,6 +286,7 @@ export default function Page() {
                          setProps={setProps}
                          inputCheck={inputCheck}
                          description={description.id}
+                         autoFocus={true}
                     />
                     <Row name={'pwd'}
                          value={user}
@@ -395,6 +356,7 @@ export default function Page() {
                                 ].join(' ')}
                                 disabled={timer >= 0 || check.email !== 'check'}
                                 onClick={sendVerifyCode}
+                                data-testid={'send-verify-code'}
                         >
                             {timer >= 0 ? transToTimerMinuteAndSecond() : '인증번호 받기'}
                         </button>
@@ -419,6 +381,7 @@ export default function Page() {
                         </button>
                     </div>
                 </div>
+                <Footer isSignUp={true} />
             </div>
         </main>
     )

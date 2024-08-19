@@ -3,23 +3,23 @@
 import Image from "next/image";
 import {defaultProfile} from "@/app/{commons}/func/image";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
-import {LoadingType} from "@/app/user/info/page";
+import UserProvider from "@/app/user/{services}/userProvider";
+import {UserInfoSpace} from "@/app/user/info/{services}/types";
+import {useQuery} from "@tanstack/react-query";
+import userApiService from "@/app/user/{services}/userApiService";
+import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 
-const ProfileImg = ({imgData} : {imgData: string}) => {
+const ProfileImg = () => {
+
+    const {data: profileImg , refetch} = useQuery(userApiService.profileImg());
+
     const inputRef = useRef<HTMLInputElement>(null);
-
-    const [loading, setLoading] = useState<LoadingType>({} as LoadingType);
-    const [profileEnter, setProfileEnter] = useState<boolean>(false);
-    const [img, setImg] = useState<string>('');
+    const [loading, setLoading] = useState({} as UserInfoSpace.Loading);
+    const [profileEnter, setProfileEnter] = useState(false);
     const debounce = createDebounce(500);
-
-    useEffect(()=>{
-        setImg(imgData);
-    },[imgData])
-
 
     const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files) return;
@@ -33,25 +33,15 @@ const ProfileImg = ({imgData} : {imgData: string}) => {
         });
 
         const fetch = async () => {
-            await apiCall({
-                path: '/api/user/info/profile-img',
-                method: 'POST',
-                body: formdata,
-                contentType: 'multipart/form-data',
-            });
+            await userInfoApiService.setProfileImg(formdata)
 
             setLoading({
                 ...loading,
                 img: false
             });
 
-            const img = await apiCall({
-                path: '/api/user/info/profile-img',
-                method: 'GET',
-                isReturnData: true,
-            })
+            await refetch();
 
-            setImg(img);
             setProfileEnter(false)
         }
 
@@ -64,23 +54,20 @@ const ProfileImg = ({imgData} : {imgData: string}) => {
             ...loading,
             img: true
         })
-        await apiCall({
-            path: '/api/user/info/profile-img',
-            method: 'DELETE',
-        })
-            .then((res) => {
-                setImg('')
-            })
-            .catch((err) => {
-                console.log(err)
-            })
-            .finally(() => {
-                setLoading({
-                    ...loading,
-                    img: false
-                });
 
-            })
+        userInfoApiService.deleteProfileImg()
+        .then((res) => {
+            refetch();
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+        .finally(() => {
+            setLoading({
+                ...loading,
+                img: false
+            });
+        })
     }
 
     const onMouseEnter = (e: React.MouseEvent<HTMLImageElement>) => {
@@ -92,8 +79,8 @@ const ProfileImg = ({imgData} : {imgData: string}) => {
 
     return (
         <div className={'relative'}>
-            <Image className={'rounded-full border-4 border-solid border-blue-200 w-[150px] h-[150px]'}
-                   src={defaultProfile(img)}
+            <Image className={'rounded-full border-4 border-solid border-main w-[150px] h-[150px]'}
+                   src={defaultProfile(profileImg)}
                    alt={''}
                    placeholder={"empty"}
                    width={150}
@@ -102,20 +89,20 @@ const ProfileImg = ({imgData} : {imgData: string}) => {
                    priority={true}
             />
             {
-                !img &&
-              <div className={'flex justify-center items-center absolute border-0 rounded-full left-0 top-0 w-[150px] h-[150px] z-10 bg-gray-200 opacity-70'}>
-                  {
-                      loading.img
-                          ? <LoadingSpinner size={20} />
-                          : <button className={'w-full h-full text-xs'}
-                                    onClick={()=> {inputRef.current?.click()}}
-                          > 프로필 추가
-                          </button>
-                  }
-              </div>
+                !profileImg
+                && <div className={'flex justify-center items-center absolute border-0 rounded-full left-0 top-0 w-[150px] h-[150px] z-10 bg-gray-200 opacity-70'}>
+                    {
+                        loading.img
+                            ? <LoadingSpinner size={20} />
+                            : <button className={'w-full h-full text-xs'}
+                                      onClick={()=> {inputRef.current?.click()}}
+                            > 프로필 추가
+                            </button>
+                    }
+                </div>
             }
             {
-                profileEnter && img &&
+                profileEnter && profileImg &&
               <div className={'flex justify-center items-center absolute border-0 rounded-full left-0 top-0 w-[150px] h-[150px] z-10 opacity-50 bg-gray-200'}
                    onMouseLeave={onMouseLeave}
               >
@@ -131,7 +118,7 @@ const ProfileImg = ({imgData} : {imgData: string}) => {
             }
             <input ref={inputRef}
                    type={'file'}
-                   accept={'image/*'}
+                   accept={'image/jpeg, image/png'}
                    onChange={onChangeHandler}
                    multiple={false}
                    hidden={true}

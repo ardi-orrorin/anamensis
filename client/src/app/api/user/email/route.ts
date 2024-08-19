@@ -1,6 +1,6 @@
-import {AuthPropsI} from "@/app/user/email/page";
 import {NextRequest, NextResponse} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
+import {User} from "@/app/login/{services}/types";
 
 export async function GET(){
     const result = await apiCall<string>({
@@ -20,13 +20,13 @@ export async function GET(){
 }
 
 export async function PUT(req: NextRequest) {
-    const {sauth, sauthType} = await req.json() as AuthPropsI;
+    const body = await req.json() as User.AuthProps;
 
     const result = await apiCall<string>({
         path: '/api/user/s-auth',
         method: 'PUT',
         call: 'Server',
-        body: {sauth, sauthType},
+        body,
         setAuthorization: true,
         isReturnData: true,
     });

@@ -1,53 +1,20 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faExclamation} from "@fortawesome/free-solid-svg-icons";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import Link from "next/link";
-import {useContext, useEffect, useMemo, useRef, useState} from "react";
-import axios from "axios";
-import {ErrorResponse, LoginAuth} from "@/app/login/page";
-import LoginProvider, {LoginI} from "@/app/login/{services}/LoginProvider";
-import ReCAPTCHA from "react-google-recaptcha";
-import apiCall from "@/app/{commons}/func/api";
-import {RoleType} from "@/app/user/system/{services}/types";
-
-
-export type LoginType = {
-    accessToken: string,
-    accessTokenExpiresIn: number,
-    refreshToken: string,
-    refreshTokenExpiresIn: number,
-} & LoginUserType
-
-export type LoginUserType = {
-    username: string,
-    roles: RoleType[]
-}
+import {useMemo, useState} from "react";
+import {useLogin} from "@/app/login/{hooks}/LoginProvider";
+import Turnstile from "react-turnstile";
+import OAuth from "@/app/login/{componens}/OAuth";
+import Footer from "@/app/find-user/{components}/footer";
 
 const Login = () => {
+    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
 
-    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-    const privateKey = process.env.NEXT_PUBLIC_RECAPTCHA_PRIVATE_KEY;
-    const [isRecaptcha, setIsReCaptcha] = useState<boolean>(false);
-    const recaptchaRef = useRef<ReCAPTCHA>(null);
+    const isTest = process.env.NEXT_PUBLIC_TEST?.toLowerCase() === 'true';
 
-    const {user, setUser} = useContext(LoginProvider);
-    const [loading, setLoading] = useState<boolean>(false);
+    const {user, goLogin, setProps, error, loading} = useLogin();
 
-    const idRef = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-        if(!idRef?.current) return;
-        idRef.current.focus();
-    },[idRef]);
-
-    useEffect(() => {
-        if (user.username.length < 4) {
-            setUser({
-                ...user,
-                password: ''
-            });
-        }
-    }, [user.username]);
+    const [isRecaptcha, setIsReCaptcha] = useState(isTest);
 
     const idCheck = useMemo(() => {
         return user.username.length > 5;
@@ -57,91 +24,22 @@ const Login = () => {
         return user.username.length > 5 && user.password.length > 4;
     }, [user]);
 
-
-    const goLogin = async () => {
-        setLoading(true);
-
-        await apiCall<LoginAuth, LoginI>({
-            path: '/api/login',
-            method: 'POST',
-            body: user,
-            call: 'Proxy'
-        }).then(res => {
-            setUser({
-                ...user,
-                verify: res.data.verity,
-                authType: res.data.authType
-            });
-        }).catch(err => {
-            console.log(err)
-            setError({
-                status: err.response.status,
-                message: err.response.data,
-                use: true
-            });
-        }).finally(() => {
-            setLoading(false);
-        });
-
-    }
-
-
-    const [error, setError] = useState<ErrorResponse>({
-        status: 0,
-        message: '',
-        use: false
-    });
-
-
-    const setProps = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = e.target;
-
-        setUser({
-            ...user,
-            [name]: value
-        });
-
-        if (error.use) {
-            setError({
-                status: 0,
-                message: '',
-                use: false
-            });
-        }
-
-        if(!recaptchaRef.current) return;
-
-    }
-
-    const onChangeReCaptchaHandler = async (value: string | null) => {
-        if (!value) return;
-
-        const url = '/api/login/google';
-        const data = {
-            secret: privateKey,
-            response: value || ""
-        };
-
-        await axios.post(url, data).then((res) => {
-            setIsReCaptcha(res.data.success);
-        })
-    }
-
     return (
         <div className={"flex flex-col gap-4 border border-solid b border-blue-300 sm:w-4/5 md:w-1/2 xl:w-1/3 w-full rounded pb-5"}>
             <div className={'flex flex-col gap-1 bg-blue-300 py-4'}>
                 <h3 className={'flex justify-center font-bold text-white text-base'}
                 >LOGIN</h3>
             </div>
+
             <div className={'flex flex-col px-2'}>
                 <div className={'flex'}>
                     <input
                         className={'w-full border border-none outline-0 focus:bg-blue-100 duration-300 text-xs rounded my-2 p-2'}
-                        ref={idRef}
                         placeholder={'아이디를 입력하세요.'}
                         name={'username'}
                         value={user.username}
                         onChange={setProps}
+                        autoFocus={true}
                     />
                 </div>
                 <div className={['flex duration-500', idCheck ? 'max-h-52' : 'max-h-0'].join(' ')}>
@@ -158,21 +56,12 @@ const Login = () => {
                   {
                     error.use &&
                     <span className={'text-xs text-red-500 my-2 px-2'}
+                          data-testid={'error-message'}
                     >
                         <FontAwesomeIcon height={12} icon={faExclamation}/>
                         &nbsp; {error.message}
                     </span>
                   }
-                </div>
-                <div className={''}>
-                    {
-                        idCheck && isNext &&
-                        <ReCAPTCHA ref={recaptchaRef}
-                                   sitekey={siteKey || ""}
-                                   onChange={onChangeReCaptchaHandler}
-                                   className={'w-full flex justify-center py-2'}
-                        />
-                    }
                 </div>
                 <div>
                     <button
@@ -180,6 +69,7 @@ const Login = () => {
                         disabled={!isNext || loading || !isRecaptcha}
                         onSubmit={goLogin}
                         onClick={goLogin}
+                        data-testid={'login'}
                     >{
                         loading ?
                             <LoadingSpinner size={12}/> :
@@ -187,17 +77,22 @@ const Login = () => {
                     }
                     </button>
                 </div>
+                <div className={'flex justify-center'}>
+                      <Turnstile sitekey={siteKey}
+                                 onVerify={() => {
+                                     setIsReCaptcha(true);
+                                 }}
+                                 theme={'light'}
+                                 language={'ko'}
+                      />
+                </div>
             </div>
-            <div className={'flex justify-between px-3'}>
-                <Link href={'/find-user'}
-                   className={'flex justify-center text-xs text-blue-500'}
-                >아이디 찾기</Link>
-                <Link href={'/signup'}
-                      className={'flex justify-center text-xs text-blue-500'}
-                >회원 가입</Link>
-                <Link href={'/reset-pwd'}
-                   className={'flex justify-center text-xs text-blue-500'}
-                >비밀번호 찾기</Link>
+            <Footer />
+            <div className={'flex flex-col gap-2 justify-between px-3'}>
+                {
+                    isRecaptcha
+                    && <OAuth {...{isRecaptcha}} />
+                }
             </div>
         </div>
     )

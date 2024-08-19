@@ -1,4 +1,3 @@
-import axios from "axios";
 import apiCall from "@/app/{commons}/func/api";
 
 const OTPInit = () => {

@@ -4,12 +4,13 @@ import Image from "next/image";
 import {defaultNoImg} from "@/app/{commons}/func/image";
 import FooterComponent from "@/app/{components}/footerComponent";
 import React from "react";
-import {BoardListI} from "@/app/{components}/boardComponent";
+import {NO_IMAGE} from "@/app/{services}/constants";
+import {Root} from "@/app/{services}/types";
 
-const AlttuelBoardComponent = (props: BoardListI) => {
+const AlttuelBoardComponent = (props: Root.BoardListI) => {
     const { body} = props;
 
-    const alttuelBlock = body?.filter((block) =>
+    const alttuelBlock =body?.filter((block) =>
         block.code === '00301'
     )[0];
 
@@ -25,7 +26,7 @@ const AlttuelBoardComponent = (props: BoardListI) => {
             .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
         return money + '원';
-    }
+    };
 
     return (
         <div className={'flex h-full'}>
@@ -35,6 +36,10 @@ const AlttuelBoardComponent = (props: BoardListI) => {
                        width={80}
                        height={80}
                        alt={''}
+                       priority={true}
+                       onError={e => {
+                           (e.target as HTMLImageElement).src = NO_IMAGE;
+                       }}
                 />
 
             </div>

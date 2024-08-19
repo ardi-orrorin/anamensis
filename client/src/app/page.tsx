@@ -1,84 +1,83 @@
 'use client';
 
-import React, {useEffect, useRef, useState} from "react";
-import {PageResponse} from "@/app/{commons}/types/commons";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
-import BoardComponent, {BoardListI} from "@/app/{components}/boardComponent";
-import {faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons/faMagnifyingGlass";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import LeftMenu from "@/app/{components}/leftMenu";
-import TopMenu from "@/app/{components}/topMenu";
-import {RoleType} from "@/app/user/system/{services}/types";
-import SearchParamsProvider, {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
-import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
+import MobileMenu from "@/app/{components}/mobileMenu";
+import {useCusSearchParams} from "@/app/{hooks}/searchParamsHook";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useRootHotKey} from "@/app/{hooks}/hotKey";
-import Notices, {NoticeType} from "@/app/{components}/boards/notices";
-import {preload} from "swr";
+import SearchInfo from "@/app/{components}/searchInfo";
+import {faBars} from "@fortawesome/free-solid-svg-icons";
+import {Virtuoso} from "react-virtuoso";
+import RightSubMenu from "@/app/{components}/rightSubMenu";
+import SearchHistory from "@/app/{components}/searchHistory";
+import SearchBox from "@/app/{components}/searchBox";
+import {Root} from "@/app/{services}/types";
+import {Common} from "@/app/{commons}/types/commons";
+import {useQuery, useQueryClient} from "@tanstack/react-query";
+import rootApiService from "@/app/{services}/rootApiService";
+import dynamic from "next/dynamic";
+import LeftMenu from "@/app/{components}/leftMenu";
+import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
+import RightMenu from "@/app/{components}/rightMenu";
+import Notices from "@/app/{components}/boards/notices";
+import {System} from "@/app/user/system/{services}/types";
 
-export type DynamicPage = {
-    isEndOfList: boolean;
-    isVisible  : boolean;
-}
+const DynamicBoardComponent = dynamic(() => import('@/app/{components}/boardComponent'), {
+    loading: () => <Loading />
+});
 
-
+const Loading = () => <div className={'w-full h-[300px] flex justify-center items-center'}><LoadingSpinner size={50}/></div>
 
 export default function Page() {
 
-    const pageSize = 20;
+    const roles = useQueryClient().getQueryData(['userRole']) as System.Role[];
+    const {data: noticeList} = useQuery(rootApiService.getNotices());
+    const {data: favorites} = useQuery(rootApiService.favorites());
+
     const [initLoading, setInitLoading] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [data, setData] = useState<BoardListI[]>([]);
-    const [roles, setRoles] = useState<RoleType[]>([]);
-    const [searchValue, setSearchValue] = useState('');
-    const [searchFocus, setSearchFocus] = useState(false);
-    const [dynamicPage, setDynamicPage] = useState<DynamicPage>({
+    const [data, setData] = useState<Root.BoardListI[]>([]);
+
+    const [dynamicPage, setDynamicPage] = useState<Root.DynamicPage>({
         isEndOfList: false,
         isVisible  : false,
     });
 
-    const [favorites, setFavorites] = useState<string[]>([]);
+    const [menuToggle, setMenuToggle] = useState(false);
 
-    const [searchParams, setSearchParams] = useState<BoardListParamsI>({
-        page: 1,
-        size: pageSize,
-    } as BoardListParamsI);
+    const {
+        searchParams, setSearchParams,
+        setOnSearchHistory, initSearchHandler,
+        searchFocus, setSearchFocus,
+    } = useCusSearchParams();
 
-    const [noticeList, setNoticeList] = useState<NoticeType[]>([]);
-
-    const moreRef = React.useRef<HTMLDivElement>(null);
+    const moreRef = useRef<HTMLDivElement>(null);
     const searchRef = useRef<HTMLInputElement>(null);
+
+    const isLogin = useMemo(()=> roles?.length > 0, [roles]);
+
+    const notFoundResult = useMemo(()=> {
+        return !initLoading && !loading && data?.length === 0
+    },[initLoading, loading, data]);
+
+    const moreToggle = useMemo(() => {
+        return !loading && !dynamicPage.isEndOfList && !dynamicPage.isVisible
+    },[loading, dynamicPage]);
 
     const fetchDebounce = createDebounce(100);
 
-    preload('/api/board-favorites', async () => {
-        return await apiCall<any, boolean>({
-            path: '/api/board-favorites',
-            method: 'GET',
-            isReturnData: true
-        })
-    })
-    .then(res => {
-        if(!res) return;
-        setFavorites(res);
-    })
-
     useEffect(()=> {
-        apiCall<NoticeType[]>({
-            path: '/api/board/notice',
-            method: 'GET',
-            isReturnData: true
-        })
-        .then(res => {
-            if(!res) return;
-            setNoticeList(res);
-        })
+        return () => {
+            initSearchHandler();
+        }
     },[]);
 
     useEffect(() => {
         if(loading) return;
         setLoading(true);
-        apiCall<PageResponse<BoardListI>, BoardListParamsI>({
+        apiCall<Common.PageResponse<Root.BoardListI>, Root.BoardListParamsI>({
             path: '/api/board',
             method: 'GET',
             params: searchParams
@@ -87,10 +86,6 @@ export default function Page() {
             if(!res) return;
             setLoading(false);
             setInitLoading(false);
-
-            const roles = res.headers['next.user.roles'] || ''
-
-            if(roles) setRoles(JSON.parse(roles));
 
             const condition = res.data.content.length < searchParams.size;
 
@@ -126,117 +121,76 @@ export default function Page() {
         return () => ob.disconnect();
     },[moreRef?.current, loading]);
 
-
-    const onSearchHandler = (init: boolean) => {
-        const initPage = {page: 1, size: pageSize};
-
-        if(init) {
-            setSearchValue('')
-            setSearchParams(initPage as BoardListParamsI);
-            return;
-        }
-
-        const params = searchValue === ''
-        ? {...initPage} as BoardListParamsI
-        : {...searchParams, ...initPage, value: searchValue, type: 'content'};
-
-        setSearchParams(params);
-    }
-
-    const onEnterHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if(e.key === 'Enter') {
-            onSearchHandler(false);
-        }
-        if(e.key === 'Escape') {
-            if(!searchRef?.current) return;
-
-            setSearchValue('')
-            searchRef.current.blur();
-        }
-    }
-
-    useRootHotKey({searchRef});
+    useRootHotKey({searchRef})
 
     return (
-        <SearchParamsProvider.Provider value={{
-            searchParams, setSearchParams,
-        }}>
-            <div className={'p-5 flex flex-col gap-10'}>
-                <div className={'px-4 sm:px-10 md:px-20 lg:px-44 w-full flex justify-center items-center gap-3'}>
-                    <div className={['relative flex justify-center duration-700', searchFocus ? 'w-full sm:w-[70%]' : 'w-70 sm:w-[40%]'].join(' ')}>
-                        <input className={'rounded-full outline-0 border-solid border-gray-200 border text-xs w-full h-10 py-3 pl-4 pr-20 focus:border-gray-500 duration-500'}
-                               ref={searchRef}
-                               placeholder={'검색어'}
-                               value={searchValue || ''}
-                               onChange={(e) => setSearchValue(e.target.value)}
-                               onKeyUp={onEnterHandler}
-                               onFocus={() => setSearchFocus(true)}
-                               onBlur={() => setSearchFocus(false)}
-                        />
-                        {
-                            searchValue.length > 0
-                            && <button className={'absolute right-12 top-1 duration-500'}
-                                       onClick={()=> onSearchHandler(true)}
-                          >
-                            <FontAwesomeIcon className={'h-4 py-1.5 px-2 text-gray-400 hover:text-red-300 duration-300'}
-                                             icon={faXmark}
-                            />
-                          </button>
-                        }
-                        <button className={'absolute right-2 top-1 duration-500'}
-                                onClick={()=> onSearchHandler(false)}
-                        >
-                            <FontAwesomeIcon className={'h-4 py-1.5 px-2 text-gray-400 hover:text-blue-300 duration-300'}
-                                             icon={faMagnifyingGlass}
-                            />
-                        </button>
-                    </div>
+        <div className={'w-auto flex flex-col gap-2 bg-gray-50'}
+             onClick={()=> {
+                 setOnSearchHistory(false)
+                 setSearchFocus(false)
+             }}
+        >
+            <div className={'w-full border-t border-solid border-t-gray-200'}>
+                <div className={'fixed z-30 sm:hidden bottom-5 right-5'}>
+                    <button className={'w-14 h-14 p-5 rounded-full bg-white shadow-md active:bg-main active:text-white duration-300'}
+                            onClick={()=> setMenuToggle(!menuToggle)}
+                    >
+                        <FontAwesomeIcon icon={faBars} className={'h-auto'} />
+                    </button>
+                    <MobileMenu {...{menuToggle, setMenuToggle, isLogin}} />
                 </div>
-                <div className={'flex sm:hidden justify-center'}>
-                    <TopMenu />
-                </div>
-                <div className={'flex flex-row justify-start sm:justify-center'}>
-                    <div className={'hidden sm:block relative min-w-[300px]'}>
-                        <LeftMenu roles={roles}
-                        />
+                <div className={'flex flex-row justify-start'}>
+                    <div className={'hidden sm:block relative min-w-[300px] min-h-screen'}>
+                        <LeftMenu {...{roles}}/>
                     </div>
-                    <div className={'w-[600px] flex flex-col gap-5 justify-start items-center'}>
-                        <div className={'w-full'}>
+                    <div className={'w-full flex flex-col justify-start items-center mt-2'}>
+                        <div className={'sticky z-40 top-0 py-3 w-full flex flex-col rounded-full justify-center items-center gap-3'}>
+                            <div className={[
+                                'relative flex flex-col justify-center bg-white shadow-sm duration-700 rounded-full',
+                                searchFocus ? 'w-full sm:w-[70%]' : 'w-70 sm:w-[50%]',
+                            ].join(' ')}>
+                                <SearchBox {...{searchRef}} />
+                                <SearchHistory />
+                            </div>
+                            <SearchInfo />
+                        </div>
+                        <div className={'w-full min-w-[350px] max-w-[600px] px-4 flex flex-col justify-start items-center'}>
                             <Notices data={noticeList} />
-                        </div>
-                        <div className={'w-full flex flex-wrap gap-2'}>
-                            {
-                                !initLoading
-                                && !loading
-                                && data?.length === 0
-                                && <div className={'text-center text-2xl w-full py-20 text-gray-600'}>검색 결과가 없습니다.</div>
-                            }
-
-                            {
-                                data
-                                && data?.length > 0
-                                && data.map((item, index) => {
-                                    if(!item) return;
-                                    return (
-                                        <BoardComponent key={'boardsummary' + index} {...{...item, favorites}} />
-                                    )
-                                })
-                            }
+                            <div className={'w-full flex flex-wrap gap-2'}>
+                                {
+                                    notFoundResult
+                                    && <div className={'text-center text-2xl w-full py-20 text-gray-600'}
+                                            data-testid={'not-found-result'}
+                                    >검색 결과가 없습니다.</div>
+                                }
+                                <Virtuoso style={{width: '100%', height: '100%', overflow: 'hidden'}}
+                                          totalCount={data.length}
+                                          data={data}
+                                          useWindowScroll
+                                          itemContent={(index, data) =>
+                                              <div className={'py-1.5'}>
+                                                  <DynamicBoardComponent key={'boardsummary' + index} {...{...data, favorites, isLogin, roles}} />
+                                              </div>
+                                          }
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div className={'relative'}>
-                    <div className={'absolute w-full -top-72 flex justify-center text-xs py-5'}>
-                        {
-                            !loading
-                            && !dynamicPage.isEndOfList
-                            && !dynamicPage.isVisible
-                            && <div ref={moreRef} className={'w-10 h-10'} />
-                        }
+                    <div className={'hidden lg:flex lg:flex-col min-w-[300px] px-3 max-w-[300px] border-l border-solid border-l-gray-200 bg-gray-50'}>
+                        <RightMenu {...{isLogin}} />
                     </div>
                 </div>
             </div>
-        </SearchParamsProvider.Provider>
+            <div className={'relative'}>
+                <div className={'absolute w-full -top-72 flex justify-center text-xs py-5'}>
+                    {
+                        moreToggle
+                        && <div ref={moreRef} className={'w-10 h-10'} />
+                    }
+                </div>
+            </div>
+            <RightSubMenu {...{isLogin}} />
+        </div>
     )
 }
 

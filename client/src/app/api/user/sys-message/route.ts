@@ -1,13 +1,14 @@
 import {NextRequest, NextResponse} from "next/server";
-import {SysMessageI} from "@/app/user/system/{components}/message";
 import apiCall from "@/app/{commons}/func/api";
+import {System} from "@/app/user/system/{services}/types";
+import {AxiosError} from "axios";
 
 export async function GET(req: NextRequest) {
     const searchParams = new URLSearchParams(req.nextUrl.search);
     const params = {id : searchParams.get('id')!}
 
     try {
-        const res = await apiCall<SysMessageI>({
+        const res = await apiCall<System.SysMessage>({
             path: `/admin/api/sys-message`,
             method: 'GET',
             call: 'Server',
@@ -25,7 +26,7 @@ export async function GET(req: NextRequest) {
 
 
     } catch (error) {
-        console.log('error:', error)
+        const err = error as AxiosError;
         return new NextResponse(null,{
             status: 404,
             headers: {
@@ -33,15 +34,12 @@ export async function GET(req: NextRequest) {
             },
         });
     }
-
-
-
 }
 
 export async function POST(req: NextRequest) {
-    const body = await req.json() as SysMessageI;
+    const body = await req.json() as System.SysMessage;
 
-    const res = await apiCall<SysMessageI>({
+    const res = await apiCall<System.SysMessage>({
         path: '/admin/api/sys-message',
         method: 'POST',
         call: 'Server',
@@ -59,9 +57,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-    const body = await req.json() as SysMessageI;
+    const body = await req.json() as System.SysMessage;
 
-    await apiCall<SysMessageI>({
+    await apiCall<System.SysMessage>({
         path: '/admin/api/sys-message',
         method: 'PUT',
         call: 'Server',
@@ -83,7 +81,7 @@ export async function DELETE(req: NextRequest) {
 
     const params = {id : searchParams.get('id')!}
 
-    const res = await apiCall<SysMessageI>({
+    const res = await apiCall<System.SysMessage>({
         path: '/admin/api/sys-message',
         method: 'DELETE',
         call: 'Server',

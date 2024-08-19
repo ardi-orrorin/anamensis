@@ -1,27 +1,23 @@
 import Link from "next/link";
+import {OTP} from "@/app/user/otp/{services}/types";
 
-export enum OTPStepEnum {
-    INIT   = 'init',
-    OTP    = 'otp',
-    VERIFY = 'verify',
 
-}
 
-const OTPStep = ({step}: {step: OTPStepEnum}) => {
+const OTPStep = ({step}: {step: OTP.OTPStep}) => {
 
     const currentStyle = 'font-bold text-blue-700';
 
     return (
         <div className={'flex gap-5 justify-center'}>
-            <Link className={step === OTPStepEnum.INIT ? currentStyle : ''} href={`?step=${OTPStepEnum.INIT}`}>
+            <Link className={step === OTP.OTPStep.INIT ? currentStyle : ''} href={`?step=${OTP.OTPStep.INIT}`}>
               등록 단계
             </Link>
             <span> {'>'} </span>
-            <Link className={step === OTPStepEnum.OTP ? currentStyle : ''} href={`?step=${OTPStepEnum.OTP}`}>
+            <Link className={step === OTP.OTPStep.OTP ? currentStyle : ''} href={`?step=${OTP.OTPStep.OTP}`}>
                 OTP 등록
             </Link>
             <span> {'>'} </span>
-            <Link className={step === OTPStepEnum.VERIFY ? currentStyle : ''} href={`?step=${OTPStepEnum.VERIFY}`}>
+            <Link className={step === OTP.OTPStep.VERIFY ? currentStyle : ''} href={`?step=${OTP.OTPStep.VERIFY}`}>
                 OTP 인증
             </Link>
         </div>

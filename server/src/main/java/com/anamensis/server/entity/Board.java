@@ -1,21 +1,27 @@
 package com.anamensis.server.entity;
 
+import com.anamensis.server.dto.SerializedJSONObject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.json.JSONObject;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @ToString
-public class Board {
+public class Board implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private long id;
     private long categoryPk;
     private long memberPk;
     private String title;
-    private JSONObject content;
+    private SerializedJSONObject content;
     private long rate;
     private long viewCount;
     private LocalDateTime createAt;
@@ -24,5 +30,5 @@ public class Board {
     private boolean isUse;
     private Boolean isPublic;
     private boolean membersOnly;
-
+    private boolean isBlocked;
 }

@@ -1,27 +1,24 @@
 import {Dispatch, SetStateAction, useContext, useState} from "react";
-import axios from "axios";
-import { WebSysI} from "@/app/user/system/page";
-import ModalProvider, {ModalContextType} from "@/app/user/{services}/modalProvider";
+import ModalProvider, {ModalContextType} from "@/app/user/system/{services}/modalProvider";
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
-import Message from "@/app/user/system/{components}/message";
-import {RoleType} from "@/app/user/system/{services}/types";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
+import {System} from "@/app/user/system/{services}/types";
 
-const Row = ({
-    props, setData
-} : {
-    props: WebSysI, setData: Dispatch<SetStateAction<WebSysI[]>>
+const Row = (props : System.WebSys & {
+    setData : Dispatch<SetStateAction<System.WebSys[]>>;
+    index  : number;
 }) => {
+    const {setData, index} = props;
 
-    const [webSys, setWebSys] = useState<WebSysI>(props);
+    const [webSys, setWebSys] = useState(props);
 
     const {modal, setModal} = useContext<ModalContextType>(ModalProvider);
 
     const debounce = createDebounce(500);
 
     const onSaveHandler = async () => {
-        await apiCall<WebSysI>({
+        await apiCall<System.WebSys>({
             path: '/api/user/system',
             method: 'PUT',
             body: webSys,
@@ -72,8 +69,6 @@ const Row = ({
             id: webSys.code,
             route: '메시지',
             isOpen: true,
-            params: {},
-            component: <Message />
         });
     }
 
@@ -92,7 +87,10 @@ const Row = ({
     }
 
     return (
-        <tr className={'h-10 '}>
+        <tr className={[
+            'h-10 border-b border-gray-200 border-solid',
+            index % 2 === 1 ? 'bg-blue-50': '',
+        ].join(' ')}>
             <td className={'px-2'}>
                 <span> {webSys.code} </span>
             </td>
@@ -126,10 +124,10 @@ const Row = ({
                               value={webSys.permission}
                               onChange={onChangeHandler}
                     >
-                        <option value={RoleType.ADMIN}>{RoleType.ADMIN}</option>
-                        <option value={RoleType.USER}>{RoleType.USER}</option>
-                        <option value={RoleType.MASTER}>{RoleType.MASTER}</option>
-                        <option value={RoleType.GUEST}>{RoleType.GUEST}</option>
+                        <option value={System.Role.ADMIN}>{System.Role.ADMIN}</option>
+                        <option value={System.Role.USER}>{System.Role.USER}</option>
+                        <option value={System.Role.MASTER}>{System.Role.MASTER}</option>
+                        <option value={System.Role.GUEST}>{System.Role.GUEST}</option>
                     </select>
                     :<span> {props.permission} </span>
                 }

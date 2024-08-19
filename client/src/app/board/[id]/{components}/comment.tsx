@@ -7,16 +7,17 @@ import {faComment} from "@fortawesome/free-solid-svg-icons";
 import apiCall from "@/app/{commons}/func/api";
 import Link from "next/link";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
-import BlockProvider from "@/app/board/{services}/BlockProvider";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {defaultProfile} from "@/app/{commons}/func/image";
-import {mutate, preload} from "swr";
 import moment from "moment";
 import {QuestionBlockExtraValueType} from "@/app/board/{components}/block/extra/questionBlock";
 import {updateBoard} from "@/app/board/{services}/funcs";
 import {useSearchParams} from "next/navigation";
-import {PageI, PageResponse} from "@/app/{commons}/types/commons";
 import PageNavigator from "@/app/{commons}/PageNavigator";
+import {Common} from "@/app/{commons}/types/commons";
+import {useQuery} from "@tanstack/react-query";
+import boardApiService from "@/app/board/{services}/boardApiService";
+import {useBlockEvent} from "@/app/board/[id]/{hooks}/useBlockEvent";
 
 export type SaveComment = {
     boardPk   : string;
@@ -25,41 +26,25 @@ export type SaveComment = {
     parentPk? : string;
 }
 
-const Comment = ({
-    isNewBoard,
-    params
-} : {
-    isNewBoard: boolean
-    params: {id: string}
-}) => {
+const Comment = () => {
     const searchParams = useSearchParams();
 
-    const {comment,setComment, board} = useContext(BoardProvider);
+    const {
+        board, isNewBoard, isTemplate
+    } = useContext(BoardProvider);
+
     const {newComment, setNewComment} = useContext(BoardProvider);
 
-    const [page, setPage] = useState<PageI>({
-        page: 1,
-        size: 10,
-    } as PageI);
+    const {data, refetch} = useQuery(boardApiService.getComments({
+        isEdit: isNewBoard || isTemplate,
+        boardPk: Number(board.data.id),
+        searchParams,
+    }));
+
+    const {page, content: comment} = data || {page:{page:1, size: 10}} as Common.PageResponse<CommentI>;
+
     const [loading, setLoading] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
-
-    preload([`/api/board/comment/${board.data.id}`, searchParams], async () => {
-        if(isNewBoard) return;
-        return await apiCall<PageResponse<CommentI>>({
-            path: '/api/board/comment',
-            method: 'GET',
-            params: {boardPk: params.id, page: searchParams.get('page') || 1, size: searchParams.get('size') || 10},
-        })
-    })
-    .then(res => {
-        if(!res) return;
-        setPage(res.data.page);
-        setComment(res.data.content);
-    })
-
-    const reload = () => mutate([`/api/board/comment/${board.data.id}`, searchParams]);
-
     const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setNewComment({...newComment, content: e.target.value});
     }
@@ -82,7 +67,7 @@ const Comment = ({
                 isReturnData: true,
             })
 
-            await reload();
+            await refetch();
 
             setNewComment({
                 boardPk: board.data.id,
@@ -103,6 +88,14 @@ const Comment = ({
         });
     }
 
+    const comments = useMemo(() =>
+        comment?.map((item, index) => {
+            return (
+                <CommentItem key={index} {...item} refetch={refetch} />
+            )
+        })
+    ,[comment])
+
     if(!board.isView) return <></>
 
     return (
@@ -116,7 +109,7 @@ const Comment = ({
                         댓글
                     </h2>
                     <span>
-                        ({page.total})
+                        ({page?.total})
                     </span>
                 </div>
             </div>
@@ -130,7 +123,7 @@ const Comment = ({
                             style={{width: newComment.blockSeq !== undefined && newComment.blockSeq !== null ? '29px' : '0'}}
                             onClick={onDeleteHandler}
                     >
-                      <span>{newComment.blockSeq?.split('-')[1]}</span>
+                      <span>{ newComment.blockSeq?.split('-')[1] }</span>
                     </button>
                     <textarea className={[
                         'w-full h-16 border border-solid border-gray-200  resize-none text-sm outline-0 duration-300',
@@ -153,33 +146,29 @@ const Comment = ({
                 </div>
             }
             <div className={'w-auto flex flex-col gap-4'}>
-                {
-                    comment.map((item, index) => {
-                        return (
-                            <CommentItem key={index} {...item} reload={reload} />
-                        )
-                    })
-                }
+                { comments }
             </div>
             {
-                page.total > 10
+                page?.total > 10
                 && <PageNavigator {...page} />
             }
         </div>
     )
 }
 
-const CommentItem = (props: CommentI & {reload: ()=> Promise<any>}) => {
+const CommentItem = (props: CommentI & {refetch: ()=> Promise<any>}) => {
     const {
         blockSeq, content
         , writer, profileImage
         , createdAt, children
         , isWriter
-        , id, reload
+        , id, refetch
     } = props;
 
     const {board} = useContext(BoardProvider);
-    const {setSelectedBlock} = useContext(BlockProvider);
+
+    const {setSelectedBlock} = useBlockEvent();
+
     const {deleteComment, setDeleteComment} = useContext(BoardProvider);
     const [loading, setLoading] = useState(false);
 
@@ -209,7 +198,7 @@ const CommentItem = (props: CommentI & {reload: ()=> Promise<any>}) => {
             alert(err.response.data.message);
         } finally {
             setLoading(false);
-            await reload();
+            await refetch();
             setDeleteComment({confirm: false});
         }
     }
@@ -239,6 +228,7 @@ const CommentItem = (props: CommentI & {reload: ()=> Promise<any>}) => {
         }) as BlockI[];
 
         const body = updateBoard({
+            isTemplate: false,
             board: board.data,
             list,
             waitUploadFiles: [],
@@ -322,7 +312,7 @@ const CommentItem = (props: CommentI & {reload: ()=> Promise<any>}) => {
                          onClick={() => {deleteComment.confirm && disabledDeleteConfirm()}}
                     >
                         <p className={''}>
-                            {content}
+                            { content }
                         </p>
                     </div>
                 </div>

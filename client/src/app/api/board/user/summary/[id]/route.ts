@@ -1,15 +1,14 @@
 import {NextRequest} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
-import {PageResponse} from "@/app/{commons}/types/commons";
-import {BoardListI} from "@/app/{components}/boardComponent";
+import {Common} from "@/app/{commons}/types/commons";
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
-import {BoardListParamsI} from "@/app/{services}/SearchParamsProvider";
+import {Root} from "@/app/{services}/types";
 
 export async function GET(req: NextRequest) {
 
     const userId = req.nextUrl.pathname.substring(req.nextUrl.pathname.lastIndexOf('/') + 1);
 
-    const result = await apiCall<PageResponse<BoardListI>>({
+    const result = await apiCall<Common.PageResponse<Root.BoardListI>>({
         path: '/public/api/boards/summary/' + userId,
         method: 'GET',
         call: 'Server',

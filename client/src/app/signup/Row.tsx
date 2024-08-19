@@ -1,31 +1,18 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCheck} from "@fortawesome/free-solid-svg-icons/faCheck";
-import {CheckProps, CheckType, UserProps} from "@/app/signup/page";
-import {LegacyRef, useState} from "react";
+import React, {useState} from "react";
+import {SignUp} from "@/app/signup/{services}/types";
 
-export type RowProps = {
-    className?  : string;
-    name        : string;
-    value       : UserProps;
-    type?       : string;
-    check       : CheckProps;
-    placeholder : string;
-    setProps    : (e: React.ChangeEvent<HTMLInputElement>) => void;
-    inputCheck  : (eleId: CheckType) => string;
-    disabled?   : boolean;
-    description?: string;
-}
-
-const Row = (props:RowProps) => {
+const Row = (props: SignUp.RowProps) => {
     const {
         type, placeholder,
         name, value,
         disabled, description,
         inputCheck, check,
-        setProps
-    }: RowProps = props
+        setProps, autoFocus
+    }: SignUp.RowProps = props
 
-    const [isFocus, setIsFocus] = useState<boolean>(false);
+    const [isFocus, setIsFocus] = useState(false);
 
     return (
         <div className={['flex relative', props.className].join(' ')}>
@@ -38,16 +25,25 @@ const Row = (props:RowProps) => {
                    disabled={disabled}
                    onFocus={() => setIsFocus(true)}
                    onBlur={() => setIsFocus(false)}
+                   autoFocus={autoFocus}
             />
             {
                 check[name] !== 'uncheck'
                 && <span className={['flex flex-col justify-center w-5 ms-2', inputCheck(check[name])].join(' ')}
-                ><FontAwesomeIcon icon={faCheck}/>
+                         data-testid={`${name}-check`}
+                >
+                    <FontAwesomeIcon icon={faCheck}/>
                 </span>
             }
             {
                 description
-                && <span className={['absolute z-10 left-2 -bottom-5 w-50 duration-300 text-xs bg-blue-400 text-white rounded p-2', isFocus ? 'flex items-center' : 'hidden '].join(' ')}>
+                && check[name] === 'check'
+                && <span className={[
+                            'absolute z-10 left-2 -bottom-5 w-50 duration-300 text-xs bg-blue-400 text-white rounded p-2',
+                            isFocus ? 'flex items-center' : 'hidden '
+                        ].join(' ')}
+                         data-testid={`${name}-description`}
+                >
                     {description}
                 </span>
             }
@@ -55,6 +51,10 @@ const Row = (props:RowProps) => {
     )
 };
 
-export default Row;
+export default React.memo(Row,(prev, next) => {
+    return prev.value    === next.value
+        && prev.check    === next.check
+        && prev.disabled === next.disabled;
+});
 
 

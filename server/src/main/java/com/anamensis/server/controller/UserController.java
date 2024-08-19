@@ -4,6 +4,7 @@ package com.anamensis.server.controller;
 import com.anamensis.server.dto.*;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.dto.response.LoginHistoryResponse;
+import com.anamensis.server.dto.response.StatusResponse;
 import com.anamensis.server.dto.response.UserResponse;
 import com.anamensis.server.entity.*;
 import com.anamensis.server.provider.TokenProvider;
@@ -11,10 +12,12 @@ import com.anamensis.server.resultMap.MemberResultMap;
 import com.anamensis.server.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -27,6 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("api/user")
+@Slf4j
 public class UserController {
 
     private final UserService userService;
@@ -39,6 +43,36 @@ public class UserController {
     private final PointService ps;
     private final PointHistoryService phs;
     private final TableCodeService tableCodeService;
+
+
+    @MasterAPI
+    @GetMapping("list")
+    public Mono<PageResponse<UserResponse.List>> findAll(
+        Page page,
+        UserRequest.Params params
+    ) {
+
+        Mono<List<UserResponse.List>> users = userService.findAllMember(page, params)
+            .collectList()
+            .subscribeOn(Schedulers.boundedElastic());
+
+        Mono<Long> count = userService.count(params)
+            .subscribeOn(Schedulers.boundedElastic());
+
+        return Mono.zip(users, count)
+            .flatMap(t -> {
+                page.setTotal(t.getT2().intValue());
+                return Mono.just(new PageResponse<>(page, t.getT1()));
+            });
+    }
+
+    @MasterAPI
+    @PutMapping("role")
+    public Mono<Boolean> updateRole(
+            @RequestBody UserRequest.UpdateRole role
+    ) {
+        return userService.updateRole(role);
+    }
 
     @PublicAPI
     @PostMapping("login")
@@ -106,15 +140,57 @@ public class UserController {
 
 
     @PublicAPI
+    @PostMapping("oauth")
+    public Mono<UserResponse.Login> oauth2Login(
+        @RequestBody UserRequest.OauthLogin user,
+        Device device
+    ) {
+        Mono<MemberResultMap> member = userService.findOauthUser(user)
+            .subscribeOn(Schedulers.boundedElastic())
+            .share();
+
+        Mono<Token> token = member.flatMap(u -> generateToken(u.getMember().getUserId()))
+            .subscribeOn(Schedulers.boundedElastic());
+
+        member.flatMap(u -> loginHistoryService.save(device, u.getMember()))
+            .subscribeOn(Schedulers.boundedElastic())
+            .subscribe();
+
+        member.flatMap(u ->
+                loginHistoryService.confirmedLogin(u.getMember(), device)
+                    .flatMap(b -> {
+                        if(b) return Mono.just(true);
+                        return userService.unConfirmLogin(u.getMember(), device);
+                    })
+            )
+            .subscribeOn(Schedulers.boundedElastic())
+            .subscribe();
+
+        return notAuth(member, token)
+            .publishOn(Schedulers.boundedElastic())
+            .doOnNext(t -> {
+                member.flatMap(u ->
+                    attendanceService.exist(u.getMemberPk())
+                        .flatMap(b -> {
+                            if (b) return Mono.just(true);
+                            return addAttendanceAndPoint(u.getMember())
+                                .flatMap(b1 -> attendanceService.init(u.getMemberPk()));
+                        })
+                )
+                .subscribe();
+            });
+    }
+
+
+    @PublicAPI
     @PostMapping("signup")
     public Mono<UserResponse.Status> signup(
             @Valid @RequestBody
             UserRequest.Register user
     ) {
-
         AtomicReference<Member> member = new AtomicReference<>();
 
-        return userService.saveUser(user)
+        return userService.saveUser(user, false)
                 .doOnNext(member::set)
                 .flatMap(u -> attendanceService.init(u.getId()))
                 .publishOn(Schedulers.boundedElastic())
@@ -124,33 +200,32 @@ public class UserController {
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(s -> {
                     if(!s.getStatus().equals(HttpStatus.CREATED)) return;
-                    ps.selectByIdOrName("1")
-                        .publishOn(Schedulers.boundedElastic())
-                        .doOnNext(p -> {
-                            userService.updatePoint(member.get().getId(), p.getPoint())
-                                .subscribe();
-                        })
-                        .publishOn(Schedulers.boundedElastic())
-                        .doOnNext(p -> {
-                            tableCodeService.findByIdByTableName(0, "attendance")
-                                .flatMap(t -> {
-                                    PointHistory ph = new PointHistory();
-                                    ph.setMemberPk(member.get().getId());
-                                    ph.setPointCodePk(p.getId());
-                                    ph.setTableCodePk(t.getId());
-                                    ph.setTableRefPk(member.get().getId());
-                                    ph.setCreateAt(LocalDateTime.now());
-                                    return phs.insert(ph);
-                                })
-                                .subscribe();
-                        })
-                        .publishOn(Schedulers.boundedElastic())
-                        .doOnNext(b -> {
-                            userService.findUserInfoCache(member.get().getUserId())
-                                .subscribe();
-                        })
+                    addAttendanceAndPoint(member.get())
                         .subscribe();
                 });
+    }
+
+    private Mono<Boolean> addAttendanceAndPoint(Member member) {
+        return ps.selectByIdOrName("1")
+            .publishOn(Schedulers.boundedElastic())
+            .doOnNext(p -> {
+                userService.updatePoint(member.getId(), p.getPoint())
+                    .flatMap($ -> userService.findUserInfoCache(member.getUserId()))
+                    .flatMap(b ->
+                        tableCodeService.findByIdByTableName(0, "attendance")
+                            .flatMap(t -> {
+                                PointHistory ph = new PointHistory();
+                                ph.setMemberPk(member.getId());
+                                ph.setPointCodePk(p.getId());
+                                ph.setTableCodePk(t.getId());
+                                ph.setTableRefPk(member.getId());
+                                ph.setCreateAt(LocalDateTime.now());
+                                return phs.insert(ph);
+                            })
+                    )
+                    .subscribe();
+            })
+            .flatMap(b -> Mono.just(true));
     }
 
     @PublicAPI
@@ -337,8 +412,39 @@ public class UserController {
             case CONFIRMED -> sendVerifyEmail(resetPwd);
             case VERIFIED -> verifyEmailCode(resetPwd);
             case RESET -> resetPwd(resetPwd);
-            default -> Mono.just(new UserResponse.ResetPwd(ResetPwdProgress.FAILED, false)).log();
+            default -> Mono.just(new UserResponse.ResetPwd(ResetPwdProgress.FAILED, false));
         };
+    }
+
+    @PostMapping("/change-password")
+    public Mono<StatusResponse> changePassword(
+            @Valid @RequestBody UserRequest.ChangePassword changePwd,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+
+        return userService.confirmPassword(userDetails.getUsername(), changePwd.getCurPwd())
+            .flatMap(b -> {
+                if (!b) return Mono.just(false);
+                return switch (changePwd.getStatus()) {
+                    case READY     -> Mono.just(b);
+                    case CONFIRMED -> this.changePwd(userDetails.getUsername(), changePwd.getNewPwd());
+                    default        -> Mono.just(false);
+                };
+            })
+            .flatMap(b -> {
+                StatusResponse sr = StatusResponse.builder()
+                    .status(b ? StatusType.SUCCESS : StatusType.FAIL)
+                    .message(b ? "Success" : "Failed")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+
+                return Mono.just(sr);
+            });
+    }
+
+    private Mono<Boolean> changePwd(String userId, String newPwd) {
+
+        return userService.changePwd(userId, newPwd);
     }
 
     private Mono<UserResponse.ResetPwd> sendVerifyEmail(UserRequest.ResetPwd resetPwd) {

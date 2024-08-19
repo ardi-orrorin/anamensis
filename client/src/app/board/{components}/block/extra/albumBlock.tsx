@@ -1,6 +1,5 @@
 import {ExpendBlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
-import React, {CSSProperties, useContext, useEffect, useRef, useState} from "react";
-import TempFileProvider from "@/app/board/{services}/TempFileProvider";
+import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBorderAll, faImage} from "@fortawesome/free-solid-svg-icons";
 import AlbumProvider, {AlbumToggleType} from "@/app/board/{components}/block/extra/providers/albumProvier";
@@ -9,7 +8,10 @@ import {FileContentI} from "@/app/api/file/img/route";
 import ImageView from "@/app/board/{components}/block/extra/{components}/ImageView";
 import Thumbnail from "@/app/board/{components}/block/extra/{components}/thumbnail";
 import Slide from "@/app/board/{components}/block/extra/{components}/slide";
-import {deleteImage} from "@/app/board/{services}/funcs";
+import BoardProvider from "@/app/board/{services}/BoardProvider";
+import {AxiosError} from "axios";
+import {usePendingFiles} from "@/app/board/[id]/{hooks}/usePendingFiles";
+import boardApiService from "@/app/board/{services}/boardApiService";
 
 export type ImageShowProps = {
     defaultIndex: number;
@@ -22,6 +24,12 @@ export type ProgressType = {
     progress: number;
 }
 
+const MAX_IMAGE = 30;
+const MAX_CONCURRENT = 30;
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const UPLOAD_WORKER = 2
+
+
 const AlbumBlock = (props: ExpendBlockProps) => {
     const {
         hash, value
@@ -30,12 +38,16 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         , type
     }: ExpendBlockProps = props;
 
-    const maxImage = 30;
-    const oneFileLength = 5;
-    const maxFileSize = 5 * 1024 * 1024;
-
     const extraValue = props.extraValue as ImageShowProps;
-    const {setWaitUploadFiles, setWaitRemoveFiles} = useContext(TempFileProvider);
+    const {
+        setWaitUploadFiles,
+        deleteImage,
+    } = usePendingFiles();
+
+    const {board, isNewBoard} = useContext(BoardProvider);
+    const {title, isPublic, membersOnly} = board?.data;
+
+    const [viewMode, setViewMode] = useState<string>(extraValue?.mode || 'thumbnail');
     const [uploadProgress, setUploadProgress] = useState<ProgressType>({
         size: 0,
         progress: 0,
@@ -45,6 +57,8 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         viewImage: '',
         viewToggle: false,
     } as AlbumToggleType);
+
+    const [waitUpload, setWaitUpload] = useState<boolean>(false);
 
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -60,16 +74,16 @@ const AlbumBlock = (props: ExpendBlockProps) => {
         } as ImageShowProps);
     },[]);
 
-    const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if(!files) return;
-        if(files.length > oneFileLength) {
-            alert(`한번에 최대 ${oneFileLength}개까지 업로드 가능합니다.`);
+        if(files.length > MAX_CONCURRENT) {
+            alert(`한번에 최대 ${MAX_CONCURRENT}개까지 업로드 가능합니다.`);
             e.currentTarget.value = '';
             return;
         }
-        if(files.length + extraValue.images.length > maxImage) {
-            alert(`이미지는 최대 ${maxImage}개까지 가능합니다.`);
+        if(files.length + extraValue.images.length > MAX_IMAGE) {
+            alert(`이미지는 최대 ${MAX_IMAGE}개까지 가능합니다.`);
             return;
         }
 
@@ -84,28 +98,32 @@ const AlbumBlock = (props: ExpendBlockProps) => {
 
         const progress: number[] = [];
 
-
         let size = 0;
 
         for(const file of files) {
-            file.size > maxFileSize || size++;
+            file.size > MAX_FILE_SIZE || size++;
         }
 
+        setWaitUpload(true);
         setUploadProgress({
             size,
             progress: 0,
         });
 
-        for(const file of files) {
-            upload(file, fileContent, uploadedImages, size, progress);
+
+        for(let i = 0 ; i < files.length ; i += UPLOAD_WORKER) {
+            await Promise.allSettled([
+                upload(files[i], fileContent, uploadedImages, size, progress),
+                upload(files[i + 1], fileContent, uploadedImages, size, progress),
+            ]);
         }
 
         e.target.value = '';
+        setWaitUpload(false);
     }
 
     const upload = async (file: File, fileContent: FileContentType, uploadedImages: string[], size: number, progress: number[]) => {
-
-        if(file.size > maxFileSize) return;
+        if(file.size > MAX_FILE_SIZE) return;
 
         const blob = new Blob([JSON.stringify(fileContent)], {type: 'application/json'})
 
@@ -124,6 +142,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
                     timeout: 5 * 60 * 1000,
                 });
             } catch (e) {
+                const err = e as AxiosError;
                 return call()
             }
         }
@@ -155,38 +174,30 @@ const AlbumBlock = (props: ExpendBlockProps) => {
     }
 
 
-    const onChangeModeHandler = (mode: string) => {
+    const onChangeModeHandler = useCallback((mode: string) => {
+        setViewMode(mode);
         if(!onChangeExtraValueHandler) return;
         onChangeExtraValueHandler({
             ...extraValue,
             mode: mode,
         } as ImageShowProps);
-    }
+    },[extraValue, isView, title, membersOnly, isPublic]);
 
 
-    const onChaneDefaultIndexHandler = (index: number) => {
+    const onChaneDefaultIndexHandler = useCallback((index: number) => {
         if(!onChangeExtraValueHandler) return;
         onChangeExtraValueHandler({
             ...extraValue,
             defaultIndex: index,
         } as ImageShowProps);
-    }
+    },[extraValue, isView, title, membersOnly, isPublic]);
 
-    const deleteImageHandler = async  (absolutePath: string, index: number) => {
+    const deleteImageHandler = async (absolutePath: string, index: number) => {
         try {
-            const res = await apiCall({
-                path: '/api/file/delete/filename',
-                method: 'PUT',
-                body: {fileUri: absolutePath},
-                contentType: 'application/json',
-            });
-
-            if(!res) return;
+            isNewBoard
+            && await boardApiService.deleteFile(absolutePath);
 
             if(!onChangeExtraValueHandler) return;
-
-            const fileName = absolutePath.substring(absolutePath.lastIndexOf('/') + 1);
-            const filePath = absolutePath.substring(0, absolutePath.lastIndexOf('/') + 1);
 
             onChangeExtraValueHandler({
                 ...extraValue,
@@ -194,37 +205,49 @@ const AlbumBlock = (props: ExpendBlockProps) => {
                 defaultIndex: extraValue.defaultIndex === index ? 0 : extraValue.defaultIndex,
             } as ImageShowProps);
 
-            deleteImage({
-                absolutePath,
-                setWaitUploadFiles,
-                setWaitRemoveFiles,
-            });
-
-            setWaitUploadFiles(prevState => {
-                return prevState.filter(item => item.fileName !== fileName);
-            });
-
-            setWaitRemoveFiles(prevState => {
-                return [...prevState, {id: 0, fileName, filePath}];
-            });
+            deleteImage(absolutePath);
 
         } catch (e) {
             console.error(e);
         }
     }
 
-    const componentProps = {
+    const componentProps = useMemo(() => ({
         images       : extraValue?.images || [],
         isView       : isView || false,
         defaultIndex : extraValue?.defaultIndex ?? 0,
         deleteImageHandler,
         onChaneDefaultIndexHandler,
-    }
+    }),[isView, extraValue, title]);
 
-    const modes = [
+    const modes = useMemo(() => [
         {icon: faBorderAll, mode: 'thumbnail', component: <Thumbnail {...componentProps}/>},
         {icon: faImage, mode: 'slide', component: <Slide {...componentProps} />},
-    ]
+    ], [componentProps]);
+
+    const modeComponent = useMemo(()=>
+        modes.map((mode, index) => {
+            return (
+                <button key={'mode' + index}
+                        className={[
+                            'w-16 h-8 rounded border border-solid border-gray-200',
+                            viewMode === mode.mode ? 'bg-gray-800' : 'bg-white'
+                        ].join(' ')}
+                        onClick={() => onChangeModeHandler(mode.mode)}
+                >
+                    <FontAwesomeIcon className={viewMode === mode.mode ? 'text-white' : ''}
+                                     icon={mode.icon}
+                    />
+                </button>
+            )
+        })
+    ,[modes])
+
+    const modeView = useMemo(() =>
+        modes.find(mode =>
+            mode.mode === viewMode
+        )?.component
+    ,[modes])
 
     return (
         <AlbumProvider.Provider value={{albumToggle, setAlbumToggle}}>
@@ -232,19 +255,22 @@ const AlbumBlock = (props: ExpendBlockProps) => {
              className={'flex w-full flex-col gap-5'}
              aria-roledescription={type}
              ref={el => {
+                 if(!props.blockRef?.current) return;
                  props!.blockRef!.current[props.seq] = el
              }}
         >
             {
                 !isView
-                && extraValue?.images?.length < maxImage
+                && extraValue?.images?.length < MAX_IMAGE
                 && <div className={'w-full flex justify-center'}>
                     <button className={'w-full flex flex-col justify-center items-center gap-3 py-4 px-2 bg-white rounded border border-solid border-gray-200'}
+                            disabled={waitUpload}
                             onClick={() => inputRef.current?.click()}
                     >
                         <p>
                             {
-                                uploadProgress.size === uploadProgress.progress
+                                uploadProgress?.size !== 0
+                                && uploadProgress?.size === uploadProgress?.progress
                                 ? '이미지 업로드 완료'
                                 : '이미지 업로드 진행중 (최대 30개)'
                             }
@@ -252,7 +278,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
                         {
                             uploadProgress.size > 0
                             && extraValue?.images?.length > 0
-                            && extraValue?.images?.length < maxImage
+                            && extraValue?.images?.length < MAX_IMAGE
                             && <div className={'flex flex-col w-full gap-3'}>
                                 <div className={'w-full h-2 bg-gray-200'}>
                                   <div className={'h-2 bg-blue-400 duration-500 rounded-xl'}
@@ -267,7 +293,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
                                     <span className={extraValue.images.length < 10 ? 'text-yellow-700' : extraValue.images.length < 20 ? 'text-blue-700' : 'text-red-600'}>
                                       {extraValue.images.length}
                                     </span>
-                                    &nbsp; / {maxImage}
+                                    &nbsp; / {MAX_IMAGE}
                                   </span>
                                 </div>
                             </div>
@@ -279,7 +305,7 @@ const AlbumBlock = (props: ExpendBlockProps) => {
                            onChange={onChangeHandler}
                            ref={inputRef}
                            hidden={true}
-                           disabled={extraValue.images.length >= maxImage}
+                           disabled={waitUpload || extraValue.images.length >= MAX_IMAGE}
                            max={10}
                     />
                 </div>
@@ -287,30 +313,12 @@ const AlbumBlock = (props: ExpendBlockProps) => {
             {
                 extraValue?.images?.length > 0
                 && <div className={'flex justify-end'}>
-                    {
-                        modes.map((mode, index) => {
-                            return (
-                                <button key={'mode' + index}
-                                        className={[
-                                            'w-16 h-8 rounded border border-solid border-gray-200',
-                                            extraValue.mode === mode.mode ? 'bg-gray-800' : 'bg-white'
-                                        ].join(' ')}
-                                        onClick={() => onChangeModeHandler(mode.mode)}
-                                >
-                                    <FontAwesomeIcon className={extraValue.mode === mode.mode ? 'text-white' : ''}
-                                                     icon={mode.icon}
-                                    />
-                                </button>
-                            )
-                        })
-                    }
+                    { modeComponent }
                 </div>
             }
             {
                 extraValue?.images?.length > 0
-                && modes.find(mode =>
-                    mode.mode === extraValue.mode
-                )?.component
+                && modeView
             }
             {
                 extraValue?.images?.length > 0

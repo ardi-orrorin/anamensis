@@ -1,16 +1,10 @@
-import {useMemo} from "react";
-
-export type EmailTemplateProps = {
-    className? : string;
-    id         : string;
-    domain     : string;
-    order      : number;
-    emailClickHandler : (value: string) => void;
-}
+import React, {useMemo} from "react";
+import {SignUp} from "@/app/signup/{services}/types";
 
 const EmailTemplate = ({
     id, className, emailClickHandler
-}:EmailTemplateProps) => {
+}: SignUp.EmailTemplateProps) => {
+
     const emailTemplate = [
         '@gmail.com',
         '@naver.com',
@@ -20,13 +14,16 @@ const EmailTemplate = ({
         '@kakao.com',
         '@outlook.com',
     ];
-    const emailToId = useMemo(()=> {
-            return id.split('@')[0]}
-        ,[id]) ;
+
+    const emailToId = useMemo(()=>
+        id.split('@')[0]
+    ,[id])
 
 
     return (
-        <div className={['w-full duration-300 overflow-y-scroll', className].join(' ')}>
+        <div className={['w-full duration-300 overflow-y-scroll', className].join(' ')}
+             data-testid={'email-template'}
+        >
             {
                 emailTemplate.map((domain, index) => {
                     return (
@@ -42,4 +39,7 @@ const EmailTemplate = ({
     )
 };
 
-export default EmailTemplate;
+export default React.memo(EmailTemplate, (prev, next) => {
+    return prev.id     === next.id
+        && prev.domain === next.domain
+});

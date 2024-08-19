@@ -1,50 +1,18 @@
 'use client';
 
-import Link from "next/link";
 import {useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
-
- enum ResetPwdProgress {
-    CONFIRMED = 'CONFIRMED',
-    VERIFIED = 'VERIFIED',
-    RESET = 'RESET',
-    FAIL = 'fail'
-}
-
-export interface ResetPwdI {
-    progress      : ResetPwdProgress;
-    userId        : string;
-    email         : string;
-    verifyCode?   : string;
-    isVerified?   : boolean;
-    pwd?          : string;
-}
-
-export type ResetPwdResponse = {
-    progress: ResetPwdProgress;
-    verified: boolean;
-}
-
-type ResetPwdVerified = {
-    confirmed     : boolean;
-    verified      : boolean;
-    reset         : boolean;
-    [key: string] : boolean;
-}
-
-type Password = {
-    pwd: string;
-    pwdCheck: string;
-}
+import Footer from "@/app/find-user/{components}/footer";
+import {User} from "@/app/login/{services}/types";
 
 export default function Page() {
 
-    const [resetPwd, setResetPwd] = useState<ResetPwdI>({
-        progress: ResetPwdProgress.CONFIRMED,
-    } as ResetPwdI);
-    const [response, setResponse] = useState<ResetPwdVerified>({} as ResetPwdVerified);
-    const [sendCode, setSendCode] = useState<boolean>(false);
-    const [pwd, setPwd] = useState<Password>({} as Password);
+    const [resetPwd, setResetPwd] = useState<User.ResetPwd>({
+        progress: User.ResetPwdProgress.CONFIRMED,
+    } as User.ResetPwd);
+    const [response, setResponse] = useState({} as User.ResetPwdVerified);
+    const [sendCode, setSendCode] = useState(false);
+    const [pwd, setPwd] = useState({} as User.Password);
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
@@ -62,7 +30,7 @@ export default function Page() {
         });
     }
 
-    const submitHandler = async (resetPwdProgress: ResetPwdProgress) => {
+    const submitHandler = async (resetPwdProgress: User.ResetPwdProgress) => {
         if(pwd && pwd.pwd !== pwd.pwdCheck) {
             return alert('비밀번호가 일치하지 않습니다');
         }
@@ -72,17 +40,15 @@ export default function Page() {
         await sendVerifyCodeHandler(body);
     }
 
-    const sendVerifyCodeHandler = async (body: ResetPwdI) => {
-        console.log(body)
+    const sendVerifyCodeHandler = async (body: User.ResetPwd) => {
         try {
-             const res = await apiCall<ResetPwdResponse, ResetPwdI>({
+             const res = await apiCall<User.ResetPwdResponse, User.ResetPwd>({
                  path: '/api/reset-pwd',
                  method: 'POST',
                  body,
                  isReturnData: true
              })
 
-            console.log(res)
             setResponse({
                 ...response,
                 [res.progress.toLowerCase()] : res.verified
@@ -99,22 +65,20 @@ export default function Page() {
         }
     }
 
-    const result = ({progress, verified}:ResetPwdResponse) => {
-        if(progress === ResetPwdProgress.CONFIRMED && !verified){
+    const result = ({progress, verified}:User.ResetPwdResponse) => {
+        if(progress === User.ResetPwdProgress.CONFIRMED && !verified){
             return alert('계정을 찾을 수 없습니다');
         }
 
-        if(progress === ResetPwdProgress.VERIFIED && !verified){
+        if(progress === User.ResetPwdProgress.VERIFIED && !verified){
             return alert('인증번호가 일치하지 않습니다');
         }
 
-        if(progress === ResetPwdProgress.RESET && verified){
+        if(progress === User.ResetPwdProgress.RESET && verified){
             alert('비밀번호가 변경되었습니다');
             return location.href = '/';
         }
     }
-
-
 
     return (
         <div className={'h-screen flex justify-center items-center'}>
@@ -184,7 +148,7 @@ export default function Page() {
                                 'w-full rounded  duration-300 text-xs text-white my-2 p-2 bg-blue-300 hover:text-white hover:bg-blue-700'
                                 , emailRegex.test(resetPwd.email) ? 'bg-blue-600' : 'bg-gray-700'
                             ].join(' ')}
-                                    onClick={()=>submitHandler(ResetPwdProgress.CONFIRMED)}
+                                    onClick={()=>submitHandler(User.ResetPwdProgress.CONFIRMED)}
                             > 인증번호 전송
                             </button>
                         </div>
@@ -200,7 +164,7 @@ export default function Page() {
                               ? 'bg-blue-600 hover:text-white hover:bg-blue-700'
                               : 'bg-gray-700'
                           ].join(' ')}
-                                  onClick={()=>submitHandler(ResetPwdProgress.VERIFIED)}
+                                  onClick={()=>submitHandler(User.ResetPwdProgress.VERIFIED)}
                           > 인증번호 확인
                           </button>
                         </div>
@@ -216,23 +180,13 @@ export default function Page() {
                                 ? 'bg-blue-600 hover:text-white hover:bg-blue-700'
                                 : 'bg-gray-700'
                         ].join(' ')}
-                                onClick={()=>submitHandler(ResetPwdProgress.RESET)}
+                                onClick={()=>submitHandler(User.ResetPwdProgress.RESET)}
                         > 비밀번호 변경
                         </button>
                       </div>
                     }
                 </div>
-                <div className={'flex justify-between px-3'}>
-                    <Link href={'/find-user'}
-                          className={'flex justify-center text-xs text-blue-500'}
-                    >아이디 찾기</Link>
-                    <Link href={'/signup'}
-                          className={'flex justify-center text-xs text-blue-500'}
-                    >회원 가입</Link>
-                    <Link href={'/reset-pwd'}
-                       className={'flex justify-center text-xs text-blue-500'}
-                    >비밀번호 찾기</Link>
-                </div>
+                <Footer />
             </div>
         </div>
     )

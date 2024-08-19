@@ -1,16 +1,17 @@
-import BoardProvider from "@/app/board/{services}/BoardProvider";
+import {BoardService} from "@/app/board/{services}/BoardProvider";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faHeart} from "@fortawesome/free-solid-svg-icons/faHeart";
-import {useContext, useMemo} from "react";
+import React, {useMemo} from "react";
+import {RateInfoI} from "@/app/board/[id]/page";
 
 const Rate = (props: {
     newBoard: boolean,
     onClick: () => void,
+    board: BoardService,
+    rateInfo: RateInfoI
 }) => {
 
-    const {newBoard, onClick} = props;
-
-    const {board, rateInfo} = useContext(BoardProvider);
+    const {newBoard, onClick, board, rateInfo} = props;
 
     const rateCount = useMemo(() => {
         return rateInfo?.count !== undefined
@@ -39,4 +40,8 @@ const Rate = (props: {
     )
 }
 
-export default Rate;
+export default React.memo(Rate, (prev, next) => {
+    return prev.newBoard === next.newBoard
+        && prev.rateInfo === next.rateInfo
+        && prev.board    === next.board;
+});

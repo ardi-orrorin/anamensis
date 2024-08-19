@@ -3,13 +3,17 @@ package com.anamensis.server.entity;
 
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 
 @Getter
 @Setter
-@ToString
-public class Member {
+public class Member implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private long id;
 
@@ -34,4 +38,6 @@ public class Member {
     private Boolean sAuth;
 
     private AuthType sAuthType;
+
+    private boolean isOAuth;
 }

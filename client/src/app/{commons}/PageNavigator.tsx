@@ -1,63 +1,76 @@
-import {PageI} from "@/app/{commons}/types/commons";
+'use client';
 import Link from "next/link";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {redirect} from "next/navigation";
+import {usePathname, useSearchParams} from "next/navigation";
 import {faAnglesLeft, faAnglesRight} from "@fortawesome/free-solid-svg-icons";
+import React, {useMemo} from "react";
+import {Common} from "@/app/{commons}/types/commons";
 
 const PageNavigator = ({
     page, size, total
-}: PageI) => {
+}: Common.PageI) => {
 
-    const lastPage = Math.ceil(total / size);
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
 
-    const startPAge = Math.max(1, page - 3);
+    const lastPage = useMemo(() => Math.ceil(total / size), [total, size]);
 
-    const curEndPage = Math.min(lastPage, page + 3);
+    const startPAge = useMemo(() => Math.max(1, page - 3), [page]);
 
-    const pages = Array.from({length: curEndPage - startPAge + 1}, (_, i) => startPAge + i);
+    const curEndPage = useMemo(() => Math.min(lastPage, page + 3), [lastPage, page]);
 
-    const skipNextPage = page + 5 > lastPage ? lastPage : page + 5;
-    const skipPrevPage = page - 5 < 1 ? 1 : page - 5;
+    const pageNumbers = useMemo(()=>
+        Array.from({length: curEndPage - startPAge + 1}, (_, i) => startPAge + i)
+    ,[curEndPage, startPAge, page])
 
-    if(total !== 0 && lastPage < page) {
-        redirect(`?page=${lastPage}&size=${size}`);
-    } else if(total !== 0 && page < 1) {
-        redirect(`?page=1&size=${size}`);
+    const skipNextPage = useMemo(() => page + 5 > lastPage ? lastPage : page + 5,[page, lastPage]);
+    const skipPrevPage = useMemo(() => page - 5 < 1 ? 1 : page - 5,[page]);
+
+    const createQueryStr = (page: number) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('page', page.toString());
+        return params.toString();
     }
+
+    const pages = useMemo(() =>
+        pageNumbers.map((item, index) => {
+            return (
+                <Link className={['border border-solid border-gray-300 rounded-md text-sm px-4 py-2', page === item ? 'bg-main text-white' : 'hover:bg-main hover:text-white duration-500'].join(' ')}
+                      href={pathname + '?' + createQueryStr(item)}
+                      key={`navi-${index}`}
+                      prefetch={true}
+                >
+                    {item}
+                </Link>
+            )
+        })
+    ,[searchParams, pageNumbers])
 
     return (
         <div className={'w-full flex justify-center gap-x-2 mt-6'}>
             {
-                page !== 1 &&
-                  <Link className={['border border-solid border-gray-300 rounded-md text-sm px-4 py-2'].join(' ')}
+                page !== 1
+                && <Link className={['border border-solid border-gray-300 rounded-md text-sm px-4 py-2 hover:bg-main hover:text-white duration-500'].join(' ')}
                         href={`?page=${skipPrevPage}&size=${size}`}
-                  >
+                >
                     <FontAwesomeIcon icon={faAnglesLeft} />
-                  </Link>
+                </Link>
             }
+            { pages }
             {
-                pages.map((item, index) => {
-                    return (
-                        <Link className={['border border-solid border-gray-300 rounded-md text-sm px-4 py-2', page === item ? 'bg-blue-500 text-white' : ''].join(' ')}
-                              href={`?page=${item}&size=${size}`}
-                              key={`navi-${index}`}
-                              prefetch={true}
-                        >
-                            {item}
-                        </Link>
-                    )
-                })
-            }
-            {
-                page !== lastPage && lastPage !== 0 && total !== 0 &&
-                  <Link className={'border border-solid border-gray-300 rounded-md text-sm px-4 py-2'}
+                page !== lastPage && lastPage !== 0 && total !== 0
+                && <Link className={'border border-solid border-gray-300 rounded-md text-sm px-4 py-2 hover:bg-main hover:text-white duration-500'}
                         href={`?page=${skipNextPage}&size=${size}`}
-                  >
+                >
                     <FontAwesomeIcon icon={faAnglesRight} />
-                  </Link>
+                </Link>
             }
         </div>
     )
 }
 
-export default PageNavigator;
+export default React.memo(PageNavigator, (prev, next) => {
+    return prev.page  === next.page
+        && prev.size  === next.size
+        && prev.total === next.total;
+});

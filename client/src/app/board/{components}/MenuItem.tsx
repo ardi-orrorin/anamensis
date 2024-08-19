@@ -1,10 +1,11 @@
-import {BlockType, blockTypeList} from "@/app/board/{components}/block/list";
+import {BlockType, blockTypeFlatList} from "@/app/board/{components}/block/list";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import React, {MutableRefObject, useCallback, useContext, useMemo} from "react";
-import BlockProvider from "@/app/board/{services}/BlockProvider";
+import React, {MutableRefObject, useContext, useMemo} from "react";
 import {ToggleEnum} from "@/app/board/{components}/SubTextMenu";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
-import {notAvailDupCheck} from "@/app/board/{services}/funcs";
+import {notAvailDupCheck, onChangeBlockGlobalHandler} from "@/app/board/{services}/funcs";
+import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
+import {useBlockEvent} from "@/app/board/[id]/{hooks}/useBlockEvent";
 
 const MenuItem = ({
     seq,
@@ -17,56 +18,80 @@ const MenuItem = ({
     toggle?  : ToggleEnum,
     subMenu? : boolean,
 }) => {
+    const {
+        onClose, setInitBlock,
+        setInitBlockMenu,
+    } = useBlockEvent();
 
-    const {blockService, setBlockService} = useContext(BlockProvider);
-    const {board, setBoard} = useContext(BoardProvider);
+    const {board, setBoard,isTemplate} = useContext(BoardProvider);
 
     const curCode = useMemo(() => {
         const item = board.data?.content?.list.find(item => item.seq === seq);
         return item?.code;
     },[board.data?.content?.list, seq]) as string;
 
-    const onCloseHandler = (e: React.MouseEvent<HTMLDivElement>) => {
-        e.stopPropagation();
-        setBlockService({...blockService, blockMenu: ''})
-    }
-
     const openMenuClick = (code: string) => {
         if(!code || code === '') return ;
 
-        if(notAvailDupCheck(code, board.data?.content)) {
-            alert('중복 사용할 수 없는 블록입니다.');
-            return;
-        }
-
-        const newList = board.data?.content?.list.map((item, index) => {
-            if (item.seq === seq) {
-                if(item.code.slice(0, 3) !== code.slice(0, 3)) {
-                    item.value = '';
-                    item.extraValue = {};
-                    item.textStyle = {};
-                }
-                item.code = code;
-            }
-            return item;
+        onChangeBlockGlobalHandler({
+            seq,
+            code,
+            board,
+            setBoard,
+            blockRef,
+            isTemplate,
         });
 
-        setBlockService({
-            ...blockService,
-            blockMenu : '',
-            block: {
-                seq   : 0,
-                code  : '',
-                value : '',
-                hash  : '',
-            }});
-
-        setBoard({...board, data: {...board.data, content: {list: newList}}});
-
-        setTimeout(() => {
-            blockRef?.current[seq]?.focus();
-        },100);
+        setInitBlock();
     };
+
+    const blockMenu = useMemo(() =>
+        blockTypeFlatList.map((block: BlockType, index: number) => {
+            const {
+                label, code,
+                comment, command,
+                icon, notAvailDup
+            } = block;
+
+            if(isTemplate && !block?.onTemplate) return;
+            if(notAvailDupCheck(code, board.data?.content)) return;
+            if(block.type === 'extra' || block.type === 'subExtra') return;
+
+            return (
+                <Item key={'blockList' + index}
+                      {...{curCode, code, icon, command, label, comment}}
+                      onClick={() => openMenuClick(code)}
+                      />
+            )
+        })
+    ,[seq, board]);
+
+    const subBlockMenu = useMemo(() => {
+        const firstBlockCode = board.data.content.list[0].code;
+        const subComponents = blockTypeFlatList.find(block =>
+            block.code === firstBlockCode)?.subBlock;
+
+        if(!subComponents || subComponents?.length === 0) return;
+
+        return subComponents.map((block: BlockType, index: number) => {
+            const {
+                label, code,
+                comment, command,
+                icon, notAvailDup
+            } = block;
+
+            if(isTemplate && !block?.onTemplate) return;
+            if(notAvailDupCheck(code, board.data?.content)) return;
+            if(block.type !== 'subExtra') return;
+
+            return (
+                <Item key={'subBlockList' + index}
+                      onClick={() => openMenuClick(code)}
+                      {...{curCode, code, icon, command, label, comment}}
+                />
+            )
+        });
+    },[board.data.content.list]);
 
     return (
         <>
@@ -81,53 +106,62 @@ const MenuItem = ({
                     subMenu ? '' : 'overflow-y-scroll scroll-p-2 max-h-72'
                 ].join(' ')}>
                     <ul className={'flex flex-col w-full'}>
-                        {
-                            blockTypeList.map((block: BlockType, index: number) => {
-                                const {
-                                    label, code,
-                                    comment, command,
-                                    icon, notAvailDup
-                                } = block;
-
-                                if(notAvailDupCheck(code, board.data?.content)) return;
-                                if(block.type === 'extra') return;
-
-                                return (
-                                    <li key={'blockList'+ index} className={'w-full'}>
-                                        <button className={[
-                                            'flex w-full h-full p-2 text-left text-sm rounded duration-300 hover:bg-blue-200 hover:text-blue-800',
-                                            curCode === code && 'bg-blue-100'
-                                        ].join(' ')}
-                                                onClick={()=> openMenuClick(code)}
-                                        >
-                                            <div className={'flex flex-col h-full p-2'}>
-                                                <FontAwesomeIcon icon={icon} height={15}/>
-                                                <div>[{command}]</div>
-                                            </div>
-                                            <div className={'flex flex-col w-full p-1'}>
-                                                <div>
-                                                    {label}
-                                                </div>
-                                                <div>
-                                                    {comment}
-                                                </div>
-                                            </div>
-                                        </button>
-                                    </li>
-                                )
-                            })
-                        }
+                        { blockMenu }
+                        { subBlockMenu }
                     </ul>
                 </div>
             </div>
             {
                 !subMenu &&
                 <div className={'fixed left-0 top-0 w-full h-full'}
-                     onClick={onCloseHandler}
+                     onClick={onClose}
                 />
             }
+
+            <div className={'z-[10] fixed w-full h-full'}
+                 onClick={() => setInitBlockMenu()}
+            ></div>
         </>
     )
+}
+
+
+const Item = ({
+    curCode, code,
+    onClick, icon,
+    command, label, comment
+}: {
+    curCode: string,
+    code: string,
+    onClick: () => void,
+    icon: IconDefinition,
+    command: string,
+    label: string,
+    comment: string
+}) => {
+    return (
+        <li className={"w-full"}>
+            <button className={[
+                "flex w-full h-full p-2 text-left text-sm rounded duration-300 hover:bg-blue-200 hover:text-blue-800",
+                curCode === code && "bg-blue-100"
+            ].join(" ")}
+                    onClick={onClick}
+            >
+                <div className={"flex flex-col h-full p-2"}>
+                    <FontAwesomeIcon icon={icon} height={15}/>
+                    <div>[{command}]</div>
+                </div>
+                <div className={"flex flex-col w-full p-1"}>
+                    <div>
+                        {label}
+                    </div>
+                    <div>
+                        {comment}
+                    </div>
+                </div>
+            </button>
+        </li>
+    );
 }
 
 export default MenuItem;

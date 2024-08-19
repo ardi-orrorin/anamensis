@@ -3,9 +3,14 @@ import NavMain from "@/app/NavMain";
 import {ErrorBoundary} from "next/dist/client/components/error-boundary";
 import Error from "@/app/error";
 import {Metadata, Viewport} from "next";
-import Head from "next/head";
 import Script from "next/script";
 import Footer from "@/app/{components}/mainFooter";
+import ProgressBar from "@/app/{components}/progressBar";
+import Providers from "@/app/Provider";
+import {cookies} from "next/headers";
+import LoginState from "@/app/loginState";
+import {SearchHistoryProvider} from "@/app/{hooks}/searchHisotryHook";
+import {SearchParamsProvider} from "@/app/{hooks}/searchParamsHook";
 
 export const metadata: Metadata = {
     title: 'anamensis',
@@ -46,7 +51,9 @@ export default function RootLayout({
 }) {
 
     const gId = process.env.NEXT_PUBLIC_GID;
-    
+
+    const isLogin = (cookies()?.get('next.access.token')  || cookies()?.get('next.refresh.token')) !== undefined;
+
     return (
         <html lang="ko">
             <Script id={'google-analytics'} async
@@ -61,16 +68,23 @@ export default function RootLayout({
                 gtag('config', 'G-${gId}');
                 `
             }} />
-            <body>
+            <body className={'flex flex-col'}>
+            <Providers>
+                { isLogin && <LoginState /> }
+                <ProgressBar />
                 <NavMain />
-                <div className={'min-h-screen'}>
-                    <ErrorBoundary errorComponent={Error}>
-                        {children}
-                    </ErrorBoundary>
-                </div>
+                <ErrorBoundary errorComponent={Error}>
+                    <SearchHistoryProvider>
+                        <SearchParamsProvider>
+                            <main className={'w-full min-h-screen'}>
+                                {children}
+                            </main>
+                        </SearchParamsProvider>
+                    </SearchHistoryProvider>
+                </ErrorBoundary>
                 <Footer />
+            </Providers>
             </body>
-
         </html>
     )
 }

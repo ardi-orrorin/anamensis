@@ -1,10 +1,10 @@
 'use client';
 
-import {CSSProperties, useContext, useRef, useState} from "react";
+import {useRef, useState} from "react";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import axios from "axios";
 import {BlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
-import TempFileProvider from "@/app/board/{services}/TempFileProvider";
+import {usePendingFiles} from "@/app/board/[id]/{hooks}/usePendingFiles";
 
 export type FileUploadProps = {
     onUploadFileUrl: (url: string) => void;
@@ -18,9 +18,7 @@ export default function FileUpload (props: FileUploadProps) {
 
     const [loading, setLoading] = useState<boolean>(false);
     const [progress, setProgress] = useState<number>(0);
-    const {setWaitUploadFiles} = useContext(TempFileProvider);
-
-
+    const {setWaitUploadFiles} = usePendingFiles();
 
     const onClick = () => {
         if(!useFileInputRef.current) return ;
@@ -33,7 +31,6 @@ export default function FileUpload (props: FileUploadProps) {
 
         if(!file) return ;
         if(file.size > 1024 * 1024 * 5) return alert('5MB 이하의 파일만 업로드 가능합니다.');
-
 
         isImage
         ? await uploadImage(e, formData, file)

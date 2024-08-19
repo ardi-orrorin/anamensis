@@ -1,6 +1,3 @@
-import axios from "axios";
-import {cookies} from "next/headers";
-import {NextRequest} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
 
 export async function GET() {

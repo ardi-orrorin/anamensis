@@ -1,9 +1,10 @@
 import PageNavigator from "@/app/{commons}/PageNavigator";
-import {PageResponse} from "@/app/{commons}/types/commons";
 import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import apiCall from "@/app/{commons}/func/api";
 import Row from "@/app/user/point-history/{components}/Row";
 import {GetProps} from "@/app/user/history/page";
+import SizeSelect from "@/app/{commons}/sizeSelect";
+import {Common} from "@/app/{commons}/types/commons";
 
 export interface PointHistoryI {
     id: number
@@ -28,32 +29,8 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
 
     return (
         <div className={'flex flex-col gap-3'}>
-            <div className={'flex justify-between'}>
-                <div></div>
-                <form className={'flex gap-3'}
-                      method={'get'}
-                >
-                    <div>
-                        <select className={'w-32 border border-solid border-gray-300 rounded-md text-sm px-3 py-1'}
-                                defaultValue={searchParams.size}
-                                name={'size'}
-                        >
-                            <option value={10}>10</option>
-                            <option value={20}>20</option>
-                            <option value={30}>30</option>
-                            <option value={50}>50</option>
-                            <option value={100}>100</option>
-                            <option value={200}>200</option>
-                        </select>
-                    </div>
-                    <div>
-                        <button className={'w-20 border border-solid border-gray-300 rounded-md text-sm px-3 py-1'}
-                                type={'submit'}
-                        >
-                            조회
-                        </button>
-                    </div>
-                </form>
+            <div className={'flex justify-end'}>
+                <SizeSelect />
             </div>
             <table className={'w-full'}>
                 <colgroup>
@@ -63,7 +40,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                     <col style={{width: '10%'}} />
                     <col style={{width: '15%'}} />
                 </colgroup>
-                <thead className={'bg-blue-300 text-white h-8 align-middle'}>
+                <thead className={'bg-main text-white h-9 align-middle'}>
                     <tr className={'text-sm border-x border-white border-solid'}>
                         <th className={'border-x border-white border-solid'}>#</th>
                         <th className={'border-x border-white border-solid'}>테이블명</th>
@@ -101,7 +78,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
 
 
 const getData = async (req: URLSearchParams) => {
-    return await apiCall<PageResponse<PointHistoryI>, URLSearchParams>({
+    return await apiCall<Common.PageResponse<PointHistoryI>, URLSearchParams>({
         path: '/api/point-histories',
         method: 'GET',
         call: 'Server',

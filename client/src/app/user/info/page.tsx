@@ -1,36 +1,22 @@
+'use client';
 import React from "react";
 import UserInfo from "@/app/user/info/{components}/userInfo";
 import ProfileImg from "@/app/user/info/{components}/profileImg";
-import apiCall from "@/app/{commons}/func/api";
-import {UserInfoI} from "@/app/user/email/page";
+import {useQuery} from "@tanstack/react-query";
+import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 
-export type LoadingType = {
-    profile : boolean,
-    img     : boolean
-}
+export default function Page() {
 
-export default async function Page() {
+    const {data: profile} = useQuery(userInfoApiService.profile());
 
-    const profile = await apiCall<UserInfoI>({
-        path: '/api/user/info',
-        method: 'GET',
-        call: 'Server',
-        setAuthorization: true,
-        isReturnData: true,
-    });
-
-    const img = await apiCall<string>({
-        path: '/api/user/profile-img',
-        method: 'GET',
-        call: 'Server',
-        setAuthorization: true,
-        isReturnData: true,
-    });
 
     return (
         <main className={'flex flex-col gap-7 w-full justify-center items-center'}>
-            <ProfileImg imgData={img} />
-            <UserInfo profileInfo={profile} />
+            <ProfileImg />
+            {
+                profile?.name
+                && <UserInfo profileInfo={profile} />
+            }
         </main>
     )
 }

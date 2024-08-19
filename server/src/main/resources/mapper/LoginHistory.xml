@@ -12,25 +12,26 @@
 
     <select id="selectAll">
         SELECT *
-          FROM login_history
-         WHERE member_pk = #{member.id}
-         ORDER BY id DESC
-         LIMIT #{page.offset}, #{page.size}
+          FROM login_history lh
+          JOIN (SELECT lh1.id
+                  FROM login_history lh1
+                 WHERE lh1.member_pk = #{member.id}
+                 ORDER BY lh1.id DESC
+                 LIMIT #{page.offset}, #{page.size}
+             ) lh2 ON lh2.id = lh.id;
     </select>
 
     <select id="exist">
         SELECT EXISTS(SELECT *
                         FROM login_history
-                       WHERE member_pk   = #{memberPk}
-                             AND ip      = #{ip}
-                             AND create_at
-                         BETWEEN current_timestamp() - INTERVAL 1 YEAR
-                             AND current_timestamp()
-                          OR member_pk   = #{memberPk}
-                             AND device  = #{device}
-                             AND create_at
-                         BETWEEN current_timestamp() - INTERVAL 1 YEAR
-                             AND current_timestamp()
+                       WHERE member_pk  = #{memberPk}
+                         AND ip         = #{ip}
+                         AND create_at BETWEEN current_timestamp() - INTERVAL 1 YEAR
+                                           AND current_timestamp()
+                          OR member_pk  = #{memberPk}
+                         AND device     = #{device}
+                         AND create_at BETWEEN current_timestamp() - INTERVAL 1 YEAR
+                                           AND current_timestamp()
                      )
     </select>
 

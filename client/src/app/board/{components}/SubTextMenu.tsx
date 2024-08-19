@@ -1,13 +1,13 @@
 'use client';
 
-import React, {MutableRefObject, useContext, useState} from "react";
+import React, {MutableRefObject, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import {faBold, faItalic, faTextSlash} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import BlockProvider from "@/app/board/{services}/BlockProvider";
 import BoardProvider from "@/app/board/{services}/BoardProvider";
 import MenuColorItem from "@/app/board/{components}/MenuColorItem";
 import MenuFontsizeItem from "@/app/board/{components}/MenuFontsizeItem";
 import MenuItem from "@/app/board/{components}/MenuItem";
+import {useBlockEvent} from "@/app/board/[id]/{hooks}/useBlockEvent";
 
 export type ToggleEnum = 'blockMenu' | 'fontSize' | 'color' | 'backgroundColor' | 'fontStyle' | '';
 
@@ -16,18 +16,24 @@ const SubTextMenu = ({
 }: {
     blockRef  : MutableRefObject<HTMLElement[] | null[]>;
 }) => {
+
+    const { blockService } = useBlockEvent();
+
     const [toggle, setToggle] = useState<ToggleEnum>('');
-    const {blockService, setBlockService} = useContext(BlockProvider);
     const {board, setBoard} = useContext(BoardProvider);
 
-    if(!blockService.block) return;
     const {seq, code, textStyle} = blockService.block;
 
+    const timeout = useRef<NodeJS.Timeout>();
 
-    if(!textStyle) return;
+    useEffect(() =>{
+        return () => {
+            if(timeout.current) clearTimeout(timeout.current);
+        }
+    },[])
 
     const selectFontStyle = (type: string, value:string) => {
-        value = textStyle[type] === value ? '' : value;
+        value = textStyle![type] === value ? '' : value;
         onClickSubTextMenu(type, value)
     }
 
@@ -42,22 +48,35 @@ const SubTextMenu = ({
         });
 
         setBoard({...board, data: {...board.data, content: {list: newList}}});
-        setTimeout(() => {
+        timeout.current = setTimeout(() => {
             blockRef.current[seq]?.focus();
         },100);
-
     }
 
-    const onClickColorHandler = (name: ToggleEnum, value: string) => {
+    const onClickColorHandler = useCallback((name: ToggleEnum, value: string) => {
         onClickSubTextMenu(name, value);
 
         setToggle(name ? '' : name)
-        setTimeout(() => {
+        timeout.current = setTimeout(() => {
             blockRef.current[seq]?.focus();
         },100);
-    }
+    },[blockRef?.current[seq]]);
 
     const buttonStyle = 'py-2 px-3 h-full hover:bg-blue-50 hover:text-black duration-300 outline-0 '
+
+    const fontStyles = useMemo(() =>
+        fontStyle.map((style, index) => {
+            return (
+                <li key={'fontStyle' + index}>
+                    <button className={buttonStyle + (textStyle![style.style] === style.value ? 'bg-blue-400 text-white' : 'bg-white')}
+                            onClick={() => selectFontStyle(style.style, style.value)}
+                    >
+                        <FontAwesomeIcon icon={style.icon} />
+                    </button>
+                </li>
+            )
+        })
+    , [textStyle]);
 
     return (
         <div className={`fixed bg-gray-100 z-20 w-auto max-h-52 duration-200 rounded shadow-md`}
@@ -66,9 +85,9 @@ const SubTextMenu = ({
             <ul className={'grid grid-cols-3 md:flex overflow-hidden rounded text-sm bg-white'}>
                 <li>
                     <button className={[
-                        'min-w-20 tracking-wider',
-                        buttonStyle,
-                    ].join(' ')}
+                                'min-w-20 tracking-wider',
+                                buttonStyle,
+                            ].join(' ')}
                             onClick={() => toggle === 'blockMenu' ? setToggle('') : setToggle('blockMenu')}
                     >
                         블록타입
@@ -85,7 +104,7 @@ const SubTextMenu = ({
                 <li>
                     <button className={[
                         'min-w-20 tracking-wider',
-                        buttonStyle + (textStyle.fontSize && textStyle.fontStyle !== '' ?  'bg-blue-400 text-white' : 'bg-white'),
+                        buttonStyle + (textStyle?.fontSize && textStyle.fontStyle !== '' ?  'bg-blue-400 text-white' : 'bg-white'),
                     ].join(' ')}
                             onClick={() => toggle === 'fontSize' ? setToggle('') : setToggle('fontSize')}
                     >
@@ -99,13 +118,14 @@ const SubTextMenu = ({
                 <li>
                     <button className={[
                                 'min-w-20 tracking-wider',
-                                buttonStyle + (textStyle.color && textStyle.color !== '' ?  'bg-blue-400 text-white' : 'bg-white'),
+                                buttonStyle + (textStyle?.color && textStyle.color !== '' ?  'bg-blue-400 text-white' : 'bg-white'),
                             ].join(' ')}
                             onClick={() => toggle === 'color' ? setToggle('') : setToggle('color')}
                     >
                         글자색
                     </button>
-                    <MenuColorItem toggle={toggle}
+                    <MenuColorItem className={'font-bold'}
+                                   toggle={toggle}
                                    menuTitle={'글자색'}
                                    name={'color'}
                                    onClick={onClickColorHandler}
@@ -114,7 +134,7 @@ const SubTextMenu = ({
                 <li>
                     <button className={[
                             'min-w-20 tracking-wider',
-                            buttonStyle + (textStyle.backgroundColor && textStyle.backgroundColor !== '' ?  'bg-blue-400 text-white' : 'bg-white'),
+                            buttonStyle + (textStyle?.backgroundColor && textStyle.backgroundColor !== '' ?  'bg-blue-400 text-white' : 'bg-white'),
                         ].join(' ')}
                             onClick={() => toggle === 'backgroundColor' ? setToggle('') :  setToggle('backgroundColor')}
                     >
@@ -126,21 +146,9 @@ const SubTextMenu = ({
                                    onClick={onClickColorHandler}
                     />
                 </li>
-                {
-                    fontStyle.map((style, index) => {
-                        return (
-                            <li key={'fontStyle' + index}>
-                                <button className={buttonStyle + (textStyle[style.style] === style.value ? 'bg-blue-400 text-white' : 'bg-white')}
-                                        onClick={() => selectFontStyle(style.style, style.value)}
-                                >
-                                    <FontAwesomeIcon icon={style.icon} />
-                                </button>
-                            </li>
-                        )
-                    })
-                }
+                { fontStyles }
                 <li>
-                    <button className={['min-w-16',buttonStyle + (Object.keys(textStyle).length > 0 ? 'bg-blue-400 text-white' : 'bg-white')].join(' ')}
+                    <button className={['min-w-16',buttonStyle + (Object.keys(textStyle!).length > 0 ? 'bg-blue-400 text-white' : 'bg-white')].join(' ')}
                             onClick={() => selectFontStyle('', '')}
                     >
                         초기화

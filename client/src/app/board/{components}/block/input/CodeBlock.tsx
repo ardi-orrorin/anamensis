@@ -2,6 +2,7 @@ import {BlockProps} from "@/app/board/{components}/block/type/Types";
 import {Editor} from "@monaco-editor/react";
 import {useEffect} from "react";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
+import ObjectTemplate from "@/app/board/{components}/block/ObjectTemplate";
 
 export type CodeExtraValueI = {
     language : string;
@@ -14,8 +15,9 @@ const CodeBlock = (props: BlockProps & {type: string}) => {
 
     const {
         value, isView,
-        hash, type,
-        onChangeValueHandler, onChangeExtraValueHandler
+        hash, type, seq, blockRef,
+        onChangeValueHandler, onChangeExtraValueHandler,
+        onMouseLeaveHandler, onMouseEnterHandler,
     } = props
 
     const extraValue = props.extraValue as CodeExtraValueI;
@@ -29,15 +31,10 @@ const CodeBlock = (props: BlockProps & {type: string}) => {
             minimap: 'on',
             theme: 'light',
         } as CodeExtraValueI);
-
     },[])
 
     return (
-        <div className={'flex flex-col p-1 gap-2 bg-gray-100'}
-             id={`block-${hash}`}
-             aria-roledescription={type}
-             ref={el => {props!.blockRef!.current[props.seq] = el}}
-        >
+        <ObjectTemplate {...{hash, seq, blockRef, type, onMouseEnterHandler, onMouseLeaveHandler}}>
             {
                 !isView
                 && <div className={'w-full flex items-center gap-1 justify-end'}>
@@ -84,7 +81,7 @@ const CodeBlock = (props: BlockProps & {type: string}) => {
               </div>
             }
             <div className={'w-full'}
-                 style={{height: extraValue?.line * 18}}
+                 style={{height: (extraValue?.line || 1) * 18}}
             >
                 <Editor defaultLanguage={'java'}
                         value={value}
@@ -120,7 +117,7 @@ const CodeBlock = (props: BlockProps & {type: string}) => {
                         theme={extraValue?.theme || 'light'}
                 />
             </div>
-        </div>
+        </ObjectTemplate>
     )
 }
 

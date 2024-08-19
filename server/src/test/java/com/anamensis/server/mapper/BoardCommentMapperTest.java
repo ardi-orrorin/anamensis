@@ -34,7 +34,7 @@ class BoardCommentMapperTest {
         Page page = new Page();
         page.setPage(1);
         page.setSize(10);
-        List<BoardCommentResultMap.List> result = bcm.findAllByBoardPk(1L, page);
+        List<BoardCommentResultMap.BoardComment> result = bcm.findAllByBoardPk(1L, page);
 
         assertEquals(6, result.size());
         result.stream().reduce((acc, next) -> {
@@ -52,7 +52,7 @@ class BoardCommentMapperTest {
         assertTrue(result.stream().anyMatch(bc -> bc.getBoardComment().getContent().equals("테스트 댓글1")));
         assertTrue(result.stream().anyMatch(bc -> bc.getBoardComment().getContent().equals("테스트 댓글5")));
 
-        List<BoardCommentResultMap.List> result1 = bcm.findAllByBoardPk(2L, page);
+        List<BoardCommentResultMap.BoardComment> result1 = bcm.findAllByBoardPk(2L, page);
 
         assertEquals(4, result1.size());
         result1.stream().reduce((acc, next) -> {

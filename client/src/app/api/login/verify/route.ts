@@ -1,59 +1,59 @@
 import {NextRequest, NextResponse} from "next/server";
 import axios from "axios";
-import {LoginI} from "@/app/login/{services}/LoginProvider";
-import {ResponseCookie} from "next/dist/compiled/@edge-runtime/cookies";
-import {ErrorResponse} from "@/app/login/page";
-import {GeoLocationType, getGeoLocation} from "@/app/login/{services}/GeoLocation";
+import loginConstants from "@/app/login/{services}/constants";
+import {User} from "@/app/login/{services}/types";
 
 export async function POST(req: NextRequest){
-    const user =  await req.json() as LoginI;
-    const url = process.env.NEXT_PUBLIC_SERVER + '/public/api/user/verify';
+
+    const reqBody = await req.json();
+    const user = reqBody?.provider
+        ? await reqBody as User.OAuth2
+        : await reqBody as User.Login;
+
+    const url = process.env.NEXT_PUBLIC_SERVER + (
+        reqBody?.provider
+            ? '/public/api/user/oauth2'
+            : '/public/api/user/verify'
+    )
 
     const clientIp = req.ip || req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for');
 
     const ipRegExp = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/;
     const ipMatch = ipRegExp.exec(clientIp || '');
 
-    const geoLocation: GeoLocationType = await getGeoLocation(ipMatch?.[0]);
+    const headers = {
+        'Content-Type': 'application/json',
+        'User-Agent': req.headers.get('User-Agent') || '',
+        'Ip': ipMatch?.[0] || '',
+        'Location': `Test`
+    }
 
     try {
-        const resData = await axios.post(url, user, {
-            headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': req.headers.get('User-Agent') || '',
-                'Ip': geoLocation.ipv4,
-                'Location': `${geoLocation.countryName}-${geoLocation.state}-${geoLocation.city}`
-            },
+        const res = await axios.post(url, user, {
+            headers,
             withCredentials: true
         })
-        const next = new NextResponse(JSON.stringify(resData.data), {
+        const next = new NextResponse(JSON.stringify(res.data), {
             status: 200,
             headers: {
                 'Content-Type': 'application/json',
             },
         });
 
-        const cookieInit: Partial<ResponseCookie> = {
-            httpOnly: true,
-            secure: false,
-            sameSite: 'lax',
-            path: '/'
-        }
-
-        next.cookies.set('next.access.token', resData.data.accessToken, {
-            ...cookieInit,
-            maxAge: resData.data.accessTokenExpiresIn / 1000
+        next.cookies.set('next.access.token', res.data.accessToken, {
+            ...loginConstants.cookieInit,
+            maxAge: res.data.accessTokenExpiresIn
         });
 
-        next.cookies.set('next.refresh.token', resData.data.refreshToken, {
-            ...cookieInit,
-            maxAge: resData.data.refreshTokenExpiresIn / 1000
+        next.cookies.set('next.refresh.token', res.data.refreshToken, {
+            ...loginConstants.cookieInit,
+            maxAge: res.data.refreshTokenExpiresIn
         });
 
         return next;
 
     } catch (err: any) {
-        const errResponse: ErrorResponse = {
+        const errResponse: User.ErrorResponse = {
             status: err.response.status,
             message: err.response.data.message,
             use: true

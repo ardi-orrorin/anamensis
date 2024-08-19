@@ -7,18 +7,20 @@ import {Table} from "@/app/user/point-history/{services}/types";
 import {RateColor} from "@/app/{commons}/types/rate";
 import useSWR, {preload} from "swr";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import UserProvider from "@/app/user/{services}/userProvider";
-
-
+import UserProvider, {PointSummaryI} from "@/app/user/{services}/userProvider";
+import moment from "moment";
+import {useQuery} from "@tanstack/react-query";
+import userApiService from "@/app/user/{services}/userApiService";
 
 const PointSummary = () => {
-
-    const {pointSummary} = useContext(UserProvider);
+    const {data: pointSummary } = useQuery(userApiService.pointSummary());
 
     return (
         <div className={'w-full h-max flex flex-col gap-2 justify-center items-start'}>
             {
-                pointSummary.map((e, i) => (
+                pointSummary
+                && pointSummary?.length > 0
+                && pointSummary.map((e, i) => (
                     <div key={`summary-${i}`}
                         className={`flex gap-3 text-sm w-full`}
                     >
@@ -29,9 +31,10 @@ const PointSummary = () => {
                             <span className={'py-0.5 '}>
                                 {Table.fromString(e.tableName).useWith}
                             </span>
-                            <span className={'py-0.5 px-4 flex justify-center items-center'}>{e.createdAt.substring(0, 10)}</span>
+                            <span className={'py-0.5 flex justify-end items-center'}>
+                                {moment(e.createdAt).format('YYYY-MM-DD')}
+                            </span>
                         </div>
-
                     </div>
                 ))
             }
@@ -39,4 +42,4 @@ const PointSummary = () => {
     );
 }
 
-export default PointSummary;
+export default React.memo(PointSummary);

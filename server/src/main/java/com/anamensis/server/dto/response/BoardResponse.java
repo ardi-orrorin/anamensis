@@ -10,6 +10,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 
 public class BoardResponse implements Serializable {
 
@@ -52,6 +53,8 @@ public class BoardResponse implements Serializable {
 
         private boolean membersOnly;
 
+        private Boolean isBlocked;
+
         @SneakyThrows
         public static List from(BoardResultMap.Board board) {
 
@@ -66,7 +69,8 @@ public class BoardResponse implements Serializable {
                     .categoryPk(board.getBoard().getCategoryPk())
                     .updatedAt(board.getBoard().getUpdateAt())
                     .isPublic(board.getBoard().getIsPublic())
-                    .membersOnly(board.getBoard().isMembersOnly());
+                    .membersOnly(board.getBoard().isMembersOnly())
+                    .isBlocked(board.getBoard().isBlocked());
 
             builder.body(board.getBoard().getContent().getJSONArray("list").toList());
 
@@ -77,7 +81,16 @@ public class BoardResponse implements Serializable {
         }
 
         @SneakyThrows
-        public static List from(BoardResultMap.List board) {
+        public static List from(BoardResultMap.List board, Member member) {
+
+            java.util.List<Object> body =
+                board.getBoard().isMembersOnly()
+                    ? member.getId() > 0 // is login
+                        ? board.getBoard().getContent().getJSONArray("list").toList()
+                        : java.util.List.of() // not login
+                    : board.getBoard().isBlocked()
+                        ? java.util.List.of() // blocked
+                        : board.getBoard().getContent().getJSONArray("list").toList();
 
             List.ListBuilder builder = List.builder()
                     .id(board.getBoard().getId())
@@ -92,7 +105,8 @@ public class BoardResponse implements Serializable {
                     .isPublic(board.getBoard().getIsPublic())
                     .membersOnly(board.getBoard().isMembersOnly())
                     .profileImage(board.getProfile())
-                    .body(board.getBoard().getContent().getJSONArray("list").toList());
+                    .isBlocked(board.getBoard().isBlocked())
+                    .body(body);
 
             return builder.build();
         }
@@ -110,6 +124,8 @@ public class BoardResponse implements Serializable {
         private long categoryPk;
 
         private Map<String, Object> content;
+
+        private String userId;
 
         private String writer;
 
@@ -131,6 +147,8 @@ public class BoardResponse implements Serializable {
 
         private boolean membersOnly;
 
+        private Boolean isBlocked;
+
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime writerCreatedAt;
 
@@ -140,20 +158,22 @@ public class BoardResponse implements Serializable {
                     .title(board.getBoard().getTitle())
                     .categoryPk(board.getBoard().getCategoryPk())
                     .content(board.getBoard().getContent().toMap())
-                    .writer(board.getMember().getUserId())
+                    .userId(board.getMember().getUserId())
+                    .writer(board.getMember().getName())
                     .viewCount(board.getBoard().getViewCount())
                     .createdAt(board.getBoard().getCreateAt())
                     .updatedAt(board.getBoard().getUpdateAt())
                     .isPublic(board.getBoard().getIsPublic())
                     .membersOnly(board.getBoard().isMembersOnly())
-                    .writerCreatedAt(board.getMember().getCreateAt());
+                    .writerCreatedAt(board.getMember().getCreateAt())
+                    .isBlocked(board.getBoard().isBlocked());
 
-            if(member != null) {
+            if(Objects.nonNull(member)) {
                 builder.isWriter(board.getBoard().getMemberPk() == member.getId());
             }
 
 
-            if (board.getFile().getFilePath() != null) {
+            if (Objects.nonNull(board.getFile().getFilePath())) {
                 builder.profileImage(board.getFile().getFilePath() + board.getFile().getFileName());
             }
 
@@ -161,58 +181,58 @@ public class BoardResponse implements Serializable {
         }
     }
 
+    @Getter
+    @Builder
+    @Setter
+    public static class RefContent {
+        private long id;
 
-//    @Getter
-//    @Builder
-//    @Setter
-//    public static class ExContent {
-//
-//        private long id;
-//
-//        private String title;
-//
-//        private long categoryPk;
-//
-//        private Map<String, Object> content;
-//
-//        private String writer;
-//
-//        private String profileImage;
-//
-//        private long viewCount;
-//
-//        private long rate;
-//
-//        private java.util.List<BoardCommentResponse.Comment> comments;
-//
-//        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-//        private LocalDateTime createdAt;
-//
-//        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-//        private LocalDateTime updatedAt;
-//
-//        private Boolean isPublic;
-//
-//        private boolean membersOnly;
-//
-//        public static ExContent from(Content board, java.util.List<BoardCommentResponse.Comment> comments) {
-//            ExContent.ExContentBuilder builder = ExContent.builder()
-//                    .id(board.getId())
-//                    .title(board.getTitle())
-//                    .categoryPk(board.getCategoryPk())
-//                    .content(board.getContent())
-//                    .writer(board.getWriter())
-//                    .viewCount(board.getViewCount())
-//                    .createdAt(board.getCreatedAt())
-//                    .comments(comments)
-//                    .profileImage(board.getProfileImage())
-//                    .updatedAt(board.getUpdatedAt())
-//                    .isPublic(board.getIsPublic())
-//                    .membersOnly(board.isMembersOnly());
-//
-//            return builder.build();
-//        }
-//    }
+        private String title;
+
+        private Map<String, Object> content;
+
+        private String writer;
+
+        private Boolean isWriter;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        private LocalDateTime updatedAt;
+
+        private Boolean isPublic;
+
+        private boolean membersOnly;
+
+        private Boolean isBlocked;
+
+        public static RefContent from(BoardResultMap.Board board, Member member) {
+
+            RefContent.RefContentBuilder builder = RefContent.builder()
+                .id(board.getId())
+                .title(board.getBoard().getTitle())
+                .writer(board.getMember().getName())
+                .updatedAt(board.getBoard().getUpdateAt())
+                .isPublic(board.getBoard().getIsPublic())
+                .membersOnly(board.getBoard().isMembersOnly())
+                .isBlocked(board.getBoard().isBlocked());
+
+            if (board.getBoard().isBlocked()) {
+                return builder.build();
+            }
+
+            if(board.getBoard().getIsPublic()) {
+                builder.content(board.getBoard().getContent().toMap());
+            } else if (Objects.nonNull(member) && board.getBoard().getMemberPk() == member.getId()) {
+                builder.isWriter(true);
+                builder.content(board.getBoard().getContent().toMap());
+            } else if (board.getBoard().isMembersOnly() && member == null) {
+                builder.content(board.getBoard().getContent().toMap());
+            }
+
+            return builder.build();
+        }
+
+    }
+
 
 
     @Getter
@@ -263,7 +283,7 @@ public class BoardResponse implements Serializable {
             return Notice.builder()
                 .id(board.getId())
                 .title(board.getBoard().getTitle())
-                .writer(board.getMember().getUserId())
+                .writer(board.getMember().getName())
                 .viewCount(board.getBoard().getViewCount())
                 .createdAt(board.getBoard().getCreateAt())
                 .build();

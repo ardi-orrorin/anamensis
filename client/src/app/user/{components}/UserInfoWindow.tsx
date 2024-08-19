@@ -2,7 +2,6 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import React from "react";
 
-
 export type UserInfoWindowProps = {
     winKey    : string,
     title     : string,
@@ -16,12 +15,13 @@ const UserInfoWindow = (props: UserInfoWindowProps) => {
     const {winKey, title, children, open, onClick} = props;
 
     return (
-        <div className={['flex flex-col w-full md:w-[500px] h-80 border border-solid border-blue-300 shadow-blue-100 shadow-md rounded duration-300',
+        <div className={['flex flex-col w-full md:w-[48%] h-80 border border-solid border-main shadow-blue-100 shadow-md rounded duration-300',
                         open ? '' : 'hidden',
                         ].join(' ')}
+             data-testid={'user-info-window'}
         >
-            <div className={['flex justify-between w-full h-10 p-3 text-sm text-white',
-                            open ? 'bg-blue-300' : 'bg-gray-400  rounded'
+            <div className={['px-5 flex justify-between w-full h-10 p-3 text-sm text-white',
+                            open ? 'bg-main' : 'bg-gray-400  rounded'
                             ].join(' ')}
             >
                 <button onClick={()=> onClick!(winKey, false)}>
@@ -40,4 +40,4 @@ const UserInfoWindow = (props: UserInfoWindowProps) => {
     );
 }
 
-export default UserInfoWindow;
+export default React.memo(UserInfoWindow);

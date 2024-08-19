@@ -1,14 +1,20 @@
 package com.anamensis.server.dto.request;
 
+import com.anamensis.server.dto.ChangePwdStatus;
 import com.anamensis.server.dto.ResetPwdProgress;
 import com.anamensis.server.entity.Member;
+import com.anamensis.server.entity.RoleType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-import org.hibernate.validator.constraints.pl.NIP;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class UserRequest {
 
@@ -22,6 +28,15 @@ public class UserRequest {
         private Boolean verify;
         private String authType;
         private Integer code;
+    }
+
+    @Getter
+    @Setter
+    public static class OauthLogin {
+        private String userId;
+        private String name;
+        private String email;
+        private String provider;
     }
 
     @Getter
@@ -153,4 +168,52 @@ public class UserRequest {
         }
 
     }
+
+    @Getter
+    @Setter
+    @ToString
+    public static class Params {
+
+        private String userId;
+
+        private RoleType role;
+
+        public void setRole(String role) {
+            this.role = RoleType.valueOf(role.toUpperCase());
+        }
+
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    public static class UpdateRole {
+        private String mode;
+        private List<Long> ids;
+        private RoleType role;
+
+        public void setRole(String role) {
+            this.role = RoleType.valueOf(role.toUpperCase());
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    public static class ChangePassword {
+
+        @NotNull(message = "Current password is required")
+        @Size(min = 8, max = 255, message = "Password must be between 8 and 255 characters")
+        private String curPwd;
+
+        private String newPwd;
+
+        private ChangePwdStatus status;
+
+        public void setStatus(String status) {
+            this.status = ChangePwdStatus.valueOf(status.toUpperCase());
+        }
+
+    }
+
 }

@@ -5,6 +5,7 @@ import com.anamensis.server.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class AuthConverter implements ServerAuthenticationConverter {
 
     private final TokenProvider tokenProvider;
@@ -36,7 +38,7 @@ public class AuthConverter implements ServerAuthenticationConverter {
         String userId = claims.get("user", String.class);
         if(claims.get("type").equals("refresh")) {
             ResponseCookie cookie = ResponseCookie.from("next.access.token", tokenProvider.generateToken(userId, true))
-                    .maxAge(tokenProvider.ACCESS_EXP / 1000)
+                    .maxAge(tokenProvider.ACCESS_EXP)
                     .build();
 
             exchange.getResponse().addCookie(cookie);

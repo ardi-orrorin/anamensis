@@ -209,7 +209,7 @@ class UserServiceTest {
         register.setPhone("010-1001-0001");
         register.setEmail("d-member-12@gmail.com");
 
-        StepVerifier.create(us.saveUser(register))
+        StepVerifier.create(us.saveUser(register, false))
                 .assertNext(user -> {
                     assertEquals("d-member-12", user.getUserId());
                     assertEquals("d-member-12", user.getName());

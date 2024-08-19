@@ -10,4 +10,4 @@ const DefaultLabel = () => {
     )
 }
 
-export default DefaultLabel;
+export default React.memo(DefaultLabel);

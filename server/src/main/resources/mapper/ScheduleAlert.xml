@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.server.mapper.ScheduleAlertMapper">
+    <select id="findAllByUserId" resultMap="scheduleAlertResultMap">
+        SELECT *
+             , sa.id As id
+             , sa.id AS sch_id
+             , b.id  AS board_id
+             , b.title AS board_title
+          FROM schedule_alert sa
+          JOIN (SELECT sa1.id
+                  FROM schedule_alert sa1
+                 WHERE user_id = #{userId}
+                   AND alert_time <![CDATA[<=]]> current_timestamp
+                   AND is_read = 0
+             ) sa1 ON sa.id    = sa1.id
+          JOIN board b ON b.id = sa.board_id
+           AND b.is_use        = 1
+         ORDER BY alert_time
+    </select>
+
+    <select id="findAllByBoardId">
+        SELECT sa.*
+
+          FROM schedule_alert sa
+          JOIN (SELECT sa1.id
+                  FROM schedule_alert sa1
+                 WHERE user_id  = #{userId}
+                   AND board_id = #{boardId}
+                 ORDER BY id DESC
+             ) sa1 ON sa.id   = sa1.id
+    </select>
+
+    <select id="findAllTodayByUserId" resultMap="scheduleAlertResultMap">
+        SELECT *
+             , sa.id As id
+             , sa.id AS sch_id
+             , b.id  AS board_id
+             , b.title AS board_title
+          FROM schedule_alert sa
+          JOIN (SELECT sa1.id
+                  FROM schedule_alert sa1
+                 WHERE DATE(alert_time) = DATE(NOW())
+                   AND user_id = #{userId}
+             ) sa2 ON sa.id  = sa2.id
+          JOIN board b ON b.id = sa.board_id
+           AND b.is_use        = 1
+         ORDER BY sa.alert_time
+    </select>
+
+    <insert id="save">
+        INSERT INTO schedule_alert
+               (hash_id, board_id, user_id, title, alert_time)
+        VALUES (#{hashId}, #{boardId}, #{userId}, #{title}, #{alertTime})
+    </insert>
+
+    <insert id="saveAll">
+        INSERT INTO schedule_alert
+               (hash_id, board_id, user_id, title, alert_time)
+        VALUES
+            <foreach collection="list" item="item" separator=",">
+                (#{item.hashId}, #{item.boardId}, #{item.userId}, #{item.title}, #{item.alertTime})
+            </foreach>
+    </insert>
+    
+    <update id="update">
+        UPDATE schedule_alert
+           SET title      = #{title},
+               alert_time = #{alertTime}
+         WHERE id         = #{id}
+    </update>
+
+    <update id="updateIsRead">
+        UPDATE schedule_alert
+           SET is_read = 1
+         WHERE id      = #{id}
+           AND user_id = #{userId}
+           AND DATE(alert_time) <![CDATA[<=]]> DATE(current_timestamp)
+    </update>
+
+    <delete id="delete">
+        DELETE
+          FROM schedule_alert
+         WHERE id = #{id}
+    </delete>
+
+    <resultMap id="scheduleAlertResultMap" type="com.anamensis.server.resultMap.ScheduleAlertResultMap">
+        <id property="id" column="id" />
+        <association property="scheduleAlert" autoMapping="true" resultMap="scheduleAlertEntity" />
+        <association property="board" autoMapping="true" resultMap="boardEntity" />
+    </resultMap>
+
+    <resultMap id="scheduleAlertEntity" type="ScheduleAlert" autoMapping="true">
+        <id property="id" column="sch_id" />
+    </resultMap>
+
+    <resultMap id="boardEntity" type="Board" autoMapping="true">
+        <id property="id" column="board_id" />
+        <result property="title" column="board_title" />
+        <result property="content" column="content" typeHandler="JsonObjectTypeHandler"/>
+    </resultMap>
+</mapper>

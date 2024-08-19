@@ -1,22 +1,17 @@
 package com.anamensis.batch.job.boardIndex;
 
-import com.anamensis.batch.entity.*;
+import com.anamensis.batch.entity.Board;
+import com.anamensis.batch.entity.BoardIndex;
+import com.anamensis.batch.job.factory.AbstractMybatisStep;
 import com.anamensis.batch.mapper.BoardIndexMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.json.JSONArray;
-import org.mybatis.spring.batch.MyBatisBatchItemWriter;
 import org.mybatis.spring.batch.MyBatisCursorItemReader;
-import org.mybatis.spring.batch.builder.MyBatisBatchItemWriterBuilder;
-import org.mybatis.spring.batch.builder.MyBatisCursorItemReaderBuilder;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.integration.async.AsyncItemProcessor;
-import org.springframework.batch.integration.async.AsyncItemWriter;
 import org.springframework.batch.item.Chunk;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -24,65 +19,48 @@ import org.springframework.transaction.PlatformTransactionManager;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 @Component
-@RequiredArgsConstructor
-@Slf4j
-public class BoardIndexStep {
+public class BoardIndexStep extends AbstractMybatisStep<Board, BoardIndex> {
 
-    private final SqlSessionFactory sqlSessionFactory;
-    private final VirtualThreadTaskExecutor taskExecutor;
-    private final BoardIndexMapper boardIndexMapper;
+    @Autowired
+    private BoardIndexMapper boardIndexMapper;
 
+    public BoardIndexStep(SqlSessionFactory sqlSessionFactory, VirtualThreadTaskExecutor taskExecutor) {
+        super(sqlSessionFactory, taskExecutor);
+    }
 
-    /**
-     * 성능에 따라 chunk size 10~100 추천
-     *
-     */
-    public Step boardIndexStep(JobRepository jobRepository, PlatformTransactionManager tm) {
+    @Override
+    public Step step(
+        int chunkSize,
+        String jobName,
+        JobRepository jobRepository,
+        PlatformTransactionManager tm
+    ) {
         boardIndexMapper.deleteAll();
-
-        return new StepBuilder("board-index-step", jobRepository)
-                .<Board, Future<BoardIndex>>chunk(100, tm)
-                .reader(myBatisCursorItemReader())
-                .processor(this::asyncBoardIndexProcessor)
-                .writer(this::save)
-                .allowStartIfComplete(true)
-                .build();
+        return super.step(chunkSize, jobName, jobRepository, tm);
     }
 
-    @SneakyThrows
-    private void save(Chunk<? extends Future<BoardIndex>> futures) {
-
-        AsyncItemWriter<BoardIndex> asyncItemWriter = new AsyncItemWriter<>();
-
-        MyBatisBatchItemWriter<BoardIndex> builder = new MyBatisBatchItemWriterBuilder<BoardIndex>()
-            .sqlSessionFactory(sqlSessionFactory)
-            .statementId("com.anamensis.batch.mapper.BoardIndexMapper.save")
-            .build();
-
-        asyncItemWriter.setDelegate(builder);
-        asyncItemWriter.write(futures);
+    @Override
+    public void writer(
+        Chunk<? extends Future<BoardIndex>> futures,
+        Optional<String> SaveMapper,
+        Converter<BoardIndex, ?> itemToParameterConverter
+    ) throws Exception {
+        Optional<String> saveMapperId = Optional.of("com.anamensis.batch.mapper.BoardIndexMapper.save");
+        super.writer(futures, saveMapperId, itemToParameterConverter);
     }
 
-    private MyBatisCursorItemReader<Board> myBatisCursorItemReader() {
-        MyBatisCursorItemReaderBuilder<Board> builder = new MyBatisCursorItemReaderBuilder<Board>()
-            .sqlSessionFactory(sqlSessionFactory);
-
-        return builder
-            .queryId("com.anamensis.batch.mapper.BoardMapper.findAllByIsUse")
-            .build();
+    @Override
+    public MyBatisCursorItemReader<Board> reader(Optional<String> findMapper, String ids) {
+        Optional<String> findMapperId = Optional.of("com.anamensis.batch.mapper.BoardMapper.findAllByIsUse");
+        return super.reader(findMapperId, null);
     }
 
-    private Future<BoardIndex> asyncBoardIndexProcessor(Board board) throws Exception {
-        AsyncItemProcessor<Board, BoardIndex> asyncItemProcessor = new AsyncItemProcessor<>();
-        asyncItemProcessor.setDelegate(this::transferToBoardIndex);
-        asyncItemProcessor.setTaskExecutor(taskExecutor);
-        return asyncItemProcessor.process(board);
-    }
-
-    private BoardIndex transferToBoardIndex(Board board) {
+    @Override
+    public BoardIndex delegate(Board board) {
         JSONArray array = board.getContent().getJSONArray("list");
         String content = this.getIndexContent(board.getTitle(), array);
 
@@ -108,5 +86,4 @@ public class BoardIndexStep {
             acc + " " + next
         ).get();
     }
-
 }

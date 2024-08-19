@@ -32,7 +32,7 @@ public class BoardIndexJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) {
         Job job = new JobBuilder("board-index-job", jobRepository)
-            .start(boardIndexStep.boardIndexStep(jobRepository, tm))
+            .start(boardIndexStep.step(100, "board-index-step", jobRepository, tm))
             .incrementer(new RunIdIncrementer())
             .preventRestart()
             .build();

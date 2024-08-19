@@ -33,9 +33,9 @@ public class EmailJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) {
         Job job = new JobBuilder("email-send-job", jobRepository)
-                .start(emailStep.emailSendStep(jobRepository, tm))
+                .start(emailStep.step(10, "email-send",jobRepository, tm))
                 .incrementer(new RunIdIncrementer())
-                .build();;
+                .build();
 
         JobParameters jobParameters = new JobParametersBuilder(this.jobExplorer)
                     .getNextJobParameters(job)

@@ -31,7 +31,7 @@ jobs:
         run: echo "${{ secrets.NEXTJS_ENV }}" | base64 --decode > ./client/.env.local
 
       - name: nextJs Add Environment Version
-        run: sed "s|__ANAMENSIS_VERSION__|${{ env.VERSION }}|g" ./client/.env.local > ./client/.env.local.temp && mv ./client/.env.local.temp ./client/.env.local
+        run: sed -i "s|__ANAMENSIS_VERSION__|${{ env.VERSION }}|g" ./client/.env.local
 
       - name: Decode and set application.yml
         run: echo "${{ secrets.SITE_TEST_CONFIG }}" | base64 --decode > ./server/src/main/resources/application.yml
@@ -68,7 +68,7 @@ jobs:
         run: echo "${{ secrets.ANAMENSIS_SSH_KEY }}" > anamensis.pem && chmod 600 anamensis.pem
 
       - name: Insert Version to Docker Secret Version
-        run: sed "s|__TAG__|${{ env.VERSION }}|g" ./site-docker-compose.yml > ./site-docker-compose.temp && mv site-docker-compose.temp site-docker-compose.yml
+        run: sed -i "s|__TAG__|${{ env.VERSION }}|g" ./site-docker-compose.yml
 
       - name: Copy Depoly Config
         run: |

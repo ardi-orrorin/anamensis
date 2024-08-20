@@ -46,3 +46,4 @@ server/src/main/resources/application.yml
 *.env
 *.env.*
 *.log
+*.p12

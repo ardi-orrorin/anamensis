@@ -29,7 +29,6 @@ const MAX_CONCURRENT = 30;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const UPLOAD_WORKER = 2
 
-
 const AlbumBlock = (props: ExpendBlockProps) => {
     const {
         hash, value
@@ -112,10 +111,10 @@ const AlbumBlock = (props: ExpendBlockProps) => {
 
 
         for(let i = 0 ; i < files.length ; i += UPLOAD_WORKER) {
-            await Promise.allSettled([
-                upload(files[i], fileContent, uploadedImages, size, progress),
-                upload(files[i + 1], fileContent, uploadedImages, size, progress),
-            ]);
+            const list = Array.from({length: UPLOAD_WORKER})
+                .map((_, index) => upload(files[i + index], fileContent, uploadedImages, size, progress))
+
+            await Promise.allSettled(list);
         }
 
         e.target.value = '';

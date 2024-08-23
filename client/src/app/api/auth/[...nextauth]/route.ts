@@ -46,9 +46,9 @@ async function handler(req: NextRequest, context: RouteHandlerContext) {
         clientSecret: process.env.NEXT_PUBLIC_KAKAO_CLIENT_SECRET,
     }));
 
-
     process.env.NEXT_PUBLIC_ARDI_CLIENT_ID
     && process.env.NEXT_PUBLIC_ARDI_CLIENT_SECRET
+    && process.env.NEXT_PUBLIC_ARDI_OAUTH2_SERVER_URL
     && providers.push(Ardi({
         clientId: process.env.NEXT_PUBLIC_ARDI_CLIENT_ID,
         clientSecret: process.env.NEXT_PUBLIC_ARDI_CLIENT_SECRET,
@@ -62,8 +62,8 @@ async function handler(req: NextRequest, context: RouteHandlerContext) {
 
                 const loginUser  = {
                     userId: user.id,
-                    email: user.email || '',
-                    name: user.name || '',
+                    email: user.email ?? '',
+                    name: user.name   ?? '',
                     provider: account.provider,
                 } as User.OAuth2;
 
@@ -76,7 +76,7 @@ async function handler(req: NextRequest, context: RouteHandlerContext) {
                 const headers = {
                     'Content-Type': 'application/json',
                     'User-Agent': req.headers.get('User-Agent') || '',
-                    'Ip': ipMatch?.[0] || '',
+                    'Ip': ipMatch?.[0] ?? '',
                     'Location': `Test`
                 }
 

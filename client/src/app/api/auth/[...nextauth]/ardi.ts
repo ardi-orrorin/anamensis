@@ -4,18 +4,18 @@ export const Ardi = ({
     clientId,
     clientSecret,
 }:{
-    clientId: string;
-    clientSecret: string;
+    clientId     : string;
+    clientSecret : string;
 }) => ({
     id: "ardi",
     name: "Ardi",
     type: "oauth",
     version: "2.0",
-    wellKnown: "http://localhost:8099/.well-known/openid-configuration",
+    wellKnown: process.env.NEXT_PUBLIC_ARDI_OAUTH2_SERVER_URL + "/.well-known/openid-configuration",
     authorization: {
         params: {
             response_type: "code",
-            scope: ["openid", "name", "birthday", "phone"].join(" "),
+            scope: ["openid", "name", "phone"].join(" "),
         },
     },
     clientId,

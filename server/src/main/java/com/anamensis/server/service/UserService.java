@@ -52,7 +52,8 @@ public class UserService implements ReactiveUserDetailsService {
         "KAKAO", "K",
         "NAVER", "N",
         "GITHUB", "GH",
-        "FACEBOOK", "FB"
+        "FACEBOOK", "FB",
+        "ARDI", "A"
     );
 
     private final MemberMapper memberMapper;

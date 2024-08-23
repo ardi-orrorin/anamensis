@@ -5,9 +5,10 @@ import {cookies} from "next/headers";
 import {NextRequest} from "next/server";
 import Github from "next-auth/providers/github";
 import loginConstants from "@/app/login/{services}/constants";
-import Kakao from "next-auth/providers/kakao";
 import Naver from "next-auth/providers/naver";
 import {User} from "@/app/login/{services}/types";
+import Kakao from "next-auth/providers/kakao";
+import {Ardi} from "@/app/api/auth/[...nextauth]/ardi";
 
 interface RouteHandlerContext {
     params: { nextauth: string[] }
@@ -45,6 +46,13 @@ async function handler(req: NextRequest, context: RouteHandlerContext) {
         clientSecret: process.env.NEXT_PUBLIC_KAKAO_CLIENT_SECRET,
     }));
 
+
+    process.env.NEXT_PUBLIC_ARDI_CLIENT_ID
+    && process.env.NEXT_PUBLIC_ARDI_CLIENT_SECRET
+    && providers.push(Ardi({
+        clientId: process.env.NEXT_PUBLIC_ARDI_CLIENT_ID,
+        clientSecret: process.env.NEXT_PUBLIC_ARDI_CLIENT_SECRET,
+    }));
 
     const options: AuthOptions = {
         providers,

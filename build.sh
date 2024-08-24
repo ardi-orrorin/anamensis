@@ -61,12 +61,10 @@ echo 'docker latest build start....'
 
 if [ "$service" == "site" ]
 then
-    sed "s|__DOCKER_ID__|$base_id|g" site.Dockerfile.template > site.Dockerfile
+    sed -i "s|__DOCKER_ID__|$base_id|g" site.Dockerfile
 
-    sed "s|__VERSION__|$version|g" ./client/package.json > package.json.temp
-    sed "s|__VERSION__|$version|g" ./client/package-lock.json > package-lock.temp
-    mv package.json.temp ./client/package.json
-    mv package-lock.temp ./client/package-lock.json
+    sed -i "s|__VERSION__|$version|g" ./client/package.json
+    sed -i "s|__VERSION__|$version|g" ./client/package-lock.json
 
     server_file_name='server-anamensis-'$version''
 

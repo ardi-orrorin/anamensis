@@ -3,7 +3,6 @@ import {useQuery, useQueryClient} from "@tanstack/react-query";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import React, {useMemo} from "react";
 import Link from "next/link";
-import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import Image from "next/image";
 import {NO_PROFILE} from "@/app/{services}/constants";
 
@@ -37,22 +36,17 @@ const ProfileInfo = () => {
                     <button className={'w-[95px] h-[95px] p-1.5 flex justify-center items-center border-4 border-solid border-main rounded-full hover:border-amber-500 duration-500'}
                             onClick={()=> router.push('/user/info')}
                     >
-
-                        {
-                            profileImg === ''
-                                ? <LoadingSpinner size={20} />
-                                : <Image src={process.env.NEXT_PUBLIC_CDN_SERVER! + profileImg}
-                                         alt={''}
-                                         height={90}
-                                         width={90}
-                                         className={'shadow rounded-full'}
-                                         placeholder={'blur'}
-                                         blurDataURL={NO_PROFILE}
-                                         onError={(e) => {
-                                             e.currentTarget.src = NO_PROFILE
-                                         }}
-                                />
-                        }
+                        <Image src={process.env.NEXT_PUBLIC_CDN_SERVER! + profileImg}
+                                 alt={''}
+                                 height={90}
+                                 width={90}
+                                 className={'shadow rounded-full'}
+                                 placeholder={'blur'}
+                                 blurDataURL={NO_PROFILE}
+                                 onError={(e) => {
+                                     e.currentTarget.src = NO_PROFILE
+                                 }}
+                        />
                     </button>
                 </div>
                 <div>

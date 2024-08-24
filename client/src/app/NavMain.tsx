@@ -8,7 +8,12 @@ import {Root} from "@/app/{services}/types";
 import ScheduleAlert from "@/app/{components}/scheduleAlert";
 import React from "react";
 import CustomImage from "@/app/{components}/customImage";
+import dynamic from "next/dynamic";
+import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 
+const DynamicCustomImage = dynamic(() => import('@/app/{components}/customImage'), {
+    loading: () => <div className={'h-[140px] flex items-center'}><LoadingSpinner size={30}/></div>,
+    ssr: false});
 
 const NavMain = async () => {
 
@@ -81,7 +86,7 @@ const NavMain = async () => {
                         <Link href={'/user'}
                               title={'프로필'}
                         >
-                          <CustomImage />
+                          <DynamicCustomImage />
                         </Link>
                       </div>
                     }

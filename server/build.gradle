@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.3'
+    id 'org.springframework.boot' version '3.3.4'
     id 'io.spring.dependency-management' version '1.1.6'
 }
 
@@ -25,7 +25,7 @@ repositories {
 
 ext {
     set('springCloudVersion', "2023.0.3")
-    set('awsSpring', '3.1.1')
+    set('awsSpring', '3.2.0')
     set('jsonwebtoken', '0.12.6')
 }
 

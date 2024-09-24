@@ -35,7 +35,9 @@ dependencies {
     implementation 'com.warrenstrange:googleauth:1.5.0'
 
     implementation "org.flywaydb:flyway-core"
-    implementation "org.flywaydb:flyway-mysql"
+//    implementation "org.flywaydb:flyway-mysql"
+    runtimeOnly 'org.flywaydb:flyway-database-postgresql:10.18.0'
+
 
     implementation "io.awspring.cloud:spring-cloud-aws-starter-s3:${awsSpring}"
     implementation "io.awspring.cloud:spring-cloud-aws-starter-ses:${awsSpring}"
@@ -57,7 +59,8 @@ dependencies {
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
 
-    runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'org.postgresql:postgresql'
+//    runtimeOnly 'com.mysql:mysql-connector-j'
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
     compileOnly 'org.projectlombok:lombok'

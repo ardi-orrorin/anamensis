@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.server.mapper.ChatRoomMapper">
+
+    <select id="selectById" resultMap="ChatRoomResultMap">
+        SELECT *
+             , cr.id         AS chat_room_pk
+             , cr.type       AS chat_room_type
+             , cr.created_at AS chat_room_created_at
+             , cr.updated_at AS chat_room_updated_at
+             , m1.id         AS member_pk
+             , m1.create_at  AS member_create_at
+             , m2.id         AS host_pk
+             , m2.create_at  AS host_create_at
+          FROM chat_room cr
+          JOIN chat_room_user cru1
+            ON cr.id = cru1.chat_room_id
+          JOIN member m1
+            ON cru1.user_id = m1.id
+          JOIN member m2
+            ON cr.host_id = m2.id
+         WHERE cr.id = #{id};
+    </select>
+
+    <select id="selectAll" resultType="ChatRoom">
+        SELECT *
+          FROM chat_room cr
+         WHERE cr.host_id IN (SELECT m1.id
+                                FROM member m1
+                               WHERE m1.user_id = #{hostUsername})
+         ORDER BY cr.updated_at DESC
+    </select>
+
+    <resultMap id="ChatRoomResultMap" type="com.anamensis.server.resultMap.ChatRoomResultMap$ChatRoom">
+        <id property="id" column="chat_room_pk"/>
+        <association property="chatRoom" resultMap="ChatRoomEntity"/>
+        <association property="host" resultMap="HostEntity"/>
+        <collection property="participants" resultMap="MemberEntity"/>
+    </resultMap>
+
+    <resultMap id="HostEntity" type="Member" autoMapping="true">
+        <id property="id" column="host_pk"/>
+        <result property="createAt" column="host_create_at" />
+    </resultMap>
+    <resultMap id="MemberEntity" type="Member" autoMapping="true">
+        <id property="id" column="member_pk"/>
+        <result property="createAt" column="member_create_at" />
+    </resultMap>
+    <resultMap id="ChatRoomEntity" type="ChatRoom" autoMapping="true">
+        <id property="id" column="chat_room_pk"/>
+        <result property="hostId" column="host_pk"/>
+        <result property="type" column="chat_room_type" typeHandler="RoomTypeHandler"/>
+        <result property="createdAt" column="chat_room_created_at"/>
+        <result property="updatedAt" column="chat_room_updated_at"/>
+    </resultMap>
+    <resultMap id="ChatMessageEntity" type="ChatMessage" autoMapping="true">
+        <id property="id" column="chat_message_pk"/>
+        <result property="createdAt" column="chat_message_created_at"/>
+    </resultMap>
+
+</mapper>

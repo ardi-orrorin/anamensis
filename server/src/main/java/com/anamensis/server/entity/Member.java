@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@ToString
 public class Member implements Serializable {
 
     @Serial

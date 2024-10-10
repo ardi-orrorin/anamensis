@@ -34,6 +34,21 @@
          ORDER BY cr.updated_at DESC
     </select>
 
+    <insert id="save" parameterType="ChatRoom">
+        <selectKey keyProperty="id" resultType="long" order="AFTER">
+            SELECT currval('chat_room_id_seq')
+        </selectKey>
+        INSERT INTO chat_room (name, type, host_id, last_message, created_at, updated_at)
+        VALUES (#{name}, #{type}, #{hostId}, #{lastMessage}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <insert id="saveChatRoomUser">
+        INSERT INTO chat_room_user (chat_room_id, user_id)
+        <foreach collection="userIds" item="userId" separator="," open="VALUES">
+            (#{chatRoomId}, #{userId})
+        </foreach>
+    </insert>
+
     <resultMap id="ChatRoomResultMap" type="com.anamensis.server.resultMap.ChatRoomResultMap$ChatRoom">
         <id property="id" column="chat_room_pk"/>
         <association property="chatRoom" resultMap="ChatRoomEntity"/>

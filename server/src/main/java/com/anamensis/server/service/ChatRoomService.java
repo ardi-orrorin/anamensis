@@ -11,4 +11,6 @@ public class ChatRoomService {
     private final ChatRoomMapper chatRoomMapper;
 
 
+    public
+
 }

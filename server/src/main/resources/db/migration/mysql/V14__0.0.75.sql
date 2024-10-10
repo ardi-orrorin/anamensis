@@ -22,7 +22,9 @@ CREATE TABLE chat_message (
     chat_room_id BIGINT NOT NULL,
     sender_user_id BIGINT NOT NULL,
     content TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT now()
+    created_at TIMESTAMP NOT NULL DEFAULT now(),
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    deleted_at TIMESTAMP
 );
 
 -- create primary key

@@ -7,6 +7,7 @@ import com.anamensis.server.websocket.dto.SessionUser;
 import com.anamensis.server.websocket.dto.WebsocketDTO;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
+import org.slf4j.Logger;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.socket.WebSocketHandler;
@@ -14,8 +15,9 @@ import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-import java.util.Set;
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -23,7 +25,9 @@ public class ChatHandler implements WebSocketHandler {
 
     private final ChatReceiver chatReceiver;
 
-    private final Map<String, Set<SessionUser>> sessionList = Map.of();
+    private final Map<String, Set<SessionUser>> sessionList = new HashMap<>();
+
+    private Logger log = org.slf4j.LoggerFactory.getLogger(ChatHandler.class);
 
     @Override
     public Mono<Void> handle(WebSocketSession session) {
@@ -32,14 +36,19 @@ public class ChatHandler implements WebSocketHandler {
                 Mono.justOrEmpty(securityContext.getAuthentication().getPrincipal())
                     .cast(UserDto.class)
                     .flatMap(user -> {
-                        String router = session.getHandshakeInfo().getUri().getPath().split("/")[2];
+
+                        String[] pathSplit = session.getHandshakeInfo().getUri().getPath().split("/");
+                        String router = pathSplit[pathSplit.length - 1];
                         SessionUser sessionUser = new SessionUser(user.username(), user.authorities(), session);
 
-                        if(sessionList.containsKey(router)) {
+                        if(sessionList.get(router) != null) {
                             sessionList.get(router).add(sessionUser);
                         } else {
-                            sessionList.put(router, Set.of(sessionUser));
+                            sessionList.put(router, new HashSet<>());
+                            sessionList.get(router).add(sessionUser);
                         }
+
+                        log.info("sessionList: {}", sessionList);
 
                         return session.send(this.init(session))
                             .and(this.receive(session))
@@ -69,28 +78,31 @@ public class ChatHandler implements WebSocketHandler {
                     .flatMap(user ->
                         session.receive()
                             .flatMap(message -> {
-                                JSONObject json = new JSONObject().getJSONObject(message.getPayloadAsText());
+                                JSONObject json = new JSONObject(message.getPayloadAsText());
+
                                 WebsocketDTO websocketDTO = new WebsocketDTO(
                                     json.getString("type"),
                                     json.getLong("routeId"),
                                     json.getString("content"),
                                     json.getBoolean("inputting"),
                                     null,
-                                    json.getString("createdAt")
+                                    Instant.now().toString()
                                 );
 
-                                return session.receive()
-                                    .flatMap(receiveMessage -> {
-                                        if(ChatType.CHAT.fromStringEquals(websocketDTO.type())) {
-                                            return chatReceiver.receiver(
-                                                user.getUsername(),
-                                                websocketDTO,
-                                                sessionList.get(websocketDTO.routeId()).stream().toList()
-                                            );
-                                        }
+                                List<SessionUser> users = sessionList.entrySet().stream()
+                                    .map(Map.Entry::getValue)
+                                    .flatMap(Collection::stream)
+                                    .toList();
 
-                                        return Mono.empty();
-                                    });
+                                if(ChatType.CHAT.fromStringEquals(websocketDTO.type())) {
+                                    return chatReceiver.receiver(
+                                        user.getUsername(),
+                                        websocketDTO,
+                                        users
+                                    );
+                                }
+
+                                return Mono.empty();
                             })
                             .then()
                     )
@@ -99,7 +111,9 @@ public class ChatHandler implements WebSocketHandler {
 
     public Mono<Void> close(String router, SessionUser sessionUser) {
         sessionList.get(router).remove(sessionUser);
-        if(sessionList.get(router).isEmpty()) sessionList.remove(router);
+        if(sessionList.get(router).isEmpty()) {
+            sessionList.remove(router);
+        }
 
         return Mono.empty();
     }

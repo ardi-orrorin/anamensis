@@ -1,6 +1,5 @@
 package com.anamensis.server.websocket.config;
 
-import com.anamensis.server.websocket.Receiver.ChatReceiver;
 import com.anamensis.server.websocket.handler.ChatHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

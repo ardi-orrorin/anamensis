@@ -46,22 +46,22 @@
     <select id="findMemberByUserId" resultType="Member">
         <include refid="tbl_member"/>
         WHERE user_id  = #{userId}
-          AND is_use   = 1
+          AND is_use   = TRUE
     </select>
 
     <select id="findOAuthMember" resultType="Member">
         <include refid="tbl_member"/>
         WHERE user_id  = #{userId}
-          AND is_use   = 1
-          AND is_oauth = 1
+          AND is_use   = TRUE
+          AND is_oauth = TRUE
     </select>
 
     <select id="findMemberByUserIdAndPwd" resultType="Member">
         <include refid="tbl_member"/>
         WHERE user_id  = #{userId}
           AND pwd      = #{pwd}
-          AND is_use   = 1
-          AND is_oauth = 0
+          AND is_use   = TRUE
+          AND is_oauth = FALSE
     </select>
 
     <select id="findMemberInfo" resultMap="memberResultMap">
@@ -70,7 +70,7 @@
           JOIN role b
             ON a.id       = b.member_pk
          WHERE a.user_id  = #{userId}
-           AND a.is_use   = 1
+           AND a.is_use   = TRUE
     </select>
 
     <select id="existsMember" resultType="boolean">
@@ -78,7 +78,7 @@
                SELECT *
                  FROM member
                 WHERE 1 = 1
-                  AND is_oauth = 0
+                  AND is_oauth = FALSE
              <choose>
                 <when test="type != null and type == 'id' and value != null and value != ''">
                     AND user_id = #{value}
@@ -98,8 +98,8 @@
         <if test="userId != null and userId != ''">
             AND user_id = #{userId}
         </if>
-          AND is_use   = 1
-          AND is_oauth = 0
+          AND is_use   = TRUE
+          AND is_oauth = FALSE
     </select>
     <insert id="save" parameterType="Member">
         <selectKey keyProperty="id" resultType="int" order="AFTER">
@@ -163,7 +163,7 @@
            <if test="email != null and email != ''">
                AND email   = #{email}
           </if>
-           AND is_use  = 1
+           AND is_use  = TRUE
     </update>
 
     <delete id="deleteRole" parameterType="Role">

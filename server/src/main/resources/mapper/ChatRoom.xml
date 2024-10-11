@@ -12,8 +12,10 @@
              , cr.created_at AS chat_room_created_at
              , cr.updated_at AS chat_room_updated_at
              , m1.id         AS member_pk
+             , m1.user_id    AS member_user_id
              , m1.create_at  AS member_create_at
              , m2.id         AS host_pk
+             , m2.user_id    AS host_user_id
              , m2.create_at  AS host_create_at
           FROM chat_room cr
           JOIN chat_room_user cru1
@@ -68,10 +70,12 @@
 
     <resultMap id="HostEntity" type="Member" autoMapping="true">
         <id property="id" column="host_pk"/>
+        <result property="userId" column="host_user_id"/>
         <result property="createAt" column="host_create_at" />
     </resultMap>
     <resultMap id="MemberEntity" type="Member" autoMapping="true">
         <id property="id" column="member_pk"/>
+        <result property="userId" column="member_user_id"/>
         <result property="createAt" column="member_create_at" />
     </resultMap>
     <resultMap id="ChatRoomRowEntity" type="ChatRoom" autoMapping="true">

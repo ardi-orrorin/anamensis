@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.server.mapper.ChatMessageMapper">
+
+    <select id="findAllByChatRoomId" resultType="ChatMessage">
+        SELECT *
+          FROM chat_message
+         WHERE chat_room_id = #{chatRoomId}
+        <if test="createdAt != null">
+            AND created_at &gt;= #{createdAt}
+        </if>
+    </select>
+
+    <insert id="save" parameterType="ChatMessage">
+        <selectKey keyProperty="id" resultType="int" order="AFTER">
+            SELECT currval('chat_message_id_seq')
+        </selectKey>
+
+        INSERT INTO chat_message (chat_room_id, sender_user_id, content, created_at)
+        VALUES (#{chatRoomId}, #{senderUserId}, #{content}, #{createdAt})
+    </insert>
+</mapper>

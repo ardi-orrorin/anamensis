@@ -9,7 +9,7 @@
           FROM board_template bt
           JOIN (SELECT bt2.id
                   FROM board_template bt2
-                 WHERE bt2.is_use = 1
+                 WHERE bt2.is_use = TRUE
                    AND bt2.member_pk = #{memberPk}) bt3
             ON bt.id = bt3.id;
     </select>
@@ -18,7 +18,7 @@
         SELECT *
           FROM board_template bt
          WHERE bt.id     = #{id}
-           AND bt.is_use = 1
+           AND bt.is_use = TRUE
     </select>
 
     <insert id="save" parameterType="BoardTemplate">
@@ -53,7 +53,7 @@
 
     <update id="disabled">
         UPDATE board_template bt
-           SET bt.is_use    = 0
+           SET bt.is_use    = FALSE
          WHERE bt.id        = #{id}
            AND bt.member_pk = #{memberPk}
     </update>

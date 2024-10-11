@@ -12,14 +12,14 @@
           JOIN member m
             ON o.member_pk = m.id
          WHERE m.user_id = #{userId}
-           AND o.is_use  = 1
+           AND o.is_use  = TRUE
     </select>
 
     <select id="selectByMemberPk" resultType="OTP">
         SELECT *
           FROM otp
          WHERE member_pk = #{memberPk}
-           AND is_use  = 1
+           AND is_use  = TRUE
     </select>
 
     <select id="selectByHash" resultType="OTP">
@@ -33,7 +33,7 @@
                SELECT id
                  FROM otp
                 WHERE member_pk = #{memberPk}
-                  AND is_use  = 1
+                  AND is_use  = TRUE
         )
     </select>
 
@@ -50,7 +50,7 @@
 
     <update id="disableOTP" parameterType="long">
         UPDATE otp
-           SET is_use    = 0
+           SET is_use    = FALSE
          WHERE member_pk = #{memberPk}
     </update>
     

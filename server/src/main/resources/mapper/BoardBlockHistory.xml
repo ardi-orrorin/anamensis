@@ -34,7 +34,8 @@
                 AND b.title LIKE CONCAT('%', #{page.keyword}, '%')
             </if>
          ORDER BY bbh.id DESC
-         LIMIT #{page.offset}, #{page.size}
+        OFFSET #{page.offset}
+         LIMIT #{page.size}
     </select>
 
     <select id="findByPk" resultMap="BoardBlockHistoryResultMap">
@@ -44,7 +45,7 @@
           FROM board_block_history bbh
           JOIN board b
             ON bbh.board_id = b.id
-         WHERE bbh.id = #{pk};
+         WHERE bbh.id       = #{pk};
     </select>
 
     <insert id="save" parameterType="BoardBlockHistory">

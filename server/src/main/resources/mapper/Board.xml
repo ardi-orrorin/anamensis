@@ -21,7 +21,7 @@
     <select id="findList" resultMap="BoardResultMapBoardList">
         SELECT *
              , b.id AS board_pk
-             , (SELECT IFNULL((
+             , (SELECT COALESCE((
                     SELECT count
                       FROM board_comment_count bcc
                      WHERE bcc.board_pk  = b.id)
@@ -37,7 +37,7 @@
                    AND f.table_code_pk = (SELECT tc.id
                                             FROM table_code tc
                                            WHERE tc.table_name = 'member')
-                   AND f.is_use        = 1
+                   AND f.is_use        = TRUE
              ) AS profile
           FROM board b
           JOIN (SELECT b1.id
@@ -45,7 +45,7 @@
                     <if test="params != null and params.type != null and params.type == 'content' and params.value != null and params.value != ''">
                         JOIN board_index bi
                           ON bi.board_id = b1.id
-                         AND bi.content REGEXP REGEXP_REPLACE(TRIM(#{params.value}), '\\s+', '|')
+                         AND bi.content ~* REGEXP_REPLACE(TRIM(#{params.value}), '\\s+', '|')
                     </if>
                     <if test="params != null and params.isFavorite">
                         JOIN board_favorite bf
@@ -53,22 +53,23 @@
                          AND bf.member_pk = #{member.id}
                    </if>
                  WHERE 1 = 1
-                   AND b1.is_use    = 1
-                   AND b1.is_public = 1
+                   AND b1.is_use    = TRUE
+                   AND b1.is_public = TRUE
                     <if test="params != null and params.categoryPk != 0">
                         AND b1.category_pk = #{params.categoryPk}
                     </if>
                     <if test="params != null and params.isFavorite">
-                        AND b1.is_blocked = 0
+                        AND b1.is_blocked = FASLE
                     </if>
                  ORDER BY b1.id DESC
-                 LIMIT #{page.offset}, #{page.size}
+                OFFSET #{page.offset}
+                 LIMIT #{page.size}
          ) b3 ON b3.id = b.id
     </select>
     <select id="findIsSelf" resultMap="BoardResultMapBoardList">
         SELECT *
              , b.id AS board_pk
-             , (SELECT IFNULL((SELECT count
+             , (SELECT COALESCE((SELECT count
                                  FROM board_comment_count bcc
                                 WHERE bcc.board_pk  = b.id)
                      , 0)
@@ -81,16 +82,17 @@
                 <if test="params != null and params.type != null and params.type == 'content' and params.value != null and params.value != ''">
                  JOIN board_index bi
                    ON bi.board_id = b1.id
-                  AND bi.content REGEXP REGEXP_REPLACE(TRIM(#{params.value}), '\\s+', '|')
+                  AND bi.content ~* REGEXP_REPLACE(TRIM(#{params.value}), '\\s+', '|')
                 </if>
                 WHERE 1 = 1
                   AND b1.member_pk = #{member.id}
                 <if test="params != null and params.categoryPk != 0">
                   AND b1.category_pk = #{params.categoryPk}
                 </if>
-                  AND b1.is_use = 1
+                  AND b1.is_use = TRUE
                 ORDER BY b1.id DESC
-                LIMIT #{page.offset}, #{page.size}
+               OFFSET #{page.offset}
+                LIMIT #{page.size}
             ) b3
            ON b3.id = b.id
          JOIN member m
@@ -100,7 +102,7 @@
           AND f.table_code_pk = (SELECT tc.id
                                    FROM table_code tc
                                   WHERE tc.table_name = 'member')
-         AND f.is_use = 1;
+         AND f.is_use = FALSE;
     </select>
 
     <select id="findByPk" resultMap="BoardResultMapBoard" parameterType="Long">
@@ -111,11 +113,11 @@
             ON m.id = b.member_pk
           LEFT OUTER JOIN file f
             ON f.table_ref_pk = m.id
-           AND f.is_use        = 1
+           AND f.is_use        = TRUE
            AND f.table_code_pk = (SELECT t.id
                                     FROM table_code t
                                    WHERE t.table_name = 'member')
-         WHERE b.is_use        = 1
+         WHERE b.is_use        = TRUE
            AND b.id            = #{boardPk}
     </select>
     <select id="findByMemberPk" resultMap="BoardResultMapBoard">
@@ -123,9 +125,10 @@
              , id as board_pk
           FROM board
          WHERE member_pk = #{memberPk}
-           AND is_use    = 1
+           AND is_use    = TRUE
          ORDER BY id DESC
-         LIMIT #{page.offset}, #{page.size}
+        OFFSET #{page.offset}
+         LIMIT #{page.size}
     </select>
     <select id="findNotice" resultMap="BoardResultMapBoardNotice">
         SELECT *
@@ -136,8 +139,8 @@
              ) AS writer
           FROM board b
          WHERE b.category_pk = 1
-           AND b.is_public   = 1
-           AND b.is_use      = 1
+           AND b.is_public   = TRUE
+           AND b.is_use      = TRUE
          ORDER BY b.id DESC
          LIMIT 6
     </select>
@@ -162,7 +165,7 @@
                 update_at   = #{updateAt}
         </set>
          WHERE id           = #{id}
-           AND is_use       = 1
+           AND is_use       = TRUE
            AND member_pk    = #{memberPk}
     </update>
     <update id="disableByPk" parameterType="Map">
@@ -170,21 +173,21 @@
            SET is_use    = 0
            AND update_at = #{updateAt}
          WHERE id        = #{boardPk}
-           AND is_use    = 1
+           AND is_use    = TRUE
            AND member_pk = #{memberPk}
     </update>
     <update id="viewUpdateByPk" parameterType="Long">
         UPDATE board
            SET view_count = view_count + 1
          WHERE id         = #{boardPk}
-           AND is_use     = 1
+           AND is_use     = TRUE
     </update>
 
     <update id="updateIsBlockedByPk">
         UPDATE board
            SET is_blocked = #{isBlocked}
          WHERE id         = #{boardPk}
-           AND is_use     = 1
+           AND is_use     = TRUE
     </update>
 
     <resultMap id="BoardResultMapBoardNotice" type="com.anamensis.server.resultMap.BoardResultMap$Notice">

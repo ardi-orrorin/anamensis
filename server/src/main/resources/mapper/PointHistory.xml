@@ -25,10 +25,10 @@
         </if>
     </sql>
     <select id="count">
-        SELECT IFNULL((SELECT phc.count
+        SELECT COALESCE((SELECT phc.count
                          FROM point_history_count phc
                         WHERE phc.member_pk = #{memberPk})
-               , 0)
+             , 0)
     </select>
 
     <select id="selectByPointHistory" resultMap="pointHistoryResultMap">

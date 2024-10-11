@@ -9,7 +9,7 @@
           FROM email_verify
          WHERE email     = #{email}
            AND code      = #{code}
-           AND is_use    = 1
+           AND is_use    = TRUE
            AND expire_at > #{expireAt}
     </select>
 
@@ -21,9 +21,9 @@
 
     <update id="updateDisableByEmail">
         UPDATE email_verify
-           SET is_use = 0
+           SET is_use = FALSE
          WHERE email  = #{email}
-           AND is_use = 1
+           AND is_use = TRUE
     </update>
 
     <update id="updateIsUse" parameterType="EmailVerify">

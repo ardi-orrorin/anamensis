@@ -11,13 +11,13 @@
     <select id="selectByMemberPk" resultType="MemberConfigSmtp">
       <include refid="tbl_member_config_smtp"/>
          WHERE member_pk = #{memberPk}
-           AND is_use = 1
+           AND is_use = TRUE
     </select>
     <select id="selectById" resultType="MemberConfigSmtp">
       <include refid="tbl_member_config_smtp"/>
          WHERE id        = #{id}
            AND member_pk = #{memberPk}
-           AND is_use    = 1
+           AND is_use    = TRUE
     </select>
 
     <select id="isDefault" resultType="boolean">
@@ -26,15 +26,15 @@
                  FROM member_config_smtp
                 WHERE member_pk  = #{memberPk}
                   AND id         = #{id}
-                  AND is_use     = 1
-                  AND is_default = 1
+                  AND is_use     = TRUE
+                  AND is_default = TRUE
         );
     </select>
 
     <select id="selectFirstId" resultType="MemberConfigSmtp">
       <include refid="tbl_member_config_smtp"/>
          WHERE member_pk = #{memberPk}
-           AND is_use = 1
+           AND is_use = TRUE
          ORDER BY ID
          LIMIT 1
     </select>
@@ -88,13 +88,13 @@
 
     <update id="disabledDefaults">
         UPDATE member_config_smtp
-           SET is_default = 0
+           SET is_default = FALSE
          WHERE member_pk  = #{memberPk}
     </update>
 
     <update id="disabled" parameterType="MemberConfigSmtp">
         UPDATE member_config_smtp
-           SET is_use     = 0
+           SET is_use     = FALSE
          WHERE id         = #{id}
            AND member_pk  = #{memberPk}
     </update>

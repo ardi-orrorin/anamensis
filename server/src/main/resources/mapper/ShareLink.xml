@@ -26,12 +26,13 @@
             <when test="page.criteria == 'id' and page.order == 'desc'">id DESC</when>
             <otherwise>id DESC</otherwise>
          </choose>
-         LIMIT #{page.offset}, #{page.size}
+        OFFSET #{page.offset}
+         LIMIT #{page.size}
     </select>
     <select id="selectByShareLink" resultType="ShareLink">
         <include refid="tbl_share_link" />
          WHERE share_link = #{shareLink}
-           AND is_use     = 1
+           AND is_use     = TRUE
     </select>
     <select id="selectById" resultType="ShareLink">
         <include refid="tbl_share_link" />

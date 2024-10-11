@@ -25,8 +25,12 @@
          WHERE cr.id = #{id};
     </select>
 
-    <select id="selectAll" resultType="ChatRoom">
+    <select id="selectAll" resultMap="ChatRoomListItemResultMap">
         SELECT *
+             , (SELECT count(*)
+                  FROM chat_room_user cru
+                 WHERE cru.chat_room_id = cr.id
+             ) AS user_count
           FROM chat_room cr
          WHERE cr.host_id IN (SELECT m1.id
                                 FROM member m1
@@ -49,11 +53,17 @@
         </foreach>
     </insert>
 
+    <resultMap id="ChatRoomListItemResultMap" type="com.anamensis.server.resultMap.ChatRoomResultMap$ChatRoomListItem">
+        <id property="id" column="id"/>
+        <result property="userCount" column="user_count"/>
+        <association property="chatRoom" resultMap="ChatRoomRowEntity" />
+    </resultMap>
+
     <resultMap id="ChatRoomResultMap" type="com.anamensis.server.resultMap.ChatRoomResultMap$ChatRoom">
         <id property="id" column="chat_room_pk"/>
         <association property="chatRoom" resultMap="ChatRoomEntity"/>
         <association property="host" resultMap="HostEntity"/>
-        <collection property="participants" resultMap="MemberEntity"/>
+        <collection property="participants" resultMap="MemberEntity" />
     </resultMap>
 
     <resultMap id="HostEntity" type="Member" autoMapping="true">
@@ -63,6 +73,9 @@
     <resultMap id="MemberEntity" type="Member" autoMapping="true">
         <id property="id" column="member_pk"/>
         <result property="createAt" column="member_create_at" />
+    </resultMap>
+    <resultMap id="ChatRoomRowEntity" type="ChatRoom" autoMapping="true">
+        <result property="type" column="type" typeHandler="RoomTypeHandler"/>
     </resultMap>
     <resultMap id="ChatRoomEntity" type="ChatRoom" autoMapping="true">
         <id property="id" column="chat_room_pk"/>

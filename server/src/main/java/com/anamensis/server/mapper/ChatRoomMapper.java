@@ -20,6 +20,6 @@ public interface ChatRoomMapper {
 //
     Optional<ChatRoomResultMap.ChatRoom> selectById(long id);
 
-    List<ChatRoom> selectAll(String hostUsername);
+    List<ChatRoomResultMap.ChatRoomListItem> selectAll(String hostUsername);
 
 }

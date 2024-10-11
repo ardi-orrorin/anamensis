@@ -1,6 +1,5 @@
 package com.anamensis.server.websocket.Receiver;
 
-import com.anamensis.server.entity.ChatMessage;
 import com.anamensis.server.entity.Member;
 import com.anamensis.server.service.UserService;
 import com.anamensis.server.websocket.dto.SessionUser;

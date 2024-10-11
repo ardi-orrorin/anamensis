@@ -45,7 +45,7 @@ class ChatRoomMapperTest {
     @Test
     void selectAll() {
 
-        List<ChatRoom> list = chatRoomMapper.selectAll("test");
+        List<ChatRoomResultMap.ChatRoomListItem> list = chatRoomMapper.selectAll("test");
 
         assertNotNull(list);
 
@@ -56,13 +56,15 @@ class ChatRoomMapperTest {
 
     @Test
     void save() {
-        ChatRoom chatRoom = new ChatRoom();
-        chatRoom.setType(RoomType.PRIVATE);
-        chatRoom.setName("test");
-        chatRoom.setHostId(1L);
-        chatRoom.setLastMessage("");
-        chatRoom.setCreatedAt(Instant.now());
-        chatRoom.setUpdatedAt(Instant.now());
+        ChatRoom chatRoom = new ChatRoom(
+            0L,
+            "test",
+            RoomType.PRIVATE,
+            1L,
+            "",
+            Instant.now(),
+            Instant.now()
+        );
 
         int result = chatRoomMapper.save(chatRoom);
 

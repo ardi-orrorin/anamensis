@@ -77,7 +77,6 @@ class CategoryControllerTest {
             .consumeWith(result ->
                     token2 = Objects.requireNonNull(result.getResponseBody()).getAccessToken()
             );
-
     }
 
     @Test

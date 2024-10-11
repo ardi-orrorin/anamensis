@@ -201,6 +201,7 @@ public class UserService implements ReactiveUserDetailsService {
         member.setCreateAt(LocalDateTime.now());
         member.setSAuthType(AuthType.NONE);
         member.setOAuth(isOAuth);
+        member.setSAuth(false);
 
         try {
             pointCodeMapper.selectByIdOrName(0,ATTENDANCE_POINT_CODE_PREFIX + "1")

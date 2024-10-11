@@ -40,7 +40,7 @@
     </select>
     <insert id="insert" parameterType="ShareLink">
         <selectKey keyProperty="id" resultType="int" order="AFTER">
-            SELECT LAST_INSERT_ID()
+            SELECT currval('share_link_id_seq')
         </selectKey>
         INSERT INTO share_link
                (org_link, share_link, create_at, user_pk)

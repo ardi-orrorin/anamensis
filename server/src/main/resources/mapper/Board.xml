@@ -6,7 +6,7 @@
 <mapper namespace="com.anamensis.server.mapper.BoardMapper">
     <insert id="save" parameterType="Board">
         <selectKey keyProperty="id" resultType="long" order="AFTER">
-            SELECT last_insert_id()
+            SELECT currval('board_id_seq')
         </selectKey>
         INSERT INTO board
                (category_pk, title, content,

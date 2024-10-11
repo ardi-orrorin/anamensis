@@ -104,7 +104,7 @@
     </select>
     <insert id="save" parameterType="Member">
         <selectKey keyProperty="id" resultType="int" order="AFTER">
-            SELECT LAST_INSERT_ID()
+            SELECT currval('member_id_seq')
         </selectKey>
         INSERT INTO member (user_id, pwd, name,
                             email, phone, create_at, is_oauth)

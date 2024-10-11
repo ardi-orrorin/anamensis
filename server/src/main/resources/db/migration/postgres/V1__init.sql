@@ -711,7 +711,7 @@ VALUES ('001', 'default', '기본값', 'ADMIN')
 
 INSERT INTO system_message
        (id, web_sys_pk, subject, content, create_at, update_at)
-VALUES (1, '001', '시스템 메시지', '시스템 메시지입니다.', current_timestamp, current_timestamp)
+VALUES (1, '001', '시스템 메시지', '시스템 메시지입니다.', current_timestamp, now())
      , (2, '002','2차 인증 비활성화', '%s님의 2차 인증 설정이 변경되었습니다.', now(), now())
      , (3, '002','2차 인증 활성화', '%s님의 2차 인증 설정이 변경되었습니다.', now(), now())
      , (4, '003','새로운 장소에서 로그인이 발생했습니다.', ' ip : %s </br> device : %s </br> location : %s </br> 에서 로그인이 발생했습니다.', now(), now());

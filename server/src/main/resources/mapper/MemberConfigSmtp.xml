@@ -41,7 +41,7 @@
 
     <insert id="save" parameterType="MemberConfigSmtp">
         <selectKey keyProperty="id" resultType="Int" order="AFTER">
-            SELECT LAST_INSERT_ID()
+            SELECT currval('member_config_smtp_id_seq')
         </selectKey>
         INSERT INTO member_config_smtp
                (member_pk, host, port,

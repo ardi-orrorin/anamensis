@@ -11,6 +11,7 @@ import {cookies} from "next/headers";
 import LoginState from "@/app/loginState";
 import {SearchHistoryProvider} from "@/app/{hooks}/searchHisotryHook";
 import {SearchParamsProvider} from "@/app/{hooks}/searchParamsHook";
+import Chat from "@/app/{components}/chats/chat";
 
 export const metadata: Metadata = {
     title: 'anamensis',
@@ -83,6 +84,7 @@ export default function RootLayout({
                     </SearchHistoryProvider>
                 </ErrorBoundary>
                 <Footer />
+                { !isLogin && <Chat />}
             </Providers>
             </body>
         </html>

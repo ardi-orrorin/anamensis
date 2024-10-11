@@ -40,7 +40,7 @@
 
     <insert id="save" parameterType="BoardComment">
         <selectKey keyProperty="id" resultType="int" order="AFTER">
-            SELECT LAST_INSERT_ID()
+            SELECT currval('board_comment_id_seq')
         </selectKey>
         INSERT INTO board_comment
                (board_pk, content, create_at, user_id, parent_pk, blockSeq)

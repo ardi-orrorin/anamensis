@@ -15,13 +15,13 @@ const UserInfoWindow = (props: UserInfoWindowProps) => {
     const {winKey, title, children, open, onClick} = props;
 
     return (
-        <div className={['flex flex-col w-full md:w-[48%] h-80 border border-solid border-main shadow-blue-100 shadow-md rounded duration-300',
+        <div className={['flex flex-col w-full md:w-[48%] h-80 border border-solid border-gray-700 shadow-gray-100 shadow-md rounded duration-300',
                         open ? '' : 'hidden',
                         ].join(' ')}
              data-testid={'user-info-window'}
         >
             <div className={['px-5 flex justify-between w-full h-10 p-3 text-sm text-white',
-                            open ? 'bg-main' : 'bg-gray-400  rounded'
+                            open ? 'bg-gray-700' : 'bg-gray-400  rounded'
                             ].join(' ')}
             >
                 <button onClick={()=> onClick!(winKey, false)}>

@@ -2,10 +2,13 @@ package com.anamensis.server.config;
 
 import com.anamensis.server.provider.TokenProvider;
 import com.anamensis.server.service.UserService;
+import com.anamensis.server.websocket.handler.ChatHandler;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.MalformedJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,6 +16,8 @@ import org.springframework.security.web.server.authentication.ServerAuthenticati
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import java.util.Arrays;
 
 @Component
 @RequiredArgsConstructor
@@ -25,12 +30,30 @@ public class AuthConverter implements ServerAuthenticationConverter {
 
     @Override
     public Mono<Authentication> convert(ServerWebExchange exchange) {
-        String auth = exchange.getRequest().getHeaders().getFirst("Authorization");
-        if(auth == null || !auth.startsWith("Bearer ")) {
-            return Mono.empty();
+        HttpHeaders headers = exchange.getRequest().getHeaders();
+        String auth = headers.getFirst("Authorization");
+        String cookie = headers.getFirst("Cookie");
+
+        if(auth != null && auth.startsWith("Bearer ")) {
+            auth =  auth.substring(7);
+            return isValidateToken(auth, exchange);
+        } else if(cookie != null && cookie.startsWith("next.access.token=")) {
+            String accessCookieName = "next.access.token";
+            String refreshCookieName = "next.refresh.token";
+
+            String[] cookies = cookie.split(";");
+            String accessToken = Arrays.stream(cookies).filter(c -> c.contains(accessCookieName)).findFirst().orElse("");
+            String refreshToken = Arrays.stream(cookies).filter(c -> c.contains(refreshCookieName)).findFirst().orElse("");
+
+
+            if(!accessToken.isEmpty()) {
+                return isValidateToken(accessToken.split("=")[1], exchange);
+            } else if(!refreshToken.isEmpty()) {
+                return isValidateToken(refreshToken.split("=")[1], exchange);
+            }
+
         }
-        auth = auth.substring(7);
-        return isValidateToken(auth, exchange);
+        return Mono.empty();
     }
 
     public Mono<Authentication> isValidateToken(String token, ServerWebExchange exchange) {

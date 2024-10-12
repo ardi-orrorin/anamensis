@@ -17,7 +17,6 @@ import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -36,7 +35,6 @@ public class ChatHandler implements WebSocketHandler {
                 Mono.justOrEmpty(securityContext.getAuthentication().getPrincipal())
                     .cast(UserDto.class)
                     .flatMap(user -> {
-
                         String[] pathSplit = session.getHandshakeInfo().getUri().getPath().split("/");
                         String router = pathSplit[pathSplit.length - 1];
                         SessionUser sessionUser = new SessionUser(user.username(), user.authorities(), session);
@@ -47,8 +45,6 @@ public class ChatHandler implements WebSocketHandler {
                             sessionList.put(router, new HashSet<>());
                             sessionList.get(router).add(sessionUser);
                         }
-
-                        log.info("sessionList: {}", sessionList);
 
                         return session.send(this.init(session))
                             .and(this.receive(session))

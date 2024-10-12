@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     description: 'anamensis',
     twitter: {},
     icons: {
-        icon: 'https://cdn.anamensis.site/favicon.ico',
+        icon: './favicon.ico',
     },
     openGraph: {
         title: 'anamensis',
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
         siteName: 'anamensis',
         images: [
             {
-                url: 'https://cdn.anamensis.site/ms-icon-310x310.png',
+                url: './static/ms-icon-310x310.png',
                 width: 310,
                 height: 310,
                 alt: 'anamensis',
@@ -51,27 +51,33 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
 
-    const gId = process.env.NEXT_PUBLIC_GID;
+    // const gId = process.env.NEXT_PUBLIC_GID;
 
     const isLogin = (cookies()?.get('next.access.token')  || cookies()?.get('next.refresh.token')) !== undefined;
 
     return (
         <html lang="ko">
-            <Script id={'google-analytics'} async
-                    src={`https://www.googletagmanager.com/gtag/js?id=G-${gId}`}
-            />
-            <Script id={'google-analytics'} dangerouslySetInnerHTML={{
-                __html: `
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-        
-                gtag('config', 'G-${gId}');
-                `
-            }} />
+            {/*<Script id={'google-analytics'} async*/}
+            {/*        src={`https://www.googletagmanager.com/gtag/js?id=G-${gId}`}*/}
+            {/*/>*/}
+            {/*<Script id={'google-analytics'} dangerouslySetInnerHTML={{*/}
+            {/*    __html: `*/}
+            {/*    window.dataLayer = window.dataLayer || [];*/}
+            {/*    function gtag(){dataLayer.push(arguments);}*/}
+            {/*    gtag('js', new Date());*/}
+
+            {/*    gtag('config', 'G-${gId}');*/}
+            {/*    `*/}
+            {/*}} />*/}
             <body className={'flex flex-col'}>
             <Providers>
-                { isLogin && <LoginState /> }
+                {
+                    isLogin
+                    && <>
+                        <LoginState />
+                        <Chat />
+                    </>
+                }
                 <ProgressBar />
                 <NavMain />
                 <ErrorBoundary errorComponent={Error}>
@@ -84,7 +90,6 @@ export default function RootLayout({
                     </SearchHistoryProvider>
                 </ErrorBoundary>
                 <Footer />
-                { !isLogin && <Chat />}
             </Providers>
             </body>
         </html>

@@ -59,7 +59,7 @@
                         AND b1.category_pk = #{params.categoryPk}
                     </if>
                     <if test="params != null and params.isFavorite">
-                        AND b1.is_blocked = FASLE
+                        AND b1.is_blocked = FALSE
                     </if>
                  ORDER BY b1.id DESC
                 OFFSET #{page.offset}
@@ -97,7 +97,7 @@
            ON b3.id = b.id
          JOIN member m
            ON m.id  = b.member_pk
-         JOIN file f
+         LEFT JOIN file f
            ON f.table_ref_pk  = b.member_pk
           AND f.table_code_pk = (SELECT tc.id
                                    FROM table_code tc

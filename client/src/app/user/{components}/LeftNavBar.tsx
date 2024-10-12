@@ -25,6 +25,7 @@ import rootApiService from "@/app/{services}/rootApiService";
 import userApiService from "@/app/user/{services}/userApiService";
 import emailApiService from "@/app/user/email/{services}/emailApiService";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
+import {defaultProfile} from "@/app/{commons}/func/image";
 
 type MenuItemType = {
     name: string,
@@ -53,7 +54,7 @@ const LeftNavBar = ({
     const {data: profileImg} = useQuery(userApiService.profileImg());
 
     const isOAuthUser = useMemo(() =>
-            roles && (roles as System.Role[])?.find(role =>
+            roles && roles?.find(role =>
             role === System.Role.OAUTH)
         , [roles]);
 
@@ -83,7 +84,7 @@ const LeftNavBar = ({
 
     const roleMenu = useMemo(()=>
         menuItems.map((item, index) => {
-            if(!item.role || !(roles as System.Role[])?.find(role => role === item.role)) {
+            if(!item.role || !roles?.find(role => role === item.role)) {
                 return null;
             }
 
@@ -107,7 +108,7 @@ const LeftNavBar = ({
 
     return (
         <>
-        <nav className={['top-0 flex flex-col min-h-screen z-30 bg-main py-2 duration-500'
+        <nav className={['top-0 flex flex-col min-h-screen z-30 bg-gray-700 py-2 duration-500'
             , isOpen || !isModalMode  ? 'sticky translate-x-0 shadow-outset-lg' : 'translate-x-[-1000px]'
             , isModalMode ? 'fixed min-w-[200px]': 'w-[40px] sm:min-w-[200px]'
         ].join(' ')}
@@ -149,7 +150,7 @@ const LeftNavBar = ({
                             'rounded-full border-solid duration-500 border-blue-200 hover:border-blue-500',
                             isModalMode ? '' : 'w-[25px] sm:w-[110px] h-[25px] sm:h-[110px]'
                         ].join(' ')}
-                               src={process.env.NEXT_PUBLIC_CDN_SERVER + profileImg! || NO_IMAGE}
+                               src={defaultProfile(profileImg)}
                                alt={''}
                                width={110}
                                height={110}

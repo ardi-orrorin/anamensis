@@ -11,7 +11,7 @@ export async function middleware(req: NextRequest) {
     const refreshToken = cookies().get('next.refresh.token');
 
     if(!accessToken && refreshToken) {
-        const result = await generateRefreshToken(refreshToken, req.headers.get('User-Agent') || '');
+        const result = await generateRefreshToken(refreshToken, req.headers.get('User-Agent') ?? '');
 
         const next = NextResponse.next();
 
@@ -38,13 +38,13 @@ const generateRefreshToken = async (refreshToken: RequestCookie, userAgent: stri
     });
 
     const accessToken = refresh.headers.getSetCookie().find((cookie: string) => {
-        const [key, value] = cookie.split(';')[0].split('=');
+        const [key, _] = cookie.split(';')[0].split('=');
         if(key === 'next.access.token') {
             return cookie;
         }
     });
 
-    return accessToken || '';
+    return accessToken ?? '';
 }
 
 export const config = {

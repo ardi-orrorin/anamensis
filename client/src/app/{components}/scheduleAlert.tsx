@@ -59,7 +59,7 @@ const ScheduleAlert = () => {
                 </span>
             </button>
             <div className={[
-                'absolute z-50 top-12 w-80 flex flex-col bg-white  text-xs border-solid border-y-main rounded shadow-md overflow-y-auto',
+                'absolute z-50 top-12 w-80 flex flex-col bg-white  text-xs border-solid border-y-gray-800 rounded shadow-md overflow-y-auto',
                 toggle ? 'border-y-2' : 'border-y-0'
             ].join(' ')}>
                 <div className={[

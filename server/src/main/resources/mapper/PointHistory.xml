@@ -36,7 +36,6 @@
           FROM point_history ph1
           JOIN (SELECT ph.id
                   FROM point_history ph
-                 FORCE INDEX (idx_id_desc_member_pk)
                 <if test="param != null and param.pointCodeName != null and param.pointCodeName != ''">
                   JOIN point_code pc
                     ON ph.point_code_pk = pc.id
@@ -55,7 +54,8 @@
                     AND ph.member_pk = #{memberPk}
                 </if>
                 ORDER BY ph.id DESC
-                LIMIT #{page.offset}, #{page.size}
+               OFFSET #{page.offset}
+                LIMIT #{page.size}
              ) ph2 ON ph2.id = ph1.id
           JOIN point_code pc
             ON ph1.point_code_pk = pc.id

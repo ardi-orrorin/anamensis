@@ -5,11 +5,12 @@ import React, {useMemo} from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {NO_PROFILE} from "@/app/{services}/constants";
+import {defaultProfile} from "@/app/{commons}/func/image";
 
 const ProfileInfo = () => {
     const router = useRouter()
 
-    const profileImg = useQueryClient().getQueryData(['profileImg']);
+    const profileImg = useQueryClient().getQueryData(['profileImg']) as string;
 
     const {data: userinfo} = useQuery(userInfoApiService.profile())
 
@@ -36,7 +37,7 @@ const ProfileInfo = () => {
                     <button className={'w-[95px] h-[95px] p-1.5 flex justify-center items-center border-4 border-solid border-main rounded-full hover:border-amber-500 duration-500'}
                             onClick={()=> router.push('/user/info')}
                     >
-                        <Image src={process.env.NEXT_PUBLIC_CDN_SERVER! + profileImg}
+                        <Image src={defaultProfile(profileImg)}
                                  alt={''}
                                  height={90}
                                  width={90}

@@ -7,6 +7,8 @@ import lombok.Getter;
 @Builder
 public class UserStatus {
 
+    private long id;
+
     private String username;
 
     private Status status;

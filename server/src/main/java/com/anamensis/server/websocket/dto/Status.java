@@ -3,7 +3,8 @@ package com.anamensis.server.websocket.dto;
 public enum Status {
     ONLINE,
     WORKING,
-    OFFLINE;
+    OFFLINE,
+    AWAY;
 
     public boolean fromStringEquals(String string) {
         return this.name().equalsIgnoreCase(string);

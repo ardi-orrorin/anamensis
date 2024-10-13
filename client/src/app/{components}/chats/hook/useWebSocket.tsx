@@ -1,6 +1,6 @@
 'use client';
 
-import {createContext, useContext, useEffect, useState} from "react";
+import {createContext, useCallback, useContext, useEffect, useState} from "react";
 import {ChatSpace} from "@/app/{components}/chats/services/types";
 
 export interface WEbSocketProviderI {
@@ -26,34 +26,6 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
             console.log('disconnected');
         }
 
-
-        ws.onmessage = (event) => {
-            const res = JSON.parse(event.data) as ChatSpace.WebSocketResponse<any>;
-            console.log('res', res);
-
-            if(res?.type === 'USERS') {
-                const data = res.data as ChatSpace.UserStatus[];
-                setUsers(data);
-
-                console.log('users', res);
-            }
-
-            if (res?.type === 'STATUS') {
-                const data = res.data as ChatSpace.UserStatus;
-                statusHandler(data);
-            }
-
-            if (res?.type === 'CHAT') {
-                const data = res.data as ChatSpace.ChatMessage;
-                chatHandler(data);
-            }
-
-            if (res?.type === 'SYSTEM') {
-                const data = res.data as string;
-                systemHandler(data);
-            }
-        }
-
         setWs(ws);
 
         return () => {
@@ -62,19 +34,40 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
 
     }, []);
 
-    const statusHandler = (data: ChatSpace.UserStatus) => {
+    ws.onmessage = (event) => {
+        const res = JSON.parse(event.data) as ChatSpace.WebSocketResponse<any>;
+        console.log('res', res);
+
+        if(res?.type === 'USERS') {
+            const data = res.data as ChatSpace.UserStatus[];
+            setUsers(data);
+        }
+
+        if (res?.type === 'STATUS') {
+            const data = res.data as ChatSpace.UserStatus;
+            statusHandler(data);
+        }
+
+        if (res?.type === 'CHAT') {
+            const data = res.data as ChatSpace.ChatMessage;
+            chatHandler(data);
+        }
+
+        if (res?.type === 'SYSTEM') {
+            const data = res.data as string;
+            systemHandler(data);
+        }
+    }
+
+    const statusHandler = useCallback((data: ChatSpace.UserStatus) => {
         const newUsers = users.map(user => {
-            if(user.username === data.username) {
-                if(user.status !== data.status) {
-                    user.status = data.status;
-                }
+            if(user.username === data.username && user.status !== data.status) {
+                user.status = data.status;
             }
             return user;
         });
-
-        console.log(newUsers);
         setUsers(newUsers);
-    }
+    },[users]);
 
     const systemHandler = (data: string) => {
         console.log('system',data);

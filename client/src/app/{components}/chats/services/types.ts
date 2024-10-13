@@ -1,3 +1,5 @@
+import {StatusEnum} from "@/app/{components}/chats/services/Status";
+
 interface WebSocketResponseI<T> {
     type     : ChatSpace.WebSocketResponseType;
     data     : T;
@@ -5,7 +7,7 @@ interface WebSocketResponseI<T> {
 }
 
 enum WebSocketResponseTypeEnum {
-    CHAT   ='CHAT',
+    CHAT   = 'CHAT',
     STATUS = 'STATUS',
     SYSTEM = 'SYSTEM',
     ERROR  = 'ERROR',
@@ -24,15 +26,10 @@ interface ChatMessageI {
 }
 
 interface UserStatusI {
+    id           : number;
     username     : number;
-    status       : ChatSpace.Status;
+    status       : StatusEnum;
     profileImage : string;
-}
-
-enum StatusEnum {
-    ONLINE  = 'ONLINE',
-    OFFLINE = 'OFFLINE',
-    WORKING = 'WORKING',
 }
 
 export namespace ChatSpace {
@@ -40,5 +37,4 @@ export namespace ChatSpace {
     export type ChatMessage           = ChatMessageI;
     export type WebSocketResponseType = WebSocketResponseTypeEnum;
     export type UserStatus            = UserStatusI;
-    export type Status                = StatusEnum;
 }

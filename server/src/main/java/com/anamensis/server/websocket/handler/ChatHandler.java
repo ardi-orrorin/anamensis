@@ -4,20 +4,19 @@ import com.anamensis.server.dto.ChatType;
 import com.anamensis.server.dto.UserDto;
 import com.anamensis.server.websocket.Receiver.ChatReceiver;
 import com.anamensis.server.websocket.Receiver.UserStatusReceiver;
-import com.anamensis.server.websocket.dto.*;
+import com.anamensis.server.websocket.dto.SessionUser;
+import com.anamensis.server.websocket.dto.Status;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.socket.WebSocketHandler;
-import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
-import java.time.Instant;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -42,33 +41,15 @@ public class ChatHandler implements WebSocketHandler {
 
                         sessionList.add(sessionUser);
 
+                        log.info("sessionList: {}", sessionList);
+
                         return session.send(statusReceiver.getUserList(session, sessionList))
                             .and(this.receive(session))
                             .then()
-                            .doAfterTerminate(() -> this.close(sessionUser, session).subscribe());
+                            .doFinally(it -> this.close(user.getUsername(), session).subscribe());
                     })
             );
     }
-
-//    private Mono<WebSocketMessage> init(WebSocketSession session) {
-//        return ReactiveSecurityContextHolder.getContext()
-//            .flatMap(securityContext ->
-//                Mono.justOrEmpty(securityContext.getAuthentication().getPrincipal())
-//                    .cast(UserDto.class)
-//                    .flatMap(user -> {
-//                        String message = String.format("User %s WebSocket Connected", user.username());
-//
-//                        WebSocketResponse<String> res = WebSocketResponse.<String>builder()
-//                            .type(ResponseType.SYSTEM)
-//                            .data(message)
-//                            .build();
-//
-//                        JSONObject json = new JSONObject(res);
-//
-//                        return Mono.just(session.textMessage(json.toString()));
-//                    })
-//                );
-//    }
 
     private Mono<Void> receive(WebSocketSession session) {
         return ReactiveSecurityContextHolder.getContext()
@@ -89,7 +70,11 @@ public class ChatHandler implements WebSocketHandler {
                                 }
 
                                 if(ChatType.STATUS.fromStringEquals(json.getString("type"))) {
-                                    return changeUserStatus(user, json, sessionList);
+                                    return statusReceiver.changeStatus(
+                                        user.getUsername(),
+                                        json,
+                                        sessionList
+                                    );
                                 }
 
                                 return Mono.empty();
@@ -99,40 +84,13 @@ public class ChatHandler implements WebSocketHandler {
             );
     }
 
-    private Mono<Void> changeUserStatus(
-        UserDto user,
-        JSONObject json,
-        Set<SessionUser> sessionList
-    ) {
+    private Mono<Void> close(String username, WebSocketSession session) {
+        sessionList.removeIf(it -> it.username().equals(username));
 
-        WebsocketDTO websocketDTO = new WebsocketDTO(
-            json.getString("type"),
-            0,
-            "",
-            false,
-            json.getString("status"),
-            null,
-            Instant.now().toString()
-        );
-
-        SessionUser mySession = sessionList.stream()
-            .filter(it -> it.username().equals(user.getUsername()))
-            .findFirst()
-            .orElseThrow();
-
-        if(!mySession.status().fromStringEquals(websocketDTO.status())) {
-            return statusReceiver.changeStatus(
-                user.getUsername(),
-                Status.fromString(websocketDTO.status()),
-                sessionList
-            );
+        if(sessionList.isEmpty()) {
+            return Mono.empty();
         }
 
-        return Mono.empty();
-    }
-
-    private Mono<Void> close(SessionUser sessionUser, WebSocketSession session) {
-        sessionList.remove(sessionUser);
         return session.send(statusReceiver.getUserList(session, sessionList))
             .then();
     }

@@ -11,6 +11,7 @@ import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -39,9 +40,16 @@ public class UserStatusReceiver {
                             ? memberResultMap.getFile().getFilePath() + memberResultMap.getFile().getFileName()
                             : "";
 
+                        Status status = sessionList.stream()
+                            .filter(it -> it.username().equals(memberResultMap.getMember().getUserId()))
+                            .findFirst()
+                            .map(SessionUser::status)
+                            .orElse(Status.ONLINE);
+
                         return UserStatus.builder()
+                                .id(memberResultMap.getMember().getId())
                                 .username(memberResultMap.getMember().getUserId())
-                                .status(Status.ONLINE)
+                                .status(status)
                                 .profileImage(profileImage)
                                 .build();
                         }
@@ -66,25 +74,40 @@ public class UserStatusReceiver {
 
     public Mono<Void> changeStatus(
         String username,
-        Status status,
+        JSONObject json,
         Set<SessionUser> sessionList
     ) {
 
-        SessionUser user = sessionList.stream()
-            .filter(sessionUser ->
-                sessionUser.username().equals(username)
-            ).findFirst()
+        SessionUser mySession = sessionList.stream()
+            .filter(it -> it.username().equals(username))
+            .findFirst()
             .orElse(null);
 
-        if(user == null) return Mono.empty();
+        if(mySession == null) return Mono.empty();
 
-        sessionList.remove(user);
+        if(mySession.status().fromStringEquals(json.getString("status"))) {
+            return Mono.empty();
+        }
+
+        WebsocketDTO websocketDTO = new WebsocketDTO(
+            json.getString("type"),
+            0,
+            "",
+            false,
+            json.getString("status"),
+            null,
+            Instant.now().toString()
+        );
+
+        Status status = Status.fromString(websocketDTO.status());
+
+        sessionList.remove(mySession);
 
         sessionList.add(new SessionUser(
-            user.username(),
+            mySession.username(),
             status,
-            user.roles(),
-            user.session()
+            mySession.roles(),
+            mySession.session()
         ));
 
         UserStatus userStatus = UserStatus.builder()
@@ -97,12 +120,12 @@ public class UserStatusReceiver {
             .data(userStatus)
             .build();
 
-        JSONObject json = new JSONObject(res);
+        JSONObject resJson = new JSONObject(res);
 
         return Flux.fromIterable(sessionList)
             .flatMap(session ->
                 session.session()
-                    .send(Mono.just(session.session().textMessage(json.toString())))
+                    .send(Mono.just(session.session().textMessage(resJson.toString())))
             )
             .then();
     }

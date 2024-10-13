@@ -12,6 +12,7 @@ import LoginState from "@/app/loginState";
 import {SearchHistoryProvider} from "@/app/{hooks}/searchHisotryHook";
 import {SearchParamsProvider} from "@/app/{hooks}/searchParamsHook";
 import Chat from "@/app/{components}/chats/chat";
+import {WebSocketProvider} from "@/app/{components}/chats/hook/useWebSocket";
 
 export const metadata: Metadata = {
     title: 'anamensis',
@@ -76,7 +77,9 @@ export default function RootLayout({
                     isLogin
                     && <>
                         <LoginState />
-                        <Chat />
+                        <WebSocketProvider>
+                            <Chat />
+                        </WebSocketProvider>
                     </>
                 }
                 <ProgressBar />

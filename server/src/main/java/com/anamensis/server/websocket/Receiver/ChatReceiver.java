@@ -7,7 +7,9 @@ import com.anamensis.server.resultMap.ChatRoomResultMap;
 import com.anamensis.server.service.ChatMessageService;
 import com.anamensis.server.service.ChatRoomService;
 import com.anamensis.server.service.UserService;
+import com.anamensis.server.websocket.dto.ResponseType;
 import com.anamensis.server.websocket.dto.SessionUser;
+import com.anamensis.server.websocket.dto.WebSocketResponse;
 import com.anamensis.server.websocket.dto.WebsocketDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import reactor.core.publisher.Mono;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Component
@@ -31,9 +34,18 @@ public class ChatReceiver {
 
     public Mono<Void> receiver(
         String username,
-        WebsocketDTO websocketDTO,
-        List<SessionUser> sessionUserList
+        JSONObject json,
+        Set<SessionUser> sessionUserList
     ) {
+        WebsocketDTO websocketDTO = new WebsocketDTO(
+            json.getString("type"),
+            json.getLong("routeId"),
+            json.getString("content"),
+            json.getBoolean("inputting"),
+            json.getString("status"),
+            null,
+            Instant.now().toString()
+        );
 
         Mono<Member> member = userService.findUserByUserId(username)
             .share();
@@ -72,7 +84,7 @@ public class ChatReceiver {
                 SessionUser sessionUser = tuple2.getT1();
                 ChatMessage chatMessage = tuple2.getT2();
 
-                ChatMessageResponse.ChatMessage res = new ChatMessageResponse().from(
+                ChatMessageResponse.ChatMessage resChatMessage = new ChatMessageResponse().from(
                     websocketDTO.routeId(),
                     websocketDTO.inputting(),
                     true,
@@ -80,10 +92,15 @@ public class ChatReceiver {
                     chatMessage
                 );
 
-                JSONObject json = new JSONObject(res);
+                WebSocketResponse<ChatMessageResponse.ChatMessage> res  = WebSocketResponse.<ChatMessageResponse.ChatMessage>builder()
+                    .type(ResponseType.CHAT)
+                    .data(resChatMessage)
+                    .build();
+
+                JSONObject resJson = new JSONObject(res);
 
                 return sessionUser.session()
-                    .send(Mono.just(sessionUser.session().textMessage(json.toString())));
+                    .send(Mono.just(sessionUser.session().textMessage(resJson.toString())));
             })
             .then();
 

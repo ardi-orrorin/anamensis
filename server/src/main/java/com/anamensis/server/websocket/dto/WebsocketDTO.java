@@ -10,6 +10,7 @@ public record WebsocketDTO(
     long routeId,
     String content,
     boolean inputting,
+    String status,
     DataBuffer data,
     String createdAt
 ) {

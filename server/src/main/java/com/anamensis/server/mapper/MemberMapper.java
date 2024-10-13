@@ -33,6 +33,8 @@ public interface MemberMapper {
 
     Optional<Member> findMemberByEmailAndUserId(String email, String userId);
 
+    List<MemberResultMap.ListItem> findMemberByUsernames(List<String> usernames);
+
     int editAuth(
             @Param("id") long id,
             @Param("isAuth") boolean isAuth,

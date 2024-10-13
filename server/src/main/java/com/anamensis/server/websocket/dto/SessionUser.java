@@ -7,6 +7,7 @@ import java.util.List;
 
 public record SessionUser(
     String username,
+    Status status,
     List<RoleType> roles,
     WebSocketSession session
 ) {}

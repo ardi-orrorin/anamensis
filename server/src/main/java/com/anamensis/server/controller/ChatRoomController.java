@@ -1,11 +1,9 @@
 package com.anamensis.server.controller;
 
-import com.anamensis.server.config.AuthConverter;
 import com.anamensis.server.dto.request.ChatRoomRequest;
 import com.anamensis.server.dto.response.ChatRoomResponse;
 import com.anamensis.server.resultMap.ChatRoomResultMap;
 import com.anamensis.server.service.ChatRoomService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -46,12 +44,9 @@ public class ChatRoomController {
         @AuthenticationPrincipal UserDetails principal
     ) {
         return chatRoomService.save(request, principal.getUsername())
-            .flatMap(chatRoomResultMap -> {
-                if(chatRoomResultMap.isEmpty()) {
-                    return Mono.error(new RuntimeException("ChatRoom not found"));
-                }
-                return Mono.just(new ChatRoomResponse().fromDetail(chatRoomResultMap.get()));
-            });
+            .flatMap(chatRoomResultMap ->
+                Mono.just(new ChatRoomResponse().fromDetail(chatRoomResultMap))
+            );
     }
 
 

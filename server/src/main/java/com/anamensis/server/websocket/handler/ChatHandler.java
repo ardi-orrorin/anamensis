@@ -9,6 +9,7 @@ import com.anamensis.server.websocket.dto.Status;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.socket.WebSocketHandler;
@@ -28,7 +29,7 @@ public class ChatHandler implements WebSocketHandler {
 
     private final Set<SessionUser> sessionList = new HashSet<>();
 
-    private Logger log = org.slf4j.LoggerFactory.getLogger(ChatHandler.class);
+    private Logger log = LoggerFactory.getLogger(ChatHandler.class);
 
     @Override
     public Mono<Void> handle(WebSocketSession session) {
@@ -62,27 +63,25 @@ public class ChatHandler implements WebSocketHandler {
                             .flatMap(message -> {
                                 JSONObject json = new JSONObject(message.getPayloadAsText());
 
-                                if(ChatType.CHAT.fromStringEquals(json.getString("type"))) {
-                                    return chatReceiver.receiver(
+                                return switch (ChatType.fromString(json.getString("type"))) {
+                                    case CHAT  -> chatReceiver.receiver(
                                         user.getUsername(),
                                         json,
                                         sessionList
                                     );
-                                }
-
-                                if(ChatType.STATUS.fromStringEquals(json.getString("type"))) {
-                                    return userReceiver.changeStatus(
+                                    case CHATROOM -> chatReceiver.getChatRoom(
+                                        user.getUsername(),
+                                        json,
+                                        session
+                                    );
+                                    case STATUS -> userReceiver.changeStatus(
                                         user.getUsername(),
                                         json,
                                         sessionList
                                     );
-                                }
-
-                                if(ChatType.USERINFO.fromStringEquals(json.getString("type"))) {
-                                    return userReceiver.getUserInfo(json, session, sessionList);
-                                }
-
-                                return Mono.empty();
+                                    case USERINFO -> userReceiver.getUserInfo(json, session, sessionList);
+                                    case null, default -> Mono.empty();
+                                };
                             })
                             .then()
                     )

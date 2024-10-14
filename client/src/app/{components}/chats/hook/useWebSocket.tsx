@@ -13,6 +13,7 @@ export interface WebSocketProviderI {
     chatList: ChatSpace.ChatListItem[];
     changeUserInfoByUsername: (username: string) => void;
     changeStatusHandler: (status: StatusEnum) => void;
+    findChatRoomId: (username: string) => void;
 }
 
 const WebSocketContext = createContext<WebSocketProviderI>({} as WebSocketProviderI);
@@ -58,6 +59,9 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
             case ChatSpace.WebSocketResponseType.CHAT:
                 chatHandler(res.data as ChatSpace.ChatMessage);
                 break;
+            case ChatSpace.WebSocketResponseType.CHATROOM:
+                chatRoomHandler(res.data as number);
+                break;
             case ChatSpace.WebSocketResponseType.SYSTEM:
                 systemHandler(res.data as string);
                 break;
@@ -76,6 +80,10 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
 
     const chatListHandler = useCallback((data: ChatSpace.ChatListItem[]) => {
         setChatList(data);
+    },[]);
+
+    const chatRoomHandler = useCallback((data: number) => {
+        console.log('chatRoom', data);
     },[]);
 
     const usersHandler = useCallback((data: ChatSpace.UserStatus[]) => {
@@ -129,10 +137,18 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
         }));
     }
 
+    const findChatRoomId = useCallback((username: string) => {
+        ws.send(JSON.stringify({
+            type: 'CHATROOM',
+            username
+        }));
+    },[ws]);
+
     return (
         <WebSocketContext.Provider value={{
             ws, users, userInfo, chatList,
-            changeUserInfoByUsername, changeStatusHandler
+            changeUserInfoByUsername, changeStatusHandler,
+            findChatRoomId
         }}>
             {children}
         </WebSocketContext.Provider>

@@ -83,4 +83,18 @@ class ChatRoomMapperTest {
 
         log.info("result: {}", result);
     }
+
+    @Test
+    void chatRoomIdByUsers() {
+
+        String firstUserId = "d-member-1";
+        String secondUserId = "admin1";
+
+        List<ChatRoomResultMap.ChatRomeUserCount> result = chatRoomMapper.chatRoomIdByUsers(firstUserId, secondUserId);
+
+        assertTrue(result.size() > 0);
+
+        log.info("result: {}", result);
+
+    }
 }

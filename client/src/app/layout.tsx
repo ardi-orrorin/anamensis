@@ -56,7 +56,6 @@ export default function RootLayout({
     // const gId = process.env.NEXT_PUBLIC_GID;
 
     const isLogin = (cookies()?.get('next.access.token')  || cookies()?.get('next.refresh.token')) !== undefined;
-    console.log('isLogin', cookies()?.get('next.access.token'));
 
     return (
         <html lang="ko">

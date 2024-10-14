@@ -23,12 +23,12 @@ const ProfileList = () => {
         <div className={'w-full max-h-80 flex flex-col gap-0.5 overflow-y-auto'}>
             {
                 users?.length > 0
-                && users.map(user => {
+                && users.map((user, index) => {
                     const status = UserStatus.fromString(user.status) ?? UserStatus.ONLINE;
 
                     return (
                         <button key={`profile-${user.id}`}
-                                className={'px-2 py-2 flex justify-between items-center hover:bg-gray-300 duration-300'}
+                                className={`px-2 py-2 flex justify-between items-center hover:bg-gray-300 duration-300 ${index === 0 && 'border-b-2 border-solid border-gray-200'}`}
                                 onClick={() => onClickUser(user.username)}
                         >
                             <div className={'flex gap-2 items-center'}>
@@ -41,7 +41,8 @@ const ProfileList = () => {
                                 <span>{user.username}</span>
                                 {
                                     userinfo.name === user.username
-                                    && <span className={'text-xs text-blue-500 font-bold'}>
+                                    && <span className={'text-xs text-blue-500 font-bold'}>v
+
                                         (나)
                                     </span>
                                 }

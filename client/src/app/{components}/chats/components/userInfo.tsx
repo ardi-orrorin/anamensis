@@ -4,7 +4,7 @@ import {defaultProfile} from "@/app/{commons}/func/image";
 
 const UserInfo = () => {
 
-    const {ws, userInfo} = useWebSocket();
+    const {ws, userInfo, findChatRoomId} = useWebSocket();
 
     return (
         <div className={'w-full py-4 flex flex-col gap-5 items-center justify-center'}>
@@ -44,7 +44,9 @@ const UserInfo = () => {
                 </table>
             </div>
             <div>
-                <button className={'w-16 h-8 text-xs rounded bg-gray-700 text-white'}>
+                <button className={'w-16 h-8 text-xs rounded bg-gray-700 text-white'}
+                        onClick={() => findChatRoomId(userInfo.userId)}
+                >
                     대화하기
                 </button>
             </div>

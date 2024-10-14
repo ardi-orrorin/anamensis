@@ -108,6 +108,14 @@
           AND is_oauth = FALSE
     </select>
 
+    <select id="findMemberByUserIds" resultType="member">
+        <include refid="tbl_member"/>
+        WHERE user_id IN
+        <foreach collection="userIds" item="userId" separator="," open="(" close=")">
+            #{userId}
+        </foreach>
+    </select>
+
     <select id="findMemberByUsernames" resultMap="memberListItemResultMap">
         SELECT *
              , f.id AS file_id

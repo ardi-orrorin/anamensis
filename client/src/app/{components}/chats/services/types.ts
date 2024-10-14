@@ -49,12 +49,13 @@ export namespace ChatSpace {
     export type UserInfo              = UserInfoI;
     export type ChatListItem         = ChatListItemI;
     export enum WebSocketResponseType {
-        CHAT   = 'CHAT',
-        STATUS = 'STATUS',
-        SYSTEM = 'SYSTEM',
-        ERROR  = 'ERROR',
-        USERS  = 'USERS',
-        USERINFO = 'USERINFO',
-        CHATLIST = 'CHATLIST',
+        CHAT        = 'CHAT',
+        CHATROOM    = 'CHATROOM',
+        STATUS      = 'STATUS',
+        SYSTEM      = 'SYSTEM',
+        ERROR       = 'ERROR',
+        USERS       = 'USERS',
+        USERINFO    = 'USERINFO',
+        CHATLIST    = 'CHATLIST',
     }
 }

@@ -38,7 +38,17 @@ public class ChatRoomService {
         return Mono.fromCallable(() -> chatRoomMapper.selectById(id));
     }
 
-    public Mono<Optional<ChatRoomResultMap.ChatRoom>> save(ChatRoomRequest.Create request, String username) {
+    public Mono<Long> hasChatRoomWithBothUsers(String firstUserId, String secondUserId) {
+        return Mono.fromCallable(() ->
+            chatRoomMapper.chatRoomIdByUsers(firstUserId, secondUserId)
+                .stream().filter(chatRoom -> chatRoom.getUserCount() == 2)
+                .findFirst()
+                .map(ChatRoomResultMap.ChatRomeUserCount::getId)
+                .orElse(0L)
+        );
+    }
+
+    public Mono<ChatRoomResultMap.ChatRoom> save(ChatRoomRequest.Create request, String username) {
         return Mono.fromCallable(()-> {
                 List<Long> participants = memberMapper.findMemberByUserIds(request.inviteUser())
                     .stream().map(Member::getId).toList();
@@ -51,7 +61,7 @@ public class ChatRoomService {
                     request.name(),
                     request.chatType(),
                     host.getId(),
-                    "대화에 참여하신 여러분 환영합니다.",
+                    "새로운 대화를 시작합니다.",
                     Instant.now(),
                     Instant.now()
                 );
@@ -62,7 +72,7 @@ public class ChatRoomService {
 
                 return chatRoom;
             })
-            .flatMap(chatRoom -> Mono.just(chatRoomMapper.selectById(chatRoom.getId())))
+            .flatMap(chatRoom -> Mono.justOrEmpty(chatRoomMapper.selectById(chatRoom.getId())))
             .switchIfEmpty(Mono.error(new RuntimeException("ChatRoom not found")));
     }
 

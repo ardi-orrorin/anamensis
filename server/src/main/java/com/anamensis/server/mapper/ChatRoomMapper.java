@@ -22,4 +22,5 @@ public interface ChatRoomMapper {
 
     List<ChatRoomResultMap.ChatRoomListItem> selectAll(String userId);
 
+    List<ChatRoomResultMap.ChatRomeUserCount> chatRoomIdByUsers(String firstUserId, String secondUserId);
 }

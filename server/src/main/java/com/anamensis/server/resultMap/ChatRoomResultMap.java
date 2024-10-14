@@ -8,6 +8,14 @@ import java.util.List;
 
 public class ChatRoomResultMap {
 
+
+    @Getter
+    @ToString
+    public static class ChatRomeUserCount {
+        private long id;
+        private long userCount;
+    }
+
     @Getter
     @ToString
     public static class ChatRoom {

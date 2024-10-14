@@ -12,6 +12,7 @@ import ChatList from "@/app/{components}/chats/components/chatList";
 import {useCallback, useEffect, useState} from "react";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import {useQuery} from "@tanstack/react-query";
+import {faWindowMinimize} from "@fortawesome/free-solid-svg-icons/faWindowMinimize";
 
 const Chat = () => {
 
@@ -55,9 +56,13 @@ const Chat = () => {
         <div className={'fixed z-[400] flex flex-col gap-2 left-5 bottom-5'}>
             {
                 activeMenu.toggle
-                && <div className={`flex flex-col ${isExpand ? 'w-[500px] h-[600px]' : 'w-80 h-80'} bg-white border-y-6 border-y-gray-800 border-solid text-sm rounded drop-shadow-xl shadow-black duration-500`}>
+                && <div className={`flex flex-col ${isExpand ? 'w-[90vw] sm:w-[400px] h-[80vh]' : 'w-80 h-80'} bg-white border-y-6 border-y-gray-800 border-solid text-sm rounded drop-shadow-xl shadow-black duration-500`}>
                     <header className={'flex px-2 justify-between items-center h-10 border-b border-solid border-gray-200 border-r-opacity-10'}>
-                        <FontAwesomeIcon icon={faComments} size={'sm'} className={'ms-1'} />
+                        <button className={'w-6 h-6 flex justify-center items-center hover:bg-gray-700 hover:text-white duration-300 rounded'}
+                                onClick={() => changeToggleHandler(!activeMenu.toggle)}
+                        >
+                            <FontAwesomeIcon icon={faWindowMinimize} size={'sm'} />
+                        </button>
                         <div className={'flex gap-2'}>
                             <select className={'text-xs w-20 h-6 bg-gray-200 rounded'}
                                     onChange={(e) => changeStatusHandler(e.target.value as StatusEnum)}
@@ -68,7 +73,7 @@ const Chat = () => {
                                 <option value={StatusEnum.WORKING}>작업중</option>
                                 <option value={StatusEnum.AWAY}>자리비움</option>
                             </select>
-                            <button className={'w-6 h-6 flex justify-center items-center hover:bg-gray-700 hover:text-white duration-300'}
+                            <button className={'w-6 h-6 flex justify-center items-center hover:bg-gray-700 hover:text-white duration-300 rounded'}
                                     onClick={() => setIsExpand(!isExpand)}
                             >
                                 <FontAwesomeIcon icon={isExpand ? faMinimize: faExpand} />

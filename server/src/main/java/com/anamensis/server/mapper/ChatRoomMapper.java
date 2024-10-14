@@ -14,7 +14,7 @@ public interface ChatRoomMapper {
 
     int saveChatRoomUser(long chatRoomId, List<Long> userIds);
 //
-//    int update(ChatRoom entity);
+    int updateLastMessage(long id, String lastMessage);
 //
 //    int delete(long id);
 //

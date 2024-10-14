@@ -19,9 +19,8 @@ export enum ActiveMenuEnum {
 export interface ChatMenuProviderI {
     activeMenu: ActiveMenuI;
     changeToggleHandler: (toggle: boolean) => void;
-    changeActiveMenuHandler: (type: ActiveMenuEnum) => void;
+    changeActiveMenuHandler: (type: ActiveMenuEnum, detailId: number) => void;
 }
-
 
 const ChatMenuContext = createContext<ChatMenuProviderI>({} as ChatMenuProviderI);
 
@@ -40,10 +39,10 @@ export const ChatMenuProvider = ({children}: { children: React.ReactNode }) => {
         })
     }
 
-    const changeActiveMenuHandler = (type: ActiveMenuEnum) => {
+    const changeActiveMenuHandler = (type: ActiveMenuEnum, detailId: number = 0) => {
         setActiveMenu({
             ...activeMenu,
-            detailId: 0,
+            detailId,
             type
         })
     }

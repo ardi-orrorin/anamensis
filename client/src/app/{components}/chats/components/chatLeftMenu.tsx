@@ -39,7 +39,7 @@ const ChatLeftMenuBtn = ({
     return (
         <button
             className={`w-full h-12 flex justify-center items-center border-b border-gray-200 hover:bg-gray-200 duration-300 ${activeMenu.type === value ? 'bg-gray-700 text-white' : ''}`}
-            onClick={() => changeActiveMenuHandler(value)}
+            onClick={() => changeActiveMenuHandler(value, 0)}
         >
             <FontAwesomeIcon icon={icon}/>
         </button>

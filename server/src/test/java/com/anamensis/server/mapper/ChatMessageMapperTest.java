@@ -1,6 +1,8 @@
 package com.anamensis.server.mapper;
 
+import com.anamensis.server.dto.response.ChatMessageResponse;
 import com.anamensis.server.entity.ChatMessage;
+import com.anamensis.server.resultMap.ChatMessageResultMap;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -58,7 +60,7 @@ class ChatMessageMapperTest {
 
     @Test
     void findAllByChatRoomId() {
-        List<ChatMessage> list = chatMessageMapper.findAllByChatRoomId(2L, Instant.now().minus(2, ChronoUnit.DAYS));
+        List<ChatMessageResultMap.Detail> list = chatMessageMapper.findAllByChatRoomId(2L, Instant.now().minus(2, ChronoUnit.DAYS));
 
         assertNotNull(list);
 

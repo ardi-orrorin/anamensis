@@ -1,6 +1,7 @@
 package com.anamensis.server.mapper;
 
 import com.anamensis.server.entity.ChatMessage;
+import com.anamensis.server.resultMap.ChatMessageResultMap;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.Instant;
@@ -11,5 +12,5 @@ public interface ChatMessageMapper {
 
     int save(ChatMessage chatMessage);
 
-    List<ChatMessage> findAllByChatRoomId(long chatRoomId, Instant createdAt);
+    List<ChatMessageResultMap.Detail> findAllByChatRoomId(long chatRoomId, Instant createdAt);
 }

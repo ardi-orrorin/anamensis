@@ -62,25 +62,17 @@ public class ChatHandler implements WebSocketHandler {
                         session.receive()
                             .flatMap(message -> {
                                 JSONObject json = new JSONObject(message.getPayloadAsText());
+                                String username = user.getUsername();
 
                                 return switch (ChatType.fromString(json.getString("type"))) {
-                                    case CHAT  -> chatReceiver.receiver(
-                                        user.getUsername(),
-                                        json,
-                                        sessionList
-                                    );
-                                    case CHATROOM -> chatReceiver.getChatRoom(
-                                        user.getUsername(),
-                                        json,
-                                        session
-                                    );
-                                    case STATUS -> userReceiver.changeStatus(
-                                        user.getUsername(),
-                                        json,
-                                        sessionList
-                                    );
-                                    case USERINFO -> userReceiver.getUserInfo(json, session, sessionList);
-                                    case null, default -> Mono.empty();
+                                    case CHAT           -> chatReceiver.receiver(username, json, sessionList);
+                                    case CHAT_ROOM_LIST -> chatReceiver.getChatRoomList(username, session);
+                                    case CHAT_MESSAGE   -> chatReceiver.getChatMessages(json, session);
+                                    case CHATROOM       -> chatReceiver.getChatRoom(username, json, session);
+                                    case STATUS         -> userReceiver.changeStatus(username, json, sessionList);
+                                    case USERINFO       -> userReceiver.getUserInfo(json, session, sessionList);
+                                    case null,
+                                         default   -> Mono.empty();
                                 };
                             })
                             .then()

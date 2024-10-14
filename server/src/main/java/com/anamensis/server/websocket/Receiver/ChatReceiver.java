@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 @Component
@@ -97,6 +98,25 @@ public class ChatReceiver {
             });
     }
 
+    public Mono<Void> getChatMessages(
+        JSONObject json,
+        WebSocketSession session
+    ) {
+        long chatRoomId = json.getLong("chatRoomId");
+
+        return chatMessageService.selectAllByRoomId(chatRoomId)
+            .flatMap( list -> {
+                WebSocketResponse<List<ChatMessageResponse.ChatMessage>> res = WebSocketResponse.<List<ChatMessageResponse.ChatMessage>>builder()
+                    .type(ResponseType.CHAT_MESSAGE)
+                    .data(list)
+                    .build();
+
+                JSONObject resJson = new JSONObject(res);
+
+                return session.send(Mono.just(session.textMessage(resJson.toString())));
+            });
+    }
+
 
     public Mono<Void> receiver(
         String username,
@@ -108,7 +128,7 @@ public class ChatReceiver {
             json.getLong("routeId"),
             json.getString("content"),
             json.getBoolean("inputting"),
-            json.getString("status"),
+            "",
             null,
             Instant.now().toString()
         );
@@ -134,41 +154,49 @@ public class ChatReceiver {
         })
         .share();
 
+        AtomicReference<List<SessionUser>> connectedUser = new AtomicReference<>();
+
         return chatRoom
             .flatMapMany( chatRoom1 -> {
                 List<String> users = chatRoom1.getParticipants().stream()
                     .map(Member::getUserId).toList();
 
-                List<SessionUser> connectedUser = sessionUserList.stream()
+                List<SessionUser> user = sessionUserList.stream()
                     .filter( it -> users.contains(it.username()))
                     .toList();
 
-                return Flux.fromIterable(connectedUser);
+                connectedUser.set(user);
+
+                return Flux.fromIterable(connectedUser.get());
             })
-            .zipWith(chat)
-            .flatMap( tuple2 -> {
-                SessionUser sessionUser = tuple2.getT1();
-                ChatMessage chatMessage = tuple2.getT2();
+            .flatMap(sessionUser ->
+                chat.flatMap( chatMessage -> {
+                    ChatMessageResponse.ChatMessage resChatMessage = new ChatMessageResponse().from(
+                        websocketDTO.routeId(),
+                        websocketDTO.inputting(),
+                        true,
+                        username,
+                        chatMessage
+                    );
 
-                ChatMessageResponse.ChatMessage resChatMessage = new ChatMessageResponse().from(
-                    websocketDTO.routeId(),
-                    websocketDTO.inputting(),
-                    true,
-                    username,
-                    chatMessage
-                );
+                    WebSocketResponse<ChatMessageResponse.ChatMessage> res  = WebSocketResponse.<ChatMessageResponse.ChatMessage>builder()
+                        .type(ResponseType.CHAT)
+                        .data(resChatMessage)
+                        .build();
 
-                WebSocketResponse<ChatMessageResponse.ChatMessage> res  = WebSocketResponse.<ChatMessageResponse.ChatMessage>builder()
-                    .type(ResponseType.CHAT)
-                    .data(resChatMessage)
-                    .build();
+                    JSONObject resJson = new JSONObject(res);
 
-                JSONObject resJson = new JSONObject(res);
+                    return sessionUser.session()
+                        .send(Mono.just(sessionUser.session().textMessage(resJson.toString())));
+                })
+            )
+            .then(Mono.defer(() ->
+                chatRoomService.updateLastMessage(websocketDTO.routeId(), websocketDTO.content()))
+                    .flatMapIterable( it -> connectedUser.get())
+                    .flatMap( it -> this.getChatRoomList(it.username(), it.session()))
+                    .then()
+            );
 
-                return sessionUser.session()
-                    .send(Mono.just(sessionUser.session().textMessage(resJson.toString())));
-            })
-            .then();
 
     }
 }

@@ -11,6 +11,7 @@ export interface WebSocketProviderI {
     users: ChatSpace.UserStatus[];
     userInfo: ChatSpace.UserInfo;
     chatList: ChatSpace.ChatListItem[];
+    chatMessages: ChatSpace.Chatting;
     changeUserInfoByUsername: (username: string) => void;
     changeStatusHandler: (status: StatusEnum) => void;
     findChatRoomId: (username: string) => void;
@@ -24,23 +25,28 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
     const [users, setUsers] = useState<ChatSpace.UserStatus[]>([]);
     const [userInfo, setUserInfo] = useState<ChatSpace.UserInfo>({} as ChatSpace.UserInfo);
     const [chatList, setChatList] = useState<ChatSpace.ChatListItem[]>([]);
+    const [chatMessages, setChatMessages] = useState<ChatSpace.Chatting>({chatMessages: new Set()} as ChatSpace.Chatting);
+
     const {data: userinfo} = useQuery(userInfoApiService.profile())
 
     useEffect(() => {
-        const ws = new WebSocket(process.env.NEXT_PUBLIC_WEBSOCKET_SERVER + '/ws/chat/123');
-
-        ws.onopen = () => {
-            console.log('connected');
+        const init = () => {
+            const newWs = new WebSocket(process.env.NEXT_PUBLIC_WEBSOCKET_SERVER + '/ws/chat/123');
+            setWs(newWs);
         }
 
-        ws.onclose = () => {
-            console.log('disconnected');
-        }
+        init();
 
-        setWs(ws);
+        const retry = setInterval(() => {
+            if(ws.readyState === ws.OPEN) return;
+
+            ws.close();
+            init();
+        }, 5000);
 
         return () => {
             ws.close();
+            clearInterval(retry);
         }
 
     }, []);
@@ -59,6 +65,9 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
             case ChatSpace.WebSocketResponseType.CHAT:
                 chatHandler(res.data as ChatSpace.ChatMessage);
                 break;
+            case ChatSpace.WebSocketResponseType.CHAT_MESSAGE:
+                chatMessageHandler(res as ChatSpace.WebSocketResponse<ChatSpace.ChatMessage[]>);
+                break;
             case ChatSpace.WebSocketResponseType.CHATROOM:
                 chatRoomHandler(res.data as number);
                 break;
@@ -68,7 +77,6 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
             case ChatSpace.WebSocketResponseType.USERINFO:
                 userInfoHandler(res.data as ChatSpace.UserInfo);
                 break;
-
             case ChatSpace.WebSocketResponseType.CHATLIST:
                 chatListHandler(res.data as ChatSpace.ChatListItem[]);
                 break;
@@ -77,6 +85,11 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
                 break;
         }
     }
+
+    const chatMessageHandler = useCallback((res: ChatSpace.WebSocketResponse<ChatSpace.ChatMessage[]>) => {
+        res.data.forEach(chat => chatMessages.chatMessages.add(chat));
+        setChatMessages({...chatMessages, createdAt: res.createdAt});
+    },[chatMessages]);
 
     const chatListHandler = useCallback((data: ChatSpace.ChatListItem[]) => {
         setChatList(data);
@@ -99,7 +112,6 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
     },[userinfo.name]);
 
     const userInfoHandler = useCallback((data: ChatSpace.UserInfo) => {
-        console.log('userInfo',data);
         setUserInfo(data);
     },[]);
 
@@ -118,8 +130,9 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
     },[]);
 
     const chatHandler = useCallback((data: ChatSpace.ChatMessage) => {
-        console.log('chat', data);
-    },[]);
+        chatMessages.chatMessages.add(data);
+        setChatMessages({...chatMessages, createdAt: data.createdAt});
+    },[chatMessages]);
 
     const changeUserInfoByUsername = useCallback((username: string) => {
         ws.send(JSON.stringify({
@@ -129,13 +142,14 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
     },[ws]);
 
 
-    const changeStatusHandler = (status: StatusEnum) => {
+    // fixme: 탭 이동으로 dom 비활성화 시 not a funtction 에러 뜸
+    const changeStatusHandler = useCallback((status: StatusEnum) => {
         if(!ws || ws.readyState !== ws.OPEN) return;
         ws?.send(JSON.stringify({
             type: 'STATUS',
             status: status
         }));
-    }
+    }, []);
 
     const findChatRoomId = useCallback((username: string) => {
         ws.send(JSON.stringify({
@@ -146,7 +160,7 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
 
     return (
         <WebSocketContext.Provider value={{
-            ws, users, userInfo, chatList,
+            ws, users, userInfo, chatList, chatMessages,
             changeUserInfoByUsername, changeStatusHandler,
             findChatRoomId
         }}>

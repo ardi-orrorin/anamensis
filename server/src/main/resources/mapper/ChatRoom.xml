@@ -67,6 +67,13 @@
         VALUES (#{name}, #{type}, #{hostId}, #{lastMessage}, #{createdAt}, #{updatedAt})
     </insert>
 
+    <update id="updateLastMessage" parameterType="ChatRoom">
+        UPDATE chat_room
+           SET last_message = #{lastMessage}
+             , updated_at = now()
+         WHERE id = #{id}
+    </update>
+
     <insert id="saveChatRoomUser">
         INSERT INTO chat_room_user (chat_room_id, user_id)
         <foreach collection="userIds" item="userId" separator="," open="VALUES">

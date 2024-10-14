@@ -2,6 +2,7 @@ package com.anamensis.server.service;
 
 import com.anamensis.server.dto.request.ChatRoomRequest;
 import com.anamensis.server.dto.response.ChatRoomResponse;
+import com.anamensis.server.entity.Board;
 import com.anamensis.server.entity.ChatMessage;
 import com.anamensis.server.entity.ChatRoom;
 import com.anamensis.server.entity.Member;
@@ -74,6 +75,12 @@ public class ChatRoomService {
             })
             .flatMap(chatRoom -> Mono.justOrEmpty(chatRoomMapper.selectById(chatRoom.getId())))
             .switchIfEmpty(Mono.error(new RuntimeException("ChatRoom not found")));
+    }
+
+    public Mono<Boolean> updateLastMessage(long id, String content) {
+        return Mono.fromCallable(() ->
+            chatRoomMapper.updateLastMessage(id, content) > 0
+        );
     }
 
 }

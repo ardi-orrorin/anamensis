@@ -5,9 +5,13 @@
 
 <mapper namespace="com.anamensis.server.mapper.ChatMessageMapper">
 
-    <select id="findAllByChatRoomId" resultType="ChatMessage">
+    <select id="findAllByChatRoomId" resultMap="ChatMessageResultMap">
         SELECT *
-          FROM chat_message
+             , m.id  AS sender_id
+             , cm.id AS chat_message_id
+          FROM chat_message cm
+          JOIN member m
+            ON cm.sender_user_id = m.id
          WHERE chat_room_id = #{chatRoomId}
         <if test="createdAt != null">
             AND created_at &gt;= #{createdAt}
@@ -22,4 +26,19 @@
         INSERT INTO chat_message (chat_room_id, sender_user_id, content, created_at)
         VALUES (#{chatRoomId}, #{senderUserId}, #{content}, #{createdAt})
     </insert>
+    
+    <resultMap id="ChatMessageResultMap" type="com.anamensis.server.resultMap.ChatMessageResultMap$Detail">
+        <id property="id" column="chat_message_id"/>
+        <association property="chatMessage" resultMap="ChatMessageEntity"/>
+        <association property="sender" resultMap="MemberEntity"/>
+    </resultMap>
+
+    <resultMap id="ChatMessageEntity" type="ChatMessage" autoMapping="true">
+        <id property="id" column="chat_message_id"/>
+    </resultMap>
+
+    <resultMap id="MemberEntity" type="Member" autoMapping="true">
+        <id property="id" column="sender_id"/>
+    </resultMap>
+
 </mapper>

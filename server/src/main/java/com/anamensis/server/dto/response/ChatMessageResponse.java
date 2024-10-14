@@ -1,5 +1,7 @@
 package com.anamensis.server.dto.response;
 
+import com.anamensis.server.resultMap.ChatMessageResultMap;
+import com.zaxxer.hikari.util.ConcurrentBag;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
@@ -21,9 +23,21 @@ public class ChatMessageResponse {
         private String createdAt;
     }
 
+    public ChatMessage from(ChatMessageResultMap.Detail resultMap) {
+        return new ChatMessage(
+            resultMap.getId(),
+            resultMap.getChatMessage().getChatRoomId(),
+            resultMap.getSender().getUserId(),
+            false,
+            true,
+            resultMap.getChatMessage().getContent(),
+            resultMap.getChatMessage().getCreatedAt().toString()
+        );
+    }
+
     public ChatMessage from(long id, boolean inputting, boolean completed, String username, com.anamensis.server.entity.ChatMessage chat) {
         return new ChatMessage(
-            id,
+            id == 0 ? chat.getId() : id,
             chat.getChatRoomId(),
             username,
             inputting,

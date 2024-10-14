@@ -3,6 +3,8 @@ package com.anamensis.server.dto;
 public enum ChatType {
     CHAT,
     CHATROOM,
+    CHAT_ROOM_LIST,
+    CHAT_MESSAGE,
     SERVICE,
     STATUS,
     USERINFO;

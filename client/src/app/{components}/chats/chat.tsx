@@ -13,6 +13,7 @@ import {useCallback, useEffect, useState} from "react";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import {useQuery} from "@tanstack/react-query";
 import {faWindowMinimize} from "@fortawesome/free-solid-svg-icons/faWindowMinimize";
+import Chatting from "@/app/{components}/chats/components/chatting";
 
 const Chat = () => {
 
@@ -88,7 +89,7 @@ const Chat = () => {
                             : ActiveMenuEnum.CHATLIST === activeMenu.type
                             ? <ChatList />
                             : ActiveMenuEnum.CHAT === activeMenu.type
-                            ? <div>Chat</div>
+                            ? <Chatting />
                             : ActiveMenuEnum.INFO === activeMenu.type
                             ? <UserInfo />
                             : <></>

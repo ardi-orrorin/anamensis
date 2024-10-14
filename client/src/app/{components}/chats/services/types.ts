@@ -16,6 +16,11 @@ interface ChatMessageI {
     createdAt  : string;
 }
 
+interface ChattingI {
+    createdAt : string;
+    chatMessages: Set<ChatMessageI>;
+}
+
 interface UserStatusI {
     id           : number;
     username     : string;
@@ -47,15 +52,17 @@ export namespace ChatSpace {
     export type ChatMessage           = ChatMessageI;
     export type UserStatus            = UserStatusI;
     export type UserInfo              = UserInfoI;
-    export type ChatListItem         = ChatListItemI;
+    export type ChatListItem          = ChatListItemI;
+    export type Chatting              = ChattingI;
     export enum WebSocketResponseType {
-        CHAT        = 'CHAT',
-        CHATROOM    = 'CHATROOM',
-        STATUS      = 'STATUS',
-        SYSTEM      = 'SYSTEM',
-        ERROR       = 'ERROR',
-        USERS       = 'USERS',
-        USERINFO    = 'USERINFO',
-        CHATLIST    = 'CHATLIST',
+        CHAT            = 'CHAT',
+        CHAT_MESSAGE    = 'CHAT_MESSAGE',
+        CHATROOM        = 'CHATROOM',
+        STATUS          = 'STATUS',
+        SYSTEM          = 'SYSTEM',
+        ERROR           = 'ERROR',
+        USERS           = 'USERS',
+        USERINFO        = 'USERINFO',
+        CHATLIST        = 'CHATLIST',
     }
 }

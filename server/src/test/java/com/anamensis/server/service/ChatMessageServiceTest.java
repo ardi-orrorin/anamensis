@@ -51,4 +51,17 @@ class ChatMessageServiceTest {
             .verifyComplete();
 
     }
+
+    @Test
+    void selectAllByRoomId() {
+        StepVerifier.create(cms.selectAllByRoomId(2L))
+            .expectNextMatches(list -> {
+                log.info("list: {}", list);
+
+                assertTrue(list.size() > 0);
+                return true;
+            })
+
+            .verifyComplete();
+    }
 }

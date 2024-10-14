@@ -4,7 +4,6 @@ import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import React, {useMemo} from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {NO_PROFILE} from "@/app/{services}/constants";
 import {defaultProfile} from "@/app/{commons}/func/image";
 
 const ProfileInfo = () => {
@@ -43,7 +42,7 @@ const ProfileInfo = () => {
                                  width={90}
                                  className={'shadow rounded-full'}
                                  onError={(e) => {
-                                     e.currentTarget.src = NO_PROFILE
+                                     e.currentTarget.src = defaultProfile('')
                                  }}
                         />
                     </button>

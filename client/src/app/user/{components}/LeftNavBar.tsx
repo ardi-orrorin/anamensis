@@ -157,7 +157,7 @@ const LeftNavBar = ({
                                priority={true}
                                fetchPriority={"high"}
                                onError={e => {
-                                     e.currentTarget.src = NO_PROFILE;
+                                     e.currentTarget.src = defaultProfile('');
                                }}
                         />
                     </Link>

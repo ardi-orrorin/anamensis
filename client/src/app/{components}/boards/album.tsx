@@ -35,7 +35,7 @@ const AlbumBoardComponent = (props: Root.BoardListI) => {
                            alt={''}
                            priority={true}
                            onError={(e) => {
-                               (e.target as HTMLImageElement).src = NO_IMAGE;
+                               e.currentTarget.src = defaultNoImg('');
                            }}
                     />
                     <span className={'absolute z-10 bg-gray-500 text-white w-8 h-8 flex justify-center items-center text-xs right-0 bottom-0'}>

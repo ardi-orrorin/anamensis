@@ -1,92 +1,104 @@
 'use client';
 
-import {faCommentDots, faUser} from "@fortawesome/free-solid-svg-icons";
+import {faCommentDots, faComments, faExpand, faMinimize} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useWebSocket} from "@/app/{components}/chats/hook/useWebSocket";
-import {useState} from "react";
-import {defaultProfile} from "@/app/{commons}/func/image";
-import {ChatSpace} from "@/app/{components}/chats/services/types";
-import {StatusEnum, UserStatus} from "@/app/{components}/chats/services/Status";
+import {StatusEnum} from "@/app/{components}/chats/services/Status";
+import ProfileList from "@/app/{components}/chats/components/profileList";
+import ChatLeftMenu from "@/app/{components}/chats/components/chatLeftMenu";
+import {ActiveMenuEnum, useChatMenu} from "@/app/{components}/chats/hook/useChatMenu";
+import UserInfo from "@/app/{components}/chats/components/userInfo";
+import ChatList from "@/app/{components}/chats/components/chatList";
+import {useCallback, useEffect, useState} from "react";
+import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
+import {useQuery} from "@tanstack/react-query";
 
 const Chat = () => {
 
-    const {ws, users} = useWebSocket();
-    const [toggle, setToggle] = useState<boolean>(false);
-    const [activeMenu, setActiveMenu] = useState<string>('');
+    const {users, changeStatusHandler} = useWebSocket();
+    const { activeMenu, changeToggleHandler } = useChatMenu();
+    const {data: userinfo} = useQuery(userInfoApiService.profile())
 
-    const changeStatus = (status: StatusEnum) => {
-        ws?.send(JSON.stringify({
-            type: 'STATUS',
-            status: status
-        }));
+    const [isExpand, setIsExpand] = useState<boolean>(false);
+    const [prevStatus, setPrevStatus] = useState<StatusEnum>(StatusEnum.ONLINE);
 
-    }
+    const [awayTimeout, setAwayTimeout] = useState<NodeJS.Timeout>();
+
+    useEffect(() => {
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, []);
+
+    const handleVisibilityChange = useCallback(() => {
+        const wait = 1000 * 60 * 5;
+        if (document.visibilityState === 'hidden') {
+            const change = setTimeout(() => {
+                const prevStatus = users.find(user =>
+                    user.username === userinfo.name
+                )?.status ?? StatusEnum.ONLINE;
+
+                changeStatusHandler(StatusEnum.AWAY);
+                setPrevStatus(prevStatus);
+            }, wait);
+            setAwayTimeout(change);
+        } else {
+            changeStatusHandler(prevStatus);
+            clearTimeout(awayTimeout);
+        }
+    }, [awayTimeout, changeStatusHandler, prevStatus, userinfo.name, users]);
+
 
     return (
         <div className={'fixed z-[400] flex flex-col gap-2 left-5 bottom-5'}>
             {
-                toggle
-                && <div className={'flex flex-col w-80 h-80 bg-white border-y-4 border-y-gray-800 border-solid  text-sm rounded drop-shadow-xl shadow-black'}>
-                    <header className={'flex px-2 justify-between items-center h-8 border-b border-solid border-gray-200 border-r-opacity-10'}>
-                        <span>Chat</span>
-                        <select className={'text-xs w-20 h-4 bg-gray-200 rounded'}
-                                onChange={(e) => changeStatus(e.target.value as StatusEnum)}
-                        >
-                            <option value={'ONLINE'}>온라인</option>
-                            <option value={'OFFLINE'}>오프라인</option>
-                            <option value={'WORKING'}>작업중</option>
-                            <option value={'AWAY'}>자리비움</option>
-                        </select>
-
+                activeMenu.toggle
+                && <div className={`flex flex-col ${isExpand ? 'w-[500px] h-[600px]' : 'w-80 h-80'} bg-white border-y-6 border-y-gray-800 border-solid text-sm rounded drop-shadow-xl shadow-black duration-500`}>
+                    <header className={'flex px-2 justify-between items-center h-10 border-b border-solid border-gray-200 border-r-opacity-10'}>
+                        <FontAwesomeIcon icon={faComments} size={'sm'} className={'ms-1'} />
+                        <div className={'flex gap-2'}>
+                            <select className={'text-xs w-20 h-6 bg-gray-200 rounded'}
+                                    onChange={(e) => changeStatusHandler(e.target.value as StatusEnum)}
+                                    value={users.find(user => user.username === userinfo.name)?.status}
+                            >
+                                <option value={StatusEnum.ONLINE}>온라인</option>
+                                <option value={StatusEnum.OFFLINE}>오프라인</option>
+                                <option value={StatusEnum.WORKING}>작업중</option>
+                                <option value={StatusEnum.AWAY}>자리비움</option>
+                            </select>
+                            <button className={'w-6 h-6 flex justify-center items-center hover:bg-gray-700 hover:text-white duration-300'}
+                                    onClick={() => setIsExpand(!isExpand)}
+                            >
+                                <FontAwesomeIcon icon={isExpand ? faMinimize: faExpand} />
+                            </button>
+                        </div>
                     </header>
-                    <div className={'flex h-full drop'}>
-                        <nav className={'flex justify-center gap-1 min-w-16 max-w-16 border-r border-solid border-gray-200 border-r-opacity-10'}>
-                            <div className={'w-full flex justify-center'}>
-                              <button className={'w-10 h-10 m-2 flex justify-center items-center rounded-full bg-gray-200'}
-                                      onClick={() => setActiveMenu('profile')}
-                              >
-                                <FontAwesomeIcon icon={faUser} />
-                              </button>
-                            </div>
-                        </nav>
+                    <div className={'flex h-full overflow-y-auto'}>
+                        <ChatLeftMenu />
                         {
-                            activeMenu === 'profile'
-                            && profileList({users})
+                            ActiveMenuEnum.PROFILE === activeMenu.type
+                            ? <ProfileList />
+                            : ActiveMenuEnum.CHATLIST === activeMenu.type
+                            ? <ChatList />
+                            : ActiveMenuEnum.CHAT === activeMenu.type
+                            ? <div>Chat</div>
+                            : ActiveMenuEnum.INFO === activeMenu.type
+                            ? <UserInfo />
+                            : <></>
                         }
                     </div>
                 </div>
             }
             <button
                 className={'w-14 h-14 flex justify-center items-center drop-shadow-md shadow-black bg-white rounded-full'}
-                onClick={() => setToggle(!toggle)}
+                onClick={() => changeToggleHandler(!activeMenu.toggle)}
             >
                 <FontAwesomeIcon icon={faCommentDots} size={'xl'} />
             </button>
         </div>
     )
-}
-
-const profileList = ({users}:{users: ChatSpace.UserStatus[]}) => {
-
-    return (
-        <div className={'w-full max-h-80 flex flex-col gap-0.5 overflow-y-auto'}>
-            {
-                users?.length > 0
-                && users?.map((user, index) => (
-                    <div key={index} className={'px-2 py-2 flex items-center gap-2 hover:bg-gray-300 duration-300'}>
-                        <img className={`w-7 h-7 rounded-2xl border-4 border-solid border-${UserStatus.fromString(user.status)?.color}`}
-                             src={defaultProfile(user.profileImage)}
-                             alt={''}
-                             onError={(e) => {
-                                 e.currentTarget.src = defaultProfile("")
-                             }}/>
-                        <span>{user.username}</span>
-                    </div>
-                ))
-            }
-        </div>
-    )
-
 }
 
 export default Chat;

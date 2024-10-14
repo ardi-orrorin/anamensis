@@ -423,11 +423,11 @@ const ImageThumb = ({
             <>
                 <div className={'relative w-full sm:w-auto'}>
                     <img className={'w-full h-[200px] sm:w-[150px] sm:h-[150px] sm:min-w-[150px] sm:min-h-[150px] object-cover rounded'}
-                         src={thumb}
+                         src={defaultNoImg(thumb)}
                          alt={'대표 이미지'}
                          onClick={onChangeImageHandler}
                          onError={e => {
-                             e.currentTarget.src = NO_IMAGE;
+                             e.currentTarget.src = defaultNoImg('');
                          }}
                     />
                     {
@@ -453,10 +453,10 @@ const ImageThumb = ({
                 <Image className={'w-full h-[200px] sm:w-[150px] sm:h-[150px] sm:min-w-[150px] sm:min-h-[150px] object-cover rounded duration-500'}
                        width={150}
                        height={150}
-                       src={thumb}
+                       src={defaultNoImg(thumb)}
                        alt={'대표 이미지'}
                        onError={e => {
-                           e.currentTarget.src = NO_IMAGE;
+                           e.currentTarget.src = defaultNoImg('');
                        }}
                        onMouseEnter={()=> setImgViewProps(prevState => ({
                            ...prevState,
@@ -486,7 +486,7 @@ const ImageThumb = ({
                                 viewImg: false
                             }))}
                     >
-                    <Image src={oriImg}
+                    <Image src={defaultNoImg(oriImg)}
                            alt={'원본 이미지'}
                            width={700}
                            height={700}
@@ -495,7 +495,7 @@ const ImageThumb = ({
                                viewImg: false
                            }))}
                            onError={e => {
-                               e.currentTarget.src = NO_IMAGE;
+                               e.currentTarget.src = defaultNoImg('');
                            }}
                     />
                   </div>

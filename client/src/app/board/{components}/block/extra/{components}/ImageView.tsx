@@ -71,7 +71,7 @@ const ImageView = ({
                        priority={true}
                        alt={'view'}
                        onError={(e) => {
-                           e.currentTarget.src = NO_IMAGE;
+                           e.currentTarget.src = defaultNoImg('');
                        }}
                 />
                 <div className={'z-40 fixed top-0 left-0 w-full h-full flex justify-between'}>

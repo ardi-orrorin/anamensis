@@ -70,6 +70,11 @@
           FROM member a
           JOIN role b
             ON a.id       = b.member_pk
+          LEFT JOIN file f
+            ON a.id       = f.table_ref_pk
+           AND f.table_code_pk = (SELECT id
+                                    FROM table_code
+                                   WHERE table_name = 'member')
          WHERE a.user_id  = #{userId}
            AND a.is_use   = TRUE
     </select>
@@ -209,6 +214,7 @@
     <resultMap id="memberResultMap" type="MemberResultMap" autoMapping="true">
         <id property="memberPk" column="id"/>
         <association property="member" resultMap="MemberEntity" autoMapping="true" />
+        <association property="file" resultMap="FileEntity" autoMapping="true" />
         <collection property="roles" resultMap="RoleEntity" />
     </resultMap>
 

@@ -3,7 +3,7 @@ package com.anamensis.server.websocket.handler;
 import com.anamensis.server.dto.ChatType;
 import com.anamensis.server.dto.UserDto;
 import com.anamensis.server.websocket.Receiver.ChatReceiver;
-import com.anamensis.server.websocket.Receiver.UserStatusReceiver;
+import com.anamensis.server.websocket.Receiver.UserReceiver;
 import com.anamensis.server.websocket.dto.SessionUser;
 import com.anamensis.server.websocket.dto.Status;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class ChatHandler implements WebSocketHandler {
 
     private final ChatReceiver chatReceiver;
 
-    private final UserStatusReceiver statusReceiver;
+    private final UserReceiver userReceiver;
 
     private final Set<SessionUser> sessionList = new HashSet<>();
 
@@ -43,7 +43,8 @@ public class ChatHandler implements WebSocketHandler {
 
                         log.info("sessionList: {}", sessionList);
 
-                        return session.send(statusReceiver.getUserList(session, sessionList))
+                        return session.send(userReceiver.getUserList(session, sessionList))
+                            .and(chatReceiver.getChatRoomList(user.getUsername(), session))
                             .and(this.receive(session))
                             .then()
                             .doFinally(it -> this.close(user.getUsername(), session).subscribe());
@@ -70,11 +71,15 @@ public class ChatHandler implements WebSocketHandler {
                                 }
 
                                 if(ChatType.STATUS.fromStringEquals(json.getString("type"))) {
-                                    return statusReceiver.changeStatus(
+                                    return userReceiver.changeStatus(
                                         user.getUsername(),
                                         json,
                                         sessionList
                                     );
+                                }
+
+                                if(ChatType.USERINFO.fromStringEquals(json.getString("type"))) {
+                                    return userReceiver.getUserInfo(json, session, sessionList);
                                 }
 
                                 return Mono.empty();
@@ -91,7 +96,7 @@ public class ChatHandler implements WebSocketHandler {
             return Mono.empty();
         }
 
-        return session.send(statusReceiver.getUserList(session, sessionList))
+        return session.send(userReceiver.getUserList(session, sessionList))
             .then();
     }
 

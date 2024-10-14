@@ -6,15 +6,6 @@ interface WebSocketResponseI<T> {
     createdAt : string;
 }
 
-enum WebSocketResponseTypeEnum {
-    CHAT   = 'CHAT',
-    STATUS = 'STATUS',
-    SYSTEM = 'SYSTEM',
-    ERROR  = 'ERROR',
-    USERS  = 'USERS',
-}
-
-
 interface ChatMessageI {
     id         : number;
     chatRoomId : number;
@@ -27,14 +18,43 @@ interface ChatMessageI {
 
 interface UserStatusI {
     id           : number;
-    username     : number;
+    username     : string;
     status       : StatusEnum;
     profileImage : string;
+}
+
+interface UserInfoI {
+    id           : number;
+    userId       : string;
+    email        : string;
+    name         : string;
+    phone        : string;
+    point        : string;
+    profileImage : string;
+}
+
+interface ChatListItemI {
+    id         : number;
+    name       : string;
+    type       : string;
+    lastMessage: string;
+    userCount  : number;
+    updatedAt  : string;
 }
 
 export namespace ChatSpace {
     export type WebSocketResponse<T>  = WebSocketResponseI<T>;
     export type ChatMessage           = ChatMessageI;
-    export type WebSocketResponseType = WebSocketResponseTypeEnum;
     export type UserStatus            = UserStatusI;
+    export type UserInfo              = UserInfoI;
+    export type ChatListItem         = ChatListItemI;
+    export enum WebSocketResponseType {
+        CHAT   = 'CHAT',
+        STATUS = 'STATUS',
+        SYSTEM = 'SYSTEM',
+        ERROR  = 'ERROR',
+        USERS  = 'USERS',
+        USERINFO = 'USERINFO',
+        CHATLIST = 'CHATLIST',
+    }
 }

@@ -29,7 +29,7 @@ public class ChatRoomService {
     public Mono<List<ChatRoomResponse.ListItem>> selectAllByUsername(String username) {
         return Flux.fromIterable(chatRoomMapper.selectAll(username))
             .flatMap(chatRoom->
-                Mono.just(new ChatRoomResponse().fromListItem(chatRoom))
+                Mono.just(ChatRoomResponse.ListItem.fromListItem(chatRoom))
             )
             .collectList();
         }

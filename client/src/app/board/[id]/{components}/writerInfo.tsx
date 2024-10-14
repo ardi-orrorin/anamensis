@@ -25,7 +25,7 @@ const WriterInfo = ({
                        alt={'profile'}
                        src={defaultProfile(board.data.profileImage)}
                        onError={(e) => {
-                           e.currentTarget.src = NO_PROFILE;
+                           e.currentTarget.src = defaultProfile('');
                        }}
                 />
                 <div className={'flex flex-col gap-2'}>

@@ -2,29 +2,33 @@ package com.anamensis.server.dto.response;
 
 import com.anamensis.server.entity.Member;
 import com.anamensis.server.resultMap.ChatRoomResultMap;
+import lombok.Builder;
+import lombok.Getter;
 
 import java.util.List;
 
 public class ChatRoomResponse {
 
-    public record ListItem(
-        Long id,
-        String name,
-        String type,
-        String lastMessage,
-        int userCount,
-        String updatedAt
-    ) {}
+    @Getter
+    @Builder
+    public static class ListItem {
+        private Long id;
+        private String name;
+        private String type;
+        private String lastMessage;
+        private int userCount;
+        private String updatedAt;
 
-    public ListItem fromListItem(ChatRoomResultMap.ChatRoomListItem resultMap) {
-        return new ListItem(
-            resultMap.getId(),
-            resultMap.getChatRoom().getName(),
-            resultMap.getChatRoom().getType().name(),
-            resultMap.getChatRoom().getLastMessage(),
-            resultMap.getUserCount(),
-            resultMap.getChatRoom().getUpdatedAt().toString()
-        );
+        public static ListItem fromListItem(ChatRoomResultMap.ChatRoomListItem resultMap) {
+            return new ListItem(
+                resultMap.getId(),
+                resultMap.getChatRoom().getName(),
+                resultMap.getChatRoom().getType().name(),
+                resultMap.getChatRoom().getLastMessage(),
+                resultMap.getUserCount(),
+                resultMap.getChatRoom().getUpdatedAt().toString()
+            );
+        }
     }
 
     public record Detail(

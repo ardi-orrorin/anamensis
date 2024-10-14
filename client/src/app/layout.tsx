@@ -13,6 +13,7 @@ import {SearchHistoryProvider} from "@/app/{hooks}/searchHisotryHook";
 import {SearchParamsProvider} from "@/app/{hooks}/searchParamsHook";
 import Chat from "@/app/{components}/chats/chat";
 import {WebSocketProvider} from "@/app/{components}/chats/hook/useWebSocket";
+import {ChatMenuProvider} from "@/app/{components}/chats/hook/useChatMenu";
 
 export const metadata: Metadata = {
     title: 'anamensis',
@@ -78,7 +79,9 @@ export default function RootLayout({
                     && <>
                         <LoginState />
                         <WebSocketProvider>
-                            <Chat />
+                            <ChatMenuProvider>
+                                <Chat />
+                            </ChatMenuProvider>
                         </WebSocketProvider>
                     </>
                 }

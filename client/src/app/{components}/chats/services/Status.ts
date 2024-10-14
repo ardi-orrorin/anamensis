@@ -1,5 +1,3 @@
-import {ChatSpace} from "@/app/{components}/chats/services/types";
-
 export enum StatusEnum {
     ONLINE  = 'ONLINE',
     OFFLINE = 'OFFLINE',
@@ -14,9 +12,9 @@ export class UserStatus {
     readonly color: string;
 
     public static ONLINE  = new this(StatusEnum.ONLINE, '온라인', 'green-500');
-    public static OFFLINE = new this(StatusEnum.OFFLINE, '오프라인', 'gray-500');
+    public static OFFLINE = new this(StatusEnum.OFFLINE, '오프라인', 'black');
     public static WORKING = new this(StatusEnum.WORKING, '작업중', 'red-500');
-    public static AWAY    = new this(StatusEnum.AWAY, '자리비움', 'violet-500');
+    public static AWAY    = new this(StatusEnum.AWAY, '자리비움', 'indigo-500');
     public static DEFAULT = new this(StatusEnum.DEFAULT, '기본', 'gray-200');
 
     constructor(value: StatusEnum, name: string, color: string) {

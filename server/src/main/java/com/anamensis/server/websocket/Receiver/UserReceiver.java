@@ -1,5 +1,6 @@
 package com.anamensis.server.websocket.Receiver;
 
+import com.anamensis.server.entity.Member;
 import com.anamensis.server.service.UserService;
 import com.anamensis.server.websocket.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class UserStatusReceiver {
+public class UserReceiver {
 
 
     private final UserService userService;
@@ -33,7 +34,7 @@ public class UserStatusReceiver {
 
         return userService.findMemberByUsernames(userList)
             .flatMapMany(list -> {
-                List<UserStatus> userStatusList = list.stream()
+                List<UserResponse.UserStatus> userStatusList = list.stream()
                     .map(memberResultMap -> {
 
                         String profileImage = memberResultMap.getFile().getFilePath() != null
@@ -46,7 +47,7 @@ public class UserStatusReceiver {
                             .map(SessionUser::status)
                             .orElse(Status.ONLINE);
 
-                        return UserStatus.builder()
+                        return UserResponse.UserStatus.builder()
                                 .id(memberResultMap.getMember().getId())
                                 .username(memberResultMap.getMember().getUserId())
                                 .status(status)
@@ -55,7 +56,7 @@ public class UserStatusReceiver {
                         }
                     ).toList();
 
-                WebSocketResponse<List<UserStatus>> res = WebSocketResponse.<List<UserStatus>>builder()
+                WebSocketResponse<List<UserResponse.UserStatus>> res = WebSocketResponse.<List<UserResponse.UserStatus>>builder()
                     .type(ResponseType.USERS)
                     .data(userStatusList)
                     .build();
@@ -110,12 +111,12 @@ public class UserStatusReceiver {
             mySession.session()
         ));
 
-        UserStatus userStatus = UserStatus.builder()
+        UserResponse.UserStatus userStatus = UserResponse.UserStatus.builder()
             .username(username)
             .status(status)
             .build();
 
-        WebSocketResponse<UserStatus> res = WebSocketResponse.<UserStatus>builder()
+        WebSocketResponse<UserResponse.UserStatus> res = WebSocketResponse.<UserResponse.UserStatus>builder()
             .type(ResponseType.STATUS)
             .data(userStatus)
             .build();
@@ -128,5 +129,49 @@ public class UserStatusReceiver {
                     .send(Mono.just(session.session().textMessage(resJson.toString())))
             )
             .then();
+    }
+
+    public Mono<Void> getUserInfo(
+        JSONObject json,
+        WebSocketSession session,
+        Set<SessionUser> sessionList
+    ) {
+
+        String username = json.getString("username");
+        return userService.findUserInfo(username)
+            .flatMap(userInfoResultMap -> {
+                Member member = userInfoResultMap.getMember();
+
+                String profileImage = userInfoResultMap.getFile().getFilePath() != null
+                    ? userInfoResultMap.getFile().getFilePath() + userInfoResultMap.getFile().getFileName()
+                    : "";
+
+                Status status = sessionList.stream()
+                    .filter(it -> it.username().equals(member.getUserId()))
+                    .findFirst()
+                    .map(SessionUser::status)
+                    .orElse(Status.OFFLINE);
+
+                UserResponse.UserInfo userInfo = UserResponse.UserInfo.builder()
+                    .id(member.getId())
+                    .userId(member.getUserId())
+                    .name(member.getName())
+                    .email(member.getEmail())
+                    .phone(member.getPhone())
+                    .point(member.getPoint())
+                    .status(status)
+                    .profileImage(profileImage)
+                    .build();
+
+                WebSocketResponse<UserResponse.UserInfo> res = WebSocketResponse.<UserResponse.UserInfo>builder()
+                    .type(ResponseType.USERINFO)
+                    .data(userInfo)
+                    .build();
+
+                JSONObject resJson = new JSONObject(res);
+
+
+                return session.send(Mono.just(session.textMessage(resJson.toString())));
+            });
     }
 }

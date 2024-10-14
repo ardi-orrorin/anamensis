@@ -56,18 +56,18 @@ const ProfileImg = () => {
         })
 
         userInfoApiService.deleteProfileImg()
-        .then((res) => {
-            refetch();
-        })
-        .catch((err) => {
-            console.log(err)
-        })
-        .finally(() => {
-            setLoading({
-                ...loading,
-                img: false
-            });
-        })
+            .then((res) => {
+                refetch();
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+            .finally(() => {
+                setLoading({
+                    ...loading,
+                    img: false
+                });
+            })
     }
 
     const onMouseEnter = (e: React.MouseEvent<HTMLImageElement>) => {
@@ -87,6 +87,9 @@ const ProfileImg = () => {
                    height={150}
                    onMouseEnter={onMouseEnter}
                    priority={true}
+                   onError={(e) => {
+                       e.currentTarget.src = defaultProfile('')
+                   }}
             />
             {
                 !profileImg

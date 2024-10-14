@@ -1,6 +1,7 @@
 package com.anamensis.server.websocket.Receiver;
 
 import com.anamensis.server.dto.response.ChatMessageResponse;
+import com.anamensis.server.dto.response.ChatRoomResponse;
 import com.anamensis.server.entity.ChatMessage;
 import com.anamensis.server.entity.Member;
 import com.anamensis.server.resultMap.ChatRoomResultMap;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -31,6 +33,24 @@ public class ChatReceiver {
     private final UserService userService;
     private final ChatMessageService chatMessageService;
     private final ChatRoomService chatRoomService;
+
+    public Mono<Void> getChatRoomList(
+        String username,
+        WebSocketSession session
+    ) {
+        return chatRoomService.selectAllByUsername(username)
+            .flatMap(list -> {
+
+                WebSocketResponse<List<ChatRoomResponse.ListItem>> res = WebSocketResponse.<List<ChatRoomResponse.ListItem>>builder()
+                    .type(ResponseType.CHATLIST)
+                    .data(list)
+                    .build();
+
+                JSONObject resJson = new JSONObject(res);
+
+                return session.send(Mono.just(session.textMessage(resJson.toString())));
+        });
+    }
 
     public Mono<Void> receiver(
         String username,

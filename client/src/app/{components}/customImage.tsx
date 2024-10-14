@@ -8,8 +8,6 @@ import {defaultProfile} from "@/app/{commons}/func/image";
 
 const CustomImage = () => {
     const {data:profileImg } = useQuery(userApiService.profileImg())
-
-    console.log("profile", profileImg);
     return (
         <Image className={'rounded'}
                src={defaultProfile(profileImg)}
@@ -17,7 +15,7 @@ const CustomImage = () => {
                width={30}
                height={30}
                onError={(e) =>
-                   e.currentTarget.src = NO_PROFILE
+                   e.currentTarget.src = defaultProfile('')
                }
         />
     );

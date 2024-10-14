@@ -1,6 +1,7 @@
 import {useMemo} from "react";
 import Image from "next/image";
 import {MouseLeaveHTMLElements} from "@/app/board/{components}/block/type/Types";
+import {defaultNoImg} from "@/app/{commons}/func/image";
 
 export type FileImageProps = {
     value: string;
@@ -25,12 +26,15 @@ export default function FileImage(props: FileImageProps){
              onMouseLeave={onMouseLeaveHandler}
              aria-roledescription={'object'}
         >
-            <Image src={url}
+            <Image src={defaultNoImg(url)}
                    alt={''}
                    height={700}
                    width={700}
                    className={'w-auto h-auto'}
                    priority={true}
+                   onError={(e) => {
+                      e.currentTarget.src = defaultNoImg('')
+                   }}
             />
         </div>
     )

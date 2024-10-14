@@ -19,6 +19,8 @@ public class MemberResultMap {
 
     private List<Role> roles;
 
+    private File file;
+
     @Getter
     @Setter
     public static class ListItem {

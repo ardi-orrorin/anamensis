@@ -34,9 +34,11 @@
                  WHERE cru.chat_room_id = cr.id
              ) AS user_count
           FROM chat_room cr
-         WHERE cr.host_id IN (SELECT m1.id
-                                FROM member m1
-                               WHERE m1.user_id = #{hostUsername})
+          JOIN chat_room_user cru
+            ON cr.id       = cru.chat_room_id
+           AND cru.user_id = (SELECT id
+                                FROM member
+                               WHERE user_id = #{userId})
          ORDER BY cr.updated_at DESC
     </select>
 

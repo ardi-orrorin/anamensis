@@ -99,7 +99,7 @@ const Slide = ({
                            height={500}
                               priority={true}
                             onError={(e) => {
-                                e.currentTarget.src = NO_IMAGE;
+                                e.currentTarget.src = defaultNoImg('');
                             }}
                             onClick={() => {
                                 setSelectedIndex(index);
@@ -130,13 +130,13 @@ const Slide = ({
                 </button>
 
                 <Image className={'w-full h-[600px] sm:h-[800px] rounded-xl object-cover sm:object-contain'}
-                       src={process.env.NEXT_PUBLIC_CDN_SERVER + images[selectedIndex]} alt={''}
+                       src={defaultNoImg(images[selectedIndex])} alt={''}
                        width={200}
                        height={200}
                        priority={true}
                        onClick={onImageClick}
                        onError={(e) => {
-                           e.currentTarget.src = NO_IMAGE;
+                           e.currentTarget.src = defaultNoImg('');
                        }}
                 />
                 <button className={'absolute right-5 z-10 w-10 h-10 bg-white rounded border border-solid border-gray-200'}

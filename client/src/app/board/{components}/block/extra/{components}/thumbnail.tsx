@@ -54,7 +54,7 @@ const Thumbnail = ({
                            alt={'thumbnail'}
                            placeholder={'empty'}
                            onError={(e) => {
-                               e.currentTarget.src = NO_IMAGE;
+                               e.currentTarget.src = defaultNoImg('');
                            }}
                            onClick={() => {
                                setAlbumToggle({

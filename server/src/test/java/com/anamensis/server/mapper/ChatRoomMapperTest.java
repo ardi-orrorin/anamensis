@@ -45,7 +45,7 @@ class ChatRoomMapperTest {
     @Test
     void selectAll() {
 
-        List<ChatRoomResultMap.ChatRoomListItem> list = chatRoomMapper.selectAll("test");
+        List<ChatRoomResultMap.ChatRoomListItem> list = chatRoomMapper.selectAll("d-member-1");
 
         assertNotNull(list);
 

@@ -38,7 +38,7 @@ const AlttuelBoardComponent = (props: Root.BoardListI) => {
                        alt={''}
                        priority={true}
                        onError={e => {
-                           (e.target as HTMLImageElement).src = NO_IMAGE;
+                           e.currentTarget.src = defaultNoImg('');
                        }}
                 />
 

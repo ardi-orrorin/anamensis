@@ -47,7 +47,7 @@ const HeaderComponent = (props: Root.BoardListI) => {
                            height={25}
                            alt={''}
                            onError={(e) => {
-                               e.currentTarget.src = NO_PROFILE;
+                               e.currentTarget.src = defaultProfile('');
                            }}
                     />
                     <span className={'text-sm'}>

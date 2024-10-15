@@ -10,13 +10,13 @@ const ProfileList = () => {
 
     const {data: userinfo} = useQuery(userInfoApiService.profile())
 
-    const {users, changeUserInfoByUsername} = useWebSocket();
+    const {users, userInfoHandler}  = useWebSocket();
 
     const {changeActiveMenuHandler} = useChatMenu();
 
     const onClickUser = (username: string) => {
-        changeUserInfoByUsername(username);
-        changeActiveMenuHandler(ActiveMenuEnum.INFO);
+        return userInfoHandler(username)
+            .then(() => changeActiveMenuHandler(ActiveMenuEnum.INFO, 0));
     }
 
     return (
@@ -41,9 +41,8 @@ const ProfileList = () => {
                                 <span>{user.username}</span>
                                 {
                                     userinfo.name === user.username
-                                    && <span className={'text-xs text-blue-500 font-bold'}>v
-
-                                        (나)
+                                    && <span className={'text-xs text-blue-500 font-bold'}>
+                                        ( 본인 )
                                     </span>
                                 }
                             </div>

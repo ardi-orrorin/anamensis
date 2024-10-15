@@ -17,7 +17,8 @@ interface ChatMessageI {
 }
 
 interface ChattingI {
-    createdAt : string;
+    chatRoomId  : number;
+    createdAt   : string;
     chatMessages: Set<ChatMessageI>;
 }
 
@@ -39,12 +40,19 @@ interface UserInfoI {
 }
 
 interface ChatListItemI {
-    id         : number;
-    name       : string;
-    type       : string;
-    lastMessage: string;
-    userCount  : number;
-    updatedAt  : string;
+    id          : number;
+    name        : string;
+    type        : string;
+    lastMessage : string;
+    users       : UserI[];
+    updatedAt   : string;
+}
+
+interface UserI {
+    id           : number;
+    name         : string;
+    userId       : string;
+    profileImage : string;
 }
 
 export namespace ChatSpace {

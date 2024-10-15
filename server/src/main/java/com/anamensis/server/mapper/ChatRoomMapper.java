@@ -13,14 +13,14 @@ public interface ChatRoomMapper {
     int save(ChatRoom entity);
 
     int saveChatRoomUser(long chatRoomId, List<Long> userIds);
-//
+
     int updateLastMessage(long id, String lastMessage);
-//
-//    int delete(long id);
-//
+
     Optional<ChatRoomResultMap.ChatRoom> selectById(long id);
 
-    List<ChatRoomResultMap.ChatRoomListItem> selectAll(String userId);
+    List<ChatRoomResultMap.ChatRoom> selectAll(String userId);
 
     List<ChatRoomResultMap.ChatRomeUserCount> chatRoomIdByUsers(String firstUserId, String secondUserId);
+
+    boolean validateChatRoomByUserId(long chatRoomId, String userId);
 }

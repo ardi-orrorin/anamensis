@@ -1,7 +1,5 @@
 package com.anamensis.server.websocket.Receiver;
 
-import com.anamensis.server.dto.RoomType;
-import com.anamensis.server.dto.request.ChatRoomRequest;
 import com.anamensis.server.dto.response.ChatMessageResponse;
 import com.anamensis.server.dto.response.ChatRoomResponse;
 import com.anamensis.server.entity.ChatMessage;
@@ -24,9 +22,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
@@ -55,48 +51,48 @@ public class ChatReceiver {
         });
     }
 
-    public Mono<Void> getChatRoom(
-        String username,
-        JSONObject json,
-        WebSocketSession session
-    ) {
-        String partner = json.getString("username");
-
-        AtomicBoolean isChatRoomExist = new AtomicBoolean(true);
-
-        return chatRoomService.hasChatRoomWithBothUsers(username, partner)
-            .flatMap( chatRoomId -> {
-                if (chatRoomId != 0) return Mono.just(chatRoomId);
-
-                ChatRoomRequest.Create request = new ChatRoomRequest.Create(
-                    "대화방",
-                    username,
-                    List.of(username, partner),
-                    RoomType.PRIVATE
-                );
-
-                return chatRoomService.save(request, username)
-                    .flatMap(it -> {
-                        isChatRoomExist.set(false);
-                        return Mono.just(it.getId());
-                    });
-            })
-            .flatMap( chatRoomId -> {
-                WebSocketResponse<Long> res = WebSocketResponse.<Long>builder()
-                    .type(ResponseType.CHATROOM)
-                    .data(chatRoomId)
-                    .build();
-
-                JSONObject resJson = new JSONObject(res);
-
-                if(isChatRoomExist.get()) {
-                    return session.send(Mono.just(session.textMessage(resJson.toString())));
-                }
-
-                return this.getChatRoomList(username, session)
-                    .and(session.send(Mono.just(session.textMessage(resJson.toString()))));
-            });
-    }
+//    public Mono<Void> getChatRoom(
+//        String username,
+//        JSONObject json,
+//        WebSocketSession session
+//    ) {
+//        String partner = json.getString("username");
+//
+//        AtomicBoolean isChatRoomExist = new AtomicBoolean(true);
+//
+//        return chatRoomService.hasChatRoomWithBothUsers(username, partner)
+//            .flatMap( chatRoomId -> {
+//                if (chatRoomId != 0) return Mono.just(chatRoomId);
+//
+//                ChatRoomRequest.Create request = new ChatRoomRequest.Create(
+//                    "대화방",
+//                    username,
+//                    List.of(username, partner),
+//                    RoomType.PRIVATE
+//                );
+//
+//                return chatRoomService.save(request, username)
+//                    .flatMap(it -> {
+//                        isChatRoomExist.set(false);
+//                        return Mono.just(it.getId());
+//                    });
+//            })
+//            .flatMap( chatRoomId -> {
+//                WebSocketResponse<Long> res = WebSocketResponse.<Long>builder()
+//                    .type(ResponseType.CHATROOM)
+//                    .data(chatRoomId)
+//                    .build();
+//
+//                JSONObject resJson = new JSONObject(res);
+//
+//                if(isChatRoomExist.get()) {
+//                    return session.send(Mono.just(session.textMessage(resJson.toString())));
+//                }
+//
+//                return this.getChatRoomList(username, session)
+//                    .and(session.send(Mono.just(session.textMessage(resJson.toString()))));
+//            });
+//    }
 
     public Mono<Void> getChatMessages(
         JSONObject json,
@@ -137,7 +133,6 @@ public class ChatReceiver {
             .share();
 
         Mono<ChatRoomResultMap.ChatRoom> chatRoom = chatRoomService.selectById(websocketDTO.routeId())
-            .map(Optional::get)
             .share();
 
         Mono<ChatMessage> chat = member.flatMap(m -> {
@@ -159,7 +154,8 @@ public class ChatReceiver {
         return chatRoom
             .flatMapMany( chatRoom1 -> {
                 List<String> users = chatRoom1.getParticipants().stream()
-                    .map(Member::getUserId).toList();
+                    .map(m -> m.getMember().getUserId())
+                    .toList();
 
                 List<SessionUser> user = sessionUserList.stream()
                     .filter( it -> users.contains(it.username()))

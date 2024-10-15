@@ -1,6 +1,5 @@
 package com.anamensis.server.controller;
 
-import com.anamensis.server.dto.response.ChatRoomResponse;
 import com.anamensis.server.dto.response.UserResponse;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
@@ -24,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("dev")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class ChatRoomControllerTest {
+class ChatMessageControllerTest {
 
     @LocalServerPort
     int port;
@@ -64,36 +63,15 @@ class ChatRoomControllerTest {
     }
 
     @Test
-    void selectAllByUsername() {
-    }
-
-    @Test
-    void selectById() {
+    void selectAllByChatRoomId() {
         wtc.get()
-            .uri("/api/chat-room/2")
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody(ChatRoomResponse.Detail.class)
-            .consumeWith(result -> {
-                log.info("result: {}", result);
-            });
-
-    }
-
-    @Test
-    void save() {
-    }
-
-    @Test
-    void selectByPartner() {
-        wtc.get()
-            .uri("/api/chat-rooms/partner/d-member-2")
+            .uri("/api/chat-messages/chat-room/2")
             .headers(httpHeaders -> {
                 httpHeaders.setBearerAuth(token);
             })
             .exchange()
             .expectStatus().isOk()
-            .expectBody(Long.class)
+            .expectBody()
             .consumeWith(result -> {
                 log.info("result: {}", result);
             });

@@ -36,7 +36,7 @@ class ChatRoomMapperTest {
     @Test
     void selectById() {
 
-        Optional<ChatRoomResultMap.ChatRoom> result = chatRoomMapper.selectById(1L);
+        Optional<ChatRoomResultMap.ChatRoom> result = chatRoomMapper.selectById(2L);
         assertNotNull(result);
 
         log.info("result: {}", result);
@@ -45,7 +45,7 @@ class ChatRoomMapperTest {
     @Test
     void selectAll() {
 
-        List<ChatRoomResultMap.ChatRoomListItem> list = chatRoomMapper.selectAll("d-member-1");
+        List<ChatRoomResultMap.ChatRoom> list = chatRoomMapper.selectAll("admin1");
 
         assertNotNull(list);
 
@@ -95,6 +95,17 @@ class ChatRoomMapperTest {
         assertTrue(result.size() > 0);
 
         log.info("result: {}", result);
+
+    }
+
+    @Test
+    void validateChatRoomByUsername() {
+        long chatRoomId = 2L;
+        String username = "admin1";
+
+        boolean result = chatRoomMapper.validateChatRoomByUserId(chatRoomId, username);
+
+        assertTrue(result);
 
     }
 }

@@ -14,6 +14,7 @@
              , m1.id         AS member_pk
              , m1.user_id    AS member_user_id
              , m1.create_at  AS member_create_at
+             , f.id          AS file_pk
              , m2.id         AS host_pk
              , m2.user_id    AS host_user_id
              , m2.create_at  AS host_create_at
@@ -22,24 +23,49 @@
             ON cr.id = cru1.chat_room_id
           JOIN member m1
             ON cru1.user_id = m1.id
+          LEFT JOIN file f
+            ON f.table_ref_pk = m1.id
+           AND f.table_code_pk = (SELECT id
+                                    FROM table_code
+                                   WHERE table_name = 'member')
           JOIN member m2
             ON cr.host_id = m2.id
          WHERE cr.id = #{id};
     </select>
 
-    <select id="selectAll" resultMap="ChatRoomListItemResultMap">
+    <select id="selectAll" resultMap="ChatRoomResultMap">
         SELECT *
-             , (SELECT count(*)
-                  FROM chat_room_user cru
-                 WHERE cru.chat_room_id = cr.id
-             ) AS user_count
+             , cr.id         AS chat_room_pk
+             , cr.type       AS chat_room_type
+             , cr.created_at AS chat_room_created_at
+             , cr.updated_at AS chat_room_updated_at
+             , m1.id         AS member_pk
+             , m1.user_id    AS member_user_id
+             , m1.create_at  AS member_create_at
+             , f.id          AS file_pk
+             , m2.id         AS host_pk
+             , m2.user_id    AS host_user_id
+             , m2.create_at  AS host_create_at
           FROM chat_room cr
-          JOIN chat_room_user cru
-            ON cr.id       = cru.chat_room_id
-           AND cru.user_id = (SELECT id
-                                FROM member
-                               WHERE user_id = #{userId})
-         ORDER BY cr.updated_at DESC
+          JOIN chat_room_user cru1
+               ON cr.id = cru1.chat_room_id
+          JOIN member m1
+               ON cru1.user_id = m1.id
+          LEFT JOIN file f
+            ON f.table_ref_pk = m1.id
+           AND f.table_code_pk = (SELECT id
+                                    FROM table_code
+                                   WHERE table_name = 'member')
+          JOIN member m2
+            ON cr.host_id = m2.id
+         WHERE cr.id IN (SELECT cru1.chat_room_id
+                           FROM chat_room_user
+                          WHERE user_id = (SELECT id
+                                             FROM member
+                                            WHERE user_id = #{userId}
+                                          )
+                         )
+        ORDER BY cr.updated_at DESC
     </select>
 
     <select id="chatRoomIdByUsers" resultMap="ChatRoomUserCount">
@@ -57,6 +83,17 @@
          WHERE cru1.user_id = (SELECT id
                                  FROM anamensis.member
                                 WHERE user_id = #{secondUserId})
+    </select>
+
+    <select id="validateChatRoomByUserId" resultType="boolean">
+        SELECT EXISTS(SELECT 1
+                        FROM chat_room_user
+                       WHERE chat_room_id = #{chatRoomId}
+                         AND user_id = (SELECT id
+                                          FROM member
+                                         WHERE user_id = #{userId}
+                                       )
+                     )
     </select>
 
     <insert id="save" parameterType="ChatRoom">
@@ -81,12 +118,6 @@
         </foreach>
     </insert>
 
-    <resultMap id="ChatRoomListItemResultMap" type="com.anamensis.server.resultMap.ChatRoomResultMap$ChatRoomListItem">
-        <id property="id" column="id"/>
-        <result property="userCount" column="user_count"/>
-        <association property="chatRoom" resultMap="ChatRoomRowEntity" />
-    </resultMap>
-
     <resultMap id="ChatRoomUserCount" type="com.anamensis.server.resultMap.ChatRoomResultMap$ChatRomeUserCount">
         <id property="id" column="id"/>
         <result property="userCount" column="user_count"/>
@@ -96,7 +127,7 @@
         <id property="id" column="chat_room_pk"/>
         <association property="chatRoom" resultMap="ChatRoomEntity"/>
         <association property="host" resultMap="HostEntity"/>
-        <collection property="participants" resultMap="MemberEntity" />
+        <collection property="participants" resultMap="memberListItemResultMap" />
     </resultMap>
 
     <resultMap id="HostEntity" type="Member" autoMapping="true">
@@ -104,6 +135,17 @@
         <result property="userId" column="host_user_id"/>
         <result property="createAt" column="host_create_at" />
     </resultMap>
+
+    <resultMap id="memberListItemResultMap" type="com.anamensis.server.resultMap.MemberResultMap$ListItem">
+        <id property="memberPk" column="member_pk"/>
+        <association property="member" resultMap="MemberEntity" autoMapping="true" />
+        <association property="file" resultMap="FileEntity" autoMapping="true" />
+    </resultMap>
+
+    <resultMap id="FileEntity" type="File" autoMapping="true">
+        <id property="id" column="file_pk"/>
+    </resultMap>
+
     <resultMap id="MemberEntity" type="Member" autoMapping="true">
         <id property="id" column="member_pk"/>
         <result property="userId" column="member_user_id"/>

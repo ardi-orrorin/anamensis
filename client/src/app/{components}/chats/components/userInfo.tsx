@@ -1,13 +1,55 @@
 import {useWebSocket} from "@/app/{components}/chats/hook/useWebSocket";
 import Image from "next/image";
 import {defaultProfile} from "@/app/{commons}/func/image";
+import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
+import {useQuery} from "@tanstack/react-query";
+import {useEffect, useMemo} from "react";
+import {ActiveMenuEnum, useChatMenu} from "@/app/{components}/chats/hook/useChatMenu";
+import apiCall from "@/app/{commons}/func/api";
+import {AxiosError} from "axios";
+import {StatusEnum, UserStatus} from "@/app/{components}/chats/services/Status";
 
 const UserInfo = () => {
 
-    const {ws, userInfo, findChatRoomId} = useWebSocket();
+    const {ws, userInfo, userInfoHandler, users} = useWebSocket();
+    const {changeActiveMenuHandler} = useChatMenu();
+    const {data: userinfo} = useQuery(userInfoApiService.profile())
+
+    const userStatus = useMemo(() => {
+        const status = users.find(user => user.username === userInfo.userId)?.status
+            ?? StatusEnum.OFFLINE
+
+        return UserStatus.fromString(status) ?? UserStatus.OFFLINE;
+    }, [users, userInfo.userId]);
+
+    useEffect(() => {
+        if(userinfo?.userId) return;
+        userInfoHandler(userinfo.userId);
+    }, [ws]);
+
+    const onClickHandler = async () => {
+        try {
+            const res = await apiCall<number>({
+                path: '/api/chat/chatroom/partner/' + userInfo.userId,
+                call: 'Proxy',
+                method: 'GET',
+                isReturnData: true,
+            });
+
+            changeActiveMenuHandler(ActiveMenuEnum.CHAT, res);
+        } catch (e) {
+            const err = e as AxiosError;
+
+            if(err.response?.status === 500) {
+                alert('채팅방 생성에 실패했습니다.');
+            }
+
+            console.error(err);
+        }
+    }
 
     return (
-        <div className={'w-full py-4 flex flex-col gap-5 items-center justify-center'}>
+        <div className={'w-full py-4 flex flex-col gap-3 items-center justify-center'}>
             <Image className={'w-20 h-20 rounded-full'}
                    src={defaultProfile(userInfo.profileImage)}
                    width={80}
@@ -17,6 +59,9 @@ const UserInfo = () => {
                       e.currentTarget.src = defaultProfile("")
                    }}
             />
+            <div>
+                <span className={`text-${userStatus.color}`}>{userStatus.name}</span>
+            </div>
             <div className={'w-full'}>
                 <table className={'w-[70%] m-auto'}>
                     <colgroup>
@@ -45,7 +90,7 @@ const UserInfo = () => {
             </div>
             <div>
                 <button className={'w-16 h-8 text-xs rounded bg-gray-700 text-white'}
-                        onClick={() => findChatRoomId(userInfo.userId)}
+                        onClick={onClickHandler}
                 >
                     대화하기
                 </button>

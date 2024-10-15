@@ -22,14 +22,6 @@ public class ChatRoomResultMap {
         private long id;
         private com.anamensis.server.entity.ChatRoom chatRoom;
         private Member host;
-        private List<Member> participants;
-    }
-
-    @Getter
-    @ToString
-    public static class ChatRoomListItem {
-        private long id;
-        private com.anamensis.server.entity.ChatRoom chatRoom;
-        private int userCount;
+        private List<MemberResultMap.ListItem> participants;
     }
 }

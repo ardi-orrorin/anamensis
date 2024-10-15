@@ -5,16 +5,24 @@ import {ChatSpace} from "@/app/{components}/chats/services/types";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import {useQuery} from "@tanstack/react-query";
 import {StatusEnum} from "@/app/{components}/chats/services/Status";
+import chatApiService from "@/app/{components}/chats/services/apiServices";
+import WebSocketResponseType = ChatSpace.WebSocketResponseType;
+import ChatListItem = ChatSpace.ChatListItem;
+import WebSocketResponse = ChatSpace.WebSocketResponse;
+import ChatMessage = ChatSpace.ChatMessage;
+import UserStatus = ChatSpace.UserStatus;
+import UserInfo = ChatSpace.UserInfo;
+import Chatting = ChatSpace.Chatting;
 
 export interface WebSocketProviderI {
     ws: WebSocket;
     users: ChatSpace.UserStatus[];
     userInfo: ChatSpace.UserInfo;
     chatList: ChatSpace.ChatListItem[];
-    chatMessages: ChatSpace.Chatting;
-    changeUserInfoByUsername: (username: string) => void;
+    chatMessages: ChatSpace.Chatting[];
     changeStatusHandler: (status: StatusEnum) => void;
-    findChatRoomId: (username: string) => void;
+    findChatMessageByChatRoomId: (chatRoomId: number) => ChatSpace.Chatting | undefined;
+    userInfoHandler: (userId: string) => Promise<void>;
 }
 
 const WebSocketContext = createContext<WebSocketProviderI>({} as WebSocketProviderI);
@@ -23,9 +31,9 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
 
     const [ws, setWs] = useState<WebSocket>({} as WebSocket);
     const [users, setUsers] = useState<ChatSpace.UserStatus[]>([]);
-    const [userInfo, setUserInfo] = useState<ChatSpace.UserInfo>({} as ChatSpace.UserInfo);
-    const [chatList, setChatList] = useState<ChatSpace.ChatListItem[]>([]);
-    const [chatMessages, setChatMessages] = useState<ChatSpace.Chatting>({chatMessages: new Set()} as ChatSpace.Chatting);
+    const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo);
+    const [chatList, setChatList] = useState<ChatListItem[]>([]);
+    const [chatMessages, setChatMessages] = useState<Chatting[]>([]);
 
     const {data: userinfo} = useQuery(userInfoApiService.profile())
 
@@ -52,33 +60,27 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
     }, []);
 
     ws.onmessage = (event) => {
-        const res = JSON.parse(event.data) as ChatSpace.WebSocketResponse<any>;
+        const res = JSON.parse(event.data) as WebSocketResponse<any>;
         console.log('res', res);
 
-        switch (res?.type) {
-            case ChatSpace.WebSocketResponseType.USERS:
-                usersHandler(res.data as ChatSpace.UserStatus[]);
+        switch (res?.type as WebSocketResponseType) {
+            case WebSocketResponseType.USERS:
+                usersHandler(res.data as UserStatus[]);
                 break;
-            case ChatSpace.WebSocketResponseType.STATUS:
-                statusHandler(res.data as ChatSpace.UserStatus);
+            case WebSocketResponseType.STATUS:
+                statusHandler(res.data as UserStatus);
                 break;
-            case ChatSpace.WebSocketResponseType.CHAT:
-                chatHandler(res.data as ChatSpace.ChatMessage);
+            case WebSocketResponseType.CHAT:
+                chatHandler(res.data as ChatMessage);
                 break;
-            case ChatSpace.WebSocketResponseType.CHAT_MESSAGE:
-                chatMessageHandler(res as ChatSpace.WebSocketResponse<ChatSpace.ChatMessage[]>);
+            case WebSocketResponseType.CHAT_MESSAGE:
+                chatMessageHandler(res as WebSocketResponse<ChatMessage[]>);
                 break;
-            case ChatSpace.WebSocketResponseType.CHATROOM:
-                chatRoomHandler(res.data as number);
-                break;
-            case ChatSpace.WebSocketResponseType.SYSTEM:
+            case WebSocketResponseType.SYSTEM:
                 systemHandler(res.data as string);
                 break;
-            case ChatSpace.WebSocketResponseType.USERINFO:
-                userInfoHandler(res.data as ChatSpace.UserInfo);
-                break;
-            case ChatSpace.WebSocketResponseType.CHATLIST:
-                chatListHandler(res.data as ChatSpace.ChatListItem[]);
+            case WebSocketResponseType.CHATLIST:
+                chatListHandler(res.data as ChatListItem[]);
                 break;
 
             default:
@@ -86,20 +88,20 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
         }
     }
 
-    const chatMessageHandler = useCallback((res: ChatSpace.WebSocketResponse<ChatSpace.ChatMessage[]>) => {
-        res.data.forEach(chat => chatMessages.chatMessages.add(chat));
-        setChatMessages({...chatMessages, createdAt: res.createdAt});
+    const chatMessageHandler = useCallback((res: WebSocketResponse<ChatMessage[]>) => {
+        const findChat = chatMessages.find(chat => chat.chatRoomId === res.data[0].chatRoomId)
+            ?? {chatRoomId: res.data[0].chatRoomId, createdAt: res.createdAt, chatMessages: new Set<ChatSpace.ChatMessage>()};
+
+        res.data.forEach(chat => findChat.chatMessages.add(chat));
+
+        setChatMessages([...chatMessages.filter(chat => chat.chatRoomId !== res.data[0].chatRoomId), findChat]);
     },[chatMessages]);
 
-    const chatListHandler = useCallback((data: ChatSpace.ChatListItem[]) => {
+    const chatListHandler = useCallback((data: ChatListItem[]) => {
         setChatList(data);
     },[]);
 
-    const chatRoomHandler = useCallback((data: number) => {
-        console.log('chatRoom', data);
-    },[]);
-
-    const usersHandler = useCallback((data: ChatSpace.UserStatus[]) => {
+    const usersHandler = useCallback((data: UserStatus[]) => {
         data.sort((a, b) => a.username.localeCompare(b.username));
         const findMe = data.findIndex(user => user.username === userinfo.name);
 
@@ -111,11 +113,12 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
         setUsers(data);
     },[userinfo.name]);
 
-    const userInfoHandler = useCallback((data: ChatSpace.UserInfo) => {
-        setUserInfo(data);
+    const userInfoHandler = useCallback(async (userId: string) => {
+        return chatApiService.getUserInfoByUserId(userId)
+            .then(data => setUserInfo(data));
     },[]);
 
-    const statusHandler = useCallback((data: ChatSpace.UserStatus) => {
+    const statusHandler = useCallback((data: UserStatus) => {
         const newUsers = users.map(user => {
             if(user.username === data.username && user.status !== data.status) {
                 user.status = data.status;
@@ -129,40 +132,44 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
         console.log('system',data);
     },[]);
 
-    const chatHandler = useCallback((data: ChatSpace.ChatMessage) => {
-        chatMessages.chatMessages.add(data);
-        setChatMessages({...chatMessages, createdAt: data.createdAt});
+    const chatHandler = useCallback((data: ChatMessage) => {
+        const updateChat = {
+            ...chatMessages.find(chat => chat.chatRoomId === data.chatRoomId),
+            createdAt: data.createdAt
+        } as Chatting;
+
+        if(updateChat.chatMessages) {
+            updateChat.chatMessages.add(data);
+            setChatMessages([...chatMessages.filter(chat => chat.chatRoomId !== data.chatRoomId), updateChat]);
+            return;
+        }
+
+        updateChat.chatMessages = new Set<ChatMessage>();
+
+        return chatApiService.getChatMessagesByChatRoomId(data.chatRoomId)
+            .then(res => {
+                res.forEach(chat => updateChat.chatMessages.add(chat));
+                setChatMessages([...chatMessages.filter(chat => chat.chatRoomId !== data.chatRoomId), updateChat]);
+            });
+
     },[chatMessages]);
 
-    const changeUserInfoByUsername = useCallback((username: string) => {
-        ws.send(JSON.stringify({
-            type: 'USERINFO',
-            username
-        }));
-    },[ws]);
-
-
-    // fixme: 탭 이동으로 dom 비활성화 시 not a funtction 에러 뜸
     const changeStatusHandler = useCallback((status: StatusEnum) => {
-        if(!ws || ws.readyState !== ws.OPEN) return;
-        ws?.send(JSON.stringify({
+        ws.send(JSON.stringify({
             type: 'STATUS',
             status: status
         }));
-    }, []);
+    }, [ws]);
 
-    const findChatRoomId = useCallback((username: string) => {
-        ws.send(JSON.stringify({
-            type: 'CHATROOM',
-            username
-        }));
-    },[ws]);
+    const findChatMessageByChatRoomId = useCallback((chatRoomId: number) => {
+        return chatMessages.find(chat => chat.chatRoomId === chatRoomId);
+    },[chatMessages]);
 
     return (
         <WebSocketContext.Provider value={{
             ws, users, userInfo, chatList, chatMessages,
-            changeUserInfoByUsername, changeStatusHandler,
-            findChatRoomId
+            changeStatusHandler, userInfoHandler,
+            findChatMessageByChatRoomId,
         }}>
             {children}
         </WebSocketContext.Provider>

@@ -1,5 +1,6 @@
 package com.anamensis.server.controller;
 
+import com.anamensis.server.dto.RoomType;
 import com.anamensis.server.dto.request.ChatRoomRequest;
 import com.anamensis.server.dto.response.ChatRoomResponse;
 import com.anamensis.server.resultMap.ChatRoomResultMap;
@@ -30,12 +31,29 @@ public class ChatRoomController {
     @GetMapping("{id}")
     public Mono<ChatRoomResponse.Detail> selectById(@PathVariable Long id) {
         return chatRoomService.selectById(id)
-            .flatMap(chatRoom-> {
-                ChatRoomResultMap.ChatRoom resultMap = chatRoom.orElseThrow(()->
-                    new RuntimeException("ChatRoom not found")
-                );
-                return Mono.just(new ChatRoomResponse().fromDetail(resultMap));
-            });
+            .flatMap(chatRoom-> Mono.just(new ChatRoomResponse().fromDetail(chatRoom)));
+    }
+
+    @GetMapping("/partner/{partner}")
+    public Mono<Long> selectByPartner(
+        @PathVariable String partner,
+        @AuthenticationPrincipal UserDetails principal
+    ) {
+        return chatRoomService.hasChatRoomWithBothUsers(principal.getUsername(), partner)
+            .flatMap(chatRoomId -> {
+                    if (chatRoomId != 0) return Mono.just(chatRoomId);
+
+                    ChatRoomRequest.Create request = new ChatRoomRequest.Create(
+                        "대화방",
+                        principal.getUsername(),
+                        List.of(principal.getUsername(), partner),
+                        RoomType.PRIVATE
+                    );
+
+                    return chatRoomService.save(request, principal.getUsername())
+                        .map(ChatRoomResultMap.ChatRoom::getId);
+                }
+            );
     }
 
     @PostMapping("")

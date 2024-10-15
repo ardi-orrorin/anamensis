@@ -35,8 +35,9 @@ public class ChatRoomService {
             .collectList();
         }
 
-    public Mono<Optional<ChatRoomResultMap.ChatRoom>> selectById(Long id) {
-        return Mono.fromCallable(() -> chatRoomMapper.selectById(id));
+    public Mono<ChatRoomResultMap.ChatRoom> selectById(Long id) {
+        return Mono.justOrEmpty(chatRoomMapper.selectById(id))
+            .switchIfEmpty(Mono.error(new RuntimeException("ChatRoom not found")));
     }
 
     public Mono<Long> hasChatRoomWithBothUsers(String firstUserId, String secondUserId) {
@@ -47,6 +48,10 @@ public class ChatRoomService {
                 .map(ChatRoomResultMap.ChatRomeUserCount::getId)
                 .orElse(0L)
         );
+    }
+
+    public Mono<Boolean> validateChatRoomByUserId(Long chatRoomId, String userId) {
+        return Mono.fromCallable(() -> chatRoomMapper.validateChatRoomByUserId(chatRoomId, userId));
     }
 
     public Mono<ChatRoomResultMap.ChatRoom> save(ChatRoomRequest.Create request, String username) {

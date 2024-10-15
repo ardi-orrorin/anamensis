@@ -1,7 +1,7 @@
 package com.anamensis.server.dto.response;
 
-import com.anamensis.server.entity.Member;
 import com.anamensis.server.resultMap.ChatRoomResultMap;
+import com.anamensis.server.resultMap.MemberResultMap;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,24 +11,43 @@ public class ChatRoomResponse {
 
     @Getter
     @Builder
-    public static class ListItem {
+    public static class  ListItem {
         private Long id;
         private String name;
         private String type;
         private String lastMessage;
-        private int userCount;
+        private List<User> users;
         private String updatedAt;
 
-        public static ListItem fromListItem(ChatRoomResultMap.ChatRoomListItem resultMap) {
+        public static ListItem fromListItem(ChatRoomResultMap.ChatRoom resultMap) {
+            List<User> users = resultMap.getParticipants().stream().map(
+                memberResultMap -> User.builder()
+                        .id(memberResultMap.getMember().getId())
+                        .userId(memberResultMap.getMember().getUserId())
+                        .name(memberResultMap.getMember().getName())
+                        .profileImage(memberResultMap.getFile().getFullPath())
+                        .build()
+            ).toList();
+
+
             return new ListItem(
                 resultMap.getId(),
                 resultMap.getChatRoom().getName(),
                 resultMap.getChatRoom().getType().name(),
                 resultMap.getChatRoom().getLastMessage(),
-                resultMap.getUserCount(),
+                users,
                 resultMap.getChatRoom().getUpdatedAt().toString()
             );
         }
+    }
+
+    @Getter
+    @Builder
+    public static class User {
+        private long id;
+        private String userId;
+        private String name;
+        private String profileImage;
     }
 
     public record Detail(
@@ -57,15 +76,17 @@ public class ChatRoomResponse {
         Long id,
         String username,
         String nickname,
-        String email
+        String email,
+        String profileImage
     ) {}
 
-    public UserInfo fromUser(Member user) {
+    public UserInfo fromUser(MemberResultMap.ListItem resultMap) {
         return new UserInfo(
-            user.getId(),
-            user.getUserId(),
-            user.getName(),
-            user.getEmail()
+            resultMap.getMember().getId(),
+            resultMap.getMember().getUserId(),
+            resultMap.getMember().getName(),
+            resultMap.getMember().getEmail(),
+            resultMap.getFile().getFullPath()
         );
     }
 }

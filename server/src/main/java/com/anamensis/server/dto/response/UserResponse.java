@@ -167,6 +167,18 @@ public class UserResponse {
         long point
     ) {}
 
+    @Getter
+    @Builder
+    public static class ChatUserStatus {
+
+        private long id;
+
+        private String username;
+
+        private com.anamensis.server.websocket.dto.Status status;
+
+        private String profileImage;
+    }
 
     @Getter
     @Builder

@@ -48,6 +48,8 @@ const UserInfo = () => {
         }
     }
 
+    if(!userInfo?.userId) return <></>
+
     return (
         <div className={'w-full py-4 flex flex-col gap-3 items-center justify-center'}>
             <Image className={'w-20 h-20 rounded-full'}

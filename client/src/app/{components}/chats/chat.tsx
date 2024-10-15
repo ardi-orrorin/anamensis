@@ -14,16 +14,23 @@ import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import {useQuery} from "@tanstack/react-query";
 import {faWindowMinimize} from "@fortawesome/free-solid-svg-icons/faWindowMinimize";
 import Chatting from "@/app/{components}/chats/components/chatting";
+import moment from "moment/moment";
+import {useHotkeys} from "react-hotkeys-hook";
+
+require('moment/locale/ko');
+moment.locale('ko');
 
 const Chat = () => {
 
-    const {ws, users, changeStatusHandler} = useWebSocket();
+    const {ws, users, changeStatusHandler, chatList} = useWebSocket();
     const {activeMenu, changeToggleHandler} = useChatMenu();
     const {data: userinfo} = useQuery(userInfoApiService.profile())
 
     const [isExpand, setIsExpand] = useState<boolean>(false);
 
     const [awayTimeout, setAwayTimeout] = useState<NodeJS.Timeout>();
+
+    const unreadCount = chatList.reduce((acc, chat) => acc + chat.unreadCount, 0);
 
     useEffect(() => {
         if(ws.readyState !== ws.OPEN) return;
@@ -36,8 +43,7 @@ const Chat = () => {
 
     // fixme: 브라우저 비활성화 자리비움 상태로 변경
     const handleVisibilityChange = () => {
-        // const wait = 1000 * 60 * 5;
-        const wait = 1000;
+        const wait = 1000 * 60 * 5;
         if (document.visibilityState === 'hidden') {
             const change = setTimeout(() => {
                 changeStatusHandler(StatusEnum.AWAY);
@@ -49,7 +55,6 @@ const Chat = () => {
             changeStatusHandler(StatusEnum.ONLINE);
         }
     };
-
 
     return (
         <div className={'fixed z-[400] flex flex-col gap-2 left-5 bottom-5'}>
@@ -96,10 +101,16 @@ const Chat = () => {
                 </div>
             }
             <button
-                className={'w-14 h-14 flex justify-center items-center drop-shadow-md shadow-black bg-white rounded-full'}
+                className={'relative w-14 h-14 flex justify-center items-center drop-shadow-md shadow-black bg-white rounded-full'}
                 onClick={() => changeToggleHandler(!activeMenu.toggle)}
             >
                 <FontAwesomeIcon icon={faCommentDots} size={'xl'} />
+                {
+                    unreadCount > 0
+                    && <div className={'absolute bottom-0 right-0 flex justify-center items-center text-xs text-white rounded-full w-6 h-6 bg-red-600'}>
+                        {unreadCount}
+                    </div>
+                }
             </button>
         </div>
     )

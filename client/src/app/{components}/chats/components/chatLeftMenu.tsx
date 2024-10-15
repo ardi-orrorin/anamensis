@@ -3,12 +3,15 @@ import {faCircleInfo, faMessage, faUsers} from "@fortawesome/free-solid-svg-icon
 import React from "react";
 import {IconProp} from "@fortawesome/fontawesome-svg-core";
 import {ActiveMenuEnum, useChatMenu} from "@/app/{components}/chats/hook/useChatMenu";
+import {useWebSocket} from "@/app/{components}/chats/hook/useWebSocket";
 
 const ChatLeftMenu = () => {
+
+    const {userInfo} = useWebSocket();
     const menus = [
-        {icon: faUsers, value: ActiveMenuEnum.PROFILE},
-        {icon: faMessage, value: ActiveMenuEnum.CHATLIST},
-        {icon: faCircleInfo, value: ActiveMenuEnum.INFO},
+        {icon: faUsers, value: ActiveMenuEnum.PROFILE, view: true},
+        {icon: faMessage, value: ActiveMenuEnum.CHATLIST, view: true},
+        {icon: faCircleInfo, value: ActiveMenuEnum.INFO, view: userInfo.userId},
     ];
 
     return (
@@ -16,7 +19,9 @@ const ChatLeftMenu = () => {
             className={'flex justify-center gap-1 min-w-16 max-w-16 border-r border-solid border-gray-200 border-r-opacity-10'}>
             <div className={'w-full flex flex-col justify-start'}>
                 {
-                    menus.map((menu, index) => (
+                    menus
+                        .filter(menu => menu.view)
+                        .map((menu, index) => (
                         <ChatLeftMenuBtn key={`menu-${index}`} {...{...menu}} />
                     ))
 

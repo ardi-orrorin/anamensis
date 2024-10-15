@@ -65,14 +65,12 @@ public class ChatHandler implements WebSocketHandler {
                                 String username = user.getUsername();
 
                                 return switch (ChatType.fromString(json.getString("type"))) {
-                                    case CHAT           -> chatReceiver.receiver(username, json, sessionList);
+                                    case CHAT           -> chatReceiver.sendMessage(username, json, sessionList);
                                     case CHAT_ROOM_LIST -> chatReceiver.getChatRoomList(username, session);
                                     case CHAT_MESSAGE   -> chatReceiver.getChatMessages(json, session);
-//                                    case CHATROOM       -> chatReceiver.getChatRoom(username, json, session);
                                     case STATUS         -> userReceiver.changeStatus(username, json, sessionList);
-                                    case USERINFO       -> userReceiver.getUserInfo(json, session, sessionList);
                                     case null,
-                                         default   -> Mono.empty();
+                                         default        -> Mono.empty();
                                 };
                             })
                             .then()

@@ -46,6 +46,7 @@ interface ChatListItemI {
     lastMessage : string;
     users       : UserI[];
     updatedAt   : string;
+    unreadCount : number;
 }
 
 interface UserI {

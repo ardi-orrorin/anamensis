@@ -1,6 +1,6 @@
 package com.anamensis.server.websocket.Receiver;
 
-import com.anamensis.server.entity.Member;
+import com.anamensis.server.dto.response.UserResponse;
 import com.anamensis.server.service.UserService;
 import com.anamensis.server.websocket.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequiredArgsConstructor
 public class UserReceiver {
 
-
     private final UserService userService;
 
     public Mono<WebSocketMessage> getUserList(WebSocketSession session, Set<SessionUser> sessionList) {
@@ -34,7 +33,7 @@ public class UserReceiver {
 
         return userService.findMemberByUsernames(userList)
             .flatMapMany(list -> {
-                List<UserResponse.UserStatus> userStatusList = list.stream()
+                List<UserResponse.ChatUserStatus> userStatusList = list.stream()
                     .map(memberResultMap -> {
 
                         String profileImage = memberResultMap.getFile().getFilePath() != null
@@ -47,7 +46,7 @@ public class UserReceiver {
                             .map(SessionUser::status)
                             .orElse(Status.ONLINE);
 
-                        return UserResponse.UserStatus.builder()
+                        return UserResponse.ChatUserStatus.builder()
                                 .id(memberResultMap.getMember().getId())
                                 .username(memberResultMap.getMember().getUserId())
                                 .status(status)
@@ -56,7 +55,7 @@ public class UserReceiver {
                         }
                     ).toList();
 
-                WebSocketResponse<List<UserResponse.UserStatus>> res = WebSocketResponse.<List<UserResponse.UserStatus>>builder()
+                WebSocketResponse<List<UserResponse.ChatUserStatus>> res = WebSocketResponse.<List<UserResponse.ChatUserStatus>>builder()
                     .type(ResponseType.USERS)
                     .data(userStatusList)
                     .build();
@@ -111,12 +110,12 @@ public class UserReceiver {
             mySession.session()
         ));
 
-        UserResponse.UserStatus userStatus = UserResponse.UserStatus.builder()
+        UserResponse.ChatUserStatus userStatus = UserResponse.ChatUserStatus.builder()
             .username(username)
             .status(status)
             .build();
 
-        WebSocketResponse<UserResponse.UserStatus> res = WebSocketResponse.<UserResponse.UserStatus>builder()
+        WebSocketResponse<UserResponse.ChatUserStatus> res = WebSocketResponse.<UserResponse.ChatUserStatus>builder()
             .type(ResponseType.STATUS)
             .data(userStatus)
             .build();
@@ -129,49 +128,5 @@ public class UserReceiver {
                     .send(Mono.just(session.session().textMessage(resJson.toString())))
             )
             .then();
-    }
-
-    public Mono<Void> getUserInfo(
-        JSONObject json,
-        WebSocketSession session,
-        Set<SessionUser> sessionList
-    ) {
-
-        String username = json.getString("username");
-        return userService.findUserInfo(username)
-            .flatMap(userInfoResultMap -> {
-                Member member = userInfoResultMap.getMember();
-
-                String profileImage = userInfoResultMap.getFile().getFilePath() != null
-                    ? userInfoResultMap.getFile().getFilePath() + userInfoResultMap.getFile().getFileName()
-                    : "";
-
-                Status status = sessionList.stream()
-                    .filter(it -> it.username().equals(member.getUserId()))
-                    .findFirst()
-                    .map(SessionUser::status)
-                    .orElse(Status.OFFLINE);
-
-                UserResponse.UserInfo userInfo = UserResponse.UserInfo.builder()
-                    .id(member.getId())
-                    .userId(member.getUserId())
-                    .name(member.getName())
-                    .email(member.getEmail())
-                    .phone(member.getPhone())
-                    .point(member.getPoint())
-                    .status(status)
-                    .profileImage(profileImage)
-                    .build();
-
-                WebSocketResponse<UserResponse.UserInfo> res = WebSocketResponse.<UserResponse.UserInfo>builder()
-                    .type(ResponseType.USERINFO)
-                    .data(userInfo)
-                    .build();
-
-                JSONObject resJson = new JSONObject(res);
-
-
-                return session.send(Mono.just(session.textMessage(resJson.toString())));
-            });
     }
 }

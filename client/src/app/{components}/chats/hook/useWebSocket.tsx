@@ -23,6 +23,7 @@ export interface WebSocketProviderI {
     changeStatusHandler: (status: StatusEnum) => void;
     findChatMessageByChatRoomId: (chatRoomId: number) => ChatSpace.Chatting | undefined;
     userInfoHandler: (userId: string) => Promise<void>;
+    initUnreadCount: (chatRoomId: number) => void;
 }
 
 const WebSocketContext = createContext<WebSocketProviderI>({} as WebSocketProviderI);
@@ -98,8 +99,13 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
     },[chatMessages]);
 
     const chatListHandler = useCallback((data: ChatListItem[]) => {
-        setChatList(data);
-    },[]);
+        const reform = data.map(chat => {
+            const prevUnreadCount = chatList.find(prevChat => chat.id === prevChat.id)?.unreadCount;
+            return {...chat, unreadCount: prevUnreadCount ?? 0};
+        });
+
+        setChatList(reform);
+    },[chatList]);
 
     const usersHandler = useCallback((data: UserStatus[]) => {
         data.sort((a, b) => a.username.localeCompare(b.username));
@@ -135,8 +141,20 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
     const chatHandler = useCallback((data: ChatMessage) => {
         const updateChat = {
             ...chatMessages.find(chat => chat.chatRoomId === data.chatRoomId),
-            createdAt: data.createdAt
+            createdAt: data.createdAt,
         } as Chatting;
+
+        const findChatList = chatList.find(chat => chat.id === data.chatRoomId);
+
+        if(!findChatList) Error('Cannot find chatList');
+
+        const unreadCount = data.sender === userinfo.userId
+            ? findChatList!!.unreadCount
+            : findChatList!!.unreadCount + 1
+
+        const updateFindChat = { ...findChatList, unreadCount } as ChatListItem;
+
+        setChatList([...chatList.filter(chat => chat.id !== data.chatRoomId), updateFindChat]);
 
         if(updateChat.chatMessages) {
             updateChat.chatMessages.add(data);
@@ -152,7 +170,7 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
                 setChatMessages([...chatMessages.filter(chat => chat.chatRoomId !== data.chatRoomId), updateChat]);
             });
 
-    },[chatMessages]);
+    },[chatMessages, chatList]);
 
     const changeStatusHandler = useCallback((status: StatusEnum) => {
         ws.send(JSON.stringify({
@@ -165,11 +183,17 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
         return chatMessages.find(chat => chat.chatRoomId === chatRoomId);
     },[chatMessages]);
 
+    const initUnreadCount = useCallback((chatRoomId: number) => {
+        const chatRoom = chatList.find(chat => chat.id === chatRoomId);
+        const updateChatRoom = {...chatRoom, unreadCount: 0} as ChatListItem;
+        setChatList([...chatList.filter(chat => chat.id !== chatRoomId), updateChatRoom]);
+    },[chatList]);
+
     return (
         <WebSocketContext.Provider value={{
             ws, users, userInfo, chatList, chatMessages,
             changeStatusHandler, userInfoHandler,
-            findChatMessageByChatRoomId,
+            findChatMessageByChatRoomId, initUnreadCount
         }}>
             {children}
         </WebSocketContext.Provider>

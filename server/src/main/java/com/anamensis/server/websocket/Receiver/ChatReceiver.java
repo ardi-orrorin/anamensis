@@ -114,7 +114,7 @@ public class ChatReceiver {
     }
 
 
-    public Mono<Void> receiver(
+    public Mono<Void> sendMessage(
         String username,
         JSONObject json,
         Set<SessionUser> sessionUserList

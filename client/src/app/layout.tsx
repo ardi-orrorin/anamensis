@@ -14,6 +14,9 @@ import {SearchParamsProvider} from "@/app/{hooks}/searchParamsHook";
 import Chat from "@/app/{components}/chats/chat";
 import {WebSocketProvider} from "@/app/{components}/chats/hook/useWebSocket";
 import {ChatMenuProvider} from "@/app/{components}/chats/hook/useChatMenu";
+import moment from "moment/moment";
+
+
 
 export const metadata: Metadata = {
     title: 'anamensis',
@@ -56,6 +59,7 @@ export default function RootLayout({
     // const gId = process.env.NEXT_PUBLIC_GID;
 
     const isLogin = (cookies()?.get('next.access.token')  || cookies()?.get('next.refresh.token')) !== undefined;
+
 
     return (
         <html lang="ko">

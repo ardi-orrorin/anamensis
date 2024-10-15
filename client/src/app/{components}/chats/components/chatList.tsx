@@ -58,18 +58,31 @@ const Item = ({
             chatRoomId: chat.id
         }))
     }
+
+
     return (
         <button className={"w-full flex items-center justify-between p-2 border-y border-solid border-gray-200 hover:bg-gray-700 hover:text-white duration-300"}
                 onClick={onClickChatHandler}
         >
             <div className={"flex items-center space-x-4"}>
-                <img className="w-10 h-10 rounded-full"
-                     src={defaultProfile('')}
-                     alt="SSGPAY"
-                />
+                <div className={'relative min-w-10 max-w-10 max-h-10 min-h-10 rounded-full'}>
+                    <img className={"w-full h-full rounded-full"}
+                         src={defaultProfile('')}
+                         alt="SSGPAY"
+                    />
+                    {
+                        chat.unreadCount > 0
+                        && <span className={`absolute flex justify-center items-center bottom-0 right-0 w-5 h-5 text-white text-xs2 rounded-full bg-red-600`}
+                        >
+                            {chat.unreadCount}
+                        </span>
+                    }
+
+                </div>
+
                 <div className={'flex flex-col items-start'}>
                     <p className="text-start font-semibold truncate w-24">{roomName}</p>
-                    <p className="text-start text-sm">{chat.lastMessage}</p>
+                    <p className="w-40 text-start text-sm truncate">{chat.lastMessage}</p>
                 </div>
             </div>
 

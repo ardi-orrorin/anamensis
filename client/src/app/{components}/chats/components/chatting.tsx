@@ -6,10 +6,11 @@ import {ChatSpace} from "@/app/{components}/chats/services/types";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import {useQuery} from "@tanstack/react-query";
 
+
 const Chatting = () => {
 
     const {activeMenu} = useChatMenu();
-    const {ws, chatMessages, findChatMessageByChatRoomId} = useWebSocket();
+    const {ws, chatMessages, findChatMessageByChatRoomId, initUnreadCount, chatList} = useWebSocket();
     const [content, setContent] = useState<string>('');
     const {data: userinfo} = useQuery(userInfoApiService.profile())
 
@@ -17,11 +18,13 @@ const Chatting = () => {
 
     useEffect(() => {
         lastRef.current?.scrollIntoView({behavior: 'instant'});
-    }, [chatMessages]);
 
+        initUnreadCount(activeMenu.detailId);
+
+    }, [chatMessages.length]);
 
     const submitHotKeyHandler = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if(e.key === 'Enter' && e.shiftKey) {
+        if(e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             submitChatHandler();
         }
@@ -39,9 +42,9 @@ const Chatting = () => {
         setContent('');
     },[content, ws, activeMenu.detailId]);
 
-
     return (
-        <div className={'w-full h-full text-xs flex flex-col overflow-hidden'}>
+        <div className={'w-full h-full text-xs flex flex-col overflow-hidden'}
+             onMouseEnter={()=> initUnreadCount(activeMenu.detailId)}>
             <div className={'h-full flex flex-col gap-3 overflow-y-auto'}>
                 {
                     Array.from(findChatMessageByChatRoomId(activeMenu.detailId)?.chatMessages || [])
@@ -69,13 +72,13 @@ const Chatting = () => {
                 }
                 <div ref={lastRef} className={'h-2'}/>
             </div>
-            <div className={'flex my-1'}>
-                <textarea className={'w-full mx-2 text-sm py-1 px-2 rounded border border-solid border-gray-200 outline-0 resize-none'}
+            <div className={'flex m-1'}>
+                <textarea className={'w-full mr-2 text-sm py-1 px-2 rounded border border-solid border-gray-200 outline-0 resize-none'}
                           value={content}
                           onChange={(e) => setContent(e.target.value)}
                           rows={1}
                           onKeyDown={submitHotKeyHandler}
-                          placeholder={'메시지를 입력하세요.(shift + enter로 전송)'}
+                          placeholder={'메시지를 입력하세요.'}
                 >
                 </textarea>
                 <button className={'min-w-12 bg-gray-700 text-white rounded'}

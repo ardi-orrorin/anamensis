@@ -7,6 +7,7 @@ import {defaultProfile} from "@/app/{commons}/func/image";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import {useQuery} from "@tanstack/react-query";
 import {User} from "@/app/login/{services}/types";
+import Image from "next/image";
 
 const ChatList = () => {
 
@@ -25,7 +26,7 @@ const ChatList = () => {
                 chatList?.length > 0
                 && chatList.toSorted((a, b) => moment(b.updatedAt).diff(moment(a.updatedAt)))
                     .map(chat => (
-                    <Item key={chat.id} {...{chat, userinfo}}/>
+                    <Item key={`chatList-${chat.id}`} {...{chat, userinfo}}/>
                 ))
             }
         </div>
@@ -59,6 +60,7 @@ const Item = ({
         }))
     }
 
+    const user =useMemo(()=> chat.users.filter(user => user.userId !== userinfo.userId)[0], [chat, userinfo]);
 
     return (
         <button className={"w-full flex items-center justify-between p-2 border-y border-solid border-gray-200 hover:bg-gray-700 hover:text-white duration-300"}
@@ -66,9 +68,11 @@ const Item = ({
         >
             <div className={"flex items-center space-x-4"}>
                 <div className={'relative min-w-10 max-w-10 max-h-10 min-h-10 rounded-full'}>
-                    <img className={"w-full h-full rounded-full"}
-                         src={defaultProfile('')}
-                         alt="SSGPAY"
+                    <Image className={"w-full h-full rounded-full"}
+                           src={defaultProfile(user?.profileImage)}
+                           width={40}
+                           height={40}
+                           alt="profile"
                     />
                     {
                         chat.unreadCount > 0

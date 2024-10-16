@@ -8,10 +8,14 @@ import {ActiveMenuEnum, useChatMenu} from "@/app/{components}/chats/hook/useChat
 import apiCall from "@/app/{commons}/func/api";
 import {AxiosError} from "axios";
 import {StatusEnum, UserStatus} from "@/app/{components}/chats/services/Status";
+import {ChatSpace} from "@/app/{components}/chats/services/types";
 
 const UserInfo = () => {
 
-    const {ws, userInfo, userInfoHandler, users} = useWebSocket();
+    const {
+        ws, userInfo, users,
+        userInfoHandler, addChatRoomHandler
+    } = useWebSocket();
     const {changeActiveMenuHandler} = useChatMenu();
     const {data: userinfo} = useQuery(userInfoApiService.profile())
 
@@ -29,14 +33,16 @@ const UserInfo = () => {
 
     const onClickHandler = async () => {
         try {
-            const res = await apiCall<number>({
+            const res = await apiCall<ChatSpace.ChatListItem>({
                 path: '/api/chat/chatroom/partner/' + userInfo.userId,
                 call: 'Proxy',
                 method: 'GET',
                 isReturnData: true,
             });
 
-            changeActiveMenuHandler(ActiveMenuEnum.CHAT, res);
+            addChatRoomHandler(res);
+            changeActiveMenuHandler(ActiveMenuEnum.CHAT, res.id);
+
         } catch (e) {
             const err = e as AxiosError;
 

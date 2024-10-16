@@ -24,6 +24,7 @@ export interface WebSocketProviderI {
     findChatMessageByChatRoomId: (chatRoomId: number) => ChatSpace.Chatting | undefined;
     userInfoHandler: (userId: string) => Promise<void>;
     initUnreadCount: (chatRoomId: number) => void;
+    addChatRoomHandler: (chatRoom: ChatListItem) => void;
 }
 
 const WebSocketContext = createContext<WebSocketProviderI>({} as WebSocketProviderI);
@@ -90,6 +91,8 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
     }
 
     const chatMessageHandler = useCallback((res: WebSocketResponse<ChatMessage[]>) => {
+        if(res.data.length === 0) return;
+
         const findChat = chatMessages.find(chat => chat.chatRoomId === res.data[0].chatRoomId)
             ?? {chatRoomId: res.data[0].chatRoomId, createdAt: res.createdAt, chatMessages: new Set<ChatSpace.ChatMessage>()};
 
@@ -140,7 +143,8 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
 
     const chatHandler = useCallback((data: ChatMessage) => {
         const updateChat = {
-            ...chatMessages.find(chat => chat.chatRoomId === data.chatRoomId),
+            ...chatMessages.find(chat => chat.chatRoomId === data.chatRoomId)
+                ?? {chatRoomId: data.chatRoomId, chatMessages: new Set<ChatMessage>()},
             createdAt: data.createdAt,
         } as Chatting;
 
@@ -189,11 +193,18 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
         setChatList([...chatList.filter(chat => chat.id !== chatRoomId), updateChatRoom]);
     },[chatList]);
 
+    const addChatRoomHandler = useCallback((chatRoom: ChatListItem) => {
+        const exist = chatList.find(chat => chat.id === chatRoom.id);
+        if(exist) return;
+        setChatList([...chatList, chatRoom]);
+    },[chatList]);
+
     return (
         <WebSocketContext.Provider value={{
             ws, users, userInfo, chatList, chatMessages,
             changeStatusHandler, userInfoHandler,
-            findChatMessageByChatRoomId, initUnreadCount
+            findChatMessageByChatRoomId, initUnreadCount,
+            addChatRoomHandler
         }}>
             {children}
         </WebSocketContext.Provider>

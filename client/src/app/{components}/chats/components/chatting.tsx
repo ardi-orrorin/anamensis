@@ -12,18 +12,16 @@ import {Virtuoso} from "react-virtuoso";
 import {User} from "@/app/login/{services}/types";
 import ChatMessage = ChatSpace.ChatMessage;
 
-// fixme: 새로 만들어진 방에서 첫 채팅시 채팅 목록 표시 안됨
 const Chatting = () => {
 
     const {activeMenu} = useChatMenu();
-    const {ws, chatMessages, findChatMessageByChatRoomId, initUnreadCount, users} = useWebSocket();
+    const {ws, chatMessages, findChatMessageByChatRoomId, initUnreadCount, users, chatList} = useWebSocket();
     const [content, setContent] = useState<string>('');
     const {data: userinfo} = useQuery(userInfoApiService.profile())
 
     useEffect(() => {
         initUnreadCount(activeMenu.detailId);
-
-    }, [chatMessages.length]);
+    }, [activeMenu.detailId, chatMessages.length]);
 
     const submitHotKeyHandler = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if(e.nativeEvent.isComposing) return;
@@ -47,31 +45,36 @@ const Chatting = () => {
 
     const data = useMemo(() => {
         return Array.from(findChatMessageByChatRoomId(activeMenu.detailId)?.chatMessages || [])
-            .filter(chat => chat.chatRoomId === activeMenu.detailId);
     }, [chatMessages, activeMenu.detailId])
-
-    console.log(data);
 
     return (
         <div className={'w-full h-full text-xs flex flex-col'}>
             <div className={'h-full'}>
-                <Virtuoso
-                    style={{height: '100%'}}
-                    totalCount={data.length}
-                    followOutput={true}
-                    data={data}
-                    itemContent={(_, chat) => {
-                        const user = users.find(user => user.username === chat.sender);
-                        return (
-                            <div className={'py-2'}>
-                                <ChatComponent key={`chat-${chat.id}-${chat.chatRoomId}`}
-                                               {...{chat, userinfo, user}}
-                                />
-                            </div>
-                        )
-                    }}
-                    onClick={() => initUnreadCount(activeMenu.detailId)}
-                />
+                {/* fixme: 배열의 변동이 없으면 마지막 행으로 이동하지 않음 */}
+
+                {
+                    data.length === 0
+                    ? <div className={'w-full h-full flex justify-center items-center text-gray-700'}>
+                        새로운 대화를 시작합니다.
+                    </div>
+                    : <Virtuoso style={{height: '100%'}}
+                          totalCount={data.length}
+                          data={data}
+                          firstItemIndex={data.length}
+                          followOutput={'smooth'}
+                          itemContent={(_, chat) => {
+                              const user = users.find(user => user.username === chat.sender);
+                              return (
+                                  <div className={'py-2'}>
+                                      <ChatComponent key={`chat-${chat.id}-${chat.chatRoomId}`}
+                                                     {...{chat, userinfo, user}}
+                                      />
+                                  </div>
+                              )
+                          }}
+                          onClick={() => initUnreadCount(activeMenu.detailId)}
+                    />
+                }
             </div>
             <div className={'flex m-1'}>
                 <textarea className={'w-full mr-2 text-sm py-1 px-2 rounded border border-solid border-gray-200 outline-0 resize-none'}
@@ -107,8 +110,8 @@ const ChatComponent = ({
                     && <div className={'relative'}>
                         <Image src={defaultProfile(user?.profileImage)}
                                alt={''}
-                               width={30}
-                               height={30}
+                               width={40}
+                               height={40}
                                className={'rounded-full'}
                                onError={(e) => e.currentTarget.src = defaultProfile('')}
                         />

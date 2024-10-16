@@ -80,6 +80,7 @@ public class ChatRoomService {
             })
             .flatMap(chatRoom -> Mono.justOrEmpty(chatRoomMapper.selectById(chatRoom.getId())))
             .switchIfEmpty(Mono.error(new RuntimeException("ChatRoom not found")));
+
     }
 
     public Mono<Boolean> updateLastMessage(long id, String content) {

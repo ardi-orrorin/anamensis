@@ -35,25 +35,27 @@ public class ChatRoomController {
     }
 
     @GetMapping("/partner/{partner}")
-    public Mono<Long> selectByPartner(
+    public Mono<ChatRoomResponse.ListItem> selectByPartner(
         @PathVariable String partner,
         @AuthenticationPrincipal UserDetails principal
     ) {
         return chatRoomService.hasChatRoomWithBothUsers(principal.getUsername(), partner)
             .flatMap(chatRoomId -> {
-                    if (chatRoomId != 0) return Mono.just(chatRoomId);
-
-                    ChatRoomRequest.Create request = new ChatRoomRequest.Create(
-                        "대화방",
-                        principal.getUsername(),
-                        List.of(principal.getUsername(), partner),
-                        RoomType.PRIVATE
-                    );
-
-                    return chatRoomService.save(request, principal.getUsername())
-                        .map(ChatRoomResultMap.ChatRoom::getId);
+                if (chatRoomId != 0) {
+                    return chatRoomService.selectById(chatRoomId)
+                        .flatMap(chatRoom -> Mono.just(ChatRoomResponse.ListItem.fromListItem(chatRoom)));
                 }
-            );
+
+                ChatRoomRequest.Create request = new ChatRoomRequest.Create(
+                    "대화방",
+                    principal.getUsername(),
+                    List.of(principal.getUsername(), partner),
+                    RoomType.PRIVATE
+                );
+
+                return chatRoomService.save(request, principal.getUsername())
+                    .flatMap(chatRoomResultMap -> Mono.just(ChatRoomResponse.ListItem.fromListItem(chatRoomResultMap)));
+            });
     }
 
     @PostMapping("")

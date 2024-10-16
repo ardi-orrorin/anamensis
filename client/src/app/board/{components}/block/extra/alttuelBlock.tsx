@@ -54,13 +54,9 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
         }
     },[]);
 
-    const thumb = useMemo(()=>{
-        return defaultNoImg(extraValue?.img?.replace(/(\.[^.]+)$/, '_thumb$1'));
-    }, [extraValue?.img])
+    const thumb = useMemo(()=> extraValue?.img?.replace(/(\.[^.]+)$/, '_thumb$1'), [extraValue?.img]);
 
-    const oriImg = useMemo(()=>{
-        return defaultNoImg(extraValue?.img);
-    }, [extraValue?.img])
+    const oriImg = useMemo(()=> extraValue?.img, [extraValue?.img])
 
     const addCommasToNumber = useCallback((number: number)  => {
         if(Number(number) === 0) return '무료';
@@ -417,7 +413,6 @@ const ImageThumb = ({
     setImgViewProps: React.Dispatch<React.SetStateAction<ImgViewProps>>
     onChangeFileHandler: (e: ChangeEvent<HTMLInputElement>) => void,
 }) => {
-
     if(!isView)
         return (
             <>
@@ -433,8 +428,8 @@ const ImageThumb = ({
                     {
                         imgViewProps.imgLoading
                         && <div className={'absolute z-10 flex justify-center items-center left-0 top-0 w-full h-full rounded bg-black bg-opacity-25'}>
-                        <LoadingSpinner size={20}/>
-                      </div>
+                            <LoadingSpinner size={20}/>
+                        </div>
                     }
                 </div>
                 <input ref={imageRef}
@@ -447,6 +442,7 @@ const ImageThumb = ({
                 />
             </>
         )
+
     return (
         <>
             <div className={'relative w-full sm:w-auto duration-500'}>

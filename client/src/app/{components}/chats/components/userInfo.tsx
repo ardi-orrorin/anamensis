@@ -91,11 +91,14 @@ const UserInfo = () => {
                 </table>
             </div>
             <div>
-                <button className={'w-16 h-8 text-xs rounded bg-gray-700 text-white'}
-                        onClick={onClickHandler}
-                >
-                    대화하기
-                </button>
+                {
+                    userInfo.userId !== userinfo.userId
+                    && <button className={'w-16 h-8 text-xs rounded bg-gray-700 text-white'}
+                               onClick={onClickHandler}
+                    >
+                        대화하기
+                    </button>
+                }
             </div>
         </div>
     )

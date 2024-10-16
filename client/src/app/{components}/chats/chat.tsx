@@ -60,7 +60,7 @@ const Chat = () => {
         <div className={'fixed z-[400] flex flex-col gap-2 left-5 bottom-5'}>
             {
                 activeMenu.toggle
-                && <div className={`flex flex-col ${isExpand ? 'w-[90vw] sm:w-[400px] h-[80vh]' : 'w-[400px] h-80'} bg-white border-y-6 border-y-gray-800 border-solid text-sm rounded drop-shadow-xl shadow-black duration-500`}>
+                && <div className={`flex flex-col ${isExpand ? 'w-[90vw] sm:w-[550px] h-[80vh]' : 'w-[400px] h-80'} bg-white border-y-6 border-y-gray-800 border-solid text-sm rounded drop-shadow-xl shadow-black duration-500`}>
                     <header className={'flex px-2 justify-between items-center h-10 border-b border-solid border-gray-200 border-r-opacity-10'}>
                         <button className={'w-6 h-6 flex justify-center items-center hover:bg-gray-700 hover:text-white duration-300 rounded'}
                                 onClick={() => changeToggleHandler(!activeMenu.toggle)}

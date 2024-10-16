@@ -149,7 +149,7 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
         if(!findChatList) Error('Cannot find chatList');
 
         const unreadCount = data.sender === userinfo.userId
-            ? findChatList!!.unreadCount
+            ? findChatList?.unreadCount ?? 0
             : findChatList!!.unreadCount + 1
 
         const updateFindChat = { ...findChatList, unreadCount } as ChatListItem;
@@ -181,7 +181,7 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
 
     const findChatMessageByChatRoomId = useCallback((chatRoomId: number) => {
         return chatMessages.find(chat => chat.chatRoomId === chatRoomId);
-    },[chatMessages]);
+    },[chatMessages, chatList]);
 
     const initUnreadCount = useCallback((chatRoomId: number) => {
         const chatRoom = chatList.find(chat => chat.id === chatRoomId);

@@ -18,15 +18,13 @@ export default function FileImage(props: FileImageProps){
         value.replace(/(\.[^.]+)$/, '_thumb$1')
     ,[value]);
 
-    const url = process.env.NEXT_PUBLIC_CDN_SERVER + thumb;
-
     return (
         <div className={'w-full flex justify-center items-center object-cover'}
              onMouseEnter={onMouseEnterHandler}
              onMouseLeave={onMouseLeaveHandler}
              aria-roledescription={'object'}
         >
-            <Image src={defaultNoImg(url)}
+            <Image src={defaultNoImg(thumb)}
                    alt={''}
                    height={700}
                    width={700}

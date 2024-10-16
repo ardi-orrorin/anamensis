@@ -19,12 +19,10 @@ const ChatLeftMenu = () => {
             className={'flex justify-center gap-1 min-w-16 max-w-16 border-r border-solid border-gray-200 border-r-opacity-10'}>
             <div className={'w-full flex flex-col justify-start'}>
                 {
-                    menus
-                        .filter(menu => menu.view)
-                        .map((menu, index) => (
-                        <ChatLeftMenuBtn key={`menu-${index}`} {...{...menu}} />
-                    ))
-
+                    menus.filter(menu => menu.view)
+                        .map(menu => (
+                            <ChatLeftMenuBtn key={`menu-${menu.value}`} {...{...menu}} />
+                        ))
                 }
             </div>
         </nav>

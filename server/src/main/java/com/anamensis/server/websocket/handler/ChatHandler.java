@@ -47,10 +47,11 @@ public class ChatHandler implements WebSocketHandler {
                         return session.send(userReceiver.getUserList(session, sessionList))
                             .and(chatReceiver.getChatRoomList(user.getUsername(), session))
                             .and(this.receive(session))
-                            .then()
-                            .doFinally(it -> this.close(user.getUsername(), session).subscribe());
+                            .then(Mono.defer(() -> this.close(user.getUsername(), session)));
+
                     })
             );
+
     }
 
     private Mono<Void> receive(WebSocketSession session) {
@@ -85,8 +86,7 @@ public class ChatHandler implements WebSocketHandler {
             return Mono.empty();
         }
 
-        return session.send(userReceiver.getUserList(session, sessionList))
-            .then();
+        return session.send(userReceiver.getUserList(session, sessionList));
     }
 
 

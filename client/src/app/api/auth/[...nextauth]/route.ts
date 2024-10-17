@@ -8,7 +8,7 @@ import loginConstants from "@/app/login/{services}/constants";
 import Naver from "next-auth/providers/naver";
 import {User} from "@/app/login/{services}/types";
 import Kakao from "next-auth/providers/kakao";
-import {Ardi} from "@/app/api/auth/[...nextauth]/ardi";
+import {Custom} from "@/app/api/auth/[...nextauth]/custom";
 
 interface RouteHandlerContext {
     params: { nextauth: string[] }
@@ -18,40 +18,40 @@ async function handler(req: NextRequest, context: RouteHandlerContext) {
 
     const providers = [];
 
-    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
-    && process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET
+    process.env.GOOGLE_CLIENT_ID
+    && process.env.GOOGLE_CLIENT_SECRET
     && providers.push(Google({
-        clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-        clientSecret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET,
+        clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }));
 
-    process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID
-    && process.env.NEXT_PUBLIC_GITHUB_CLIENT_SECRET
+    process.env.GITHUB_CLIENT_ID
+    && process.env.GITHUB_CLIENT_SECRET
     && providers.push(Github({
-        clientId: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID,
-        clientSecret: process.env.NEXT_PUBLIC_GITHUB_CLIENT_SECRET,
+        clientId: process.env.GITHUB_CLIENT_ID,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET,
     }));
 
-    process.env.NEXT_PUBLIC_NAVER_CLIENT_ID
-    && process.env.NEXT_PUBLIC_NAVER_CLIENT_SECRET
+    process.env.NAVER_CLIENT_ID
+    && process.env.NAVER_CLIENT_SECRET
     && providers.push(Naver({
-        clientId: process.env.NEXT_PUBLIC_NAVER_CLIENT_ID,
-        clientSecret: process.env.NEXT_PUBLIC_NAVER_CLIENT_SECRET,
+        clientId: process.env.NAVER_CLIENT_ID,
+        clientSecret: process.env.NAVER_CLIENT_SECRET,
     }));
 
-    process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID
-    && process.env.NEXT_PUBLIC_KAKAO_CLIENT_SECRET
+    process.env.KAKAO_CLIENT_ID
+    && process.env.KAKAO_CLIENT_SECRET
     && providers.push(Kakao({
-        clientId: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID,
-        clientSecret: process.env.NEXT_PUBLIC_KAKAO_CLIENT_SECRET,
+        clientId: process.env.KAKAO_CLIENT_ID,
+        clientSecret: process.env.KAKAO_CLIENT_SECRET,
     }));
 
-    process.env.NEXT_PUBLIC_ARDI_CLIENT_ID
-    && process.env.NEXT_PUBLIC_ARDI_CLIENT_SECRET
-    && process.env.NEXT_PUBLIC_ARDI_OAUTH2_SERVER_URL
-    && providers.push(Ardi({
-        clientId: process.env.NEXT_PUBLIC_ARDI_CLIENT_ID,
-        clientSecret: process.env.NEXT_PUBLIC_ARDI_CLIENT_SECRET,
+    process.env.CUSTOM_CLIENT_ID
+    && process.env.CUSTOM_CLIENT_SECRET
+    && process.env.CUSTOM_OAUTH2_SERVER_URL
+    && providers.push(Custom({
+        clientId: process.env.CUSTOM_CLIENT_ID,
+        clientSecret: process.env.CUSTOM_CLIENT_SECRET,
     }));
 
     const options: AuthOptions = {
@@ -61,21 +61,21 @@ async function handler(req: NextRequest, context: RouteHandlerContext) {
                 if(!account?.provider) return false;
 
                 const loginUser  = {
-                    userId: user.id,
-                    email: user.email ?? '',
-                    name: user.name   ?? '',
-                    provider: account.provider,
+                    userId   : user.id,
+                    email    : user.email ?? '',
+                    name     : user.name   ?? '',
+                    provider : account.provider,
                 } as User.OAuth2;
 
                 const url = process.env.NEXT_PUBLIC_SERVER + '/public/api/user/oauth'
-                const clientIp = req.ip || req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for');
+                const clientIp = req.ip ?? req.headers.get('x-real-ip') ?? req.headers.get('x-forwarded-for');
 
                 const ipRegExp = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/;
-                const ipMatch = ipRegExp.exec(clientIp || '');
+                const ipMatch = ipRegExp.exec(clientIp ?? '');
 
                 const headers = {
                     'Content-Type': 'application/json',
-                    'User-Agent': req.headers.get('User-Agent') || '',
+                    'User-Agent': req.headers.get('User-Agent') ?? '',
                     'Ip': ipMatch?.[0] ?? '',
                     'Location': `Test`
                 }
@@ -103,7 +103,7 @@ async function handler(req: NextRequest, context: RouteHandlerContext) {
                     return false;
                 }
             },
-            redirect(params ) {
+            redirect(params) {
                 return '/';
             },
         },

@@ -81,7 +81,6 @@ const NavMain = async () => {
                     }
                     {
                         isLogged
-                        && process.env.NEXT_PUBLIC_CDN_SERVER
                         && <div className={'flex h-full justify-center items-center px-1.5 hover:bg-gray-800 rounded duration-500'}>
                         <Link href={'/user'}
                               title={'프로필'}

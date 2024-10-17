@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles("dev")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Transactional
@@ -194,6 +194,26 @@ class UserServiceTest {
                     assertEquals(0, user.getPoint());
                     assertTrue(user.getSAuth());
                     assertEquals(AuthType.EMAIL, user.getSAuthType());
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void saveee() {
+        UserRequest.Register register = new UserRequest.Register();
+        register.setId("master");
+        register.setPwd("master");
+        register.setName("master");
+        register.setEmail("");
+        register.setPhone("");
+
+        StepVerifier.create(us.saveUser(register, true))
+                .assertNext(user -> {
+                    assertEquals("master", user.getUserId());
+                    assertEquals("master", user.getName());
+                    assertEquals("", user.getEmail());
+                    assertEquals("", user.getPhone());
+                    assertEquals(10, user.getPoint());
                 })
                 .verifyComplete();
     }

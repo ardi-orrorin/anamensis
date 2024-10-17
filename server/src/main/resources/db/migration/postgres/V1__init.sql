@@ -757,3 +757,13 @@ SELECT lh.member_pk, count(lh.id) as count from log_history lh GROUP BY (lh.memb
 
 INSERT INTO point_history_count (member_pk, count)
 SELECT lh.member_pk, count(lh.id) as count from point_history lh GROUP BY (lh.member_pk);
+
+
+INSERT INTO member (id, user_id, pwd, name, email, phone, create_at, update_at)
+VALUES (1, 'master', '$2a$10$2duD9QVPe4rtDFbAQO7kK.sV8csuKvKx97AlPP.decA9.4.whTRiq', 'master', '', '', now(), now());
+
+INSERT INTO role (role, member_pk)
+VALUES ('ADMIN', 1),
+       ('MASTER', 1),
+       ('USER', 1),
+       ('GUEST', 1);

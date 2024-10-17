@@ -8,6 +8,7 @@ import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 const CustomImage = () => {
     const {data:profileImg } = useQuery(userApiService.profileImg())
     const {defaultProfile} = useDefaultImage();
+
     return (
         <Image className={'rounded'}
                src={defaultProfile(profileImg)}

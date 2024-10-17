@@ -18,6 +18,9 @@ const nextConfig = {
   },
   optimizeFonts : true,
   compress : true,
+  env: {
+    NEXT_PUBLIC_SERVER: `http://localhost:8080`
+  },
   async rewrites() {
     return [
       {

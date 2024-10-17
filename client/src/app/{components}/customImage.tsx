@@ -1,13 +1,13 @@
 'use client';
 
 import Image from "next/image";
-import {NO_PROFILE} from "@/app/{services}/constants";
 import {useQuery} from "@tanstack/react-query";
 import userApiService from "@/app/user/{services}/userApiService";
-import {defaultProfile} from "@/app/{commons}/func/image";
+import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 const CustomImage = () => {
     const {data:profileImg } = useQuery(userApiService.profileImg())
+    const {defaultProfile} = useDefaultImage();
     return (
         <Image className={'rounded'}
                src={defaultProfile(profileImg)}

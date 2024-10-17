@@ -1,9 +1,8 @@
 import {Category} from "@/app/board/{services}/types";
 import Image from "next/image";
-import {defaultProfile} from "@/app/{commons}/func/image";
 import React, {useMemo} from "react";
-import {NO_PROFILE} from "@/app/{services}/constants";
 import {Root} from "@/app/{services}/types";
+import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 const HeaderComponent = (props: Root.BoardListI) => {
     const {
@@ -11,6 +10,8 @@ const HeaderComponent = (props: Root.BoardListI) => {
         , isPublic, profileImage
         , writer, membersOnly
     } = props;
+
+    const {defaultProfile} = useDefaultImage();
 
     const categoryName = useMemo(()=>
         Category.findById(categoryPk)?.name

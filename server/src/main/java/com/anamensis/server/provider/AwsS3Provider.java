@@ -176,12 +176,20 @@ public class AwsS3Provider {
     }
 
     public Mono<Void> deleteS3(String filePath, String filename) {
-        s3Client.deleteObject(
-            DeleteObjectRequest.builder()
-                .bucket(bucket)
-                .key(filePath.substring(1) + filename)
-                .build()
-        );
+
+        if(ACTIVE_S3) {
+            s3Client.deleteObject(
+                DeleteObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(filePath.substring(1) + filename)
+                    .build()
+            );
+            return Mono.empty();
+        }
+
+        File file = new File(FILE_STORAGE_DIR + filePath + filename);
+        file.delete();
+
         return Mono.empty();
     }
 

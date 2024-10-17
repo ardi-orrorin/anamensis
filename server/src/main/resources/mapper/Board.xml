@@ -65,6 +65,7 @@
                 OFFSET #{page.offset}
                  LIMIT #{page.size}
          ) b3 ON b3.id = b.id
+         ORDER BY b3.id DESC
     </select>
     <select id="findIsSelf" resultMap="BoardResultMapBoardList">
         SELECT *
@@ -103,6 +104,7 @@
                                    FROM table_code tc
                                   WHERE tc.table_name = 'member')
           AND f.is_use = TRUE
+        ORDER BY b3.id DESC
     </select>
 
     <select id="findByPk" resultMap="BoardResultMapBoard" parameterType="Long">
@@ -170,7 +172,7 @@
     </update>
     <update id="disableByPk" parameterType="Map">
         UPDATE board
-           SET is_use    = 0
+           SET is_use    = FALSE
            AND update_at = #{updateAt}
          WHERE id        = #{boardPk}
            AND is_use    = TRUE

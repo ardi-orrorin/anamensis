@@ -41,7 +41,7 @@ export const WebSocketProvider = ({children} : {children: React.ReactNode}) => {
 
     useEffect(() => {
         const init = () => {
-            const newWs = new WebSocket(process.env.NEXT_PUBLIC_WEBSOCKET_SERVER + '/ws/chat/123');
+            const newWs = new WebSocket('/ws/chat/123');
             setWs(newWs);
         }
 

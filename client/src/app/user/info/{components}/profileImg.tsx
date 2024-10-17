@@ -1,16 +1,14 @@
 'use client';
 
 import Image from "next/image";
-import {defaultProfile} from "@/app/{commons}/func/image";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import React, {useContext, useEffect, useRef, useState} from "react";
-import apiCall from "@/app/{commons}/func/api";
+import React, {useRef, useState} from "react";
 import {createDebounce} from "@/app/{commons}/func/debounce";
-import UserProvider from "@/app/user/{services}/userProvider";
 import {UserInfoSpace} from "@/app/user/info/{services}/types";
 import {useQuery} from "@tanstack/react-query";
 import userApiService from "@/app/user/{services}/userApiService";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
+import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 const ProfileImg = () => {
 
@@ -20,6 +18,7 @@ const ProfileImg = () => {
     const [loading, setLoading] = useState({} as UserInfoSpace.Loading);
     const [profileEnter, setProfileEnter] = useState(false);
     const debounce = createDebounce(500);
+    const {defaultProfile} = useDefaultImage();
 
     const onChangeHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files) return;

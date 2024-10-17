@@ -18,14 +18,13 @@ import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import {faTableList} from "@fortawesome/free-solid-svg-icons/faTableList";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import Image from "next/image";
-import {NO_PROFILE} from "@/app/{services}/constants";
 import {System} from "@/app/user/system/{services}/types";
 import {usePrefetchQuery, useQuery} from "@tanstack/react-query";
 import rootApiService from "@/app/{services}/rootApiService";
 import userApiService from "@/app/user/{services}/userApiService";
 import emailApiService from "@/app/user/email/{services}/emailApiService";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
-import {defaultProfile} from "@/app/{commons}/func/image";
+import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 type MenuItemType = {
     name: string,
@@ -52,6 +51,8 @@ const LeftNavBar = ({
 
     const {data: roles} = useQuery(rootApiService.userRole());
     const {data: profileImg} = useQuery(userApiService.profileImg());
+
+    const {defaultProfile} = useDefaultImage();
 
     const isOAuthUser = useMemo(() =>
             roles && roles?.find(role =>

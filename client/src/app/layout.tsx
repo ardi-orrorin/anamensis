@@ -3,7 +3,6 @@ import NavMain from "@/app/NavMain";
 import {ErrorBoundary} from "next/dist/client/components/error-boundary";
 import Error from "@/app/error";
 import {Metadata, Viewport} from "next";
-import Script from "next/script";
 import Footer from "@/app/{components}/mainFooter";
 import ProgressBar from "@/app/{components}/progressBar";
 import Providers from "@/app/Provider";
@@ -14,8 +13,7 @@ import {SearchParamsProvider} from "@/app/{hooks}/searchParamsHook";
 import Chat from "@/app/{components}/chats/chat";
 import {WebSocketProvider} from "@/app/{components}/chats/hook/useWebSocket";
 import {ChatMenuProvider} from "@/app/{components}/chats/hook/useChatMenu";
-import moment from "moment/moment";
-
+import {DefaultImageProvider} from "@/app/{hooks}/useDefaultImage";
 
 
 export const metadata: Metadata = {
@@ -39,7 +37,7 @@ export const metadata: Metadata = {
                 alt: 'anamensis',
             },
         ],
-        url: 'https://anamensis.site',
+        url: process.env.NEXT_PUBLIC_BASE_URL,
     },
 }
 
@@ -56,50 +54,37 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
 
-    // const gId = process.env.NEXT_PUBLIC_GID;
-
     const isLogin = (cookies()?.get('next.access.token')  || cookies()?.get('next.refresh.token')) !== undefined;
-
 
     return (
         <html lang="ko">
-            {/*<Script id={'google-analytics'} async*/}
-            {/*        src={`https://www.googletagmanager.com/gtag/js?id=G-${gId}`}*/}
-            {/*/>*/}
-            {/*<Script id={'google-analytics'} dangerouslySetInnerHTML={{*/}
-            {/*    __html: `*/}
-            {/*    window.dataLayer = window.dataLayer || [];*/}
-            {/*    function gtag(){dataLayer.push(arguments);}*/}
-            {/*    gtag('js', new Date());*/}
-
-            {/*    gtag('config', 'G-${gId}');*/}
-            {/*    `*/}
-            {/*}} />*/}
             <body className={'flex flex-col'}>
             <Providers>
-                {
-                    isLogin
-                    && <>
-                        <LoginState />
-                        <WebSocketProvider>
-                            <ChatMenuProvider>
-                                <Chat />
-                            </ChatMenuProvider>
-                        </WebSocketProvider>
-                    </>
-                }
-                <ProgressBar />
-                <NavMain />
-                <ErrorBoundary errorComponent={Error}>
-                    <SearchHistoryProvider>
-                        <SearchParamsProvider>
-                            <main className={'w-full min-h-screen'}>
-                                {children}
-                            </main>
-                        </SearchParamsProvider>
-                    </SearchHistoryProvider>
-                </ErrorBoundary>
-                <Footer />
+                <DefaultImageProvider>
+                    {
+                        isLogin
+                        && <>
+                            <LoginState />
+                            <WebSocketProvider>
+                                <ChatMenuProvider>
+                                    <Chat />
+                                </ChatMenuProvider>
+                            </WebSocketProvider>
+                        </>
+                    }
+                    <ProgressBar />
+                    <NavMain />
+                    <ErrorBoundary errorComponent={Error}>
+                        <SearchHistoryProvider>
+                            <SearchParamsProvider>
+                                <main className={'w-full min-h-screen'}>
+                                    {children}
+                                </main>
+                            </SearchParamsProvider>
+                        </SearchHistoryProvider>
+                    </ErrorBoundary>
+                    <Footer />
+                </DefaultImageProvider>
             </Providers>
             </body>
         </html>

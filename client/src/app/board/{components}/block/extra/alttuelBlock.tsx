@@ -3,12 +3,11 @@ import React, {ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} f
 import Image from "next/image";
 import axios from "axios";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import {defaultNoImg} from "@/app/{commons}/func/image";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
-import {NO_IMAGE} from "@/app/{services}/constants";
 import {usePendingFiles} from "@/app/board/[id]/{hooks}/usePendingFiles";
 import boardApiService from "@/app/board/{services}/boardApiService";
+import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 
 export type AlttuelBlockProps = {
@@ -413,6 +412,9 @@ const ImageThumb = ({
     setImgViewProps: React.Dispatch<React.SetStateAction<ImgViewProps>>
     onChangeFileHandler: (e: ChangeEvent<HTMLInputElement>) => void,
 }) => {
+
+    const {defaultNoImg} = useDefaultImage();
+
     if(!isView)
         return (
             <>

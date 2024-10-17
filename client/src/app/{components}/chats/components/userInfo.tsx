@@ -1,6 +1,5 @@
 import {useWebSocket} from "@/app/{components}/chats/hook/useWebSocket";
 import Image from "next/image";
-import {defaultProfile} from "@/app/{commons}/func/image";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import {useQuery} from "@tanstack/react-query";
 import {useEffect, useMemo} from "react";
@@ -9,6 +8,7 @@ import apiCall from "@/app/{commons}/func/api";
 import {AxiosError} from "axios";
 import {StatusEnum, UserStatus} from "@/app/{components}/chats/services/Status";
 import {ChatSpace} from "@/app/{components}/chats/services/types";
+import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 const UserInfo = () => {
 
@@ -16,7 +16,10 @@ const UserInfo = () => {
         ws, userInfo, users,
         userInfoHandler, addChatRoomHandler
     } = useWebSocket();
+
     const {changeActiveMenuHandler} = useChatMenu();
+    const {defaultProfile} = useDefaultImage();
+
     const {data: userinfo} = useQuery(userInfoApiService.profile())
 
     const userStatus = useMemo(() => {

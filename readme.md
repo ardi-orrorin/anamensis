@@ -55,32 +55,8 @@ docker secret create nextjs_anamensis_secret_config nextjs.env
 
 
 ## example site nextjs.env
-- [CloudFlare Turnstile](https://www.cloudflare.com/ko-kr/products/turnstile/)
-- [Google Analytics Link](https://analytics.google.com/analytics/web/)
 - [KaKao Login](https://developers.kakao.com/product/kakaoLogin)
 - [Google OAuth](https://cloud.google.com/apigee/docs/api-platform/security/oauth/oauth-home?hl=ko)
 - [Github OAuth](https://docs.github.com/ko/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps)
 - [Naver OAuth](https://developers.naver.com/docs/login/api/api.md)
 
-
-```text
-NEXT_PUBLIC_SERVER=http(s):// + Spring Server Domain
-NEXT_PUBLIC_DOMAIN=NextJS Public Domain
-NEXT_PUBLIC_CDN_SERVER=http(s):// + CDN Server Url
-NEXT_PUBLIC_CDN_SERVER_HOST=CDN Server Url
-NEXT_PUBLIC_TURNSTILE_SITE_KEY=
-NEXT_PUBLIC_TURNSTILE_PRIVATE_KEY=
-NEXT_PUBLIC_SSL=TRUE
-NEXT_PUBLIC_GID1=Google Analytics GID
-NEXT_PUBLIC_VERSION=__ANAMENSIS_VERSION__
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=
-NEXT_PUBLIC_GOOGLE_CLIENT_SECRET=
-NEXT_PUBLIC_KAKAO_CLIENT_ID=
-NEXT_PUBLIC_KAKAO_CLIENT_SECRET=
-NEXT_PUBLIC_GITHUB_CLIENT_ID=
-NEXT_PUBLIC_GITHUB_CLIENT_SECRET=
-NEXT_PUBLIC_NAVER_CLIENT_ID=
-NEXT_PUBLIC_NAVER_CLIENT_SECRET=
-NEXTAUTH_SECRET=custome_secret
-NEXTAUTH_URL=http(s):// + NextJS Domain (Redirect Domain)
-```

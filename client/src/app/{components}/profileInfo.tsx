@@ -4,7 +4,7 @@ import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import React, {useMemo} from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {defaultProfile} from "@/app/{commons}/func/image";
+import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 const ProfileInfo = () => {
     const router = useRouter()
@@ -12,6 +12,8 @@ const ProfileInfo = () => {
     const profileImg = useQueryClient().getQueryData(['profileImg']) as string;
 
     const {data: userinfo} = useQuery(userInfoApiService.profile())
+
+    const {defaultProfile} = useDefaultImage();
 
     const point = useMemo(() =>
             userinfo?.point.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")

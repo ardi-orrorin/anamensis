@@ -3,11 +3,11 @@ import React, {useEffect, useMemo} from "react";
 import {ChatSpace} from "@/app/{components}/chats/services/types";
 import moment from "moment";
 import {ActiveMenuEnum, useChatMenu} from "@/app/{components}/chats/hook/useChatMenu";
-import {defaultProfile} from "@/app/{commons}/func/image";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import {useQuery} from "@tanstack/react-query";
 import {User} from "@/app/login/{services}/types";
 import Image from "next/image";
+import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 const ChatList = () => {
 
@@ -42,6 +42,7 @@ const Item = ({
 
     const {ws, findChatMessageByChatRoomId} = useWebSocket();
     const {changeActiveMenuHandler} = useChatMenu();
+    const {defaultProfile} = useDefaultImage();
 
     const roomName = useMemo(() =>
         chat.users.filter(user => user.userId !== userinfo.userId).map(user => user.userId).join(', ')

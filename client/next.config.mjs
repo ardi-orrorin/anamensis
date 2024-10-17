@@ -1,3 +1,7 @@
+
+import { createProxyMiddleware} from 'http-proxy-middleware';
+
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
@@ -14,6 +18,43 @@ const nextConfig = {
   },
   optimizeFonts : true,
   compress : true,
+  async rewrites() {
+    return [
+      {
+        source: '/ws/:path*',
+        destination: 'http://localhost:8080/ws/:path*',
+      },
+      {
+        source: '/files/:path*',
+        destination: 'http://localhost:8080/files/:path*',
+      }
+    ];
+  },
+
+  async headers() {
+    return [
+      {
+        source: '/ws/:path*',
+        headers: [
+          { key: 'Connection', value: 'Upgrade' },
+          { key: 'Upgrade', value: 'websocket' },
+        ],
+      },
+    ];
+  },
+
+  devServer: {
+    onBeforeSetupMiddleware(devServer) {
+      devServer.app.use(
+        '/ws',
+        createProxyMiddleware({
+          target: 'http://localhost:8080',
+          changeOrigin: true,
+          ws: true,
+        })
+      );
+    },
+  },
 
 };
 

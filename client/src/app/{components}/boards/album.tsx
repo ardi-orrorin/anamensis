@@ -1,13 +1,14 @@
 import {ImageShowProps} from "@/app/board/{components}/block/extra/albumBlock";
 import HeaderComponent from "@/app/{components}/headerComponent";
-import {defaultNoImg} from "@/app/{commons}/func/image";
 import FooterComponent from "@/app/{components}/footerComponent";
 import Image from "next/image";
-import {NO_IMAGE} from "@/app/{services}/constants";
 import {Root} from "@/app/{services}/types";
+import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 const AlbumBoardComponent = (props: Root.BoardListI) => {
     const { body } = props;
+
+    const { defaultNoImg } = useDefaultImage();
 
     const extraValue = body?.filter((block) =>
         block.code === '00302'

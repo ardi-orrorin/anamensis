@@ -107,8 +107,8 @@
     <update id="updateLastMessage" parameterType="ChatRoom">
         UPDATE chat_room
            SET last_message = #{lastMessage}
-             , updated_at = now()
-         WHERE id = #{id}
+             , updated_at   = now()
+         WHERE id           = #{id}
     </update>
 
     <insert id="saveChatRoomUser">

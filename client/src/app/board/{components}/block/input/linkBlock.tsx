@@ -110,7 +110,7 @@ const LinkBlock = (props: ExpendBlockProps) => {
                         >{extraValue.description || '내용 없음'}</p>
                     </div>
                     <img className={'min-w-[100px] w-[30%] h-[80px] rounded object-cover'}
-                         src={extraValue.image || 'http://' + process.env.NEXT_PUBLIC_DOMAIN + '/noimage.jpg'} alt=""
+                         src={extraValue.image ||process.env.NEXT_PUBLIC_DOMAIN + '/noimage.jpg'} alt=""
                     />
                 </a>
             }

@@ -5,6 +5,8 @@ import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import axios from "axios";
 import {BlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
 import {usePendingFiles} from "@/app/board/[id]/{hooks}/usePendingFiles";
+import rootApiService from "@/app/{services}/rootApiService";
+import {useQuery} from "@tanstack/react-query";
 
 export type FileUploadProps = {
     onUploadFileUrl: (url: string) => void;
@@ -19,6 +21,7 @@ export default function FileUpload (props: FileUploadProps) {
     const [loading, setLoading] = useState<boolean>(false);
     const [progress, setProgress] = useState<number>(0);
     const {setWaitUploadFiles} = usePendingFiles();
+    const {data: config} = useQuery(rootApiService.getConfig());
 
     const onClick = () => {
         if(!useFileInputRef.current) return ;
@@ -45,7 +48,7 @@ export default function FileUpload (props: FileUploadProps) {
 
             formData.append('file', file);
 
-            const root = process.env.NEXT_PUBLIC_SERVER + '/public/api/files/upload/';
+            const root = config?.backendUrl + '/public/api/files/upload/';
 
             setLoading(true);
 

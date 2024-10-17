@@ -1,10 +1,9 @@
 import React, {CSSProperties, useContext, useMemo, useRef, useState} from "react";
 import AlbumProvider from "@/app/board/{components}/block/extra/providers/albumProvier";
-import {defaultNoImg} from "@/app/{commons}/func/image";
 import DeleteOverlay from "@/app/board/{components}/block/extra/{components}/deleteOverlay";
 import DefaultLabel from "@/app/board/{components}/block/extra/{components}/defaultLabel";
-import {NO_IMAGE} from "@/app/{services}/constants";
 import Image from "next/image";
+import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 const Thumbnail = ({
     images,
@@ -24,6 +23,7 @@ const Thumbnail = ({
     const divRef = useRef<HTMLDivElement>(null);
 
     const { setAlbumToggle } = useContext(AlbumProvider);
+    const { defaultNoImg } = useDefaultImage();
 
     const arrays = useMemo(() =>
         Array.from({length: 4}, (_, index) => {

@@ -11,8 +11,8 @@
           FROM otp o
           JOIN member m
             ON o.member_pk = m.id
-         WHERE m.user_id = #{userId}
-           AND o.is_use  = TRUE
+         WHERE m.user_id   = #{userId}
+           AND o.is_use    = TRUE
     </select>
 
     <select id="selectByMemberPk" resultType="OTP">

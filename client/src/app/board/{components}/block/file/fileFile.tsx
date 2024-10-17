@@ -1,6 +1,8 @@
 'use client';
 import {CSSProperties, useMemo} from "react";
 import Link from "next/link";
+import rootApiService from "@/app/{services}/rootApiService";
+import {useQuery} from "@tanstack/react-query";
 
 export type FileFileProps = {
     value: string;
@@ -26,7 +28,9 @@ export default function FileFile(props: FileFileProps){
         backgroundColor   : 'rgba(240,240,240, 0.5)',
     }),[]);
 
-    const downloadUrl = process.env.NEXT_PUBLIC_SERVER + value;
+    const {data: config} = useQuery(rootApiService.getConfig());
+
+    const downloadUrl = config?.backendUrl + value;
 
     return (
         <div style={style}>

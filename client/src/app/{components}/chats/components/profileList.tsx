@@ -1,10 +1,10 @@
 import {UserStatus} from "@/app/{components}/chats/services/Status";
-import {defaultProfile} from "@/app/{commons}/func/image";
 import React from "react";
 import {useQuery} from "@tanstack/react-query";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import {useWebSocket} from "@/app/{components}/chats/hook/useWebSocket";
 import {ActiveMenuEnum, useChatMenu} from "@/app/{components}/chats/hook/useChatMenu";
+import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 const ProfileList = () => {
 
@@ -13,6 +13,8 @@ const ProfileList = () => {
     const {users, userInfoHandler}  = useWebSocket();
 
     const {changeActiveMenuHandler} = useChatMenu();
+
+    const {defaultProfile} = useDefaultImage();
 
     const onClickUser = (username: string) => {
         return userInfoHandler(username)

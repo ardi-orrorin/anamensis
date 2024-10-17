@@ -1,4 +1,6 @@
 import axios, {AxiosHeaders, AxiosRequestConfig, AxiosResponse} from "axios";
+import {useQuery} from "@tanstack/react-query";
+import rootApiService from "@/app/{services}/rootApiService";
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export type Call = 'Proxy' | 'Server';

@@ -6,16 +6,16 @@ import {ChatSpace} from "@/app/{components}/chats/services/types";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import {useQuery} from "@tanstack/react-query";
 import Image from "next/image";
-import {defaultProfile} from "@/app/{commons}/func/image";
 import {UserStatus} from "@/app/{components}/chats/services/Status";
 import {Virtuoso} from "react-virtuoso";
 import {User} from "@/app/login/{services}/types";
 import ChatMessage = ChatSpace.ChatMessage;
+import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 const Chatting = () => {
 
     const {activeMenu} = useChatMenu();
-    const {ws, chatMessages, findChatMessageByChatRoomId, initUnreadCount, users, chatList} = useWebSocket();
+    const {ws, chatMessages, findChatMessageByChatRoomId, initUnreadCount, users,} = useWebSocket();
     const [content, setContent] = useState<string>('');
     const {data: userinfo} = useQuery(userInfoApiService.profile())
 
@@ -102,6 +102,9 @@ const ChatComponent = ({
     user     : ChatSpace.UserStatus | undefined
     userinfo : User.UserInfo,
 }) => {
+
+    const {defaultProfile} = useDefaultImage();
+
     return (
         <div className={`px-2 flex ${chat.sender !== userinfo.name ? 'justify-start' : 'justify-end'}`}>
             <div className={'flex items-start gap-1'}>

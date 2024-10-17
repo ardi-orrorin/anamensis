@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import software.amazon.awssdk.services.s3.S3Client;
 
 import java.util.Random;
 
@@ -32,6 +33,4 @@ public class BeanConfig {
     public VirtualThreadTaskExecutor virtualThreadTaskExecutor() {
         return new VirtualThreadTaskExecutor("virtual-thread-");
     }
-
-
 }

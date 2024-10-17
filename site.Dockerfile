@@ -1,13 +1,10 @@
 FROM       __DOCKER_ID__/anamensis-base:latest
+#FROM       __DOCKER_ID__/anamensis-base:latest
 LABEL      author="ARDI"
 RUN        mkdir -p /app
 WORKDIR    /app
 
 ARG        JAR
-
-ENV        SPRING_CONFIG_LOCATION "/application.yml"
-ENV        SPRING_PROFILES_ACTIVE "prod"
-
 ARG        JAR_FILE=server/build/libs/${JAR}.jar
 
 COPY       ${JAR_FILE} /app.jar
@@ -19,6 +16,6 @@ COPY       ./client/package-lock.json ./package-lock.json
 
 COPY       entrypoint.sh entrypoint.sh
 
-RUN        bun i
+RUN        npm i
 RUN        chmod +x entrypoint.sh
 ENTRYPOINT ["./entrypoint.sh"]

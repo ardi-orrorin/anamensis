@@ -45,7 +45,7 @@ public class FileService {
 
     private final TableCodeMapper tableCodeMapper;
 
-    @Value("${file.upload-dir}")
+    @Value("${file.storage.dir}")
     private String UPLOAD_DIR;
 
     private final Sinks.Many<FileHashRecord> list = Sinks.many().multicast().directAllOrNothing();

@@ -38,20 +38,22 @@ docker secret create nextjs_anamensis_secret_config nextjs.env
 /root/build.sh base 0.0.1 anamensis
 ```
 
-## example site application.yml
-```yaml
-spring:
-  application:
-    name: server, aws, mysql, security, redis
-  config:
-    import: optional:configserver:https://url
-  flyway: #db migration
-    enabled: true
-    baseline-on-migrate: true
-    locations: classpath:db/migration/mysql
-    validate-on-migrate: true
-    validate-migration-naming: true
-```
+## Spring Server environments
+- TIME_ZONE (기본값: Asia/Seoul)
+- DB_URI (필수값)
+- DB_USERNAME (필수값)
+- DB_PASSWORD (필수값)
+- DB_MAX_POOL_SIZE (기본값: 21)
+- JWT_SECRET_KEY (필수값)
+- FILE_STORAGE_DIR (기본값: /)
+- AWS 설정
+  - AWS_S3_ACTIVE (기본값: false)
+  - AWS_ACCESS_KEY  (AWS 설정 시 필수값, 기본값 없음)
+  - AWS_SECRET_KEY (AWS 설정 시 필수값, 기본값 없음)
+  - AWS_REGION (기본값: ap-northeast-2)
+  - AWS_BUCKET (기본값: anamensis)
+
+
 
 ## example site nextjs.env
 - [CloudFlare Turnstile](https://www.cloudflare.com/ko-kr/products/turnstile/)

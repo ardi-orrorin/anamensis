@@ -22,7 +22,7 @@ public class ChatMessageService {
     private final ChatMessageMapper chatMessageMapper;
 
     public Mono<List<ChatMessageResponse.ChatMessage>> selectAllByRoomId(long roomId) {
-        return Flux.fromIterable(chatMessageMapper.findAllByChatRoomId(roomId, Instant.now().minus(10, ChronoUnit.DAYS)))
+        return Flux.fromIterable(chatMessageMapper.findAllByChatRoomId(roomId, Instant.now().minus(3, ChronoUnit.DAYS)))
             .flatMap(chatMessage ->
                 Mono.just(new ChatMessageResponse().from(chatMessage))
             )

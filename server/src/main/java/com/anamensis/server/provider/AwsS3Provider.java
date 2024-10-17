@@ -28,7 +28,7 @@ public class AwsS3Provider {
     @Value("${file.storage.dir}")
     private String FILE_STORAGE_DIR;
 
-    @Value("${aws.active.s3}")
+    @Value("${spring.cloud.aws.s3.active}")
     private boolean ACTIVE_S3;
 
     private final S3Client s3Client;

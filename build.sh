@@ -61,13 +61,20 @@ echo 'docker latest build start....'
 
 if [ "$service" == "site" ]
 then
-    sed -i "s|__DOCKER_ID__|$base_id|g" site.Dockerfile
+    if [ "$(uname)" == "Darwin" ]; then
+        brew install gnu-sed
+        gsed -i "s|__DOCKER_ID__|$base_id|g" ./site.Dockerfile
 
-    sed -i "s|__VERSION__|$version|g" ./client/package.json
-    sed -i "s|__VERSION__|$version|g" ./client/package-lock.json
+        gsed -i "s|__VERSION__|$version|g" ./client/package.json
+        gsed -i "s|__VERSION__|$version|g" ./client/package-lock.json
+    elif [ "$(uname)" == "Linux" ]; then
+        sed -i "s|__DOCKER_ID__|$base_id|g" ./site.Dockerfile
+
+        sed -i "s|__VERSION__|$version|g" ./client/package.json
+        sed -i "s|__VERSION__|$version|g" ./client/package-lock.json
+    fi
 
     server_file_name='server-anamensis-'$version''
-
 
 else
     server_file_name=''$service'-anamensis-'$version''

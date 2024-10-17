@@ -1,0 +1,105 @@
+spring:
+  time-zone: ${TIME_ZONE:Asia/Seoul}
+
+  data:
+    redis:
+      url: redis://${REDIS_URI:localhost:6379/1}
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${DB_URI}?currentSchema=anamensis&serverTimezone=${TIME_ZONE:Asia/Seoul}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: ${DB_MAX_POOL_SIZE:21}
+
+  devtools:
+    livereload:
+      enabled: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration/postgres
+    validate-on-migrate: true
+    validate-migration-naming: true
+
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_KEY}
+      s3:
+        active: ${AWS_S3_ACTIVE:false}
+        enabled: true
+        region: ${AWS_REGION:ap-northeast-2}
+        bucket: ${AWS_BUCKET:anamensis}
+      ses:
+        region: ap-northeast-2
+        enabled: true
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.anamensis.server.entity, com.anamensis.server.resultMap, com.anamensis.server.typeHandler
+  configuration:
+    map-underscore-to-camel-case: true
+    jdbc-type-for-null: "null"
+
+#server:
+# http2:
+#   enabled: ${HTTP2_ENABLED:false}
+# ssl:
+#   key-store: ${SSL_KEY_STORE}
+#   key-store-password: ${SSL_KEY_STORE_PASSWORD}
+#   key-store-type: ${SSL_KEY_STORE_TYPE}
+#   key-alias: ${SSL_KEY_ALIAS}
+
+jwt:
+  secret: ${JWT_SECRET_KEY}
+
+file:
+  storage:
+    dir: ${FILE_STORAGE_DIR:/}
+
+db:
+  setting:
+    user:
+      attendance_point_code_prefix: attend-
+
+pageable:
+  page: 1
+  size: 20
+
+logging:
+  level:
+    org:
+    springframework: DEBUG
+    hibernate: DEBUG
+    liquibase: DEBUG
+    flywaydb: DEBUG
+    com:
+      anamensis: DEBUG
+
+  logback:
+    rollingpolicy:
+      max-history: 10
+      total-size-cap: 1GB
+      max-file-size: 10MB
+      clean-history-on-start: false
+  file:
+    name: anamensis.log
+
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health, metrics
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  metrics:
+    tags:
+      application: "server"

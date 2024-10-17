@@ -54,35 +54,36 @@ jobs:
           name: anamensis-server-test-report.tar.gz
           path: anamensis-server-test-report.tar.gz
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          repository: ardi-orrorin/aws-anamensis
-          ref: main
-          token: ${{ secrets.ANAMENSIS_REPO_TOKEN }}
 
-      - name: Write SSH key
-        run: echo "${{ secrets.ANAMENSIS_SSH_KEY }}" > anamensis.pem && chmod 600 anamensis.pem
-
-      - name: Insert Version to Docker Secret Version
-        run: sed -i "s|__TAG__|${{ env.VERSION }}|g" ./site-docker-compose.yml
-
-      - name: Copy Depoly Config
-        run: |
-          scp -o StrictHostKeyChecking=no -i anamensis.pem -r * ${{ secrets.AWS_EC2_INSTANCE }}:
-
-      - name: Docker deploy
-        run: |
-          ssh -o StrictHostKeyChecking=no -i anamensis.pem ${{ secrets.AWS_EC2_INSTANCE }} << 'EOF'
-          cd ./config
-          sudo ./site-docker-secret.sh ${{ env.VERSION }}
-          cd ..
-          sudo ./deploy.sh ${{ env.SERVICE }} ${{ env.VERSION }} ${{ secrets.EC2_INSTANCE_PORT }} ${{ secrets.DOCKER_ID }}
-          rm -rf *
-          EOF
-
-      - name: Clean up
-        run: rm -rf *
+#  deploy:
+#    runs-on: ubuntu-latest
+#    needs: build
+#    steps:
+#      - uses: actions/checkout@v4
+#        with:
+#          repository: ardi-orrorin/aws-anamensis
+#          ref: main
+#          token: ${{ secrets.ANAMENSIS_REPO_TOKEN }}
+#
+#      - name: Write SSH key
+#        run: echo "${{ secrets.ANAMENSIS_SSH_KEY }}" > anamensis.pem && chmod 600 anamensis.pem
+#
+#      - name: Insert Version to Docker Secret Version
+#        run: sed -i "s|__TAG__|${{ env.VERSION }}|g" ./site-docker-compose.yml
+#
+#      - name: Copy Depoly Config
+#        run: |
+#          scp -o StrictHostKeyChecking=no -i anamensis.pem -r * ${{ secrets.AWS_EC2_INSTANCE }}:
+#
+#      - name: Docker deploy
+#        run: |
+#          ssh -o StrictHostKeyChecking=no -i anamensis.pem ${{ secrets.AWS_EC2_INSTANCE }} << 'EOF'
+#          cd ./config
+#          sudo ./site-docker-secret.sh ${{ env.VERSION }}
+#          cd ..
+#          sudo ./deploy.sh ${{ env.SERVICE }} ${{ env.VERSION }} ${{ secrets.EC2_INSTANCE_PORT }} ${{ secrets.DOCKER_ID }}
+#          rm -rf *
+#          EOF
+#
+#      - name: Clean up
+#        run: rm -rf *

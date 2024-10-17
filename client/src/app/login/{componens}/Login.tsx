@@ -1,20 +1,14 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faExclamation} from "@fortawesome/free-solid-svg-icons";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import {useMemo, useState} from "react";
+import {useMemo} from "react";
 import {useLogin} from "@/app/login/{hooks}/LoginProvider";
-import Turnstile from "react-turnstile";
 import OAuth from "@/app/login/{componens}/OAuth";
 import Footer from "@/app/find-user/{components}/footer";
 
 const Login = () => {
-    const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
-
-    const isTest = process.env.NEXT_PUBLIC_TEST?.toLowerCase() === 'true';
-
     const {user, goLogin, setProps, error, loading} = useLogin();
 
-    const [isRecaptcha, setIsReCaptcha] = useState(isTest);
 
     const idCheck = useMemo(() => {
         return user.username.length > 5;
@@ -65,8 +59,8 @@ const Login = () => {
                 </div>
                 <div>
                     <button
-                        className={['w-full rounded  duration-300 text-xs text-white my-2 p-2', isNext && isRecaptcha ? 'bg-blue-300 hover:bg-blue-600' : 'bg-gray-400 hover:bg-gray-700'].join(' ')}
-                        disabled={!isNext || loading || !isRecaptcha}
+                        className={['w-full rounded  duration-300 text-xs text-white my-2 p-2', isNext ? 'bg-blue-300 hover:bg-blue-600' : 'bg-gray-400 hover:bg-gray-700'].join(' ')}
+                        disabled={!isNext || loading}
                         onSubmit={goLogin}
                         onClick={goLogin}
                         data-testid={'login'}
@@ -77,22 +71,10 @@ const Login = () => {
                     }
                     </button>
                 </div>
-                <div className={'flex justify-center'}>
-                      <Turnstile sitekey={siteKey}
-                                 onVerify={() => {
-                                     setIsReCaptcha(true);
-                                 }}
-                                 theme={'light'}
-                                 language={'ko'}
-                      />
-                </div>
             </div>
             <Footer />
             <div className={'flex flex-col gap-2 justify-between px-3'}>
-                {
-                    isRecaptcha
-                    && <OAuth {...{isRecaptcha}} />
-                }
+                <OAuth />
             </div>
         </div>
     )

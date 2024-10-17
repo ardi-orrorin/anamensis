@@ -3,11 +3,7 @@ import Image from "next/image";
 import React, {useEffect, useState} from "react";
 import {User} from "@/app/login/{services}/types";
 
-const OAuth = ({
-    isRecaptcha
-}: {
-    isRecaptcha: boolean;
-}) => {
+const OAuth = () => {
 
     const [provider, setProvider] = useState<any>({});
 
@@ -18,7 +14,7 @@ const OAuth = ({
         });
     },[]);
 
-    if(Object?.values(provider)?.length === 0) return <></>;
+    if(Object.values(provider ?? {})?.length === 0) return <></>;
 
     return (
         Object?.values(provider)?.map((provider) => {
@@ -34,7 +30,6 @@ const OAuth = ({
                         ].join(' ')}
                         key={'oauth-login' + id}
                         onClick={() => signIn(id)}
-                        disabled={!isRecaptcha}
                 >
                     <Image src={logoImg}
                            alt={''}
@@ -62,6 +57,4 @@ const oAuthProviders: User.OAuthProvider[] = [
     { provider: 'ardi',      bgColor: 'bg-gray-300',   hoverBgColor: 'bg-gray-500',   size: 18,   },
 ];
 
-export default React.memo(OAuth, (prev, next) => {
-    return prev.isRecaptcha === next.isRecaptcha;
-});
+export default React.memo(OAuth);

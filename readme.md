@@ -8,7 +8,6 @@
 - application.yml 파일 및 nextjs.env secret으로 등록
 
 ```shell
-docker secret create server_anamensis_secret_config server-config.yml
 docker secret create config_anamensis_secret_config config-config.yml
 docker secret create config_anamensis_secret_keystore keystore.jks
 docker secret create batch_anamensis_secret_config batch-config.yml
@@ -40,8 +39,8 @@ docker secret create nextjs_anamensis_secret_config nextjs.env
 
 ## Spring Server environments
 - TIME_ZONE (기본값: Asia/Seoul)
-- DB_URI (필수값)
-- DB_USERNAME (필수값)
+- DB_URI (필수, 기본값: localhost:5432/anamensis)
+- DB_USERNAME (필수값: postgres)
 - DB_PASSWORD (필수값)
 - DB_MAX_POOL_SIZE (기본값: 21)
 - JWT_SECRET_KEY (필수값)

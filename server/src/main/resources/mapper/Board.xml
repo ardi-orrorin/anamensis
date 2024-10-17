@@ -102,7 +102,7 @@
           AND f.table_code_pk = (SELECT tc.id
                                    FROM table_code tc
                                   WHERE tc.table_name = 'member')
-         AND f.is_use = FALSE;
+          AND f.is_use = TRUE
     </select>
 
     <select id="findByPk" resultMap="BoardResultMapBoard" parameterType="Long">

@@ -37,17 +37,19 @@ const CalenderBlock = (props: ExpendBlockProps) => {
     },[])
 
     const events = useMemo(()=> {
-        const subBlocks = blockTypeFlatList.find(item => item.code === code)?.subBlock;
+        const subBlocks    = blockTypeFlatList.find(item => item.code === code)?.subBlock;
+
         if(!subBlocks) return [];
-        const blockCodes = subBlocks.map(item => item.code);
-        const blockValues = board.data.content.list.filter(item => blockCodes.includes(item.code));
+
+        const blockCodes   = subBlocks.map(item => item.code);
+        const blockValues  = board.data.content.list.filter(item => blockCodes.includes(item.code));
         return blockValues.map(item => item.extraValue as EventInput).filter(item => item.title)
     },[board]);
 
     const addEvent = useCallback((event: DateSelectArg) => {
-        const eventCode = blockTypeFlatList.find(item => item.label === 'event')?.code;
-        const lastSeq = board.data.content.list[board.data.content.list.length - 1].seq + 1;
-        const newBlock = initBlock({seq: lastSeq, code: eventCode}) as BlockI;
+        const eventCode  = blockTypeFlatList.find(item => item.label === 'event')?.code;
+        const lastSeq    = board.data.content.list[board.data.content.list.length - 1].seq + 1;
+        const newBlock   = initBlock({seq: lastSeq, code: eventCode}) as BlockI;
         const timeFormat = event.allDay ? 'YYYY-MM-DD' : 'YYYY-MM-DDTHH:mm';
 
         newBlock.extraValue = {

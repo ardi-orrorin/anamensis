@@ -17,7 +17,8 @@
                   FROM login_history lh1
                  WHERE lh1.member_pk = #{member.id}
                  ORDER BY lh1.id DESC
-                 LIMIT #{page.offset}, #{page.size}
+                OFFSET #{page.offset}
+                 LIMIT  #{page.size}
              ) lh2 ON lh2.id = lh.id;
     </select>
 
@@ -26,12 +27,12 @@
                         FROM login_history
                        WHERE member_pk  = #{memberPk}
                          AND ip         = #{ip}
-                         AND create_at BETWEEN current_timestamp() - INTERVAL 1 YEAR
-                                           AND current_timestamp()
+                         AND create_at BETWEEN NOW() - INTERVAL '1 YEAR'
+                                           AND NOW()
                           OR member_pk  = #{memberPk}
                          AND device     = #{device}
-                         AND create_at BETWEEN current_timestamp() - INTERVAL 1 YEAR
-                                           AND current_timestamp()
+                         AND create_at BETWEEN NOW() - INTERVAL '1 YEAR'
+                                           AND NOW()
                      )
     </select>
 

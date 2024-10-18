@@ -8,6 +8,8 @@ import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import apiCall from "@/app/{commons}/func/api";
 import Footer from "@/app/find-user/{components}/footer";
 import {SignUp} from "@/app/signup/{services}/types";
+
+// 2024-10-11 email 체크 기능 비활성화
 export default function Page() {
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -38,7 +40,8 @@ export default function Page() {
         pwdCheck   : 'uncheck',
         name       : 'uncheck',
         email      : 'uncheck',
-        emailCheck : 'uncheck',
+        // emailCheck : 'uncheck',
+        emailCheck : 'check',
         phone      : 'uncheck',
     });
 
@@ -77,8 +80,9 @@ export default function Page() {
 
             email      : email.length === 0 ? 'uncheck' : check.email,
 
-            emailCheck : emailCheck.length === 0 ? 'uncheck'
-                       : check.emailCheck,
+            emailCheck : "check",
+            // emailCheck : emailCheck.length === 0 ? 'uncheck'
+            //            : check.emailCheck,
 
             phone      : phone.length === 0 ? 'uncheck' : check.phone,
         });
@@ -331,36 +335,36 @@ export default function Page() {
                                    order={0}
                                    emailClickHandler={emailClickHandler}
                     />
-                    <div className={'flex'}>
-                        <Row className={[emailRegex.test(user.email)? 'max-h-52' : 'max-h-0', 'w-full duration-500'].join(' ')}
-                             name={'emailCheck'}
-                             value={user}
-                             check={check}
-                             placeholder={'6자리 인증번호 입력하세요.'}
-                             setProps={setProps}
-                             inputCheck={inputCheck}
-                             description={description.emailCheck}
-                        />
-                        {
-                            timer >= 0 && emailRegex.test(user.email) && user.emailCheck.length === 6 &&
-                            <button className={'w-1/4 my-3 ms-2 rounded text-xs text-white bg-blue-300'}
-                                    onClick={verifyCode}
-                            >
-                              인증하기
-                            </button>
-                        }
-                        <button className={[
-                                    emailRegex.test(user.email)? 'max-h-52  my-3 ms-2' : 'max-h-0',
-                                    (timer >= 0 || check.email !== 'check') ? 'bg-gray-400' : 'bg-blue-300',
-                                    'duration-500','w-1/4 rounded text-xs text-white'
-                                ].join(' ')}
-                                disabled={timer >= 0 || check.email !== 'check'}
-                                onClick={sendVerifyCode}
-                                data-testid={'send-verify-code'}
-                        >
-                            {timer >= 0 ? transToTimerMinuteAndSecond() : '인증번호 받기'}
-                        </button>
-                    </div>
+                    {/*<div className={'flex'}>*/}
+                    {/*    <Row className={[emailRegex.test(user.email)? 'max-h-52' : 'max-h-0', 'w-full duration-500'].join(' ')}*/}
+                    {/*         name={'emailCheck'}*/}
+                    {/*         value={user}*/}
+                    {/*         check={check}*/}
+                    {/*         placeholder={'6자리 인증번호 입력하세요.'}*/}
+                    {/*         setProps={setProps}*/}
+                    {/*         inputCheck={inputCheck}*/}
+                    {/*         description={description.emailCheck}*/}
+                    {/*    />*/}
+                    {/*    {*/}
+                    {/*        timer >= 0 && emailRegex.test(user.email) && user.emailCheck.length === 6 &&*/}
+                    {/*        <button className={'w-1/4 my-3 ms-2 rounded text-xs text-white bg-blue-300'}*/}
+                    {/*                onClick={verifyCode}*/}
+                    {/*        >*/}
+                    {/*          인증하기*/}
+                    {/*        </button>*/}
+                    {/*    }*/}
+                    {/*    <button className={[*/}
+                    {/*                emailRegex.test(user.email)? 'max-h-52  my-3 ms-2' : 'max-h-0',*/}
+                    {/*                (timer >= 0 || check.email !== 'check') ? 'bg-gray-400' : 'bg-blue-300',*/}
+                    {/*                'duration-500','w-1/4 rounded text-xs text-white'*/}
+                    {/*            ].join(' ')}*/}
+                    {/*            disabled={timer >= 0 || check.email !== 'check'}*/}
+                    {/*            onClick={sendVerifyCode}*/}
+                    {/*            data-testid={'send-verify-code'}*/}
+                    {/*    >*/}
+                    {/*        {timer >= 0 ? transToTimerMinuteAndSecond() : '인증번호 받기'}*/}
+                    {/*    </button>*/}
+                    {/*</div>*/}
                     <Row name={'phone'}
                          value={user}
                          check={check}

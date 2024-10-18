@@ -1,1 +1,0 @@
-ALTER TABLE board ADD INDEX idx_id_desc_category_pk_use_public_blocked (id DESC, is_use, is_public, is_blocked, category_pk);

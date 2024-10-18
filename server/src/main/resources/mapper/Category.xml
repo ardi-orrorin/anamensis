@@ -7,19 +7,19 @@
     <select id="selectAll" resultType="Category">
         SELECT *
           FROM category
-         WHERE is_use = 1
+         WHERE is_use = TRUE
     </select>
 
     <select id="selectById">
         SELECT *
           FROM category
          WHERE id     = #{id}
-           AND is_use = 1
+           AND is_use = TRUE
     </select>
 
     <insert id="insert" parameterType="Category">
         <selectKey keyProperty="id" resultType="int" order="AFTER">
-            SELECT LAST_INSERT_ID()
+            SELECT currval('category_id_seq')
         </selectKey>
         INSERT INTO category (name, parent_pk)
         VALUES (#{name}, #{parentPK})

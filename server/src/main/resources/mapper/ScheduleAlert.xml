@@ -15,16 +15,15 @@
                   FROM schedule_alert sa1
                  WHERE user_id = #{userId}
                    AND alert_time <![CDATA[<=]]> current_timestamp
-                   AND is_read = 0
+                   AND is_read = FALSE
              ) sa1 ON sa.id    = sa1.id
           JOIN board b ON b.id = sa.board_id
-           AND b.is_use        = 1
+           AND b.is_use        = TRUE
          ORDER BY alert_time
     </select>
 
     <select id="findAllByBoardId">
         SELECT sa.*
-
           FROM schedule_alert sa
           JOIN (SELECT sa1.id
                   FROM schedule_alert sa1
@@ -47,7 +46,7 @@
                    AND user_id = #{userId}
              ) sa2 ON sa.id  = sa2.id
           JOIN board b ON b.id = sa.board_id
-           AND b.is_use        = 1
+           AND b.is_use        = TRUE
          ORDER BY sa.alert_time
     </select>
 
@@ -78,7 +77,7 @@
            SET is_read = 1
          WHERE id      = #{id}
            AND user_id = #{userId}
-           AND DATE(alert_time) <![CDATA[<=]]> DATE(current_timestamp)
+           AND DATE(alert_time) <![CDATA[<=]]> DATE(NOW())
     </update>
 
     <delete id="delete">

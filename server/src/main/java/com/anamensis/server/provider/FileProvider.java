@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 @Slf4j
 public class FileProvider {
-    @Value("${file.upload-dir}")
+    @Value("${file.storage.dir}")
     private String UPLOAD_DIR;
 
     /**

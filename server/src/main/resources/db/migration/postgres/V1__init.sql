@@ -711,7 +711,7 @@ VALUES ('001', 'default', '기본값', 'ADMIN')
 
 INSERT INTO system_message
        (id, web_sys_pk, subject, content, create_at, update_at)
-VALUES (1, '001', '시스템 메시지', '시스템 메시지입니다.', current_timestamp, current_timestamp)
+VALUES (1, '001', '시스템 메시지', '시스템 메시지입니다.', current_timestamp, now())
      , (2, '002','2차 인증 비활성화', '%s님의 2차 인증 설정이 변경되었습니다.', now(), now())
      , (3, '002','2차 인증 활성화', '%s님의 2차 인증 설정이 변경되었습니다.', now(), now())
      , (4, '003','새로운 장소에서 로그인이 발생했습니다.', ' ip : %s </br> device : %s </br> location : %s </br> 에서 로그인이 발생했습니다.', now(), now());
@@ -757,3 +757,13 @@ SELECT lh.member_pk, count(lh.id) as count from log_history lh GROUP BY (lh.memb
 
 INSERT INTO point_history_count (member_pk, count)
 SELECT lh.member_pk, count(lh.id) as count from point_history lh GROUP BY (lh.member_pk);
+
+
+INSERT INTO member (id, user_id, pwd, name, email, phone, create_at, update_at)
+VALUES (1, 'master', '$2a$10$2duD9QVPe4rtDFbAQO7kK.sV8csuKvKx97AlPP.decA9.4.whTRiq', 'master', '', '', now(), now());
+
+INSERT INTO role (role, member_pk)
+VALUES ('ADMIN', 1),
+       ('MASTER', 1),
+       ('USER', 1),
+       ('GUEST', 1);

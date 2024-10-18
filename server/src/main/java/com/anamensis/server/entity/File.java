@@ -30,4 +30,8 @@ public class File implements Serializable {
 
     private boolean isUse;
 
+    public String getFullPath() {
+        return this.filePath != null ? this.filePath + this.fileName : "";
+    }
+
 }

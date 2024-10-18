@@ -62,7 +62,7 @@ export default function Page() {
     const minimizedSize = useMemo(() => windowList.filter(e => !e.open).length > 0, [windowList]);
 
     const toggle = useMemo(() =>
-        <button className={'w-[50px] h-10 bg-main text-white rounded'}
+        <button className={'w-[50px] h-10 bg-gray-700 text-white rounded'}
                 onClick={()=> windowToggle(minimizedSize)}
                 data-testid={'toggle-window'}
         >

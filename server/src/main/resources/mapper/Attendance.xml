@@ -10,7 +10,7 @@
             SELECT *
               FROM attendance
              WHERE member_pk = #{memberPk}
-               AND is_use  = 1
+               AND is_use    = TRUE
         )
     </select>
 
@@ -18,7 +18,7 @@
         SELECT *
           FROM attendance
          WHERE member_pk = #{memberPk}
-           AND is_use  = 1
+           AND is_use    = TRUE
     </select>
 
     <insert id="init" parameterType="Attendance">
@@ -34,9 +34,8 @@
              WHERE member_pk = #{memberPk}
         </selectKey>
         UPDATE attendance
-           SET days     = IF(lastDate = (#{lastDate} - INTERVAL 1 DAY), days + 1, 1)
-             , lastDate = #{lastDate}
+           SET days       = IF(lastDate = (#{lastDate} - INTERVAL 1 DAY), days + 1, 1)
+             , lastDate   = #{lastDate}
          WHERE member_pk  = #{memberPk}
     </update>
-
 </mapper>

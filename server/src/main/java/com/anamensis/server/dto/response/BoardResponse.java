@@ -165,16 +165,12 @@ public class BoardResponse implements Serializable {
                     .updatedAt(board.getBoard().getUpdateAt())
                     .isPublic(board.getBoard().getIsPublic())
                     .membersOnly(board.getBoard().isMembersOnly())
+                    .profileImage(board.getFile().getFullPath())
                     .writerCreatedAt(board.getMember().getCreateAt())
                     .isBlocked(board.getBoard().isBlocked());
 
             if(Objects.nonNull(member)) {
                 builder.isWriter(board.getBoard().getMemberPk() == member.getId());
-            }
-
-
-            if (Objects.nonNull(board.getFile().getFilePath())) {
-                builder.profileImage(board.getFile().getFilePath() + board.getFile().getFileName());
             }
 
             return builder.build();

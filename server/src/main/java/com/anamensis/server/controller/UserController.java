@@ -328,6 +328,14 @@ public class UserController {
                 });
     }
 
+    @GetMapping("info/user/{userId}")
+    public Mono<UserResponse.ChatUserInfo> info(
+            @PathVariable String userId
+    ) {
+        return userService.findUserInfo(userId)
+            .map(UserResponse.ChatUserInfo::from);
+    }
+
     @GetMapping("get-point")
     public Mono<UserResponse.GetPoint> getPoint(
             @AuthenticationPrincipal UserDetails userDetails

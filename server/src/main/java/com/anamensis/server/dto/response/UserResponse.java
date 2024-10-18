@@ -7,6 +7,7 @@ import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.Role;
 import com.anamensis.server.entity.RoleType;
 import com.anamensis.server.resultMap.MemberResultMap;
+import com.anamensis.server.websocket.dto.Status;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.jsonwebtoken.io.Serializer;
 import lombok.Builder;
@@ -165,4 +166,47 @@ public class UserResponse {
     public record GetPoint (
         long point
     ) {}
+
+    @Getter
+    @Builder
+    public static class ChatUserStatus {
+
+        private long id;
+
+        private String username;
+
+        private com.anamensis.server.websocket.dto.Status status;
+
+        private String profileImage;
+    }
+
+    @Getter
+    @Builder
+    public static class ChatUserInfo {
+        private long id;
+
+        private String userId;
+
+        private String name;
+
+        private String email;
+
+        private String phone;
+
+        private long point;
+
+        private String profileImage;
+
+        public static ChatUserInfo from(MemberResultMap resultMap) {
+            return ChatUserInfo.builder()
+                    .id(resultMap.getMember().getId())
+                    .userId(resultMap.getMember().getUserId())
+                    .name(resultMap.getMember().getName())
+                    .email(resultMap.getMember().getEmail())
+                    .phone(resultMap.getMember().getPhone())
+                    .point(resultMap.getMember().getPoint())
+                    .profileImage(resultMap.getFile().getFullPath())
+                    .build();
+        }
+    }
 }

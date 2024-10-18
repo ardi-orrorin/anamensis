@@ -4,9 +4,8 @@ import React from "react";
 import {BoardService} from "@/app/board/{services}/BoardProvider";
 import Link from "next/link";
 import {Category} from "@/app/board/{services}/types";
-import {defaultProfile} from "@/app/{commons}/func/image";
-import {NO_PROFILE} from "@/app/{services}/constants";
 import {BoardSummaryI} from "@/app/user/{services}/userProvider";
+import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 const WriterInfo = ({
     board,
@@ -15,6 +14,8 @@ const WriterInfo = ({
     board: BoardService,
     summary: BoardSummaryI[]
 }) => {
+
+    const {defaultProfile} = useDefaultImage();
 
     return (
         <div className={'flex flex-col sm:flex-row p-2 gap-2 sm:gap-0 border border-solid border-blue-300 rounded'}>
@@ -25,7 +26,7 @@ const WriterInfo = ({
                        alt={'profile'}
                        src={defaultProfile(board.data.profileImage)}
                        onError={(e) => {
-                           e.currentTarget.src = NO_PROFILE;
+                           e.currentTarget.src = defaultProfile('');
                        }}
                 />
                 <div className={'flex flex-col gap-2'}>

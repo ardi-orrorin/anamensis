@@ -1,14 +1,15 @@
 import {AlttuelBlockProps} from "@/app/board/{components}/block/extra/alttuelBlock";
 import HeaderComponent from "@/app/{components}/headerComponent";
 import Image from "next/image";
-import {defaultNoImg} from "@/app/{commons}/func/image";
 import FooterComponent from "@/app/{components}/footerComponent";
 import React from "react";
-import {NO_IMAGE} from "@/app/{services}/constants";
 import {Root} from "@/app/{services}/types";
+import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 const AlttuelBoardComponent = (props: Root.BoardListI) => {
     const { body} = props;
+
+    const {defaultNoImg} = useDefaultImage();
 
     const alttuelBlock =body?.filter((block) =>
         block.code === '00301'
@@ -38,7 +39,7 @@ const AlttuelBoardComponent = (props: Root.BoardListI) => {
                        alt={''}
                        priority={true}
                        onError={e => {
-                           (e.target as HTMLImageElement).src = NO_IMAGE;
+                           e.currentTarget.src = defaultNoImg('');
                        }}
                 />
 

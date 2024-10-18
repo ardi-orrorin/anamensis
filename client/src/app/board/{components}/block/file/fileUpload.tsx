@@ -5,6 +5,8 @@ import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import axios from "axios";
 import {BlockProps, FileContentType} from "@/app/board/{components}/block/type/Types";
 import {usePendingFiles} from "@/app/board/[id]/{hooks}/usePendingFiles";
+import rootApiService from "@/app/{services}/rootApiService";
+import {useQuery} from "@tanstack/react-query";
 
 export type FileUploadProps = {
     onUploadFileUrl: (url: string) => void;

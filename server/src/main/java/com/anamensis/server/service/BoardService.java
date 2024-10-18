@@ -217,6 +217,7 @@ public class BoardService {
     }
 
     public Mono<List<BoardResponse.Notice>> findNotice() {
+
         return Flux.fromIterable(redisTemplate.boundListOps("board:notice").range(0, -1))
             .cast(BoardResponse.Notice.class)
             .collectList();

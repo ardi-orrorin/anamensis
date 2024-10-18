@@ -27,20 +27,11 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_KEY }}
 
-      - name: Decode and set .env.local
-        run: echo "${{ secrets.NEXTJS_ENV }}" | base64 --decode > ./client/.env.local
-
-      - name: nextJs Add Environment Version
-        run: sed -i "s|__ANAMENSIS_VERSION__|${{ env.VERSION }}|g" ./client/.env.local
-
-      - name: Decode and set application.yml
-        run: echo "${{ secrets.SITE_TEST_CONFIG }}" | base64 --decode > ./server/src/main/resources/application.yml
-
       - name: Next.js install
         run: npm install --prefix ./client
 
       - name: Build the Next.js
-        run: npm run build --prefix ./client
+        run: NEXT_PUBLIC_VERSION=${{env.VERSION}} npm run build --prefix ./client
 
       - name: Build the Docker image
         run: ./build.sh ${{ env.SERVICE }} ${{ env.VERSION }} ${{ secrets.DOCKER_ID }} ${{ secrets.BASE_ID }}
@@ -54,35 +45,36 @@ jobs:
           name: anamensis-server-test-report.tar.gz
           path: anamensis-server-test-report.tar.gz
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          repository: ardi-orrorin/aws-anamensis
-          ref: main
-          token: ${{ secrets.ANAMENSIS_REPO_TOKEN }}
 
-      - name: Write SSH key
-        run: echo "${{ secrets.ANAMENSIS_SSH_KEY }}" > anamensis.pem && chmod 600 anamensis.pem
-
-      - name: Insert Version to Docker Secret Version
-        run: sed -i "s|__TAG__|${{ env.VERSION }}|g" ./site-docker-compose.yml
-
-      - name: Copy Depoly Config
-        run: |
-          scp -o StrictHostKeyChecking=no -i anamensis.pem -r * ${{ secrets.AWS_EC2_INSTANCE }}:
-
-      - name: Docker deploy
-        run: |
-          ssh -o StrictHostKeyChecking=no -i anamensis.pem ${{ secrets.AWS_EC2_INSTANCE }} << 'EOF'
-          cd ./config
-          sudo ./site-docker-secret.sh ${{ env.VERSION }}
-          cd ..
-          sudo ./deploy.sh ${{ env.SERVICE }} ${{ env.VERSION }} ${{ secrets.EC2_INSTANCE_PORT }} ${{ secrets.DOCKER_ID }}
-          rm -rf *
-          EOF
-
-      - name: Clean up
-        run: rm -rf *
+#  deploy:
+#    runs-on: ubuntu-latest
+#    needs: build
+#    steps:
+#      - uses: actions/checkout@v4
+#        with:
+#          repository: ardi-orrorin/aws-anamensis
+#          ref: main
+#          token: ${{ secrets.ANAMENSIS_REPO_TOKEN }}
+#
+#      - name: Write SSH key
+#        run: echo "${{ secrets.ANAMENSIS_SSH_KEY }}" > anamensis.pem && chmod 600 anamensis.pem
+#
+#      - name: Insert Version to Docker Secret Version
+#        run: sed -i "s|__TAG__|${{ env.VERSION }}|g" ./site-docker-compose.yml
+#
+#      - name: Copy Depoly Config
+#        run: |
+#          scp -o StrictHostKeyChecking=no -i anamensis.pem -r * ${{ secrets.AWS_EC2_INSTANCE }}:
+#
+#      - name: Docker deploy
+#        run: |
+#          ssh -o StrictHostKeyChecking=no -i anamensis.pem ${{ secrets.AWS_EC2_INSTANCE }} << 'EOF'
+#          cd ./config
+#          sudo ./site-docker-secret.sh ${{ env.VERSION }}
+#          cd ..
+#          sudo ./deploy.sh ${{ env.SERVICE }} ${{ env.VERSION }} ${{ secrets.EC2_INSTANCE_PORT }} ${{ secrets.DOCKER_ID }}
+#          rm -rf *
+#          EOF
+#
+#      - name: Clean up
+#        run: rm -rf *

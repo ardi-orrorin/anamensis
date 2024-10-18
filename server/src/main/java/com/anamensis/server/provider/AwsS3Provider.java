@@ -8,14 +8,14 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 @Component
@@ -24,6 +24,12 @@ public class AwsS3Provider {
 
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucket;
+
+    @Value("${file.storage.dir}")
+    private String FILE_STORAGE_DIR;
+
+    @Value("${spring.cloud.aws.s3.active}")
+    private boolean ACTIVE_S3;
 
     private final S3Client s3Client;
 
@@ -34,7 +40,6 @@ public class AwsS3Provider {
     private static final float PROFILE = 0.4f;
     private static final float CONTENT_THUMBNAIL = 0.6f;
     private static final float ALTTUEL_THUMBNAIL = 0.4f;
-
     private static final float ALBUM_THUMBNAIL = 0.7f;
 
     private static final ThumbnailType[] CROP_LIST = {
@@ -49,37 +54,87 @@ public class AwsS3Provider {
         int width, int height,
         ThumbnailType thumbnailType
     ) {
+        if(!ACTIVE_S3) {
+            return saveStorage(filePart, path, filename, width, height, thumbnailType);
+        }
+
+        return uploadFileS3(filePart, path, filename, width, height, thumbnailType);
+    }
+
+    private Mono<Boolean> saveStorage(
+        FilePart filePart,
+        String path, String filename,
+        int width, int height,
+        ThumbnailType thumbnailType
+    ) {
+
+        return DataBufferUtils.join(filePart.content())
+            .flatMap(data -> {
+                try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+                    if(thumbnailType == ThumbnailType.ORI) {
+                        data.asInputStream().transferTo(os);
+                    } else {
+                        buildThumbnail(data.asInputStream(), width, height, thumbnailType)
+                            .toOutputStream(os);
+                    }
+
+                    File file = new File(FILE_STORAGE_DIR + path + filename);
+
+                    if(!file.getParentFile().exists()) {
+                        file.getParentFile().mkdirs();
+                    }
+
+                    try (FileOutputStream fos = new FileOutputStream(file)) {
+                        os.writeTo(fos);
+                    }
+
+                } catch (IOException e) {
+                    return Mono.error(new RuntimeException(e));
+                } finally {
+                    DataBufferUtils.release(data);
+                }
+
+                return Mono.just(true);
+            });
+    }
+
+    private Mono<Boolean> uploadFileS3(
+        FilePart filePart,
+        String path, String filename,
+        int width, int height,
+        ThumbnailType thumbnailType
+    ) {
 
         PutObjectRequest.Builder reqBuilder = PutObjectRequest.builder()
-                .bucket(bucket)
-                .contentType(filePart.headers().getContentType().toString())
-                .cacheControl(CACHE_CONTROL);
+            .bucket(bucket)
+            .contentType(filePart.headers().getContentType().toString())
+            .cacheControl(CACHE_CONTROL);
 
 
         PutObjectRequest req = reqBuilder.key(path.substring(1) + filename)
-                .build();
+            .build();
 
         return DataBufferUtils.join(filePart.content())
-                .flatMap(data -> {
-                    if(thumbnailType == ThumbnailType.ORI) {
-                        s3Client.putObject(req, RequestBody.fromInputStream(data.asInputStream(), data.readableByteCount()));
-                        return Mono.just(true);
-                    }
-
-                    try(ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-                        buildThumbnail(data.asInputStream(), width, height, thumbnailType)
-                            .toOutputStream(os);
-
-                        s3Client.putObject(req, RequestBody.fromBytes(os.toByteArray()));
-
-                    } catch (IOException e) {
-                        return Mono.error(new RuntimeException(e));
-                    } finally {
-                        DataBufferUtils.release(data);
-                    }
-
+            .flatMap(data -> {
+                if(thumbnailType == ThumbnailType.ORI) {
+                    s3Client.putObject(req, RequestBody.fromInputStream(data.asInputStream(), data.readableByteCount()));
                     return Mono.just(true);
-                });
+                }
+
+                try(ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+                    buildThumbnail(data.asInputStream(), width, height, thumbnailType)
+                        .toOutputStream(os);
+
+                    s3Client.putObject(req, RequestBody.fromBytes(os.toByteArray()));
+
+                } catch (IOException e) {
+                    return Mono.error(new RuntimeException(e));
+                } finally {
+                    DataBufferUtils.release(data);
+                }
+
+                return Mono.just(true);
+            });
     }
 
 
@@ -121,12 +176,20 @@ public class AwsS3Provider {
     }
 
     public Mono<Void> deleteS3(String filePath, String filename) {
-        s3Client.deleteObject(
-            DeleteObjectRequest.builder()
-                .bucket(bucket)
-                .key(filePath.substring(1) + filename)
-                .build()
-        );
+
+        if(ACTIVE_S3) {
+            s3Client.deleteObject(
+                DeleteObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(filePath.substring(1) + filename)
+                    .build()
+            );
+            return Mono.empty();
+        }
+
+        File file = new File(FILE_STORAGE_DIR + filePath + filename);
+        file.delete();
+
         return Mono.empty();
     }
 

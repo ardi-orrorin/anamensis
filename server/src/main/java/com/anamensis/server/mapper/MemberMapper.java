@@ -27,9 +27,13 @@ public interface MemberMapper {
 
     Optional<Member> findMemberByUserId(String userId);
 
+    List<Member> findMemberByUserIds(List<String> userIds);
+
     Optional<MemberResultMap> findMemberInfo(String userId);
 
     Optional<Member> findMemberByEmailAndUserId(String email, String userId);
+
+    List<MemberResultMap.ListItem> findMemberByUsernames(List<String> usernames);
 
     int editAuth(
             @Param("id") long id,

@@ -51,13 +51,13 @@ const NavMain = async () => {
     ];
 
     return (
-        <nav className={'w-full min-w-full p-1 flex justify-between items-center bg-main text-white h-12'}>
+        <nav className={'w-full min-w-full p-1 flex justify-between items-center bg-gray-700 text-white h-12'}>
             <div>
-                <Link className={'px-2 h-10 flex justify-center items-center hover:bg-blue-800 rounded duration-500'}
+                <Link className={'px-2 h-10 flex justify-center items-center hover:bg-gray-800 rounded duration-500'}
                       href={'/'}
                       title={'홈'}
                 >
-                    <Image src={process.env.NEXT_PUBLIC_CDN_SERVER + '/favicon.jpg'}
+                    <Image src={'/static/ms-icon-310x310.png'}
                            alt={''}
                            width={30}
                            height={30}
@@ -81,8 +81,7 @@ const NavMain = async () => {
                     }
                     {
                         isLogged
-                        && process.env.NEXT_PUBLIC_CDN_SERVER
-                        && <div className={'flex h-full justify-center items-center px-1.5 hover:bg-blue-800 rounded duration-500'}>
+                        && <div className={'flex h-full justify-center items-center px-1.5 hover:bg-gray-800 rounded duration-500'}>
                         <Link href={'/user'}
                               title={'프로필'}
                         >
@@ -99,7 +98,7 @@ const NavMain = async () => {
 const NavItem = ({icon, name, url, prefetch}: Root.NavItemProps) => {
     return (
         <li>
-            <Link className={'w-10 h-10 flex justify-center items-center hover:bg-blue-800 rounded duration-500'}
+            <Link className={'w-10 h-10 flex justify-center items-center hover:bg-gray-800 rounded duration-500'}
                   href={url}
                   prefetch={prefetch}
                   title={name}

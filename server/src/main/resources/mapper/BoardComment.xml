@@ -5,10 +5,10 @@
 
 <mapper namespace="com.anamensis.server.mapper.BoardCommentMapper">
     <select id="count" resultType="int">
-        SELECT IFNULL((
+        SELECT COALESCE((
             SELECT count
-             FROM board_comment_count bcc
-            WHERE bcc.board_pk  = #{boardPk})
+              FROM board_comment_count bcc
+             WHERE bcc.board_pk  = #{boardPk})
         , 0);
     </select>
 
@@ -18,8 +18,9 @@
           JOIN (SELECT bc.id
                   FROM board_comment bc
                  WHERE board_pk = #{boardPk}
-                   AND is_use   = 1
-                 LIMIT #{page.offset}, #{page.size}
+                   AND is_use   = TRUE
+                OFFSET #{page.offset}
+                 LIMIT #{page.size}
              ) bc2 ON bc2.id    = bc1.id
           JOIN member m
             ON m.user_id        = bc1.user_id
@@ -28,31 +29,9 @@
            AND f.table_code_pk  = (SELECT tc.id
                                      FROM table_code tc
                                     WHERE tc.table_name = 'member')
-           AND f.is_use         = 1
+           AND f.is_use         = TRUE
          ORDER BY bc1.id;
     </select>
-
-<!--    <select id="findAllByBoardPk" resultMap="boardCommentListResultMap">-->
-<!--        SELECT *-->
-<!--             , (SELECT concat(f.file_path, f.file_name)-->
-<!--                  FROM member m-->
-<!--                  LEFT JOIN file f-->
-<!--                    ON f.table_ref_pk  = m.id-->
-<!--                   AND f.table_code_pk = (SELECT tc.id-->
-<!--                                            FROM table_code tc-->
-<!--                                           WHERE tc.table_name = 'member')-->
-<!--                   AND f.is_use    = 1-->
-<!--                 WHERE m.user_id = bc1.user_id-->
-<!--             ) AS profile-->
-<!--          FROM board_comment bc1-->
-<!--          JOIN (-->
-<!--               SELECT bc.id-->
-<!--                 FROM board_comment bc-->
-<!--                WHERE board_pk = #{boardPk}-->
-<!--                  AND is_use = 1-->
-<!--                LIMIT #{page.offset}, #{page.size}-->
-<!--             ) bc2 ON bc2.id = bc1.id;-->
-<!--    </select>-->
 
     <select id="findById">
         SELECT *
@@ -62,7 +41,7 @@
 
     <insert id="save" parameterType="BoardComment">
         <selectKey keyProperty="id" resultType="int" order="AFTER">
-            SELECT LAST_INSERT_ID()
+            SELECT currval('board_comment_id_seq')
         </selectKey>
         INSERT INTO board_comment
                (board_pk, content, create_at, user_id, parent_pk, blockSeq)
@@ -71,10 +50,10 @@
 
     <update id="delete">
         UPDATE board_comment
-           SET is_use   = 0
+           SET is_use   = FALSE
          WHERE id       = #{id}
            AND user_id  = #{userId}
-           AND is_use   = 1
+           AND is_use   = TRUE
     </update>
 
     <resultMap id="boardCommentListResultMap" type="com.anamensis.server.resultMap.BoardCommentResultMap$List">

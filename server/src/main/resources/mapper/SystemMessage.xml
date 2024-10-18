@@ -18,7 +18,7 @@
 
     <insert id="save" parameterType="SystemMessage">
         <selectKey keyProperty="id" resultType="Integer" order="AFTER">
-            SELECT LAST_INSERT_ID()
+            SELECT currval('system_message_id_seq')
         </selectKey>
         INSERT INTO system_message
                (web_sys_pk, subject, content,

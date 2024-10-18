@@ -36,6 +36,7 @@ export default function Page() {
     const {data: noticeList} = useQuery(rootApiService.getNotices());
     const {data: favorites} = useQuery(rootApiService.favorites());
 
+
     const [initLoading, setInitLoading] = useState(true);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState<Root.BoardListI[]>([]);

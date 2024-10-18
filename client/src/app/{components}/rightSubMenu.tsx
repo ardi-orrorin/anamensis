@@ -22,7 +22,7 @@ const RightSubMenu = ({
 
     return (
         <div className={[
-            'fixed z-30 bottom-1/4 right-5 flex flex-col bg-green-600 border-y-4 border-solid border-green-600 rounded-md shadow-md ',
+            'fixed z-30 bottom-1/4 right-5 flex flex-col bg-gray-700 border-y-4 border-solid border-gray-700 rounded-md shadow-md ',
             rightMenu && 'gap-2'
         ].join(' ')}>
             <div className={['duration-500 overflow-y-hidden', rightMenu ? 'max-h-72' : 'max-h-0'].join(' ')}
@@ -34,7 +34,7 @@ const RightSubMenu = ({
 
                 <BottomMenu />
             </div>
-            <button className={'p-3 flex justify-center items-center bg-white text-black hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
+            <button className={'p-3 flex justify-center items-center bg-white text-black hover:bg-gray-700 hover:text-white active:bg-gray-800 duration-300 outline-0'}
                     onClick={() => setRightMenu(!rightMenu)}
                     data-testid={'right-menu-toggle'}
             >
@@ -47,13 +47,13 @@ const RightSubMenu = ({
 const TopMenu = () => {
     return (
         <div className={'w-full flex flex-col justify-center bg-white shadow'}>
-            <button className={'p-3 flex justify-center items-center hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
+            <button className={'p-3 flex justify-center items-center hover:bg-gray-700 hover:text-white active:bg-gray-600 duration-300 outline-0'}
                     onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
                     title={'맨 위로'}
             >
                 <FontAwesomeIcon icon={faAnglesUp} className={'w-5 h-3'} />
             </button>
-            <button className={'p-3 flex justify-center items-center border-y border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
+            <button className={'p-3 flex justify-center items-center border-y border-solid border-gray-200 hover:bg-gray-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
                     onClick={() => window.scrollTo({top: window.scrollY - window.innerHeight, behavior: 'smooth'})}
                     title={'위로'}
             >
@@ -66,13 +66,13 @@ const TopMenu = () => {
 const BottomMenu = () => {
     return (
         <div className={'w-full flex flex-col justify-center bg-white shadow'}>
-            <button className={'p-3 flex justify-center items-center border-y border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
+            <button className={'p-3 flex justify-center items-center border-y border-solid border-gray-200 hover:bg-gray-600 hover:text-white active:bg-gray-600 duration-300 outline-0'}
                     onClick={() => window.scrollTo({top: window.scrollY + window.innerHeight, behavior: 'smooth'})}
                     title={'아래로'}
             >
                 <FontAwesomeIcon icon={faAngleDown} className={'w-5 h-3'} />
             </button>
-            <button className={'p-3 flex justify-center items-center hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
+            <button className={'p-3 flex justify-center items-center hover:bg-gray-700 hover:text-white active:bg-gary-800 duration-300 outline-0'}
                     onClick={() => window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})}
                     title={'맨 아래로'}
             >
@@ -96,19 +96,19 @@ const MiddleMenu = ({
             {
                 isLogin
                     ? <div className={'w-full flex flex-col justify-center bg-white shadow'}>
-                        <Link className={'p-3 flex justify-center items-center border-t border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
+                        <Link className={'p-3 flex justify-center items-center border-t border-solid border-gray-200 hover:bg-gary-700 hover:text-white active:bg-gray-600 duration-300 outline-0'}
                               href={'/board/new?categoryPk=2'}
                               title={'글쓰기'}
                         >
                             <FontAwesomeIcon className={'w-4'} icon={faPenToSquare} />
                         </Link>
-                        <Link className={'p-3 flex justify-center items-center border-y border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
+                        <Link className={'p-3 flex justify-center items-center border-y border-solid border-gray-200 hover:bg-gray-700 hover:text-white active:bg-gray-600 duration-300 outline-0'}
                               href={'/user'}
                               title={'프로필'}
                         >
                             <FontAwesomeIcon className={'w-4'} icon={faUser} />
                         </Link>
-                        <button className={'p-3 flex justify-center items-center border-y border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
+                        <button className={'p-3 flex justify-center items-center border-y border-solid border-gray-200 hover:bg-gray-700 hover:text-white active:bg-gray-600 duration-300 outline-0'}
                                 onClick={() => {
                                     if(!confirm('로그아웃 하시겠습니까?')) return;
                                     router.push('/api/logout')

@@ -5,14 +5,11 @@
 ![](./resource/erd.jpg)
 
 ## docker create secret
-- application.yml 파일 및 nextjs.env secret으로 등록
+- application.yml
 
 ```shell
-docker secret create server_anamensis_secret_config server-config.yml
 docker secret create config_anamensis_secret_config config-config.yml
-docker secret create config_anamensis_secret_keystore keystore.jks
 docker secret create batch_anamensis_secret_config batch-config.yml
-docker secret create nextjs_anamensis_secret_config nextjs.env
 ```
 
 ## docker build
@@ -38,48 +35,48 @@ docker secret create nextjs_anamensis_secret_config nextjs.env
 /root/build.sh base 0.0.1 anamensis
 ```
 
-## example site application.yml
-```yaml
-spring:
-  application:
-    name: server, aws, mysql, security, redis
-  config:
-    import: optional:configserver:https://url
-  flyway: #db migration
-    enabled: true
-    baseline-on-migrate: true
-    locations: classpath:db/migration/mysql
-    validate-on-migrate: true
-    validate-migration-naming: true
+## NextJs Environments
+- NEXTAUTH_SECRET (필수값)
+- CDN_SERVER (기본값: http://localhost:3000/files)
+- BASE_URL (기본값: http://localhost:3000)
+- OATH2 설정
+  - GOOGLE_CLIENT_ID (선택값)
+  - GOOGLE_CLIENT_SECRET (선택값) 
+  - KAKAO_CLIENT_ID (선택값)
+  - KAKAO_CLIENT_SECRET (선택값)
+  - GITHUB_CLIENT_ID (선택값)
+  - GITHUB_CLIENT_SECRET (선택값)
+  - NAVER_CLIENT_ID (선택값)
+  - NAVER_CLIENT_SECRET (선택값)
+- CUSTOM OAUTH2 설정
+  - CUSTOM_CLIENT_ID (선택값)
+  - CUSTOM_CLIENT_SECRET (선택값)
+  - CUSTOM_OAUTH2_SERVER_URL (선택값)
+
+## Spring Server Environments
+- DB_URI (필수, 기본값: localhost:5432/anamensis)
+- DB_USERNAME (필수값: postgres)
+- DB_PASSWORD (필수값)
+- DB_MAX_POOL_SIZE (기본값: 21)
+- JWT_SECRET_KEY (필수값)
+- FILE_STORAGE_DIR (기본값: /)
+- AWS 설정
+  - AWS_S3_ACTIVE (기본값: false)
+  - AWS_ACCESS_KEY  (AWS 설정 시 필수값, 기본값 없음)
+  - AWS_SECRET_KEY (AWS 설정 시 필수값, 기본값 없음)
+  - AWS_REGION (기본값: ap-northeast-2)
+  - AWS_BUCKET (기본값: anamensis)
+
+## Init User
+```text
+Default User
+ID: master
+PASSWORD: master
 ```
 
 ## example site nextjs.env
-- [CloudFlare Turnstile](https://www.cloudflare.com/ko-kr/products/turnstile/)
-- [Google Analytics Link](https://analytics.google.com/analytics/web/)
 - [KaKao Login](https://developers.kakao.com/product/kakaoLogin)
 - [Google OAuth](https://cloud.google.com/apigee/docs/api-platform/security/oauth/oauth-home?hl=ko)
 - [Github OAuth](https://docs.github.com/ko/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps)
 - [Naver OAuth](https://developers.naver.com/docs/login/api/api.md)
 
-
-```text
-NEXT_PUBLIC_SERVER=http(s):// + Spring Server Domain
-NEXT_PUBLIC_DOMAIN=NextJS Public Domain
-NEXT_PUBLIC_CDN_SERVER=http(s):// + CDN Server Url
-NEXT_PUBLIC_CDN_SERVER_HOST=CDN Server Url
-NEXT_PUBLIC_TURNSTILE_SITE_KEY=
-NEXT_PUBLIC_TURNSTILE_PRIVATE_KEY=
-NEXT_PUBLIC_SSL=TRUE
-NEXT_PUBLIC_GID1=Google Analytics GID
-NEXT_PUBLIC_VERSION=__ANAMENSIS_VERSION__
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=
-NEXT_PUBLIC_GOOGLE_CLIENT_SECRET=
-NEXT_PUBLIC_KAKAO_CLIENT_ID=
-NEXT_PUBLIC_KAKAO_CLIENT_SECRET=
-NEXT_PUBLIC_GITHUB_CLIENT_ID=
-NEXT_PUBLIC_GITHUB_CLIENT_SECRET=
-NEXT_PUBLIC_NAVER_CLIENT_ID=
-NEXT_PUBLIC_NAVER_CLIENT_SECRET=
-NEXTAUTH_SECRET=custome_secret
-NEXTAUTH_URL=http(s):// + NextJS Domain (Redirect Domain)
-```

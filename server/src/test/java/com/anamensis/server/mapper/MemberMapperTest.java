@@ -26,7 +26,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest
-@ActiveProfiles("test")
+//@ActiveProfiles("test")
+@ActiveProfiles("dev")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Transactional
@@ -45,43 +46,43 @@ class MemberMapperTest {
 
     Role role2 = new Role();
 
-    @BeforeAll
-    void setup() {
-        member1.setUserId("admin1");
-        member1.setPwd(encoder.encode("admin1"));
-        member1.setName("admin1");
-        member1.setEmail("admin1@gmail.com");
-        member1.setPhone("010-1111-1111");
-        member1.setUse(true);
-        member1.setCreateAt(LocalDateTime.now());
-        memberMapper.save(member1);
-
-        member2.setUserId("admin2");
-        member2.setPwd(encoder.encode("admin2"));
-        member2.setName("admin2");
-        member2.setEmail("admin2@gmail.com");
-        member2.setPhone("010-1111-2222");
-        member2.setUse(true);
-        member2.setCreateAt(LocalDateTime.now());
-        memberMapper.save(member2);
-
-        role2.setMemberPk(member2.getId());
-        role2.setRole(RoleType.ADMIN);
-        memberMapper.saveRole(role2);
-
-        role2.setMemberPk(member2.getId());
-        role2.setRole(RoleType.USER);
-        memberMapper.saveRole(role2);
-
-        member100.setUserId("admin100");
-        member100.setPwd(encoder.encode("admin100"));
-        member100.setName("admin100");
-        member100.setEmail("admin100@gmail.com");
-        member100.setPhone("010-1111-1222");
-        member100.setUse(true);
-        member100.setCreateAt(LocalDateTime.now());
-        memberMapper.save(member100);
-    }
+//    @BeforeAll
+//    void setup() {
+//        member1.setUserId("admin1");
+//        member1.setPwd(encoder.encode("admin1"));
+//        member1.setName("admin1");
+//        member1.setEmail("admin1@gmail.com");
+//        member1.setPhone("010-1111-1111");
+//        member1.setUse(true);
+//        member1.setCreateAt(LocalDateTime.now());
+//        memberMapper.save(member1);
+//
+//        member2.setUserId("admin2");
+//        member2.setPwd(encoder.encode("admin2"));
+//        member2.setName("admin2");
+//        member2.setEmail("admin2@gmail.com");
+//        member2.setPhone("010-1111-2222");
+//        member2.setUse(true);
+//        member2.setCreateAt(LocalDateTime.now());
+//        memberMapper.save(member2);
+//
+//        role2.setMemberPk(member2.getId());
+//        role2.setRole(RoleType.ADMIN);
+//        memberMapper.saveRole(role2);
+//
+//        role2.setMemberPk(member2.getId());
+//        role2.setRole(RoleType.USER);
+//        memberMapper.saveRole(role2);
+//
+//        member100.setUserId("admin100");
+//        member100.setPwd(encoder.encode("admin100"));
+//        member100.setName("admin100");
+//        member100.setEmail("admin100@gmail.com");
+//        member100.setPhone("010-1111-1222");
+//        member100.setUse(true);
+//        member100.setCreateAt(LocalDateTime.now());
+//        memberMapper.save(member100);
+//    }
 
     @Test
     @DisplayName("모든 유저 조회")
@@ -486,6 +487,16 @@ class MemberMapperTest {
             assertEquals("010-1111-1234", m.getPhone());
         });
 
+
+
+    }
+
+    @Test
+    void findMemberByUsernames() {
+        List<String> usernames = List.of("d-member-1", "d-member-2", "admin1");
+        List<MemberResultMap.ListItem> list = memberMapper.findMemberByUsernames(usernames);
+
+        log.info("{}", list);
 
 
     }

@@ -3,9 +3,8 @@ import AlbumProvider from "@/app/board/{components}/block/extra/providers/albumP
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import {faChevronLeft, faChevronRight} from "@fortawesome/free-solid-svg-icons";
-import {defaultNoImg} from "@/app/{commons}/func/image";
-import {NO_IMAGE} from "@/app/{services}/constants";
 import Image from "next/image";
+import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 const ImageView = ({
     images,
@@ -13,6 +12,8 @@ const ImageView = ({
     images: string[];
 }) => {
     const {albumToggle, setAlbumToggle} = useContext(AlbumProvider);
+
+    const {defaultNoImg} = useDefaultImage();
 
     const prevImage = useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
@@ -71,7 +72,7 @@ const ImageView = ({
                        priority={true}
                        alt={'view'}
                        onError={(e) => {
-                           e.currentTarget.src = NO_IMAGE;
+                           e.currentTarget.src = defaultNoImg('');
                        }}
                 />
                 <div className={'z-40 fixed top-0 left-0 w-full h-full flex justify-between'}>

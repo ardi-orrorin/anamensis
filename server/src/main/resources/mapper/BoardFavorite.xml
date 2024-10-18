@@ -14,7 +14,7 @@
             SELECT *
               FROM board_favorite bf
              WHERE bf.member_pk = #{memberPk}
-               AND bf.board_pk = #{boardPk}
+               AND bf.board_pk  = #{boardPk}
         )
     </select>
     <insert id="save">

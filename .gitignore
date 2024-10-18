@@ -39,9 +39,10 @@ out/
 .vscode/
 
 ### Spring Boot ###
-application*.yml
+batch/**/application*.yml
+config/**/application*.yml
+server/**/application-*.yml
 *.jks
-server/src/main/resources/application.yml
 .gitignore
 *.env
 *.env.*

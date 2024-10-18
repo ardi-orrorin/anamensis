@@ -35,7 +35,7 @@ public class BoardCommentResponse {
                     .id(resultMap.getId())
                     .content(resultMap.getBoardComment().getContent())
                     .writer(resultMap.getMember().getName())
-                    .profileImage(resultMap.getFile().getFilePath() + resultMap.getFile().getFileName())
+                    .profileImage(resultMap.getFile().getFullPath())
                     .parentPk(resultMap.getBoardComment().getParentPk())
                     .blockSeq(resultMap.getBoardComment().getBlockSeq())
                     .createdAt(resultMap.getBoardComment().getCreateAt());

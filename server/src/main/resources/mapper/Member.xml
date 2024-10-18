@@ -33,7 +33,8 @@
                     AND m1.user_id LIKE concat('%', #{params.userId}, '%')
                   </if>
                  ORDER BY m1.user_id
-                 LIMIT #{page.offset}, #{page.size}
+                OFFSET #{page.offset}
+                 LIMIT #{page.size}
              ) m2
             ON m.id = m2.id
           JOIN role r
@@ -46,22 +47,22 @@
     <select id="findMemberByUserId" resultType="Member">
         <include refid="tbl_member"/>
         WHERE user_id  = #{userId}
-          AND is_use   = 1
+          AND is_use   = TRUE
     </select>
 
     <select id="findOAuthMember" resultType="Member">
         <include refid="tbl_member"/>
         WHERE user_id  = #{userId}
-          AND is_use   = 1
-          AND is_oauth = 1
+          AND is_use   = TRUE
+          AND is_oauth = TRUE
     </select>
 
     <select id="findMemberByUserIdAndPwd" resultType="Member">
         <include refid="tbl_member"/>
         WHERE user_id  = #{userId}
           AND pwd      = #{pwd}
-          AND is_use   = 1
-          AND is_oauth = 0
+          AND is_use   = TRUE
+          AND is_oauth = FALSE
     </select>
 
     <select id="findMemberInfo" resultMap="memberResultMap">
@@ -69,8 +70,13 @@
           FROM member a
           JOIN role b
             ON a.id       = b.member_pk
+          LEFT JOIN file f
+            ON a.id       = f.table_ref_pk
+           AND f.table_code_pk = (SELECT id
+                                    FROM table_code
+                                   WHERE table_name = 'member')
          WHERE a.user_id  = #{userId}
-           AND a.is_use   = 1
+           AND a.is_use   = TRUE
     </select>
 
     <select id="existsMember" resultType="boolean">
@@ -78,7 +84,7 @@
                SELECT *
                  FROM member
                 WHERE 1 = 1
-                  AND is_oauth = 0
+                  AND is_oauth = FALSE
              <choose>
                 <when test="type != null and type == 'id' and value != null and value != ''">
                     AND user_id = #{value}
@@ -98,12 +104,36 @@
         <if test="userId != null and userId != ''">
             AND user_id = #{userId}
         </if>
-          AND is_use   = 1
-          AND is_oauth = 0
+          AND is_use   = TRUE
+          AND is_oauth = FALSE
     </select>
+
+    <select id="findMemberByUserIds" resultType="member">
+        <include refid="tbl_member"/>
+        WHERE user_id IN
+        <foreach collection="userIds" item="userId" separator="," open="(" close=")">
+            #{userId}
+        </foreach>
+    </select>
+
+    <select id="findMemberByUsernames" resultMap="memberListItemResultMap">
+        SELECT *
+             , f.id AS file_id
+          FROM member m
+          LEFT JOIN file f
+            ON m.id            = f.table_ref_pk
+           AND f.table_code_pk = (SELECT id
+                                    FROM table_code
+                                   WHERE table_name = 'member')
+         WHERE m.user_id IN
+        <foreach collection="usernames" item="username" separator="," open="(" close=")">
+            #{username}
+        </foreach>
+    </select>
+
     <insert id="save" parameterType="Member">
         <selectKey keyProperty="id" resultType="int" order="AFTER">
-            SELECT LAST_INSERT_ID()
+            SELECT currval('member_id_seq')
         </selectKey>
         INSERT INTO member (user_id, pwd, name,
                             email, phone, create_at, is_oauth)
@@ -163,7 +193,7 @@
            <if test="email != null and email != ''">
                AND email   = #{email}
           </if>
-           AND is_use  = 1
+           AND is_use  = TRUE
     </update>
 
     <delete id="deleteRole" parameterType="Role">
@@ -182,18 +212,27 @@
             </foreach>
            AND role = #{role}
     </delete>
+
+    <resultMap id="memberListItemResultMap" type="com.anamensis.server.resultMap.MemberResultMap$ListItem">
+        <id property="memberPk" column="id"/>
+        <association property="member" resultMap="MemberEntity" autoMapping="true" />
+        <association property="file" resultMap="FileEntity" autoMapping="true" />
+    </resultMap>
     
     <resultMap id="memberResultMap" type="MemberResultMap" autoMapping="true">
         <id property="memberPk" column="id"/>
         <association property="member" resultMap="MemberEntity" autoMapping="true" />
+        <association property="file" resultMap="FileEntity" autoMapping="true" />
         <collection property="roles" resultMap="RoleEntity" />
     </resultMap>
 
+    <resultMap id="FileEntity" type="File" autoMapping="true">
+        <id property="id" column="file_id"/>
+    </resultMap>
     <resultMap id="MemberEntity" type="Member" autoMapping="true">
         <result property="sAuthType" column="s_auth_type" typeHandler="AuthTypeHandler"/>
     </resultMap>
     <resultMap id="RoleEntity" type="Role" autoMapping="true">
         <result property="role" column="role" typeHandler="RoleTypeHandler"/>
     </resultMap>
-
 </mapper>

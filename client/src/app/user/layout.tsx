@@ -19,7 +19,8 @@ export default function Layout({children}: {children: React.ReactNode & {test:'1
     useEffect(() => {
         if(typeof window === 'undefined') return;
 
-        localStorage.getItem('isModalMode') || localStorage.setItem('isModalMode', JSON.stringify(false));
+        localStorage.getItem('isModalMode')
+            ?? localStorage.setItem('isModalMode', JSON.stringify(false));
 
         const isModalMode = JSON.parse(localStorage.getItem('isModalMode')!);
         setIsModalMode(isModalMode);

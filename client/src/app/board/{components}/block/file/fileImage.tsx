@@ -1,6 +1,7 @@
 import {useMemo} from "react";
 import Image from "next/image";
 import {MouseLeaveHTMLElements} from "@/app/board/{components}/block/type/Types";
+import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 export type FileImageProps = {
     value: string;
@@ -13,11 +14,11 @@ export default function FileImage(props: FileImageProps){
         value, onMouseEnterHandler, onMouseLeaveHandler
     } = props;
 
+    const {defaultNoImg} = useDefaultImage();
+
     const thumb = useMemo(() =>
         value.replace(/(\.[^.]+)$/, '_thumb$1')
     ,[value]);
-
-    const url = process.env.NEXT_PUBLIC_CDN_SERVER + thumb;
 
     return (
         <div className={'w-full flex justify-center items-center object-cover'}
@@ -25,12 +26,15 @@ export default function FileImage(props: FileImageProps){
              onMouseLeave={onMouseLeaveHandler}
              aria-roledescription={'object'}
         >
-            <Image src={url}
+            <Image src={defaultNoImg(thumb)}
                    alt={''}
                    height={700}
                    width={700}
                    className={'w-auto h-auto'}
                    priority={true}
+                   onError={(e) => {
+                      e.currentTarget.src = defaultNoImg('')
+                   }}
             />
         </div>
     )

@@ -7,7 +7,7 @@
     <select id="findByIdByTableName" resultType="TableCode">
         SELECT *
           FROM table_code tc
-         WHERE is_use = 1
+         WHERE is_use = TRUE
        <choose>
            <when test="tableName != null and tableName != ''">
                AND tc.table_name = #{tableName}
@@ -19,7 +19,7 @@
     </select>
     <insert id="save" parameterType="TableCode">
         <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
-            SELECT LAST_INSERT_ID()
+            SELECT currval('table_code_id_seq')
         </selectKey>
         INSERT INTO table_code
                (table_name, is_use)

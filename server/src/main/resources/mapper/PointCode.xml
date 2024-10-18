@@ -27,7 +27,7 @@
 
     <insert id="insert" parameterType="PointCode">
         <selectKey keyProperty="id" resultType="int" order="AFTER">
-            SELECT LAST_INSERT_ID()
+            SELECT currval('point_code_id_seq')
         </selectKey>
         INSERT INTO point_code
                (name, point)

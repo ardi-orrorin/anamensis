@@ -4,14 +4,16 @@ import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import React, {useMemo} from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {NO_PROFILE} from "@/app/{services}/constants";
+import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 const ProfileInfo = () => {
     const router = useRouter()
 
-    const profileImg = useQueryClient().getQueryData(['profileImg']);
+    const profileImg = useQueryClient().getQueryData(['profileImg']) as string;
 
     const {data: userinfo} = useQuery(userInfoApiService.profile())
+
+    const {defaultProfile} = useDefaultImage();
 
     const point = useMemo(() =>
             userinfo?.point.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -36,15 +38,13 @@ const ProfileInfo = () => {
                     <button className={'w-[95px] h-[95px] p-1.5 flex justify-center items-center border-4 border-solid border-main rounded-full hover:border-amber-500 duration-500'}
                             onClick={()=> router.push('/user/info')}
                     >
-                        <Image src={process.env.NEXT_PUBLIC_CDN_SERVER! + profileImg}
+                        <Image src={defaultProfile(profileImg)}
                                  alt={''}
                                  height={90}
                                  width={90}
                                  className={'shadow rounded-full'}
-                                 placeholder={'blur'}
-                                 blurDataURL={NO_PROFILE}
                                  onError={(e) => {
-                                     e.currentTarget.src = NO_PROFILE
+                                     e.currentTarget.src = defaultProfile('')
                                  }}
                         />
                     </button>

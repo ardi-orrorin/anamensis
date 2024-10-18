@@ -3,12 +3,11 @@ import React, {ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} f
 import Image from "next/image";
 import axios from "axios";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import {defaultNoImg} from "@/app/{commons}/func/image";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
-import {NO_IMAGE} from "@/app/{services}/constants";
 import {usePendingFiles} from "@/app/board/[id]/{hooks}/usePendingFiles";
 import boardApiService from "@/app/board/{services}/boardApiService";
+import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 
 export type AlttuelBlockProps = {
@@ -54,13 +53,9 @@ const AlttuelBlock = (props: ExpendBlockProps) => {
         }
     },[]);
 
-    const thumb = useMemo(()=>{
-        return defaultNoImg(extraValue?.img?.replace(/(\.[^.]+)$/, '_thumb$1'));
-    }, [extraValue?.img])
+    const thumb = useMemo(()=> extraValue?.img?.replace(/(\.[^.]+)$/, '_thumb$1'), [extraValue?.img]);
 
-    const oriImg = useMemo(()=>{
-        return defaultNoImg(extraValue?.img);
-    }, [extraValue?.img])
+    const oriImg = useMemo(()=> extraValue?.img, [extraValue?.img])
 
     const addCommasToNumber = useCallback((number: number)  => {
         if(Number(number) === 0) return '무료';
@@ -418,23 +413,25 @@ const ImageThumb = ({
     onChangeFileHandler: (e: ChangeEvent<HTMLInputElement>) => void,
 }) => {
 
+    const {defaultNoImg} = useDefaultImage();
+
     if(!isView)
         return (
             <>
                 <div className={'relative w-full sm:w-auto'}>
                     <img className={'w-full h-[200px] sm:w-[150px] sm:h-[150px] sm:min-w-[150px] sm:min-h-[150px] object-cover rounded'}
-                         src={thumb}
+                         src={defaultNoImg(thumb)}
                          alt={'대표 이미지'}
                          onClick={onChangeImageHandler}
                          onError={e => {
-                             e.currentTarget.src = NO_IMAGE;
+                             e.currentTarget.src = defaultNoImg('');
                          }}
                     />
                     {
                         imgViewProps.imgLoading
                         && <div className={'absolute z-10 flex justify-center items-center left-0 top-0 w-full h-full rounded bg-black bg-opacity-25'}>
-                        <LoadingSpinner size={20}/>
-                      </div>
+                            <LoadingSpinner size={20}/>
+                        </div>
                     }
                 </div>
                 <input ref={imageRef}
@@ -447,16 +444,17 @@ const ImageThumb = ({
                 />
             </>
         )
+
     return (
         <>
             <div className={'relative w-full sm:w-auto duration-500'}>
                 <Image className={'w-full h-[200px] sm:w-[150px] sm:h-[150px] sm:min-w-[150px] sm:min-h-[150px] object-cover rounded duration-500'}
                        width={150}
                        height={150}
-                       src={thumb}
+                       src={defaultNoImg(thumb)}
                        alt={'대표 이미지'}
                        onError={e => {
-                           e.currentTarget.src = NO_IMAGE;
+                           e.currentTarget.src = defaultNoImg('');
                        }}
                        onMouseEnter={()=> setImgViewProps(prevState => ({
                            ...prevState,
@@ -486,7 +484,7 @@ const ImageThumb = ({
                                 viewImg: false
                             }))}
                     >
-                    <Image src={oriImg}
+                    <Image src={defaultNoImg(oriImg)}
                            alt={'원본 이미지'}
                            width={700}
                            height={700}
@@ -495,7 +493,7 @@ const ImageThumb = ({
                                viewImg: false
                            }))}
                            onError={e => {
-                               e.currentTarget.src = NO_IMAGE;
+                               e.currentTarget.src = defaultNoImg('');
                            }}
                     />
                   </div>

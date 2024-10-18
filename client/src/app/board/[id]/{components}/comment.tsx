@@ -8,7 +8,6 @@ import apiCall from "@/app/{commons}/func/api";
 import Link from "next/link";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import {defaultProfile} from "@/app/{commons}/func/image";
 import moment from "moment";
 import {QuestionBlockExtraValueType} from "@/app/board/{components}/block/extra/questionBlock";
 import {updateBoard} from "@/app/board/{services}/funcs";
@@ -18,6 +17,7 @@ import {Common} from "@/app/{commons}/types/commons";
 import {useQuery} from "@tanstack/react-query";
 import boardApiService from "@/app/board/{services}/boardApiService";
 import {useBlockEvent} from "@/app/board/[id]/{hooks}/useBlockEvent";
+import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 export type SaveComment = {
     boardPk   : string;
@@ -168,6 +168,8 @@ const CommentItem = (props: CommentI & {refetch: ()=> Promise<any>}) => {
     const {board} = useContext(BoardProvider);
 
     const {setSelectedBlock} = useBlockEvent();
+
+    const {defaultProfile} = useDefaultImage();
 
     const {deleteComment, setDeleteComment} = useContext(BoardProvider);
     const [loading, setLoading] = useState(false);

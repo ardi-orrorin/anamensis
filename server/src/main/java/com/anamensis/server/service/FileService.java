@@ -45,7 +45,7 @@ public class FileService {
 
     private final TableCodeMapper tableCodeMapper;
 
-    @Value("${file.upload-dir}")
+    @Value("${file.storage.dir}")
     private String UPLOAD_DIR;
 
     private final Sinks.Many<FileHashRecord> list = Sinks.many().multicast().directAllOrNothing();
@@ -59,7 +59,6 @@ public class FileService {
         return Mono.just(fileMapper.findByTableNameAndTableRefPk(tableName, tableRefPk));
     }
 
-    @Transactional
     public Mono<File> insertFile(FilePartEvent filePartEvent, String hash) {
         File newFile = new File();
         newFile.setFileName(filePartEvent.filename());
@@ -108,6 +107,7 @@ public class FileService {
 
 
         Mono<Boolean> ori = awsS3Provider.saveOriginal(filePart, filepath.filepath(), filepath.filename());
+
         return Mono.zip(thumbnail, ori)
             .subscribeOn(Schedulers.boundedElastic())
             .map(r -> fileEntity);

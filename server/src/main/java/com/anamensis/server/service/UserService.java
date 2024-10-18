@@ -33,6 +33,7 @@ import reactor.util.annotation.NonNull;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -149,6 +150,11 @@ public class UserService implements ReactiveUserDetailsService {
             .switchIfEmpty(Mono.error(new RuntimeException("User not found")));
     }
 
+    public Mono<List<MemberResultMap.ListItem>> findMemberByUsernames(List<String> usernames) {
+        return Flux.fromIterable(memberMapper.findMemberByUsernames(usernames))
+            .collectList();
+    }
+
     public Mono<Void> addUserInfoCache(String userId) {
         MemberResultMap member = memberMapper.findMemberInfo(userId).orElseThrow(() ->
             new RuntimeException("User not found"));
@@ -201,6 +207,7 @@ public class UserService implements ReactiveUserDetailsService {
         member.setCreateAt(LocalDateTime.now());
         member.setSAuthType(AuthType.NONE);
         member.setOAuth(isOAuth);
+        member.setSAuth(false);
 
         try {
             pointCodeMapper.selectByIdOrName(0,ATTENDANCE_POINT_CODE_PREFIX + "1")

@@ -5,13 +5,11 @@
 ![](./resource/erd.jpg)
 
 ## docker create secret
-- application.yml 파일 및 nextjs.env secret으로 등록
+- application.yml
 
 ```shell
 docker secret create config_anamensis_secret_config config-config.yml
-docker secret create config_anamensis_secret_keystore keystore.jks
 docker secret create batch_anamensis_secret_config batch-config.yml
-docker secret create nextjs_anamensis_secret_config nextjs.env
 ```
 
 ## docker build
@@ -37,10 +35,10 @@ docker secret create nextjs_anamensis_secret_config nextjs.env
 /root/build.sh base 0.0.1 anamensis
 ```
 
-## nextjs environments
+## NextJs Environments
 - NEXTAUTH_SECRET (필수값)
-- NEXT_PUBLIC_CDN_SERVER (기본값: http://localhost:3000/files)
-- NEXT_PUBLIC_BASE_URL (기본값: http://localhost:3000)
+- CDN_SERVER (기본값: http://localhost:3000/files)
+- BASE_URL (기본값: http://localhost:3000)
 - OATH2 설정
   - GOOGLE_CLIENT_ID (선택값)
   - GOOGLE_CLIENT_SECRET (선택값) 
@@ -55,8 +53,7 @@ docker secret create nextjs_anamensis_secret_config nextjs.env
   - CUSTOM_CLIENT_SECRET (선택값)
   - CUSTOM_OAUTH2_SERVER_URL (선택값)
 
-## Spring Server environments
-- TIME_ZONE (기본값: Asia/Seoul)
+## Spring Server Environments
 - DB_URI (필수, 기본값: localhost:5432/anamensis)
 - DB_USERNAME (필수값: postgres)
 - DB_PASSWORD (필수값)
@@ -70,7 +67,12 @@ docker secret create nextjs_anamensis_secret_config nextjs.env
   - AWS_REGION (기본값: ap-northeast-2)
   - AWS_BUCKET (기본값: anamensis)
 
-
+## Init User
+```text
+Default User
+ID: master
+PASSWORD: master
+```
 
 ## example site nextjs.env
 - [KaKao Login](https://developers.kakao.com/product/kakaoLogin)

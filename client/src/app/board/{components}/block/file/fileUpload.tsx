@@ -21,7 +21,6 @@ export default function FileUpload (props: FileUploadProps) {
     const [loading, setLoading] = useState<boolean>(false);
     const [progress, setProgress] = useState<number>(0);
     const {setWaitUploadFiles} = usePendingFiles();
-    const {data: config} = useQuery(rootApiService.getConfig());
 
     const onClick = () => {
         if(!useFileInputRef.current) return ;
@@ -48,7 +47,7 @@ export default function FileUpload (props: FileUploadProps) {
 
             formData.append('file', file);
 
-            const root = config?.backendUrl + '/public/api/files/upload/';
+            const root = process.env.NEXT_PUBLIC_SERVER + '/public/api/files/upload/';
 
             setLoading(true);
 

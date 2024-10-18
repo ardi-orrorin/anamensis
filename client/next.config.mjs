@@ -19,17 +19,17 @@ const nextConfig = {
   optimizeFonts : true,
   compress : true,
   env: {
-    NEXT_PUBLIC_SERVER: `http://localhost:8080`
+    NEXT_PUBLIC_SERVER: `http://127.0.0.1:8080`
   },
   async rewrites() {
     return [
       {
         source: '/ws/:path*',
-        destination: 'http://localhost:8080/ws/:path*',
+        destination: 'http://127.0.0.1:8080/ws/:path*',
       },
       {
         source: '/files/:path*',
-        destination: 'http://localhost:8080/files/:path*',
+        destination: 'http://127.0.0.1:8080/files/:path*',
       }
     ];
   },
@@ -51,7 +51,7 @@ const nextConfig = {
       devServer.app.use(
         '/ws',
         createProxyMiddleware({
-          target: 'http://localhost:8080',
+          target: 'http://127.0.0.1:8080',
           changeOrigin: true,
           ws: true,
         })

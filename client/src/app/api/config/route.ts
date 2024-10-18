@@ -1,8 +1,8 @@
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
 
 export interface NextJsConfigI {
-    cdnServer: string
-    baseUrl: string
+    cdnServer  : string;
+    baseUrl    : string;
 }
 
 export function GET() {

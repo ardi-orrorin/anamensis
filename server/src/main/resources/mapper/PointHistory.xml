@@ -60,8 +60,8 @@
           JOIN point_code pc
             ON ph1.point_code_pk = pc.id
           JOIN table_code tc
-            ON ph1.table_code_pk = tc.id;
-        ORDER BY ph2.id DESC
+            ON ph1.table_code_pk = tc.id
+         ORDER BY ph2.id DESC;
     </select>
 
     <insert id="insert" parameterType="PointHistory">

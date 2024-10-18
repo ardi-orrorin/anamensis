@@ -28,9 +28,7 @@ export default function FileFile(props: FileFileProps){
         backgroundColor   : 'rgba(240,240,240, 0.5)',
     }),[]);
 
-    const {data: config} = useQuery(rootApiService.getConfig());
-
-    const downloadUrl = config?.backendUrl + value;
+    const downloadUrl = process.env.NEXT_PUBLIC_SERVER + value;
 
     return (
         <div style={style}>

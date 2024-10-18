@@ -59,7 +59,7 @@ const oAuthProviders: User.OAuthProvider[] = [
     { provider: 'naver',     bgColor: 'bg-green-400',  hoverBgColor: 'bg-green-600',  size: 20,   },
     { provider: 'kakao',     bgColor: 'bg-amber-400',  hoverBgColor: 'bg-amber-700',  size: 18,   },
     { provider: 'github',    bgColor: 'bg-gray-600',   hoverBgColor: 'bg-gray-900',   size: 18,   },
-    { provider: 'ardi',      bgColor: 'bg-gray-300',   hoverBgColor: 'bg-gray-500',   size: 18,   },
+    { provider: 'custom',    bgColor: 'bg-gray-300',   hoverBgColor: 'bg-gray-500',   size: 18,   },
 ];
 
 export default React.memo(OAuth);

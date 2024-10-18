@@ -1,6 +1,4 @@
 spring:
-  time-zone: ${TIME_ZONE:Asia/Seoul}
-
   data:
     redis:
       url: redis://${REDIS_URI:localhost:6379/1}
@@ -92,6 +90,7 @@ logging:
       clean-history-on-start: false
   file:
     name: anamensis.log
+
 
 management:
   server:

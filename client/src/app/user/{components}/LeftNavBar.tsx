@@ -212,28 +212,6 @@ const LeftNavBar = ({
                 </li>
                 <li className={'w-full'}>
                     <Link className={'text text-white w-full'}
-                          href={'/user/smtp'}
-                          onClick={onChangeDisabledHandler}
-                    >
-                        <div className={'w-full flex gap-2 p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
-                            <FontAwesomeIcon icon={faEnvelope} width={iconSize} />
-                            <span className={isModalMode ? '' : 'hidden sm:inline'}>SMTP</span>
-                        </div>
-                    </Link>
-                </li>
-                <li className={'w-full'}>
-                    <Link className={'text text-white w-full'}
-                          href={'/user/smtp-history'}
-                          onClick={onChangeDisabledHandler}
-                    >
-                        <div className={'w-full flex gap-2 p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
-                            <FontAwesomeIcon icon={faEnvelopesBulk} width={iconSize}/>
-                            <span className={isModalMode ? '' : 'hidden sm:inline'}>SMTP 발송 내역</span>
-                        </div>
-                    </Link>
-                </li>
-                <li className={'w-full'}>
-                    <Link className={'text text-white w-full'}
                           href={'/user/board-block'}
                           onClick={onChangeDisabledHandler}
                     >

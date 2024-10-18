@@ -8,13 +8,12 @@ import com.anamensis.server.websocket.dto.SessionUser;
 import com.anamensis.server.websocket.dto.Status;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -29,8 +28,6 @@ public class ChatHandler implements WebSocketHandler {
 
     private final Set<SessionUser> sessionList = new HashSet<>();
 
-    private Logger log = LoggerFactory.getLogger(ChatHandler.class);
-
     @Override
     public Mono<Void> handle(WebSocketSession session) {
         return ReactiveSecurityContextHolder.getContext()
@@ -42,13 +39,11 @@ public class ChatHandler implements WebSocketHandler {
 
                         sessionList.add(sessionUser);
 
-                        log.info("sessionList: {}", sessionList);
-
-                        return session.send(userReceiver.getUserList(session, sessionList))
+                        return userReceiver.getUserList(sessionList)
                             .and(chatReceiver.getChatRoomList(user.getUsername(), session))
                             .and(this.receive(session))
-                            .then(Mono.defer(() -> this.close(user.getUsername(), session)));
-
+                            .then()
+                            .doFinally(signalType -> this.close(user.getUsername(), session));
                     })
             );
 
@@ -79,15 +74,12 @@ public class ChatHandler implements WebSocketHandler {
             );
     }
 
-    private Mono<Void> close(String username, WebSocketSession session) {
+    private void close(String username, WebSocketSession session) {
         sessionList.removeIf(it -> it.username().equals(username));
 
-        if(sessionList.isEmpty()) {
-            return Mono.empty();
-        }
-
-        return session.send(userReceiver.getUserList(session, sessionList));
+        session.close()
+            .then(Mono.defer(() -> userReceiver.getUserList(sessionList)))
+            .subscribeOn(Schedulers.boundedElastic())
+            .subscribe();
     }
-
-
 }

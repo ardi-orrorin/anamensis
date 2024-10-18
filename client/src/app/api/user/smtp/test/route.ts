@@ -1,6 +1,6 @@
 import {NextRequest, NextResponse} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
-import {SMTP} from "@/app/user/smtp/{services}/types";
+import {SMTP} from "@/app/system/smtp/{services}/types";
 
 export async function POST(req: NextRequest) {
     const data = await req.json() as SMTP.FullProps;

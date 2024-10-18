@@ -1,6 +1,6 @@
 import Link from "next/link";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPenToSquare, faRightFromBracket, faUserPlus} from "@fortawesome/free-solid-svg-icons";
+import {faGear, faPenToSquare, faRightFromBracket, faUserPlus} from "@fortawesome/free-solid-svg-icons";
 import {cookies} from "next/headers";
 import {faRightToBracket} from "@fortawesome/free-solid-svg-icons/faRightToBracket";
 import Image from "next/image";
@@ -10,6 +10,7 @@ import React from "react";
 import CustomImage from "@/app/{components}/customImage";
 import dynamic from "next/dynamic";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
+import SystemLink from "@/app/{components}/systemLink";
 
 const DynamicCustomImage = dynamic(() => import('@/app/{components}/customImage'), {
     loading: () => <div className={'h-[140px] flex items-center'}><LoadingSpinner size={30}/></div>,
@@ -88,6 +89,10 @@ const NavMain = async () => {
                           <DynamicCustomImage />
                         </Link>
                       </div>
+                    }
+                    {
+                        isLogged
+                        && <SystemLink />
                     }
                 </ul>
             </div>

@@ -1,4 +1,4 @@
-import {SMTP} from "@/app/user/smtp/{services}/types";
+import {SMTP} from "@/app/system/smtp/{services}/types";
 
 const Row = ({
     rowNum,  index,

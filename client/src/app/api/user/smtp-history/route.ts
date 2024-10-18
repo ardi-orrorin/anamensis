@@ -1,7 +1,7 @@
 import {NextRequest, NextResponse} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
 import {Common} from "@/app/{commons}/types/commons";
-import {SMTP} from "@/app/user/smtp/{services}/types";
+import {SMTP} from "@/app/system/smtp/{services}/types";
 
 export async function GET(req: NextRequest): Promise<NextResponse<Common.PageResponse<SMTP.History>>> {
     const search = new URLSearchParams(req.nextUrl.search);

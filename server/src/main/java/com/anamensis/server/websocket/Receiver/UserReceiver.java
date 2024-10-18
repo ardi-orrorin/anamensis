@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.socket.WebSocketMessage;
-import org.springframework.web.reactive.socket.WebSocketSession;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -24,7 +22,9 @@ public class UserReceiver {
 
     private final UserService userService;
 
-    public Mono<WebSocketMessage> getUserList(WebSocketSession session, Set<SessionUser> sessionList) {
+    public Mono<Void> getUserList(Set<SessionUser> sessionList) {
+        if(sessionList.isEmpty()) return Mono.empty();
+
         List<String> userList = sessionList.stream()
             .map(SessionUser::username)
             .toList();
@@ -68,8 +68,7 @@ public class UserReceiver {
                 sessionUser.session()
                     .send(Mono.just(sessionUser.session().textMessage(json.toString())))
             )
-            .then()
-            .then(Mono.just(session.textMessage(json.toString())));
+            .then();
     }
 
     public Mono<Void> changeStatus(

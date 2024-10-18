@@ -11,8 +11,8 @@ platform=linux/amd64,linux/arm64
 
 if [ "$service" == "base" ] && [ "$version" != "" ] && [ "$docker_id" != "" ]
 then
-    docker buildx build --platform $platform --push -t $docker_id/anamensis-base:latest -f base.Dockerfile  .
-    docker buildx build --platform $platform --push -t $docker_id/anamensis-base:$version -f base.Dockerfile  .
+    docker buildx build --platform $platform --push -t $docker_id/base-anamensis:latest -f base.Dockerfile  .
+    docker buildx build --platform $platform --push -t $docker_id/base-anamensis:$version -f base.Dockerfile  .
     exit 1
 fi
 

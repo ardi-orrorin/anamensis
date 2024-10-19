@@ -1,14 +1,10 @@
 
 interface SmtpI {
-    host: string;
-    port: string;
+    host    : string;
+    port    : string;
     username: string;
     password: string;
-}
-
-interface TestResponseI {
-    result: boolean;
-    message: string;
+    enabled : boolean;
 }
 
 interface HistoryI {
@@ -24,9 +20,8 @@ interface HistoriesRowI extends HistoryI {
     index  : number;
 }
 
-export namespace SMTP {
+export namespace SystemSMTP {
     export type Smtp            = SmtpI;
-    export type TestResponse    = TestResponseI;
     export type History         = HistoryI;
     export type HistoriesRow    = HistoriesRowI;
 }

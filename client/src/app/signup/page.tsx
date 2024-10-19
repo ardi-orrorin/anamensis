@@ -8,9 +8,15 @@ import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import apiCall from "@/app/{commons}/func/api";
 import Footer from "@/app/find-user/{components}/footer";
 import {SignUp} from "@/app/signup/{services}/types";
+import systemApiServices from "@/app/system/{services}/apiServices";
+import {useQuery} from "@tanstack/react-query";
+import DisabledPage from "@/app/{components}/system/disabledPage";
 
 // 2024-10-11 email 체크 기능 비활성화
+// todo: emailVerification 활성화 시 email 체크 기능 활성화
 export default function Page() {
+
+    const {data: publicSystemConfig} = useQuery(systemApiServices.getPublicSystemConfig());
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const idRegex = /^[a-z0-9]{5,20}$/;
@@ -56,6 +62,15 @@ export default function Page() {
     });
 
     useEffect(()=>{
+
+        if(!publicSystemConfig?.sign_up?.enabled) {
+            const timer = setTimeout(() => {
+                router.push('/');
+            }, 2000);
+
+            return () => clearTimeout(timer);
+        }
+
         return () => {
             clearInterval(timeout.current);
         }
@@ -274,6 +289,14 @@ export default function Page() {
         const second = timer % 60;
         return `${minute}분 ${second}초`;
     };
+
+    if(!publicSystemConfig?.sign_up?.enabled) {
+        const body = {
+            title: '회원가입 기능을 사용할 수 없습니다.',
+            description: '시스템에서 회원가입 기능을 비활성화 했습니다. 관리자에게 문의하세요.',
+        }
+        return <DisabledPage {...body} />
+    }
 
     return (
         <main className={'flex flex-col min-h-screen justify-center items-center'}>

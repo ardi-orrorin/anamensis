@@ -2,18 +2,18 @@
 
 import React, {useEffect, useState} from "react";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import {SMTP} from "@/app/system/smtp/{services}/types";
+import {SystemSMTP} from "@/app/system/smtp/{services}/types";
 import smtpApiServices from "@/app/system/smtp/{services}/apiServices";
 import {useQuery} from "@tanstack/react-query";
 import systemApiServices from "@/app/system/{services}/apiServices";
 import {System} from "@/app/system/{services}/types";
 
 export default function SmtpInfo() {
-    const [smtp, setSmtp] = useState({} as SMTP.Smtp);
+    const [smtp, setSmtp] = useState({} as SystemSMTP.Smtp);
     const [loading, setLoading] = useState(false);
     const [errResponse, setErrResponse] = useState('');
 
-    const {data: systemConfig, refetch} = useQuery(systemApiServices.getSystemConfig());
+    const {data: systemConfig, refetch} = useQuery(systemApiServices.getPrivateSystemConfig());
 
     useEffect(() => {
         setSmtp(systemConfig.smtp);
@@ -27,7 +27,7 @@ export default function SmtpInfo() {
         const body = {
             key: System.Key.SMTP,
             value: smtp
-        } as System.Request<SMTP.Smtp>;
+        } as System.Request<SystemSMTP.Smtp>;
 
         setLoading(true);
 
@@ -72,7 +72,6 @@ export default function SmtpInfo() {
                            name={'host'}
                            value={smtp?.host ?? ''}
                            onChange={setSmtpHandler}
-
                     />
                     <input className={'w-20 ' + inputStyle}
                            placeholder={'port'}

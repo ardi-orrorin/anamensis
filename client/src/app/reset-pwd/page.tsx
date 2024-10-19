@@ -1,11 +1,17 @@
 'use client';
 
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
 import Footer from "@/app/find-user/{components}/footer";
 import {User} from "@/app/login/{services}/types";
+import systemApiServices from "@/app/system/{services}/apiServices";
+import {useQuery} from "@tanstack/react-query";
+import DisabledPage from "@/app/{components}/system/disabledPage";
+import {useRouter} from "next/navigation";
 
 export default function Page() {
+    const router = useRouter();
+    const {data: publicSystemConfig} = useQuery(systemApiServices.getPublicSystemConfig());
 
     const [resetPwd, setResetPwd] = useState<User.ResetPwd>({
         progress: User.ResetPwdProgress.CONFIRMED,
@@ -15,6 +21,15 @@ export default function Page() {
     const [pwd, setPwd] = useState({} as User.Password);
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    useEffect(() => {
+        if(!publicSystemConfig?.sign_up?.emailVerification) {
+            const timer = setTimeout(() => {
+                router.push('/');
+            }, 2000);
+            return () => clearTimeout(timer);
+        }
+    }, []);
 
     const onResetPwdChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         setResetPwd({
@@ -78,6 +93,15 @@ export default function Page() {
             alert('비밀번호가 변경되었습니다');
             return location.href = '/';
         }
+    }
+
+    if(!publicSystemConfig?.sign_up?.emailVerification) {
+        const body = {
+            title: '아이디 찾기 기능을 사용할 수 없습니다.',
+            description: '시스템에서 아이디 찾기 기능을 비활성화 했습니다. 관리자에게 문의하세요.',
+        }
+
+        return <DisabledPage {...body} />
     }
 
     return (

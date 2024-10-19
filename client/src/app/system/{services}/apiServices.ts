@@ -5,24 +5,39 @@ import apiCall from "@/app/{commons}/func/api";
 import {System} from "@/app/system/{services}/types";
 
 
-const getSystemConfig = () => {
+const getPrivateSystemConfig = () => {
     return queryOptions({
         queryKey: ['getSystemConfig'],
         queryFn: async () => {
-            return await apiCall<System.Response>({
-                path: "/api/config/system",
+            return await apiCall<System.PrivateResponse>({
+                path: "/api/config/private/system",
                 method: "GET",
                 isReturnData: true,
             })
         },
-        initialData: {} as System.Response,
+        initialData: {} as System.PrivateResponse,
+        initialDataUpdatedAt: 1,
+    })
+}
+
+const getPublicSystemConfig = () => {
+    return queryOptions({
+        queryKey: ['getSystemConfig'],
+        queryFn: async () => {
+            return await apiCall<System.PublicResponse>({
+                path: "/api/config/public/system",
+                method: "GET",
+                isReturnData: true,
+            })
+        },
+        initialData: {} as System.PublicResponse,
         initialDataUpdatedAt: 1,
     })
 }
 
 const initSystemConfig = async ({key}: {key: System.Key}): Promise<boolean> => {
     return await apiCall<boolean, System.Key>({
-        path: '/api/config/system/init',
+        path: '/api/config/system/private/init',
         method: 'GET',
         call: 'Proxy',
         params: {key: key},
@@ -32,7 +47,8 @@ const initSystemConfig = async ({key}: {key: System.Key}): Promise<boolean> => {
 
 
 const systemApiServices = {
-    getSystemConfig,
+    getPrivateSystemConfig,
+    getPublicSystemConfig,
     initSystemConfig,
 }
 

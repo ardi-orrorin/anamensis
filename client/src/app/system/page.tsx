@@ -5,7 +5,7 @@ import systemApiServices from "@/app/system/{services}/apiServices";
 
 export default function Page() {
 
-    usePrefetchQuery(systemApiServices.getSystemConfig());
+    usePrefetchQuery(systemApiServices.getPrivateSystemConfig());
 
     return (
         <>

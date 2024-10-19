@@ -14,6 +14,7 @@ import Chat from "@/app/{components}/chats/chat";
 import {WebSocketProvider} from "@/app/{components}/chats/hook/useWebSocket";
 import {ChatMenuProvider} from "@/app/{components}/chats/hook/useChatMenu";
 import {DefaultImageProvider} from "@/app/{hooks}/useDefaultImage";
+import GlobalState from "@/app/globalState";
 
 
 export const metadata: Metadata = {
@@ -61,6 +62,7 @@ export default function RootLayout({
             <body className={'flex flex-col'}>
             <Providers>
                 <DefaultImageProvider>
+                    <GlobalState />
                     {
                         isLogin
                         && <>

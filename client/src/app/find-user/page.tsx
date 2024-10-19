@@ -1,17 +1,34 @@
 'use client';
 
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
 import Footer from "@/app/find-user/{components}/footer";
 import {User} from "@/app/login/{services}/types";
+import {useQuery} from "@tanstack/react-query";
+import systemApiServices from "@/app/system/{services}/apiServices";
+import {useRouter} from "next/navigation";
+import DisabledPage from "@/app/{components}/system/disabledPage";
 
 export default function Page() {
 
     const [findUser, setFindUser] = useState({} as User.FindUser);
     const [sendCode, setSendCode] = useState(false);
     const [responseId, setResponseId] = useState({} as User.FindUserResponse);
+    const router = useRouter();
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    const {data: publicSystemConfig} = useQuery(systemApiServices.getPublicSystemConfig());
+
+    useEffect(() => {
+        if(!publicSystemConfig?.sign_up?.emailVerification) {
+            const timer = setTimeout(() => {
+                router.push('/');
+            }, 2000);
+            return () => clearTimeout(timer);
+        }
+
+    }, []);
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (sendCode && e.target.name === 'email') setSendCode(false);
@@ -49,6 +66,15 @@ export default function Page() {
         }).catch(err => {
             console.log(err);
         });
+    }
+
+    if(!publicSystemConfig?.sign_up?.emailVerification) {
+        const body = {
+            title: '아이디 찾기 기능을 사용할 수 없습니다.',
+            description: '시스템에서 아이디 찾기 기능을 비활성화 했습니다. 관리자에게 문의하세요.',
+        }
+
+        return <DisabledPage {...body} />
     }
 
     return (

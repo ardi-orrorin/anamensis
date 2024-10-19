@@ -20,6 +20,7 @@ export const DefaultImageProvider = ({children}: {children: React.ReactNode}) =>
     const defaultNoImg = (img: string | undefined | null) =>
         defaultImage({img, defaultImg: '/noimage.jpg'});
 
+
     const defaultImage = ({
       img, defaultImg
     }:{

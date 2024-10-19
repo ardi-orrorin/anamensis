@@ -15,7 +15,7 @@ import SearchHistory from "@/app/{components}/searchHistory";
 import SearchBox from "@/app/{components}/searchBox";
 import {Root} from "@/app/{services}/types";
 import {Common} from "@/app/{commons}/types/commons";
-import {useQuery, useQueryClient} from "@tanstack/react-query";
+import {usePrefetchQuery, useQuery, useQueryClient} from "@tanstack/react-query";
 import rootApiService from "@/app/{services}/rootApiService";
 import dynamic from "next/dynamic";
 import LeftMenu from "@/app/{components}/leftMenu";
@@ -23,6 +23,7 @@ import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import RightMenu from "@/app/{components}/rightMenu";
 import Notices from "@/app/{components}/boards/notices";
 import {System} from "@/app/user/system/{services}/types";
+import systemApiServices from "@/app/system/{services}/apiServices";
 
 const DynamicBoardComponent = dynamic(() => import('@/app/{components}/boardComponent'), {
     loading: () => <Loading />

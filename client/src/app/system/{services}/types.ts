@@ -1,19 +1,25 @@
-import {SMTP} from "@/app/system/smtp/{services}/types";
+import {SystemSMTP} from "@/app/system/smtp/{services}/types";
+import {SystemAccount} from "@/app/system/account/types";
 
 interface RequestI<T> {
-    key: System.Key;
-    value: T;
+    key     : System.Key;
+    value   : T;
 }
 
-interface ResponseI {
-    smtp: SMTP.Smtp;
+interface PrivateResponseI {
+    smtp: SystemSMTP.Smtp;
+}
+interface PublicResponseI {
+    sign_up: SystemAccount.SignUp;
 }
 
 export namespace System {
     export type Request<T> = RequestI<T>;
-    export type Response = ResponseI;
+    export type PrivateResponse = PrivateResponseI;
+    export type PublicResponse = PublicResponseI;
     export enum Key {
-        SMTP = 'smtp',
+        SMTP    = 'smtp',
+        SIGN_UP = 'sign_up',
     }
     
 }

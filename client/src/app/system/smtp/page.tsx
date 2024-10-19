@@ -5,7 +5,7 @@ import {GetProps} from "@/app/user/history/page";
 import apiCall from "@/app/{commons}/func/api";
 import SizeSelect from "@/app/{commons}/sizeSelect";
 import {Common} from "@/app/{commons}/types/commons";
-import {SMTP} from "@/app/system/smtp/{services}/types";
+import {SystemSMTP} from "@/app/system/smtp/{services}/types";
 import SmtpInfo from "@/app/system/smtp/{components}/smtpInfo";
 import smtpApiServices from "@/app/system/smtp/{services}/apiServices";
 

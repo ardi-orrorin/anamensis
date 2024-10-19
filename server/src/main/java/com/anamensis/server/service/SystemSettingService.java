@@ -23,8 +23,8 @@ public class SystemSettingService {
 
     private final MailProvider mailProvider;
 
-    public Mono<List<SystemSetting>> findAll() {
-        return Flux.fromIterable(systemSettingMapper.findAll())
+    public Mono<List<SystemSetting>> findAll(boolean isPublic) {
+        return Flux.fromIterable(systemSettingMapper.findAll(isPublic))
             .collectList();
     }
 

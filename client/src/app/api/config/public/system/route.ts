@@ -8,10 +8,9 @@ export async function GET() {
 
     try {
         const result = await apiCall({
-            path: '/master/system-settings',
+            path: '/public/master/system-settings',
             method: 'GET',
             call: 'Server',
-            setAuthorization: true,
             isReturnData: true,
         });
 
@@ -28,24 +27,4 @@ export async function GET() {
             status: err.response?.status ?? 500
         })
     }
-}
-
-export async function PUT(req: NextRequest) {
-    const body = await req.json() as System.Request<any>;
-
-    console.log(body);
-
-    const result = await apiCall<boolean, System.Request<any>>({
-        path: '/master/system-settings',
-        method: 'PUT',
-        call: 'Server',
-        setAuthorization: true,
-        body,
-        isReturnData: true,
-    });
-
-    return ExNextResponse({
-        body: JSON.stringify({result}),
-        status: 200
-    })
 }

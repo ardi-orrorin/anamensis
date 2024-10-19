@@ -1,9 +1,9 @@
 import {NextRequest, NextResponse} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
 import {Common} from "@/app/{commons}/types/commons";
-import {SMTP} from "@/app/system/smtp/{services}/types";
+import {SystemSMTP} from "@/app/system/smtp/{services}/types";
 
-export async function GET(req: NextRequest): Promise<NextResponse<Common.PageResponse<SMTP.History>>> {
+export async function GET(req: NextRequest): Promise<NextResponse<Common.PageResponse<SystemSMTP.History>>> {
     const search = new URLSearchParams(req.nextUrl.search);
 
     const params = {
@@ -11,7 +11,7 @@ export async function GET(req: NextRequest): Promise<NextResponse<Common.PageRes
             size: search.get('size') || 10,
     };
 
-    const result = await apiCall<Common.PageResponse<SMTP.History>>({
+    const result = await apiCall<Common.PageResponse<SystemSMTP.History>>({
         path: '/api/user-config-smtp',
         method: 'GET',
         call: 'Server',

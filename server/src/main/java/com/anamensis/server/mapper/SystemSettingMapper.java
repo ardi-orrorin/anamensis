@@ -9,7 +9,7 @@ import java.util.List;
 @Mapper
 public interface SystemSettingMapper {
 
-    List<SystemSetting> findAll();
+    List<SystemSetting> findAll(boolean isPublic);
 
     SystemSetting findByKey(SystemSettingKey key);
 

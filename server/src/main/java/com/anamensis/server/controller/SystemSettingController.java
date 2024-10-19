@@ -20,9 +20,17 @@ public class SystemSettingController {
 
     private final SystemSettingService systemSettingService;
 
+
+    @PublicAPI
+    @GetMapping("")
+    public Mono<Map<String, Object>> publicFindAll() {
+        return systemSettingService.findAll(true)
+            .map(SystemSettingResponse::toList);
+    }
+
     @GetMapping("")
     public Mono<Map<String, Object>> findAll() {
-        return systemSettingService.findAll()
+        return systemSettingService.findAll(false)
             .map(SystemSettingResponse::toList);
     }
 

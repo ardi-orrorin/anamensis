@@ -16,7 +16,11 @@ public class SerializedJSONObject extends JSONObject implements Serializable {
     public SerializedJSONObject(Map<String, Object> content) {
         super(content);
         this.map = super.toMap();
+    }
 
+    public SerializedJSONObject(JSONObject content) {
+        super(content);
+        this.map = super.toMap();
     }
 
     public SerializedJSONObject(String string) {

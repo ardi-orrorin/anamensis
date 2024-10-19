@@ -1,16 +1,19 @@
+import apiCall from "@/app/{commons}/func/api";
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
+import {AxiosError} from "axios";
 import {NextRequest} from "next/server";
 import {System} from "@/app/system/{services}/types";
-import apiCall from "@/app/{commons}/func/api";
-import {AxiosError} from "axios";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+
+    const key = req.nextUrl.searchParams.get('key') as System.Key;
 
     try {
         const result = await apiCall({
-            path: '/master/system-settings',
+            path: '/master/system-settings/init',
             method: 'GET',
             call: 'Server',
+            params: {key: key},
             setAuthorization: true,
             isReturnData: true,
         });
@@ -28,24 +31,4 @@ export async function GET() {
             status: err.response?.status ?? 500
         })
     }
-}
-
-export async function PUT(req: NextRequest) {
-    const body = await req.json() as System.Request<any>;
-
-    console.log(body);
-
-    const result = await apiCall<boolean, System.Request<any>>({
-        path: '/master/system-settings',
-        method: 'PUT',
-        call: 'Server',
-        setAuthorization: true,
-        body,
-        isReturnData: true,
-    });
-
-    return ExNextResponse({
-        body: JSON.stringify({result}),
-        status: 200
-    })
 }

@@ -19,11 +19,13 @@ const getServerSideProps: GetServerSideProps<GetProps> = async (context) => {
 }
 
 export default async function Page(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+
     const {searchParams} = props;
+
     const {page, content} = await smtpApiServices.getSmtpHistory({req: searchParams});
 
     return (
-        <div className={'w-full border border-solid border-gray-300 rounded px-2 py-3'}>
+        <div className={'w-full h-[80vh] border border-solid border-gray-300 rounded px-2 py-3'}>
             <h1 className={'px-1'}>발송 내역</h1>
             <div className={'flex flex-col gap-3'}>
                 <div className={'flex justify-end'}>

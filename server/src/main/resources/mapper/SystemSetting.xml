@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.server.mapper.SystemSettingMapper">
+    <select id="findAll" resultMap="SystemSettingEntity">
+        SELECT *
+          FROM system_settings
+    </select>
+
+    <select id="findByKey" resultMap="SystemSettingEntity">
+        SELECT *
+          FROM system_settings
+         WHERE key = #{key, typeHandler=SystemSettingKeyHandler}
+    </select>
+
+    <update id="update" parameterType="SystemSetting">
+        UPDATE system_settings
+           SET value = #{value, typeHandler=JsonObjectTypeHandler}::JSONB
+         WHERE key   = #{key, typeHandler=SystemSettingKeyHandler}
+    </update>
+
+    <update id="init">
+        UPDATE system_settings
+           SET value = init_value
+         WHERE key   = #{key, typeHandler=SystemSettingKeyHandler}
+    </update>
+    
+    <resultMap id="SystemSettingEntity" type="SystemSetting" autoMapping="true">
+        <id property="id" column="id"/>
+        <result property="key" column="key" typeHandler="SystemSettingKeyHandler"/>
+        <result property="value" column="value" typeHandler="JsonObjectTypeHandler"/>
+    </resultMap>
+</mapper>

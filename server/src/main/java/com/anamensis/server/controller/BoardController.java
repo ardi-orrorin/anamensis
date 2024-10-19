@@ -46,7 +46,6 @@ public class BoardController {
     private final TableCodeService tableCodeService;
     private final FileService fileService;
     private final BoardCommentService boardCommentService;
-    private final MemberConfigSmtpService memberConfigSmtpService;
     private final BoardIndexService boardIndexService;
     private final ScheduleAlertService scheduleAlertService;
 
@@ -329,23 +328,24 @@ public class BoardController {
                     .flatMap(p ->
                         insertQnAPointHistory(commentMemberAtomic.get().getId(),(int) pointCommentAtomic.get().point)
                     )
-                    .flatMap(t ->
-                        memberConfigSmtpService.selectByUserPk(commentMemberAtomic.get().getId())
-                            .next()
-                            .flatMap(mcs -> {
-                                if(mcs == null) return Mono.just(false);
-                                SelectAnswerQueueDto saqdto = new SelectAnswerQueueDto();
-                                saqdto.setBoardPk(boardPk);
-                                saqdto.setBoardTitle(board.getTitle());
-                                saqdto.setPoint((int) pointCommentAtomic.get().point);
-                                saqdto.setSmtpHost(mcs.getHost());
-                                saqdto.setSmtpPort(mcs.getPort());
-                                saqdto.setSmtpUser(mcs.getUsername());
-                                saqdto.setSmtpPassword(mcs.getPassword());
-                                return boardService.addSelectAnswerQueue(saqdto);
-                            })
-                            .onErrorReturn(false)
-                    )
+//                    메일 알림
+//                    .flatMap(t ->
+//                        memberConfigSmtpService.selectByUserPk(commentMemberAtomic.get().getId())
+//                            .next()
+//                            .flatMap(mcs -> {
+//                                if(mcs == null) return Mono.just(false);
+//                                SelectAnswerQueueDto saqdto = new SelectAnswerQueueDto();
+//                                saqdto.setBoardPk(boardPk);
+//                                saqdto.setBoardTitle(board.getTitle());
+//                                saqdto.setPoint((int) pointCommentAtomic.get().point);
+//                                saqdto.setSmtpHost(mcs.getHost());
+//                                saqdto.setSmtpPort(mcs.getPort());
+//                                saqdto.setSmtpUser(mcs.getUsername());
+//                                saqdto.setSmtpPassword(mcs.getPassword());
+//                                return boardService.addSelectAnswerQueue(saqdto);
+//                            })
+//                            .onErrorReturn(false)
+//                    )
                     .subscribe();
             });
     }

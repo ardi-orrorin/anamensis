@@ -28,6 +28,13 @@ public class SystemSettingController {
             .map(SystemSettingResponse::toList);
     }
 
+    @PublicAPI
+    @GetMapping("oauth")
+    public Mono<Map<String, Object>> publicFindAllOauth() {
+        return systemSettingService.findByKey(SystemSettingKey.OAUTH)
+            .map(SystemSettingResponse::toItem);
+    }
+
     @GetMapping("")
     public Mono<Map<String, Object>> findAll() {
         return systemSettingService.findAll(false)

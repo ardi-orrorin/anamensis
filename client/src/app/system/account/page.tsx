@@ -6,6 +6,7 @@ import {useQuery} from "@tanstack/react-query";
 import React from "react";
 import {System} from "@/app/system/{services}/types";
 import {SystemAccount} from "@/app/system/account/types";
+import SystemToggle from "@/app/system/{components}/SystemToggle";
 
 export default function Page() {
 
@@ -74,8 +75,8 @@ export default function Page() {
             <SystemContainer headline={'회원 가입'}>
                 <div className={'flex flex-col gap-2 text-sm'}>
                     <span>회원 가입 기능을 활성화합니다.</span>
-                    <Toggle toggle={publicSystemConfig?.sign_up?.enabled}
-                            onClick={changeSignUpEnabledHandler}
+                    <SystemToggle toggle={publicSystemConfig?.sign_up?.enabled}
+                                  onClick={changeSignUpEnabledHandler}
                     />
                 </div>
             </SystemContainer>
@@ -85,8 +86,8 @@ export default function Page() {
                     <RequiredToggle requiredText={'SMTP 활성화'}
                                     requiredValue={privateSystemConfig?.smtp?.enabled}
                     />
-                    <Toggle toggle={publicSystemConfig?.sign_up?.emailVerification}
-                            onClick={changeSignUpEmailVerificaitonHandler}
+                    <SystemToggle toggle={publicSystemConfig?.sign_up?.emailVerification}
+                                  onClick={changeSignUpEmailVerificaitonHandler}
                     />
                 </div>
             </SystemContainer>
@@ -96,8 +97,8 @@ export default function Page() {
                     <RequiredToggle requiredText={'SMTP 활성화'}
                                     requiredValue={privateSystemConfig?.smtp?.enabled}
                     />
-                    <Toggle toggle={publicSystemConfig?.login?.emailAuth}
-                            onClick={changeLoginEmailAuthHandler}
+                    <SystemToggle toggle={publicSystemConfig?.login?.emailAuth}
+                                  onClick={changeLoginEmailAuthHandler}
                     />
                 </div>
             </SystemContainer>
@@ -121,22 +122,4 @@ const RequiredToggle = ({
             </span>
         </div>
     );
-}
-
-const Toggle = ({
-    toggle, onClick
-}: {
-    toggle  : boolean,
-    onClick : () => void
-}) => {
-    return (
-        <div
-            className={`relative w-12 h-6 ${toggle ? 'bg-gray-700' : 'bg-gray-300'} rounded cursor-pointer transition duration-300 ease-in-out`}
-            onClick={onClick}
-        >
-            <div
-                className={`absolute w-6 h-6 bg-white shadow-md rounded transform transition-transform duration-300 ease-in-out ${toggle ? 'translate-x-6' : ''}`}
-            ></div>
-        </div>
-    )
 }

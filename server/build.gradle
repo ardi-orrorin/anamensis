@@ -39,7 +39,7 @@ dependencies {
 
 
     implementation "io.awspring.cloud:spring-cloud-aws-starter-s3:${awsSpring}"
-    implementation "io.awspring.cloud:spring-cloud-aws-starter-ses:${awsSpring}"
+//    implementation "io.awspring.cloud:spring-cloud-aws-starter-ses:${awsSpring}"
 
     implementation "io.jsonwebtoken:jjwt-api:${jsonwebtoken}"
     implementation "io.jsonwebtoken:jjwt-impl:${jsonwebtoken}"

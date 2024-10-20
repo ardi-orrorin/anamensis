@@ -4,4 +4,7 @@ public enum SystemSettingKey {
     SMTP,
     SIGN_UP,
     LOGIN,
+    OAUTH,
+    SITE,
+
 }

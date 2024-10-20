@@ -3,9 +3,9 @@ import apiCall from "@/app/{commons}/func/api";
 import {SystemSMTP} from "@/app/system/smtp/{services}/types";
 
 export async function POST(req: NextRequest) {
-    const data = await req.json() as SystemSMTP.FullProps;
+    const data = await req.json() as SystemSMTP.Smtp;
 
-    const result = await apiCall<SystemSMTP.FullProps>({
+    const result = await apiCall<SystemSMTP.Smtp>({
         path: '/api/user-config-smtp/test',
         method: 'POST',
         call: 'Server',

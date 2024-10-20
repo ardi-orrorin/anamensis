@@ -6,18 +6,14 @@ import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.UserDto;
 import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.dto.response.UserResponse;
-import com.anamensis.server.entity.AuthType;
-import com.anamensis.server.entity.Member;
-import com.anamensis.server.entity.Role;
-import com.anamensis.server.entity.RoleType;
+import com.anamensis.server.entity.*;
 import com.anamensis.server.exception.DuplicateUserException;
 import com.anamensis.server.mapper.MemberMapper;
 import com.anamensis.server.mapper.PointCodeMapper;
-import com.anamensis.server.provider.AwsSesMailProvider;
+import com.anamensis.server.provider.MailProvider;
 import com.anamensis.server.resultMap.MemberResultMap;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -28,13 +24,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.annotation.NonNull;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -45,26 +41,24 @@ public class UserService implements ReactiveUserDetailsService {
     @Value("${db.setting.user.attendance_point_code_prefix}")
     private String ATTENDANCE_POINT_CODE_PREFIX;
 
-    @Value("${site.host}")
-    private String HOST;
-
     private static final Map<String, String> OAUTH_ACCOUNT_PREFIX = Map.of(
         "GOOGLE", "G",
         "KAKAO", "K",
         "NAVER", "N",
         "GITHUB", "GH",
         "FACEBOOK", "FB",
-        "ARDI", "A"
+        "CUSTOM", "CS"
     );
 
     private final MemberMapper memberMapper;
     private final PointCodeMapper pointCodeMapper;
     private final RedisTemplate<String, Object> redisTemplate;
 
+    private final Set<SystemSetting> systemSettings;
+
+    private final MailProvider mailProvider;
+
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    private final AwsSesMailProvider awsSesMailProvider;
-
 
     public Mono<Long> count(UserRequest.Params params) {
         return Mono.fromCallable(() -> memberMapper.count(params));
@@ -113,7 +107,16 @@ public class UserService implements ReactiveUserDetailsService {
 
                     if(user.getEmail().equals("")) {
                         String tempId = UUID.randomUUID().toString().replaceAll("-", "");
-                        newUser.setEmail(tempId + "@" + HOST);
+
+                        String domain = systemSettings.stream()
+                            .filter(setting -> setting.getKey() == SystemSettingKey.SITE)
+                            .findFirst()
+                            .orElseThrow(() -> new RuntimeException("Domain setting not found"))
+                            .getValue()
+                            .getString("domain");
+
+
+                        newUser.setEmail(tempId + "@" + domain);
                     } else {
                         newUser.setEmail(user.getEmail());
                     }
@@ -260,44 +263,61 @@ public class UserService implements ReactiveUserDetailsService {
         AuthType authType
     ) {
 
-        String subject = authType == AuthType.NONE ? "2차 인증이 비활성화 되었습니다." : "2차 인증이 활성화 되었습니다.";
+        return checkSMTPEnabled()
+            .flatMap(enabled -> {
+                if(!enabled) return Mono.just(true);
+                String subject = authType == AuthType.NONE ? "2차 인증이 비활성화 되었습니다." : "2차 인증이 활성화 되었습니다.";
 
-        String bodyTemplate = """
-            %s님의 2차 인증 설정이 변경되었습니다. \n
-            변경 시간 : %s
-            """;
+                String bodyTemplate = """
+                    %s님의 2차 인증 설정이 변경되었습니다. </br> 
+                    변경 시간 : %s
+                """;
 
-        try {
-            awsSesMailProvider.systemEmail(
-                subject,
-                String.format(bodyTemplate, member.getUserId(), LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))),
-                member.getEmail()
-            );
-        } catch (MessagingException e) {
-            return Mono.error(new RuntimeException("Email not send"));
-        }
+                MailProvider.MailMessage mailMessage = new MailProvider.MailMessage(
+                    member.getEmail(),
+                    subject,
+                    String.format(bodyTemplate, member.getName(), LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                );
 
-        return Mono.just(true);
+                return mailProvider.sendMessage(mailMessage);
+            });
+
     }
 
     public Mono<Boolean> unConfirmLogin(Member member, Device device) {
-        String subject = "새로운 장소에서 로그인이 발생했습니다.";
-        String bodyTemplate = """
-            ip : %s </br>
-            device : %s </br>
-            location : %s </br>
-            dateTime : %s </br>
-            에서 로그인이 발생했습니다.
-            """;
+        return checkSMTPEnabled()
+            .flatMap(enabled -> {
+                if(!enabled) return Mono.just(true);
+                String subject = "새로운 장소에서 로그인이 발생했습니다.";
+                String bodyTemplate = """
+                    ip : %s </br>
+                    device : %s </br>
+                    location : %s </br>
+                    dateTime : %s </br>
+                    에서 로그인이 발생했습니다.
+                """;
 
-        String body = String.format(bodyTemplate, device.ip(), device.device(), device.Location(), LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        try {
-            awsSesMailProvider.systemEmail(subject, body, member.getEmail());
-        } catch (MessagingException e) {
-            return Mono.error(new RuntimeException("Email not send"));
-        }
+                String body = String.format(bodyTemplate, device.ip(), device.device(), device.Location(), LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
-        return Mono.just(true);
+                MailProvider.MailMessage mailMessage = new MailProvider.MailMessage(
+                    member.getEmail(),
+                    subject,
+                    body
+                );
+
+                return mailProvider.sendMessage(mailMessage);
+            });
+    }
+
+    private Mono<Boolean> checkSMTPEnabled() {
+        return Mono.fromCallable(() ->
+            systemSettings.stream()
+                .filter(setting -> setting.getKey() == SystemSettingKey.SMTP)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("System setting not found"))
+                .getValue()
+                .getBoolean("enabled")
+        );
     }
 
     private String oAuthUserIdConvert(String userId, String provider) {

@@ -18,4 +18,10 @@ public class SystemSettingResponse {
                 HashMap::putAll
             );
     }
+
+    public static Map<String, Object> toItem(SystemSetting systemSetting) {
+        return Map.of(
+            systemSetting.getKey().name().toLowerCase(), systemSetting.getValue().toMap()
+        );
+    }
 }

@@ -17,6 +17,7 @@ const SystemLeftNavBar = () => {
                     <ListItem icon={faTableList} text={'ROOT'} href={'/system'} />
                     <ListItem icon={faEnvelope} text={'SMTP'} href={'/system/smtp'} />
                     <ListItem icon={faEnvelope} text={'ACCOUNT'} href={'/system/account'} />
+                    <ListItem icon={faEnvelope} text={'O-AUTH'} href={'/system/oauth'} />
                 </ul>
             </div>
         </nav>

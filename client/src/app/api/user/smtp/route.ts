@@ -24,9 +24,9 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
 
-    const data = await req.json() as SystemSMTP.FullProps;
+    const data = await req.json() as SystemSMTP.Smtp;
 
-    const result = await apiCall<SystemSMTP.FullProps>({
+    const result = await apiCall<SystemSMTP.Smtp>({
         path: '/api/user-config-smtp',
         method: 'POST',
         call: 'Server',

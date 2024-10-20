@@ -3,7 +3,6 @@
 import React, {useEffect, useState} from "react";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {SystemSMTP} from "@/app/system/smtp/{services}/types";
-import smtpApiServices from "@/app/system/smtp/{services}/apiServices";
 import {useQuery} from "@tanstack/react-query";
 import systemApiServices from "@/app/system/{services}/apiServices";
 import {System} from "@/app/system/{services}/types";
@@ -145,15 +144,15 @@ export default function SmtpInfo() {
                         {moreDescription ? '접기' : '펼치기'}
                     </button>
                 </div>
-
-                <ul className={`flex flex-col gap-1 text-xs text-gray-400 ${moreDescription ? 'h-32 py-1' : 'h-0'} duration-300 overflow-y-hidden`}>
+                <div className={`list-disc space-y-1 text-xs text-yellow-600 ${moreDescription ? 'h-36 py-1' : 'h-0'} duration-300 overflow-y-hidden`}>
                     <li>회원가입(이메일 인증)</li>
                     <li>비밀번호 찾기(이메일 인증)</li>
                     <li>아이디 찾기(이메일 인증)</li>
                     <li>로그인(이메일 인증)</li>
+                    <li>계정 2차 인증 변경</li>
                     <li>질문 게시글 답변 알림</li>
                     <li>관리자 이메일 발송</li>
-                </ul>
+                </div>
             </div>
         </div>
     )

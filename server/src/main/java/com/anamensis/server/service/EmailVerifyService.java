@@ -4,17 +4,14 @@ import com.anamensis.server.entity.EmailVerify;
 import com.anamensis.server.entity.SystemSetting;
 import com.anamensis.server.entity.SystemSettingKey;
 import com.anamensis.server.mapper.EmailVerifyMapper;
-import com.anamensis.server.provider.AwsSesMailProvider;
 import com.anamensis.server.provider.EmailVerifyProvider;
 import com.anamensis.server.provider.MailProvider;
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -25,8 +22,6 @@ public class EmailVerifyService {
     private final EmailVerifyMapper emailVerifyMapper;
 
     private final EmailVerifyProvider emailVerifyProvider;
-
-//    private final AwsSesMailProvider awsSesMailProvider;
 
     private final MailProvider mailProvider;
 
@@ -58,13 +53,6 @@ public class EmailVerifyService {
         if(!smtp.getValue().getBoolean("enabled")) {
             return Mono.error(new RuntimeException("smtp not enabled"));
         }
-
-
-//        try {
-//            awsSesMailProvider.verifyEmail(code, emailVerify.getEmail());
-//        } catch (MessagingException e) {
-//            return Mono.error(new RuntimeException(e.getMessage()));
-//        }
 
         MailProvider.MailMessage mailMessage = new MailProvider.MailMessage(
             emailVerify.getEmail(),

@@ -1,5 +1,6 @@
 import {SystemSMTP} from "@/app/system/smtp/{services}/types";
 import {SystemAccount} from "@/app/system/account/types";
+import {SystemOAuth} from "@/app/system/oauth/{services}/types";
 
 interface RequestI<T> {
     key     : System.Key;
@@ -7,8 +8,11 @@ interface RequestI<T> {
 }
 
 interface PrivateResponseI {
-    smtp: SystemSMTP.Smtp;
+    smtp    : SystemSMTP.Smtp;
+    oauth   : SystemOAuth.OAuth2;
 }
+
+
 interface PublicResponseI {
     sign_up : SystemAccount.SignUp;
     login   : SystemAccount.Login;
@@ -22,6 +26,7 @@ export namespace System {
         SMTP    = 'smtp',
         SIGN_UP = 'sign_up',
         LOGIN   = 'login',
+        OAUTH   = 'oauth',
     }
     
 }

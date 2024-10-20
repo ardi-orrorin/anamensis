@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS member_config_smtp CASCADE ;
 ALTER TABLE member DROP COLUMN IF EXISTS email_verified;
+DROP TABLE IF EXISTS system_settings CASCADE ;
 
 CREATE TABLE system_settings (
     id SERIAL,
@@ -19,4 +20,6 @@ CREATE UNIQUE INDEX system_settings_key_idx ON system_settings (key);
 INSERT INTO system_settings (key, value, init_value, public)
 VALUES ('SMTP', '{"enabled":false, "host": "", "port": 587, "username": "", "password": ""}', '{"enabled":false, "host": "", "port": 587, "username": "", "password": ""}', FALSE),
        ('SIGN_UP','{"enabled": false,"emailVerification": false}', '{"enabled": false, "emailVerification": false}', TRUE),
-       ('LOGIN', '{"emailAuth": false}','{"emailAuth": false}', TRUE);
+       ('LOGIN', '{"emailAuth": false}','{"emailAuth": false}', TRUE),
+       ('OAUTH', '{"kakao": {"clientId": "", "clientSecret": "", "enabled": false}, "github": {"clientId": "", "clientSecret": "", "enabled": false}, "naver": {"clientId": "", "clientSecret": "", "enabled": false}, "google": {"clientId": "", "clientSecret": "", "enabled": false}, "custom": {"clientId": "", "clientSecret": "", "url": "", "enabled": false}}', '{"kakao": {"clientId": "", "clientSecret": "", "enabled": false}, "github": {"clientId": "", "clientSecret": "", "enabled": false}, "naver": {"clientId": "", "clientSecret": "", "enabled": false}, "google": {"clientId": "", "clientSecret": "", "enabled": false}, "custom": {"clientId": "", "clientSecret": "", "url": "", "enabled": false}}', FALSE),
+       ('SITE', '{"domain": "localhost", "ssl": false}', '{"domain": "localhost", "ssl": false}', TRUE)

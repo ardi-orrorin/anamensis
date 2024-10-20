@@ -48,11 +48,19 @@ public class MailProvider {
     }
 
     public Mono<Boolean> updateConnection(JSONObject value) {
+        if(!value.getBoolean("enabled")) return Mono.just(true);
+
         JavaMailSenderImpl mailSenderImpl = (JavaMailSenderImpl) mailSender;
         mailSenderImpl.setHost(value.get("host").toString());
         mailSenderImpl.setPort(Integer.parseInt(value.get("port").toString()));
         mailSenderImpl.setUsername(value.get("username").toString());
         mailSenderImpl.setPassword(value.get("password").toString());
+
+        Properties properties = new Properties();
+        properties.put("mail.smtp.auth", "true");
+        properties.put("mail.smtp.starttls.enable", "true");
+        properties.put("mail.smtp.ssl.trust", "*");
+        mailSenderImpl.setJavaMailProperties(properties);
 
         return Mono.just(true);
     }

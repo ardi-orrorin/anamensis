@@ -1,3 +1,7 @@
+interface ResponseI {
+    status : 'success' | 'error';
+    message: string;
+}
 
 interface SmtpI {
     host    : string;
@@ -21,6 +25,7 @@ interface HistoriesRowI extends HistoryI {
 }
 
 export namespace SystemSMTP {
+    export type Response        = ResponseI;
     export type Smtp            = SmtpI;
     export type History         = HistoryI;
     export type HistoriesRow    = HistoriesRowI;

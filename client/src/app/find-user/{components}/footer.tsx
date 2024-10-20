@@ -12,7 +12,7 @@ const Footer = ({
     const{data: publicSystemConfig} = useQuery(systemApiServices.getPublicSystemConfig());
 
     return (
-        <div className={'flex justify-between px-3'}>
+        <div className={`flex ${publicSystemConfig?.sign_up?.emailVerification ? 'justify-between' : 'justify-center'}  px-3`}>
             {
                 publicSystemConfig?.sign_up?.emailVerification
                 && <Link href={'/find-user'}

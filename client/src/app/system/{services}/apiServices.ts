@@ -3,11 +3,12 @@
 import {queryOptions} from "@tanstack/react-query";
 import apiCall from "@/app/{commons}/func/api";
 import {System} from "@/app/system/{services}/types";
+import {SystemSMTP} from "@/app/system/smtp/{services}/types";
 
 
 const getPrivateSystemConfig = () => {
     return queryOptions({
-        queryKey: ['getSystemConfig'],
+        queryKey: ['getPrivateSystemConfig'],
         queryFn: async () => {
             return await apiCall<System.PrivateResponse>({
                 path: "/api/config/private/system",
@@ -22,7 +23,7 @@ const getPrivateSystemConfig = () => {
 
 const getPublicSystemConfig = () => {
     return queryOptions({
-        queryKey: ['getSystemConfig'],
+        queryKey: ['getPublicSystemConfig'],
         queryFn: async () => {
             return await apiCall<System.PublicResponse>({
                 path: "/api/config/public/system",
@@ -37,10 +38,20 @@ const getPublicSystemConfig = () => {
 
 const initSystemConfig = async ({key}: {key: System.Key}): Promise<boolean> => {
     return await apiCall<boolean, System.Key>({
-        path: '/api/config/system/private/init',
+        path: '/api/config/private/system/init',
         method: 'GET',
         call: 'Proxy',
         params: {key: key},
+        isReturnData: true,
+    });
+}
+
+const save = async ({body}: {body: System.Request<any>}): Promise<boolean> => {
+    return await apiCall<boolean, System.Request<any>>({
+        path: '/api/config/private/system',
+        method: 'PUT',
+        call: 'Proxy',
+        body,
         isReturnData: true,
     });
 }
@@ -50,6 +61,7 @@ const systemApiServices = {
     getPrivateSystemConfig,
     getPublicSystemConfig,
     initSystemConfig,
+    save,
 }
 
 export default systemApiServices;

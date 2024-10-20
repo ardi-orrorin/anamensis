@@ -7,7 +7,9 @@
     <select id="findAll" resultMap="SystemSettingEntity">
         SELECT *
           FROM system_settings
-         WHERE public = #{isPublic}
+          <if test="isPublic != null">
+              WHERE public = #{isPublic}
+          </if>
     </select>
 
     <select id="findByKey" resultMap="SystemSettingEntity">

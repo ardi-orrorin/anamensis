@@ -5,11 +5,10 @@ import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.SelectAnswerQueueDto;
 import com.anamensis.server.dto.request.BoardRequest;
 import com.anamensis.server.dto.response.BoardResponse;
-import com.anamensis.server.entity.Board;
-import com.anamensis.server.entity.BoardIndex;
-import com.anamensis.server.entity.Member;
+import com.anamensis.server.entity.*;
 import com.anamensis.server.mapper.BoardIndexMapper;
 import com.anamensis.server.mapper.BoardMapper;
+import com.anamensis.server.provider.MailProvider;
 import com.anamensis.server.resultMap.BoardResultMap;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -22,6 +21,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -34,6 +34,10 @@ public class BoardService {
     private final BoardMapper boardMapper;
 
     private final RedisTemplate<String, Object> redisTemplate;
+
+    private final Set<SystemSetting> systemSettings;
+
+    private final MailProvider mailProvider;
 
     public Flux<BoardResponse.List> findAll(
         Page page,
@@ -214,6 +218,24 @@ public class BoardService {
                 .flatMap($ -> Mono.just(true))
                 .onErrorReturn(false)
                 .publishOn(Schedulers.boundedElastic());
+    }
+
+    // fixme: email subject 내용 수정
+    public Mono<Boolean> selectedAnswerAlert(long boardPk, String toEmail) {
+        SystemSetting smtp = systemSettings.stream()
+            .filter(s -> s.getKey() == SystemSettingKey.SMTP)
+            .findFirst().orElse(null);
+
+        if(smtp == null || smtp.getValue().getBoolean("enabled")) return Mono.just(false);
+
+        MailProvider.MailMessage message = new MailProvider.MailMessage(
+            toEmail,
+            "답변이 선택되었습니다.",
+            "게시글 번호 " + boardPk + "의 답변이 선택되었습니다."
+        );
+
+        return mailProvider.sendMessage(message)
+            .onErrorReturn(false);
     }
 
     public Mono<List<BoardResponse.Notice>> findNotice() {

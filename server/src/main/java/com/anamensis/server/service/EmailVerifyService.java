@@ -1,9 +1,12 @@
 package com.anamensis.server.service;
 
 import com.anamensis.server.entity.EmailVerify;
+import com.anamensis.server.entity.SystemSetting;
+import com.anamensis.server.entity.SystemSettingKey;
 import com.anamensis.server.mapper.EmailVerifyMapper;
 import com.anamensis.server.provider.AwsSesMailProvider;
 import com.anamensis.server.provider.EmailVerifyProvider;
+import com.anamensis.server.provider.MailProvider;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +15,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +26,11 @@ public class EmailVerifyService {
 
     private final EmailVerifyProvider emailVerifyProvider;
 
-    private final AwsSesMailProvider awsSesMailProvider;
+//    private final AwsSesMailProvider awsSesMailProvider;
+
+    private final MailProvider mailProvider;
+
+    private final Set<SystemSetting> systemSettings;
 
 
     public Mono<String> insert(EmailVerify emailVerify) {
@@ -42,14 +50,35 @@ public class EmailVerifyService {
         int result = emailVerifyMapper.insert(emailVerify);
         if (result == 0) return Mono.error(new RuntimeException("insert failed"));
 
+        SystemSetting smtp = systemSettings.stream()
+                .filter(s -> s.getKey() == SystemSettingKey.SMTP)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("smtp not found"));
 
-        try {
-            awsSesMailProvider.verifyEmail(code, emailVerify.getEmail());
-        } catch (MessagingException e) {
-            return Mono.error(new RuntimeException(e.getMessage()));
+        if(!smtp.getValue().getBoolean("enabled")) {
+            return Mono.error(new RuntimeException("smtp not enabled"));
         }
 
-        return Mono.just(code);
+
+//        try {
+//            awsSesMailProvider.verifyEmail(code, emailVerify.getEmail());
+//        } catch (MessagingException e) {
+//            return Mono.error(new RuntimeException(e.getMessage()));
+//        }
+
+        MailProvider.MailMessage mailMessage = new MailProvider.MailMessage(
+            emailVerify.getEmail(),
+            "Anamensis Email Verify",
+            "Your verify code is " + code
+        );
+
+        return mailProvider.sendMessage(mailMessage)
+            .flatMap(success -> {
+                if(!success) {
+                    return Mono.error(new RuntimeException("send email failed"));
+                }
+                return Mono.just(code);
+            });
     }
 
     public Mono<Boolean> updateIsUse(EmailVerify emailVerify) {

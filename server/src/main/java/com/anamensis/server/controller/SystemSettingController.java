@@ -45,7 +45,7 @@ public class SystemSettingController {
     public Mono<SystemSetting> saveSystemSetting(
         @RequestBody SystemSettingRequest.Update request
     ) {
-        return systemSettingService.saveSystemSetting(request.getKey(), request.getValue());
+        return systemSettingService.save(request.getKey(), request.getValue());
     }
 
 }

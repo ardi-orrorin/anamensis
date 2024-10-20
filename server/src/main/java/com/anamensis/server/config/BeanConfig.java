@@ -15,15 +15,14 @@ import org.springframework.mail.javamail.MimeMailMessage;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import software.amazon.awssdk.services.s3.S3Client;
 
-import java.util.Properties;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Configuration
 @RequiredArgsConstructor
 
 public class BeanConfig {
     private final SystemSettingMapper systemSettingMapper;
-
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -72,5 +71,10 @@ public class BeanConfig {
         mailSenderImpl.setPassword(ss.getValue().get("password").toString());
 
         return mailSenderImpl;
+    }
+
+    @Bean
+    public Set<SystemSetting> systemSettings() {
+        return new HashSet<>(systemSettingMapper.findAll(null));
     }
 }

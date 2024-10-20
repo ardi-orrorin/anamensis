@@ -47,6 +47,11 @@ const Login = () => {
                         name={'password'}
                         value={user.password}
                         onChange={setProps}
+                        onKeyUp={e => {
+                            if (e.key === 'Enter') {
+                                goLogin();
+                            }
+                        }}
                     />
                 </div>
                 <div className={['flex duration-500', error.use ? 'max-h-52' : 'max-h-0'].join(' ')}>

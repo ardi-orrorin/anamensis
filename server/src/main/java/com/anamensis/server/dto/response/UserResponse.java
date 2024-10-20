@@ -77,6 +77,7 @@ public class UserResponse {
         private AuthType sAuthType;
         private String createAt;
         private Boolean isOAuth;
+        private boolean emailVerified;
 
         public static MyPage transToMyPage(MemberResultMap user) {
             MyPage my = new MyPage();
@@ -89,6 +90,7 @@ public class UserResponse {
             my.setSAuthType(user.getMember().getSAuthType());
             my.setCreateAt(user.getMember().getCreateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             my.setIsOAuth(user.getMember().isOAuth());
+            my.setEmailVerified(user.getMember().isEmailVerified());
             return my;
         }
 
@@ -102,6 +104,7 @@ public class UserResponse {
             my.setSAuth(users.getSAuth());
             my.setSAuthType(users.getSAuthType());
             my.setIsOAuth(users.isOAuth());
+            my.setEmailVerified(users.isEmailVerified());
             return my;
         }
     }

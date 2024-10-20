@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS member_config_smtp CASCADE ;
+ALTER TABLE member DROP COLUMN IF EXISTS email_verified;
 
 CREATE TABLE system_settings (
     id SERIAL,
@@ -8,6 +9,8 @@ CREATE TABLE system_settings (
     public BOOLEAN DEFAULT FALSE
 );
 
+ALTER TABLE member ADD COLUMN email_verified BOOLEAN DEFAULT FALSE;
+
 ALTER TABLE system_settings ADD CONSTRAINT system_settings_pk PRIMARY KEY (id);
 ALTER TABLE system_settings ADD CONSTRAINT system_settings_key_uq UNIQUE (key);
 
@@ -15,4 +18,5 @@ CREATE UNIQUE INDEX system_settings_key_idx ON system_settings (key);
 
 INSERT INTO system_settings (key, value, init_value, public)
 VALUES ('SMTP', '{"enabled":false, "host": "", "port": 587, "username": "", "password": ""}', '{"enabled":false, "host": "", "port": 587, "username": "", "password": ""}', FALSE),
-       ('SIGN_UP','{"enabled": false,"emailVerification": "false"}', '{"enabled": false, "emailVerification": false}', TRUE)
+       ('SIGN_UP','{"enabled": false,"emailVerification": false}', '{"enabled": false, "emailVerification": false}', TRUE),
+       ('LOGIN', '{"emailAuth": false}','{"emailAuth": false}', TRUE);

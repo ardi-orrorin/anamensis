@@ -10,7 +10,8 @@ interface PrivateResponseI {
     smtp: SystemSMTP.Smtp;
 }
 interface PublicResponseI {
-    sign_up: SystemAccount.SignUp;
+    sign_up : SystemAccount.SignUp;
+    login   : SystemAccount.Login;
 }
 
 export namespace System {
@@ -20,6 +21,7 @@ export namespace System {
     export enum Key {
         SMTP    = 'smtp',
         SIGN_UP = 'sign_up',
+        LOGIN   = 'login',
     }
     
 }

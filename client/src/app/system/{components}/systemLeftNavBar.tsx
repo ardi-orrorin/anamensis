@@ -3,7 +3,7 @@ import Link from "next/link";
 import React from "react";
 import {faTableList} from "@fortawesome/free-solid-svg-icons/faTableList";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
-import {faEnvelope, faEnvelopesBulk} from "@fortawesome/free-solid-svg-icons";
+import {faEnvelope} from "@fortawesome/free-solid-svg-icons";
 
 const SystemLeftNavBar = () => {
     return (
@@ -16,6 +16,7 @@ const SystemLeftNavBar = () => {
                 >
                     <ListItem icon={faTableList} text={'ROOT'} href={'/system'} />
                     <ListItem icon={faEnvelope} text={'SMTP'} href={'/system/smtp'} />
+                    <ListItem icon={faEnvelope} text={'ACCOUNT'} href={'/system/account'} />
                 </ul>
             </div>
         </nav>

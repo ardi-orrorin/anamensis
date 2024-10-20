@@ -10,7 +10,8 @@ interface UserPropsI {
     email         : string;
     emailCheck    : string;
     phone         : string;
-    [key: string] : string;
+    emailVerified : boolean;
+    [key: string] : string | boolean;
 }
 
 type CheckPropsT = {

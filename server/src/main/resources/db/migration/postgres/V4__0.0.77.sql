@@ -11,4 +11,5 @@ ALTER TABLE anamensis.smtp_push_history
 
 DROP TABLE IF EXISTS anamensis.smtp_push_history_count;
 
+DROP TABLE IF EXISTS anamensis.attendance;
 

@@ -39,7 +39,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                     <col style={{width: '10%'}}/>
                     <col style={{width: '15%'}}/>
                 </colgroup>
-                <thead className={'bg-main text-white h-9 align-middle'}>
+                <thead className={'bg-gray-700 text-white h-9 align-middle'}>
                 <tr className={'text-sm border-x border-white border-solid'}>
                     <th className={'border-x border-white border-solid'}>#</th>
                     <th className={'border-x border-white border-solid'}>From</th>

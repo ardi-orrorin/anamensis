@@ -8,11 +8,6 @@ import {faWindowMinimize} from "@fortawesome/free-solid-svg-icons/faWindowMinimi
 import dynamic from "next/dynamic";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 
-
-const DynamicAttendInfo = dynamic(() => import('@/app/user/{components}/AttendInfo'),{
-    loading: () => <Loading/>,
-    ssr: false
-});
 const DynamicBoardSummary = dynamic(() => import('@/app/user/{components}/BoardSummary'),{
     loading: () => <Loading/>,
     ssr: false
@@ -29,7 +24,6 @@ const Loading = () => <div className={'w-full h-full flex justify-center items-c
 export default function Page() {
 
     const [windowList, setWindowList] = useState<UserInfoWindowProps[]>([
-        {winKey: 'win1', title: '출석체크', open: true, children: <DynamicAttendInfo/>},
         {winKey: 'win2', title: '최근 작성글', open: true, children: <DynamicBoardSummary/>},
         {winKey: 'win3', title: '최근 포인트적립 내역', open: true, children: <DynamicPointSummary /> },
     ]);

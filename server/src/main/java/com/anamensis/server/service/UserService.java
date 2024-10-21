@@ -10,6 +10,7 @@ import com.anamensis.server.entity.*;
 import com.anamensis.server.exception.DuplicateUserException;
 import com.anamensis.server.mapper.MemberMapper;
 import com.anamensis.server.mapper.PointCodeMapper;
+import com.anamensis.server.mapper.PointHistoryMapper;
 import com.anamensis.server.provider.MailProvider;
 import com.anamensis.server.resultMap.MemberResultMap;
 import jakarta.mail.MessagingException;
@@ -38,9 +39,6 @@ import java.util.UUID;
 @Transactional
 public class UserService implements ReactiveUserDetailsService {
 
-    @Value("${db.setting.user.attendance_point_code_prefix}")
-    private String ATTENDANCE_POINT_CODE_PREFIX;
-
     private static final Map<String, String> OAUTH_ACCOUNT_PREFIX = Map.of(
         "GOOGLE", "G",
         "KAKAO", "K",
@@ -51,7 +49,9 @@ public class UserService implements ReactiveUserDetailsService {
     );
 
     private final MemberMapper memberMapper;
-    private final PointCodeMapper pointCodeMapper;
+
+    private final PointHistoryMapper pointHistoryMapper;
+
     private final RedisTemplate<String, Object> redisTemplate;
 
     private final Set<SystemSetting> systemSettings;
@@ -205,23 +205,24 @@ public class UserService implements ReactiveUserDetailsService {
 
     public Mono<Member> saveUser(UserRequest.Register user, boolean isOAuth) {
 
+        long point = 100;
+
         Member member = UserRequest.Register.transToUser(user);
         member.setPwd(bCryptPasswordEncoder.encode(member.getPwd()));
         member.setCreateAt(LocalDateTime.now());
         member.setSAuthType(AuthType.NONE);
         member.setOAuth(isOAuth);
         member.setSAuth(false);
+        member.setPoint(point);
 
-        try {
-            pointCodeMapper.selectByIdOrName(0,ATTENDANCE_POINT_CODE_PREFIX + "1")
-                    .ifPresentOrElse(
-                            pc -> member.setPoint(pc.getPoint()),
-                            () -> new RuntimeException("Point code not found")
-                    );
-            memberMapper.save(member);
-        } catch (Exception e) {
-            return Mono.error(new RuntimeException("User not save"));
-        }
+        int isSave = memberMapper.save(member);
+
+        if(isSave == 0) return Mono.error(new RuntimeException("User save failed"));
+
+        // fixme: 포인트 이력 저장 (point 히스토리 관련 로직 전체 수정 필요)
+//        PointHistory pointHistory = new PointHistory();
+//        pointHistory.setMemberPk(member.getId());
+
 
         return generateRole(member, RoleType.USER)
                 .doOnNext(memberMapper::saveRole)

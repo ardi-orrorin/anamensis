@@ -7,15 +7,12 @@ import {
     faClockRotateLeft,
     faEnvelope,
     faFilePowerpoint,
-    faGear,
     faKey,
     faRectangleList,
-    faUserGear,
 } from "@fortawesome/free-solid-svg-icons";
 import React, {useCallback, useMemo} from "react";
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import {faTableList} from "@fortawesome/free-solid-svg-icons/faTableList";
-import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import Image from "next/image";
 import {System} from "@/app/system/message/{services}/types";
 import {usePrefetchQuery, useQuery} from "@tanstack/react-query";
@@ -24,13 +21,6 @@ import userApiService from "@/app/user/{services}/userApiService";
 import emailApiService from "@/app/user/email/{services}/emailApiService";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
-
-type MenuItemType = {
-    name: string,
-    href: string,
-    icon: IconDefinition,
-    role: System.Role
-}
 
 const LeftNavBar = ({
     isOpen,
@@ -59,9 +49,6 @@ const LeftNavBar = ({
         , [roles]);
 
     const iconSize = 16;
-    const menuItems: MenuItemType[] = [
-        {name: 'SYSTEM', href:'/user/system', icon: faGear, role: System.Role.ADMIN},
-    ]
 
     const openToggle = useCallback(() => {
         bodyScrollToggle(false, false);
@@ -80,30 +67,6 @@ const LeftNavBar = ({
         bodyScrollToggle(false, true);
         setIsOpen(false);
     },[]);
-
-    const roleMenu = useMemo(()=>
-        menuItems.map((item, index) => {
-            if(!item.role || !roles?.find(role => role === item.role)) {
-                return null;
-            }
-
-            return (
-                <li key={'userleftnavbar' + index}
-                    className={'w-full'}
-                >
-                    <Link className={'text text-white w-full'}
-                          href={item.href}
-                          onClick={onChangeDisabledHandler}
-                    >
-                        <div className={'w-full flex gap-2 p-3 hover:bg-blue-500 active:bg-blue-800 duration-300'}>
-                            <FontAwesomeIcon icon={item.icon} width={iconSize} />
-                            <span className={isModalMode ? '' : 'hidden sm:inline'}>{item.name}</span>
-                        </div>
-                    </Link>
-                </li>
-            )
-        })
-    , [menuItems, roles]);
 
     return (
         <>
@@ -235,7 +198,6 @@ const LeftNavBar = ({
                       </li>
                     </>
                 }
-                { roleMenu }
             </ul>
         </nav>
             {

@@ -12,12 +12,10 @@ import com.anamensis.server.resultMap.MemberResultMap;
 import com.anamensis.server.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -31,19 +29,14 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("api/user")
-@Slf4j
 public class UserController {
 
     private final UserService userService;
     private final OTPService otpService;
-    private final AttendanceService attendanceService;
     private final LoginHistoryService loginHistoryService;
     private final EmailVerifyService emailVerifyService;
     private final TokenProvider tokenProvider;
     private final FileService fileService;
-    private final PointService ps;
-    private final PointHistoryService phs;
-    private final TableCodeService tableCodeService;
 
     private final Set<SystemSetting> systemSettings;
 
@@ -175,19 +168,7 @@ public class UserController {
             .subscribeOn(Schedulers.boundedElastic())
             .subscribe();
 
-        return notAuth(member, token)
-            .publishOn(Schedulers.boundedElastic())
-            .doOnNext(t -> {
-                member.flatMap(u ->
-                    attendanceService.exist(u.getMemberPk())
-                        .flatMap(b -> {
-                            if (b) return Mono.just(true);
-                            return addAttendanceAndPoint(u.getMember())
-                                .flatMap(b1 -> attendanceService.init(u.getMemberPk()));
-                        })
-                )
-                .subscribe();
-            });
+        return notAuth(member, token);
     }
 
 
@@ -197,44 +178,13 @@ public class UserController {
             @Valid @RequestBody
             UserRequest.Register user
     ) {
-        AtomicReference<Member> member = new AtomicReference<>();
-
         return userService.saveUser(user, false)
-                .doOnNext(member::set)
-                .flatMap(u -> attendanceService.init(u.getId()))
-                .publishOn(Schedulers.boundedElastic())
-                .then(Mono.fromCallable(() -> UserResponse.Status
-                          .transToStatus(HttpStatus.CREATED, "User created"))
-                )
-                .publishOn(Schedulers.boundedElastic())
-                .doOnNext(s -> {
-                    if(!s.getStatus().equals(HttpStatus.CREATED)) return;
-                    addAttendanceAndPoint(member.get())
-                        .subscribe();
-                });
-    }
+            .flatMap(m -> {
+                UserResponse.Status res = UserResponse.Status
+                    .transToStatus(HttpStatus.CREATED, "User created");
 
-    private Mono<Boolean> addAttendanceAndPoint(Member member) {
-        return ps.selectByIdOrName("1")
-            .publishOn(Schedulers.boundedElastic())
-            .doOnNext(p -> {
-                userService.updatePoint(member.getId(), p.getPoint())
-                    .flatMap($ -> userService.findUserInfoCache(member.getUserId()))
-                    .flatMap(b ->
-                        tableCodeService.findByIdByTableName(0, "attendance")
-                            .flatMap(t -> {
-                                PointHistory ph = new PointHistory();
-                                ph.setMemberPk(member.getId());
-                                ph.setPointCodePk(p.getId());
-                                ph.setTableCodePk(t.getId());
-                                ph.setTableRefPk(member.getId());
-                                ph.setCreateAt(LocalDateTime.now());
-                                return phs.insert(ph);
-                            })
-                    )
-                    .subscribe();
-            })
-            .flatMap(b -> Mono.just(true));
+                return Mono.just(res);
+            });
     }
 
     @PublicAPI

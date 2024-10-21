@@ -7,7 +7,7 @@ import SystemLeftNavBar from "@/app/system/{components}/systemLeftNavBar";
 export default function Layout({children}: {children: React.ReactNode}) {
 
     return (
-        <main className={'flex items-start h-full min-h-max'}>
+        <main className={'flex items-start max-h-full'}>
             <SystemLeftNavBar />
             <SystemContents>
                 {children}

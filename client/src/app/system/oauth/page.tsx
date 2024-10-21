@@ -20,7 +20,7 @@ export default function Page() {
     }, [privateSystemConfig]);
 
     const validate = useCallback((type: string) => {
-        const defaultConditional = oauth[type]?.enabled && (!oauth[type]?.clientId || !oauth[type]?.clientSecret);
+        const defaultConditional = !oauth[type]?.enabled && (!oauth[type]?.clientId || !oauth[type]?.clientSecret);
 
         if(defaultConditional) {
             alert(`${type}의 clientId와 clientSecret을 입력하세요.`);
@@ -153,9 +153,9 @@ const Item = ({
 
     return (
         <SystemContainer headline={headLine}>
-            <span className={'text-xs text-gray-500'}>
+            <p className={'list-item ms-4 text-sm text-gray-600 whitespace-pre-line'}>
                 {description}
-            </span>
+            </p>
             <input className={'w-96 p-2 outline-0 text-sm focus:bg-gray-200 duration-300'}
                    name={'clientId'}
                    value={oauth?.clientId}

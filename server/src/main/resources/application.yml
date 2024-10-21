@@ -28,9 +28,6 @@ spring:
         enabled: true
         region: ${AWS_REGION:ap-northeast-2}
         bucket: ${AWS_BUCKET:anamensis}
-      ses:
-        region: ap-northeast-2
-        enabled: true
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
@@ -47,14 +44,6 @@ mybatis:
 #   key-store-password: ${SSL_KEY_STORE_PASSWORD}
 #   key-store-type: ${SSL_KEY_STORE_TYPE}
 #   key-alias: ${SSL_KEY_ALIAS}
-
-
-aws:
-  ses:
-    from: admin@example.com
-
-site:
-  host: localhost.site
 
 jwt:
   secret: ${JWT_SECRET_KEY}

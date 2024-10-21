@@ -3,7 +3,7 @@ import SystemContainer from "@/app/system/{components}/systemContainer";
 
 export default function Layout({children}: {children: React.ReactNode}) {
     return (
-        <div className={'flex flex-col gap-2'}>
+        <div className={'h-full flex flex-col gap-2'}>
             <SystemContainer headline={'SMTP 설정'}>
                 <SmtpInfo/>
             </SystemContainer>

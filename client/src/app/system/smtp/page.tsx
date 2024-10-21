@@ -25,7 +25,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
     const {page, content} = await smtpApiServices.getSmtpHistory({req: searchParams});
 
     return (
-        <div className={'min-h-[80vh] flex flex-col gap-3'}>
+        <div className={'min-h-full flex flex-col gap-3'}>
             <div className={'flex justify-end'}>
                 <SizeSelect/>
             </div>

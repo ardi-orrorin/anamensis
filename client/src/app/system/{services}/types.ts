@@ -16,9 +16,18 @@ interface PrivateResponseI {
 interface PublicResponseI {
     sign_up : SystemAccount.SignUp;
     login   : SystemAccount.Login;
+    site    : System.Site;
+}
+
+interface SiteI {
+    domain          : string;
+    cdnUrl          : string;
+    ssl             : boolean;
+    [key: string]   : string | boolean;
 }
 
 export namespace System {
+    export type Site = SiteI;
     export type Request<T> = RequestI<T>;
     export type PrivateResponse = PrivateResponseI;
     export type PublicResponse = PublicResponseI;
@@ -27,6 +36,7 @@ export namespace System {
         SIGN_UP = 'sign_up',
         LOGIN   = 'login',
         OAUTH   = 'oauth',
+        SITE    = 'site',
     }
     
 }

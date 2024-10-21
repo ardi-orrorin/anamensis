@@ -12,7 +12,6 @@ import org.springframework.mail.javamail.MimeMailMessage;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import javax.xml.crypto.dsig.keyinfo.PGPData;
 import java.util.Properties;
 
 @Slf4j
@@ -26,18 +25,8 @@ public class MailProvider {
 
     public Mono<Boolean> testConnection(JSONObject value) {
         JavaMailSenderImpl mailSenderImpl = new JavaMailSenderImpl();
-        mailSenderImpl.setProtocol("smtp");
 
-        mailSenderImpl.setHost(value.get("host").toString());
-        mailSenderImpl.setPort(Integer.parseInt(value.get("port").toString()));
-        mailSenderImpl.setUsername(value.get("username").toString());
-        mailSenderImpl.setPassword(value.get("password").toString());
-
-        Properties properties = new Properties();
-        properties.put("mail.smtp.auth", "true");
-        properties.put("mail.smtp.starttls.enable", "true");
-        properties.put("mail.smtp.ssl.trust", "*");
-        mailSenderImpl.setJavaMailProperties(properties);
+        setJavaMailSender(mailSenderImpl, value);
 
         try {
             mailSenderImpl.testConnection();
@@ -51,6 +40,15 @@ public class MailProvider {
         if(!value.getBoolean("enabled")) return Mono.just(true);
 
         JavaMailSenderImpl mailSenderImpl = (JavaMailSenderImpl) mailSender;
+
+        setJavaMailSender(mailSenderImpl, value);
+
+        return Mono.just(true);
+    }
+
+    private void setJavaMailSender(JavaMailSenderImpl mailSenderImpl, JSONObject value) {
+        mailSenderImpl.setProtocol("smtp");
+
         mailSenderImpl.setHost(value.get("host").toString());
         mailSenderImpl.setPort(Integer.parseInt(value.get("port").toString()));
         mailSenderImpl.setUsername(value.get("username").toString());
@@ -62,7 +60,6 @@ public class MailProvider {
         properties.put("mail.smtp.ssl.trust", "*");
         mailSenderImpl.setJavaMailProperties(properties);
 
-        return Mono.just(true);
     }
 
     public Mono<Boolean> sendMessage(MailMessage message) {

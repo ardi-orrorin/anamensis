@@ -41,4 +41,6 @@ public class Member implements Serializable {
     private AuthType sAuthType;
 
     private boolean isOAuth;
+
+    private boolean emailVerified;
 }

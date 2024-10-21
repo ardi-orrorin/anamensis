@@ -1,4 +1,4 @@
-FROM       __DOCKER_ID__/anamensis-base:latest
+FROM       __DOCKER_ID__/base-anamensis:latest
 LABEL      author="ARDI"
 RUN        mkdir -p /app
 WORKDIR    /app

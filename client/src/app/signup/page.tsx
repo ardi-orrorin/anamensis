@@ -8,9 +8,13 @@ import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import apiCall from "@/app/{commons}/func/api";
 import Footer from "@/app/find-user/{components}/footer";
 import {SignUp} from "@/app/signup/{services}/types";
+import systemApiServices from "@/app/system/{services}/apiServices";
+import {useQuery} from "@tanstack/react-query";
+import DisabledPage from "@/app/{components}/system/disabledPage";
 
-// 2024-10-11 email 체크 기능 비활성화
 export default function Page() {
+
+    const {data: publicSystemConfig} = useQuery(systemApiServices.getPublicSystemConfig());
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const idRegex = /^[a-z0-9]{5,20}$/;
@@ -25,13 +29,14 @@ export default function Page() {
     const timeout = useRef<NodeJS.Timeout>();
 
     const [user, setUser] = useState<SignUp.UserProps>({
-        id         : '',
-        pwd        : '',
-        pwdCheck   : '',
-        name       : '',
-        email      : '',
-        emailCheck : '',
-        phone      : '',
+        id              : '',
+        pwd             : '',
+        pwdCheck        : '',
+        name            : '',
+        email           : '',
+        emailCheck      : '',
+        phone           : '',
+        emailVerified   : false,
     });
 
     const [check, setCheck] = useState<SignUp.CheckProps>({
@@ -40,8 +45,7 @@ export default function Page() {
         pwdCheck   : 'uncheck',
         name       : 'uncheck',
         email      : 'uncheck',
-        // emailCheck : 'uncheck',
-        emailCheck : 'check',
+        emailCheck : publicSystemConfig?.sign_up?.emailVerification ? 'uncheck' : 'check',
         phone      : 'uncheck',
     });
 
@@ -56,6 +60,15 @@ export default function Page() {
     });
 
     useEffect(()=>{
+
+        if(!publicSystemConfig?.sign_up?.enabled) {
+            const timer = setTimeout(() => {
+                router.push('/');
+            }, 2000);
+
+            return () => clearTimeout(timer);
+        }
+
         return () => {
             clearInterval(timeout.current);
         }
@@ -80,9 +93,11 @@ export default function Page() {
 
             email      : email.length === 0 ? 'uncheck' : check.email,
 
-            emailCheck : "check",
-            // emailCheck : emailCheck.length === 0 ? 'uncheck'
-            //            : check.emailCheck,
+            emailCheck : publicSystemConfig?.sign_up?.emailVerification
+                            ? emailCheck.length === 0
+                                ? 'uncheck'
+                                : check.emailCheck
+                            : 'check',
 
             phone      : phone.length === 0 ? 'uncheck' : check.phone,
         });
@@ -193,7 +208,7 @@ export default function Page() {
     },[check]);
 
     const submitHandler = async () => {
-        await setLoading(true);
+        setLoading(true);
 
         await apiCall<any, SignUp.UserProps>({
             path: '/api/signup',
@@ -242,19 +257,32 @@ export default function Page() {
     }
 
     const verifyCode = async () => {
-        await apiCall<any, {email: string, code: string}>({
-            path: '/api/signup/verify',
-            method: 'POST',
-            body: {email: user.email, code: user.emailCheck},
-            call: 'Proxy'
-        }).then((res) => {
-            if(res.status !== 200) return;
+
+        try {
+            await apiCall<any, {email: string, code: string}>({
+                path: '/api/signup/verify',
+                method: 'POST',
+                body: {email: user.email, code: user.emailCheck},
+                call: 'Proxy'
+            });
+
             alert('인증이 완료되었습니다.');
+
             setCheck({
                 ...check,
                 emailCheck: 'check'
             });
-        });
+
+            setUser({
+                ...user,
+                emailVerified: true
+            });
+
+        } catch (e) {
+            console.log(e);
+        } finally {
+            clearInterval(timeout.current);
+        };
     }
 
     const checkTimer = () => {
@@ -274,6 +302,14 @@ export default function Page() {
         const second = timer % 60;
         return `${minute}분 ${second}초`;
     };
+
+    if(!publicSystemConfig?.sign_up?.enabled) {
+        const body = {
+            title: '회원가입 기능을 사용할 수 없습니다.',
+            description: '시스템에서 회원가입 기능을 비활성화 했습니다. 관리자에게 문의하세요.',
+        }
+        return <DisabledPage {...body} />
+    }
 
     return (
         <main className={'flex flex-col min-h-screen justify-center items-center'}>
@@ -335,36 +371,41 @@ export default function Page() {
                                    order={0}
                                    emailClickHandler={emailClickHandler}
                     />
-                    {/*<div className={'flex'}>*/}
-                    {/*    <Row className={[emailRegex.test(user.email)? 'max-h-52' : 'max-h-0', 'w-full duration-500'].join(' ')}*/}
-                    {/*         name={'emailCheck'}*/}
-                    {/*         value={user}*/}
-                    {/*         check={check}*/}
-                    {/*         placeholder={'6자리 인증번호 입력하세요.'}*/}
-                    {/*         setProps={setProps}*/}
-                    {/*         inputCheck={inputCheck}*/}
-                    {/*         description={description.emailCheck}*/}
-                    {/*    />*/}
-                    {/*    {*/}
-                    {/*        timer >= 0 && emailRegex.test(user.email) && user.emailCheck.length === 6 &&*/}
-                    {/*        <button className={'w-1/4 my-3 ms-2 rounded text-xs text-white bg-blue-300'}*/}
-                    {/*                onClick={verifyCode}*/}
-                    {/*        >*/}
-                    {/*          인증하기*/}
-                    {/*        </button>*/}
-                    {/*    }*/}
-                    {/*    <button className={[*/}
-                    {/*                emailRegex.test(user.email)? 'max-h-52  my-3 ms-2' : 'max-h-0',*/}
-                    {/*                (timer >= 0 || check.email !== 'check') ? 'bg-gray-400' : 'bg-blue-300',*/}
-                    {/*                'duration-500','w-1/4 rounded text-xs text-white'*/}
-                    {/*            ].join(' ')}*/}
-                    {/*            disabled={timer >= 0 || check.email !== 'check'}*/}
-                    {/*            onClick={sendVerifyCode}*/}
-                    {/*            data-testid={'send-verify-code'}*/}
-                    {/*    >*/}
-                    {/*        {timer >= 0 ? transToTimerMinuteAndSecond() : '인증번호 받기'}*/}
-                    {/*    </button>*/}
-                    {/*</div>*/}
+                    {
+                        publicSystemConfig?.sign_up?.emailVerification
+                        && <div className={'flex'}>
+                            <Row
+                              className={[emailRegex.test(user.email) ? 'max-h-52' : 'max-h-0', 'w-full duration-500'].join(' ')}
+                              name={'emailCheck'}
+                              value={user}
+                              check={check}
+                              placeholder={'6자리 인증번호 입력하세요.'}
+                              setProps={setProps}
+                              inputCheck={inputCheck}
+                              description={description.emailCheck}
+                            />
+                                {
+                                    timer >= 0 && emailRegex.test(user.email) && user.emailCheck.length === 6 &&
+                                  <button className={'w-1/4 my-3 ms-2 rounded text-xs text-white bg-blue-300'}
+                                          onClick={verifyCode}
+                                  >
+                                    인증하기
+                                  </button>
+                                }
+                            <button className={[
+                                emailRegex.test(user.email) ? 'max-h-52  my-3 ms-2' : 'max-h-0',
+                                (timer >= 0 || check.email !== 'check') ? 'bg-gray-400' : 'bg-blue-300',
+                                'duration-500', 'w-1/4 rounded text-xs text-white'
+                            ].join(' ')}
+                                    disabled={timer >= 0 || check.email !== 'check'}
+                                    onClick={sendVerifyCode}
+                                    data-testid={'send-verify-code'}
+                            >
+                                {timer >= 0 ? transToTimerMinuteAndSecond() : '인증번호 받기'}
+                            </button>
+                        </div>
+                    }
+
                     <Row name={'phone'}
                          value={user}
                          check={check}
@@ -374,18 +415,19 @@ export default function Page() {
                          description={description.phone}
                     />
                     <div>
-                        <button className={['w-full rounded duration-300 text-xs text-white p-2', allCheck && 'hover:bg-blue-600', allCheck ? 'bg-blue-300' : 'bg-gray-400'].join(' ')}
-                                disabled={!allCheck}
-                                onClick={submitHandler}
+                        <button
+                            className={['w-full rounded duration-300 text-xs text-white p-2', allCheck && 'hover:bg-blue-600', allCheck ? 'bg-blue-300' : 'bg-gray-400'].join(' ')}
+                            disabled={!allCheck}
+                            onClick={submitHandler}
                         >{
                             loading
-                            ? <LoadingSpinner size={15} />
-                            : '회원가입'
+                                ? <LoadingSpinner size={15}/>
+                                : '회원가입'
                         }
                         </button>
                     </div>
                 </div>
-                <Footer isSignUp={true} />
+                <Footer isSignUp={true}/>
             </div>
         </main>
     )

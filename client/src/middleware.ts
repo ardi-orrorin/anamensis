@@ -1,6 +1,8 @@
 import {NextRequest, NextResponse} from "next/server";
 import {cookies} from "next/headers";
 import {RequestCookie} from "next/dist/compiled/@edge-runtime/cookies";
+import apiCall from "@/app/{commons}/func/api";
+import {System} from "@/app/user/system/{services}/types";
 
 export async function middleware(req: NextRequest) {
 
@@ -25,8 +27,28 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(url)
     }
 
+    if(req.nextUrl.pathname.includes('/system')) {
+        const roles = await getUserRoles();
+        if(roles.find(role => role === System.Role.MASTER)) {
+            return NextResponse.next();
+        }
+
+        url.pathname = '/';
+        url.search = '';
+        return NextResponse.redirect(url);
+    }
+
     return NextResponse.next();
 }
+
+const getUserRoles = async (): Promise<System.Role[]> => {
+    return await apiCall<any, System.Role[]>({
+        path: '/api/user/roles',
+        method: 'GET',
+        call: 'Server',
+        setAuthorization: true,
+        isReturnData: true,
+    });}
 
 const generateRefreshToken = async (refreshToken: RequestCookie, userAgent: string): Promise<string> => {
     const refresh = await fetch(process.env.NEXT_PUBLIC_SERVER + '/api/user/refresh', {
@@ -53,5 +75,6 @@ export const config = {
         '/api/logout/:path*',
         '/user/:path*',
         '/board/new/:path*',
+        '/system/:path*',
     ]
 }

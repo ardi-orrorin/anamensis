@@ -38,6 +38,13 @@ const config: Config = {
       'bg-gray-200',
       'bg-gray-100',
       'bg-yellow-600',
+      'text-green-500',
+      'text-black',
+      'text-red-500',
+      'text-orange-600',
+      'text-gray-200',
+      'text-gray-100',
+      'text-yellow-600',
   ],
   plugins: [],
 };

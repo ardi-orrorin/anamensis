@@ -21,7 +21,7 @@ const Row = (props: SignUp.RowProps) => {
                    placeholder={placeholder}
                    name={name}
                    onChange={setProps}
-                   value={value[props.name]}
+                   value={value[props.name] as string}
                    disabled={disabled}
                    onFocus={() => setIsFocus(true)}
                    onBlur={() => setIsFocus(false)}

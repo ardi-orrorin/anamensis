@@ -1,6 +1,7 @@
 package com.anamensis.server.service;
 
 import com.anamensis.server.entity.SystemMessage;
+import com.anamensis.server.provider.MailProvider;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;

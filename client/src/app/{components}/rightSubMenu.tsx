@@ -12,6 +12,8 @@ import {faWindowMinimize} from "@fortawesome/free-solid-svg-icons/faWindowMinimi
 import React, {useState} from "react";
 import {useRouter} from "next/navigation";
 import {faRightToBracket} from "@fortawesome/free-solid-svg-icons/faRightToBracket";
+import {useQuery} from "@tanstack/react-query";
+import systemApiServices from "@/app/system/{services}/apiServices";
 
 const RightSubMenu = ({
     isLogin
@@ -91,6 +93,8 @@ const MiddleMenu = ({
 }) => {
     const router = useRouter();
 
+    const {data: publicSystemConfig} = useQuery(systemApiServices.getPublicSystemConfig());
+
     return (
         <>
             {
@@ -119,12 +123,15 @@ const MiddleMenu = ({
                         </button>
                     </div>
                     : <div className={'w-full flex flex-col justify-center bg-white shadow'}>
-                        <Link className={'p-3 flex justify-center items-center border-t border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
-                              href={'/signup'}
-                              title={'회원가입'}
-                        >
-                            <FontAwesomeIcon className={'w-4'} icon={faUserPlus} />
-                        </Link>
+                        {
+                            publicSystemConfig?.sign_up?.enabled
+                            && <Link className={'p-3 flex justify-center items-center border-t border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
+                                     href={'/signup'}
+                                     title={'회원가입'}
+                            >
+                                <FontAwesomeIcon className={'w-4'} icon={faUserPlus} />
+                            </Link>
+                        }
                         <Link className={'p-3 flex justify-center items-center border-t border-solid border-gray-200 hover:bg-green-600 hover:text-white active:bg-green-800 duration-300 outline-0'}
                               href={'/login'}
                               title={'로그인'}

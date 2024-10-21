@@ -1,4 +1,5 @@
 'use client';
+
 import {usePrefetchQuery} from "@tanstack/react-query";
 import userApiService from "@/app/user/{services}/userApiService";
 import rootApiService from "@/app/{services}/rootApiService";

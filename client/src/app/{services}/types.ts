@@ -47,6 +47,7 @@ type NavItemPropsT = {
     url            : string
     loginRequired? : boolean,
     prefetch       : boolean
+    view           : boolean
     onClick?       : () => void
 }
 

@@ -1,11 +1,13 @@
 import PageNavigator from "@/app/{commons}/PageNavigator";
-import Row from "@/app/user/smtp-history/{components}/Row";
+import Row from "@/app/system/smtp/{components}/Row";
 import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import {GetProps} from "@/app/user/history/page";
 import apiCall from "@/app/{commons}/func/api";
 import SizeSelect from "@/app/{commons}/sizeSelect";
 import {Common} from "@/app/{commons}/types/commons";
-import {SMTP} from "@/app/user/smtp/{services}/types";
+import {SystemSMTP} from "@/app/system/smtp/{services}/types";
+import SmtpInfo from "@/app/system/smtp/{components}/smtpInfo";
+import smtpApiServices from "@/app/system/smtp/{services}/apiServices";
 
 const getServerSideProps: GetServerSideProps<GetProps> = async (context) => {
     const searchParams = new URLSearchParams(context.query as any);
@@ -17,30 +19,32 @@ const getServerSideProps: GetServerSideProps<GetProps> = async (context) => {
 }
 
 export default async function Page(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+
     const {searchParams} = props;
-    const {page,content} = await getData(searchParams);
+
+    const {page, content} = await smtpApiServices.getSmtpHistory({req: searchParams});
 
     return (
-        <div className={'flex flex-col gap-3'}>
+        <div className={'min-h-full flex flex-col gap-3'}>
             <div className={'flex justify-end'}>
-                <SizeSelect />
+                <SizeSelect/>
             </div>
             <table className={'w-full'}>
                 <colgroup>
-                    <col style={{width: '5%'}} />
-                    <col style={{width: '20%'}} />
-                    <col style={{width: '40%'}} />
-                    <col style={{width: '10%'}} />
-                    <col style={{width: '15%'}} />
+                    <col style={{width: '5%'}}/>
+                    <col style={{width: '20%'}}/>
+                    <col style={{width: '40%'}}/>
+                    <col style={{width: '10%'}}/>
+                    <col style={{width: '15%'}}/>
                 </colgroup>
                 <thead className={'bg-main text-white h-9 align-middle'}>
-                    <tr className={'text-sm border-x border-white border-solid'}>
-                        <th className={'border-x border-white border-solid'}>#</th>
-                        <th className={'border-x border-white border-solid'}>제목</th>
-                        <th className={'border-x border-white border-solid'}>상태메시지</th>
-                        <th className={'border-x border-white border-solid'}>전송상태</th>
-                        <th className={'border-x border-white border-solid'}>전송일시</th>
-                    </tr>
+                <tr className={'text-sm border-x border-white border-solid'}>
+                    <th className={'border-x border-white border-solid'}>#</th>
+                    <th className={'border-x border-white border-solid'}>제목</th>
+                    <th className={'border-x border-white border-solid'}>상태메시지</th>
+                    <th className={'border-x border-white border-solid'}>전송상태</th>
+                    <th className={'border-x border-white border-solid'}>전송일시</th>
+                </tr>
                 </thead>
                 <tbody className={''}>
                 {
@@ -56,28 +60,16 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                 }
                 {
                     content.length === 0 &&
-                    <tr>
-                      <td className={'text-center py-5'}
-                          colSpan={5}
-                      >조회할 내용이 없습니다.</td>
-                    </tr>
+                  <tr>
+                    <td className={'text-center py-5'}
+                        colSpan={5}
+                    >조회할 내용이 없습니다.
+                    </td>
+                  </tr>
                 }
                 </tbody>
             </table>
             <PageNavigator {...page} />
         </div>
     );
-}
-
-
-const getData = async (req: URLSearchParams) => {
-    return await apiCall<Common.PageResponse<SMTP.History>, URLSearchParams>({
-        path: '/api/smtp-push-history',
-        method: 'GET',
-        call: 'Server',
-        setAuthorization: true,
-        params: req
-    }).then(res => {
-        return res.data;
-    });
 }

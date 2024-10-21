@@ -5,10 +5,13 @@ import {useMemo} from "react";
 import {useLogin} from "@/app/login/{hooks}/LoginProvider";
 import OAuth from "@/app/login/{componens}/OAuth";
 import Footer from "@/app/find-user/{components}/footer";
+import systemApiServices from "@/app/system/{services}/apiServices";
+import {useQuery} from "@tanstack/react-query";
 
 const Login = () => {
     const {user, goLogin, setProps, error, loading} = useLogin();
 
+    const {data: publicSystemConfig} = useQuery(systemApiServices.getPublicSystemConfig());
 
     const idCheck = useMemo(() => {
         return user.username.length > 5;
@@ -44,6 +47,11 @@ const Login = () => {
                         name={'password'}
                         value={user.password}
                         onChange={setProps}
+                        onKeyUp={e => {
+                            if (e.key === 'Enter') {
+                                goLogin();
+                            }
+                        }}
                     />
                 </div>
                 <div className={['flex duration-500', error.use ? 'max-h-52' : 'max-h-0'].join(' ')}>
@@ -73,9 +81,12 @@ const Login = () => {
                 </div>
             </div>
             <Footer />
-            <div className={'flex flex-col gap-2 justify-between px-3'}>
-                <OAuth />
-            </div>
+            {
+                publicSystemConfig?.sign_up?.enabled
+                && <div className={'flex flex-col gap-2 justify-between px-3'}>
+                    <OAuth/>
+                </div>
+            }
         </div>
     )
 }

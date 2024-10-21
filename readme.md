@@ -37,21 +37,6 @@ docker secret create batch_anamensis_secret_config batch-config.yml
 
 ## NextJs Environments
 - NEXTAUTH_SECRET (필수값)
-- CDN_SERVER (기본값: http://localhost:3000/files)
-- BASE_URL (기본값: http://localhost:3000)
-- OATH2 설정
-  - GOOGLE_CLIENT_ID (선택값)
-  - GOOGLE_CLIENT_SECRET (선택값) 
-  - KAKAO_CLIENT_ID (선택값)
-  - KAKAO_CLIENT_SECRET (선택값)
-  - GITHUB_CLIENT_ID (선택값)
-  - GITHUB_CLIENT_SECRET (선택값)
-  - NAVER_CLIENT_ID (선택값)
-  - NAVER_CLIENT_SECRET (선택값)
-- CUSTOM OAUTH2 설정
-  - CUSTOM_CLIENT_ID (선택값)
-  - CUSTOM_CLIENT_SECRET (선택값)
-  - CUSTOM_OAUTH2_SERVER_URL (선택값)
 
 ## Spring Server Environments
 - DB_URI (필수, 기본값: localhost:5432/anamensis)

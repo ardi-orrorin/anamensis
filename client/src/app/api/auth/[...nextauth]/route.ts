@@ -9,6 +9,8 @@ import Naver from "next-auth/providers/naver";
 import {User} from "@/app/login/{services}/types";
 import Kakao from "next-auth/providers/kakao";
 import {Custom} from "@/app/api/auth/[...nextauth]/custom";
+import apiCall from "@/app/{commons}/func/api";
+import {System} from "@/app/system/{services}/types";
 
 interface RouteHandlerContext {
     params: { nextauth: string[] }
@@ -16,42 +18,47 @@ interface RouteHandlerContext {
 
 async function handler(req: NextRequest, context: RouteHandlerContext) {
 
+    const systemSettings = await apiCall<System.PrivateResponse>({
+        path: '/public/master/system-settings/oauth',
+        method: 'GET',
+        call: 'Server',
+        setAuthorization: true,
+        isReturnData: true,
+    });
+
+    const {github, google, kakao, naver, custom} = systemSettings.oauth;
+
     const providers = [];
 
-    process.env.GOOGLE_CLIENT_ID
-    && process.env.GOOGLE_CLIENT_SECRET
-    && providers.push(Google({
-        clientId: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    }));
-
-    process.env.GITHUB_CLIENT_ID
-    && process.env.GITHUB_CLIENT_SECRET
+    github.enabled
     && providers.push(Github({
-        clientId: process.env.GITHUB_CLIENT_ID,
-        clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        clientId: github.clientId,
+        clientSecret: github.clientSecret,
     }));
 
-    process.env.NAVER_CLIENT_ID
-    && process.env.NAVER_CLIENT_SECRET
-    && providers.push(Naver({
-        clientId: process.env.NAVER_CLIENT_ID,
-        clientSecret: process.env.NAVER_CLIENT_SECRET,
+    google.enabled
+    && providers.push(Google({
+        clientId: google.clientId,
+        clientSecret: google.clientSecret,
     }));
 
-    process.env.KAKAO_CLIENT_ID
-    && process.env.KAKAO_CLIENT_SECRET
+    kakao.enabled
     && providers.push(Kakao({
-        clientId: process.env.KAKAO_CLIENT_ID,
-        clientSecret: process.env.KAKAO_CLIENT_SECRET,
+        clientId: kakao.clientId,
+        clientSecret: kakao.clientSecret,
     }));
 
-    process.env.CUSTOM_CLIENT_ID
-    && process.env.CUSTOM_CLIENT_SECRET
-    && process.env.CUSTOM_OAUTH2_SERVER_URL
+    naver.enabled
+    && providers.push(Naver({
+        clientId: naver.clientId,
+        clientSecret: naver.clientSecret,
+    }));
+
+    custom.enabled
     && providers.push(Custom({
-        clientId: process.env.CUSTOM_CLIENT_ID,
-        clientSecret: process.env.CUSTOM_CLIENT_SECRET,
+        clientId: custom.clientId,
+        clientSecret: custom.clientSecret,
+        url: custom.url,
     }));
 
     const options: AuthOptions = {

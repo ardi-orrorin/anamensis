@@ -1,70 +1,81 @@
 package com.anamensis.server.provider;
 
-import com.anamensis.server.entity.MemberConfigSmtp;
 import jakarta.mail.MessagingException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.angus.mail.util.MailConnectException;
+import org.json.JSONObject;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMailMessage;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.Properties;
 
+@Slf4j
+@Component
+@RequiredArgsConstructor
 public class MailProvider {
 
-    JavaMailSenderImpl mailSenderImpl;
-    MimeMailMessage mimeMailMessage;
+    private final JavaMailSender mailSender;
 
-    public Mono<Void> send() {
-        return Mono.fromRunnable(() -> {
-            mailSenderImpl.send(mimeMailMessage.getMimeMessage());
-        });
-    }
+    private final ConfigurableApplicationContext context;
 
-    public void testConnection() {
+    public Mono<Boolean> testConnection(JSONObject value) {
+        JavaMailSenderImpl mailSenderImpl = new JavaMailSenderImpl();
+
+        setJavaMailSender(mailSenderImpl, value);
+
         try {
             mailSenderImpl.testConnection();
+            return Mono.just(true);
         } catch (MessagingException e) {
-            throw new RuntimeException(e);
+            return Mono.error(e);
         }
     }
 
-    private MailProvider(Builder builder) {
-        this.mailSenderImpl = builder.mailSenderImpl;
-        this.mimeMailMessage = builder.mimeMailMessage;
+    public Mono<Boolean> updateConnection(JSONObject value) {
+        if(!value.getBoolean("enabled")) return Mono.just(true);
+
+        JavaMailSenderImpl mailSenderImpl = (JavaMailSenderImpl) mailSender;
+
+        setJavaMailSender(mailSenderImpl, value);
+
+        return Mono.just(true);
     }
 
-    public static class Builder {
-        JavaMailSenderImpl mailSenderImpl = new JavaMailSenderImpl();
-        MimeMailMessage mimeMailMessage = new MimeMailMessage(mailSenderImpl.createMimeMessage());
+    private void setJavaMailSender(JavaMailSenderImpl mailSenderImpl, JSONObject value) {
+        mailSenderImpl.setProtocol("smtp");
 
-        public Builder config(MemberConfigSmtp userConfigSmtp) {
-            this.mailSenderImpl.setHost(userConfigSmtp.getHost());
-            this.mailSenderImpl.setPort(Integer.parseInt(userConfigSmtp.getPort()));
-            this.mailSenderImpl.setUsername(userConfigSmtp.getUsername());
-            this.mailSenderImpl.setPassword(userConfigSmtp.getPassword());
-            this.mailSenderImpl.setProtocol("smtp");
+        mailSenderImpl.setHost(value.get("host").toString());
+        mailSenderImpl.setPort(Integer.parseInt(value.get("port").toString()));
+        mailSenderImpl.setUsername(value.get("username").toString());
+        mailSenderImpl.setPassword(value.get("password").toString());
 
-            Properties properties = new Properties();
-            properties.put("mail.smtp.auth", "true");
-            properties.put("mail.smtp.starttls.enable", "true");
+        Properties properties = new Properties();
+        properties.put("mail.smtp.auth", "true");
+        properties.put("mail.smtp.starttls.enable", "true");
+        properties.put("mail.smtp.ssl.trust", "*");
+        mailSenderImpl.setJavaMailProperties(properties);
 
-            if (userConfigSmtp.getUseSSL()) {
-                properties.put("mail.smtp.ssl.trust", "*");
-            }
-
-            this.mailSenderImpl.setJavaMailProperties(properties);
-            return this;
-        }
-
-        public Builder message(MemberConfigSmtp userConfigSmtp, String subject, String content) {
-            this.mimeMailMessage.setTo(userConfigSmtp.getFromEmail());
-            this.mimeMailMessage.setFrom(userConfigSmtp.getFromEmail());
-            this.mimeMailMessage.setSubject(subject);
-            this.mimeMailMessage.setText(content);
-            return this;
-        }
-
-        public MailProvider build() {
-            return new MailProvider(this);
-        }
     }
+
+    public Mono<Boolean> sendMessage(MailMessage message) {
+        MimeMailMessage mimeMailMessage = new MimeMailMessage(mailSender.createMimeMessage());
+        mimeMailMessage.setTo(message.to);
+        mimeMailMessage.setSubject(message.subject);
+        mimeMailMessage.setText(message.text);
+
+        mailSender.send(mimeMailMessage.getMimeMessage());
+        return Mono.just(true);
+    }
+
+    public record MailMessage(
+        String to,
+        String subject,
+        String text
+    ) {}
+
 }

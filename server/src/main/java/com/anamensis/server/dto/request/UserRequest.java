@@ -62,6 +62,8 @@ public class UserRequest {
 //        @Pattern(regexp = "^01(?:0|1|[6-9])-(?:\\d{3}|\\d{4})-\\d{4}$", message = "Invalid phone number")
         private String phone;
 
+        private boolean emailVerified;
+
         public static Member transToUser(Register reg) {
             Member users = new Member();
             users.setUserId(reg.getId());
@@ -69,6 +71,7 @@ public class UserRequest {
             users.setName(reg.getName());
             users.setEmail(reg.getEmail());
             users.setPhone(reg.getPhone());
+            users.setEmailVerified(reg.isEmailVerified());
             users.setCreateAt(LocalDateTime.now());
             users.setUpdateAt(LocalDateTime.now());
             users.setUse(true);

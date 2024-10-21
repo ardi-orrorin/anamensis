@@ -2,22 +2,6 @@ import apiCall from "@/app/{commons}/func/api";
 import {queryOptions} from "@tanstack/react-query";
 import {System} from "@/app/user/system/{services}/types";
 import {Root} from "@/app/{services}/types";
-import {NextJsConfigI} from "@/app/api/config/route";
-
-const getConfig = () => {
-    return queryOptions({
-        queryKey: ['config'],
-        queryFn: async () => {
-            return await apiCall<NextJsConfigI>({
-                path: '/api/config',
-                method: 'GET',
-                isReturnData: true
-            })
-        },
-        initialData: {} as NextJsConfigI,
-        initialDataUpdatedAt: 1,
-    })
-}
 
 const userRole = () => {
     return queryOptions({
@@ -103,7 +87,6 @@ const favorites = () => {
 
 
 const rootApiService = {
-    getConfig,
     userRole,
     scheduleAlert,
     getNotices,

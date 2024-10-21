@@ -38,7 +38,7 @@ class SystemSettingServiceTest {
 
     @Test
     void findAll() {
-        StepVerifier.create(sss.findAll())
+        StepVerifier.create(sss.findAll(true))
                 .assertNext(list -> {
 
                     log.info("list: {}", list);
@@ -84,8 +84,8 @@ class SystemSettingServiceTest {
         value.put("password", "real password test");
 
         StepVerifier.create(sss.saveSystemSetting(SystemSettingKey.SMTP, value))
-                .assertNext(systemSetting -> {
-                    assertEquals(SystemSettingKey.SMTP, systemSetting.getKey());
+                .assertNext(aBoolean -> {
+                    assertTrue(aBoolean);
                 })
                 .verifyComplete();
 

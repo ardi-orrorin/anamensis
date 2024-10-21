@@ -31,7 +31,7 @@ class SystemSettingMapperTest {
     @Test
     void findAll() {
 
-        log.info("{}", ssm.findAll());
+        log.info("{}", ssm.findAll(true));
 
     }
 

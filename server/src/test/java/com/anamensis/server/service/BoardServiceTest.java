@@ -476,10 +476,6 @@ class BoardServiceTest {
         saqdto.setBoardPk(1);
         saqdto.setBoardTitle("테스트 제목");
         saqdto.setPoint(500);
-        saqdto.setSmtpHost("smtp.gmail.com");
-        saqdto.setSmtpPort("587");
-        saqdto.setSmtpUser("d-member-1");
-        saqdto.setSmtpPassword("password");
 
         StepVerifier.create(bs.addSelectAnswerQueue(saqdto))
                 .expectNext(false)

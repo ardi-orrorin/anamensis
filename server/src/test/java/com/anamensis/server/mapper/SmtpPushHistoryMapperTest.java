@@ -1,6 +1,7 @@
 package com.anamensis.server.mapper;
 
 import com.anamensis.server.dto.Page;
+import com.anamensis.server.entity.SmtpPushHistory;
 import com.anamensis.server.resultMap.SmtpPushHistoryResultMap;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,7 +35,7 @@ class SmtpPushHistoryMapperTest {
         Page page = new Page();
         page.setPage(1);
         page.setSize(6);
-        List<SmtpPushHistoryResultMap.ListSmtpPushHistory> list = spm.findByMemberPk(1, page);
+        List<SmtpPushHistory> list = spm.findByMemberPk(1, page);
         assertFalse(list.isEmpty());
         assertEquals(6, list.size());
 

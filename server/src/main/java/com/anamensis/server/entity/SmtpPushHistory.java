@@ -13,9 +13,9 @@ public class SmtpPushHistory {
 
     private long id;
 
-    private long memberPk;
+    private String fromMail;
 
-    private long memberConfigSmtpPk;
+    private String toMail;
 
     private String subject;
 
@@ -25,5 +25,5 @@ public class SmtpPushHistory {
 
     private String message;
 
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
 }

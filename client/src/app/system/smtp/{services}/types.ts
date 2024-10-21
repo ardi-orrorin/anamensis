@@ -13,10 +13,12 @@ interface SmtpI {
 
 interface HistoryI {
     id       : number;
+    to       : string;
+    from     : string;
     subject  : string;
     status   : string;
     message  : string;
-    createAt : string;
+    createdAt : string;
 }
 
 interface HistoriesRowI extends HistoryI {

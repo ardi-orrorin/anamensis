@@ -1,6 +1,7 @@
 package com.anamensis.server.dto.response;
 
 import com.anamensis.server.dto.seriallizer.StringNullSerializer;
+import com.anamensis.server.entity.SmtpPushHistory;
 import com.anamensis.server.resultMap.SmtpPushHistoryResultMap;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -18,6 +19,10 @@ public class SmtpPushHistoryResponse {
     public static class ListSmtpPushHistory {
         private long id;
 
+        private String from;
+
+        private String to;
+
         @JsonSerialize(nullsUsing = StringNullSerializer.class)
         private String subject;
 
@@ -28,15 +33,17 @@ public class SmtpPushHistoryResponse {
         private String message;
 
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-        private LocalDateTime createAt;
+        private LocalDateTime createdAt;
 
-        public static ListSmtpPushHistory fromResultMap(SmtpPushHistoryResultMap.ListSmtpPushHistory smtpPushHistory) {
+        public static ListSmtpPushHistory fromEntity(SmtpPushHistory smtpPushHistory) {
             return ListSmtpPushHistory.builder()
                     .id(smtpPushHistory.getId())
+                    .from(smtpPushHistory.getFromMail())
+                    .to(smtpPushHistory.getToMail())
                     .subject(smtpPushHistory.getSubject())
                     .status(smtpPushHistory.getStatus())
                     .message(smtpPushHistory.getMessage())
-                    .createAt(smtpPushHistory.getCreateAt())
+                    .createdAt(smtpPushHistory.getCreatedAt())
                     .build();
         }
     }

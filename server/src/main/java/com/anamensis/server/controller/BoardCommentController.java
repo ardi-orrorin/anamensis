@@ -95,7 +95,7 @@ public class BoardCommentController {
         ph.setMemberPk(t.getT3().getId());
         ph.setPointCodePk(t.getT1().getId());
         ph.setTableCodePk(t.getT2().getId());
-        ph.setCreateAt(bc.getCreateAt());
+        ph.setCreatedAt(bc.getCreateAt());
         ph.setTableRefPk(bc.getId());
 
         pointHistoryService.insert(ph)

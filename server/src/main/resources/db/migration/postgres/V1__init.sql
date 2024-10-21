@@ -164,12 +164,12 @@ CREATE TABLE point_code (
 
 CREATE TABLE point_history (
     id             BIGSERIAL,
-    table_code_pk  BIGINT          NOT NULL,
-    table_ref_pk   BIGINT          NOT NULL,
-    member_pk      BIGINT          NOT NULL,
-    point_code_pk  BIGINT          NOT NULL,
-    value          INT             NOT NULL,
-    create_at      TIMESTAMP(6)    NOT NULL
+    table_code_pk  BIGINT           NOT NULL,
+    table_ref_pk   BIGINT           NOT NULL,
+    member_pk      BIGINT           NOT NULL,
+    point_code_pk  BIGINT           NOT NULL,
+    value          BIGINT           NOT NULL,
+    created_at     TIMESTAMP(6)     NOT NULL
 );
 
 CREATE TABLE email_verify (

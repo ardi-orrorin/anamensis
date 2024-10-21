@@ -210,18 +210,20 @@ public class BoardController {
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(b -> {
                     Mono.zip(pointCode, tableCode)
-                        .publishOn(Schedulers.boundedElastic())
                         .doOnNext(t -> {
-                            userService.updatePoint(b.getMemberPk(), (int) t.getT1().getPoint())
-                                    .subscribeOn(Schedulers.boundedElastic())
-                                    .subscribe();
 
                             PointHistory ph = new PointHistory();
                             ph.setMemberPk(b.getMemberPk());
                             ph.setPointCodePk(t.getT1().getId());
-                            ph.setCreateAt(b.getCreateAt());
+                            ph.setCreatedAt(b.getCreateAt());
                             ph.setTableCodePk(t.getT2().getId());
                             ph.setTableRefPk(t.getT1().getId());
+                            ph.setValue(t.getT1().getPoint());
+
+                            userService.updatePoint(b.getMemberPk(), t.getT1().getPoint())
+                                    .flatMap($ -> userService.addUserInfoCache(user.getUsername()))
+                                    .subscribeOn(Schedulers.boundedElastic())
+                                    .subscribe();
 
                             pointHistoryService.insert(ph)
                                     .subscribeOn(Schedulers.boundedElastic())
@@ -235,6 +237,7 @@ public class BoardController {
 
                             board.setId(b.getId());
                             boardIndexService.save(board.toEntity())
+                                .subscribeOn(Schedulers.boundedElastic())
                                 .subscribe();
 
                         })
@@ -405,7 +408,7 @@ public class BoardController {
                 PointHistory ph = new PointHistory();
                 ph.setMemberPk(memberPk);
                 ph.setPointCodePk(t.getT1().getId());
-                ph.setCreateAt(LocalDateTime.now());
+                ph.setCreatedAt(LocalDateTime.now());
                 ph.setTableCodePk(t.getT2().getId());
                 ph.setTableRefPk(t.getT1().getId());
                 ph.setValue(point);

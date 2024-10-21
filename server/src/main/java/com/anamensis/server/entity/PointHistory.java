@@ -15,6 +15,6 @@ public class PointHistory {
     private long tableRefPk;
     private long memberPk;
     private long pointCodePk;
-    private int value = 0;
-    private LocalDateTime createAt;
+    private long value = 0L;
+    private LocalDateTime createdAt;
 }

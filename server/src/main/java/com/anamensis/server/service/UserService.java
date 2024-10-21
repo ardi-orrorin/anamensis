@@ -11,11 +11,10 @@ import com.anamensis.server.exception.DuplicateUserException;
 import com.anamensis.server.mapper.MemberMapper;
 import com.anamensis.server.mapper.PointCodeMapper;
 import com.anamensis.server.mapper.PointHistoryMapper;
+import com.anamensis.server.mapper.TableCodeMapper;
 import com.anamensis.server.provider.MailProvider;
 import com.anamensis.server.resultMap.MemberResultMap;
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
@@ -51,6 +50,10 @@ public class UserService implements ReactiveUserDetailsService {
     private final MemberMapper memberMapper;
 
     private final PointHistoryMapper pointHistoryMapper;
+
+    private final PointCodeMapper pointCodeMapper;
+
+    private final TableCodeMapper tableCodeMapper;
 
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -205,7 +208,9 @@ public class UserService implements ReactiveUserDetailsService {
 
     public Mono<Member> saveUser(UserRequest.Register user, boolean isOAuth) {
 
-        long point = 100;
+        PointCode pointCode = pointCodeMapper.selectByIdOrName(0, "sign_up")
+            .orElseThrow(() -> new RuntimeException("Point code not found"));
+
 
         Member member = UserRequest.Register.transToUser(user);
         member.setPwd(bCryptPasswordEncoder.encode(member.getPwd()));
@@ -213,16 +218,26 @@ public class UserService implements ReactiveUserDetailsService {
         member.setSAuthType(AuthType.NONE);
         member.setOAuth(isOAuth);
         member.setSAuth(false);
-        member.setPoint(point);
+
 
         int isSave = memberMapper.save(member);
 
         if(isSave == 0) return Mono.error(new RuntimeException("User save failed"));
 
-        // fixme: 포인트 이력 저장 (point 히스토리 관련 로직 전체 수정 필요)
-//        PointHistory pointHistory = new PointHistory();
-//        pointHistory.setMemberPk(member.getId());
+        memberMapper.updatePoint(member.getId(), pointCode.getPoint());
 
+        TableCode tableCode = tableCodeMapper.findByIdByTableName(0, "member")
+            .orElseThrow(() -> new RuntimeException("Table code not found"));
+
+        PointHistory pointHistory = new PointHistory();
+        pointHistory.setMemberPk(member.getId());
+        pointHistory.setTableRefPk(member.getId());
+        pointHistory.setTableCodePk(tableCode.getId());
+        pointHistory.setPointCodePk(pointCode.getId());
+        pointHistory.setValue(pointCode.getPoint());
+        pointHistory.setCreatedAt(LocalDateTime.now());
+
+        pointHistoryMapper.insert(pointHistory);
 
         return generateRole(member, RoleType.USER)
                 .doOnNext(memberMapper::saveRole)

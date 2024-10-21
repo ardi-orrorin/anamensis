@@ -4,7 +4,7 @@ import React, {useEffect, useState} from "react";
 import LeftNavBar from "@/app/user/{components}/LeftNavBar";
 import Contents from "@/app/user/{components}/Contents";
 import UserProvider, {AttendInfoI, BoardSummaryI, PointSummaryI} from "@/app/user/{services}/userProvider";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 import dynamic from "next/dynamic";
 
 const DynamicLeftNavBar = dynamic(() => import('@/app/user/{components}/LeftNavBar'),{

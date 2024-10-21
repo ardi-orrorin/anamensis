@@ -1,6 +1,6 @@
 import {Dispatch, SetStateAction, useState} from "react";
 import apiCall from "@/app/{commons}/func/api";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 
 const Add = ({
     setAdd, data
@@ -30,7 +30,7 @@ const Add = ({
 
     const onSaveHandler = async () => {
         await apiCall<System.WebSys>({
-            path: '/api/user/system',
+            path: '/api/config/system',
             method: 'POST',
             body: webSys,
             call: 'Proxy'

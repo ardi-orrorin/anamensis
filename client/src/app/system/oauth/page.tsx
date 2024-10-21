@@ -8,6 +8,7 @@ import {SystemOAuth} from "@/app/system/oauth/{services}/types";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {System} from "@/app/system/{services}/types";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
+import Link from "next/link";
 
 export default function Page() {
 
@@ -101,10 +102,10 @@ export default function Page() {
     }
 
     const list = [
-        {type: 'google', headline: 'GOOGLE', description: 'GOOGLE OAuth2'},
-        {type: 'github', headline: 'GITHUB', description: 'GITHUB OAuth2'},
-        {type: 'kakao', headline: 'KAKAO', description: 'KAKAO OAuth2'},
-        {type: 'naver', headline: 'NAVER', description: 'NAVER OAuth2'},
+        {type: 'google', headline: 'GOOGLE', description: 'GOOGLE OAuth2', link: 'https://cloud.google.com/apigee/docs/api-platform/security/oauth/oauth-home?hl=ko'},
+        {type: 'github', headline: 'GITHUB', description: 'GITHUB OAuth2', link: 'https://docs.github.com/ko/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps'},
+        {type: 'kakao', headline: 'KAKAO', description: 'KAKAO OAuth2', link: 'https://developers.kakao.com/product/kakaoLogin'},
+        {type: 'naver', headline: 'NAVER', description: 'NAVER OAuth2', link: 'https://developers.naver.com/docs/login/api/api.md'},
         {type: 'custom', headline: 'CUSTOM', description: 'CUSTOM OAuth2', isCustom: true},
     ]
 
@@ -120,6 +121,7 @@ export default function Page() {
                                   type: item.type,
                                   oauth: oauth && oauth[item.type],
                                   isCustom: item?.isCustom,
+                                  link: item?.link,
                                   onClickHandler, onChangeHandler,
                                   save, init, loading,
                               }
@@ -135,7 +137,7 @@ export default function Page() {
 const Item = ({
     description, oauth, type,
     onChangeHandler, onClickHandler,
-    save, init, headLine, loading, isCustom
+    save, init, headLine, loading, isCustom, link
 }:{
     headLine: string;
     description: string;
@@ -147,15 +149,26 @@ const Item = ({
     init: (type: string) => void;
     loading: {type: string, value: boolean};
     isCustom?: boolean;
+    link?: string;
 }) => {
 
     const isLoading = useMemo(() => loading.type === type && loading.value, [loading, type]);
 
     return (
         <SystemContainer headline={headLine}>
-            <p className={'list-item ms-4 text-sm text-gray-600 whitespace-pre-line'}>
-                {description}
-            </p>
+            <div className={'space-y-1.5'}>
+                {
+                    link
+                    && <div className={'list-item ms-4 text-sm text-gray-600 space-x-2'}>
+                        <span>키 관련 안내 링크</span>
+                        <Link className={'text-blue-500 underline'} href={link}>이동</Link>
+                    </div>
+                }
+                <p className={'list-item ms-4 text-sm text-gray-600 whitespace-pre-line'}>
+                    {description}
+
+                </p>
+            </div>
             <input className={'w-96 p-2 outline-0 text-sm focus:bg-gray-200 duration-300'}
                    name={'clientId'}
                    value={oauth?.clientId}

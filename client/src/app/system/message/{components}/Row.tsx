@@ -1,9 +1,9 @@
 import {Dispatch, SetStateAction, useContext, useState} from "react";
-import ModalProvider, {ModalContextType} from "@/app/user/system/{services}/modalProvider";
+import ModalProvider, {ModalContextType} from "@/app/system/message/{services}/modalProvider";
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import apiCall from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 
 const Row = (props : System.WebSys & {
     setData : Dispatch<SetStateAction<System.WebSys[]>>;
@@ -19,7 +19,7 @@ const Row = (props : System.WebSys & {
 
     const onSaveHandler = async () => {
         await apiCall<System.WebSys>({
-            path: '/api/user/system',
+            path: '/api/config/system',
             method: 'PUT',
             body: webSys,
         })
@@ -75,7 +75,7 @@ const Row = (props : System.WebSys & {
     const onDeleteHandler = async (code: string) => {
 
         await apiCall({
-            path: '/api/user/system/' + code,
+            path: '/api/config/system/' + code,
             method: 'DELETE',
         })
         .then(res => {

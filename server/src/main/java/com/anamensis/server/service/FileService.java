@@ -132,7 +132,7 @@ public class FileService {
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(file -> {
                     if(!file.isEmpty()) { // 이미 파일이 있는 경우 삭제
-                        fileMapper.updateIsUseById(file.get(0).getId(), 0);
+                        fileMapper.updateIsUseById(file.get(0).getId(), false);
                         awsS3Provider.deleteS3(file.get(0).getFilePath(), file.get(0).getFileName())
                                 .subscribe();
                     }
@@ -144,7 +144,7 @@ public class FileService {
 
 
     public Mono<Boolean> deleteFile(File file) {
-        return Mono.just(fileMapper.updateIsUseById(file.getId(), 0))
+        return Mono.just(fileMapper.updateIsUseById(file.getId(), false))
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(r -> {
                     awsS3Provider.aws3ImgDelete(file.getFilePath(), file.getFileName());

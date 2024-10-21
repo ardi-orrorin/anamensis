@@ -46,6 +46,7 @@
          WHERE id     = #{id}
     </update>
 
+
     <update id="updateByTableRefPk">
         UPDATE file
            SET table_ref_pk = #{tableRefPk}

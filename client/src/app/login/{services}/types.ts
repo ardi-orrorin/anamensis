@@ -1,4 +1,4 @@
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 import ResetPwdProgress = User.ResetPwdProgress;
 
 interface UserI {

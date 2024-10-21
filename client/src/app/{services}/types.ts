@@ -1,7 +1,7 @@
 import {BlockI} from "@/app/board/{services}/types";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import React from "react";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 
 type DynamicPageT = {
     isEndOfList : boolean;

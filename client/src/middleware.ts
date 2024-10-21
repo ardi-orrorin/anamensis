@@ -2,7 +2,7 @@ import {NextRequest, NextResponse} from "next/server";
 import {cookies} from "next/headers";
 import {RequestCookie} from "next/dist/compiled/@edge-runtime/cookies";
 import apiCall from "@/app/{commons}/func/api";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 
 export async function middleware(req: NextRequest) {
 

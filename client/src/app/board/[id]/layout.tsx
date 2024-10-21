@@ -10,7 +10,7 @@ import {useSearchParams} from "next/navigation";
 import {preload} from "swr";
 import {initBlock} from "@/app/board/{services}/funcs";
 import {BoardSummaryI} from "@/app/user/{services}/userProvider";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 import {useQueryClient} from "@tanstack/react-query";
 import {TempFileProvider} from "@/app/board/[id]/{hooks}/usePendingFiles";
 import boardApiService from "@/app/board/{services}/boardApiService";

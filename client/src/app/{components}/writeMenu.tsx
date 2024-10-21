@@ -4,7 +4,7 @@ import Link from "next/link";
 import HotKeybtn from "@/app/{components}/hotKeybtn";
 import React from "react";
 import {Category} from "@/app/board/{services}/types";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 
 const WriteMenu = ({
     boardBaseUrl,

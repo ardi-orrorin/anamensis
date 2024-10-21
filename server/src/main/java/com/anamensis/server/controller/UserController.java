@@ -24,6 +24,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 
@@ -43,6 +44,8 @@ public class UserController {
     private final PointService ps;
     private final PointHistoryService phs;
     private final TableCodeService tableCodeService;
+
+    private final Set<SystemSetting> systemSettings;
 
 
     @MasterAPI
@@ -80,12 +83,18 @@ public class UserController {
             @RequestBody UserRequest.Login user
     ) {
 
+        boolean isEmailVerify = systemSettings.stream()
+            .filter(s -> s.getKey() == SystemSettingKey.SIGN_UP)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("signup setting is not found"))
+            .getValue().getBoolean("emailVerification");
+
         Mono<Member> member = userService.findUserByUserId(user.getUsername(), user.getPassword())
                 .subscribeOn(Schedulers.boundedElastic())
                 .share();
 
         Mono<String> emailVerifyResult = member.flatMap(u -> {
-                    if(AuthType.EMAIL.equals(u.getSAuthType())) {
+                    if(AuthType.EMAIL.equals(u.getSAuthType()) && isEmailVerify) {
                         EmailVerify emailVerify = new EmailVerify();
                         emailVerify.setEmail(u.getEmail());
                         return emailVerifyService.insert(emailVerify);
@@ -95,8 +104,8 @@ public class UserController {
 
         return Mono.zip(member, emailVerifyResult)
                 .map(t -> UserResponse.Auth.builder()
-                       .authType(t.getT1().getSAuthType())
-                       .verity(t.getT1().getSAuth())
+                       .authType(isEmailVerify ? t.getT1().getSAuthType() : AuthType.NONE)
+                       .verity(isEmailVerify && t.getT1().getSAuth())
                        .build()
                 );
     }

@@ -2,7 +2,7 @@ import {NextRequest, NextResponse} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
 import {AxiosError} from "axios";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 
 export async function GET() {
     try {

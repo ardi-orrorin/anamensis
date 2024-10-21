@@ -4,12 +4,15 @@ import {useRouter} from "next/navigation";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSpinner} from "@fortawesome/free-solid-svg-icons";
 import {User} from "@/app/login/{services}/types";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 import {useQuery} from "@tanstack/react-query";
 import rootApiService from "@/app/{services}/rootApiService";
 import emailApiService from "@/app/user/email/{services}/emailApiService";
+import systemApiServices from "@/app/system/{services}/apiServices";
 
 export default function Page() {
+
+    const {data: publicSystemConfig} = useQuery(systemApiServices.getPublicSystemConfig());
 
     const [loading, setLoading] = useState(false);
 
@@ -63,28 +66,30 @@ export default function Page() {
                         {userInfo?.email}
                     </span>
                 </div>
-
-                <div className={'flex flex-col gap-3'}>
-                    <h1 className={'text-lg font-bold'}>
-                        Email 2차 인증 사용 여부
-                    </h1>
-                    <label className="inline-flex items-center cursor-pointer">
-                        <input type="checkbox"
-                               className={"sr-only peer hidden"}
-                               checked={isSAuthEmail}
-                               onChange={onChangeHandler}
-                        />
-                        <div className="relative w-11 h-6 ray-200 peer-focus:outline-none peer-focus:ring-4
-                                        peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-300
-                                        peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
-                                        peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px]
-                                        after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5
-                                        after:transition-all dark:border-gray-600 peer-checked:bg-main"></div>
-                        <span className="ms-3 text-sm fontclassNameum text-blue-7000 items-center">
-                            {isSAuthEmail ? '사용 중' : '사용 안함'}
-                        </span>
-                    </label>
-                </div>
+                {
+                    publicSystemConfig?.sign_up?.emailVerification
+                    && <div className={'flex flex-col gap-3'}>
+                        <h1 className={'text-lg font-bold'}>
+                          Email 2차 인증 사용 여부
+                        </h1>
+                        <label className="inline-flex items-center cursor-pointer">
+                          <input type="checkbox"
+                                 className={"sr-only peer hidden"}
+                                 checked={isSAuthEmail}
+                                 onChange={onChangeHandler}
+                          />
+                          <div className="relative w-11 h-6 ray-200 peer-focus:outline-none peer-focus:ring-4
+                                            peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-300
+                                            peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
+                                            peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px]
+                                            after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5
+                                            after:transition-all dark:border-gray-600 peer-checked:bg-main"></div>
+                          <span className="ms-3 text-sm fontclassNameum text-blue-7000 items-center">
+                                {isSAuthEmail ? '사용 중' : '사용 안함'}
+                            </span>
+                        </label>
+                    </div>
+                }
                 <div className={'flex flex-col gap-3'}>
                     <h1 className={'text-lg font-bold'}>
                         사용 중인 인증 방식
@@ -96,9 +101,10 @@ export default function Page() {
             </div>
             {
                 loading
-                && <div className={'w-full h-screen bg-gray-400 opacity-25 absolute left-0 top-0 flex justify-center items-center'}>
-                    <FontAwesomeIcon className={'animate-spin h-12'} icon={faSpinner} />
-                </div>
+                && <div
+                className={'w-full h-screen bg-gray-400 opacity-25 absolute left-0 top-0 flex justify-center items-center'}>
+                <FontAwesomeIcon className={'animate-spin h-12'} icon={faSpinner}/>
+              </div>
             }
         </div>
     )

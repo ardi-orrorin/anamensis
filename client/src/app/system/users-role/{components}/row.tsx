@@ -1,7 +1,7 @@
 import moment from "moment/moment";
-import {UsersRole} from "@/app/user/users-role/page";
+import {UsersRole} from "@/app/system/users-role/page";
 import React, {useMemo} from "react";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 
 const Row = ({
     user,
@@ -41,7 +41,7 @@ const Row = ({
     ,[user.roles])
 
     return (
-        <tr key={'user-role' + user.id} className={['border-b border-gray-200 border-solid', index % 2 === 1 ? 'bg-blue-50': '', select.includes(user.id) && 'bg-yellow-300'].join(' ')}>
+        <tr key={'user-role' + user.id} className={['border-b border-gray-200 border-solid', index % 2 === 1 ? 'bg-gray-50': '', select.includes(user.id) && 'bg-yellow-400'].join(' ')}>
             <td className={'py-2 px-3'}>
                 <input type={'checkbox'}
                        checked={!!select.find(id => id === user.id)}

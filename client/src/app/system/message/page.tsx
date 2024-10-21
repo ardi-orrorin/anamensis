@@ -3,13 +3,13 @@
 import apiCall from "@/app/{commons}/func/api";
 import {preload} from "swr";
 import {useState} from "react";
-import Row from "@/app/user/system/{components}/Row";
-import Add from "@/app/user/system/{components}/Add";
+import Row from "@/app/system/message/{components}/Row";
+import Add from "@/app/system/message/{components}/Add";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus} from "@fortawesome/free-solid-svg-icons/faPlus";
-import ModalProvider, {ModalI} from "@/app/user/system/{services}/modalProvider";
-import Message from "@/app/user/system/{components}/message";
-import {System} from "@/app/user/system/{services}/types";
+import ModalProvider, {ModalI} from "@/app/system/message/{services}/modalProvider";
+import Message from "@/app/system/message/{components}/message";
+import {System} from "@/app/system/message/{services}/types";
 
 export default function Page(){
 
@@ -21,9 +21,9 @@ export default function Page(){
         setAdd(true);
     }
 
-    preload('/api/user/system', async () => {
+    preload('/api/config/system', async () => {
         return await apiCall<System.WebSys[]>({
-            path: `/api/user/system`,
+            path: `/api/config/system`,
             method: 'GET',
             isReturnData: true,
         });

@@ -1,6 +1,6 @@
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
 import apiCall from "@/app/{commons}/func/api";
-import {UsersRole} from "@/app/user/users-role/page";
+import {UsersRole} from "@/app/system/users-role/page";
 import {NextRequest} from "next/server";
 import axios, {AxiosError} from "axios";
 

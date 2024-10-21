@@ -1,6 +1,6 @@
 {
   "name": "anamensis",
-  "version": "0.0.1",
+  "version": "__VERSION__",
   "private": true,
   "scripts": {
     "dev": "next dev",

@@ -198,10 +198,10 @@ class FileMapperTest {
 
         assertTrue(fileMapper.selectByFileName("uuidFileName4.txt").isPresent());
 
-        assertEquals(1, fileMapper.updateIsUseById(file1.getId(), 0));
+        assertEquals(1, fileMapper.updateIsUseById(file1.getId(), false));
         assertFalse(fileMapper.selectByFileName("uuidFileName4.txt").isPresent());
 
-        assertEquals(1, fileMapper.updateIsUseById(file1.getId(), 1));
+        assertEquals(1, fileMapper.updateIsUseById(file1.getId(), true));
         assertTrue(fileMapper.selectByFileName("uuidFileName4.txt").isPresent());
     }
 

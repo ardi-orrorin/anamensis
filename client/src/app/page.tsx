@@ -22,7 +22,7 @@ import LeftMenu from "@/app/{components}/leftMenu";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import RightMenu from "@/app/{components}/rightMenu";
 import Notices from "@/app/{components}/boards/notices";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 import systemApiServices from "@/app/system/{services}/apiServices";
 
 const DynamicBoardComponent = dynamic(() => import('@/app/{components}/boardComponent'), {

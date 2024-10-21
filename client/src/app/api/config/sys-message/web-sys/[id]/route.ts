@@ -1,6 +1,6 @@
 import {NextRequest, NextResponse} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 
 export async function GET(req: NextRequest,{params}: {params: {id: string}}) {
     const {id} = params;

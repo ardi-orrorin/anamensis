@@ -7,7 +7,7 @@ import {useRouter} from "next/navigation";
 import {Options} from "react-hotkeys-hook/src/types";
 import HotKeybtn from "@/app/{components}/hotKeybtn";
 import {useRootLeftMenuHotKey} from "@/app/{hooks}/hotKey";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 import dynamic from "next/dynamic";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {useCusSearchParams} from "@/app/{hooks}/searchParamsHook";

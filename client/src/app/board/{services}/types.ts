@@ -1,5 +1,5 @@
 import {CSSProperties} from "react";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 
 export interface RefBoardI {
     id         : string;

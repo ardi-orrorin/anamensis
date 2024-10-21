@@ -9,12 +9,12 @@ interface CustomOAuth2ItemI extends OAuth2ItemI {
 }
 
 interface OAuth2I {
-    kakao   : SystemOAuth.OAuth2Item;
-    google  : SystemOAuth.OAuth2Item;
-    naver   : SystemOAuth.OAuth2Item;
-    github  : SystemOAuth.OAuth2Item;
-    custom  : SystemOAuth.CustomOAuth2Item;
-    [key: string]: SystemOAuth.OAuth2Item | SystemOAuth.CustomOAuth2Item;
+    kakao           : SystemOAuth.OAuth2Item;
+    google          : SystemOAuth.OAuth2Item;
+    naver           : SystemOAuth.OAuth2Item;
+    github          : SystemOAuth.OAuth2Item;
+    custom          : SystemOAuth.CustomOAuth2Item;
+    [key: string]   : SystemOAuth.OAuth2Item | SystemOAuth.CustomOAuth2Item;
 }
 
 export namespace SystemOAuth {

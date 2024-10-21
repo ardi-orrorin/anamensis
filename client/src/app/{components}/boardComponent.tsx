@@ -8,7 +8,7 @@ import MembersOnlyBody from "@/app/{components}/membersOnlyBody";
 import Blocked from "@/app/{components}/boards/blocked";
 import CalenderComponent from "@/app/{components}/boards/calender";
 import {Root} from "@/app/{services}/types";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 
 const BoardComponent = (props: Root.BoardListI & {favorites: string[], isLogin: boolean}) => {
     const {

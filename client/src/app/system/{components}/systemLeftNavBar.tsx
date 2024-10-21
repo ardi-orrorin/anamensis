@@ -20,6 +20,8 @@ const SystemLeftNavBar = () => {
                     <ListItem icon={faEnvelope} text={'SMTP'} href={'/system/smtp'}/>
                     <ListItem icon={faUser} text={'ACCOUNT'} href={'/system/account'}/>
                     <ListItem icon={faShieldHalved} text={'O-AUTH'} href={'/system/oauth'}/>
+                    <ListItem icon={faShieldHalved} text={'ACCOUNT-ROLES'} href={'/system/users-role'}/>
+                    <ListItem icon={faShieldHalved} text={'SYSTEM-MESSAGE'} href={'/system/message'}/>
                 </ul>
             </div>
         </nav>

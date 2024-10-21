@@ -1,4 +1,4 @@
-import ModalProvider, {ModalI} from "@/app/user/system/{services}/modalProvider";
+import ModalProvider, {ModalI} from "@/app/system/message/{services}/modalProvider";
 import React, {useContext, useEffect, useMemo, useState} from "react";
 import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import {faXmark} from "@fortawesome/free-solid-svg-icons/faXmark";
@@ -6,7 +6,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import apiCall, {ApiCallProps} from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 
 const Message = () => {
     const {modal, setModal} = useContext(ModalProvider);
@@ -26,7 +26,7 @@ const Message = () => {
         })
         const fetch = async () => {
             await apiCall({
-                path: '/api/user/sys-message/web-sys/' + modal.id,
+                path: '/api/config/sys-message/web-sys/' + modal.id,
                 method: 'GET',
             })
             .then(res => {
@@ -50,7 +50,7 @@ const Message = () => {
 
         const fetch = async () => {
            await apiCall({
-                path: '/api/user/sys-message',
+                path: '/api/config/sys-message',
                 method: 'GET',
                 call: 'Proxy',
                 params: {
@@ -127,7 +127,7 @@ const Message = () => {
     const submitMessageHandler = async (addItem: boolean, remove: boolean) => {
 
         let config: ApiCallProps = {
-            path: '/api/user/sys-message',
+            path: '/api/config/sys-message',
             method: 'POST',
         }
 

@@ -8,7 +8,7 @@ import {faCaretRight} from "@fortawesome/free-solid-svg-icons";
 import apiCall from "@/app/{commons}/func/api";
 import TextBox from "@/app/user/board-block/{components}/textBox";
 import {BoardBlocking} from "@/app/user/board-block/{services}/types";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 import {useQuery} from "@tanstack/react-query";
 import rootApiService from "@/app/{services}/rootApiService";
 import GlobalLoadingSpinner from "@/app/{commons}/GlobalLoadingSpinner";

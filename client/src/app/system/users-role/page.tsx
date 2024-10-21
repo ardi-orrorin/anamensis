@@ -6,9 +6,9 @@ import {AxiosError} from "axios";
 import {useSearchParams} from "next/navigation";
 import PageNavigator from "@/app/{commons}/PageNavigator";
 import useSWR from "swr";
-import Row from "@/app/user/users-role/{components}/row";
+import Row from "@/app/system/users-role/{components}/row";
 import {Common} from "@/app/{commons}/types/commons";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 
 export type UsersRole = {
     id       : number
@@ -31,9 +31,9 @@ export default function Page() {
 
     const maxIndex = useMemo(()=> page.total - ((page.page - 1) * page.size), [page]);
 
-    const {mutate} = useSWR(['/api/user/users-role', searchParams], async () => {
+    const {mutate} = useSWR(['/api/config/users-role', searchParams], async () => {
         return await apiCall<Common.PageResponse<UsersRole>>({
-            path : '/api/user/users-role',
+            path : '/api/config/users-role',
             method : 'GET',
             params : {
                 page: searchParams.get('page') || 1,
@@ -69,7 +69,7 @@ export default function Page() {
 
         try {
             const res = await apiCall({
-                path : '/api/user/users-role',
+                path : '/api/config/users-role',
                 method : 'PUT',
                 body,
                 isReturnData: true
@@ -112,7 +112,7 @@ export default function Page() {
 
         try {
             const res = await apiCall({
-                path : '/api/user/users-role',
+                path : '/api/config/users-role',
                 method : 'PUT',
                 body,
                 isReturnData: true
@@ -130,7 +130,10 @@ export default function Page() {
 
 
     return (
-        <div className={'flex w-full h-full flex-col gap-2'}>
+        <div className={'flex w-full h-full pb-4 flex-col gap-2'}>
+            <div className={'list-disc pb-2'}>
+                <li>유저 권한 관련 수정 페이지</li>
+            </div>
             <div className={'px-2 w-full flex gap-2 h-7'}>
                 {
                     select.length > 0
@@ -144,12 +147,12 @@ export default function Page() {
                             <option value={'USER'}>USER</option>
                             <option value={'GUEST'}>GUEST</option>
                         </select>
-                        <button className={'w-16 bg-blue-300 text-white rounded-md text-sm px-2 py-1'}
+                        <button className={'w-16 bg-blue-600 text-white rounded-md text-sm px-2 py-1'}
                               onClick={()=>onSaveRoles('add')}
                         >
                           저장
                         </button>
-                        <button className={'w-16 bg-red-700 text-white rounded-md text-sm px-2 py-1'}
+                        <button className={'w-16 bg-red-600 text-white rounded-md text-sm px-2 py-1'}
                                 onClick={()=>onSaveRoles('delete')}
                         >
                           삭제
@@ -169,7 +172,7 @@ export default function Page() {
                     <col style={{width: '10%'}}/>
                     <col style={{width: '10%'}}/>
                 </colgroup>
-                <thead className={'bg-main text-white h-9 align-middle'}>
+                <thead className={'bg-gray-700 text-white h-9 align-middle'}>
                     <tr className={'text-sm border-x border-white border-solid'}>
                         <th className={'border-x border-white border-solid'}>
                             <input className={'border-0 outline-0 text-lg'}

@@ -6,7 +6,6 @@ import {
     faBan,
     faClockRotateLeft,
     faEnvelope,
-    faEnvelopesBulk,
     faFilePowerpoint,
     faGear,
     faKey,
@@ -18,7 +17,7 @@ import {bodyScrollToggle} from "@/app/user/{services}/modalSetting";
 import {faTableList} from "@fortawesome/free-solid-svg-icons/faTableList";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import Image from "next/image";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 import {usePrefetchQuery, useQuery} from "@tanstack/react-query";
 import rootApiService from "@/app/{services}/rootApiService";
 import userApiService from "@/app/user/{services}/userApiService";
@@ -62,7 +61,6 @@ const LeftNavBar = ({
     const iconSize = 16;
     const menuItems: MenuItemType[] = [
         {name: 'SYSTEM', href:'/user/system', icon: faGear, role: System.Role.ADMIN},
-        {name: '권한관리', href:'/user/users-role', icon: faUserGear, role: System.Role.MASTER},
     ]
 
     const openToggle = useCallback(() => {

@@ -58,10 +58,3 @@ Default User
 ID: master
 PASSWORD: master
 ```
-
-## example site nextjs.env
-- [KaKao Login](https://developers.kakao.com/product/kakaoLogin)
-- [Google OAuth](https://cloud.google.com/apigee/docs/api-platform/security/oauth/oauth-home?hl=ko)
-- [Github OAuth](https://docs.github.com/ko/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps)
-- [Naver OAuth](https://developers.naver.com/docs/login/api/api.md)
-

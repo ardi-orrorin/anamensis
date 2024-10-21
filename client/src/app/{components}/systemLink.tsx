@@ -6,7 +6,7 @@ import {faGear} from "@fortawesome/free-solid-svg-icons";
 import React from "react";
 import {useQuery} from "@tanstack/react-query";
 import rootApiService from "@/app/{services}/rootApiService";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 import Role = System.Role;
 
 const SystemLink = () => {

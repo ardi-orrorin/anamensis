@@ -1,9 +1,9 @@
-import {UserStatus} from "@/app/{components}/chats/services/Status";
+import {UserStatus} from "@/app/{components}/modal/chats/services/Status";
 import React from "react";
 import {useQuery} from "@tanstack/react-query";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
-import {useWebSocket} from "@/app/{components}/chats/hook/useWebSocket";
-import {ActiveMenuEnum, useChatMenu} from "@/app/{components}/chats/hook/useChatMenu";
+import {useWebSocket} from "@/app/{components}/modal/chats/hook/useWebSocket";
+import {ActiveMenuEnum, useChatMenu} from "@/app/{components}/modal/chats/hook/useChatMenu";
 import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 const ProfileList = () => {

@@ -7,11 +7,13 @@ import com.anamensis.server.dto.response.LoginHistoryResponse;
 import com.anamensis.server.dto.response.StatusResponse;
 import com.anamensis.server.dto.response.UserResponse;
 import com.anamensis.server.entity.*;
+import com.anamensis.server.provider.RedisCacheProvider;
 import com.anamensis.server.provider.TokenProvider;
 import com.anamensis.server.resultMap.MemberResultMap;
 import com.anamensis.server.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,10 +24,11 @@ import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("api/user")
@@ -37,8 +40,9 @@ public class UserController {
     private final EmailVerifyService emailVerifyService;
     private final TokenProvider tokenProvider;
     private final FileService fileService;
+    private final RedisCacheProvider redisCacheService;
 
-    private final Set<SystemSetting> systemSettings;
+    private final Map<SystemSettingKey, SystemSetting> systemSettings;
 
 
     @MasterAPI
@@ -76,10 +80,7 @@ public class UserController {
             @RequestBody UserRequest.Login user
     ) {
 
-        boolean isEmailVerify = systemSettings.stream()
-            .filter(s -> s.getKey() == SystemSettingKey.SIGN_UP)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("signup setting is not found"))
+        boolean isEmailVerify = systemSettings.get(SystemSettingKey.SIGN_UP)
             .getValue().getBoolean("emailVerification");
 
         Mono<Member> member = userService.findUserByUserId(user.getUsername(), user.getPassword())
@@ -256,9 +257,13 @@ public class UserController {
 
     @GetMapping("info")
     public Mono<UserResponse.MyPage> info(
-            @AuthenticationPrincipal UserDetails userDetails
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestHeader(name = "Cache-Data", required = false) boolean cache
     ) {
-        return userService.findUserInfoCache(userDetails.getUsername());
+        return cache && redisCacheService.enable()
+            ? userService.findUserInfoCache(userDetails.getUsername())
+            : userService.findUserInfo(userDetails.getUsername())
+                .map(UserResponse.MyPage::transToMyPage);
     }
 
     @PutMapping("info")

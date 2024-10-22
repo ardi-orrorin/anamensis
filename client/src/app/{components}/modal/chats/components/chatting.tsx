@@ -1,12 +1,12 @@
-import {useChatMenu} from "@/app/{components}/chats/hook/useChatMenu";
-import {useWebSocket} from "@/app/{components}/chats/hook/useWebSocket";
+import {useChatMenu} from "@/app/{components}/modal/chats/hook/useChatMenu";
+import {useWebSocket} from "@/app/{components}/modal/chats/hook/useWebSocket";
 import moment from "moment";
 import React, {useCallback, useEffect, useMemo, useState} from "react";
-import {ChatSpace} from "@/app/{components}/chats/services/types";
+import {ChatSpace} from "@/app/{components}/modal/chats/services/types";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import {useQuery} from "@tanstack/react-query";
 import Image from "next/image";
-import {UserStatus} from "@/app/{components}/chats/services/Status";
+import {UserStatus} from "@/app/{components}/modal/chats/services/Status";
 import {Virtuoso} from "react-virtuoso";
 import {User} from "@/app/login/{services}/types";
 import ChatMessage = ChatSpace.ChatMessage;

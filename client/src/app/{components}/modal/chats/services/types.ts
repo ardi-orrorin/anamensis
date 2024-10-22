@@ -1,4 +1,4 @@
-import {StatusEnum} from "@/app/{components}/chats/services/Status";
+import {StatusEnum} from "@/app/{components}/modal/chats/services/Status";
 
 interface WebSocketResponseI<T> {
     type     : ChatSpace.WebSocketResponseType;

@@ -1,13 +1,13 @@
 import {useQuery} from "@tanstack/react-query";
 import userApiService from "@/app/user/{services}/userApiService";
-import React from "react";
+import React, {useState} from "react";
 import {PointSummaryI} from "@/app/user/{services}/userProvider";
 import {Table} from "@/app/user/point-history/{services}/types";
 import moment from "moment";
 import Link from "next/link";
 
 const RecentPoint = () => {
-    const {data: recentPoint } = useQuery(userApiService.pointSummary());
+    const {data: recentPoint } = useQuery(userApiService.pointSummary())
 
     return (
         <div className={'flex flex-col gap-2 border-b border-b-gray-200 border-solid pb-4'}>
@@ -17,7 +17,7 @@ const RecentPoint = () => {
                 </span>
                 <Link className={'text-xs text-gray-400'}
                     href={'/user/point-history'} >
-                    더보기
+                    전체보기
                 </Link>
 
             </h1>

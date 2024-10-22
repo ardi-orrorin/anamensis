@@ -34,9 +34,11 @@ export const SearchHistoryProvider = ({children}: {children: React.ReactNode}) =
     }, [searchHistory]);
 
     const removeSearchHistories = useCallback((keyword?: string) => {
-        if (!keyword) return setSearchHistory({...searchHistory, history: []});
+        if (!keyword) return setValue({...searchHistory, history: []});
+
         const newHistory = searchHistory?.history.filter(key => key !== keyword);
         const value = {...searchHistory, history: newHistory};
+
         setValue(value);
     }, [searchHistory]);
 

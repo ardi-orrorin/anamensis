@@ -15,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.redis.connection.ReactiveListCommands;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,18 +27,16 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 
+import java.io.PipedReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 @RestController
 @RequestMapping("api/boards")
 @RequiredArgsConstructor
-@Slf4j
 public class BoardController {
 
     private final BoardService boardService;
@@ -48,30 +49,25 @@ public class BoardController {
     private final BoardCommentService boardCommentService;
     private final BoardIndexService boardIndexService;
     private final ScheduleAlertService scheduleAlertService;
+    private final Map<SystemSettingKey, SystemSetting> systemSettings;
 
+    private boolean enableRedis() {
+        return systemSettings.get(SystemSettingKey.REDIS)
+            .getValue().getBoolean("enabled");
+    }
 
     @PublicAPI
     @GetMapping("")
     public Mono<PageResponse<BoardResponse.List>> findAll(
         Page page,
         BoardRequest.Params params,
-        @AuthenticationPrincipal UserDetails user
+        @AuthenticationPrincipal UserDetails user,
+        @RequestHeader(name = "Cache-Data", required = false) boolean cache
     ) {
 
         Flux<BoardResponse.List> list;
 
-        boolean condition = user == null
-            && page.getPage() == 1
-            && page.getSize() == 20
-            && params.getCategoryPk() == 0
-            && params.getType() == null
-            && params.getValue() == null
-            && params.getIsSelf() != null
-            && !params.getIsSelf()
-            && params.getIsFavorite() != null
-            && !params.getIsFavorite();
-
-        if(condition) {
+        if(cache && enableRedis()) {
             list = boardService.findOnePage();
         } else {
             list = user == null

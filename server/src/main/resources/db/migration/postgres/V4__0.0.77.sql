@@ -23,5 +23,8 @@ UPDATE anamensis.point_code
 INSERT INTO anamensis.point_code (id, name, point, init_value, is_use)
 VALUES (14,'sign_up', 100,  100, true);
 
+INSERT INTO system_settings (key, value, init_value, public)
+VALUES ('REDIS', '{"enabled": false, "host": "", "port": 6379}', '{"enabled": false, "host": "", "port": 6379}', FALSE);
+
 
 

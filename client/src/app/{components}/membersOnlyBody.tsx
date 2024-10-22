@@ -1,5 +1,5 @@
-import HeaderComponent from "@/app/{components}/headerComponent";
-import FooterComponent from "@/app/{components}/footerComponent";
+import HeaderComponent from "@/app/{components}/middleArea/headerComponent";
+import FooterComponent from "@/app/{components}/middleArea/footerComponent";
 import {Root} from "@/app/{services}/types";
 
 const MembersOnlyBody = (props: Root.BoardListI) => {

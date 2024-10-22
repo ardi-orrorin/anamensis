@@ -6,5 +6,5 @@ public enum SystemSettingKey {
     LOGIN,
     OAUTH,
     SITE,
-
+    REDIS,
 }

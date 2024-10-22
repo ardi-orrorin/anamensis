@@ -20,8 +20,8 @@ const WriteMenu = ({
             <div className={'flex gap-2 items-center text-sm font-bold py-2'}>
                 <FontAwesomeIcon icon={faPen} height={'16'} />
                 <span>
-                              글쓰기
-                        </span>
+                  글쓰기
+                </span>
             </div>
             <div className={'w-full flex flex-col items-center text-xs'}
                  data-testid={'write-menu'}

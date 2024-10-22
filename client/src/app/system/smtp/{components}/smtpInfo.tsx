@@ -68,7 +68,7 @@ export default function SmtpInfo() {
         save({enabled: !systemConfig?.smtp?.enabled});
     };
 
-    const inputStyle = 'outline-0 focus:bg-gray-700 focus:bg-opacity-15 px-2 py-1.5 text-sm duration-500 disabled:bg-gray-400 disabled:text-white';
+    const inputStyle = 'outline-0 focus:bg-gray-700 focus:bg-opacity-15 px-2 py-1.5 text-sm duration-500 drop-shadow disabled:bg-gray-400 disabled:text-white';
 
     return (
         <div className={'w-full'}>
@@ -110,7 +110,7 @@ export default function SmtpInfo() {
                        disabled={loading}
                        type={'password'}
                 />
-                <button className={['min-w-16 text-xs text-white p-2 duration-500',
+                <button className={['min-w-16 text-xs text-white p-2 duration-500 drop-shadow',
                     !loading ? 'bg-blue-600 hover:bg-blue-800' : 'bg-gray-400 hover:bg-gray-600'
                 ].join(' ')}
                         onClick={() => save({})}
@@ -118,7 +118,7 @@ export default function SmtpInfo() {
                 >
                     {loading ? <LoadingSpinner size={10}/> : '저장'}
                 </button>
-                <button className={['min-w-16 text-xs text-white p-2 duration-500',
+                <button className={['min-w-16 text-xs text-white p-2 duration-500 drop-shadow',
                     !loading ? 'bg-red-600 hover:bg-red-800' : 'bg-gray-400 hover:bg-gray-600'
                 ].join(' ')}
                         onClick={init}
@@ -138,7 +138,7 @@ export default function SmtpInfo() {
                     <h1 className={'text-sm text-gray-600'}>
                         활용 기능 목록
                     </h1>
-                    <button className={'text-xs'}
+                    <button className={'text-xs text-gray-500'}
                             onClick={() => setMoreDescription(!moreDescription)}
                     >
                         {moreDescription ? '접기' : '펼치기'}

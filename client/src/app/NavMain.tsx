@@ -5,7 +5,7 @@ import {cookies} from "next/headers";
 import {faRightToBracket} from "@fortawesome/free-solid-svg-icons/faRightToBracket";
 import Image from "next/image";
 import {Root} from "@/app/{services}/types";
-import ScheduleAlert from "@/app/{components}/scheduleAlert";
+import ScheduleAlert from "@/app/{components}/modal/scheduleAlert";
 import React from "react";
 import CustomImage from "@/app/{components}/customImage";
 import dynamic from "next/dynamic";

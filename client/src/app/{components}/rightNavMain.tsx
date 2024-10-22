@@ -1,6 +1,6 @@
 'use client';
 
-import ScheduleAlert from "@/app/{components}/scheduleAlert";
+import ScheduleAlert from "@/app/{components}/modal/scheduleAlert";
 import Link from "next/link";
 import SystemLink from "@/app/{components}/systemLink";
 import React from "react";

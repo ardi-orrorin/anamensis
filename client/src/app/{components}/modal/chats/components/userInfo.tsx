@@ -1,13 +1,13 @@
-import {useWebSocket} from "@/app/{components}/chats/hook/useWebSocket";
+import {useWebSocket} from "@/app/{components}/modal/chats/hook/useWebSocket";
 import Image from "next/image";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import {useQuery} from "@tanstack/react-query";
 import {useEffect, useMemo} from "react";
-import {ActiveMenuEnum, useChatMenu} from "@/app/{components}/chats/hook/useChatMenu";
+import {ActiveMenuEnum, useChatMenu} from "@/app/{components}/modal/chats/hook/useChatMenu";
 import apiCall from "@/app/{commons}/func/api";
 import {AxiosError} from "axios";
-import {StatusEnum, UserStatus} from "@/app/{components}/chats/services/Status";
-import {ChatSpace} from "@/app/{components}/chats/services/types";
+import {StatusEnum, UserStatus} from "@/app/{components}/modal/chats/services/Status";
+import {ChatSpace} from "@/app/{components}/modal/chats/services/types";
 import {useDefaultImage} from "@/app/{hooks}/useDefaultImage";
 
 const UserInfo = () => {

@@ -1,11 +1,11 @@
 'use client';
 
 import {createContext, useCallback, useContext, useEffect, useState} from "react";
-import {ChatSpace} from "@/app/{components}/chats/services/types";
+import {ChatSpace} from "@/app/{components}/modal/chats/services/types";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import {useQuery} from "@tanstack/react-query";
-import {StatusEnum} from "@/app/{components}/chats/services/Status";
-import chatApiService from "@/app/{components}/chats/services/apiServices";
+import {StatusEnum} from "@/app/{components}/modal/chats/services/Status";
+import chatApiService from "@/app/{components}/modal/chats/services/apiServices";
 import WebSocketResponseType = ChatSpace.WebSocketResponseType;
 import ChatListItem = ChatSpace.ChatListItem;
 import WebSocketResponse = ChatSpace.WebSocketResponse;

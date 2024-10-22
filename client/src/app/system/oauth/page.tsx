@@ -172,13 +172,13 @@ const Item = ({
 
                 </p>
             </div>
-            <input className={'w-96 p-2 outline-0 text-sm focus:bg-gray-200 duration-300'}
+            <input className={'w-96 p-2 outline-0 text-sm drop-shadow focus:bg-gray-200 duration-300'}
                    name={'clientId'}
                    value={oauth?.clientId}
                    placeholder={'clientId을 입력하세요'}
                    onChange={(e) => onChangeHandler(e, type)}
             />
-            <input className={'w-96 p-2 outline-0 text-sm focus:bg-gray-200 duration-300'}
+            <input className={'w-96 p-2 outline-0 text-sm drop-shadow focus:bg-gray-200 duration-300'}
                    name={'clientSecret'}
                    value={oauth?.clientSecret}
                    placeholder={'clientSecret을 입력하세요'}
@@ -186,7 +186,7 @@ const Item = ({
             />
             {
                 isCustom
-                && <input className={'w-96 p-2 outline-0 text-sm focus:bg-gray-200 duration-300'}
+                && <input className={'w-96 p-2 outline-0 text-sm drop-shadow focus:bg-gray-200 duration-300'}
                           name={'url'}
                           value={(oauth as SystemOAuth.CustomOAuth2Item)?.url }
                           placeholder={'server URL 주소를 입력하세요'}
@@ -197,7 +197,7 @@ const Item = ({
             <SystemToggle toggle={oauth?.enabled} onClick={() => onClickHandler(type)}/>
 
             <div className={'flex space-x-3 items-center'}>
-                <button className={`h-8 w-14 flex justify-center items-center ${isLoading ? 'bg-gray-700' : 'bg-blue-600'} rounded text-xs text-white`}
+                <button className={`h-8 w-14 flex justify-center items-center ${isLoading ? 'bg-gray-700' : 'bg-blue-600'} rounded text-xs text-white drop-shadow`}
                         onClick={() => save(type)}
                         disabled={isLoading}
                 >
@@ -207,7 +207,7 @@ const Item = ({
                             : '저장'
                     }
                 </button>
-                <button className={`h-8 w-14 flex justify-center items-center ${isLoading ? 'bg-gray-700' : 'bg-red-600'} rounded text-xs text-white`}
+                <button className={`h-8 w-14 flex justify-center items-center ${isLoading ? 'bg-gray-700' : 'bg-red-600'} rounded text-xs text-white drop-shadow`}
                         onClick={() => init(type)}
                         disabled={isLoading}
                 >

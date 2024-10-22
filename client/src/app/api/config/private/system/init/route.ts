@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
 
     try {
         const result = await apiCall({
-            path: '/master/system-settings/init',
+            path: '/master/api/system-settings/init',
             method: 'GET',
             call: 'Server',
             params,

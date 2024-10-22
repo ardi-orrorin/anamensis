@@ -1,5 +1,5 @@
 import apiCall from "@/app/{commons}/func/api";
-import {ChatSpace} from "@/app/{components}/chats/services/types";
+import {ChatSpace} from "@/app/{components}/modal/chats/services/types";
 
 const getUserInfoByUserId = async (userId: string) => {
     return await apiCall<ChatSpace.UserInfo>({

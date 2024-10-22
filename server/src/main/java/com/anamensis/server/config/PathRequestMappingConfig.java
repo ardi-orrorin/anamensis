@@ -9,7 +9,6 @@ import org.springframework.web.reactive.result.method.annotation.RequestMappingH
 
 import java.lang.reflect.Method;
 
-@Component
 public class PathRequestMappingConfig extends RequestMappingHandlerMapping {
 
     @Override

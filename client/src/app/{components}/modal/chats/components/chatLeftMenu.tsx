@@ -2,8 +2,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCircleInfo, faMessage, faUsers} from "@fortawesome/free-solid-svg-icons";
 import React from "react";
 import {IconProp} from "@fortawesome/fontawesome-svg-core";
-import {ActiveMenuEnum, useChatMenu} from "@/app/{components}/chats/hook/useChatMenu";
-import {useWebSocket} from "@/app/{components}/chats/hook/useWebSocket";
+import {ActiveMenuEnum, useChatMenu} from "@/app/{components}/modal/chats/hook/useChatMenu";
+import {useWebSocket} from "@/app/{components}/modal/chats/hook/useWebSocket";
 
 const ChatLeftMenu = () => {
 

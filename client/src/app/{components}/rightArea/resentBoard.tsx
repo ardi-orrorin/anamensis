@@ -1,4 +1,4 @@
-import React, {useMemo} from "react";
+import React, {Ref, RefObject, useEffect, useMemo, useRef, useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import userApiService from "@/app/user/{services}/userApiService";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -13,13 +13,24 @@ import {useRouter} from "next/navigation";
 const RecentBoard = () => {
     const {data: recentBoard} = useQuery(userApiService.boardSummery());
 
+    const [more, setMore] = useState(false);
+
+
+
     return (
         <div className={'flex flex-col gap-2 border-b border-b-gray-200 border-solid pb-4'}>
-            <h1 className={'text-sm font-bold'}>최근 작성한 게시글</h1>
-            <div className={'flex flex-col gap-2'}>
+            <div className={'flex gap-2 items-end'}>
+                <h1 className={'text-sm font-bold'}>최근 작성한 게시글</h1>
+                <button className={'text-xs text-gray-400'}
+                        onClick={() => setMore(!more)}
+                >
+                    {more ? '접기' : '더보기'}
+                </button>
+            </div>
+            <div className={`flex flex-col gap-2 overflow-y-hidden duration-700 ${more ? 'max-h-[450px]' : 'max-h-[90px]'}`}>
                 {
-                    recentBoard?.map((board) => (
-                        <Item key={`recent-board-${board.id}`} {...board}/>
+                    recentBoard?.map((board, index) => (
+                        <Item key={`recent-board-${board.id}`} {...board} />
                     ))
                 }
             </div>
@@ -29,7 +40,7 @@ const RecentBoard = () => {
 
 const Item = ({
     rate, categoryPk, createdAt, title, viewCount, id
-}: BoardSummaryI) => {
+}: BoardSummaryI ) => {
 
     const router = useRouter();
 

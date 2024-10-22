@@ -137,7 +137,7 @@ export default function Page() {
                     }
                 </div>
                 <div className={`space-x-2.5`}>
-                    <button className={'w-20 py-2 bg-blue-600 text-white text-sm rounded shadow disabled:bg-gray-500'}
+                    <button className={'w-20 py-2 bg-blue-600 text-white text-sm rounded drop-shadow disabled:bg-gray-500'}
                             onClick={() => onSaveHandler(-1)}
                     >
                         {
@@ -146,7 +146,7 @@ export default function Page() {
                                 : '모두 저장'
                         }
                     </button>
-                    <button className={'w-24 py-2 bg-gray-700 text-white text-sm rounded shadow disabled:bg-gray-500'}
+                    <button className={'w-24 py-2 bg-gray-700 text-white text-sm rounded drop-shadow disabled:bg-gray-500'}
                             onClick={() => onResetHandler(-1)}
                     >
                         {
@@ -191,7 +191,7 @@ const Row = ({
         <div className={'flex items-center gap-4'}>
             <div className={'relative h-[30px]'}>
                 <input
-                    className={'px-2 py-1 text-sm w-60 border border-solid border-gray-100 rounded outline-0 shadow focus:bg-gray-100 disabled:bg-gray-100'}
+                    className={'px-2 py-1 text-sm w-60 border border-solid border-gray-100 rounded outline-0 drop-shadow focus:bg-gray-100 disabled:bg-gray-100'}
                     name={'name'}
                     value={name}
                     disabled
@@ -203,7 +203,7 @@ const Row = ({
             </div>
             <div className={'relative h-[30px]'}>
                 <input
-                    className={'px-2 py-1 text-sm w-60 border border-solid border-gray-100 rounded outline-0 shadow focus:bg-gray-100 no-spinner'}
+                    className={'px-2 py-1 text-sm w-60 border border-solid border-gray-100 rounded outline-0 drop-shadow focus:bg-gray-100 no-spinner'}
                     type={'number'}
                     name={'point'}
                     value={point}
@@ -214,7 +214,7 @@ const Row = ({
                     현재값: {currentPoint?.point}
                 </span>
             </div>
-            <button className={'w-16 py-1 bg-blue-600 text-white text-sm rounded shadow disabled:bg-gray-500'}
+            <button className={'w-16 py-1 bg-blue-600 text-white text-sm rounded drop-shadow disabled:bg-gray-500'}
                     onClick={() => onSaveHandler(id)}
                     disabled={isLoading}
             >
@@ -224,7 +224,7 @@ const Row = ({
                         : '저장'
                 }
             </button>
-            <button className={'w-16 py-1 bg-red-600 text-white text-sm rounded shadow disabled:bg-gray-500'}
+            <button className={'w-16 py-1 bg-red-600 text-white text-sm rounded drop-shadow disabled:bg-gray-500'}
                     onClick={() => onCancelHandler(id)}
                     disabled={isLoading}
             >
@@ -234,7 +234,7 @@ const Row = ({
                         : '취소'
                 }
             </button>
-            <button className={'w-16 py-1 bg-gray-700 text-white text-sm rounded shadow disabled:bg-gray-500'}
+            <button className={'w-16 py-1 bg-gray-700 text-white text-sm rounded drop-shadow disabled:bg-gray-500'}
                     onClick={() => onResetHandler(id)}
                     disabled={isLoading}
             >

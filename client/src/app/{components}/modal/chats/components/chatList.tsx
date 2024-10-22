@@ -1,8 +1,8 @@
-import {useWebSocket} from "@/app/{components}/chats/hook/useWebSocket";
+import {useWebSocket} from "@/app/{components}/modal/chats/hook/useWebSocket";
 import React, {useEffect, useMemo} from "react";
-import {ChatSpace} from "@/app/{components}/chats/services/types";
+import {ChatSpace} from "@/app/{components}/modal/chats/services/types";
 import moment from "moment";
-import {ActiveMenuEnum, useChatMenu} from "@/app/{components}/chats/hook/useChatMenu";
+import {ActiveMenuEnum, useChatMenu} from "@/app/{components}/modal/chats/hook/useChatMenu";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import {useQuery} from "@tanstack/react-query";
 import {User} from "@/app/login/{services}/types";

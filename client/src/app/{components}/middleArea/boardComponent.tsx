@@ -1,12 +1,12 @@
 import Link from "next/link";
 import React, {useMemo} from "react";
-import DefaultBoardComponent from "@/app/{components}/boards/default";
-import AlttuelBoardComponent from "@/app/{components}/boards/alttuel";
-import AlbumBoardComponent from "@/app/{components}/boards/album";
-import QuestionBoardComponent from "@/app/{components}/boards/question";
+import DefaultBoardComponent from "@/app/{components}/middleArea/boards/default";
+import AlttuelBoardComponent from "@/app/{components}/middleArea/boards/alttuel";
+import AlbumBoardComponent from "@/app/{components}/middleArea/boards/album";
+import QuestionBoardComponent from "@/app/{components}/middleArea/boards/question";
 import MembersOnlyBody from "@/app/{components}/membersOnlyBody";
-import Blocked from "@/app/{components}/boards/blocked";
-import CalenderComponent from "@/app/{components}/boards/calender";
+import Blocked from "@/app/{components}/middleArea/boards/blocked";
+import CalenderComponent from "@/app/{components}/middleArea/boards/calender";
 import {Root} from "@/app/{services}/types";
 import {System} from "@/app/system/message/{services}/types";
 

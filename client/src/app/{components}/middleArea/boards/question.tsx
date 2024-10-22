@@ -1,7 +1,7 @@
 import {QuestionBlockExtraValueType} from "@/app/board/{components}/block/extra/questionBlock";
-import HeaderComponent from "@/app/{components}/headerComponent";
+import HeaderComponent from "@/app/{components}/middleArea/headerComponent";
 import React from "react";
-import FooterComponent from "@/app/{components}/footerComponent";
+import FooterComponent from "@/app/{components}/middleArea/footerComponent";
 import {Root} from "@/app/{services}/types";
 
 const QuestionBoardComponent = (props: Root.BoardListI) => {

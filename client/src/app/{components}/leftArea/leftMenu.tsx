@@ -12,10 +12,10 @@ import dynamic from "next/dynamic";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 import {useCusSearchParams} from "@/app/{hooks}/searchParamsHook";
 
-const DynamicProfileInfo = dynamic(() => import('@/app/{components}/profileInfo'), {
+const DynamicProfileInfo = dynamic(() => import('@/app/{components}/leftArea/profileInfo'), {
     loading: () => <div className={'h-[140px] flex items-center'}><LoadingSpinner size={30}/></div>,
     ssr: false});
-const DynamicWriteMenu = dynamic(() => import('@/app/{components}/writeMenu'), {
+const DynamicWriteMenu = dynamic(() => import('@/app/{components}/leftArea/writeMenu'), {
     loading: () => <div className={'h-[300px] flex items-center'}><LoadingSpinner size={30}/></div>,
     ssr: false});
 

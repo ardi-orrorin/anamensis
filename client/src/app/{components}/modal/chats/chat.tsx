@@ -2,18 +2,18 @@
 
 import {faCommentDots, faExpand, faMinimize} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {useWebSocket} from "@/app/{components}/chats/hook/useWebSocket";
-import {StatusEnum} from "@/app/{components}/chats/services/Status";
-import ProfileList from "@/app/{components}/chats/components/profileList";
-import ChatLeftMenu from "@/app/{components}/chats/components/chatLeftMenu";
-import {ActiveMenuEnum, useChatMenu} from "@/app/{components}/chats/hook/useChatMenu";
-import UserInfo from "@/app/{components}/chats/components/userInfo";
-import ChatList from "@/app/{components}/chats/components/chatList";
+import {useWebSocket} from "@/app/{components}/modal/chats/hook/useWebSocket";
+import {StatusEnum} from "@/app/{components}/modal/chats/services/Status";
+import ProfileList from "@/app/{components}/modal/chats/components/profileList";
+import ChatLeftMenu from "@/app/{components}/modal/chats/components/chatLeftMenu";
+import {ActiveMenuEnum, useChatMenu} from "@/app/{components}/modal/chats/hook/useChatMenu";
+import UserInfo from "@/app/{components}/modal/chats/components/userInfo";
+import ChatList from "@/app/{components}/modal/chats/components/chatList";
 import {useEffect, useState} from "react";
 import userInfoApiService from "@/app/user/info/{services}/userInfoApiService";
 import {useQuery} from "@tanstack/react-query";
 import {faWindowMinimize} from "@fortawesome/free-solid-svg-icons/faWindowMinimize";
-import Chatting from "@/app/{components}/chats/components/chatting";
+import Chatting from "@/app/{components}/modal/chats/components/chatting";
 import moment from "moment/moment";
 import {useHotkeys} from "react-hotkeys-hook";
 

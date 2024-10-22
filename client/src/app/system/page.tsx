@@ -94,14 +94,14 @@ export default function Page() {
                     예) example.com
                 </p>
                 <div className={'flex space-x-3.5'}>
-                    <input className={'w-96 p-2 text-sm outline-0 focus:bg-gray-200 duration-300'}
+                    <input className={'w-96 p-2 text-sm outline-0 duration-300 drop-shadow focus:bg-gray-200'}
                            name={'domain'}
                            placeholder={'http(s):// 제외하고 도메인만 입력하세요. example.com'}
                            value={setting?.domain}
                            onChange={onChangeHandler}
 
                     />
-                    <button className={'bg-blue-600 text-sm text-white py-2 w-14 disabled:bg-gray-500'}
+                    <button className={'bg-blue-600 text-sm text-white py-2 w-14 drop-shadow disabled:bg-gray-500'}
                             onClick={() => onSaveHandler('domain')}
                             disabled={loading.type === 'domain' && loading.status}
                     >
@@ -111,7 +111,7 @@ export default function Page() {
                                 : '저장'
                         }
                     </button>
-                    <button className={'bg-red-600 text-sm text-white py-2 w-14 disabled:bg-gray-500'}
+                    <button className={'bg-red-600 text-sm text-white py-2 w-14 drop-shadow disabled:bg-gray-500'}
                             onClick={() => onInitHandler('domain')}
                             disabled={loading.type === 'domain' && loading.status}
                     >
@@ -129,14 +129,14 @@ export default function Page() {
                     http(s):// 포함하여 입력하세요. https://example.com
                 </p>
                 <div className={'flex space-x-3.5'}>
-                    <input className={'w-96 p-2 text-sm outline-0 focus:bg-gray-200 duration-300'}
+                    <input className={'w-96 p-2 text-sm outline-0 drop-shadow focus:bg-gray-200 duration-300'}
                            name={'cdnUrl'}
                            placeholder={'http(s):// 포함하여 입력하세요. https://example.com'}
                            value={setting?.cdnUrl}
                            onChange={onChangeHandler}
 
                     />
-                    <button className={'bg-blue-600 text-sm text-white py-2 w-14 disabled:bg-gray-500'}
+                    <button className={'bg-blue-600 text-sm text-white py-2 w-14 drop-shadow disabled:bg-gray-500'}
                             onClick={() => onSaveHandler('cdnUrl')}
                             disabled={loading.type === 'domain' && loading.status}
                     >
@@ -146,7 +146,7 @@ export default function Page() {
                                 : '저장'
                         }
                     </button>
-                    <button className={'bg-red-600 text-sm text-white py-2 w-14 disabled:bg-gray-500'}
+                    <button className={'bg-red-600 text-sm text-white py-2 w-14 drop-shadow disabled:bg-gray-500'}
                             onClick={() => onInitHandler('cdnUrl')}
                             disabled={loading.type === 'cdnUrl' && loading.status}
                     >

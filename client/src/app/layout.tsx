@@ -10,9 +10,9 @@ import {cookies} from "next/headers";
 import LoginState from "@/app/loginState";
 import {SearchHistoryProvider} from "@/app/{hooks}/searchHisotryHook";
 import {SearchParamsProvider} from "@/app/{hooks}/searchParamsHook";
-import Chat from "@/app/{components}/chats/chat";
-import {WebSocketProvider} from "@/app/{components}/chats/hook/useWebSocket";
-import {ChatMenuProvider} from "@/app/{components}/chats/hook/useChatMenu";
+import Chat from "@/app/{components}/modal/chats/chat";
+import {WebSocketProvider} from "@/app/{components}/modal/chats/hook/useWebSocket";
+import {ChatMenuProvider} from "@/app/{components}/modal/chats/hook/useChatMenu";
 import {DefaultImageProvider} from "@/app/{hooks}/useDefaultImage";
 import GlobalState from "@/app/globalState";
 

@@ -8,7 +8,7 @@ export async function GET() {
 
     try {
         const result = await apiCall({
-            path: '/master/system-settings',
+            path: '/master/api/system-settings',
             method: 'GET',
             call: 'Server',
             setAuthorization: true,
@@ -34,7 +34,7 @@ export async function PUT(req: NextRequest) {
     const body = await req.json() as System.Request<any>;
 
     const result = await apiCall<boolean, System.Request<any>>({
-        path: '/master/system-settings',
+        path: '/master/api/system-settings',
         method: 'PUT',
         call: 'Server',
         setAuthorization: true,

@@ -74,7 +74,7 @@
 
     <update id="updateIsRead">
         UPDATE schedule_alert
-           SET is_read = 1
+           SET is_read = TRUE
          WHERE id      = #{id}
            AND user_id = #{userId}
            AND DATE(alert_time) <![CDATA[<=]]> DATE(NOW())

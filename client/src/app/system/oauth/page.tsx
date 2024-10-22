@@ -161,7 +161,10 @@ const Item = ({
                     link
                     && <div className={'list-item ms-4 text-sm text-gray-600 space-x-2'}>
                         <span>키 관련 안내 링크</span>
-                        <Link className={'text-blue-500 underline'} href={link}>이동</Link>
+                        <Link className={'text-blue-500 underline'}
+                              href={link}
+                              target={'_blank'}
+                        >이동</Link>
                     </div>
                 }
                 <p className={'list-item ms-4 text-sm text-gray-600 whitespace-pre-line'}>

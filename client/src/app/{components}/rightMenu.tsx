@@ -10,6 +10,8 @@ import {AxiosError} from "axios";
 import {useRouter} from "next/navigation";
 import {useSearchHistory} from "@/app/{hooks}/searchHisotryHook";
 import {useCusSearchParams} from "@/app/{hooks}/searchParamsHook";
+import RecentBoard from "@/app/{components}/resentBoard";
+import RecentPoint from "@/app/{components}/recentPoint";
 
 interface RightMenuProps {
     isLogin            : boolean;
@@ -20,8 +22,10 @@ const RightMenu = ({
 }: RightMenuProps) => {
     return (
         <div className={'sticky z-30 top-4 mt-4 flex flex-col gap-6'}>
-            {isLogin && <Alert /> }
+            { isLogin && <Alert /> }
             <SearchHistory />
+            { isLogin && <RecentBoard /> }
+            { isLogin && <RecentPoint /> }
         </div>
     );
 }
@@ -112,7 +116,7 @@ const SearchHistory = () => {
     const {setSearchValue, onSearchHandler} = useCusSearchParams();
 
     return (
-        <div className={'flex flex-col gap-2'}
+        <div className={'flex flex-col gap-2 border-b border-b-gray-200 border-solid pb-4'}
              data-testid={'right-menu-search-history-container'}
         >
             <h4 className={'text-sm font-bold'}>최근 검색 내역</h4>

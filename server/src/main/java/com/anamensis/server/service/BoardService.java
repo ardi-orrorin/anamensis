@@ -271,7 +271,7 @@ public class BoardService {
     private Mono<Boolean> updateSummaryList(long memberPk) {
         Page page = new Page();
         page.setPage(1);
-        page.setSize(8);
+        page.setSize(5);
 
         return Mono.fromCallable(() -> redisTemplate.delete("board:summary:member:" + memberPk))
             .flatMapIterable($ -> boardMapper.findByMemberPk(memberPk, page))

@@ -105,18 +105,13 @@ export default function Page() {
 
             res.status === StatusResponseStatusEnum.SUCCESS && refetch();
 
-
-
             setResult({index: id, status: res});
-
-
         } catch (e) {
             const err = e as AxiosError;
             alert(err.message);
         } finally {
             setLoading({} as LoadingType);
         }
-
     }
 
     if(!point) return <>Loading...</>;
@@ -214,7 +209,7 @@ const Row = ({
                     value={point}
                     onChange={(e) => onChangeHandler(e, id)}
                 />
-                <span className={'absolute flex h-full items-center top-0 right-3 text-xs text-gray-300'}
+                <span className={'absolute flex h-full items-center top-0 right-3 text-xs text-gray-500'}
                 >
                     현재값: {currentPoint?.point}
                 </span>

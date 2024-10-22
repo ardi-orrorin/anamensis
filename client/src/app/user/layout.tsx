@@ -1,17 +1,14 @@
 'use client';
 
 import React, {useEffect, useState} from "react";
-import LeftNavBar from "@/app/user/{components}/LeftNavBar";
 import Contents from "@/app/user/{components}/Contents";
-import UserProvider, {AttendInfoI, BoardSummaryI, PointSummaryI} from "@/app/user/{services}/userProvider";
-import {System} from "@/app/system/message/{services}/types";
 import dynamic from "next/dynamic";
 
 const DynamicLeftNavBar = dynamic(() => import('@/app/user/{components}/LeftNavBar'),{
     ssr: false
 });
 
-export default function Layout({children}: {children: React.ReactNode & {test:'1'}}) {
+export default function Layout({children}: {children: React.ReactNode}) {
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [isModalMode, setIsModalMode] = React.useState<boolean>(false);

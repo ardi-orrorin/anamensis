@@ -5,10 +5,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 public class PointCodeRequest {
 
     @Getter
-    @Setter
     public static class UpdateList {
         private Update[] list;
     }
@@ -32,4 +33,11 @@ public class PointCodeRequest {
             return pointCode;
         }
     }
+
+    @Getter
+    public static class Reset {
+        private List<Long> ids;
+        private boolean all;
+    }
+
 }

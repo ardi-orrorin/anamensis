@@ -12,6 +12,7 @@ public class PointCodeResponse {
         private long id;
         private String name;
         private long point;
+        private long initValue;
         private boolean editable;
 
         public static ListItem fromEntity(PointCode pointCode) {
@@ -19,6 +20,7 @@ public class PointCodeResponse {
                     .id(pointCode.getId())
                     .name(pointCode.getName())
                     .point(pointCode.getPoint())
+                    .initValue(pointCode.getInitValue())
                     .editable(pointCode.isEditable())
                     .build();
         }

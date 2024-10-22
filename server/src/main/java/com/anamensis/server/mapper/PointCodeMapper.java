@@ -16,4 +16,8 @@ public interface PointCodeMapper {
     int insert(PointCode pointCode);
 
     int update(PointCode pointCode);
+
+    int resetById(long id);
+
+    int reset();
 }

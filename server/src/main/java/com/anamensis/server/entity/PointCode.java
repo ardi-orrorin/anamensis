@@ -14,5 +14,5 @@ public class PointCode {
     private long point;
     private boolean isUse;
     private boolean editable;
-
+    private long initValue;
 }

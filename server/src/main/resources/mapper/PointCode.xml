@@ -47,4 +47,15 @@
         </set>
          WHERE id       = #{id}
     </update>
+
+    <update id="resetById">
+        UPDATE point_code
+           SET point = init_value
+         WHERE id    = #{id}
+    </update>
+
+    <update id="reset">
+        UPDATE point_code
+           SET point = init_value
+    </update>
 </mapper>

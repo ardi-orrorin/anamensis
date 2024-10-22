@@ -1,7 +1,9 @@
 package com.anamensis.server.controller;
 
+import com.anamensis.server.dto.StatusType;
 import com.anamensis.server.dto.request.PointCodeRequest;
 import com.anamensis.server.dto.response.PointCodeResponse;
+import com.anamensis.server.dto.response.StatusResponse;
 import com.anamensis.server.entity.PointCode;
 import com.anamensis.server.service.PointService;
 import lombok.RequiredArgsConstructor;
@@ -24,17 +26,41 @@ public class PointController {
     }
 
     @PutMapping("")
-    public Mono<Boolean> update(@RequestBody PointCodeRequest.UpdateList pointCodeList) {
-        return pointService.update(pointCodeList.getList());
+    public Mono<StatusResponse> update(@RequestBody PointCodeRequest.UpdateList pointCodeList) {
+        return pointService.update(pointCodeList.getList())
+            .flatMap(result -> {
+                StatusResponse statusResponse = StatusResponse.builder()
+                    .status(result ? StatusType.SUCCESS : StatusType.FAIL)
+                    .message("Updated Successfully")
+                    .build();
+
+                return Mono.just(statusResponse);
+            });
     }
 
-//    @GetMapping("/search")
-//    public Mono<List<PointCode>> selectByIdOrName(Mono<PointCode> pointCode) {
-//        return pointCode.flatMap(pointService::selectByIdOrName);
-//    }
+    @PutMapping("reset")
+    public Mono<StatusResponse> init(
+        @RequestBody PointCodeRequest.Reset reset
+    ) {
+        return Mono.defer(()->
+                reset.isAll()
+                ? pointService.reset()
+                : pointService.resetById(reset.getIds())
+        )
+        .flatMap(result -> {
+            StatusResponse statusResponse = StatusResponse.builder()
+                .status(result ? StatusType.SUCCESS : StatusType.FAIL)
+                .message("Reset Successfully")
+                .build();
+
+            return Mono.just(statusResponse);
+        });
+    }
 
     @PostMapping("")
     public Mono<Boolean> insert(@RequestBody PointCode pointCode) {
         return pointService.insert(pointCode);
     }
+
+
 }

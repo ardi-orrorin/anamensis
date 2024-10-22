@@ -5,7 +5,6 @@ import com.anamensis.server.dto.response.PointCodeResponse;
 import com.anamensis.server.entity.PointCode;
 import com.anamensis.server.mapper.PointCodeMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -33,7 +32,6 @@ public class PointService {
                 .map(pointCodeMapper::update)
                 .all(x -> x > 0)
                 .onErrorReturn(false);
-
     }
 
 
@@ -46,6 +44,18 @@ public class PointService {
         return Mono.fromCallable(() -> pointCodeMapper.insert(pointCode) > 0)
                 .onErrorReturn(false);
 
+    }
+
+    public Mono<Boolean> resetById(List<Long> ids) {
+        return Flux.fromIterable(ids)
+                .map(pointCodeMapper::resetById)
+                .all(x -> x > 0)
+                .onErrorReturn(false);
+    }
+
+    public Mono<Boolean> reset() {
+        return Mono.fromCallable(() -> pointCodeMapper.reset() > 0)
+                .onErrorReturn(false);
     }
 
 

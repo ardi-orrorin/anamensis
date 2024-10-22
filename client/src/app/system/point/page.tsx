@@ -4,12 +4,21 @@ import SystemContainer from "@/app/system/{components}/systemContainer";
 import {useQuery} from "@tanstack/react-query";
 import pointApiService from "@/app/system/point/{services}/apiService";
 import {SystemPoint} from "@/app/system/point/{services}/types";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {AxiosError} from "axios";
+import {Common} from "@/app/{commons}/types/commons";
+import StatusResponse = Common.StatusResponse;
+import StatusResponseStatusEnum = Common.StatusResponseStatusEnum;
+import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
 
 type LoadingType = {
     index   : number
     status  : boolean
+}
+
+type ResultType = {
+    index   : number;
+    status  : StatusResponse;
 }
 
 export default function Page() {
@@ -19,10 +28,10 @@ export default function Page() {
 
     const [loading, setLoading] = useState({} as LoadingType);
 
+    const [result, setResult] = useState({} as ResultType);
+
     useEffect(() => {
-        if(systemPoint){
-            setPoint(systemPoint);
-        }
+        setPoint(systemPoint);
     }, [systemPoint]);
 
     const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>, id: number) => {
@@ -47,19 +56,28 @@ export default function Page() {
             point.find(item => item.id === id)!!
         ] as SystemPoint.Point[] : point;
 
+        if(id !== -1) {
+            const evalPoint = point.find(item => item.id === id)!!.point
+                === systemPoint.find(point => point.id === id)!!.point;
 
-        setLoading({
-            ...loading,
-            [id]: true
-        });
+            if(evalPoint) return;
+        }
+
+        setLoading({index: id, status: true});
 
         try {
             const res = await pointApiService.updatePoints({body});
-            // todo: row졀로 변경 완료 됐다는 문구 옆에 표시
+
+            res.status === StatusResponseStatusEnum.SUCCESS && refetch();
+
+            setResult({index: id, status: res});
+
 
         } catch (e) {
             const err = e as AxiosError;
             alert(err.message);
+        } finally {
+            setLoading({} as LoadingType);
         }
     }
 
@@ -74,11 +92,37 @@ export default function Page() {
         });
     }
 
+    const onResetHandler = async (id: number) => {
+        const body: SystemPoint.RequestReset = id === -1
+            ? {ids: [0], all: true}
+            : {ids: [id], all: false};
+
+
+        setLoading({index: id, status: true});
+
+        try {
+            const res = await pointApiService.resetPoints({body});
+
+            res.status === StatusResponseStatusEnum.SUCCESS && refetch();
+
+
+
+            setResult({index: id, status: res});
+
+
+        } catch (e) {
+            const err = e as AxiosError;
+            alert(err.message);
+        } finally {
+            setLoading({} as LoadingType);
+        }
+
+    }
 
     if(!point) return <>Loading...</>;
 
     return (
-        <div>
+        <div className={''}>
             <SystemContainer headline={'시스템 포인트'}>
                 <div className={'list-disc'}>
                     <li>
@@ -91,19 +135,38 @@ export default function Page() {
                             return (
                                 <Row key={`system-point-${index}`}
                                      {...point}
-                                     {...loading}
-                                     {...{onChangeHandler, onSaveHandler, onCancelHandler}}
+                                     {...{loading, result, onChangeHandler, onSaveHandler, onCancelHandler, onResetHandler}}
                                 />
                             )
                         })
                     }
                 </div>
-                <div>
-                    <button className={'w-20 py-2 bg-blue-600 text-white text-sm rounded shadow'}
+                <div className={`space-x-2.5`}>
+                    <button className={'w-20 py-2 bg-blue-600 text-white text-sm rounded shadow disabled:bg-gray-500'}
                             onClick={() => onSaveHandler(-1)}
                     >
-                        모두 저장
+                        {
+                            loading.index === -1 && loading.status
+                                ? <LoadingSpinner size={10}/>
+                                : '모두 저장'
+                        }
                     </button>
+                    <button className={'w-24 py-2 bg-gray-700 text-white text-sm rounded shadow disabled:bg-gray-500'}
+                            onClick={() => onResetHandler(-1)}
+                    >
+                        {
+                            loading.index === -1 && loading.status
+                                ? <LoadingSpinner size={10}/>
+                                : '모두 초기화'
+                        }
+                    </button>
+                    {
+                        result?.index === -1
+                        && <span
+                        className={`text-sm ${result.status.status === StatusResponseStatusEnum.SUCCESS ? 'text-blue-500' : 'text-red-600'}`}>
+                            {result.status.status === StatusResponseStatusEnum.SUCCESS ? '저장 완료' : '저장 실패'}
+                        </span>
+                    }
                 </div>
 
             </SystemContainer>
@@ -112,36 +175,91 @@ export default function Page() {
 }
 
 const Row = ({
-    id, name, point, editable, index, status,
-    onChangeHandler, onSaveHandler, onCancelHandler
-}:  {
-    onChangeHandler : (e: React.ChangeEvent<HTMLInputElement>, id: number) => void
-    onSaveHandler   : (id: number) => void
-    onCancelHandler : (id: number) => void
-} & SystemPoint.Point & LoadingType) => {
+    id, name, point, initValue, editable, loading, result,
+    onChangeHandler, onSaveHandler,
+    onCancelHandler, onResetHandler
+}: {
+    loading: LoadingType
+    result: ResultType
+    onChangeHandler: (e: React.ChangeEvent<HTMLInputElement>, id: number) => void
+    onSaveHandler: (id: number) => void
+    onCancelHandler: (id: number) => void
+    onResetHandler  : (id: number) => void
+} & SystemPoint.Point) => {
+
+    const {data: systemPoint} = useQuery(pointApiService.getPoints());
+    const isLoading = useMemo(() => (loading.index === id || loading.index === -1) && loading.status, [loading, id]);
+
+    const currentPoint = useMemo(() => systemPoint?.find(points => points.id === id)  , [id, systemPoint]);
 
     return (
-        <div className={'flex gap-4'}>
-            <input className={'px-2 py-1 text-sm w-60 border border-solid border-gray-100 rounded outline-0 focus:bg-gray-100 disabled:bg-gray-200'}
-                   name={'name'}
-                   value={name}
-                   onChange={(e) => onChangeHandler(e, id)}
-                   disabled={!editable}
-            />
-            <input className={'px-2 py-1 text-sm w-60 border border-solid border-gray-100 rounded outline-0 shadow focus:bg-gray-100'}
-                   type={'number'}
-                   name={'point'}
-                   value={point}
-                   onChange={(e) => onChangeHandler(e, id)}
-            />
-            <button className={'w-16 py-1 bg-blue-600 text-white text-sm rounded shadow'}
+        <div className={'flex items-center gap-4'}>
+            <div className={'relative h-[30px]'}>
+                <input
+                    className={'px-2 py-1 text-sm w-60 border border-solid border-gray-100 rounded outline-0 shadow focus:bg-gray-100 disabled:bg-gray-100'}
+                    name={'name'}
+                    value={name}
+                    disabled
+                />
+                <span className={'absolute flex h-full items-center top-0 right-3 text-xs text-gray-500'}
+                >
+                    초기값 : {initValue}
+                </span>
+            </div>
+            <div className={'relative h-[30px]'}>
+                <input
+                    className={'px-2 py-1 text-sm w-60 border border-solid border-gray-100 rounded outline-0 shadow focus:bg-gray-100 no-spinner'}
+                    type={'number'}
+                    name={'point'}
+                    value={point}
+                    onChange={(e) => onChangeHandler(e, id)}
+                />
+                <span className={'absolute flex h-full items-center top-0 right-3 text-xs text-gray-300'}
+                >
+                    현재값: {currentPoint?.point}
+                </span>
+            </div>
+            <button className={'w-16 py-1 bg-blue-600 text-white text-sm rounded shadow disabled:bg-gray-500'}
                     onClick={() => onSaveHandler(id)}
-            >수정
+                    disabled={isLoading}
+            >
+                {
+                    isLoading
+                        ? <LoadingSpinner size={10}/>
+                        : '저장'
+                }
             </button>
-            <button className={'w-16 py-1 bg-red-600 text-white text-sm rounded shadow'}
+            <button className={'w-16 py-1 bg-red-600 text-white text-sm rounded shadow disabled:bg-gray-500'}
                     onClick={() => onCancelHandler(id)}
-            >취소
+                    disabled={isLoading}
+            >
+                {
+                    isLoading
+                        ? <LoadingSpinner size={10}/>
+                        : '취소'
+                }
             </button>
+            <button className={'w-16 py-1 bg-gray-700 text-white text-sm rounded shadow disabled:bg-gray-500'}
+                    onClick={() => onResetHandler(id)}
+                    disabled={isLoading}
+            >
+                {
+                    isLoading
+                        ? <LoadingSpinner size={10}/>
+                        : '초기값'
+                }
+            </button>
+            {
+                result?.index === id
+                && <span
+                className={`text-sm ${result.status.status === StatusResponseStatusEnum.SUCCESS ? 'text-blue-500' : 'text-red-600'}`}>
+                    {
+                        result.status.status === StatusResponseStatusEnum.SUCCESS
+                            ? '저장 완료'
+                            : '저장 실패'
+                    }
+                </span>
+            }
         </div>
     )
 

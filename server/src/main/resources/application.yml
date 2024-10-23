@@ -1,8 +1,4 @@
 spring:
-  data:
-    redis:
-      url: redis://${REDIS_URI:localhost:6379/1}
-
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${DB_URI:localhost:5432/anamensis}?currentSchema=anamensis&serverTimezone=${TIME_ZONE:Asia/Seoul}
@@ -51,11 +47,6 @@ jwt:
 file:
   storage:
     dir: ${FILE_STORAGE_DIR:/}
-
-db:
-  setting:
-    user:
-      attendance_point_code_prefix: attend-
 
 pageable:
   page: 1

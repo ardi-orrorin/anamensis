@@ -7,25 +7,25 @@ import MobileMenu from "@/app/{components}/mobileMenu";
 import {useCusSearchParams} from "@/app/{hooks}/searchParamsHook";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import {useRootHotKey} from "@/app/{hooks}/hotKey";
-import SearchInfo from "@/app/{components}/searchInfo";
+import SearchInfo from "@/app/{components}/leftArea/searchInfo";
 import {faBars} from "@fortawesome/free-solid-svg-icons";
 import {Virtuoso} from "react-virtuoso";
-import RightSubMenu from "@/app/{components}/rightSubMenu";
-import SearchHistory from "@/app/{components}/searchHistory";
-import SearchBox from "@/app/{components}/searchBox";
+import RightSubMenu from "@/app/{components}/modal/rightSubMenu";
+import SearchHistory from "@/app/{components}/rightArea/searchHistory";
+import SearchBox from "@/app/{components}/middleArea/searchBox";
 import {Root} from "@/app/{services}/types";
 import {Common} from "@/app/{commons}/types/commons";
 import {usePrefetchQuery, useQuery, useQueryClient} from "@tanstack/react-query";
 import rootApiService from "@/app/{services}/rootApiService";
 import dynamic from "next/dynamic";
-import LeftMenu from "@/app/{components}/leftMenu";
+import LeftMenu from "@/app/{components}/leftArea/leftMenu";
 import LoadingSpinner from "@/app/{commons}/LoadingSpinner";
-import RightMenu from "@/app/{components}/rightMenu";
-import Notices from "@/app/{components}/boards/notices";
-import {System} from "@/app/user/system/{services}/types";
+import RightMenu from "@/app/{components}/rightArea/rightMenu";
+import Notices from "@/app/{components}/middleArea/boards/notices";
+import {System} from "@/app/system/message/{services}/types";
 import systemApiServices from "@/app/system/{services}/apiServices";
 
-const DynamicBoardComponent = dynamic(() => import('@/app/{components}/boardComponent'), {
+const DynamicBoardComponent = dynamic(() => import('@/app/{components}/middleArea/boardComponent'), {
     loading: () => <Loading />
 });
 

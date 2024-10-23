@@ -21,7 +21,7 @@ public interface FileMapper {
 
     int updateIsUseById(
             @Param("id") long id,
-            @Param("isUse") int isUse
+            @Param("isUse") boolean isUse
     );
 
     int deleteByIds(long[] ids);

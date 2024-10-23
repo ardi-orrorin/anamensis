@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/master/system-settings")
+@RequestMapping("/master/api/system-settings")
 @Slf4j
 public class SystemSettingController {
 

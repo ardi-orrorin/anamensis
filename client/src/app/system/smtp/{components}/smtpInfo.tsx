@@ -6,11 +6,12 @@ import {SystemSMTP} from "@/app/system/smtp/{services}/types";
 import {useQuery} from "@tanstack/react-query";
 import systemApiServices from "@/app/system/{services}/apiServices";
 import {System} from "@/app/system/{services}/types";
+import {AxiosError} from "axios";
 
 export default function SmtpInfo() {
     const [smtp, setSmtp] = useState({} as SystemSMTP.Smtp);
     const [loading, setLoading] = useState(false);
-    const [response, setResponse] = useState({} as SystemSMTP.Response);
+    const [response, setResponse] = useState({} as System.StatusResponse);
     const [moreDescription, setMoreDescription] = useState(false);
 
     const {data: systemConfig, refetch: privateRefetch} = useQuery(systemApiServices.getPrivateSystemConfig());
@@ -39,7 +40,8 @@ export default function SmtpInfo() {
                 setResponse({status: 'success', message: '저장되었습니다.'});
             })
             .catch((e) => {
-                setResponse({status: 'error', message: '저장에 실패했습니다.'});
+                const err = e as AxiosError;
+                setResponse({status: 'error', message: err.response?.data as string});
             })
             .finally(() => {
                 setLoading(false);
@@ -56,7 +58,8 @@ export default function SmtpInfo() {
                 setResponse({status: 'success', message: '초기화되었습니다.'});
             })
             .catch((e) => {
-                setResponse({status: 'error', message: '초기화에 실패했습니다.'});
+                const err = e as AxiosError;
+                setResponse({status: 'error', message: err.response?.data as string});
             })
             .finally(() => {
                 setLoading(false);
@@ -68,7 +71,7 @@ export default function SmtpInfo() {
         save({enabled: !systemConfig?.smtp?.enabled});
     };
 
-    const inputStyle = 'outline-0 focus:bg-gray-700 focus:bg-opacity-15 px-2 py-1.5 text-sm duration-500 disabled:bg-gray-400 disabled:text-white';
+    const inputStyle = 'outline-0 focus:bg-gray-700 focus:bg-opacity-15 px-2 py-1.5 text-sm duration-500 drop-shadow disabled:bg-gray-400 disabled:text-white';
 
     return (
         <div className={'w-full'}>
@@ -110,7 +113,7 @@ export default function SmtpInfo() {
                        disabled={loading}
                        type={'password'}
                 />
-                <button className={['min-w-16 text-xs text-white p-2 duration-500',
+                <button className={['min-w-16 text-xs text-white p-2 duration-500 drop-shadow',
                     !loading ? 'bg-blue-600 hover:bg-blue-800' : 'bg-gray-400 hover:bg-gray-600'
                 ].join(' ')}
                         onClick={() => save({})}
@@ -118,7 +121,7 @@ export default function SmtpInfo() {
                 >
                     {loading ? <LoadingSpinner size={10}/> : '저장'}
                 </button>
-                <button className={['min-w-16 text-xs text-white p-2 duration-500',
+                <button className={['min-w-16 text-xs text-white p-2 duration-500 drop-shadow',
                     !loading ? 'bg-red-600 hover:bg-red-800' : 'bg-gray-400 hover:bg-gray-600'
                 ].join(' ')}
                         onClick={init}
@@ -138,7 +141,7 @@ export default function SmtpInfo() {
                     <h1 className={'text-sm text-gray-600'}>
                         활용 기능 목록
                     </h1>
-                    <button className={'text-xs'}
+                    <button className={'text-xs text-gray-500'}
                             onClick={() => setMoreDescription(!moreDescription)}
                     >
                         {moreDescription ? '접기' : '펼치기'}

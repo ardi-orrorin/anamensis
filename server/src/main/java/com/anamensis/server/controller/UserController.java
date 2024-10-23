@@ -7,6 +7,7 @@ import com.anamensis.server.dto.response.LoginHistoryResponse;
 import com.anamensis.server.dto.response.StatusResponse;
 import com.anamensis.server.dto.response.UserResponse;
 import com.anamensis.server.entity.*;
+import com.anamensis.server.provider.RedisCacheProvider;
 import com.anamensis.server.provider.TokenProvider;
 import com.anamensis.server.resultMap.MemberResultMap;
 import com.anamensis.server.service.*;
@@ -17,32 +18,31 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("api/user")
-@Slf4j
 public class UserController {
 
     private final UserService userService;
     private final OTPService otpService;
-    private final AttendanceService attendanceService;
     private final LoginHistoryService loginHistoryService;
     private final EmailVerifyService emailVerifyService;
     private final TokenProvider tokenProvider;
     private final FileService fileService;
-    private final PointService ps;
-    private final PointHistoryService phs;
-    private final TableCodeService tableCodeService;
+    private final RedisCacheProvider redisCacheService;
+
+    private final Map<SystemSettingKey, SystemSetting> systemSettings;
 
 
     @MasterAPI
@@ -80,12 +80,15 @@ public class UserController {
             @RequestBody UserRequest.Login user
     ) {
 
+        boolean isEmailVerify = systemSettings.get(SystemSettingKey.SIGN_UP)
+            .getValue().getBoolean("emailVerification");
+
         Mono<Member> member = userService.findUserByUserId(user.getUsername(), user.getPassword())
                 .subscribeOn(Schedulers.boundedElastic())
                 .share();
 
         Mono<String> emailVerifyResult = member.flatMap(u -> {
-                    if(AuthType.EMAIL.equals(u.getSAuthType())) {
+                    if(AuthType.EMAIL.equals(u.getSAuthType()) && isEmailVerify) {
                         EmailVerify emailVerify = new EmailVerify();
                         emailVerify.setEmail(u.getEmail());
                         return emailVerifyService.insert(emailVerify);
@@ -95,8 +98,8 @@ public class UserController {
 
         return Mono.zip(member, emailVerifyResult)
                 .map(t -> UserResponse.Auth.builder()
-                       .authType(t.getT1().getSAuthType())
-                       .verity(t.getT1().getSAuth())
+                       .authType(isEmailVerify ? t.getT1().getSAuthType() : AuthType.NONE)
+                       .verity(isEmailVerify && t.getT1().getSAuth())
                        .build()
                 );
     }
@@ -166,19 +169,7 @@ public class UserController {
             .subscribeOn(Schedulers.boundedElastic())
             .subscribe();
 
-        return notAuth(member, token)
-            .publishOn(Schedulers.boundedElastic())
-            .doOnNext(t -> {
-                member.flatMap(u ->
-                    attendanceService.exist(u.getMemberPk())
-                        .flatMap(b -> {
-                            if (b) return Mono.just(true);
-                            return addAttendanceAndPoint(u.getMember())
-                                .flatMap(b1 -> attendanceService.init(u.getMemberPk()));
-                        })
-                )
-                .subscribe();
-            });
+        return notAuth(member, token);
     }
 
 
@@ -188,44 +179,13 @@ public class UserController {
             @Valid @RequestBody
             UserRequest.Register user
     ) {
-        AtomicReference<Member> member = new AtomicReference<>();
-
         return userService.saveUser(user, false)
-                .doOnNext(member::set)
-                .flatMap(u -> attendanceService.init(u.getId()))
-                .publishOn(Schedulers.boundedElastic())
-                .then(Mono.fromCallable(() -> UserResponse.Status
-                          .transToStatus(HttpStatus.CREATED, "User created"))
-                )
-                .publishOn(Schedulers.boundedElastic())
-                .doOnNext(s -> {
-                    if(!s.getStatus().equals(HttpStatus.CREATED)) return;
-                    addAttendanceAndPoint(member.get())
-                        .subscribe();
-                });
-    }
+            .flatMap(m -> {
+                UserResponse.Status res = UserResponse.Status
+                    .transToStatus(HttpStatus.CREATED, "User created");
 
-    private Mono<Boolean> addAttendanceAndPoint(Member member) {
-        return ps.selectByIdOrName("1")
-            .publishOn(Schedulers.boundedElastic())
-            .doOnNext(p -> {
-                userService.updatePoint(member.getId(), p.getPoint())
-                    .flatMap($ -> userService.findUserInfoCache(member.getUserId()))
-                    .flatMap(b ->
-                        tableCodeService.findByIdByTableName(0, "attendance")
-                            .flatMap(t -> {
-                                PointHistory ph = new PointHistory();
-                                ph.setMemberPk(member.getId());
-                                ph.setPointCodePk(p.getId());
-                                ph.setTableCodePk(t.getId());
-                                ph.setTableRefPk(member.getId());
-                                ph.setCreateAt(LocalDateTime.now());
-                                return phs.insert(ph);
-                            })
-                    )
-                    .subscribe();
-            })
-            .flatMap(b -> Mono.just(true));
+                return Mono.just(res);
+            });
     }
 
     @PublicAPI
@@ -297,9 +257,13 @@ public class UserController {
 
     @GetMapping("info")
     public Mono<UserResponse.MyPage> info(
-            @AuthenticationPrincipal UserDetails userDetails
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestHeader(name = "Cache-Data", required = false) boolean cache
     ) {
-        return userService.findUserInfoCache(userDetails.getUsername());
+        return cache && redisCacheService.enable()
+            ? userService.findUserInfoCache(userDetails.getUsername())
+            : userService.findUserInfo(userDetails.getUsername())
+                .map(UserResponse.MyPage::transToMyPage);
     }
 
     @PutMapping("info")

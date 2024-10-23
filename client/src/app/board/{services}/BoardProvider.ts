@@ -21,8 +21,6 @@ export interface BoardProviderI {
     setBoard: Dispatch<SetStateAction<BoardService>>
     comment: CommentI[];
     setComment: Dispatch<SetStateAction<CommentI[]>>
-    rateInfo: RateInfoI;
-    setRateInfo: Dispatch<SetStateAction<RateInfoI>>;
     newComment: SaveComment;
     setNewComment: Dispatch<SetStateAction<SaveComment>>;
     deleteComment: DeleteCommentI;

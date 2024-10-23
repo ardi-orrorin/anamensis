@@ -1,7 +1,6 @@
 'use client';
 
 import {createContext, useContext, useEffect} from "react";
-import rootApiService from "@/app/{services}/rootApiService";
 import {useQuery} from "@tanstack/react-query";
 import systemApiServices from "@/app/system/{services}/apiServices";
 
@@ -14,7 +13,6 @@ const DefaultImageContext = createContext<DefaultImageContextI>({} as DefaultIma
 export const DefaultImageProvider = ({children}: {children: React.ReactNode}) => {
 
     const {data} = useQuery(systemApiServices.getPublicSystemConfig());
-
 
     const defaultProfile = (img: string | undefined | null) =>
         defaultImage({img, defaultImg: '/static/default_profile.jpg'});
@@ -29,6 +27,8 @@ export const DefaultImageProvider = ({children}: {children: React.ReactNode}) =>
         img: string | undefined | null,
         defaultImg: string
     }): string => {
+        if(!data?.site?.cdnUrl) return defaultImg;
+
         const condition = img && img !== 'nullnull' && img.length > 0;
 
         const existCDNServerUrl = data?.site?.cdnUrl

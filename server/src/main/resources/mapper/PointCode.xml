@@ -10,6 +10,7 @@
     </sql>
     <select id="selectAll"  resultType="PointCode">
         <include refid="tbl_point_code" />
+        ORDER BY id
     </select>
     
     <select id="selectByIdOrName" resultType="PointCode">
@@ -30,20 +31,31 @@
             SELECT currval('point_code_id_seq')
         </selectKey>
         INSERT INTO point_code
-               (name, point)
-        VALUES (#{name}, #{point})
+               (name, point, editable)
+        VALUES (#{name}, #{point}, TRUE)
     </insert>
 
     <update id="update" parameterType="PointCode">
         UPDATE point_code
         <set>
             <if test="name != null and name != ''">
-                name = #{name},
+                name  = #{name},
             </if>
             <if test="point != null and point != 0">
                 point = #{point}
             </if>
         </set>
-         WHERE id = #{id}
+         WHERE id       = #{id}
+    </update>
+
+    <update id="resetById">
+        UPDATE point_code
+           SET point = init_value
+         WHERE id    = #{id}
+    </update>
+
+    <update id="reset">
+        UPDATE point_code
+           SET point = init_value
     </update>
 </mapper>

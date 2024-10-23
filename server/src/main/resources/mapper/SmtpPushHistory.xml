@@ -4,18 +4,16 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.anamensis.server.mapper.SmtpPushHistoryMapper">
-    <select id="findByMemberPk" resultType="com.anamensis.server.resultMap.SmtpPushHistoryResultMap$ListSmtpPushHistory">
-        SELECT id, subject, create_at, status, message
+    <select id="findAll" resultType="SmtpPushHistory">
+        SELECT *
           FROM smtp_push_history
-         WHERE member_pk = #{memberPk}
          ORDER BY id DESC
-        OFFSET #{page.offset}
-         LIMIT #{page.size}
+        OFFSET #{offset}
+         LIMIT #{size}
     </select>
-    <select id="countByMemberPk" resultType="Long">
-        SELECT COALESCE(SUM(count), 0)
-          FROM smtp_push_history_count
-         WHERE member_pk = #{memberPk}
+    <select id="count" resultType="Long">
+        SELECT COUNT(*)
+          FROM smtp_push_history
     </select>
     <select id="findById" resultType="SmtpPushHistory">
         SELECT *

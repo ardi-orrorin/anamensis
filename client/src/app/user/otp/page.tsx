@@ -8,7 +8,7 @@ import OTPMain from "@/app/user/otp/{components}/OTPMain";
 import apiCall from "@/app/{commons}/func/api";
 import UserProvider from "@/app/user/{services}/userProvider";
 import {OTP} from "@/app/user/otp/{services}/types";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 import {useQuery} from "@tanstack/react-query";
 import rootApiService from "@/app/{services}/rootApiService";
 

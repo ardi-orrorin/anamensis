@@ -54,7 +54,7 @@ class PointHistoryMapperTest {
         ph.setTableCodePk(tableCode.getId());
         ph.setTableRefPk(member.getId());
         ph.setPointCodePk(pointCode.getId());
-        ph.setCreateAt(LocalDateTime.now());
+        ph.setCreatedAt(LocalDateTime.now());
 
         assertEquals(1, pointHistoryMapper.insert(ph));
     }
@@ -73,7 +73,7 @@ class PointHistoryMapperTest {
         ph.setTableCodePk(tableCode.getId());
         ph.setTableRefPk(member.getId());
         ph.setPointCodePk(pointCode.getId());
-        ph.setCreateAt(LocalDateTime.now());
+        ph.setCreatedAt(LocalDateTime.now());
 
         assertEquals(1, pointHistoryMapper.insert(ph));
 

@@ -6,6 +6,9 @@ if [ -f "$APPLICATION_PATH" ]; then
   java -Djava.net.preferIPv4Stack=true \
         -jar app.jar \
         --spring.config.location=application.yml &
+elif [ -n "$JWT_SECRET_KEY" ]; then
+  java -Djava.net.preferIPv4Stack=true \
+          -jar app.jar &
 else
   java -Djava.net.preferIPv4Stack=true \
        -DJWT_SECRET_KEY=$(cat /run/secrets/jwt_secret) \

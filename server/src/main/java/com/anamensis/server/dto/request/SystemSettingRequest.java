@@ -2,7 +2,6 @@ package com.anamensis.server.dto.request;
 
 
 import com.anamensis.server.entity.SystemSettingKey;
-import lombok.Getter;
 import org.json.JSONObject;
 
 import java.util.Map;

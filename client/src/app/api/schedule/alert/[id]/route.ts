@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 
         return ExNextResponse({
             body: JSON.stringify(err.response?.data),
-            status: err.response?.status || 500,
+            status: err.response?.status ?? 500,
         })
     }
 

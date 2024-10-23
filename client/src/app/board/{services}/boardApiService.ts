@@ -60,19 +60,10 @@ const deleteFile = async (fileUri: string) => {
     });
 }
 
- const getRateInfo = async (boardId: string) => {
-     return await apiCall<RateInfoI>({
-         path: '/api/board/rate/' + boardId,
-         method: 'GET',
-         call: 'Proxy'
-     })
- }
-
 const boardApiService = {
     getTemplates,
     getComments,
     deleteFile,
-    getRateInfo,
 }
 
 export default boardApiService;

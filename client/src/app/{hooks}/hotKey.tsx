@@ -3,7 +3,7 @@ import {RefObject} from 'react';
 import {Category} from "@/app/board/{services}/types";
 import {Options} from "react-hotkeys-hook/src/types";
 import {AppRouterInstance} from "next/dist/shared/lib/app-router-context.shared-runtime";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 
 export const useRootHotKey = ({
     searchRef,

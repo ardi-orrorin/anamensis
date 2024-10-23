@@ -2,17 +2,16 @@ package com.anamensis.server.controller;
 
 import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.PageResponse;
-import com.anamensis.server.dto.SelectAnswerQueueDto;
 import com.anamensis.server.dto.StatusType;
 import com.anamensis.server.dto.request.BoardRequest;
 import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.dto.response.StatusResponse;
 import com.anamensis.server.entity.*;
 import com.anamensis.server.exception.AuthorizationException;
+import com.anamensis.server.provider.RedisCacheProvider;
 import com.anamensis.server.resultMap.BoardResultMap;
 import com.anamensis.server.service.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -26,21 +25,16 @@ import reactor.util.function.Tuple2;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
 @RequestMapping("api/boards")
 @RequiredArgsConstructor
-@Slf4j
 public class BoardController {
 
     private final BoardService boardService;
     private final UserService userService;
-    private final RateService rateService;
     private final PointHistoryService pointHistoryService;
     private final PointService pointService;
     private final TableCodeService tableCodeService;
@@ -48,30 +42,21 @@ public class BoardController {
     private final BoardCommentService boardCommentService;
     private final BoardIndexService boardIndexService;
     private final ScheduleAlertService scheduleAlertService;
+    private final RedisCacheProvider redisCacheProvider;
 
-
+    
     @PublicAPI
     @GetMapping("")
     public Mono<PageResponse<BoardResponse.List>> findAll(
         Page page,
         BoardRequest.Params params,
-        @AuthenticationPrincipal UserDetails user
+        @AuthenticationPrincipal UserDetails user,
+        @RequestHeader(name = "Cache-Data", required = false) boolean cache
     ) {
 
         Flux<BoardResponse.List> list;
 
-        boolean condition = user == null
-            && page.getPage() == 1
-            && page.getSize() == 20
-            && params.getCategoryPk() == 0
-            && params.getType() == null
-            && params.getValue() == null
-            && params.getIsSelf() != null
-            && !params.getIsSelf()
-            && params.getIsFavorite() != null
-            && !params.getIsFavorite();
-
-        if(condition) {
+        if(cache && redisCacheProvider.enable()) {
             list = boardService.findOnePage();
         } else {
             list = user == null
@@ -81,10 +66,6 @@ public class BoardController {
         }
 
         return list
-            .flatMap(b -> rateService.countRate(b.getId())
-                .doOnNext(b::setRate)
-                .map($ -> b)
-            )
             .subscribeOn(Schedulers.boundedElastic())
             .collectList()
             .map(l -> new PageResponse<>(page, l));
@@ -103,12 +84,9 @@ public class BoardController {
                 .subscribeOn(Schedulers.boundedElastic())
                 .share();
 
-        Mono<BoardResultMap.Board> content = user == null
+        Mono<BoardResultMap.Board> content = user == null || !redisCacheProvider.enable()
             ? boardService.findByPk(boardPk)
             : member.flatMap(u -> boardService.cacheFindByPk(boardPk));
-
-        Mono<Long> count = rateService.countRate(boardPk)
-            .subscribeOn(Schedulers.boundedElastic());
 
         return Mono.zip(content, member)
             .flatMap(t -> {
@@ -124,14 +102,6 @@ public class BoardController {
                 }
 
                 return Mono.just(BoardResponse.Content.from(board, m));
-            })
-            .zipWith(count)
-            .doOnNext(t -> t.getT1().setRate(t.getT2()))
-            .map(Tuple2::getT1)
-            .doOnNext($ -> {
-                boardService.viewUpdateByPk(boardPk)
-                    .subscribeOn(Schedulers.boundedElastic())
-                    .subscribe();
             });
     }
 
@@ -158,11 +128,13 @@ public class BoardController {
         @AuthenticationPrincipal UserDetails user
     ) {
         return userService.findUserByUserId(user.getUsername())
-                .flatMapMany(u -> boardService.findSummaryList(u.getId()))
-                .flatMap(b -> rateService.countRate(b.getId())
-                    .doOnNext(b::setRate)
-                    .map($ -> b)
-                )
+                .flatMapMany(u -> {
+                    if(redisCacheProvider.enable()) {
+                        return boardService.findSummaryListCache(u.getId());
+                    }
+
+                    return boardService.findSummaryList(u.getId());
+                })
                 .collectList();
     }
 
@@ -172,7 +144,12 @@ public class BoardController {
         @PathVariable(name = "userId") String userId
     ) {
         return userService.findUserByUserId(userId)
-            .flatMapMany(u -> boardService.findSummaryList(u.getId()))
+            .flatMapMany(u -> {
+                if(redisCacheProvider.enable()) {
+                    return boardService.findSummaryListCache(u.getId());
+                }
+                return boardService.findSummaryList(u.getId());
+            })
             .collectList();
     }
 
@@ -192,7 +169,7 @@ public class BoardController {
                 return Mono.error(new RuntimeException("공지사항은 관리자 권한이 필요합니다."));
         }
 
-        Mono<PointCode> pointCode = pointService.selectByIdOrTableName("board")
+        Mono<PointCode> pointCode = pointService.selectByTableName("board")
                 .subscribeOn(Schedulers.boundedElastic());
 
         Mono<TableCode> tableCode = tableCodeService.findByIdByTableName(0, "board")
@@ -210,18 +187,20 @@ public class BoardController {
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(b -> {
                     Mono.zip(pointCode, tableCode)
-                        .publishOn(Schedulers.boundedElastic())
                         .doOnNext(t -> {
-                            userService.updatePoint(b.getMemberPk(), (int) t.getT1().getPoint())
-                                    .subscribeOn(Schedulers.boundedElastic())
-                                    .subscribe();
 
                             PointHistory ph = new PointHistory();
                             ph.setMemberPk(b.getMemberPk());
                             ph.setPointCodePk(t.getT1().getId());
-                            ph.setCreateAt(b.getCreateAt());
+                            ph.setCreatedAt(b.getCreateAt());
                             ph.setTableCodePk(t.getT2().getId());
                             ph.setTableRefPk(t.getT1().getId());
+                            ph.setValue(t.getT1().getPoint());
+
+                            userService.updatePoint(b.getMemberPk(), t.getT1().getPoint())
+                                    .flatMap($ -> userService.addUserInfoCache(user.getUsername()))
+                                    .subscribeOn(Schedulers.boundedElastic())
+                                    .subscribe();
 
                             pointHistoryService.insert(ph)
                                     .subscribeOn(Schedulers.boundedElastic())
@@ -235,6 +214,7 @@ public class BoardController {
 
                             board.setId(b.getId());
                             boardIndexService.save(board.toEntity())
+                                .subscribeOn(Schedulers.boundedElastic())
                                 .subscribe();
 
                         })
@@ -252,6 +232,8 @@ public class BoardController {
                                 .subscribe();
                         })
                         .doOnNext($ -> {
+                            if(!redisCacheProvider.enable()) return;
+
                             userService.addUserInfoCache(user.getUsername())
                                 .subscribe();
                         })
@@ -391,7 +373,7 @@ public class BoardController {
     }
 
     private Mono<Tuple2<PointCode, TableCode>> insertQnAPointHistory(long memberPk, int point) {
-        Mono<PointCode> qnaPointCode = pointService.selectByIdOrTableName("q&a")
+        Mono<PointCode> qnaPointCode = pointService.selectByTableName("q&a")
             .share()
             .subscribeOn(Schedulers.boundedElastic());
 
@@ -405,7 +387,7 @@ public class BoardController {
                 PointHistory ph = new PointHistory();
                 ph.setMemberPk(memberPk);
                 ph.setPointCodePk(t.getT1().getId());
-                ph.setCreateAt(LocalDateTime.now());
+                ph.setCreatedAt(LocalDateTime.now());
                 ph.setTableCodePk(t.getT2().getId());
                 ph.setTableRefPk(t.getT1().getId());
                 ph.setValue(point);

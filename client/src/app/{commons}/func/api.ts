@@ -1,10 +1,9 @@
 import axios, {AxiosHeaders, AxiosRequestConfig, AxiosResponse} from "axios";
-import {useQuery} from "@tanstack/react-query";
-import rootApiService from "@/app/{services}/rootApiService";
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export type Call = 'Proxy' | 'Server';
 export type ContentType = 'application/json' | 'multipart/form-data' | '' | string;
+export type Headers = Record<string, string | boolean>;
 
 export type ApiCallProps = {
     path              : string;
@@ -14,6 +13,8 @@ export type ApiCallProps = {
     call?             : Call;
     setAuthorization? : boolean;
     contentType?      : ContentType;
+    headers?          : Headers;
+    cache?            : boolean;
     cookie?           : string;
     isReturnData?     : boolean;
     timeout?          : number;
@@ -28,6 +29,7 @@ async function apiCall <R = any, I = any>(props: ApiCallProps): Promise<R | Axio
         , body, params, call
         , setAuthorization, contentType, cookie
         , isReturnData, timeout
+        , headers, cache
     } = props;
 
     if(!path) Error('path is required');
@@ -35,11 +37,19 @@ async function apiCall <R = any, I = any>(props: ApiCallProps): Promise<R | Axio
 
     const url = ((call && call === 'Server') ? process.env.NEXT_PUBLIC_SERVER : '')  + path;
 
-    const headers = new AxiosHeaders();
+    const newHeaders = new AxiosHeaders();
     if(contentType) {
-        headers.setContentType(contentType);
+        newHeaders.setContentType(contentType);
     } else if(method !== 'DELETE') {
-        headers.setContentType('application/json');
+        newHeaders.setContentType('application/json');
+    }
+
+    if(headers) {
+        newHeaders.set(headers);
+    }
+
+    if(cache) {
+        newHeaders.set('Cache-Data', true);
     }
 
     if(setAuthorization) {
@@ -50,7 +60,7 @@ async function apiCall <R = any, I = any>(props: ApiCallProps): Promise<R | Axio
         }
 
         if(token) {
-            headers.setAuthorization( 'Bearer ' + token);
+            newHeaders.setAuthorization( 'Bearer ' + token);
         } else {
             Error('token is required');
         }
@@ -58,7 +68,7 @@ async function apiCall <R = any, I = any>(props: ApiCallProps): Promise<R | Axio
 
     const Axios = axios.create();
     const config: AxiosRequestConfig<I> = {
-        headers,
+        headers : newHeaders,
         method,
         url,
     }

@@ -13,5 +13,6 @@ public class PointCode {
     private String name;
     private long point;
     private boolean isUse;
-
+    private boolean editable;
+    private long initValue;
 }

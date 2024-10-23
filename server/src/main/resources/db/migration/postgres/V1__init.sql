@@ -164,12 +164,12 @@ CREATE TABLE point_code (
 
 CREATE TABLE point_history (
     id             BIGSERIAL,
-    table_code_pk  BIGINT          NOT NULL,
-    table_ref_pk   BIGINT          NOT NULL,
-    member_pk      BIGINT          NOT NULL,
-    point_code_pk  BIGINT          NOT NULL,
-    value          INT             NOT NULL,
-    create_at      TIMESTAMP(6)    NOT NULL
+    table_code_pk  BIGINT           NOT NULL,
+    table_ref_pk   BIGINT           NOT NULL,
+    member_pk      BIGINT           NOT NULL,
+    point_code_pk  BIGINT           NOT NULL,
+    value          BIGINT           NOT NULL,
+    created_at     TIMESTAMP(6)     NOT NULL
 );
 
 CREATE TABLE email_verify (
@@ -504,7 +504,7 @@ COMMENT ON COLUMN point_history.table_ref_pk   IS '참조된 테이블 PK';
 COMMENT ON COLUMN point_history.member_pk      IS '유저 PK';
 COMMENT ON COLUMN point_history.point_code_pk  IS '포인트 코드 PK';
 COMMENT ON COLUMN point_history.value          IS '포인트 값';
-COMMENT ON COLUMN point_history.create_at      IS '생성일자';
+COMMENT ON COLUMN point_history.created_at     IS '생성일자';
 
 COMMENT ON TABLE email_verify              IS '이메일 인증';
 COMMENT ON COLUMN email_verify.id          IS 'PK';

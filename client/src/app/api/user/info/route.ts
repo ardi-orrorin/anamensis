@@ -7,6 +7,7 @@ export async function GET() {
         path: '/api/user/info',
         method: 'GET',
         call: 'Server',
+        cache: true,
         setAuthorization: true,
         isReturnData: true,
     });

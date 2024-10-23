@@ -1,6 +1,6 @@
 import apiCall from "@/app/{commons}/func/api";
 import {queryOptions} from "@tanstack/react-query";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 import {Root} from "@/app/{services}/types";
 
 const userRole = () => {

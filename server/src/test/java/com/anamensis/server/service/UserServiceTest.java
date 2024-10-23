@@ -4,24 +4,14 @@ import com.anamensis.server.dto.request.UserRequest;
 import com.anamensis.server.entity.AuthType;
 import com.anamensis.server.entity.Member;
 import com.anamensis.server.entity.RoleType;
-import com.anamensis.server.mapper.AttendanceMapper;
-import com.anamensis.server.mapper.MemberMapper;
 import com.anamensis.server.mapper.PointCodeMapper;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import reactor.test.StepVerifierOptions;
-
-import java.time.DateTimeException;
-import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
 

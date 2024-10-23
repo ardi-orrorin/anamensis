@@ -1,8 +1,3 @@
-interface ResponseI {
-    status : 'success' | 'error';
-    message: string;
-}
-
 interface SmtpI {
     host    : string;
     port    : string;
@@ -13,10 +8,12 @@ interface SmtpI {
 
 interface HistoryI {
     id       : number;
+    to       : string;
+    from     : string;
     subject  : string;
     status   : string;
     message  : string;
-    createAt : string;
+    createdAt : string;
 }
 
 interface HistoriesRowI extends HistoryI {
@@ -25,7 +22,6 @@ interface HistoriesRowI extends HistoryI {
 }
 
 export namespace SystemSMTP {
-    export type Response        = ResponseI;
     export type Smtp            = SmtpI;
     export type History         = HistoryI;
     export type HistoriesRow    = HistoriesRowI;

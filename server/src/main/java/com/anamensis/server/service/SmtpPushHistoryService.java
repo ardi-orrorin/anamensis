@@ -23,14 +23,14 @@ public class SmtpPushHistoryService {
 
     private final VirtualThreadTaskExecutor virtualThreadTaskExecutor;
 
-    public Mono<Long> countByMemberPk(long memberPk) {
-        return Mono.just(smtpPushHistoryMapper.countByMemberPk(memberPk));
+    public Mono<Long> count() {
+        return Mono.just(smtpPushHistoryMapper.count());
     }
 
-    public Flux<SmtpPushHistoryResponse.ListSmtpPushHistory> findByMemberPk(long memberPk, Page page) {
-        return Flux.fromIterable(smtpPushHistoryMapper.findByMemberPk(memberPk, page))
+    public Flux<SmtpPushHistoryResponse.ListSmtpPushHistory> findAll(Page page) {
+        return Flux.fromIterable(smtpPushHistoryMapper.findAll(page))
                 .publishOn(Schedulers.fromExecutor(virtualThreadTaskExecutor))
-                .map(SmtpPushHistoryResponse.ListSmtpPushHistory::fromResultMap);
+                .map(SmtpPushHistoryResponse.ListSmtpPushHistory::fromEntity);
     }
 
     public Mono<SmtpPushHistory> findById(long id) {

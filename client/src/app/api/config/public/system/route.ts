@@ -8,7 +8,7 @@ export async function GET() {
 
     try {
         const result = await apiCall({
-            path: '/public/master/system-settings',
+            path: '/public/master/api/system-settings',
             method: 'GET',
             call: 'Server',
             isReturnData: true,

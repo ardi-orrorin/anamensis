@@ -1,7 +1,7 @@
 import {NextRequest} from "next/server";
 import apiCall from "@/app/{commons}/func/api";
 import ExNextResponse from "@/app/{commons}/func/ExNextResponse";
-import {ChatSpace} from "@/app/{components}/chats/services/types";
+import {ChatSpace} from "@/app/{components}/modal/chats/services/types";
 
 export async function GET(req: NextRequest) {
 

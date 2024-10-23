@@ -32,14 +32,18 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
             <table className={'w-full'}>
                 <colgroup>
                     <col style={{width: '5%'}}/>
+                    <col style={{width: '5%'}}/>
+                    <col style={{width: '5%'}}/>
                     <col style={{width: '20%'}}/>
                     <col style={{width: '40%'}}/>
                     <col style={{width: '10%'}}/>
                     <col style={{width: '15%'}}/>
                 </colgroup>
-                <thead className={'bg-main text-white h-9 align-middle'}>
+                <thead className={'bg-gray-700 text-white h-9 align-middle'}>
                 <tr className={'text-sm border-x border-white border-solid'}>
                     <th className={'border-x border-white border-solid'}>#</th>
+                    <th className={'border-x border-white border-solid'}>From</th>
+                    <th className={'border-x border-white border-solid'}>To</th>
                     <th className={'border-x border-white border-solid'}>제목</th>
                     <th className={'border-x border-white border-solid'}>상태메시지</th>
                     <th className={'border-x border-white border-solid'}>전송상태</th>
@@ -62,7 +66,7 @@ export default async function Page(props: InferGetServerSidePropsType<typeof get
                     content.length === 0 &&
                   <tr>
                     <td className={'text-center py-5'}
-                        colSpan={5}
+                        colSpan={7}
                     >조회할 내용이 없습니다.
                     </td>
                   </tr>

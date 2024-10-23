@@ -1,16 +1,13 @@
 package com.anamensis.server.mapper;
 
-import com.anamensis.server.dto.Page;
-import com.anamensis.server.resultMap.SmtpPushHistoryResultMap;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -27,47 +24,48 @@ class SmtpPushHistoryMapperTest {
     void countByMemberPk() {
     }
 
-    @Test
-    @Order(1)
-    @DisplayName("회원별 히스토리 조회")
-    void findByMemberPk() {
-        Page page = new Page();
-        page.setPage(1);
-        page.setSize(6);
-        List<SmtpPushHistoryResultMap.ListSmtpPushHistory> list = spm.findByMemberPk(1, page);
-        assertFalse(list.isEmpty());
-        assertEquals(6, list.size());
-
-        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 10));
-        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 9));
-        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 8));
-        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 7));
-        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 6));
-        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 5));
-        assertFalse(list.stream().anyMatch(sph -> sph.getId() == 4));
-
-        list.stream().reduce((sph1, sph2) -> {
-            assertTrue(sph1.getId() > sph2.getId());
-            return sph2;
-        });
-
-        page.setPage(2);
-        list = spm.findByMemberPk(1, page);
-        assertFalse(list.isEmpty());
-        assertEquals(4, list.size());
-
-        assertFalse(list.stream().anyMatch(sph -> sph.getId() == 5));
-        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 4));
-        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 3));
-        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 2));
-        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 1));
-        assertFalse(list.stream().anyMatch(sph -> sph.getId() == 0));
-
-        list.stream().reduce((sph1, sph2) -> {
-            assertTrue(sph1.getId() > sph2.getId());
-            return sph2;
-        });
-    }
+// 회원별 smtp push 기능 없어짐
+//    @Test
+//    @Order(1)
+//    @DisplayName("회원별 히스토리 조회")
+//    void findByMemberPk() {
+//        Page page = new Page();
+//        page.setPage(1);
+//        page.setSize(6);
+//        List<SmtpPushHistory> list = spm.findByMemberPk(1, page);
+//        assertFalse(list.isEmpty());
+//        assertEquals(6, list.size());
+//
+//        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 10));
+//        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 9));
+//        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 8));
+//        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 7));
+//        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 6));
+//        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 5));
+//        assertFalse(list.stream().anyMatch(sph -> sph.getId() == 4));
+//
+//        list.stream().reduce((sph1, sph2) -> {
+//            assertTrue(sph1.getId() > sph2.getId());
+//            return sph2;
+//        });
+//
+//        page.setPage(2);
+//        list = spm.findByMemberPk(1, page);
+//        assertFalse(list.isEmpty());
+//        assertEquals(4, list.size());
+//
+//        assertFalse(list.stream().anyMatch(sph -> sph.getId() == 5));
+//        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 4));
+//        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 3));
+//        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 2));
+//        assertTrue(list.stream().anyMatch(sph -> sph.getId() == 1));
+//        assertFalse(list.stream().anyMatch(sph -> sph.getId() == 0));
+//
+//        list.stream().reduce((sph1, sph2) -> {
+//            assertTrue(sph1.getId() > sph2.getId());
+//            return sph2;
+//        });
+//    }
 
     @Test
     @Order(2)

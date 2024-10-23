@@ -10,7 +10,7 @@ import {useSearchParams} from "next/navigation";
 import {preload} from "swr";
 import {initBlock} from "@/app/board/{services}/funcs";
 import {BoardSummaryI} from "@/app/user/{services}/userProvider";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 import {useQueryClient} from "@tanstack/react-query";
 import {TempFileProvider} from "@/app/board/[id]/{hooks}/usePendingFiles";
 import boardApiService from "@/app/board/{services}/boardApiService";
@@ -35,8 +35,6 @@ export default function Page({children, params} : {children: ReactNode, params: 
     const [newComment, setNewComment] = useState<SaveComment>({} as SaveComment);
 
     const [comment, setComment] = useState<CommentI[]>([]);
-
-    const [rateInfo, setRateInfo] = useState<RateInfoI>({} as RateInfoI);
 
     const [boardTemplate, setBoardTemplate] = useState<BoardTemplateService>({
         isApply: false,
@@ -92,10 +90,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
     useEffect(() => {
         if(isNewBoard || isTemplate) return ;
 
-        Promise.allSettled([
-            fetchBoard(),
-            fetchRate()
-        ]);
+        fetchBoard();
 
     },[params.id]);
 
@@ -104,7 +99,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
         if(searchParams.get('categoryPk') !== '3') return;
         if(!isNewBoard || board?.isView || isTemplate) return ;
 
-        setMyPoint(profile?.point || 0);
+        setMyPoint(profile?.point ?? 0);
 
     },[profile])
 
@@ -146,21 +141,15 @@ export default function Page({children, params} : {children: ReactNode, params: 
             alert(e.response.data);
             location.href = '/';
         } finally {
+            return true;
         }
     },[params.id, board.isView]);
 
-    const fetchRate = useCallback(() => {
-        boardApiService.getRateInfo(params.id)
-        .then(res => {
-            setRateInfo(res.data);
-        });
-    },[params.id]);
 
     return (
             <BoardProvider.Provider value={{
                 board, setBoard,
                 comment, setComment,
-                rateInfo, setRateInfo,
                 newComment, setNewComment,
                 deleteComment, setDeleteComment,
                 summary, setSummary,

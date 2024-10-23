@@ -5,8 +5,11 @@ import com.anamensis.server.entity.SystemSettingKey;
 import com.anamensis.server.mapper.SystemSettingMapper;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -20,7 +23,6 @@ import java.util.stream.Collectors;
 
 @Configuration
 @RequiredArgsConstructor
-
 public class BeanConfig {
     private final SystemSettingMapper systemSettingMapper;
 
@@ -74,7 +76,15 @@ public class BeanConfig {
     }
 
     @Bean
-    public Set<SystemSetting> systemSettings() {
-        return new HashSet<>(systemSettingMapper.findAll(null));
+    public Map<SystemSettingKey, SystemSetting> systemSettings() {
+        return systemSettingMapper.findAll(null)
+            .stream()
+            .collect(Collectors.toMap(SystemSetting::getKey, s -> s));
+    }
+
+
+    @Bean
+    public PathRequestMappingConfig pathRequestMappingConfig() {
+        return new PathRequestMappingConfig();
     }
 }

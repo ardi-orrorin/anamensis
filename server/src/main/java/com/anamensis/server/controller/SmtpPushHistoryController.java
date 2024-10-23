@@ -29,20 +29,14 @@ public class SmtpPushHistoryController {
 
     @GetMapping("")
     public Mono<PageResponse<SmtpPushHistoryResponse.ListSmtpPushHistory>> findByUserPk (
-            @AuthenticationPrincipal UserDetails userDetails,
             Page page
         ) {
 
-        Mono<MemberResultMap> memberResult = userService.findUserInfo(userDetails.getUsername())
-                .subscribeOn(Schedulers.boundedElastic())
-                .share();
-
-        Mono<Long> count = memberResult
-                .flatMap(user -> smtpPushHistoryService.countByMemberPk(user.getMemberPk()))
+        Mono<Long> count = smtpPushHistoryService.count()
                 .subscribeOn(Schedulers.boundedElastic());
 
-        Mono<List<SmtpPushHistoryResponse.ListSmtpPushHistory>> content = memberResult
-                .flatMapMany(user -> smtpPushHistoryService.findByMemberPk(user.getMemberPk(), page))
+        Mono<List<SmtpPushHistoryResponse.ListSmtpPushHistory>> content =
+            smtpPushHistoryService.findAll(page)
                 .subscribeOn(Schedulers.boundedElastic())
                 .collectList();
 

@@ -3,7 +3,6 @@
 import {queryOptions} from "@tanstack/react-query";
 import apiCall from "@/app/{commons}/func/api";
 import {System} from "@/app/system/{services}/types";
-import {SystemSMTP} from "@/app/system/smtp/{services}/types";
 
 
 const getPrivateSystemConfig = () => {

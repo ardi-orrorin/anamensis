@@ -15,7 +15,6 @@ import apiCall, {ApiCallProps} from "@/app/{commons}/func/api";
 import {createDebounce} from "@/app/{commons}/func/debounce";
 import SubTextMenu from "@/app/board/{components}/SubTextMenu";
 import Comment from "@/app/board/[id]/{components}/comment";
-import Rate from "@/app/board/[id]/{components}/rate";
 import BoardTitle from "@/app/board/[id]/{components}/boardTitle";
 import HeaderBtn from "@/app/board/[id]/{components}/headerBtn";
 import BoardInfo from "@/app/board/[id]/{components}/boardInfo";
@@ -54,7 +53,6 @@ export default function Page({params}: {params : {id: string}}) {
 
     const {
         board, setBoard
-        , rateInfo, setRateInfo
         , isNewBoard, isTemplate
         , boardTemplate, setBoardTemplate
         , summary
@@ -340,20 +338,6 @@ export default function Page({params}: {params : {id: string}}) {
         }
     }
 
-    const onChangeRateHandler = useCallback(async () => {
-        return await apiCall<RateInfoI>({
-            path: rateInfo.status ? '/api/board/rate/' + params.id : '/api/board/rate/add/' + params.id,
-            method: rateInfo.status ? 'DELETE' : 'GET',
-            call: 'Proxy'
-        })
-        .then(res => {
-            setRateInfo(res.data);
-        })
-        .catch(e => {
-            rateInfo.status || alert('로그인이 필요합니다.');
-        });
-    },[rateInfo]);
-
     const onClickFavoriteHandler = useCallback(async () => {
         try {
             const options: ApiCallProps = isFavorite ? {
@@ -540,10 +524,6 @@ export default function Page({params}: {params : {id: string}}) {
                         </div>
                     }
                 </div>
-                <Rate newBoard={isNewBoard}
-                      onClick={() => debounce(onChangeRateHandler)}
-                      {...{board, rateInfo}}
-                />
                 {
                     !isNewBoard
                     && board.isView

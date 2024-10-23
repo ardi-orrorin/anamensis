@@ -1,6 +1,6 @@
 import React from "react";
 import {BoardService} from "@/app/board/{services}/BoardProvider";
-import {System} from "@/app/user/system/{services}/types";
+import {System} from "@/app/system/message/{services}/types";
 import {useQueryClient} from "@tanstack/react-query";
 
 type HeaderBtnProps = {

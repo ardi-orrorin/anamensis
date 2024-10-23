@@ -35,7 +35,7 @@ public class PointService {
     }
 
 
-    public Mono<PointCode> selectByIdOrTableName(String name) {
+    public Mono<PointCode> selectByTableName(String name) {
         return Mono.justOrEmpty(pointCodeMapper.selectByIdOrName(0, name))
                 .switchIfEmpty(Mono.error(new RuntimeException("not found")));
     }

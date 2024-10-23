@@ -15,8 +15,6 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple3;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/board/comments")
 @RequiredArgsConstructor
@@ -61,7 +59,7 @@ public class BoardCommentController {
         Mono<Member> member = userService.findUserByUserId(user.getUsername())
                 .subscribeOn(Schedulers.boundedElastic());
 
-        Mono<PointCode> pointCode = pointService.selectByIdOrTableName("board_comment")
+        Mono<PointCode> pointCode = pointService.selectByTableName("board_comment")
                 .subscribeOn(Schedulers.boundedElastic());
 
         Mono<TableCode> tableCode = tableCodeService.findByIdByTableName(0, "board_comment")

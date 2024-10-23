@@ -51,7 +51,7 @@ class PointHistoryServiceTest {
                 .assertNext(Assertions::assertFalse)
                 .verifyComplete();
 
-        ph.setCreateAt(LocalDateTime.now());
+        ph.setCreatedAt(LocalDateTime.now());
 
         StepVerifier.create(phs.insert(ph))
                 .assertNext(Assertions::assertTrue)

@@ -169,7 +169,7 @@ public class BoardController {
                 return Mono.error(new RuntimeException("공지사항은 관리자 권한이 필요합니다."));
         }
 
-        Mono<PointCode> pointCode = pointService.selectByIdOrTableName("board")
+        Mono<PointCode> pointCode = pointService.selectByTableName("board")
                 .subscribeOn(Schedulers.boundedElastic());
 
         Mono<TableCode> tableCode = tableCodeService.findByIdByTableName(0, "board")
@@ -373,7 +373,7 @@ public class BoardController {
     }
 
     private Mono<Tuple2<PointCode, TableCode>> insertQnAPointHistory(long memberPk, int point) {
-        Mono<PointCode> qnaPointCode = pointService.selectByIdOrTableName("q&a")
+        Mono<PointCode> qnaPointCode = pointService.selectByTableName("q&a")
             .share()
             .subscribeOn(Schedulers.boundedElastic());
 

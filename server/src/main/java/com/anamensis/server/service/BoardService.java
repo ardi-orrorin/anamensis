@@ -6,7 +6,6 @@ import com.anamensis.server.dto.SelectAnswerQueueDto;
 import com.anamensis.server.dto.request.BoardRequest;
 import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.entity.*;
-import com.anamensis.server.mapper.BoardIndexMapper;
 import com.anamensis.server.mapper.BoardMapper;
 import com.anamensis.server.provider.MailProvider;
 import com.anamensis.server.resultMap.BoardResultMap;
@@ -123,6 +122,15 @@ public class BoardService {
     }
 
     public Flux<BoardResponse.SummaryList> findSummaryList(long memberPk) {
+        Page page = new Page();
+        page.setPage(1);
+        page.setSize(5);
+
+        return Flux.fromIterable(boardMapper.findByMemberPk(memberPk, page))
+            .map(BoardResponse.SummaryList::from);
+    }
+
+    public Flux<BoardResponse.SummaryList> findSummaryListCache(long memberPk) {
 
          return Mono.fromCallable(() -> redisTemplate.boundListOps("board:summary:member:" + memberPk)
              .range(0, -1))

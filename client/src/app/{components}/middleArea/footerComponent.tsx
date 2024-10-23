@@ -20,10 +20,6 @@ const FooterComponent = (props: Root.BoardListI) => {
         : moment(createdAt).format('YYYY-MM-DD HH:mm')
     , [createdAt])
 
-    const rateColor = useMemo(() =>
-        RateColor.findColor(rate)?.getColor
-    ,[rate])
-
     const commentCountColor = useMemo(() =>
         RateColor.findColor(commentCount)?.getColor
     ,[commentCount])
@@ -36,12 +32,6 @@ const FooterComponent = (props: Root.BoardListI) => {
                 <span className={'flex gap-1 items-center'}>
                     <FontAwesomeIcon icon={faEye} />
                     {viewCount}
-                </span>
-                <span className={`flex gap-1 items-center`}
-                      style={{color: rateColor}}
-                >
-                    <FontAwesomeIcon icon={faHeart} />
-                    {rate}
                 </span>
                 <span className={`flex gap-1 items-center`}
                       style={{color: commentCountColor}}

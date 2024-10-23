@@ -2,22 +2,18 @@ package com.anamensis.server.controller;
 
 import com.anamensis.server.dto.Page;
 import com.anamensis.server.dto.PageResponse;
-import com.anamensis.server.dto.SelectAnswerQueueDto;
 import com.anamensis.server.dto.StatusType;
 import com.anamensis.server.dto.request.BoardRequest;
 import com.anamensis.server.dto.response.BoardResponse;
 import com.anamensis.server.dto.response.StatusResponse;
 import com.anamensis.server.entity.*;
 import com.anamensis.server.exception.AuthorizationException;
+import com.anamensis.server.provider.RedisCacheProvider;
 import com.anamensis.server.resultMap.BoardResultMap;
 import com.anamensis.server.service.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.redis.connection.ReactiveListCommands;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,12 +23,10 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 
-import java.io.PipedReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
 
 @RestController
 @RequestMapping("api/boards")
@@ -41,7 +35,6 @@ public class BoardController {
 
     private final BoardService boardService;
     private final UserService userService;
-    private final RateService rateService;
     private final PointHistoryService pointHistoryService;
     private final PointService pointService;
     private final TableCodeService tableCodeService;
@@ -49,13 +42,9 @@ public class BoardController {
     private final BoardCommentService boardCommentService;
     private final BoardIndexService boardIndexService;
     private final ScheduleAlertService scheduleAlertService;
-    private final Map<SystemSettingKey, SystemSetting> systemSettings;
+    private final RedisCacheProvider redisCacheProvider;
 
-    private boolean enableRedis() {
-        return systemSettings.get(SystemSettingKey.REDIS)
-            .getValue().getBoolean("enabled");
-    }
-
+    
     @PublicAPI
     @GetMapping("")
     public Mono<PageResponse<BoardResponse.List>> findAll(
@@ -67,7 +56,7 @@ public class BoardController {
 
         Flux<BoardResponse.List> list;
 
-        if(cache && enableRedis()) {
+        if(cache && redisCacheProvider.enable()) {
             list = boardService.findOnePage();
         } else {
             list = user == null
@@ -77,10 +66,6 @@ public class BoardController {
         }
 
         return list
-            .flatMap(b -> rateService.countRate(b.getId())
-                .doOnNext(b::setRate)
-                .map($ -> b)
-            )
             .subscribeOn(Schedulers.boundedElastic())
             .collectList()
             .map(l -> new PageResponse<>(page, l));
@@ -99,12 +84,9 @@ public class BoardController {
                 .subscribeOn(Schedulers.boundedElastic())
                 .share();
 
-        Mono<BoardResultMap.Board> content = user == null
+        Mono<BoardResultMap.Board> content = user == null || !redisCacheProvider.enable()
             ? boardService.findByPk(boardPk)
             : member.flatMap(u -> boardService.cacheFindByPk(boardPk));
-
-        Mono<Long> count = rateService.countRate(boardPk)
-            .subscribeOn(Schedulers.boundedElastic());
 
         return Mono.zip(content, member)
             .flatMap(t -> {
@@ -120,14 +102,6 @@ public class BoardController {
                 }
 
                 return Mono.just(BoardResponse.Content.from(board, m));
-            })
-            .zipWith(count)
-            .doOnNext(t -> t.getT1().setRate(t.getT2()))
-            .map(Tuple2::getT1)
-            .doOnNext($ -> {
-                boardService.viewUpdateByPk(boardPk)
-                    .subscribeOn(Schedulers.boundedElastic())
-                    .subscribe();
             });
     }
 
@@ -154,11 +128,13 @@ public class BoardController {
         @AuthenticationPrincipal UserDetails user
     ) {
         return userService.findUserByUserId(user.getUsername())
-                .flatMapMany(u -> boardService.findSummaryList(u.getId()))
-                .flatMap(b -> rateService.countRate(b.getId())
-                    .doOnNext(b::setRate)
-                    .map($ -> b)
-                )
+                .flatMapMany(u -> {
+                    if(redisCacheProvider.enable()) {
+                        return boardService.findSummaryListCache(u.getId());
+                    }
+
+                    return boardService.findSummaryList(u.getId());
+                })
                 .collectList();
     }
 
@@ -168,7 +144,12 @@ public class BoardController {
         @PathVariable(name = "userId") String userId
     ) {
         return userService.findUserByUserId(userId)
-            .flatMapMany(u -> boardService.findSummaryList(u.getId()))
+            .flatMapMany(u -> {
+                if(redisCacheProvider.enable()) {
+                    return boardService.findSummaryListCache(u.getId());
+                }
+                return boardService.findSummaryList(u.getId());
+            })
             .collectList();
     }
 
@@ -251,6 +232,8 @@ public class BoardController {
                                 .subscribe();
                         })
                         .doOnNext($ -> {
+                            if(!redisCacheProvider.enable()) return;
+
                             userService.addUserInfoCache(user.getUsername())
                                 .subscribe();
                         })

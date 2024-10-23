@@ -36,8 +36,6 @@ export default function Page({children, params} : {children: ReactNode, params: 
 
     const [comment, setComment] = useState<CommentI[]>([]);
 
-    const [rateInfo, setRateInfo] = useState<RateInfoI>({} as RateInfoI);
-
     const [boardTemplate, setBoardTemplate] = useState<BoardTemplateService>({
         isApply: false,
         templateId: 0,
@@ -92,10 +90,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
     useEffect(() => {
         if(isNewBoard || isTemplate) return ;
 
-        Promise.allSettled([
-            fetchBoard(),
-            fetchRate()
-        ]);
+        fetchBoard();
 
     },[params.id]);
 
@@ -104,7 +99,7 @@ export default function Page({children, params} : {children: ReactNode, params: 
         if(searchParams.get('categoryPk') !== '3') return;
         if(!isNewBoard || board?.isView || isTemplate) return ;
 
-        setMyPoint(profile?.point || 0);
+        setMyPoint(profile?.point ?? 0);
 
     },[profile])
 
@@ -146,21 +141,15 @@ export default function Page({children, params} : {children: ReactNode, params: 
             alert(e.response.data);
             location.href = '/';
         } finally {
+            return true;
         }
     },[params.id, board.isView]);
 
-    const fetchRate = useCallback(() => {
-        boardApiService.getRateInfo(params.id)
-        .then(res => {
-            setRateInfo(res.data);
-        });
-    },[params.id]);
 
     return (
             <BoardProvider.Provider value={{
                 board, setBoard,
                 comment, setComment,
-                rateInfo, setRateInfo,
                 newComment, setNewComment,
                 deleteComment, setDeleteComment,
                 summary, setSummary,

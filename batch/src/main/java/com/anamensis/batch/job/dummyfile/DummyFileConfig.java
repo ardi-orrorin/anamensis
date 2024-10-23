@@ -11,6 +11,7 @@ public class DummyFileConfig {
     public Trigger DummyFileDeleteJobTrigger() {
         SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule();
         scheduleBuilder.withRepeatCount(1);
+        scheduleBuilder.withIntervalInSeconds(10);
 
         return TriggerBuilder.newTrigger()
                 .forJob(dummyFileDeleteJobDetail())

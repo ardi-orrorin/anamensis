@@ -1,4 +1,4 @@
-package com.anamensis.batch.job.email;
+package com.anamensis.batch.job.qnaalert;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -17,8 +17,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @RequiredArgsConstructor
-public class EmailJob extends QuartzJobBean {
-
+public class QnAAlertJob extends QuartzJobBean {
     private final JobExplorer jobExplorer;
 
     private final JobLauncher jobLauncher;
@@ -27,20 +26,20 @@ public class EmailJob extends QuartzJobBean {
 
     private final PlatformTransactionManager tm;
 
-    private final EmailStep emailStep;
+    private final QnAAlertStep qnAAlertStep;
 
     @SneakyThrows
     @Override
     protected void executeInternal(JobExecutionContext context) {
-        Job job = new JobBuilder("email-send-job", jobRepository)
-                .start(emailStep.step(10, "email-send",jobRepository, tm))
+        Job job = new JobBuilder("qna-alert-job", jobRepository)
+                .start(qnAAlertStep.qnaAlertStep(jobRepository, tm))
                 .incrementer(new RunIdIncrementer())
                 .build();
 
         JobParameters jobParameters = new JobParametersBuilder(this.jobExplorer)
-                    .getNextJobParameters(job)
-                    .toJobParameters();
-
+                .getNextJobParameters(job)
+                .toJobParameters();
+//
         this.jobLauncher.run(job, jobParameters);
     }
 }

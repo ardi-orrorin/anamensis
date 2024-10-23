@@ -8,8 +8,15 @@
         SELECT *
           FROM file
          WHERE table_ref_pk = 0
+           AND is_use = 1
            AND DATE (create_at) BETWEEN #{from} AND #{to}
     </select>
+
+    <update id="disabledDummyFile">
+        UPDATE file
+           SET is_use = 0
+         WHERE id = #{id}
+    </update>
 
     <delete id="deleteDummyFile">
         DELETE

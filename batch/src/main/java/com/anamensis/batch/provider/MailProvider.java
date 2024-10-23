@@ -1,6 +1,6 @@
 package com.anamensis.batch.provider;
 
-import com.anamensis.batch.entity.UserConfigSmtp;
+import com.anamensis.batch.entity.MemberConfigSmtp;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import jakarta.mail.MessagingException;
@@ -35,7 +35,7 @@ public class MailProvider {
         JavaMailSenderImpl mailSenderImpl = new JavaMailSenderImpl();
         MimeMessageHelper mimeMailMessage = new MimeMessageHelper(mailSenderImpl.createMimeMessage());
 
-        public Builder config(UserConfigSmtp userConfigSmtp) {
+        public Builder config(MemberConfigSmtp userConfigSmtp) {
             this.mailSenderImpl.setHost(userConfigSmtp.getHost());
             this.mailSenderImpl.setPort(Integer.parseInt(userConfigSmtp.getPort()));
             this.mailSenderImpl.setUsername(userConfigSmtp.getUsername());
@@ -54,7 +54,7 @@ public class MailProvider {
             return this;
         }
 
-        public Builder message(UserConfigSmtp userConfigSmtp, String subject, String content, String model) {
+        public Builder message(MemberConfigSmtp userConfigSmtp, String subject, String content, String model) {
             try {
                 String body = "";
 

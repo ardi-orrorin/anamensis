@@ -1,4 +1,4 @@
-package com.anamensis.batch.job.email;
+package com.anamensis.batch.job.boardIndex;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -17,8 +17,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @RequiredArgsConstructor
-public class EmailJob extends QuartzJobBean {
-
+public class BoardIndexJob extends QuartzJobBean {
     private final JobExplorer jobExplorer;
 
     private final JobLauncher jobLauncher;
@@ -27,19 +26,20 @@ public class EmailJob extends QuartzJobBean {
 
     private final PlatformTransactionManager tm;
 
-    private final EmailStep emailStep;
+    private final BoardIndexStep boardIndexStep;
 
     @SneakyThrows
     @Override
     protected void executeInternal(JobExecutionContext context) {
-        Job job = new JobBuilder("email-send-job", jobRepository)
-                .start(emailStep.step(10, "email-send",jobRepository, tm))
-                .incrementer(new RunIdIncrementer())
-                .build();
+        Job job = new JobBuilder("board-index-job", jobRepository)
+            .start(boardIndexStep.step(100, "board-index-step", jobRepository, tm))
+            .incrementer(new RunIdIncrementer())
+            .preventRestart()
+            .build();
 
         JobParameters jobParameters = new JobParametersBuilder(this.jobExplorer)
-                    .getNextJobParameters(job)
-                    .toJobParameters();
+            .getNextJobParameters(job)
+            .toJobParameters();
 
         this.jobLauncher.run(job, jobParameters);
     }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.anamensis.batch.mapper.BoardMapper">
+    <select id="findAllByIsUse" resultMap="BoardResultMap">
+        SELECT *
+          FROM board
+         WHERE is_use = 1;
+    </select>
+
+    <resultMap id="BoardResultMap" type="Board" autoMapping="true">
+        <result column="content" property="content" typeHandler="JsonObjectTypeHandler" />
+    </resultMap>
+</mapper>

@@ -4,16 +4,16 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.anamensis.batch.mapper.UserConfigSmtpMapper">
-    <sql id="tbl_user_config_smtp">
+    <sql id="tbl_member_config_smtp">
         SELECT *
-          FROM user_config_smtp
+          FROM member_config_smtp
     </sql>
-    <select id="findAll" resultType="UserConfigSmtp">
-        <include refid="tbl_user_config_smtp"/>
+    <select id="findAll" resultType="MemberConfigSmtp">
+        <include refid="tbl_member_config_smtp"/>
         WHERE is_use = 1
     </select>
-    <select id="findByIds" resultType="UserConfigSmtp">
-        <include refid="tbl_user_config_smtp"/>
+    <select id="findByIds" resultType="MemberConfigSmtp">
+        <include refid="tbl_member_config_smtp"/>
         WHERE is_use = 1
           AND id IN
         <foreach collection="ids" item="id"  open="(" close=")" separator=",">
@@ -21,7 +21,7 @@
         </foreach>
     </select>
 <!--    <select id="findByIds" resultType="UserConfigSmtp">-->
-<!--        <include refid="tbl_user_config_smtp"/>-->
+<!--        <include refid="tbl_member_config_smtp"/>-->
 <!--        WHERE is_use = 1-->
 <!--        AND id IN (#{ids})-->
 <!--    </select>-->

@@ -21,8 +21,6 @@ export async function GET(req: NextRequest) {
         isSelf,
     }
 
-    console.log('page : ', page)
-
     try {
         const result = await apiCall<Common.PageResponse<Root.BoardListI>, URLSearchParams>({
             path: '/public/api/boards',

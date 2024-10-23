@@ -16,6 +16,8 @@ import java.util.Optional;
 public interface BoardMapper {
     int save(Board board);
 
+    List<Board> findAllByIsUse();
+
     List<BoardResultMap.List> findList(
         @Param("page") Page page,
         @Param("params") BoardRequest.Params params,

@@ -352,8 +352,8 @@ ALTER TABLE table_code ADD UNIQUE (table_name);
 -- ADD INDEX
 
 CREATE UNIQUE INDEX idx_id_desc ON board (id DESC);
-CREATE INDEX idx_use ON board (is_use);
 CREATE INDEX idx_title ON board (title);
+CREATE INDEX idx_use ON board (is_use);
 CREATE INDEX idx_public ON board (is_public);
 CREATE INDEX idx_category_pk ON board (category_pk);
 CREATE INDEX idx_member_pk ON board (member_pk);

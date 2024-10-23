@@ -22,4 +22,8 @@
           FROM board_index
          WHERE board_id = #{boardId}
     </delete>
+
+    <delete id="deleteAll">
+        TRUNCATE board_index;
+    </delete>
 </mapper>

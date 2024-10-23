@@ -24,6 +24,7 @@ const SystemLeftNavBar = () => {
                     <ListItem icon={faShieldHalved} text={'SYSTEM-MESSAGE'} href={'/system/message'}/>
                     <ListItem icon={faShieldHalved} text={'POINT'} href={'/system/point'}/>
                     <ListItem icon={faShieldHalved} text={'CACHE'} href={'/system/cache'}/>
+                    <ListItem icon={faShieldHalved} text={'BOARD'} href={'/system/board'}/>
                 </ul>
             </div>
         </nav>

@@ -4,6 +4,13 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.anamensis.server.mapper.BoardMapper">
+    <select id="findAllByIsUse" resultMap="BoardEntity">
+        SELECT *
+             , id AS board_pk
+          FROM board
+         WHERE is_use = TRUE
+    </select>
+
     <insert id="save" parameterType="Board">
         <selectKey keyProperty="id" resultType="long" order="AFTER">
             SELECT currval('board_id_seq')

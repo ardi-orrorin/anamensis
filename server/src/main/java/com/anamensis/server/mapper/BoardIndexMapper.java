@@ -11,4 +11,6 @@ public interface BoardIndexMapper {
     int update(BoardIndex boardIndex);
 
     int delete(long boardId);
+
+    void deleteAll();
 }

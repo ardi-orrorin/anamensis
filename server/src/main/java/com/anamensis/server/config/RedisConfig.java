@@ -38,6 +38,8 @@ public class RedisConfig {
 
             LettuceConnectionFactory redisConnectionFactory = new LettuceConnectionFactory(host, port);
 
+            redisConnectionFactory.start();
+
             template.setConnectionFactory(redisConnectionFactory);
         } else {
             template.setConnectionFactory(new LettuceConnectionFactory());

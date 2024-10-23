@@ -33,6 +33,8 @@ interface SiteI {
     [key: string]   : string | boolean;
 }
 
+
+
 export namespace System {
     export type Site            = SiteI;
     export type Request<T>      = RequestI<T>;
@@ -47,6 +49,13 @@ export namespace System {
         SITE    = 'site',
         REDIS   = 'redis',
         POINT   = 'point',
+    }
+
+    export enum JobStatus {
+        COMPLETED = 'COMPLETED',
+        READY = 'READY',
+        FAILED = 'FAILED',
+        PROCESSING = 'PROCESSING',
     }
     
 }

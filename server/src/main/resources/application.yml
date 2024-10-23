@@ -25,6 +25,17 @@ spring:
         region: ${AWS_REGION:ap-northeast-2}
         bucket: ${AWS_BUCKET:anamensis}
 
+  quartz:
+    wait-for-jobs-to-complete-on-shutdown: true
+    auto-startup: true
+    startup-delay: 60s
+
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: true
+
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.anamensis.server.entity, com.anamensis.server.resultMap, com.anamensis.server.typeHandler

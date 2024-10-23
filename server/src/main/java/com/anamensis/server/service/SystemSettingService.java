@@ -5,6 +5,7 @@ import com.anamensis.server.entity.SystemSetting;
 import com.anamensis.server.entity.SystemSettingKey;
 import com.anamensis.server.mapper.SystemSettingMapper;
 import com.anamensis.server.provider.MailProvider;
+import com.anamensis.server.provider.RedisCacheProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -14,7 +15,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -25,7 +26,10 @@ public class SystemSettingService {
 
     private final MailProvider mailProvider;
 
-    private final Set<SystemSetting> systemSettings;
+    private final RedisCacheProvider redisCacheProvider;
+
+
+    private final Map<SystemSettingKey, SystemSetting> systemSettings;
 
     public Mono<List<SystemSetting>> findAll(boolean isPublic) {
         return Flux.fromIterable(systemSettingMapper.findAll(isPublic))
@@ -44,20 +48,48 @@ public class SystemSettingService {
         return this.saveSystemSetting(key, value)
             .flatMap(success -> this.findByKey(key))
             .flatMap(systemSetting -> {
-                systemSettings.removeIf(setting -> setting.getKey().equals(key));
-                systemSettings.add(systemSetting);
-
+                systemSettings.put(key, systemSetting);
                 return Mono.just(systemSetting);
             });
     }
 
     public Mono<Boolean> saveSystemSetting(SystemSettingKey key, JSONObject value) {
         return switch (key) {
-            case SMTP -> this.saveSMTP(key, value);
-            case SIGN_UP -> this.saveSignUp(key, value);
-            case LOGIN -> this.saveLogin(key, value);
-            default   -> this.updateSystemSetting(key, value);
+            case SMTP       -> this.saveSMTP(key, value);
+            case SIGN_UP    -> this.saveSignUp(key, value);
+            case LOGIN      -> this.saveLogin(key, value);
+            case REDIS      -> this.saveRedis(key, value);
+            default         -> this.updateSystemSetting(key, value);
         };
+    }
+
+    private Mono<Boolean> saveRedis(SystemSettingKey key, JSONObject value) {
+
+        String host = value.getString("host");
+        int port = value.getInt("port");
+        boolean enabled = value.getBoolean("enabled");
+
+        if(enabled && (host == null || host.isEmpty() || port <= 0)) {
+            return Mono.error(new RuntimeException("Invalid Redis configuration"));
+        }
+
+        if(enabled && !redisCacheProvider.testConnection(host, port)) {
+            return Mono.error(new RuntimeException("Failed to connect to Redis"));
+        }
+
+        return this.updateSystemSetting(key, value)
+            .flatMap(success -> {
+                if(!enabled || !success) {
+                    return Mono.just(success);
+                }
+
+                return this.findByKey(SystemSettingKey.REDIS)
+                        .flatMap(redisSetting -> {
+                            boolean result = redisCacheProvider.updateConfig(redisSetting);
+
+                            return Mono.just(result);
+                        });
+            });
     }
 
     private Mono<Boolean> saveLogin(SystemSettingKey key, JSONObject value) {

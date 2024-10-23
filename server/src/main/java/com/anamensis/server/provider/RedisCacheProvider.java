@@ -26,25 +26,34 @@ public class RedisCacheProvider {
             .getBoolean("enabled");
     }
 
-    public void updateConfig() {
-        SystemSetting redisSetting = systemSettingMapper.findByKey(SystemSettingKey.REDIS);
 
-        if(redisSetting == null) return;
+    public boolean testConnection(String host, int port) {
+        LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(host, port);
 
-        systemSettings.put(SystemSettingKey.REDIS, redisSetting);
+        connectionFactory.start();
+
+        String ping = connectionFactory.getConnection().ping();
+
+        connectionFactory.destroy();
+
+        return "PONG".equals(ping);
+    }
+
+    public boolean updateConfig(SystemSetting redisSetting) {
 
         if(!redisSetting.getValue().getBoolean("enabled")) {
             redisTemplate.setConnectionFactory(new LettuceConnectionFactory());
-            return ;
+            return false;
         }
 
         String host = redisSetting.getValue().getString("host");
         int port = redisSetting.getValue().getInt("port");
 
-        redisTemplate.setConnectionFactory(new LettuceConnectionFactory(host, port));
+        LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(host, port);
+        connectionFactory.start();
+        redisTemplate.setConnectionFactory(connectionFactory);
+
+        return true;
     }
-
-
-
 
 }

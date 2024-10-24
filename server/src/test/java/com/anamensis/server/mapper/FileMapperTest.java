@@ -3,6 +3,8 @@ package com.anamensis.server.mapper;
 import com.anamensis.server.entity.File;
 import com.anamensis.server.entity.TableCode;
 import org.junit.jupiter.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -10,17 +12,20 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles("dev")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Transactional
 class FileMapperTest {
+
+    Logger log = LoggerFactory.getLogger(FileMapperTest.class);
 
     @SpyBean
     FileMapper fileMapper;
@@ -32,21 +37,21 @@ class FileMapperTest {
 
     File file = new File();
 
-    @BeforeAll
-    public void setUp() {
-        tableCode.setTableName("file-board");
-        tableCode.setUse(true);
-        tableCodeMapper.save(tableCode);
-
-        file.setTableCodePk(tableCode.getId());
-        file.setTableRefPk(12);
-        file.setOrgFileName("orgFileName100.txt");
-        file.setFileName("uuidFileName100.txt");
-        file.setFilePath("/20240601/100/");
-        file.setCreateAt(LocalDateTime.now());
-        file.setUse(true);
-        fileMapper.insert(file);
-    }
+//    @BeforeAll
+//    public void setUp() {
+//        tableCode.setTableName("file-board");
+//        tableCode.setUse(true);
+//        tableCodeMapper.save(tableCode);
+//
+//        file.setTableCodePk(tableCode.getId());
+//        file.setTableRefPk(12);
+//        file.setOrgFileName("orgFileName100.txt");
+//        file.setFileName("uuidFileName100.txt");
+//        file.setFilePath("/20240601/100/");
+//        file.setCreateAt(LocalDateTime.now());
+//        file.setUse(true);
+//        fileMapper.insert(file);
+//    }
 
     @Test
     @Order(1)
@@ -252,4 +257,16 @@ class FileMapperTest {
     }
 
 
+    @Test
+    void selectDummyFile() {
+
+        List<File> files = fileMapper.selectDummyFile(LocalDate.now().minusDays(2), LocalDate.now());
+        log.info("files.size() = {}", files.size());
+        log.info("files = {}", files);
+
+    }
+
+    @Test
+    void disabledDummyFile() {
+    }
 }

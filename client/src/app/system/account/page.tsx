@@ -5,7 +5,7 @@ import systemApiServices from "@/app/system/{services}/apiServices";
 import {useQuery} from "@tanstack/react-query";
 import React from "react";
 import {System} from "@/app/system/{services}/types";
-import {SystemAccount} from "@/app/system/account/types";
+import {SystemAccount} from "@/app/system/account/{services}/types";
 import SystemToggle from "@/app/system/{components}/SystemToggle";
 
 export default function Page() {

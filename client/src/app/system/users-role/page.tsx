@@ -131,7 +131,7 @@ export default function Page() {
 
     return (
         <div className={'flex w-full h-full pb-4 flex-col gap-2'}>
-            <div className={'list-disc pb-2'}>
+            <div className={'list-disc pb-2 text-sm'}>
                 <li>유저 권한 관련 수정 페이지</li>
             </div>
             <div className={'px-2 w-full flex gap-2 h-7'}>

@@ -155,8 +155,12 @@ public class BoardController {
 
     @PublicAPI
     @GetMapping("notice")
-    public Mono<List<BoardResponse.Notice>> findNotice() {
-        return boardService.findNotice();
+    public Mono<List<BoardResponse.Notice>> findNotice(
+        @RequestHeader(name = "Cache-Data", required = false) boolean cache
+    ) {
+        return cache && redisCacheProvider.enable()
+            ? boardService.findNoticeCache()
+            : boardService.findNotice();
     }
 
     @PostMapping("")
@@ -367,8 +371,6 @@ public class BoardController {
                                 .flatMap($ -> insertQnAPointHistory(boardAtomic.get().getMemberPk(),(int) p.point));
                         })
                         .subscribe();
-
-
                 });
     }
 

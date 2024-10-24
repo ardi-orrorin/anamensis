@@ -32,13 +32,15 @@ public class JobsController {
 
     private final JobService jobService;
 
-    @GetMapping("reset-board-index")
-    public Mono<StatusResponse> resetBoardIndex() {
-        return jobService.startJob("board-index-job")
+    @GetMapping("")
+    public Mono<StatusResponse> resetBoardIndex(
+        @RequestParam String jobName
+    ) {
+        return jobService.startJob(jobName)
             .flatMap(aBoolean -> {
                 StatusResponse statusResponse = StatusResponse.builder()
                     .status(aBoolean ? StatusType.SUCCESS : StatusType.FAIL)
-                    .message("Board index reset")
+                    .message(jobName + " job completed")
                     .build();
 
                 return Mono.just(statusResponse);

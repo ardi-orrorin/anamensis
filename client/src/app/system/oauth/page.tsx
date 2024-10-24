@@ -1,4 +1,4 @@
-'use client';
+ 'use client';
 
 import SystemContainer from "@/app/system/{components}/systemContainer";
 import {useQuery} from "@tanstack/react-query";

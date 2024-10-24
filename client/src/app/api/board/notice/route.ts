@@ -9,6 +9,7 @@ export async function GET(req: NextRequest) {
         path: '/public/api/boards/notice',
         method: 'GET',
         call: 'Server',
+        cache: true,
         isReturnData: true,
     })
 

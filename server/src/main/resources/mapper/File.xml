@@ -74,4 +74,18 @@
          WHERE file_path = #{filePath}
            AND file_name = #{fileName}
     </update>
+
+    <select id="selectDummyFile" resultType="File">
+        SELECT *
+          FROM file
+         WHERE table_ref_pk = 0
+           AND is_use       = TRUE
+           AND DATE (create_at) BETWEEN #{from} AND #{to}
+    </select>
+
+    <update id="disabledDummyFile">
+        UPDATE file
+           SET is_use   = FALSE
+         WHERE id       = #{id}
+    </update>
 </mapper>

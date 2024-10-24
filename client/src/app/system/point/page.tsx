@@ -119,7 +119,7 @@ export default function Page() {
     return (
         <div className={''}>
             <SystemContainer headline={'시스템 포인트'}>
-                <div className={'list-disc'}>
+                <div className={'list-disc text-sm'}>
                     <li>
                         <span>시스템 포인트는 시스템에서 사용되는 포인트입니다.</span>
                     </li>

@@ -9,14 +9,13 @@ public class DummyFileTrigger {
 
     @Bean
     public Trigger DummyFileDeleteJobTrigger() {
-        SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule();
-        scheduleBuilder.withRepeatCount(1);
-        scheduleBuilder.withIntervalInSeconds(10);
+        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0 23 * * ?")
+                .withMisfireHandlingInstructionDoNothing();
 
         return TriggerBuilder.newTrigger()
                 .forJob(dummyFileDeleteJobDetail())
                 .withIdentity("dummy-file-delete-job-trigger")
-                .withSchedule(scheduleBuilder)
+                .withSchedule(cronScheduleBuilder)
                 .build();
     }
 

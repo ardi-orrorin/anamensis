@@ -6,13 +6,16 @@ import {NextRequest} from "next/server";
 import {Common} from "@/app/{commons}/types/commons";
 import StatusResponse = Common.StatusResponse;
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+
+    const params = req.nextUrl.searchParams;
 
     try {
         const res = await apiCall<StatusResponse>({
-            path: '/master/api/jobs/reset-board-index',
+            path: '/master/api/jobs',
             method: 'GET',
             call: 'Server',
+            params,
             setAuthorization: true,
             isReturnData: true,
         });

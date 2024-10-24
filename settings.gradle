@@ -1,5 +1,5 @@
 rootProject.name = 'anamnesis'
 
 includeBuild('server')
-includeBuild('batch')
+//includeBuild('batch')
 includeBuild('config')

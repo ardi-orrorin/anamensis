@@ -247,6 +247,12 @@ public class BoardService {
     }
 
     public Mono<List<BoardResponse.Notice>> findNotice() {
+        return Flux.fromIterable(boardMapper.findNotice())
+            .map(BoardResponse.Notice::from)
+            .collectList();
+    }
+
+    public Mono<List<BoardResponse.Notice>> findNoticeCache() {
 
         return Flux.fromIterable(redisTemplate.boundListOps("board:notice").range(0, -1))
             .cast(BoardResponse.Notice.class)

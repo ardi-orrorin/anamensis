@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.security.core.parameters.P;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,12 +13,18 @@ import java.util.Optional;
 public interface FileMapper {
     int insert(File file);
 
+
+
     Optional<File> selectByFileName(String fileName);
 
     List<File> findByTableNameAndTableRefPk(
             @Param("tableName") String tableName,
             @Param("tableRefPk") long tableRefPk
     );
+
+    List<File> selectDummyFile(LocalDate from, LocalDate to);
+
+    int disabledDummyFile(long id);
 
     int updateIsUseById(
             @Param("id") long id,

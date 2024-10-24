@@ -36,12 +36,21 @@ public class JobService {
     public Mono<JobStatus> jobStatus(String jobName) {
         JobExecution jobExecutionEntity = jobExecutionRepository.findById(jobName).orElseThrow(() ->
             new RuntimeException("Job not found"));
+
+        if(jobExecutionEntity.getStatus() == JobStatus.PROCESSING){
+            return Mono.just(JobStatus.PROCESSING);
+        }
+
+        jobExecutionEntity.setStatus(JobStatus.READY);
+        jobExecutionRepository.save(jobExecutionEntity);
         return Mono.just(jobExecutionEntity.getStatus());
     }
 
     public Mono<Boolean> startJob(String jobName) {
         JobExecution jobExecutionEntity = jobExecutionRepository.findById(jobName).orElseThrow(() ->
             new RuntimeException("Job not found"));
+
+
         try {
             Job job = jobRegistry.getJob(jobName);
             jobExecutionEntity.setStatus(JobStatus.PROCESSING);

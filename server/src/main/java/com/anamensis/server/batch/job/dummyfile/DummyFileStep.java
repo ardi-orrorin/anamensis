@@ -2,6 +2,8 @@ package com.anamensis.server.batch.job.dummyfile;
 
 import com.anamensis.server.batch.job.factory.AbstractMybatisStep;
 import com.anamensis.server.entity.File;
+import com.anamensis.server.provider.FileProvider;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.batch.MyBatisCursorItemReader;
 import org.mybatis.spring.batch.builder.MyBatisCursorItemReaderBuilder;
@@ -9,13 +11,10 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.Chunk;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -23,15 +22,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
+@Slf4j
 @Component
 public class DummyFileStep extends AbstractMybatisStep<File, File> {
 
-
-    @Value("${spring.cloud.aws.s3.bucket}")
-    private String bucket;
-
     @Autowired
-    private S3Client s3Client;
+    private FileProvider fileProvider;
 
     private SqlSessionFactory sqlSessionFactory;
 
@@ -48,14 +44,14 @@ public class DummyFileStep extends AbstractMybatisStep<File, File> {
     @Override
     public MyBatisCursorItemReader<File> reader(Optional<String> findMapper, String ids) {
 
-        Optional<String> findMapperId = Optional.of("com.anamensis.batch.mapper.FileMapper.selectDummyFile");
+        Optional<String> findMapperId = Optional.of("com.anamensis.server.mapper.FileMapper.selectDummyFile");
 
         MyBatisCursorItemReaderBuilder<File> builder = new MyBatisCursorItemReaderBuilder<File>()
             .sqlSessionFactory(sqlSessionFactory);
 
         Map<String , Object> parameterValues = new HashMap<>();
         LocalDate to = LocalDate.now().minusDays(2);
-        LocalDate from = to.minusDays(5);
+        LocalDate from = LocalDate.MIN;
         parameterValues.put("from", from);
         parameterValues.put("to", to);
 
@@ -72,7 +68,7 @@ public class DummyFileStep extends AbstractMybatisStep<File, File> {
         Converter<File, ?> itemToParameterConverter
     ) throws Exception {
 
-        Optional<String> saveMapperId = Optional.of("com.anamensis.batch.mapper.FileMapper.disabledDummyFile");
+        Optional<String> saveMapperId = Optional.of("com.anamensis.server.mapper.FileMapper.disabledDummyFile");
 
         super.writer(futures, saveMapperId, (file) -> {
             Map<String, Object> parameter = new HashMap<>();
@@ -88,23 +84,13 @@ public class DummyFileStep extends AbstractMybatisStep<File, File> {
 
     @Override
     public File delegate(File file) {
-        ObjectIdentifier.Builder image = ObjectIdentifier.builder()
-            .key(file.getFilePath().substring(1) + file.getFileName());
-
-        String thumbnailFilename = file.getFileName().substring(0, file.getFileName().lastIndexOf("."))
+        String thumbnailFilename = file.getFilePath()
+            + file.getFileName().substring(0, file.getFileName().lastIndexOf("."))
             + "_thumb"
             + file.getFileName().substring(file.getFileName().lastIndexOf("."));
 
-        ObjectIdentifier.Builder thumbnail = ObjectIdentifier.builder()
-            .key(file.getFilePath().substring(1) + thumbnailFilename);
-
-
-        s3Client.deleteObjects(builder -> builder
-            .bucket(bucket)
-            .delete(delete -> delete
-                .objects(image.build(), thumbnail.build())
-            )
-        );
+        fileProvider.deleteFile(file.getFullPath());
+        fileProvider.deleteFile(thumbnailFilename);
 
         return file;
     }

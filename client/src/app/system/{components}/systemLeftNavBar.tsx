@@ -3,7 +3,7 @@ import Link from "next/link";
 import React from "react";
 import {faTableList} from "@fortawesome/free-solid-svg-icons/faTableList";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
-import {faEnvelope, faShieldHalved, faUser} from "@fortawesome/free-solid-svg-icons";
+import {faEnvelope, faGears, faUserGear} from "@fortawesome/free-solid-svg-icons";
 
 const SystemLeftNavBar = () => {
     return (
@@ -18,13 +18,13 @@ const SystemLeftNavBar = () => {
                     <h1 className={'ps-3 p-3 font-bold text-white'}>시스템 설정</h1>
                     <ListItem icon={faTableList} text={'SITE'} href={'/system'}/>
                     <ListItem icon={faEnvelope} text={'SMTP'} href={'/system/smtp'}/>
-                    <ListItem icon={faUser} text={'ACCOUNT'} href={'/system/account'}/>
-                    <ListItem icon={faShieldHalved} text={'O-AUTH'} href={'/system/oauth'}/>
-                    <ListItem icon={faShieldHalved} text={'ACCOUNT-ROLES'} href={'/system/users-role'}/>
-                    <ListItem icon={faShieldHalved} text={'SYSTEM-MESSAGE'} href={'/system/message'}/>
-                    <ListItem icon={faShieldHalved} text={'POINT'} href={'/system/point'}/>
-                    <ListItem icon={faShieldHalved} text={'CACHE'} href={'/system/cache'}/>
-                    <ListItem icon={faShieldHalved} text={'BOARD'} href={'/system/board'}/>
+                    <ListItem icon={faUserGear} text={'ACCOUNT'} href={'/system/account'}/>
+                    <ListItem icon={faGears} text={'O-AUTH'} href={'/system/oauth'}/>
+                    <ListItem icon={faUserGear} text={'ACCOUNTS-ROLES'} href={'/system/users-role'}/>
+                    <ListItem icon={faGears} text={'SYSTEM-MESSAGE'} href={'/system/message'}/>
+                    <ListItem icon={faGears} text={'POINT'} href={'/system/point'}/>
+                    <ListItem icon={faGears} text={'CACHE'} href={'/system/cache'}/>
+                    <ListItem icon={faGears} text={'BOARD'} href={'/system/board'}/>
                 </ul>
             </div>
         </nav>

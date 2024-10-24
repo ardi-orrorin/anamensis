@@ -74,10 +74,33 @@ export default function SmtpInfo() {
     const inputStyle = 'outline-0 focus:bg-gray-700 focus:bg-opacity-15 px-2 py-1.5 text-sm duration-500 drop-shadow disabled:bg-gray-400 disabled:text-white';
 
     return (
-        <div className={'w-full'}>
+        <div className={'w-full flex flex-col gap-4'}>
+            <div className={'flex flex-col'}>
+                <div className={'list-disc flex gap-2 items-end'}>
+                    <li className={'text-sm text-gray-600'}>
+                        활용 기능 목록
+                    </li>
+                    <button className={'text-xs text-gray-500'}
+                            onClick={() => setMoreDescription(!moreDescription)}
+                    >
+                        {moreDescription ? '접기' : '펼치기'}
+                    </button>
+                </div>
+                <div
+                    className={`list-disc ms-4 space-y-1 text-xs text-yellow-600 ${moreDescription ? 'h-36 py-1' : 'h-0'} duration-300 overflow-y-hidden`}>
+                    <li>회원가입(이메일 인증)</li>
+                    <li>비밀번호 찾기(이메일 인증)</li>
+                    <li>아이디 찾기(이메일 인증)</li>
+                    <li>로그인(이메일 인증)</li>
+                    <li>계정 2차 인증 변경</li>
+                    <li>질문 게시글 답변 알림</li>
+                    <li>관리자 이메일 발송</li>
+                </div>
+            </div>
             <div className={'flex gap-3 items-center'}>
-                <div className={`relative w-12 h-6 ${systemConfig?.smtp?.enabled ? 'bg-gray-700' : 'bg-gray-300'} rounded cursor-pointer transition duration-300 ease-in-out`}
-                     onClick={handleToggle}
+                <div
+                    className={`relative w-12 h-6 ${systemConfig?.smtp?.enabled ? 'bg-gray-700' : 'bg-gray-300'} rounded cursor-pointer transition duration-300 ease-in-out`}
+                    onClick={handleToggle}
                 >
                     <div
                         className={`absolute w-6 h-6 bg-white shadow-md rounded transform transition-transform duration-300 ease-in-out ${systemConfig?.smtp?.enabled ? 'translate-x-6' : ''}`}
@@ -130,33 +153,14 @@ export default function SmtpInfo() {
                 </button>
                 {
                     response?.status
-                    && <div className={`py-2 text-xs ${response.status === 'success' ? 'text-blue-700' : 'text-red-500'}`}>
-                        {response.message}
+                    &&
+                  <div className={`py-2 text-xs ${response.status === 'success' ? 'text-blue-700' : 'text-red-500'}`}>
+                      {response.message}
                   </div>
                 }
             </div>
 
-            <div className={'flex flex-col gap-1 py-2'}>
-                <div className={'flex gap-2 items-end'}>
-                    <h1 className={'text-sm text-gray-600'}>
-                        활용 기능 목록
-                    </h1>
-                    <button className={'text-xs text-gray-500'}
-                            onClick={() => setMoreDescription(!moreDescription)}
-                    >
-                        {moreDescription ? '접기' : '펼치기'}
-                    </button>
-                </div>
-                <div className={`list-disc space-y-1 text-xs text-yellow-600 ${moreDescription ? 'h-36 py-1' : 'h-0'} duration-300 overflow-y-hidden`}>
-                    <li>회원가입(이메일 인증)</li>
-                    <li>비밀번호 찾기(이메일 인증)</li>
-                    <li>아이디 찾기(이메일 인증)</li>
-                    <li>로그인(이메일 인증)</li>
-                    <li>계정 2차 인증 변경</li>
-                    <li>질문 게시글 답변 알림</li>
-                    <li>관리자 이메일 발송</li>
-                </div>
-            </div>
+
         </div>
     )
 }

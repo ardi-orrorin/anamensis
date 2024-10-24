@@ -1,5 +1,6 @@
 package com.anamensis.server.batch.job.dummyfile;
 
+import com.anamensis.server.config.BeanConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.quartz.JobExecutionContext;
@@ -11,6 +12,8 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -28,21 +31,28 @@ public class DummyFileJob extends QuartzJobBean {
     private final PlatformTransactionManager tm;
 
     private final DummyFileStep dummyFileStep;
+    private final BeanConfig beanConfig;
+
+    @Bean("dummy-file-delete-job")
+    public Job dummyFileJob() {
+        return new JobBuilder("dummy-file-delete-job", jobRepository)
+                .start(dummyFileStep.step(10, "dummy-file-delete", jobRepository, tm))
+                .incrementer(new RunIdIncrementer())
+                .build();
+    }
 
 
     @SneakyThrows
     @Override
     protected void executeInternal(JobExecutionContext context) {
 
-        Job job = new JobBuilder("dummy-file-delete-job", jobRepository)
-                .start(dummyFileStep.step(10, "dummy-file-delete", jobRepository, tm))
-                .incrementer(new RunIdIncrementer())
-                .build();
+        Job dummyFileJob = this.dummyFileJob();
 
         JobParameters jobParameters = new JobParametersBuilder(this.jobExplorer)
-                .getNextJobParameters(job)
+                .addLong("time", System.currentTimeMillis())
+                .getNextJobParameters(dummyFileJob)
                 .toJobParameters();
 
-//        this.jobLauncher.run(job, jobParameters);
+        this.jobLauncher.run(dummyFileJob, jobParameters);
     }
 }

@@ -9,6 +9,8 @@ import com.anamensis.server.provider.RedisCacheProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
+import org.quartz.*;
+import org.quartz.utils.Key;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,12 +24,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SystemSettingService {
 
+    private final Scheduler scheduler;
+
     private final SystemSettingMapper systemSettingMapper;
 
     private final MailProvider mailProvider;
 
     private final RedisCacheProvider redisCacheProvider;
-
 
     private final Map<SystemSettingKey, SystemSetting> systemSettings;
 
@@ -59,8 +62,58 @@ public class SystemSettingService {
             case SIGN_UP    -> this.saveSignUp(key, value);
             case LOGIN      -> this.saveLogin(key, value);
             case REDIS      -> this.saveRedis(key, value);
+            case TRIGGER    -> this.saveTrigger(key, value);
             default         -> this.updateSystemSetting(key, value);
         };
+    }
+
+    /**
+     * Trigger 하나의 정보만 업데이트 가능
+     * @param value trigger 하나의 정보만 업데이트 가능
+     * */
+    private Mono<Boolean> saveTrigger(SystemSettingKey key, JSONObject value) {
+        String triggerName = value.keys().next();
+
+        TriggerKey triggerKey = TriggerKey.triggerKey(triggerName, Key.DEFAULT_GROUP);
+
+        try {
+            CronTrigger cronTrigger = (CronTrigger) scheduler.getTrigger(triggerKey);
+
+            if(cronTrigger == null) {
+                return Mono.error(new RuntimeException("Trigger not found"));
+            }
+
+            SystemSetting triggerSetting = systemSettings.get(SystemSettingKey.TRIGGER);
+
+            if(triggerSetting == null) {
+                return Mono.error(new RuntimeException("Trigger setting not found"));
+            }
+
+            triggerSetting.getValue().put(triggerName, value.getJSONObject(triggerName));
+
+            String cron = value.getJSONObject(triggerName).getString("cron");
+
+            CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(cron)
+                .withMisfireHandlingInstructionDoNothing();
+
+            CronTrigger newCronTrigger = cronTrigger.getTriggerBuilder()
+                .withIdentity(triggerKey)
+                .withSchedule(cronScheduleBuilder)
+                .build();
+
+            scheduler.rescheduleJob(triggerKey, newCronTrigger);
+
+            if(value.getJSONObject(triggerName).getBoolean("enabled")) {
+                scheduler.resumeTrigger(triggerKey);
+            } else {
+                scheduler.pauseTrigger(triggerKey);
+            }
+
+            return this.updateSystemSetting(key, triggerSetting.getValue());
+        } catch (SchedulerException e) {
+            return Mono.error(e);
+        }
+
     }
 
     private Mono<Boolean> saveRedis(SystemSettingKey key, JSONObject value) {

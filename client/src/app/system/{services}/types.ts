@@ -2,6 +2,7 @@ import {SystemSMTP} from "@/app/system/smtp/{services}/types";
 import {SystemAccount} from "@/app/system/account/{services}/types";
 import {SystemOAuth} from "@/app/system/oauth/{services}/types";
 import {SystemCache} from "@/app/system/cache/{services}/types";
+import {SystemTrigger} from "@/app/system/trigger/{services}/types";
 
 interface RequestI<T> {
     key     : System.Key;
@@ -17,6 +18,7 @@ interface PrivateResponseI {
     smtp    : SystemSMTP.Smtp;
     oauth   : SystemOAuth.OAuth2;
     redis   : SystemCache.Redis;
+    trigger : SystemTrigger.Trigger;
 }
 
 
@@ -49,6 +51,7 @@ export namespace System {
         SITE    = 'site',
         REDIS   = 'redis',
         POINT   = 'point',
+        TRIGGER = 'trigger',
     }
 
     export enum JobStatus {

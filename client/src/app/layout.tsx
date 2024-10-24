@@ -20,7 +20,6 @@ import GlobalState from "@/app/globalState";
 export const metadata: Metadata = {
     title: 'anamensis',
     description: 'anamensis',
-    twitter: {},
     icons: {
         icon: './favicon.ico',
     },

@@ -25,6 +25,7 @@ const SystemLeftNavBar = () => {
                     <ListItem icon={faGears} text={'POINT'} href={'/system/point'}/>
                     <ListItem icon={faGears} text={'CACHE'} href={'/system/cache'}/>
                     <ListItem icon={faGears} text={'BOARD'} href={'/system/board'}/>
+                    <ListItem icon={faGears} text={'TRIGGER'} href={'/system/trigger'}/>
                 </ul>
             </div>
         </nav>

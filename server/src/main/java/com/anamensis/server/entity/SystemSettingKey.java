@@ -7,4 +7,5 @@ public enum SystemSettingKey {
     OAUTH,
     SITE,
     REDIS,
+    TRIGGER,
 }

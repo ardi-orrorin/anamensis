@@ -14,7 +14,6 @@ export default function Page() {
     const boardIndexJob = 'board-index-job';
     const dummyFileDeleteJob =  'dummy-file-delete-job'
 
-
     const [loading, setLoading] = useState({} as {[key: string]: boolean});
 
     const [response, setResponse] = useState({} as {[key: string]: StatusResponse});
@@ -22,8 +21,6 @@ export default function Page() {
     useEffect(() => {
         const call = async () => {
             try {
-
-
                 const [boardIndexRes, dummyFileDeleteRes] = await Promise.allSettled([
                     boardApiServices.getBoardIndexStatus({jobName: boardIndexJob}),
                     boardApiServices.getBoardIndexStatus({jobName: dummyFileDeleteJob})

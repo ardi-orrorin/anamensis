@@ -2,12 +2,16 @@ package com.anamensis.server.service;
 
 import com.anamensis.server.entity.JobExecution;
 import com.anamensis.server.entity.JobStatus;
+import com.anamensis.server.entity.SystemSetting;
+import com.anamensis.server.entity.SystemSettingKey;
 import com.anamensis.server.repository.JobExecutionRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.TriggerKey;
+import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
@@ -18,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
 import java.util.Set;
 
 @Service

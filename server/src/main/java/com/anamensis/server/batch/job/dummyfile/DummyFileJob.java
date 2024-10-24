@@ -31,7 +31,6 @@ public class DummyFileJob extends QuartzJobBean {
     private final PlatformTransactionManager tm;
 
     private final DummyFileStep dummyFileStep;
-    private final BeanConfig beanConfig;
 
     @Bean("dummy-file-delete-job")
     public Job dummyFileJob() {
